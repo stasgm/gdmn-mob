@@ -72,7 +72,7 @@ export const lineTypes: IListItem[] = [
   },
   {
     id: 'old',
-    value: 'по магазину',
+    value: 'предыдущие',
   },
 ];
 export const ROUTE_ITEM_HEIGHT = 80;

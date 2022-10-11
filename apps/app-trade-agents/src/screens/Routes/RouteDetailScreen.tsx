@@ -134,6 +134,7 @@ const RouteDetailScreen = () => {
   useFocusEffect(
     React.useCallback(() => {
       setScreenState('idle');
+      setLineType(lineTypes[0].id);
     }, []),
   );
 
@@ -158,24 +159,39 @@ const RouteDetailScreen = () => {
           coords = await getCurrentPosition();
 
           const date = new Date().toISOString();
-          const visitId = generateId();
 
-          const newVisit: IVisitDocument = {
-            id: visitId,
-            documentType: visitDocumentType,
-            number: visitId,
-            documentDate: date,
-            status: 'DRAFT',
-            head: {
-              routeLineId: id,
-              dateBegin: date,
-              beginGeoPoint: coords,
-              takenType: 'ON_PLACE',
-            },
-            creationDate: date,
-            editionDate: date,
-          };
-          dispatch(documentActions.addDocument(newVisit));
+          if (visit) {
+            const updatedVisit: IVisitDocument = {
+              ...visit,
+              documentDate: date,
+              head: {
+                ...visit.head,
+                dateBegin: date,
+                beginGeoPoint: coords,
+              },
+              creationDate: date,
+              editionDate: date,
+            };
+            dispatch(documentActions.updateDocument({ docId: visit.id, document: updatedVisit }));
+          } else {
+            const visitId = generateId();
+            const newVisit: IVisitDocument = {
+              id: visitId,
+              documentType: visitDocumentType,
+              number: visitId,
+              documentDate: date,
+              status: 'DRAFT',
+              head: {
+                routeLineId: id,
+                dateBegin: date,
+                beginGeoPoint: coords,
+                takenType: 'ON_PLACE',
+              },
+              creationDate: date,
+              editionDate: date,
+            };
+            dispatch(documentActions.addDocument(newVisit));
+          }
         }
 
         const newOrderDate = new Date().toISOString();
@@ -202,7 +218,6 @@ const RouteDetailScreen = () => {
         };
 
         dispatch(documentActions.addDocument(newOrder));
-
         navigation.navigate('OrderView', { id: newOrder.id, routeId: route.id });
       } catch (e) {
         setScreenState('idle');
@@ -224,6 +239,7 @@ const RouteDetailScreen = () => {
     outlet,
     route,
     screenState,
+    visit,
     visit?.head.takenType,
   ]);
 
@@ -231,6 +247,8 @@ const RouteDetailScreen = () => {
 
   const [delList, setDelList] = useState<IDelList>({});
   const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
+
+  console.log('visit', visit?.documentDate);
 
   const handleDeleteDocs = useCallback(() => {
     const docIds = Object.keys(delList);
@@ -320,11 +338,11 @@ const RouteDetailScreen = () => {
             ? setDelList(getDelList(delList, item.id, item.status!))
             : navigation.navigate('OrderView', { id: item.id, routeId: route.id })
         }
-        onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
+        onLongPress={() => (lineType === 'new' ? setDelList(getDelList(delList, item.id, item.status!)) : undefined)}
         checked={!!delList[item.id]}
       />
     ),
-    [delList, isDelList, navigation, route.id],
+    [delList, isDelList, lineType, navigation, route.id],
   );
 
   const isFocused = useIsFocused();
@@ -385,7 +403,6 @@ const RouteDetailScreen = () => {
           {contact && (
             <>
               <Divider />
-
               <MediumText>{`Условия оплаты: ${contact.paycond}`}</MediumText>
               <MediumText>
                 {saldo < 0
@@ -401,10 +418,6 @@ const RouteDetailScreen = () => {
           )}
         </>
       </InfoBlock>
-      <View style={localStyles.order}>
-        <LargeText>Заявки</LargeText>
-      </View>
-      <LineTypes />
       <FlatList
         data={lineType === 'new' ? orders : ordersOld}
         keyExtractor={keyExtractor}
@@ -412,6 +425,14 @@ const RouteDetailScreen = () => {
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
         ListEmptyComponent={EmptyList}
+        ListHeaderComponent={
+          <View>
+            <View style={localStyles.order}>
+              <LargeText>Заявки по магазину</LargeText>
+            </View>
+            <LineTypes />
+          </View>
+        }
       />
     </AppScreen>
   );

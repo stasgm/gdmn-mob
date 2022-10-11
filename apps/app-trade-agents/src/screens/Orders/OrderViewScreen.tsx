@@ -99,7 +99,11 @@ const OrderViewScreen = () => {
 
   const routeLineId = route?.lines.find((i) => i.outlet.id === order?.head.outlet.id)?.id;
 
+  const visit = docSelectors.selectByDocType<IVisitDocument>('visit')?.find((e) => e.head.routeLineId === routeLineId);
+
   const handleCopyOrder = useCallback(async () => {
+    setScreenState('copying');
+    await sleep(1);
     const newDocDate = new Date().toISOString();
     const newId = generateId();
 
@@ -128,38 +132,52 @@ const OrderViewScreen = () => {
           coords = await getCurrentPosition();
 
           const date = new Date().toISOString();
-          const visitId = generateId();
+          if (visit) {
+            const updatedVisit: IVisitDocument = {
+              ...visit,
+              documentDate: date,
+              head: {
+                ...visit.head,
+                dateBegin: date,
+                beginGeoPoint: coords,
+              },
+              creationDate: date,
+              editionDate: date,
+            };
+            dispatch(documentActions.updateDocument({ docId: visit.id, document: updatedVisit }));
+          } else {
+            const visitId = generateId();
 
-          const newVisit: IVisitDocument = {
-            id: visitId,
-            documentType: visitDocumentType,
-            number: visitId,
-            documentDate: date,
-            status: 'DRAFT',
-            head: {
-              routeLineId: routeLineId,
-              dateBegin: date,
-              beginGeoPoint: coords,
-              takenType: 'ON_PLACE',
-            },
-            creationDate: date,
-            editionDate: date,
-          };
-          dispatch(documentActions.addDocument(newVisit));
+            const newVisit: IVisitDocument = {
+              id: visitId,
+              documentType: visitDocumentType,
+              number: visitId,
+              documentDate: date,
+              status: 'DRAFT',
+              head: {
+                routeLineId: routeLineId,
+                dateBegin: date,
+                beginGeoPoint: coords,
+                takenType: 'ON_PLACE',
+              },
+              creationDate: date,
+              editionDate: date,
+            };
+            dispatch(documentActions.addDocument(newVisit));
+          }
+
+          dispatch(documentActions.addDocument(newDoc));
         }
-
-        dispatch(documentActions.addDocument(newDoc));
-
         navigation.navigate('OrderView', { id: newId, routeId });
       } catch (e) {
-        // console.log('err', e);
+        setScreenState('idle');
       }
     } else {
       docDispatch(documentActions.addDocument(newDoc));
-
       navigation.navigate('OrderView', routeId ? { id: newId, routeId } : { id: newId });
     }
-  }, [orderDocs, order, routeId, routeLineId, dispatch, navigation, docDispatch]);
+    setScreenState('copied');
+  }, [orderDocs, order, routeId, routeLineId, navigation, visit, dispatch, docDispatch]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
@@ -244,9 +262,13 @@ const OrderViewScreen = () => {
   }, [dispatch, id, navigation, order]);
 
   useEffect(() => {
-    if (screenState === 'sent' || screenState === 'deleted') {
+    if (screenState === 'sent' || screenState === 'deleted' || screenState === 'copied') {
       setScreenState('idle');
-      navigation.goBack();
+      if (screenState === 'copied') {
+        // navigation.navigate('OrderView', routeId ? { id: newId, routeId } : { id: newId });
+      } else {
+        navigation.goBack();
+      }
     }
   }, [navigation, screenState]);
 
@@ -391,11 +413,11 @@ const OrderViewScreen = () => {
     return <AppActivityIndicator />;
   }
 
-  if (screenState === 'deleting') {
+  if (screenState === 'deleting' || screenState === 'copying') {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
-          <LargeText>Удаление документа...</LargeText>
+          <LargeText>{screenState === 'deleting' ? 'Удаление документа...' : 'Копирование документа...'}</LargeText>
           <AppActivityIndicator style={{}} />
         </View>
       </View>
