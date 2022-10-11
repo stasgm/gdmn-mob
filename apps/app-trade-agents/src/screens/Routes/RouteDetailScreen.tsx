@@ -322,6 +322,17 @@ const RouteDetailScreen = () => {
 
   const isFocused = useIsFocused();
 
+  if ((screenState === 'adding' || screenState === 'added') && !orderDocs.length) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.containerCenter}>
+          <LargeText>Определение местоположения...</LargeText>
+          <AppActivityIndicator style={{}} />
+        </View>
+      </View>
+    );
+  }
+
   if (!point) {
     return (
       <View style={styles.content}>
