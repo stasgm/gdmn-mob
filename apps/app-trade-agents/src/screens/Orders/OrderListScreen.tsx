@@ -158,20 +158,20 @@ const OrderListScreen = () => {
         ? filteredOrderList.filter((e) => e.status === 'PROCESSED')
         : [];
 
-    return res.map(
-      (i) =>
-        ({
-          id: i.id,
-          title: i.head.outlet?.name,
-          documentDate: getDateString(i.documentDate),
-          status: i.status,
-          subtitle: `№ ${i.number} от ${getDateString(i.documentDate)} на ${getDateString(i.head?.onDate)}`,
-          isFromRoute: !!i.head.route,
-          lineCount: i.lines.length,
-          errorMessage: i.errorMessage,
-        } as IListItemProps),
-    );
-  }, [status, filteredOrderList]);
+    return res.map((i) => {
+      const address = outlets.find((o) => i?.head?.outlet.id === o.id)?.address;
+      return {
+        id: i.id,
+        title: i.head.outlet?.name,
+        documentDate: getDateString(i.documentDate),
+        status: i.status,
+        subtitle: `${address}\n№ ${i.number} от ${getDateString(i.documentDate)} на ${getDateString(i.head?.onDate)}`,
+        isFromRoute: !!i.head.route,
+        lineCount: i.lines.length,
+        errorMessage: i.errorMessage,
+      } as IListItemProps;
+    });
+  }, [status, filteredOrderList, outlets]);
 
   const sections = useMemo(
     () =>
