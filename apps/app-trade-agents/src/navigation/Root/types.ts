@@ -20,7 +20,7 @@ export type OrderParamList = RefParamList & {
   OrderView: { id: string; routeId?: string };
   OrderEdit: { id: string } | undefined;
   OrderLine: { mode: number; docId: string; item: IOrderLine };
-  SelectGroupItem: { docId: string };
+  SelectGood: { docId: string };
 };
 
 export type OrdersStackParamList = { OrderList: undefined } & OrderParamList;
