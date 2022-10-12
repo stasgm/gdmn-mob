@@ -4,6 +4,7 @@ import { DataNotFoundException, ConflictException, InvalidParameterException, Fo
 
 import { hashPassword } from '../utils/crypt';
 import { extraPredicate, getListPart } from '../utils/helpers';
+import { processValidation } from '../validations';
 
 import { getDb } from './dao/db';
 import { device } from './data/devices';
@@ -316,14 +317,19 @@ const findMany = (params: Record<string, string | number>): IUser[] => {
 export const findManyWithDevice = (params: Record<string, string | number>): IUserWithDevice[] => {
   const userList = findMany(params);
   const { devices, deviceBindings } = getDb();
-  return userList.map((item) => {
-    const fullUser: IUserWithDevice = item;
-    const deviceUids = deviceBindings.data
+  return userList.map((user) => {
+    /* const deviceUids = deviceBindings.data
       .filter((i) => i.userId === item.id && i.state === 'ACTIVE')
       .map((i) => devices.findById(i.deviceId)?.uid)
-      .filter((i) => i !== undefined) as string[] | undefined;
-    fullUser.deviceUid = deviceUids;
-    return fullUser;
+      .filter((i) => i !== undefined) as string[] | undefined; */
+    const deviceUids = deviceBindings.data
+      .reduce<(string | undefined)[]>((prev, item) => {
+        return item.userId === user.id && item.state === 'ACTIVE'
+          ? [...prev, devices.findById(item.deviceId)?.uid]
+          : prev;
+      }, [])
+      .filter((i) => i !== undefined) as string[];
+    return deviceUids.length ? { ...user, deviceUids: deviceUids } : user;
   });
 };
 
@@ -335,13 +341,14 @@ export const findManyWithDevice = (params: Record<string, string | number>): IUs
 export const findOneWithDevice = (id: string): IUserWithDevice => {
   const user = findOne(id);
   const { devices, deviceBindings } = getDb();
-  const fullUser: IUserWithDevice = user;
   const deviceUids = deviceBindings.data
-    .filter((i) => i.userId === user.id && i.state === 'ACTIVE')
-    .map((i) => devices.findById(i.deviceId)?.uid)
-    .filter((i) => i !== undefined) as string[] | undefined;
-  fullUser.deviceUid = deviceUids;
-  return fullUser;
+    .reduce<(string | undefined)[]>((prev, item) => {
+      return item.userId === user.id && item.state === 'ACTIVE'
+        ? [...prev, devices.findById(item.deviceId)?.uid]
+        : prev;
+    }, [])
+    .filter((i) => i !== undefined) as string[];
+  return deviceUids.length ? { ...user, deviceUids: deviceUids } : user;
 };
 
 export const makeUser = (user: IDBUser): IUser => {
