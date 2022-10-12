@@ -318,18 +318,12 @@ export const findManyWithDevice = (params: Record<string, string | number>): IUs
   const userList = findMany(params);
   const { devices, deviceBindings } = getDb();
   return userList.map((user) => {
-    /* const deviceUids = deviceBindings.data
-      .filter((i) => i.userId === item.id && i.state === 'ACTIVE')
-      .map((i) => devices.findById(i.deviceId)?.uid)
-      .filter((i) => i !== undefined) as string[] | undefined; */
-    const deviceUids = deviceBindings.data
-      .reduce<(string | undefined)[]>((prev, item) => {
-        return item.userId === user.id && item.state === 'ACTIVE'
-          ? [...prev, devices.findById(item.deviceId)?.uid]
-          : prev;
-      }, [])
-      .filter((i) => i !== undefined) as string[];
-    return deviceUids.length ? { ...user, deviceUids: deviceUids } : user;
+    const deviceUids = deviceBindings.data.reduce<(string | undefined)[]>((prev, item) => {
+      return item.userId === user.id && item.state === 'ACTIVE' && !!devices.findById(item.deviceId)?.uid
+        ? [...prev, devices.findById(item.deviceId)?.uid]
+        : prev;
+    }, []) as string[];
+    return { ...user, ...(deviceUids.length && { deviceUids: deviceUids }) };
   });
 };
 
@@ -341,14 +335,12 @@ export const findManyWithDevice = (params: Record<string, string | number>): IUs
 export const findOneWithDevice = (id: string): IUserWithDevice => {
   const user = findOne(id);
   const { devices, deviceBindings } = getDb();
-  const deviceUids = deviceBindings.data
-    .reduce<(string | undefined)[]>((prev, item) => {
-      return item.userId === user.id && item.state === 'ACTIVE'
-        ? [...prev, devices.findById(item.deviceId)?.uid]
-        : prev;
-    }, [])
-    .filter((i) => i !== undefined) as string[];
-  return deviceUids.length ? { ...user, deviceUids: deviceUids } : user;
+  const deviceUids = deviceBindings.data.reduce<(string | undefined)[]>((prev, item) => {
+    return item.userId === user.id && item.state === 'ACTIVE' && !!devices.findById(item.deviceId)?.uid
+      ? [...prev, devices.findById(item.deviceId)?.uid]
+      : prev;
+  }, []) as string[];
+  return { ...user, ...(deviceUids.length && { deviceUids: deviceUids }) };
 };
 
 export const makeUser = (user: IDBUser): IUser => {
