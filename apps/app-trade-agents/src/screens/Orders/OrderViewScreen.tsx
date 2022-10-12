@@ -95,7 +95,7 @@ const OrderViewScreen = () => {
       routeId ? doc.head?.route?.id === routeId && doc.head.outlet?.id === order?.head.outlet?.id : true,
     );
 
-  const route = docSelectors.selectByDocId<IRouteDocument>(routeId);
+  const route = docSelectors.selectByDocId<IRouteDocument>(routeId || order?.head?.route?.id);
 
   const routeLineId = route?.lines.find((i) => i.outlet.id === order?.head.outlet.id)?.id;
 
