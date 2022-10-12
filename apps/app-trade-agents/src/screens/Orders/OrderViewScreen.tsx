@@ -92,16 +92,19 @@ const OrderViewScreen = () => {
   const orderDocs = docSelectors
     .selectByDocType<IOrderDocument>('order')
     ?.filter((doc) =>
-      routeId ? doc.head?.route?.id === routeId && doc.head.outlet?.id === order.head.outlet?.id : true,
+      routeId ? doc.head?.route?.id === routeId && doc.head.outlet?.id === order?.head.outlet?.id : true,
     );
 
-  const route = routeId ? docSelectors.selectByDocId<IRouteDocument>(routeId) : undefined;
+  const route = docSelectors.selectByDocId<IRouteDocument>(routeId);
 
   const routeLineId = route?.lines.find((i) => i.outlet.id === order?.head.outlet.id)?.id;
 
   const visit = docSelectors.selectByDocType<IVisitDocument>('visit')?.find((e) => e.head.routeLineId === routeLineId);
 
   const handleCopyOrder = useCallback(async () => {
+    if (!order) {
+      return;
+    }
     setScreenState('copying');
     await sleep(1);
     const newDocDate = new Date().toISOString();
@@ -115,7 +118,7 @@ const OrderViewScreen = () => {
       number: newNumber,
       status: 'DRAFT',
       head: {
-        ...order?.head,
+        ...order.head,
         route: routeId ? ({ id: routeId, name: '' } as INamedEntity) : undefined,
         onDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString(),
       },
@@ -233,7 +236,7 @@ const OrderViewScreen = () => {
     ]);
   }, [delList, dispatch, id]);
 
-  const sendDoc = useSendDocs([order]);
+  const sendDoc = useSendDocs(order ? [order] : []);
 
   const handleSendDocument = useCallback(() => {
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
@@ -252,6 +255,9 @@ const OrderViewScreen = () => {
   }, [sendDoc]);
 
   const handleSaveDocument = useCallback(() => {
+    if (!order) {
+      return;
+    }
     dispatch(
       documentActions.updateDocument({
         docId: id,
@@ -264,9 +270,7 @@ const OrderViewScreen = () => {
   useEffect(() => {
     if (screenState === 'sent' || screenState === 'deleted' || screenState === 'copied') {
       setScreenState('idle');
-      if (screenState === 'copied') {
-        // navigation.navigate('OrderView', routeId ? { id: newId, routeId } : { id: newId });
-      } else {
+      if (screenState !== 'copied') {
         navigation.goBack();
       }
     }

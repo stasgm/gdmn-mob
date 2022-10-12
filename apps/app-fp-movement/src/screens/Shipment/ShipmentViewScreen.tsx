@@ -123,7 +123,7 @@ const ShipmentViewScreen = () => {
         workDate: barc.workDate,
         numReceived: barc.numReceived,
         quantPack: barc.quantPack,
-        sortOrder: shipmentLines?.length + 1,
+        sortOrder: (shipmentLines?.length || 0) + 1,
       };
 
       if (tempLine && tempOrder) {
@@ -182,17 +182,7 @@ const ShipmentViewScreen = () => {
       setBarcode('');
     },
 
-    [
-      dispatch,
-      fpDispatch,
-      goodBarcodeSettings,
-      goods,
-      id,
-      minBarcodeLength,
-      shipment?.lines,
-      shipmentLines?.length,
-      tempOrder,
-    ],
+    [dispatch, fpDispatch, goodBarcodeSettings, goods, id, minBarcodeLength, shipment?.lines, shipmentLines, tempOrder],
   );
 
   const handleShowDialog = () => {
@@ -285,6 +275,9 @@ const ShipmentViewScreen = () => {
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
   const handleSaveDocument = useCallback(() => {
+    if (!shipment) {
+      return;
+    }
     dispatch(
       documentActions.updateDocument({
         docId: id,
@@ -294,7 +287,7 @@ const ShipmentViewScreen = () => {
     navigation.goBack();
   }, [dispatch, id, navigation, shipment]);
 
-  const sendDoc = useSendDocs([shipment]);
+  const sendDoc = useSendDocs(shipment ? [shipment] : []);
 
   const handleSendDocument = useCallback(() => {
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
@@ -412,7 +405,7 @@ const ShipmentViewScreen = () => {
         workDate: barc.workDate,
         numReceived: barc.numReceived,
         quantPack: barc.quantPack,
-        sortOrder: shipmentLines?.length + 1,
+        sortOrder: (shipmentLines?.length || 0) + 1,
       };
 
       if (tempLine && tempOrder) {
@@ -611,7 +604,7 @@ const ShipmentViewScreen = () => {
             scrollEventThrottle={400}
             ItemSeparatorComponent={ItemSeparator}
           />
-          <ViewTotal quantity={shipmentLineSum} weight={shipmentLines?.length} />
+          <ViewTotal quantity={shipmentLineSum} weight={shipmentLines?.length || 0} />
         </>
       ) : (
         <>

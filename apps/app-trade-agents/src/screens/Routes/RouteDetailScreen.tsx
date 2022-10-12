@@ -73,11 +73,11 @@ const RouteDetailScreen = () => {
 
   const point = docSelectors.selectByDocId<IRouteDocument>(routeId)?.lines.find((i) => i.id === id);
 
-  const outlet = point ? refSelectors.selectByRefId<IOutlet>('outlet', point?.outlet.id) : undefined;
+  const outlet = refSelectors.selectByRefId<IOutlet>('outlet', point?.outlet.id);
 
-  const contact = outlet ? refSelectors.selectByRefId<IContact>('contact', outlet.company.id) : undefined;
+  const contact = refSelectors.selectByRefId<IContact>('contact', outlet.company.id);
 
-  const debt = contact ? refSelectors.selectByRefId<IDebt>('debt', contact.id) : undefined;
+  const debt = refSelectors.selectByRefId<IDebt>('debt', contact.id);
 
   const saldo = debt?.saldo ?? 0;
   const saldoDebt = debt?.saldoDebt ?? 0;

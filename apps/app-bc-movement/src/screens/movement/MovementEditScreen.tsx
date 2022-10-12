@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { Alert, Switch, View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { Divider } from 'react-native-paper';
 
@@ -28,21 +28,18 @@ export const MovementEditScreen = () => {
   const navigation = useNavigation<StackNavigationProp<MovementStackParamList, 'MovementEdit'>>();
   const dispatch = useDispatch();
 
-  const formParams = useSelector((state) => state.app.formParams as IMovementFormParam);
-  const bcMovement = id ? docSelectors.selectByDocId<IMovementDocument>(id) : undefined;
-  const docType = refSelectors
-    .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data.find((t) => t.name === 'bcMovement');
-
   const {
     fromPlace: docFromPlace,
     toPlace: docToPlace,
     documentDate: docDate,
     number: docNumber,
     status: docStatus,
-  } = useMemo(() => {
-    return formParams;
-  }, [formParams]);
+  } = useSelector((state) => state.app.formParams as IMovementFormParam);
+
+  const bcMovement = docSelectors.selectByDocId<IMovementDocument>(id);
+  const docType = refSelectors
+    .selectByName<IReference<IDocumentType>>('documentType')
+    ?.data.find((t) => t.name === 'bcMovement');
 
   useEffect(() => {
     return () => {
