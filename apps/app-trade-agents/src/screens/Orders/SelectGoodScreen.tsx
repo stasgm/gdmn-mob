@@ -68,7 +68,7 @@ const SelectGoodScreen = () => {
   const refGroup = refSelectors.selectByName<IGoodGroup>('goodGroup');
   const groups = useMemo(() => refGroup.data.concat(UNKNOWN_GROUP), [refGroup.data]);
   const doc = docSelectors.selectByDocId<IOrderDocument>(docId);
-  const contactId = doc.head.contact.id;
+  const contactId = doc?.head.contact.id;
   const { parentGroupId, groupId } = useSelector((state) => state.app.formParams as IGroupFormParam);
 
   const [filterVisible, setFilterVisible] = useState(false);
@@ -82,10 +82,12 @@ const SelectGoodScreen = () => {
     [windowWidth],
   );
 
-  const model = useMemo(
-    () => getGroupModelByContact(groups, goods, goodMatrix[contactId], isUseNetPrice) as IMGroupModel,
-    [groups, goods, goodMatrix, contactId, isUseNetPrice],
-  );
+  const model = useMemo(() => {
+    if (contactId) {
+      return getGroupModelByContact(groups, goods, goodMatrix[contactId], isUseNetPrice) as IMGroupModel;
+    }
+    return {};
+  }, [groups, goods, goodMatrix, contactId, isUseNetPrice]);
 
   const firstLevelGroups = useMemo(() => Object.values(model).map((item) => item.parent), [model]);
 
@@ -112,13 +114,14 @@ const SelectGoodScreen = () => {
     [selectedGroup, selectedParentGroup, model],
   );
 
-  const goodsByContact = useMemo(
-    () =>
-      getGoodMatrixByContact(goods, goodMatrix[contactId], isUseNetPrice, undefined, searchQuery)?.sort((a, b) =>
+  const goodsByContact = useMemo(() => {
+    if (contactId) {
+      return getGoodMatrixByContact(goods, goodMatrix[contactId], isUseNetPrice, undefined, searchQuery)?.sort((a, b) =>
         a.name < b.name ? -1 : 1,
-      ),
-    [contactId, goodMatrix, goods, isUseNetPrice, searchQuery],
-  );
+      );
+    }
+    return [];
+  }, [contactId, goodMatrix, goods, isUseNetPrice, searchQuery]);
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
@@ -189,7 +192,7 @@ const SelectGoodScreen = () => {
         },
       ]);
       setSelectedLine(undefined);
-    } else if (selectedGood) {
+    } else if (selectedGood && doc) {
       const lineIds: string[] = doc.lines?.filter((i) => i.good.id === selectedGood?.id)?.map((i) => i.id);
       Alert.alert(`Вы уверены, что хотите удалить ${lineIds.length > 1 ? 'все позиции' : 'позицию'} ?`, '', [
         {
@@ -204,7 +207,7 @@ const SelectGoodScreen = () => {
       ]);
       setSelectedGood(undefined);
     }
-  }, [dispatch, doc.lines, docId, selectedGood, selectedLine]);
+  }, [dispatch, doc, docId, selectedGood, selectedLine]);
 
   const hadndleDismissDialog = () => {
     setSelectedLine(undefined);
@@ -252,7 +255,7 @@ const SelectGoodScreen = () => {
 
   const renderGood = useCallback(
     ({ item }: { item: IGood }) => {
-      const lines = doc.lines?.filter((i) => i.good.id === item.id);
+      const lines = doc?.lines?.filter((i) => i.good.id === item.id);
       const isAdded = !!lines?.length;
       const iconStyle = [styles.icon, { backgroundColor: isAdded ? '#06567D' : '#E91E63' }];
 
@@ -297,7 +300,7 @@ const SelectGoodScreen = () => {
         </View>
       );
     },
-    [colors.primary, doc.lines, docId],
+    [colors.primary, doc?.lines, docId],
   );
 
   const refListGood = React.useRef<FlatList<IGood>>(null);
