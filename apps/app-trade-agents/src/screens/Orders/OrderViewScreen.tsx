@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { Alert, FlatList, View } from 'react-native';
+import { Alert, View, FlatList } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -45,9 +45,9 @@ import { getStatusColor } from '../../utils/constants';
 
 import { getNextDocNumber } from '../../utils/helpers';
 
-import { getCurrentPosition } from '../../utils/expoFunctions';
-
 import { ICoords } from '../../store/geo/types';
+
+import { getCurrentPosition } from '../../utils/expoFunctions';
 
 import OrderItem from './components/OrderItem';
 import OrderTotal from './components/OrderTotal';
@@ -86,16 +86,12 @@ const OrderViewScreen = () => {
   }, [id, navigation]);
 
   const handleEditOrderHead = useCallback(() => {
-    navigation.navigate('OrderEdit', { id });
-  }, [navigation, id]);
+    navigation.navigate('OrderEdit', { id, routeId });
+  }, [navigation, id, routeId]);
 
-  const orderDocs = docSelectors
-    .selectByDocType<IOrderDocument>('order')
-    ?.filter((doc) =>
-      routeId ? doc.head?.route?.id === routeId && doc.head.outlet?.id === order?.head.outlet?.id : true,
-    );
+  const orderList = docSelectors.selectByDocType<IOrderDocument>('order');
 
-  const route = docSelectors.selectByDocId<IRouteDocument>(routeId || order?.head?.route?.id);
+  const route = docSelectors.selectByDocId<IRouteDocument>(routeId);
 
   const routeLineId = route?.lines.find((i) => i.outlet.id === order?.head.outlet.id)?.id;
 
@@ -109,6 +105,10 @@ const OrderViewScreen = () => {
     await sleep(1);
     const newDocDate = new Date().toISOString();
     const newId = generateId();
+
+    const orderDocs = routeId
+      ? orderList?.filter((doc) => doc.head?.route?.id === routeId && doc.head.outlet?.id === order?.head.outlet?.id)
+      : orderList;
 
     const newNumber = getNextDocNumber(orderDocs);
 
@@ -128,24 +128,30 @@ const OrderViewScreen = () => {
     };
 
     if (routeId && routeLineId && !orderDocs.length) {
-      let coords: ICoords | undefined;
+      let beginGeoPoint: ICoords | undefined;
 
       try {
-        if (!orderDocs.find((i) => i.head.route)) {
-          coords = await getCurrentPosition();
+        //Если копируется первая заявка
+        //и есть визит по точке маршрута, то редактируем его
+        //и нет визита - создаем
+        console.log('orderDocs.length', orderDocs.length, !orderDocs.length);
+        if (!orderDocs.length) {
+          console.log('beginGeoPoint');
+          beginGeoPoint = await getCurrentPosition();
 
-          const date = new Date().toISOString();
+          const visitDate = new Date().toISOString();
           if (visit) {
             const updatedVisit: IVisitDocument = {
               ...visit,
-              documentDate: date,
+              documentDate: visitDate,
               head: {
                 ...visit.head,
-                dateBegin: date,
-                beginGeoPoint: coords,
+                dateBegin: visitDate,
+                beginGeoPoint,
+                routeLineId,
               },
-              creationDate: date,
-              editionDate: date,
+              creationDate: visitDate,
+              editionDate: visitDate,
             };
             dispatch(documentActions.updateDocument({ docId: visit.id, document: updatedVisit }));
           } else {
@@ -155,16 +161,16 @@ const OrderViewScreen = () => {
               id: visitId,
               documentType: visitDocumentType,
               number: visitId,
-              documentDate: date,
+              documentDate: visitDate,
               status: 'DRAFT',
               head: {
-                routeLineId: routeLineId,
-                dateBegin: date,
-                beginGeoPoint: coords,
+                routeLineId,
+                dateBegin: visitDate,
+                beginGeoPoint,
                 takenType: 'ON_PLACE',
               },
-              creationDate: date,
-              editionDate: date,
+              creationDate: visitDate,
+              editionDate: visitDate,
             };
             dispatch(documentActions.addDocument(newVisit));
           }
@@ -177,10 +183,10 @@ const OrderViewScreen = () => {
       }
     } else {
       docDispatch(documentActions.addDocument(newDoc));
-      navigation.navigate('OrderView', routeId ? { id: newId, routeId } : { id: newId });
+      navigation.navigate('OrderView', { id: newId, routeId });
     }
     setScreenState('copied');
-  }, [orderDocs, order, routeId, routeLineId, navigation, visit, dispatch, docDispatch]);
+  }, [order, routeId, orderList, routeLineId, navigation, visit, dispatch, docDispatch]);
 
   const handleDelete = useCallback(() => {
     if (!id) {

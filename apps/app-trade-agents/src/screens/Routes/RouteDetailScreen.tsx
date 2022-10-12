@@ -52,7 +52,7 @@ import {
 import { ICoords } from '../../store/geo/types';
 import { getCurrentPosition } from '../../utils/expoFunctions';
 import { lineTypes } from '../../utils/constants';
-import { getNextDocNumber } from '../../utils/helpers';
+import { getNextDocNumber, twoDigits } from '../../utils/helpers';
 
 const RouteDetailScreen = () => {
   const dispatch = useDispatch();
@@ -65,6 +65,9 @@ const RouteDetailScreen = () => {
 
   const visit = docSelectors.selectByDocType<IVisitDocument>('visit')?.find((e) => e.head.routeLineId === id);
 
+  const dateBegin = visit ? new Date(visit?.head.dateBegin) : undefined;
+  const geo = visit?.head.beginGeoPoint;
+
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
   const [sendLoading, setSendLoading] = useState(false);
@@ -75,9 +78,9 @@ const RouteDetailScreen = () => {
 
   const outlet = refSelectors.selectByRefId<IOutlet>('outlet', point?.outlet.id);
 
-  const contact = refSelectors.selectByRefId<IContact>('contact', outlet.company.id);
+  const contact = refSelectors.selectByRefId<IContact>('contact', outlet?.company.id);
 
-  const debt = refSelectors.selectByRefId<IDebt>('debt', contact.id);
+  const debt = refSelectors.selectByRefId<IDebt>('debt', contact?.id);
 
   const saldo = debt?.saldo ?? 0;
   const saldoDebt = debt?.saldoDebt ?? 0;
@@ -88,18 +91,24 @@ const RouteDetailScreen = () => {
 
   const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity | undefined;
 
-  const orderDocs = docSelectors
-    .selectByDocType<IOrderDocument>('order')
-    ?.filter((doc) => doc.head?.route?.id === route.id && doc.head.outlet?.id === outlet?.id);
+  const orderList = docSelectors.selectByDocType<IOrderDocument>('order');
 
-  const orderDocsOld = docSelectors
-    .selectByDocType<IOrderDocument>('order')
-    ?.filter((doc) => doc.head.outlet?.id === outlet?.id && !orderDocs.find((a) => a.id === doc.id))
-    .sort(
-      (a, b) =>
-        new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
-        new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
-    );
+  const orderDocs = useMemo(
+    () => orderList?.filter((doc) => doc.head?.route?.id === route.id && doc.head.outlet?.id === outlet?.id),
+    [orderList, outlet?.id, route.id],
+  );
+
+  const orderDocsOld = useMemo(
+    () =>
+      orderList
+        ?.filter((doc) => doc.head.outlet?.id === outlet?.id && !orderDocs.find((a) => a.id === doc.id))
+        .sort(
+          (a, b) =>
+            new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
+            new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
+        ),
+    [orderDocs, orderList, outlet?.id],
+  );
 
   const orders: IListItemProps[] = useMemo(() => {
     return orderDocs.map((i) => {
@@ -391,7 +400,7 @@ const RouteDetailScreen = () => {
           {outlet && (
             <>
               <MediumText>{outlet.address}</MediumText>
-              <MediumText>{outlet.phoneNumber}</MediumText>
+              {outlet.phoneNumber ? <MediumText>{outlet.phoneNumber}</MediumText> : null}
             </>
           )}
           <Divider />
@@ -411,6 +420,17 @@ const RouteDetailScreen = () => {
                 <MediumText style={debtTextStyle}>
                   {`Просрочено: ${formatValue({ type: 'currency', decimals: 2 }, saldoDebt ?? 0)}, ${debt.dayLeft} дн.`}
                 </MediumText>
+              )}
+              <Divider />
+              {visit && dateBegin && (
+                <View>
+                  <LargeText style={localStyles.contract}>{`Визит начат: ${getDateString(
+                    dateBegin,
+                  )} ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())}`}</LargeText>
+                  {geo && (
+                    <MediumText style={debtTextStyle}>{`Координаты: ${geo.latitude}, ${geo.longitude}`}</MediumText>
+                  )}
+                </View>
               )}
             </>
           )}
