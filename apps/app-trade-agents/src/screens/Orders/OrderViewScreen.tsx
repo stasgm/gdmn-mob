@@ -65,7 +65,7 @@ const OrderViewScreen = () => {
   const [delList, setDelList] = useState<string[]>([]);
   const isDelList = !!Object.keys(delList).length;
 
-  const [isGroupVisible, setIsGroupVisible] = useState(true);
+  const [isGroupVisible, setIsGroupVisible] = useState(false);
 
   const order = docSelectors.selectByDocId<IOrderDocument>(id);
 
@@ -103,8 +103,12 @@ const OrderViewScreen = () => {
     }
     setScreenState('copying');
     await sleep(1);
-    const newDocDate = new Date().toISOString();
     const newId = generateId();
+
+    const tomorrow = new Date();
+    const newDocDate = tomorrow.toISOString();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const newOnDate = tomorrow.toISOString();
 
     const orderDocs = routeId
       ? orderList?.filter((doc) => doc.head?.route?.id === routeId && doc.head.outlet?.id === order?.head.outlet?.id)
@@ -120,7 +124,7 @@ const OrderViewScreen = () => {
       head: {
         ...order.head,
         route: routeId ? ({ id: routeId, name: '' } as INamedEntity) : undefined,
-        onDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString(),
+        onDate: newOnDate,
       },
       documentDate: newDocDate,
       creationDate: newDocDate,
@@ -134,12 +138,10 @@ const OrderViewScreen = () => {
         //Если копируется первая заявка
         //и есть визит по точке маршрута, то редактируем его
         //и нет визита - создаем
-        console.log('orderDocs.length', orderDocs.length, !orderDocs.length);
         if (!orderDocs.length) {
-          console.log('beginGeoPoint');
           beginGeoPoint = await getCurrentPosition();
-
           const visitDate = new Date().toISOString();
+
           if (visit) {
             const updatedVisit: IVisitDocument = {
               ...visit,

@@ -104,7 +104,6 @@ const DocumentViewScreen = () => {
         ItemSeparatorComponent={ItemSeparator}
         scrollEventThrottle={400}
         onEndReached={() => ({})}
-        // refreshing={loading}
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
         ListHeaderComponent={() => <Header titles={titles ?? ['Идентификатор']} />}

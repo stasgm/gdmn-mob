@@ -102,11 +102,17 @@ const OrderEditScreen = () => {
       );
     } else {
       const newNumber = getNextDocNumber(orders);
+
+      const tomorrow = new Date();
+      const newDocDate = tomorrow.toISOString();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const newOnDate = tomorrow.toISOString();
+
       dispatch(
         appActions.setFormParams({
           number: newNumber,
-          onDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString(),
-          documentDate: new Date().toISOString(),
+          onDate: newOnDate,
+          documentDate: newDocDate,
           status: 'DRAFT',
           depart: defaultDepart,
         }),
@@ -175,7 +181,6 @@ const OrderEditScreen = () => {
             outlet: docOutlet,
             onDate: docOnDate,
             depart: docDepart,
-            // route: docRoute,
             comment: docComment && docComment.trim(),
           },
           lines: order.lines,
@@ -234,7 +239,7 @@ const OrderEditScreen = () => {
       setShowOnDate(false);
 
       if (selectedOnDate) {
-        dispatch(appActions.setFormParams({ onDate: selectedOnDate.toISOString().slice(0, 10) }));
+        dispatch(appActions.setFormParams({ onDate: selectedOnDate.toISOString() }));
       }
     },
     [dispatch],

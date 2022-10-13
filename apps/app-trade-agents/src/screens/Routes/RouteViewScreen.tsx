@@ -52,7 +52,7 @@ const RouteViewScreen = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
-  const [isGroupVisible, setIsGroupVisible] = useState(true);
+  const [isGroupVisible, setIsGroupVisible] = useState(false);
 
   const id = useRoute<RouteProp<RoutesStackParamList, 'RouteView'>>().params.id;
 
@@ -197,7 +197,7 @@ const RouteViewScreen = () => {
   const handlePressRouteItem = useCallback(
     (item: IRouteLine) => {
       if (route) {
-        navigation.navigate('RouteDetails', { routeId: route.id, id: item.id });
+        navigation.navigate('Visit', { routeId: route.id, id: item.id });
       }
     },
 

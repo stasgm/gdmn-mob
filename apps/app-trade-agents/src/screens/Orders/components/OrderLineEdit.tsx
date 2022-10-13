@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, Alert, StyleSheet, Modal, SafeAreaView } from 'react-native';
 
 import { documentActions, refSelectors, useDispatch } from '@lib/store';
@@ -25,60 +25,57 @@ interface IProps {
 
 const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
   const dispatch = useDispatch();
-
   const { mode, item, docId } = orderLine;
+
+  const [line, setLine] = useState<IOrderLine>(item);
+  const [screenState, setScreenState] = useState<ScreenState>('idle');
+  const [visibleQuantityInput, setVisibleQuantityInput] = useState(false);
 
   const packages = refSelectors
     .selectByName<IPackageGood>('packageGood')
     ?.data?.filter((e) => e.good.id === item.good.id);
 
-  const [line, setLine] = useState<IOrderLine>(item);
-
-  const [screenState, setScreenState] = useState<ScreenState>('idle');
-
-  useEffect(() => {
-    if (screenState === 'saving') {
-      if (!line.package && packages.length > 0) {
-        Alert.alert('Ошибка!', 'Не указана упаковка', [{ text: 'Ок' }]);
-        setScreenState('idle');
-        return;
-      }
-
-      if (line.quantity) {
-        dispatch(
-          mode === 0
-            ? documentActions.addDocumentLine({ docId, line })
-            : documentActions.updateDocumentLine({ docId, line }),
-        );
-        onDismiss();
-      } else {
-        Alert.alert('Внимание!', 'В позиции не указан вес товара. Все равно продолжить сохранение?', [
-          {
-            text: 'Да',
-            onPress: () => {
-              dispatch(
-                mode === 0
-                  ? documentActions.addDocumentLine({ docId, line })
-                  : documentActions.updateDocumentLine({ docId, line }),
-              );
-              onDismiss();
-              setScreenState('idle');
-            },
-          },
-          { text: 'Отмена', onPress: () => setScreenState('idle') },
-        ]);
-      }
+  const handleSaveLine = useCallback(() => {
+    setScreenState('saving');
+    if (!line.package && packages.length > 0) {
+      Alert.alert('Ошибка!', 'Не указана упаковка', [{ text: 'Ок' }]);
+      setScreenState('idle');
+      return;
     }
-  }, [dispatch, docId, line, mode, onDismiss, packages.length, screenState]);
 
-  const [visibleQuantityInput, setVisibleQuantityInput] = useState(false);
+    if (line.quantity) {
+      dispatch(
+        mode === 0
+          ? documentActions.addDocumentLine({ docId, line })
+          : documentActions.updateDocumentLine({ docId, line }),
+      );
+      setScreenState('idle');
+      onDismiss();
+    } else {
+      Alert.alert('Внимание!', 'В позиции не указан вес товара.\nВсе равно продолжить сохранение?', [
+        {
+          text: 'Да',
+          onPress: () => {
+            dispatch(
+              mode === 0
+                ? documentActions.addDocumentLine({ docId, line })
+                : documentActions.updateDocumentLine({ docId, line }),
+            );
+            setScreenState('idle');
+            onDismiss();
+          },
+        },
+        { text: 'Отмена', onPress: () => setScreenState('idle') },
+      ]);
+    }
+  }, [dispatch, docId, line, mode, onDismiss, packages.length]);
 
   return (
     <Modal
       animationType="fade"
       visible={true}
       onShow={() => {
-        //Для правильной отрисовки курсора после открытия клавиатуры в компоненте ввода количества
+        /*Для правильной отрисовки курсора после открытия клавиатуры в компоненте ввода количества*/
         const timeout = setTimeout(() => {
           setVisibleQuantityInput(true);
         }, 100);
@@ -91,7 +88,7 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
             <IconButton icon="chevron-left" onPress={onDismiss} size={30} />
             <Title>Позиция заявки</Title>
             <View style={localStyles.btnOk}>
-              <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />
+              <SaveButton onPress={handleSaveLine} disabled={screenState === 'saving'} />
             </View>
           </View>
           <OrderLine item={line} packages={packages} onSetLine={setLine} visibleQuantityInput={visibleQuantityInput} />

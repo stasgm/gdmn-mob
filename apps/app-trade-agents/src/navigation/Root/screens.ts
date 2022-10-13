@@ -1,12 +1,6 @@
-import { RouteViewScreen, RouteListScreen, RouteDetailScreen as RouteDetailsScreen } from '../../screens/Routes/';
+import { RouteViewScreen, RouteListScreen, VisitScreen } from '../../screens/Routes/';
 
-import {
-  OrderEditScreen,
-  OrderLineScreen,
-  OrderListScreen,
-  OrderViewScreen,
-  SelectGoodScreen,
-} from '../../screens/Orders';
+import { OrderEditScreen, OrderListScreen, OrderViewScreen, SelectGoodScreen } from '../../screens/Orders';
 
 import SelectRefItemScreen from '../../components/SelectRefItemScreen';
 
@@ -20,7 +14,6 @@ const orderListScreens = {
 const orderScreens = {
   OrderView: { title: 'Заявка', component: OrderViewScreen },
   OrderEdit: { title: 'Заявка', component: OrderEditScreen },
-  OrderLine: { title: 'Позиция заявки', component: OrderLineScreen },
   SelectGood: { title: 'Выбор товара', component: SelectGoodScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
 };
@@ -32,7 +25,7 @@ const debetListScreens = {
 const routerScreen = {
   RouteList: { title: 'Маршруты', component: RouteListScreen },
   RouteView: { title: 'Точки маршрута', component: RouteViewScreen },
-  RouteDetails: { title: 'Визит', component: RouteDetailsScreen },
+  Visit: { title: 'Визит', component: VisitScreen },
 };
 
 const goodMatrixListScreens = {

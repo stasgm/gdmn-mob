@@ -6,6 +6,8 @@ import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigat
 import { documentActions, useDispatch } from '@lib/store';
 import { SaveButton, globalStyles as styles, AppActivityIndicator, AppScreen, navBackButton } from '@lib/mobile-ui';
 
+import { ScreenState } from '@lib/types';
+
 import { DocStackParamList } from '../../navigation/Root/types';
 import { DocLine } from '../../components/DocLine';
 import { IMovementLine } from '../../store/types';
@@ -16,7 +18,7 @@ export const DocLineScreen = () => {
   const { mode, docId, item } = useRoute<RouteProp<DocStackParamList, 'DocLine'>>().params;
   const [line, setLine] = useState<IMovementLine>(item);
 
-  const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
+  const [screenState, setScreenState] = useState<ScreenState>('idle');
 
   useEffect(() => {
     if (screenState === 'saving') {

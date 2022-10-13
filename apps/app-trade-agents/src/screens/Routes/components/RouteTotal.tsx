@@ -18,7 +18,7 @@ export interface IItem {
   isGroupVisible?: boolean;
 }
 
-const RouteTotal = ({ routeId, onPress, isGroupVisible = true }: IItem) => {
+const RouteTotal = ({ routeId, onPress, isGroupVisible = false }: IItem) => {
   const { colors } = useTheme();
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;

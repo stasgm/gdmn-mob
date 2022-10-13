@@ -116,7 +116,7 @@ const OrderListScreen = () => {
               : true
             : false,
         )
-        .sort(
+        ?.sort(
           (a, b) =>
             new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
             new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
@@ -400,7 +400,6 @@ const OrderListScreen = () => {
           onChange={handleApplyDateBegin}
         />
       )}
-
       {showDateEnd && (
         <DateTimePicker
           testID="dateTimePicker"
