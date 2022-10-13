@@ -1,13 +1,15 @@
-import React, { useLayoutEffect, useMemo } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo } from 'react';
 import { FlatList, RefreshControl, Text } from 'react-native';
-import { Divider } from 'react-native-paper';
+import { Divider, IconButton } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useSelector } from '@lib/store';
-import { AppScreen, navBackDrawer } from '@lib/mobile-ui';
+import { AppScreen, MenuButton, navBackDrawer, SendButton, useActionSheet } from '@lib/mobile-ui';
 
 import { ReferenceStackParamList } from '../../navigation/Root/types';
+
+import useSendRefsRequest from '../../hooks/useSendRefsRequest';
 
 import ReferenceItem, { RefListItem } from './components/ReferenceListItem';
 
@@ -27,9 +29,31 @@ const ReferenceListScreen = () => {
 
   const navigation = useNavigation<ViewScreenProp>();
 
+  const showActionSheet = useActionSheet();
+
+  const sendRequest = useSendRefsRequest();
+
+  const handleSendRefsRequest = () => sendRequest();
+
+  const actionsMenu = useCallback(() => {
+    showActionSheet([
+      {
+        title: 'Отправить запрос на получение справочников',
+        onPress: handleSendRefsRequest,
+      },
+      {
+        title: 'Отмена',
+        type: 'cancel',
+      },
+    ]);
+  }, []);
+
+  const renderRight = useCallback(() => <MenuButton actionsMenu={actionsMenu} />, []);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackDrawer,
+      headerRight: renderRight,
     });
   }, [navigation]);
 

@@ -12,8 +12,7 @@ import {
 import { AuthLogOut, IAppSystem, IDocument, IMessage } from '@lib/types';
 import api from '@lib/client-api';
 import { Alert } from 'react-native';
-
-import { getNextOrder } from './orderCounter';
+import { getNextOrder } from '@lib/mobile-navigation';
 
 const useSendDocs = (readyDocs: IDocument[]) => {
   const docDispatch = useDocThunkDispatch();
