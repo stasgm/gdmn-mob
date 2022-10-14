@@ -26,7 +26,7 @@ import { getNextDocNumber } from '../../utils/helpers';
 import { STATUS_LIST } from '../../utils/constants';
 
 const OrderEditScreen = () => {
-  const id = useRoute<RouteProp<OrdersStackParamList, 'OrderEdit'>>().params?.id;
+  const { id, routeId } = useRoute<RouteProp<OrdersStackParamList, 'OrderEdit'>>().params || {};
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderEdit'>>();
   const dispatch = useDispatch();
 
@@ -48,7 +48,6 @@ const OrderEditScreen = () => {
     documentDate: docDocumentDate,
     onDate: docOnDate,
     status: docStatus,
-    route: docRoute,
     comment: docComment,
   } = useSelector((state) => state.app.formParams as IOrderFormParam);
 
@@ -97,18 +96,23 @@ const OrderEditScreen = () => {
           onDate: order.head.onDate,
           documentDate: order.documentDate,
           status: order.status,
-          route: order.head.route,
           depart: order.head.depart,
           comment: order.head.comment,
         }),
       );
     } else {
       const newNumber = getNextDocNumber(orders);
+
+      const tomorrow = new Date();
+      const newDocDate = tomorrow.toISOString();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const newOnDate = tomorrow.toISOString();
+
       dispatch(
         appActions.setFormParams({
           number: newNumber,
-          onDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString(),
-          documentDate: new Date().toISOString(),
+          onDate: newOnDate,
+          documentDate: newDocDate,
           status: 'DRAFT',
           depart: defaultDepart,
         }),
@@ -154,7 +158,7 @@ const OrderEditScreen = () => {
           editionDate: newOrderDate,
         };
         dispatch(documentActions.addDocument(newOrder));
-        navigation.dispatch(StackActions.replace('OrderView', { id: newOrder.id }));
+        navigation.dispatch(StackActions.replace('OrderView', { id: newOrder.id, routeId }));
       } else {
         if (!order) {
           setScreenState('idle');
@@ -183,9 +187,10 @@ const OrderEditScreen = () => {
           creationDate: order.creationDate || updatedOrderDate,
           editionDate: updatedOrderDate,
         };
-        setScreenState('idle');
+
         dispatch(documentActions.updateDocument({ docId: id, document: updatedOrder }));
-        navigation.navigate('OrderView', { id });
+        setScreenState('idle');
+        navigation.navigate('OrderView', { id, routeId });
       }
     }
   }, [
@@ -203,6 +208,7 @@ const OrderEditScreen = () => {
     order,
     docStatus,
     screenState,
+    routeId,
   ]);
 
   const renderRight = useCallback(
@@ -217,7 +223,7 @@ const OrderEditScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  const isBlocked = useMemo(() => docStatus !== 'DRAFT' || !!docRoute, [docRoute, docStatus]);
+  const isBlocked = useMemo(() => docStatus !== 'DRAFT' || !!order?.head.route?.id, [docStatus, order?.head.route?.id]);
 
   const statusName = useMemo(
     () => (id ? (docStatus === 'DRAFT' ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ'),
@@ -233,7 +239,7 @@ const OrderEditScreen = () => {
       setShowOnDate(false);
 
       if (selectedOnDate) {
-        dispatch(appActions.setFormParams({ onDate: selectedOnDate.toISOString().slice(0, 10) }));
+        dispatch(appActions.setFormParams({ onDate: selectedOnDate.toISOString() }));
       }
     },
     [dispatch],
@@ -252,8 +258,8 @@ const OrderEditScreen = () => {
       return;
     }
 
-    if (docRoute) {
-      return Alert.alert('Внимание!', 'Нельзя менять организацию! Документ возврата привязан к маршруту.', [
+    if (order?.head.route?.id) {
+      return Alert.alert('Внимание!', 'Нельзя менять организацию! Документ заявки привязан к маршруту.', [
         { text: 'OK' },
       ]);
     }
@@ -263,17 +269,15 @@ const OrderEditScreen = () => {
       fieldName: 'contact',
       value: docContact && [docContact],
     });
-  }, [docContact, docRoute, isBlocked, navigation]);
+  }, [docContact, isBlocked, navigation, order?.head.route?.id]);
 
   const handlePresentOutlet = useCallback(() => {
     if (isBlocked) {
       return;
     }
 
-    if (docRoute) {
-      return Alert.alert('Внимание!', 'Нельзя менять магазин! Документ возврата привязан к маршруту.', [
-        { text: 'OK' },
-      ]);
+    if (order?.head.route?.id) {
+      return Alert.alert('Внимание!', 'Нельзя менять магазин! Документ заявки привязан к маршруту.', [{ text: 'OK' }]);
     }
 
     //TODO: если изменился контакт, то и магазин должен обнулиться
@@ -290,7 +294,7 @@ const OrderEditScreen = () => {
       value: docOutlet && [docOutlet],
       descrFieldName: 'address',
     });
-  }, [docContact?.id, docOutlet, docRoute, isBlocked, navigation]);
+  }, [docContact?.id, docOutlet, isBlocked, navigation, order?.head.route?.id]);
 
   const handlePresentDepart = useCallback(() => {
     if (isBlocked) {

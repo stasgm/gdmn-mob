@@ -52,7 +52,7 @@ const RouteViewScreen = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
-  const [isGroupVisible, setIsGroupVisible] = useState(true);
+  const [isGroupVisible, setIsGroupVisible] = useState(false);
 
   const id = useRoute<RouteProp<RoutesStackParamList, 'RouteView'>>().params.id;
 
@@ -195,8 +195,13 @@ const RouteViewScreen = () => {
   );
 
   const handlePressRouteItem = useCallback(
-    (item: IRouteLine) => navigation.navigate('RouteDetails', { routeId: route?.id, id: item.id }),
-    [navigation, route?.id],
+    (item: IRouteLine) => {
+      if (route) {
+        navigation.navigate('Visit', { routeId: route.id, id: item.id });
+      }
+    },
+
+    [navigation, route],
   );
 
   const renderItem = useCallback(
@@ -245,7 +250,7 @@ const RouteViewScreen = () => {
           data={filteredList.routeLineList}
         />
       </AppScreen>
-      {!!routeLineList.length && !filterVisible && (
+      {!!routeLineList?.length && !filterVisible && (
         <RouteTotal
           onPress={() => setIsGroupVisible(!isGroupVisible)}
           isGroupVisible={isGroupVisible}

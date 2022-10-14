@@ -1,6 +1,6 @@
 import { IReferenceData } from '@lib/types';
 
-import { IGood, IOrderLine } from '../../store/types';
+import { IGood } from '../../store/types';
 
 export type IRefSelectParams = {
   refName: string;
@@ -18,8 +18,7 @@ export type RefParamList = {
 
 export type OrderParamList = RefParamList & {
   OrderView: { id: string; routeId?: string };
-  OrderEdit: { id: string } | undefined;
-  OrderLine: { mode: number; docId: string; item: IOrderLine };
+  OrderEdit: { id: string; routeId?: string } | undefined;
   SelectGood: { docId: string };
 };
 
@@ -28,7 +27,7 @@ export type OrdersStackParamList = { OrderList: undefined } & OrderParamList;
 export type RoutesStackParamList = OrderParamList & {
   RouteList: undefined;
   RouteView: { id: string };
-  RouteDetails: { routeId: string; id: string };
+  Visit: { routeId: string; id: string };
 };
 
 export type MapStackParamList = {

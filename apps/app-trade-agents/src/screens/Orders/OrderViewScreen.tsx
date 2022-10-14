@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { Alert, FlatList, View } from 'react-native';
+import { Alert, View, FlatList } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -45,9 +45,9 @@ import { getStatusColor } from '../../utils/constants';
 
 import { getNextDocNumber } from '../../utils/helpers';
 
-import { getCurrentPosition } from '../../utils/expoFunctions';
-
 import { ICoords } from '../../store/geo/types';
+
+import { getCurrentPosition } from '../../utils/expoFunctions';
 
 import OrderItem from './components/OrderItem';
 import OrderTotal from './components/OrderTotal';
@@ -65,7 +65,7 @@ const OrderViewScreen = () => {
   const [delList, setDelList] = useState<string[]>([]);
   const isDelList = !!Object.keys(delList).length;
 
-  const [isGroupVisible, setIsGroupVisible] = useState(true);
+  const [isGroupVisible, setIsGroupVisible] = useState(false);
 
   const order = docSelectors.selectByDocId<IOrderDocument>(id);
 
@@ -86,26 +86,33 @@ const OrderViewScreen = () => {
   }, [id, navigation]);
 
   const handleEditOrderHead = useCallback(() => {
-    navigation.navigate('OrderEdit', { id });
-  }, [navigation, id]);
+    navigation.navigate('OrderEdit', { id, routeId });
+  }, [navigation, id, routeId]);
 
-  const orderDocs = docSelectors
-    .selectByDocType<IOrderDocument>('order')
-    ?.filter((doc) =>
-      routeId ? doc.head?.route?.id === routeId && doc.head.outlet?.id === order.head.outlet?.id : true,
-    );
+  const orderList = docSelectors.selectByDocType<IOrderDocument>('order');
 
-  const route = routeId ? docSelectors.selectByDocId<IRouteDocument>(routeId) : undefined;
+  const route = docSelectors.selectByDocId<IRouteDocument>(routeId);
 
   const routeLineId = route?.lines.find((i) => i.outlet.id === order?.head.outlet.id)?.id;
 
   const visit = docSelectors.selectByDocType<IVisitDocument>('visit')?.find((e) => e.head.routeLineId === routeLineId);
 
   const handleCopyOrder = useCallback(async () => {
+    if (!order) {
+      return;
+    }
     setScreenState('copying');
     await sleep(1);
-    const newDocDate = new Date().toISOString();
     const newId = generateId();
+
+    const tomorrow = new Date();
+    const newDocDate = tomorrow.toISOString();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const newOnDate = tomorrow.toISOString();
+
+    const orderDocs = routeId
+      ? orderList?.filter((doc) => doc.head?.route?.id === routeId && doc.head.outlet?.id === order?.head.outlet?.id)
+      : orderList;
 
     const newNumber = getNextDocNumber(orderDocs);
 
@@ -115,9 +122,9 @@ const OrderViewScreen = () => {
       number: newNumber,
       status: 'DRAFT',
       head: {
-        ...order?.head,
+        ...order.head,
         route: routeId ? ({ id: routeId, name: '' } as INamedEntity) : undefined,
-        onDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString(),
+        onDate: newOnDate,
       },
       documentDate: newDocDate,
       creationDate: newDocDate,
@@ -125,24 +132,28 @@ const OrderViewScreen = () => {
     };
 
     if (routeId && routeLineId && !orderDocs.length) {
-      let coords: ICoords | undefined;
+      let beginGeoPoint: ICoords | undefined;
 
       try {
-        if (!orderDocs.find((i) => i.head.route)) {
-          coords = await getCurrentPosition();
+        //Если копируется первая заявка
+        //и есть визит по точке маршрута, то редактируем его
+        //и нет визита - создаем
+        if (!orderDocs.length) {
+          beginGeoPoint = await getCurrentPosition();
+          const visitDate = new Date().toISOString();
 
-          const date = new Date().toISOString();
           if (visit) {
             const updatedVisit: IVisitDocument = {
               ...visit,
-              documentDate: date,
+              documentDate: visitDate,
               head: {
                 ...visit.head,
-                dateBegin: date,
-                beginGeoPoint: coords,
+                dateBegin: visitDate,
+                beginGeoPoint,
+                routeLineId,
               },
-              creationDate: date,
-              editionDate: date,
+              creationDate: visitDate,
+              editionDate: visitDate,
             };
             dispatch(documentActions.updateDocument({ docId: visit.id, document: updatedVisit }));
           } else {
@@ -152,16 +163,16 @@ const OrderViewScreen = () => {
               id: visitId,
               documentType: visitDocumentType,
               number: visitId,
-              documentDate: date,
+              documentDate: visitDate,
               status: 'DRAFT',
               head: {
-                routeLineId: routeLineId,
-                dateBegin: date,
-                beginGeoPoint: coords,
+                routeLineId,
+                dateBegin: visitDate,
+                beginGeoPoint,
                 takenType: 'ON_PLACE',
               },
-              creationDate: date,
-              editionDate: date,
+              creationDate: visitDate,
+              editionDate: visitDate,
             };
             dispatch(documentActions.addDocument(newVisit));
           }
@@ -174,10 +185,10 @@ const OrderViewScreen = () => {
       }
     } else {
       docDispatch(documentActions.addDocument(newDoc));
-      navigation.navigate('OrderView', routeId ? { id: newId, routeId } : { id: newId });
+      navigation.navigate('OrderView', { id: newId, routeId });
     }
     setScreenState('copied');
-  }, [orderDocs, order, routeId, routeLineId, navigation, visit, dispatch, docDispatch]);
+  }, [order, routeId, orderList, routeLineId, navigation, visit, dispatch, docDispatch]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
@@ -233,7 +244,7 @@ const OrderViewScreen = () => {
     ]);
   }, [delList, dispatch, id]);
 
-  const sendDoc = useSendDocs([order]);
+  const sendDoc = useSendDocs(order ? [order] : []);
 
   const handleSendDocument = useCallback(() => {
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
@@ -252,6 +263,9 @@ const OrderViewScreen = () => {
   }, [sendDoc]);
 
   const handleSaveDocument = useCallback(() => {
+    if (!order) {
+      return;
+    }
     dispatch(
       documentActions.updateDocument({
         docId: id,
@@ -264,9 +278,7 @@ const OrderViewScreen = () => {
   useEffect(() => {
     if (screenState === 'sent' || screenState === 'deleted' || screenState === 'copied') {
       setScreenState('idle');
-      if (screenState === 'copied') {
-        // navigation.navigate('OrderView', routeId ? { id: newId, routeId } : { id: newId });
-      } else {
+      if (screenState !== 'copied') {
         navigation.goBack();
       }
     }

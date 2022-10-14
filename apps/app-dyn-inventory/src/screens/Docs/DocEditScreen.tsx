@@ -28,7 +28,7 @@ export const DocEditScreen = () => {
   const dispatch = useDispatch();
 
   const formParams = useSelector((state) => state.app.formParams as IInventoryFormParam);
-  const doc = id ? docSelectors.selectByDocId<IInventoryDocument>(id) : undefined;
+  const doc = docSelectors.selectByDocId<IInventoryDocument>(id);
   const docType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'inventory');

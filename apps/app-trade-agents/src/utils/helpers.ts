@@ -24,11 +24,11 @@ const twoDigits = (value: number) => {
   return value >= 10 ? value : `0${value}`;
 };
 
-export const getNextDocNumber = (documents: IOrderDocument[]) => {
+export const getNextDocNumber = (documents?: IOrderDocument[]) => {
   return (
-    documents
+    (documents
       ?.map((item) => parseInt(item.number, 10))
-      .reduce((newId, currId) => (newId > currId ? newId : currId), 0) + 1 || 1
+      ?.reduce((newId, currId) => (newId > currId ? newId : currId), 0) || 0) + 1 || 1
   ).toString();
 };
 
