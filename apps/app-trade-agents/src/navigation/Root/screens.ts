@@ -38,11 +38,8 @@ const goodMatrixScreens = {
   GoodLine: { title: 'Позиция матрицы', component: GoodLineScreen },
 };
 
-const reportListScreens = {
-  ReportList: { title: 'Отчёты', component: ReportListScreen },
-};
-
 const reportScreens = {
+  ReportList: { title: 'Отчёты', component: ReportListScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
 };
 
@@ -53,6 +50,5 @@ export {
   routerScreen,
   goodMatrixListScreens,
   goodMatrixScreens,
-  reportListScreens,
   reportScreens,
 };
