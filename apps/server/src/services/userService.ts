@@ -1,11 +1,13 @@
-import { IDBUser, IUser, NewUser } from '@lib/types';
+import { IDBUser, IUser, NewUser, IUserWithDevice } from '@lib/types';
 
 import { DataNotFoundException, ConflictException, InvalidParameterException, ForbiddenException } from '../exceptions';
 
 import { hashPassword } from '../utils/crypt';
 import { extraPredicate, getListPart } from '../utils/helpers';
+import { processValidation } from '../validations';
 
 import { getDb } from './dao/db';
+import { device } from './data/devices';
 
 import { users as mockUsers } from './data/user';
 
@@ -54,6 +56,7 @@ const addOne = (userData: NewUser): IUser => {
     email: userData.email,
     erpUserId: userData.erpUser?.id,
     appSystemId: userData.appSystem?.id,
+    disabled: userData.disabled,
     creationDate: new Date().toISOString(),
     editionDate: new Date().toISOString(),
   });
@@ -136,6 +139,7 @@ const updateOne = (id: string, userData: Partial<IUser & { password: string }>):
     email: userData.email === undefined ? oldUser.email : userData.email,
     erpUserId: userData.erpUser === null ? undefined : newErpUserId || oldUser.erpUserId,
     appSystemId: userData.appSystem === null ? undefined : newAppSystemId || oldUser.appSystemId,
+    disabled: userData.disabled === undefined ? oldUser.disabled : userData.disabled,
     creationDate: oldUser.creationDate,
     editionDate: new Date().toISOString(),
   });
@@ -255,6 +259,20 @@ const findMany = (params: Record<string, string | number>): IUser[] => {
       delete newParams['companyId'];
     }
 
+    let appSystemFound = true;
+
+    if ('appSystemId' in newParams) {
+      appSystemFound = item.appSystemId === newParams.appSystemId;
+      delete newParams['appSystemId'];
+    }
+
+    let erpUserFound = true;
+
+    if ('erpUserId' in newParams) {
+      erpUserFound = item.erpUserId === newParams.erpUserId;
+      delete newParams['erpUserId'];
+    }
+
     /** filtering data */
     let filteredUsers = true;
     if ('filterText' in newParams) {
@@ -279,10 +297,50 @@ const findMany = (params: Record<string, string | number>): IUser[] => {
       delete newParams['filterText'];
     }
 
-    return companyFound && filteredUsers && extraPredicate(item, newParams as Record<string, string>);
+    return (
+      companyFound &&
+      filteredUsers &&
+      erpUserFound &&
+      appSystemFound &&
+      extraPredicate(item, newParams as Record<string, string>)
+    );
   });
 
   return getListPart(userList, params).map((i) => makeUser(i));
+};
+
+/**
+ *  Возвращает множество пользователей c uid device по указанным параметрам
+ * @param params - параметры
+ * @returns
+ */
+export const findManyWithDevice = (params: Record<string, string | number>): IUserWithDevice[] => {
+  const userList = findMany(params);
+  const { devices, deviceBindings } = getDb();
+  return userList.map((user) => {
+    const deviceUids = deviceBindings.data.reduce<(string | undefined)[]>((prev, item) => {
+      return item.userId === user.id && item.state === 'ACTIVE' && !!devices.findById(item.deviceId)?.uid
+        ? [...prev, devices.findById(item.deviceId)?.uid]
+        : prev;
+    }, []) as string[];
+    return { ...user, ...(deviceUids.length && { deviceUids: deviceUids }) };
+  });
+};
+
+/**
+ *  Возвращает пользователя c uid device по указанным параметрам
+ * @id id пользователя
+ * @returns
+ */
+export const findOneWithDevice = (id: string): IUserWithDevice => {
+  const user = findOne(id);
+  const { devices, deviceBindings } = getDb();
+  const deviceUids = deviceBindings.data.reduce<(string | undefined)[]>((prev, item) => {
+    return item.userId === user.id && item.state === 'ACTIVE' && !!devices.findById(item.deviceId)?.uid
+      ? [...prev, devices.findById(item.deviceId)?.uid]
+      : prev;
+  }, []) as string[];
+  return { ...user, ...(deviceUids.length && { deviceUids: deviceUids }) };
 };
 
 export const makeUser = (user: IDBUser): IUser => {
@@ -306,6 +364,7 @@ export const makeUser = (user: IDBUser): IUser => {
     email: user.email,
     appSystem: user.appSystemId ? appSystems.getNamedItem(user.appSystemId) : undefined,
     erpUser: user.erpUserId ? users.getNamedItem(user.erpUserId) : undefined,
+    disabled: user.disabled,
   };
 };
 

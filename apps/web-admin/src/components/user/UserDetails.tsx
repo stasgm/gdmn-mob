@@ -75,6 +75,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
       appSystem: (user.appSystem || null) as INamedEntity,
       erpUser: (user.erpUser || null) as INamedEntity,
       externalId: user.externalId || '',
+      disabled: user.disabled || false,
     },
 
     validationSchema: yup.object().shape({
@@ -250,9 +251,25 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     value={formik.values.externalId}
                   />
                 </Grid>
-                <Grid item md={12} xs={12}>
+                <Grid item md={6} xs={12}>
                   <Checkbox checked={userERP} color="primary" onChange={handleUserERP} />
                   Пользователь ERP
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <Field
+                    id="disabled"
+                    type="checkbox"
+                    name="disabled"
+                    label="Неактивен"
+                    variant="outlined"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    disabled={loading}
+                    value={formik.values.disabled}
+                    checked={formik.values.disabled}
+                    component={Checkbox}
+                  />
+                  Неактивен
                 </Grid>
                 <Grid item md={6} xs={12} display={open ? 'block' : 'none'}>
                   <TextField

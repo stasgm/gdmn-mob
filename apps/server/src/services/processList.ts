@@ -400,6 +400,7 @@ export const makeMessageSync = (message: IDBMessage): IMessage => {
       deviceId: message.head.deviceId,
     },
     status: message.status,
+    errorMessage: message.errorMessage,
     body: message.body,
   };
 };
@@ -418,6 +419,7 @@ export const makeDBNewMessageSync = (message: NewMessage, producerId: string): I
       replyTo: message.head.replyTo,
     },
     status: message.status,
+    errorMessage: message.errorMessage,
     body: message.body,
   };
 };
