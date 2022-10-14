@@ -9,7 +9,7 @@ import {
   SelectableInput,
   SubTitle,
 } from '@lib/mobile-ui';
-import { appActions, refSelectors, useDispatch, useSelector } from '@lib/store';
+import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
 import { IReference } from '@lib/types';
 import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -45,7 +45,7 @@ const ReportListScreen = () => {
 
   const outlets = refSelectors.selectByName<IOutlet>('outlet')?.data;
 
-  const orders = useSelector((state) => state.documents.list) as IOrderDocument[];
+  const orders = docSelectors.selectByDocType<IOrderDocument>('order');
 
   useEffect(() => {
     return () => {
@@ -77,8 +77,6 @@ const ReportListScreen = () => {
     );
   }, [dispatch]);
 
-  const orderList = useMemo(() => orders?.filter((i) => i.documentType?.name === 'order'), [orders]);
-
   const filteredOrderList = useMemo(() => {
     if (filterContact?.id || filterOutlet?.id || filterGood?.id || filterDateBegin || filterDateEnd) {
       let dateEnd: Date | undefined;
@@ -87,7 +85,7 @@ const ReportListScreen = () => {
         dateEnd.setDate(dateEnd.getDate() + 1);
       }
 
-      return orderList.filter(
+      return orders.filter(
         (i) =>
           (filterContact?.id ? i.head.contact.id === filterContact.id : true) &&
           (filterOutlet?.id ? i.head.outlet.id === filterOutlet.id : true) &&
@@ -102,7 +100,7 @@ const ReportListScreen = () => {
     } else {
       return [];
     }
-  }, [filterContact?.id, filterDateBegin, filterDateEnd, filterGood?.id, filterOutlet?.id, orderList]);
+  }, [filterContact?.id, filterDateBegin, filterDateEnd, filterGood?.id, filterOutlet?.id, orders]);
 
   const filteredOutletList: IReportItem[] = useMemo(() => {
     return filteredOrderList.length
@@ -111,7 +109,7 @@ const ReportListScreen = () => {
             const address = outlets.find((o) => cur?.head?.outlet.id === o.id)?.address;
             const is = prev.find(
               (e) =>
-                orderList.find((a) => a.id === e.id)?.head.outlet.id === cur.head.outlet.id &&
+                orders.find((a) => a.id === e.id)?.head.outlet.id === cur.head.outlet.id &&
                 new Date(e.documentDate.slice(0, 10)).getTime() === new Date(cur.documentDate.slice(0, 10)).getTime(),
             );
 
@@ -130,7 +128,7 @@ const ReportListScreen = () => {
               new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() && (a.name < b.name ? -1 : 1),
           )
       : [];
-  }, [filteredOrderList, orderList, outlets]);
+  }, [filteredOrderList, orders, outlets]);
 
   const sections = useMemo(
     () =>
