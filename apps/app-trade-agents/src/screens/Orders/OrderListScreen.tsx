@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import { ListRenderItem, Platform, SectionList, SectionListData, View, StyleSheet } from 'react-native';
+import { ListRenderItem, Platform, SectionList, SectionListData, View, StyleSheet, Keyboard } from 'react-native';
 import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 
 import {
@@ -264,6 +264,7 @@ const OrderListScreen = () => {
     }
   };
   const handlePresentDateBegin = () => {
+    Keyboard.dismiss();
     setShowDateBegin(true);
   };
 
@@ -278,6 +279,7 @@ const OrderListScreen = () => {
   };
 
   const handlePresentDateEnd = () => {
+    Keyboard.dismiss();
     setShowDateEnd(true);
   };
 

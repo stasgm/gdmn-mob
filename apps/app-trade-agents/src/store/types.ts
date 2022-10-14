@@ -38,6 +38,7 @@ export interface IOrderListFormParam extends IFormParam {
   filterOutlet?: IReferenceData;
   filterDateBegin?: string;
   filterDateEnd?: string;
+  filterGood?: IReferenceData;
 }
 
 export interface IRouteFormParam extends IFormParam {

@@ -45,3 +45,7 @@ export type GoodMatrixStackParamList = { ContactList: undefined } & GoodMatrixPa
 export type DebetStackParamList = {
   DebetList: undefined;
 };
+
+export type ReportStackParamList = RefParamList & {
+  ReportList: undefined;
+};
