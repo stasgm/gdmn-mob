@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Alert, View, StyleSheet, ScrollView, Platform } from 'react-native';
+import { Alert, View, StyleSheet, ScrollView, Platform, Keyboard } from 'react-native';
 import { RouteProp, useNavigation, useRoute, StackActions, useTheme, useIsFocused } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -246,6 +246,7 @@ const OrderEditScreen = () => {
   );
 
   const handlePresentOnDate = useCallback(() => {
+    Keyboard.dismiss();
     if (docStatus !== 'DRAFT') {
       return;
     }

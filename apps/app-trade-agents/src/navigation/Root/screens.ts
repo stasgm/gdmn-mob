@@ -6,6 +6,7 @@ import SelectRefItemScreen from '../../components/SelectRefItemScreen';
 
 import { ContactListScreen, GoodListScreen, GoodLineScreen } from '../../screens/GoodMatrix';
 import { DebetListScreen } from '../../screens/Debets';
+import { ReportListScreen } from '../../screens/Reports';
 
 const orderListScreens = {
   OrderList: { title: 'Заявки', component: OrderListScreen },
@@ -37,4 +38,17 @@ const goodMatrixScreens = {
   GoodLine: { title: 'Позиция матрицы', component: GoodLineScreen },
 };
 
-export { orderListScreens, orderScreens, debetListScreens, routerScreen, goodMatrixListScreens, goodMatrixScreens };
+const reportScreens = {
+  ReportList: { title: 'Отчёты', component: ReportListScreen },
+  SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
+};
+
+export {
+  orderListScreens,
+  orderScreens,
+  debetListScreens,
+  routerScreen,
+  goodMatrixListScreens,
+  goodMatrixScreens,
+  reportScreens,
+};

@@ -39,6 +39,7 @@ import { RoutesNavigator, OrdersNavigator, DebetsNavigator, MapNavigator, GoodMa
 
 import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
 import { messageAgent } from './src/store/mock';
+import ReportsNavigator from './src/navigation/Root/ReportsNavigator';
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -54,6 +55,12 @@ const Root = () => {
         title: 'Заявки',
         icon: 'clipboard-list-outline',
         component: OrdersNavigator,
+      },
+      {
+        name: 'ReportsNav',
+        title: 'Отчёты',
+        icon: 'text-box-search-outline',
+        component: ReportsNavigator,
       },
       {
         name: 'DebetsNav',
