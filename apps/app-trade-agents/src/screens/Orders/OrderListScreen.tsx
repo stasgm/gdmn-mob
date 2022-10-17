@@ -366,16 +366,18 @@ const OrderListScreen = () => {
             <View style={[styles.flexDirectionRow, localStyles.marginTop]}>
               <View style={localStyles.width}>
                 <SelectableInput
-                  label="С даты"
+                  label="С даты отгрузки"
                   value={filterDateBegin ? getDateString(filterDateBegin) : ''}
                   onPress={handlePresentDateBegin}
+                  style={filterDateBegin ? localStyles.leftInput : [localStyles.leftInput, localStyles.font]}
                 />
               </View>
               <View style={localStyles.width}>
                 <SelectableInput
-                  label="По дату"
+                  label="По дату отгрузки"
                   value={filterDateEnd ? getDateString(filterDateEnd || '') : ''}
                   onPress={handlePresentDateEnd}
+                  style={filterDateEnd ? localStyles.rightInput : [localStyles.rightInput, localStyles.font]}
                 />
               </View>
             </View>
@@ -429,4 +431,13 @@ const localStyles = StyleSheet.create({
     marginTop: -5,
   },
   width: { width: '50%' },
+  font: { fontSize: 14 },
+  leftInput: {
+    marginLeft: 10,
+    marginRight: 6,
+  },
+  rightInput: {
+    marginLeft: 6,
+    marginRight: 10,
+  },
 });
