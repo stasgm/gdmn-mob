@@ -61,7 +61,7 @@ const OrderLine = ({ item, packages, onSetLine, visibleQuantityInput }: IProps) 
         <View style={styles.item}>
           <View style={styles.details}>
             <Text style={styles.name}>Цена</Text>
-            <Text style={textStyle}>{item.good.priceFsn.toString()}</Text>
+            <Text style={textStyle}>{item.good.priceFsn}</Text>
           </View>
         </View>
         <ItemSeparator />
