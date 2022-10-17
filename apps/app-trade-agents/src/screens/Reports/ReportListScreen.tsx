@@ -110,30 +110,27 @@ const ReportListScreen = () => {
             const is = prev.find(
               (e) =>
                 orders.find((a) => a.id === e.id)?.head.outlet.id === cur.head.outlet.id &&
-                new Date(e.documentDate.slice(0, 10)).getTime() === new Date(cur.documentDate.slice(0, 10)).getTime(),
+                new Date(e.onDate.slice(0, 10)).getTime() === new Date(cur.head.onDate.slice(0, 10)).getTime(),
             );
 
             if (!is) {
               prev.push({
                 id: cur.id,
                 name: cur.head.outlet?.name,
-                documentDate: cur.documentDate,
+                onDate: cur.head.onDate,
                 address: address,
               } as IReportItem);
             }
             return prev;
           }, [])
-          ?.sort(
-            (a, b) =>
-              new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() && (a.name < b.name ? -1 : 1),
-          )
+          ?.sort((a, b) => new Date(b.onDate).getTime() - new Date(a.onDate).getTime() && (a.name < b.name ? -1 : 1))
       : [];
   }, [filteredOrderList, orders, outlets]);
 
   const sections = useMemo(
     () =>
       filteredOutletList.reduce<SectionDataProps>((prev, item) => {
-        const sectionTitle = getDateString(item.documentDate);
+        const sectionTitle = getDateString(item.onDate);
         const sectionExists = prev.some(({ title }) => title === sectionTitle);
         if (sectionExists) {
           return prev.map((section) =>

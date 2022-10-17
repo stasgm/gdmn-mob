@@ -6,7 +6,7 @@ import { INamedEntity } from '@lib/types';
 
 export interface IReportItem extends INamedEntity {
   address: string;
-  documentDate: string;
+  onDate: string;
 }
 
 const ReportItem = ({ name, address }: IReportItem) => {
