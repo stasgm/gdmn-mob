@@ -47,7 +47,7 @@
     "@types/react-test-renderer": "^18.0.0",
     "dotenv": "^16.0.3",
     "axios": "^0.27.2",
-    "expo": "^46.0.15",
+    "expo": "^46.0.16",
     "expo-asset": "~8.6.1",
     "expo-constants": "~13.2.4",
     "expo-font": "~10.2.1",

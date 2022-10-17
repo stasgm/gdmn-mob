@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { StyleProp, TextStyle, View, ViewStyle } from 'react-native';
 import { TextInput, useTheme } from 'react-native-paper';
 
 import styles from './styles';
@@ -12,11 +12,12 @@ interface Props {
   editable?: boolean;
   disabled?: boolean;
   required?: boolean;
+  style?: StyleProp<TextStyle>;
 }
 
 const truncate = (str: string, l: number | undefined = 40) => (str.length > l ? `${str.substring(0, l)}...` : str);
 
-const SelectableInput = ({ value, onPress, label, placeholder, editable = false, disabled }: Props) => {
+const SelectableInput = ({ value, onPress, label, placeholder, editable = false, disabled, style }: Props) => {
   const { colors } = useTheme();
 
   return (
@@ -34,7 +35,7 @@ const SelectableInput = ({ value, onPress, label, placeholder, editable = false,
             },
           }}
           mode="outlined"
-          style={styles.input}
+          style={style ? [styles.input, style] : styles.input}
           placeholderTextColor={colors.text}
           placeholder={placeholder}
           right={!disabled && <TextInput.Icon name="chevron-right" style={{ marginTop: 14 }} onPress={onPress} />}
