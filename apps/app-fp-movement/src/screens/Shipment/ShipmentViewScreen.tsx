@@ -23,7 +23,7 @@ import {
 
 import { sleep } from '@lib/client-api';
 
-import { generateId, getDateString, round, useSendDocs } from '@lib/mobile-app';
+import { generateId, getDateString, round, useSendDocs } from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
 

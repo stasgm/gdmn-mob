@@ -1,4 +1,4 @@
-import { keyExtractor } from '@lib/mobile-app';
+import { keyExtractor } from '@lib/mobile-hooks';
 import { IListItem } from '@lib/mobile-types';
 import {
   AppActivityIndicator,

@@ -13,7 +13,7 @@ import {
   navBackDrawer,
 } from '@lib/mobile-ui';
 
-import { keyExtractor } from '@lib/mobile-app';
+import { keyExtractor } from '@lib/mobile-hooks';
 
 import { useDispatch, useSelector } from '../../store';
 import { ILocation } from '../../store/geo/types';

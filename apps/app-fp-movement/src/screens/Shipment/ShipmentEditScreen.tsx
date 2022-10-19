@@ -17,7 +17,7 @@ import {
 } from '@lib/mobile-ui';
 import { IDepartment, IDocumentType, IReference } from '@lib/types';
 
-import { getDateString } from '@lib/mobile-app';
+import { getDateString } from '@lib/mobile-hooks';
 
 import { ShipmentStackParamList } from '../../navigation/Root/types';
 import { IShipmentFormParam, IShipmentDocument } from '../../store/types';

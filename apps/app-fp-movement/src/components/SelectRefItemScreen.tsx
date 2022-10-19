@@ -15,7 +15,7 @@ import {
   navBackButton,
 } from '@lib/mobile-ui';
 
-import { extraPredicate } from '@lib/mobile-app';
+import { extraPredicate } from '@lib/mobile-hooks';
 
 import { IReferenceData } from '@lib/types';
 

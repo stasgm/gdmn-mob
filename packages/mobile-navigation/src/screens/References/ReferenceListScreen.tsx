@@ -1,5 +1,5 @@
-import React, { useCallback, useLayoutEffect, useMemo } from 'react';
-import { FlatList, RefreshControl, Text } from 'react-native';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { Alert, FlatList, RefreshControl, Text } from 'react-native';
 import { Divider, IconButton } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -7,9 +7,9 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useSelector } from '@lib/store';
 import { AppScreen, MenuButton, navBackDrawer, SendButton, useActionSheet } from '@lib/mobile-ui';
 
-import { ReferenceStackParamList } from '../../navigation/Root/types';
+import { useSendRefsRequest } from '@lib/mobile-hooks';
 
-import useSendRefsRequest from '../../hooks/useSendRefsRequest';
+import { ReferenceStackParamList } from '../../navigation/Root/types';
 
 import ReferenceItem, { RefListItem } from './components/ReferenceListItem';
 
@@ -33,7 +33,11 @@ const ReferenceListScreen = () => {
 
   const sendRequest = useSendRefsRequest();
 
-  const handleSendRefsRequest = () => sendRequest();
+  const handleSendRefsRequest = async () => {
+    if (sendRequest) {
+      await sendRequest();
+    }
+  };
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -67,7 +71,7 @@ const ReferenceListScreen = () => {
         renderItem={renderItem}
         ItemSeparatorComponent={Divider}
         scrollEventThrottle={400}
-        refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
+        refreshControl={<RefreshControl refreshing={loading} />}
         ListEmptyComponent={
           !loading ? (
             <Text style={styles.emptyList}>{'Список пуст. \nПожалуйста, выполните синхронизацию.'}</Text>

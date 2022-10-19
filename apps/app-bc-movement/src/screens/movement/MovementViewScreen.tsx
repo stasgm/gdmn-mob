@@ -7,7 +7,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { docSelectors } from '@lib/store';
 import { globalStyles as styles, InfoBlock, ItemSeparator, SubTitle, ScanButton, navBackButton } from '@lib/mobile-ui';
 
-import { getDateString } from '@lib/mobile-app';
+import { getDateString } from '@lib/mobile-hooks';
 
 import { IMovementDocument, IMovementLine } from '../../store/types';
 import { MovementStackParamList } from '../../navigation/Root/types';

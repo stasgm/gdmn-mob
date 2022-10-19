@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import { Provider } from 'react-redux';
-import { dialCall, MobileApp } from '@lib/mobile-app';
+import { MobileApp } from '@lib/mobile-app';
 import { GDMN_EMAIL, GDMN_PHONE, GDMN_SITE_ADDRESS, INavItem } from '@lib/mobile-navigation';
 import ErrorBoundary from 'react-native-error-boundary';
 
@@ -36,6 +36,8 @@ import { sleep } from '@lib/client-api';
 import { TouchableOpacity, Linking } from 'react-native';
 
 import Constants from 'expo-constants';
+
+import { dialCall } from '@lib/mobile-hooks';
 
 import { MoveNavigator } from './src/navigation/MoveNavigator';
 

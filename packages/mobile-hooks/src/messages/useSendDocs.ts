@@ -12,9 +12,10 @@ import {
 import { AuthLogOut, IAppSystem, IDocument, IMessage } from '@lib/types';
 import api from '@lib/client-api';
 import { Alert } from 'react-native';
-import { getNextOrder } from '@lib/mobile-navigation';
 
-const useSendDocs = (readyDocs: IDocument[]) => {
+import { getNextOrder } from './helpers';
+
+export const useSendDocs = (readyDocs: IDocument[]) => {
   const docDispatch = useDocThunkDispatch();
   const authDispatch = useAuthThunkDispatch();
   const dispatch = useDispatch();
@@ -52,7 +53,6 @@ const useSendDocs = (readyDocs: IDocument[]) => {
 
     const deviceId = config.deviceId!;
 
-    // const sendData = async () => {
     const getErpUser = await api.user.getUser(consumer.id, authMiddleware);
 
     let appSystem: IAppSystem | undefined;
@@ -105,7 +105,6 @@ const useSendDocs = (readyDocs: IDocument[]) => {
         }
       }
     }
-    // };
 
     dispatch(documentActions.setLoading(false));
     dispatch(appActions.setErrorList(errList));
@@ -115,11 +114,5 @@ const useSendDocs = (readyDocs: IDocument[]) => {
         { text: 'OK' },
       ]);
     }
-
-    // sendData();
   };
-
-  // return send;
 };
-
-export default useSendDocs;

@@ -23,9 +23,10 @@ import {
 } from '@lib/types';
 import api from '@lib/client-api';
 import { Alert } from 'react-native';
-import { getNextOrder } from '@lib/mobile-navigation';
 
-const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>): (() => void) => {
+import { getNextOrder } from './helpers';
+
+export const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>): (() => void) => {
   const docDispatch = useDocThunkDispatch();
   const refDispatch = useRefThunkDispatch();
   const authDispatch = useAuthThunkDispatch();
@@ -411,5 +412,3 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
 
   return sync;
 };
-
-export default useSync;

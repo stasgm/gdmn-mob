@@ -31,7 +31,7 @@ import {
   getDelList,
   keyExtractor,
   useSendDocs,
-} from '@lib/mobile-app';
+} from '@lib/mobile-hooks';
 
 import { IDocumentType, INamedEntity, ScreenState } from '@lib/types';
 

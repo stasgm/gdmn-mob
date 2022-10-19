@@ -20,7 +20,7 @@ import {
   SaveDocument,
 } from '@lib/mobile-ui';
 
-import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
+import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-hooks';
 
 import { sleep } from '@lib/client-api';
 
@@ -54,7 +54,7 @@ export const FreeShipmentViewScreen = () => {
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
 
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
-  const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0);
+  const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0) || 0;
   const isBlocked = doc?.status !== 'DRAFT';
   const goods = refSelectors.selectByName<IGood>('good').data;
   const settings = useSelector((state) => state.settings?.data);
@@ -74,6 +74,10 @@ export const FreeShipmentViewScreen = () => {
 
   const handleGetBarcode = useCallback(
     (brc: string) => {
+      if (!doc) {
+        return;
+      }
+
       if (!brc.match(/^-{0,1}\d+$/)) {
         setErrorMessage('Штрих-код неверного формата');
         return;
@@ -120,7 +124,7 @@ export const FreeShipmentViewScreen = () => {
       }
     },
 
-    [dispatch, doc?.lines, goodBarcodeSettings, goods, id, minBarcodeLength],
+    [dispatch, doc, goodBarcodeSettings, goods, id, minBarcodeLength],
   );
 
   const handleShowDialog = () => {
@@ -172,7 +176,7 @@ export const FreeShipmentViewScreen = () => {
     }
   }, [dispatch, id, lines]);
 
-  const sendDoc = useSendDocs([doc]);
+  const sendDoc = useSendDocs(doc ? [doc] : []);
 
   const handleSendDocument = useCallback(() => {
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
@@ -217,6 +221,9 @@ export const FreeShipmentViewScreen = () => {
   }, [showActionSheet, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
 
   const handleSaveDocument = useCallback(() => {
+    if (!doc) {
+      return;
+    }
     dispatch(
       documentActions.updateDocument({
         docId: id,
@@ -290,6 +297,10 @@ export const FreeShipmentViewScreen = () => {
 
   const getScannedObject = useCallback(
     (brc: string) => {
+      if (!doc) {
+        return;
+      }
+
       if (!brc.match(/^-{0,1}\d+$/)) {
         Alert.alert('Внимание!', 'Штрих-код не определен. Повторите сканирование!', [{ text: 'OK' }]);
         setScanned(false);
@@ -339,7 +350,7 @@ export const FreeShipmentViewScreen = () => {
       setScanned(false);
     },
 
-    [minBarcodeLength, goodBarcodeSettings, goods, doc?.lines, dispatch, id],
+    [doc, minBarcodeLength, goodBarcodeSettings, goods, dispatch, id],
   );
 
   const [key, setKey] = useState(1);

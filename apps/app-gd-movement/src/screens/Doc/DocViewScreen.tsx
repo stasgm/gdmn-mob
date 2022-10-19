@@ -22,7 +22,7 @@ import {
   SaveDocument,
 } from '@lib/mobile-ui';
 
-import { deleteSelectedLineItems, getDateString, getDelLineList, keyExtractor, useSendDocs } from '@lib/mobile-app';
+import { deleteSelectedLineItems, getDateString, getDelLineList, keyExtractor, useSendDocs } from '@lib/mobile-hooks';
 
 import { sleep } from '@lib/client-api';
 
@@ -108,7 +108,7 @@ export const DocViewScreen = () => {
     }
   }, [navigation, screenState]);
 
-  const sendDoc = useSendDocs([doc]);
+  const sendDoc = useSendDocs(doc ? [doc] : []);
 
   const handleSendDocument = useCallback(() => {
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
@@ -149,6 +149,9 @@ export const DocViewScreen = () => {
   }, [showActionSheet, handleAddDocLine, handleDelete, handleEditDocHead]);
 
   const handleSaveDocument = useCallback(() => {
+    if (!doc) {
+      return;
+    }
     dispatch(
       documentActions.updateDocument({
         docId: id,

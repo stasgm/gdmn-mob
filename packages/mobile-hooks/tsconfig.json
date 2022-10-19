@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-native",
+    "noEmit": true,
+    "allowJs": false,
+    "checkJs": false,
+    "lib": ["dom", "esnext"]
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}

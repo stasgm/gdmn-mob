@@ -3,7 +3,7 @@ import { View, Text } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles, MediumText } from '@lib/mobile-ui';
 
-import { formatValue } from '@lib/mobile-app';
+import { formatValue } from '@lib/mobile-hooks';
 
 import { useTheme } from 'react-native-paper';
 

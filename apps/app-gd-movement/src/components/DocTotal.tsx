@@ -5,7 +5,7 @@ import { Divider } from 'react-native-paper';
 
 import { useTheme } from '@react-navigation/native';
 
-import { round } from '@lib/mobile-app';
+import { round } from '@lib/mobile-hooks';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 

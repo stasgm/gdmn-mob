@@ -22,7 +22,7 @@ import {
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { getDelList, getDateString, keyExtractor, deleteSelectedItems } from '@lib/mobile-app';
+import { getDelList, getDateString, keyExtractor, deleteSelectedItems } from '@lib/mobile-hooks';
 
 import { IDocumentType } from '@lib/types';
 
