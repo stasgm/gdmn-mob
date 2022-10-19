@@ -19,6 +19,7 @@ import {
   navBackDrawer,
   MediumText,
   SelectableInput,
+  SearchButton,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -30,7 +31,7 @@ import { appActions, documentActions, refSelectors, useDispatch, useSelector } f
 
 import { IDelList } from '@lib/mobile-types';
 
-import { IconButton, Searchbar } from 'react-native-paper';
+import { Searchbar } from 'react-native-paper';
 
 import { IDebt, IOrderDocument, IOrderListFormParam, IOutlet } from '../../store/types';
 import { OrdersStackParamList } from '../../navigation/Root/types';
@@ -232,17 +233,12 @@ const OrderListScreen = () => {
         ) : (
           <>
             <AddButton onPress={handleAddDocument} />
-            <IconButton
-              icon="card-search-outline"
-              style={filterVisible && { backgroundColor: colors.card }}
-              size={26}
-              onPress={handleSearch}
-            />
+            <SearchButton onPress={handleSearch} visible={filterVisible} />
           </>
         )}
       </View>
     ),
-    [colors.card, filterVisible, handleAddDocument, handleDeleteDocs, handleSearch, isDelList],
+    [filterVisible, handleAddDocument, handleDeleteDocs, handleSearch, isDelList],
   );
 
   const renderLeft = useCallback(() => isDelList && <CloseButton onPress={() => setDelList({})} />, [isDelList]);

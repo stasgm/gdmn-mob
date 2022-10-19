@@ -17,7 +17,7 @@ export type RefParamList = {
 };
 
 export type OrderParamList = RefParamList & {
-  OrderView: { id: string; routeId?: string };
+  OrderView: { id: string; routeId?: string; blocked?: boolean };
   OrderEdit: { id: string; routeId?: string } | undefined;
   SelectGood: { docId: string };
 };

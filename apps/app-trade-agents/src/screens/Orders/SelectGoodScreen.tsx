@@ -417,7 +417,8 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     padding: 3,
     minHeight: 50,
-    fontWeight: '500',
+    fontWeight: 'bold',
+    opacity: 0.9,
   },
   flexRowWrap: {
     flexDirection: 'row',
@@ -441,7 +442,8 @@ const localStyles = StyleSheet.create({
   },
   buttonLabel: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: 'bold',
+    opacity: 0.9,
     lineHeight: 14,
     textAlignVertical: 'center',
     height: 70,

@@ -69,16 +69,16 @@ const Root = () => {
         component: DebetsNavigator,
       },
       {
-        name: 'MapNav',
-        title: 'Карта',
-        icon: 'map-outline',
-        component: MapNavigator,
-      },
-      {
         name: 'GoodMatrixNav',
         title: 'Матрицы',
         icon: 'tag-text-outline',
         component: GoodMatrixNavigator,
+      },
+      {
+        name: 'MapNav',
+        title: 'Карта',
+        icon: 'map-outline',
+        component: MapNavigator,
       },
     ],
     [],

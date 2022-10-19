@@ -57,7 +57,7 @@ const OrderViewScreen = () => {
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderView'>>();
-  const { id, routeId } = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params;
+  const { id, routeId, blocked } = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params;
 
   const dispatch = useDispatch();
 
@@ -69,7 +69,7 @@ const OrderViewScreen = () => {
 
   const order = docSelectors.selectByDocId<IOrderDocument>(id);
 
-  const isBlocked = order?.status !== 'DRAFT';
+  const isBlocked = blocked || order?.status !== 'DRAFT';
 
   const debt = refSelectors.selectByRefId<IDebt>('debt', order?.head?.contact.id);
 
@@ -287,7 +287,7 @@ const OrderViewScreen = () => {
   const actionsMenu = useCallback(() => {
     showActionSheet(
       isBlocked
-        ? order?.status === 'SENT'
+        ? order?.status === 'SENT' || blocked
           ? [
               {
                 title: 'Копировать заявку',
@@ -341,6 +341,7 @@ const OrderViewScreen = () => {
     showActionSheet,
     isBlocked,
     order?.status,
+    blocked,
     handleCopyOrder,
     handleDelete,
     handleAddOrderLine,
@@ -412,12 +413,12 @@ const OrderViewScreen = () => {
           item={item}
           onPress={() => handlePressOrderLine(item)}
           isChecked={checkedId ? true : false}
-          onLongPress={() => handleAddDeletelList(item.id, checkedId)}
+          onLongPress={() => !isBlocked && handleAddDeletelList(item.id, checkedId)}
           isDelList={isDelList}
         />
       );
     },
-    [delList, handleAddDeletelList, handlePressOrderLine, isDelList],
+    [delList, handleAddDeletelList, handlePressOrderLine, isBlocked, isDelList],
   );
 
   const isFocused = useIsFocused();
