@@ -79,7 +79,7 @@ const VisitScreen = () => {
   const dateBegin = visit ? new Date(visit?.head.dateBegin) : undefined;
   const geo = visit?.head.beginGeoPoint;
   const [screenState, setScreenState] = useState<ScreenState>('idle');
-  const [sendLoading, setSendLoading] = useState(false);
+  // const [sendLoading, setSendLoading] = useState(false);
   const [lineType, setLineType] = useState(lineTypes[0].id);
 
   const route = useMemo(() => ({ id: routeId, name: '' } as INamedEntity), [routeId]);
@@ -303,6 +303,24 @@ const VisitScreen = () => {
     deleteSelectedItems(delList, deleteDocs);
   }, [delList, dispatch]);
 
+  const handleSendDocuments = useCallback(() => {
+    Alert.alert('Вы уверены, что хотите отправить документы?', '', [
+      {
+        text: 'Да',
+        onPress: async () => {
+          setScreenState('sending');
+          await sendDoc();
+          setScreenState('sent');
+
+          navigation.navigate('RouteView', { id: route.id });
+        },
+      },
+      {
+        text: 'Отмена',
+      },
+    ]);
+  }, [navigation, route.id, sendDoc]);
+
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
@@ -311,14 +329,9 @@ const VisitScreen = () => {
         ) : (
           <>
             <SendButton
-              onPress={async () => {
-                setSendLoading(true);
-                await sendDoc();
-                setSendLoading(false);
-                navigation.navigate('RouteView', { id: route.id });
-              }}
+              onPress={handleSendDocuments}
               disabled={
-                sendLoading ||
+                screenState === 'sending' ||
                 screenState !== 'idle' ||
                 !orderDocs.find((doc) => doc.status === 'READY' || doc.status === 'DRAFT')
               }
@@ -328,7 +341,7 @@ const VisitScreen = () => {
         )}
       </View>
     ),
-    [handleDeleteDocs, isDelList, navigation, orderDocs, route.id, screenState, sendDoc, sendLoading],
+    [handleDeleteDocs, handleSendDocuments, isDelList, orderDocs, screenState],
   );
 
   const renderLeft = useCallback(() => isDelList && <CloseButton onPress={() => setDelList({})} />, [isDelList]);
