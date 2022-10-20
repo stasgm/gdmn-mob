@@ -19,6 +19,8 @@ import {
   navBackDrawer,
   MediumText,
   SelectableInput,
+  SearchButton,
+  PrimeButton,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -30,7 +32,7 @@ import { appActions, documentActions, refSelectors, useDispatch, useSelector } f
 
 import { IDelList } from '@lib/mobile-types';
 
-import { IconButton, Searchbar } from 'react-native-paper';
+import { Searchbar } from 'react-native-paper';
 
 import { IDebt, IOrderDocument, IOrderListFormParam, IOutlet } from '../../store/types';
 import { OrdersStackParamList } from '../../navigation/Root/types';
@@ -66,6 +68,12 @@ const OrderListScreen = () => {
     return () => {
       dispatch(appActions.clearFormParams());
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleCleanFormParams = useCallback(() => {
+    dispatch(appActions.clearFormParams());
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -117,8 +125,8 @@ const OrderListScreen = () => {
         )
         ?.sort(
           (a, b) =>
-            new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
-            new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
+            new Date(b.documentDate.slice(0, 10)).getTime() - new Date(a.documentDate.slice(0, 10)).getTime() ||
+            new Date(b.head.onDate.slice(0, 10)).getTime() - new Date(a.head.onDate.slice(0, 10)).getTime(),
         ),
     [orders, outlets, searchQuery],
   );
@@ -231,17 +239,12 @@ const OrderListScreen = () => {
         ) : (
           <>
             <AddButton onPress={handleAddDocument} />
-            <IconButton
-              icon="card-search-outline"
-              style={filterVisible && { backgroundColor: colors.card }}
-              size={26}
-              onPress={handleSearch}
-            />
+            <SearchButton onPress={handleSearch} visible={filterVisible} />
           </>
         )}
       </View>
     ),
-    [colors.card, filterVisible, handleAddDocument, handleDeleteDocs, handleSearch, isDelList],
+    [filterVisible, handleAddDocument, handleDeleteDocs, handleSearch, isDelList],
   );
 
   const renderLeft = useCallback(() => isDelList && <CloseButton onPress={() => setDelList({})} />, [isDelList]);
@@ -380,6 +383,15 @@ const OrderListScreen = () => {
                 />
               </View>
             </View>
+            <View style={localStyles.container}>
+              <PrimeButton
+                icon={'delete-outline'}
+                onPress={handleCleanFormParams}
+                disabled={!(filterContact || filterOutlet || filterDateBegin || filterDateEnd)}
+              >
+                {'Очистить'}
+              </PrimeButton>
+            </View>
           </View>
           <ItemSeparator />
         </>
@@ -437,5 +449,9 @@ const localStyles = StyleSheet.create({
   },
   marginInput: {
     marginLeft: 5,
+  },
+  container: {
+    alignItems: 'center',
+    marginTop: -10,
   },
 });

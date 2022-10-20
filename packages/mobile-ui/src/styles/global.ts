@@ -88,7 +88,8 @@ const globalStyles = StyleSheet.create({
     fontSize: 15,
   },
   textBold: {
-    fontWeight: '500',
+    fontWeight: 'bold',
+    opacity: 0.9,
   },
   searchBar: {
     elevation: 0,
@@ -194,7 +195,8 @@ const globalStyles = StyleSheet.create({
   },
   name: {
     fontSize: 17,
-    fontWeight: '500',
+    fontWeight: 'bold',
+    opacity: 0.9,
   },
   number: {
     fontSize: 14,
@@ -215,7 +217,8 @@ const globalStyles = StyleSheet.create({
   },
   textTotal: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: 'bold',
+    opacity: 0.9,
   },
   total: {
     margin: 6,

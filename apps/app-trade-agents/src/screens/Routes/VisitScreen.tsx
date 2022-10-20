@@ -1,5 +1,14 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { View, StyleSheet, ListRenderItem, FlatList, Alert, TouchableHighlight } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ListRenderItem,
+  FlatList,
+  Alert,
+  TouchableHighlight,
+  SectionList,
+  SectionListData,
+} from 'react-native';
 import { RouteProp, useFocusEffect, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 import {
@@ -53,6 +62,12 @@ import { ICoords } from '../../store/geo/types';
 import { getCurrentPosition } from '../../utils/expoFunctions';
 import { lineTypes } from '../../utils/constants';
 import { getNextDocNumber, twoDigits } from '../../utils/helpers';
+
+export interface VisitListSectionProps {
+  title: string;
+}
+
+export type SectionDataProps = SectionListData<IListItemProps, VisitListSectionProps>[];
 
 const VisitScreen = () => {
   const dispatch = useDispatch();
@@ -135,6 +150,28 @@ const VisitScreen = () => {
       } as IListItemProps;
     });
   }, [orderDocsOld]);
+
+  const sections = useMemo(
+    () =>
+      ordersOld.reduce<SectionDataProps>((prev, item) => {
+        const sectionTitle = item.documentDate;
+        const sectionExists = prev.some(({ title }) => title === sectionTitle);
+        if (sectionExists) {
+          return prev.map((section) =>
+            section.title === sectionTitle ? { ...section, data: [...section.data, item] } : section,
+          );
+        }
+
+        return [
+          ...prev,
+          {
+            title: sectionTitle,
+            data: [item],
+          },
+        ];
+      }, []),
+    [ordersOld],
+  );
 
   useFocusEffect(
     React.useCallback(() => {
@@ -350,6 +387,20 @@ const VisitScreen = () => {
     [delList, isDelList, lineType, navigation, route.id],
   );
 
+  const renderSectionsItem: ListRenderItem<IListItemProps> = ({ item }) => {
+    return (
+      <ScreenListItem
+        key={item.id}
+        {...item}
+        onPress={() => navigation.navigate('OrderView', { id: item.id, routeId: route.id, readonly: true })}
+      />
+    );
+  };
+
+  const renderSectionHeader = ({ section }: any) => (
+    <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
+  );
+
   const isFocused = useIsFocused();
 
   if ((screenState === 'adding' || screenState === 'added') && !orderDocs.length) {
@@ -432,28 +483,37 @@ const VisitScreen = () => {
           )}
         </>
       </InfoBlock>
-      <FlatList
-        data={lineType === 'new' ? orders : ordersOld}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        scrollEventThrottle={400}
-        ItemSeparatorComponent={ItemSeparator}
-        ListEmptyComponent={EmptyList}
-        ListHeaderComponent={
-          <View>
-            <View style={localStyles.order}>
-              <LargeText>Заявки по магазину</LargeText>
-            </View>
-            <LineTypes />
-          </View>
-        }
-      />
+      <View>
+        <View style={localStyles.order}>
+          <LargeText>Заявки по магазину</LargeText>
+        </View>
+        <LineTypes />
+      </View>
+      {lineType === 'new' ? (
+        <FlatList
+          data={orders}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          scrollEventThrottle={400}
+          ItemSeparatorComponent={ItemSeparator}
+          ListEmptyComponent={EmptyList}
+        />
+      ) : (
+        <SectionList
+          sections={sections}
+          renderItem={renderSectionsItem}
+          keyExtractor={keyExtractor}
+          ItemSeparatorComponent={ItemSeparator}
+          renderSectionHeader={renderSectionHeader}
+          ListEmptyComponent={EmptyList}
+        />
+      )}
     </AppScreen>
   );
 };
 
 const localStyles = StyleSheet.create({
-  contract: { fontWeight: '500', fontSize: 15 },
+  contract: { fontWeight: 'bold', opacity: 0.9, fontSize: 15 },
   order: { alignItems: 'center', justifyContent: 'center', marginBottom: 5 },
   size: { fontSize: 15 },
 });

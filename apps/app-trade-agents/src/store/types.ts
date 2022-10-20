@@ -41,6 +41,14 @@ export interface IOrderListFormParam extends IFormParam {
   filterGood?: IReferenceData;
 }
 
+export interface IReportListFormParam extends IFormParam {
+  filterReportContact?: IReferenceData;
+  filterReportOutlet?: IReferenceData;
+  filterReportDateBegin?: string;
+  filterReportDateEnd?: string;
+  filterReportGood?: IReferenceData;
+}
+
 export interface IRouteFormParam extends IFormParam {
   routeItemId?: number;
 }

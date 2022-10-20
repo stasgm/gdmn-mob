@@ -1,15 +1,22 @@
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
+import { View } from 'react-native';
 import { IconButton } from 'react-native-paper';
+
+import styles from '../../styles/buttonRippleStyle';
 
 interface IProps {
   onPress?: () => void;
 }
 
-const BackButton = (props: IProps) => {
+const BackButton = ({ onPress }: IProps) => {
   const navigation = useNavigation();
 
-  return <IconButton icon="chevron-left" onPress={props.onPress || navigation.goBack} size={30} />;
+  return (
+    <View style={styles.viewLeft_30}>
+      <IconButton icon="chevron-left" size={30} style={styles.icon_30} onPress={onPress || navigation.goBack} />
+    </View>
+  );
 };
 
 export default BackButton;
