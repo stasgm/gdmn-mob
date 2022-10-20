@@ -57,7 +57,7 @@ const OrderViewScreen = () => {
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderView'>>();
-  const { id, routeId, blocked } = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params;
+  const { id, routeId, readonly } = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params;
 
   const dispatch = useDispatch();
 
@@ -69,7 +69,7 @@ const OrderViewScreen = () => {
 
   const order = docSelectors.selectByDocId<IOrderDocument>(id);
 
-  const isBlocked = blocked || order?.status !== 'DRAFT';
+  const isBlocked = readonly || order?.status !== 'DRAFT';
 
   const debt = refSelectors.selectByRefId<IDebt>('debt', order?.head?.contact.id);
 
@@ -287,7 +287,7 @@ const OrderViewScreen = () => {
   const actionsMenu = useCallback(() => {
     showActionSheet(
       isBlocked
-        ? order?.status === 'SENT' || blocked
+        ? order?.status === 'SENT' || readonly
           ? [
               {
                 title: 'Копировать заявку',
@@ -341,7 +341,7 @@ const OrderViewScreen = () => {
     showActionSheet,
     isBlocked,
     order?.status,
-    blocked,
+    readonly,
     handleCopyOrder,
     handleDelete,
     handleAddOrderLine,

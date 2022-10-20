@@ -392,7 +392,7 @@ const VisitScreen = () => {
       <ScreenListItem
         key={item.id}
         {...item}
-        onPress={() => navigation.navigate('OrderView', { id: item.id, routeId: route.id, blocked: true })}
+        onPress={() => navigation.navigate('OrderView', { id: item.id, routeId: route.id, readonly: true })}
       />
     );
   };
