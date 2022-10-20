@@ -3,14 +3,7 @@ import { Text, View, StyleSheet } from 'react-native';
 
 import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigation/native';
 
-import {
-  AppActivityIndicator,
-  globalStyles,
-  MediumText,
-  navBackButton,
-  ScanBarcode,
-  ScanBarcodeReader,
-} from '@lib/mobile-ui';
+import { AppActivityIndicator, globalStyles, navBackButton, ScanBarcode, ScanBarcodeReader } from '@lib/mobile-ui';
 import { useSelector, refSelectors } from '@lib/store';
 
 import { IDocumentType, INamedEntity, ISettingsOption } from '@lib/types';
@@ -176,7 +169,16 @@ const ScanBarcodeScreen = () => {
     >
       {scannedObject ? (
         <View style={localStyles.itemInfo}>
-          <MediumText style={localStyles.text}>{scannedObject.barcode}</MediumText>
+          <View style={localStyles.goodInfo}>
+            <Text style={localStyles.goodName} numberOfLines={3}>
+              {scannedObject?.good.name}
+            </Text>
+            <Text style={localStyles.barcode}>{scannedObject?.barcode}</Text>
+            <Text style={localStyles.barcode}>
+              цена: {scannedObject?.price || 0} р., остаток: {scannedObject?.remains}
+            </Text>
+            <Text style={localStyles.barcode}>количество: {scannedObject?.quantity}</Text>
+          </View>
         </View>
       ) : undefined}
     </ScanBarcodeReader>
@@ -217,10 +219,6 @@ const localStyles = StyleSheet.create({
   itemInfo: {
     flexShrink: 1,
     paddingRight: 10,
-  },
-  text: {
-    color: '#fff',
-    textTransform: 'uppercase',
   },
   goodInfo: {
     flexShrink: 1,

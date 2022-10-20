@@ -55,10 +55,20 @@ const ScanGoodScreen = () => {
 
   const tempOrder = useFpSelector((state) => state.fpMovement.list).find((i) => i.orderId === shipment?.head?.orderId);
 
+  const minBarcodeLength = settings.minBarcodeLength?.data || 0;
+
   const handleGetScannedObject = useCallback(
     (brc: string) => {
       if (!brc.match(/^-{0,1}\d+$/)) {
         setScaner({ state: 'error', message: 'Штрих-код неверного формата' });
+        return;
+      }
+
+      if (brc.length < minBarcodeLength) {
+        setScaner({
+          state: 'error',
+          message: `Неверный формат штрих-кода \nДлина меньше ${minBarcodeLength} символов`,
+        });
         return;
       }
 
@@ -92,7 +102,7 @@ const ScanGoodScreen = () => {
       setScaner({ state: 'found' });
     },
 
-    [goodBarcodeSettings, goods, shipmentLines],
+    [goodBarcodeSettings, goods, minBarcodeLength, shipmentLines],
   );
 
   const handleSaveScannedItem = useCallback(() => {
@@ -142,7 +152,7 @@ const ScanGoodScreen = () => {
           },
         ]);
       }
-    } else {
+    } else if (shipment.documentType.name === 'shipment' || shipment.documentType.name === 'currShipment') {
       Alert.alert('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', [
         {
           text: 'Да',
@@ -155,8 +165,11 @@ const ScanGoodScreen = () => {
           text: 'Отмена',
         },
       ]);
+    } else {
+      dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
+      setScaner({ state: 'init' });
     }
-  }, [scannedObject, tempOrder, fpDispatch, dispatch, docId]);
+  }, [scannedObject, tempOrder, shipment.documentType.name, fpDispatch, dispatch, docId]);
 
   const handleClearScaner = () => setScaner({ state: 'init' });
 

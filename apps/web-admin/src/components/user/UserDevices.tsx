@@ -4,10 +4,13 @@ import { IDeviceBinding } from '@lib/types';
 
 import { useCallback, useEffect, useState } from 'react';
 
+import { authActions, useAuthThunkDispatch } from '@lib/store';
+
 import { IToolBarButton, IPageParam } from '../../types';
 import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
 import { useDispatch, useSelector } from '../../store';
 import actionsBinding from '../../store/deviceBinding';
+import deviceActions from '../../store/device';
 import codeActions from '../../store/activationCode';
 import DeviceBindingListTable from '../deviceBinding/DeviceBindingListTable';
 
@@ -19,6 +22,8 @@ interface IProps {
 
 const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
   const dispatch = useDispatch();
+  const authDispatch = useAuthThunkDispatch();
+
   // const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
   const { pageParams } = useSelector((state) => state.deviceBindings);
@@ -26,6 +31,14 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
   const { list: activationCodes } = useSelector((state) => state.activationCodes);
+  const { list: devices } = useSelector((state) => state.devices);
+
+  const fetchDevices = useCallback(
+    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+      dispatch(deviceActions.fetchDevices(filterText, fromRecord, toRecord));
+    },
+    [dispatch],
+  );
 
   const fetchDeviceBindings = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
@@ -40,11 +53,19 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
     },
     [dispatch],
   );
+
   useEffect(() => {
     /* Загружаем данные при загрузке компонента */
     fetchActivationCodes();
+    fetchDevices(pageParams?.filterText as string);
     fetchDeviceBindings(pageParams?.filterText as string);
-  }, [fetchActivationCodes, fetchDeviceBindings, pageParams?.filterText]);
+  }, [fetchActivationCodes, fetchDeviceBindings, fetchDevices, pageParams?.filterText]);
+
+  const handleCreateUid = async (code: string, deviceId: string) => {
+    await authDispatch(authActions.activateDevice(code));
+    dispatch(deviceActions.fetchDeviceById(deviceId));
+    fetchActivationCodes(deviceId);
+  };
 
   const handleUpdateInput = (value: string) => {
     const inputValue: string = value;
@@ -60,19 +81,12 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
     dispatch(actionsBinding.deviceBindingActions.setPageParam({ filterText: pageParamLocal?.filterText }));
 
     fetchDeviceBindings(pageParamLocal?.filterText as string);
-
-    // const inputValue = valueRef?.current?.value;
-
-    // fetchDeviceBindings(inputValue);
   };
 
   const handleKeyPress = (key: string) => {
     if (key !== 'Enter') return;
 
     handleSearchClick();
-    // const inputValue = valueRef?.current?.value;
-
-    // fetchDeviceBindings(inputValue);
   };
 
   const handleCreateCode = (deviceId: string) => {
@@ -109,9 +123,11 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
         />
         <Box sx={{ pt: 2 }}>
           <DeviceBindingListTable
+            devices={devices}
             deviceBindings={userBindingDevices}
             activationCodes={activationCodes}
             onCreateCode={handleCreateCode}
+            onCreateUid={handleCreateUid}
             limitRows={5}
           />
         </Box>

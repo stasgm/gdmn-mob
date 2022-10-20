@@ -6,13 +6,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { documentActions, useDispatch, useSelector } from '@lib/store';
 
-import { MenuButton, DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
+import { MenuButton, navBackDrawer } from '@lib/mobile-ui';
 import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 import { useNavigation } from '@react-navigation/native';
 
 import { documentsMock } from '@lib/mock';
-
-import { navBackDrawer } from '@lib/mobile-ui';
 
 import DocumentListScreen from '../../screens/Documents/DocumentListScreen';
 

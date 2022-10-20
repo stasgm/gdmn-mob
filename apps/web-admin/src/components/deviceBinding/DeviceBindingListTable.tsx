@@ -17,7 +17,7 @@ import {
   Tooltip,
   Typography,
 } from '@material-ui/core';
-import { IDeviceBinding, IActivationCode } from '@lib/types';
+import { IDeviceBinding, IActivationCode, IDevice } from '@lib/types';
 
 import RefreshIcon from '@material-ui/icons/Refresh';
 
@@ -25,8 +25,10 @@ import { deviceStates, adminPath } from '../../utils/constants';
 
 interface IProps {
   deviceBindings?: IDeviceBinding[];
+  devices?: IDevice[];
   activationCodes?: IActivationCode[];
   onCreateCode?: (deviceId: string) => void;
+  onCreateUid?: (code: string, deviceId: string) => void;
   selectedDevices?: IDeviceBinding[];
   limitRows?: number;
   onChangeSelectedDevices?: (newSelectedDeviceIds: any[]) => void;
@@ -34,8 +36,10 @@ interface IProps {
 
 const DeviceBindingListTable = ({
   deviceBindings = [],
+  devices = [],
   activationCodes = [],
   onCreateCode,
+  onCreateUid,
   onChangeSelectedDevices,
   selectedDevices = [],
   limitRows = 0,
@@ -105,6 +109,7 @@ const DeviceBindingListTable = ({
   const TableRows = () => {
     const deviceList = deviceBindings.slice(page * limit, page * limit + limit).map((binding: IDeviceBinding) => {
       const code = activationCodes.find((a) => a.device.id === binding.device.id)?.code;
+      const device = devices.find((a) => a.id === binding.device.id);
       return (
         <TableRow
           hover
@@ -142,6 +147,23 @@ const DeviceBindingListTable = ({
                   {binding.device?.name}
                 </Typography>
               </NavLink>
+            </Box>
+          </TableCell>
+          <TableCell>
+            <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+              <Box>
+                {onCreateUid && (
+                  <Tooltip title="Создать номер">
+                    <Button
+                      // component={RouterLink}
+                      onClick={() => onCreateUid && code && device && onCreateUid(code, device?.id)}
+                    >
+                      <RefreshIcon />
+                    </Button>
+                  </Tooltip>
+                )}
+              </Box>
+              <Box style={{ width: '40px' }}>{device?.uid}</Box>
             </Box>
           </TableCell>
           <TableCell>{deviceStates[binding.state]}</TableCell>
@@ -198,6 +220,7 @@ const DeviceBindingListTable = ({
                   />
                 </TableCell>
                 <TableCell>Наименование</TableCell>
+                <TableCell>UID</TableCell>
                 <TableCell>Состояние</TableCell>
                 <TableCell>Код активации</TableCell>
                 <TableCell>Дата создания</TableCell>

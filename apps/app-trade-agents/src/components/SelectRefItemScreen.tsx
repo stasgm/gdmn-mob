@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useLayoutEffect, useMemo } fro
 import { View, FlatList, Alert, TouchableOpacity } from 'react-native';
 import { Searchbar, Divider, Checkbox } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
-import { IReferenceData } from '@lib/types';
+import { IReferenceData, ScreenState } from '@lib/types';
 import { appActions, refSelectors } from '@lib/store';
 import {
   AppScreen,
@@ -62,7 +62,7 @@ const SelectRefItemScreen = () => {
 
   const title = refObj?.description || refObj?.name;
 
-  const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
+  const [screenState, setScreenState] = useState<ScreenState>('idle');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -176,6 +176,7 @@ const SelectRefItemScreen = () => {
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
               selectionColor={colors.primary}
+              keyboardType="url"
             />
           </View>
           <ItemSeparator />
@@ -187,6 +188,7 @@ const SelectRefItemScreen = () => {
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
+        keyboardShouldPersistTaps={'handled'}
       />
     </AppScreen>
   );

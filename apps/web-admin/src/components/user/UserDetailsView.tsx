@@ -81,6 +81,16 @@ const UserDetailsView = ({ user }: IProps) => {
               </Grid>
               <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>
+                  ID
+                </Typography>
+              </Grid>
+              <Grid item md={10} xs={6}>
+                <Typography variant="h4" gutterBottom>
+                  {user.externalId}
+                </Typography>
+              </Grid>
+              <Grid item md={2} xs={6}>
+                <Typography variant="subtitle1" gutterBottom>
                   {user.appSystem ? 'Подсистема' : 'Пользователь ERP'}
                 </Typography>
               </Grid>

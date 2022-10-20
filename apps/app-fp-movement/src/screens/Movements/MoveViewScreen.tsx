@@ -26,6 +26,8 @@ import { sleep } from '@lib/client-api';
 
 import { ScreenState } from '@lib/types';
 
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
 import { barcodeSettings, IMoveDocument, IMoveLine } from '../../store/types';
 import { MoveStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
@@ -290,11 +292,15 @@ export const MoveViewScreen = () => {
     <ListItemLine key={item.id} readonly={true}>
       <View style={styles.details}>
         <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-        <View style={styles.directionRow}>
-          <MediumText>Вес: {(item.weight || 0).toString()} кг</MediumText>
+        <View style={styles.flexDirectionRow}>
+          <MaterialCommunityIcons name="shopping-outline" size={18} />
+          <MediumText> {(item.weight || 0).toString()} кг</MediumText>
         </View>
-        <MediumText>Номер партии: {item.numReceived || ''}</MediumText>
-        <MediumText>Дата изготовления: {getDateString(item.workDate) || ''}</MediumText>
+        <View style={styles.flexDirectionRow}>
+          <MediumText>
+            Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
+          </MediumText>
+        </View>
       </View>
     </ListItemLine>
   );
@@ -410,12 +416,15 @@ export const MoveViewScreen = () => {
     <View style={styles.container}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
-        title={`№ ${doc.number} от ${getDateString(doc.documentDate)}` || ''}
+        title={doc.head.subtype.name || ''}
         onPress={handleEditDocHead}
         disabled={!['DRAFT', 'READY'].includes(doc.status)}
         isBlocked={isBlocked}
       >
         <>
+          <MediumText style={styles.rowCenter}>
+            {`№ ${doc.number} от ${getDateString(doc.documentDate)}` || ''}
+          </MediumText>
           <MediumText style={styles.rowCenter}>Откуда: {doc.head.fromDepart?.name || ''}</MediumText>
           <View style={styles.rowCenter}>
             <MediumText>Куда: {doc.head.toDepart?.name || ''}</MediumText>

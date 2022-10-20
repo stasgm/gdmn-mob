@@ -104,6 +104,9 @@ export const ScanViewScreen = () => {
   }, [delList, dispatch, id, setDelList]);
 
   const handleSaveDocument = useCallback(() => {
+    if (!doc) {
+      return;
+    }
     dispatch(
       documentActions.updateDocument({
         docId: id,
@@ -113,7 +116,7 @@ export const ScanViewScreen = () => {
     navigation.goBack();
   }, [dispatch, id, doc, navigation]);
 
-  const sendDoc = useSendDocs([doc]);
+  const sendDoc = useSendDocs(doc ? [doc] : []);
 
   const handleSendDocument = useCallback(() => {
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [

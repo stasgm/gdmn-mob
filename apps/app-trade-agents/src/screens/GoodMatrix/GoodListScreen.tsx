@@ -93,6 +93,7 @@ const GoodListScreen = () => {
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
               selectionColor={colors.primary}
+              keyboardType="url"
             />
           </View>
           <ItemSeparator />
@@ -105,6 +106,7 @@ const GoodListScreen = () => {
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
         ListEmptyComponent={EmptyList}
+        keyboardShouldPersistTaps={'handled'}
       />
     </AppScreen>
   );

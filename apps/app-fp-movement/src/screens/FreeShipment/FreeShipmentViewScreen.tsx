@@ -26,6 +26,8 @@ import { sleep } from '@lib/client-api';
 
 import { ScreenState } from '@lib/types';
 
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
 import { barcodeSettings, IFreeShipmentDocument, IFreeShipmentLine } from '../../store/types';
 import { FreeShipmentStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
@@ -266,14 +268,18 @@ export const FreeShipmentViewScreen = () => {
   }, [navigation, renderRight]);
 
   const renderItem: ListRenderItem<IFreeShipmentLine> = ({ item }) => (
-    <ListItemLine key={item.id}>
+    <ListItemLine key={item.id} readonly={true}>
       <View style={styles.details}>
         <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-        <View style={styles.directionRow}>
-          <MediumText>Вес: {(item.weight || 0).toString()} кг</MediumText>
+        <View style={styles.flexDirectionRow}>
+          <MaterialCommunityIcons name="shopping-outline" size={18} />
+          <MediumText> {(item.weight || 0).toString()} кг</MediumText>
         </View>
-        <MediumText>Номер партии: {item.numReceived || ''}</MediumText>
-        <MediumText>Дата изготовления: {getDateString(item.workDate) || ''}</MediumText>
+        <View style={styles.flexDirectionRow}>
+          <MediumText>
+            Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
+          </MediumText>
+        </View>
       </View>
     </ListItemLine>
   );
@@ -389,12 +395,13 @@ export const FreeShipmentViewScreen = () => {
     <View style={styles.container}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
-        title={doc.head.depart.name || ''}
+        title={doc.documentType.description || ''}
         onPress={handleEditDocHead}
         disabled={!['DRAFT', 'READY'].includes(doc.status)}
         isBlocked={isBlocked}
       >
         <View style={styles.infoBlock}>
+          <MediumText>{doc.head.depart.name || ''}</MediumText>
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
         </View>
       </InfoBlock>

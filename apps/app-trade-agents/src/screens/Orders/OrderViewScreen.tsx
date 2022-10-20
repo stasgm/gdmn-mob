@@ -23,26 +23,41 @@ import {
 
 import { formatValue, generateId, getDateString, useSendDocs, keyExtractor } from '@lib/mobile-app';
 
-import { IDocument, ScreenState } from '@lib/types';
+import { INamedEntity, ScreenState } from '@lib/types';
 
 import { sleep } from '@lib/client-api';
 
 import { useTheme } from 'react-native-paper';
 
-import { IDebt, IOrderDocument, IOrderLine, IOutlet } from '../../store/types';
+import {
+  IDebt,
+  IOrderDocument,
+  IOrderLine,
+  IOutlet,
+  IRouteDocument,
+  IVisitDocument,
+  visitDocumentType,
+} from '../../store/types';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
 import { getStatusColor } from '../../utils/constants';
 
+import { getNextDocNumber } from '../../utils/helpers';
+
+import { ICoords } from '../../store/geo/types';
+
+import { getCurrentPosition } from '../../utils/expoFunctions';
+
 import OrderItem from './components/OrderItem';
 import OrderTotal from './components/OrderTotal';
+import OrderLineEdit, { IOrderItemLine } from './components/OrderLineEdit';
 
 const OrderViewScreen = () => {
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderView'>>();
-  const id = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.id;
+  const { id, routeId, readonly } = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params;
 
   const dispatch = useDispatch();
 
@@ -50,11 +65,11 @@ const OrderViewScreen = () => {
   const [delList, setDelList] = useState<string[]>([]);
   const isDelList = !!Object.keys(delList).length;
 
-  const [isGroupVisible, setIsGroupVisible] = useState(true);
+  const [isGroupVisible, setIsGroupVisible] = useState(false);
 
   const order = docSelectors.selectByDocId<IOrderDocument>(id);
 
-  const isBlocked = order?.status !== 'DRAFT';
+  const isBlocked = readonly || order?.status !== 'DRAFT';
 
   const debt = refSelectors.selectByRefId<IDebt>('debt', order?.head?.contact.id);
 
@@ -65,33 +80,115 @@ const OrderViewScreen = () => {
   const address = refSelectors.selectByRefId<IOutlet>('outlet', order?.head?.outlet.id)?.address;
 
   const handleAddOrderLine = useCallback(() => {
-    navigation.navigate('SelectGroupItem', {
+    navigation.navigate('SelectGood', {
       docId: id,
     });
   }, [id, navigation]);
 
   const handleEditOrderHead = useCallback(() => {
-    navigation.navigate('OrderEdit', { id });
-  }, [navigation, id]);
+    navigation.navigate('OrderEdit', { id, routeId });
+  }, [navigation, id, routeId]);
 
-  const handleCopyOrder = useCallback(() => {
-    const newDocDate = new Date().toISOString();
+  const orderList = docSelectors.selectByDocType<IOrderDocument>('order');
+
+  const route = docSelectors.selectByDocId<IRouteDocument>(routeId);
+
+  const routeLineId = route?.lines.find((i) => i.outlet.id === order?.head.outlet.id)?.id;
+
+  const visit = docSelectors.selectByDocType<IVisitDocument>('visit')?.find((e) => e.head.routeLineId === routeLineId);
+
+  const handleCopyOrder = useCallback(async () => {
+    if (!order) {
+      return;
+    }
+    setScreenState('copying');
+    await sleep(1);
     const newId = generateId();
 
-    const newDoc: IDocument = {
+    const tomorrow = new Date();
+    const newDocDate = tomorrow.toISOString();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const newOnDate = tomorrow.toISOString();
+
+    const orderDocs = routeId
+      ? orderList?.filter((doc) => doc.head?.route?.id === routeId && doc.head.outlet?.id === order?.head.outlet?.id)
+      : orderList;
+
+    const newNumber = getNextDocNumber(orderDocs);
+
+    const newDoc: IOrderDocument = {
       ...order,
       id: newId,
-      number: 'б\\н',
+      number: newNumber,
       status: 'DRAFT',
+      head: {
+        ...order.head,
+        route: routeId ? ({ id: routeId, name: '' } as INamedEntity) : undefined,
+        onDate: newOnDate,
+      },
       documentDate: newDocDate,
       creationDate: newDocDate,
       editionDate: newDocDate,
     };
 
-    docDispatch(documentActions.addDocument(newDoc));
+    if (routeId && routeLineId && !orderDocs.length) {
+      let beginGeoPoint: ICoords | undefined;
 
-    navigation.navigate('OrderView', { id: newId });
-  }, [order, docDispatch, navigation]);
+      try {
+        //Если копируется первая заявка
+        //и есть визит по точке маршрута, то редактируем его
+        //и нет визита - создаем
+        if (!orderDocs.length) {
+          beginGeoPoint = await getCurrentPosition();
+          const visitDate = new Date().toISOString();
+
+          if (visit) {
+            const updatedVisit: IVisitDocument = {
+              ...visit,
+              documentDate: visitDate,
+              head: {
+                ...visit.head,
+                dateBegin: visitDate,
+                beginGeoPoint,
+                routeLineId,
+              },
+              creationDate: visitDate,
+              editionDate: visitDate,
+            };
+            dispatch(documentActions.updateDocument({ docId: visit.id, document: updatedVisit }));
+          } else {
+            const visitId = generateId();
+
+            const newVisit: IVisitDocument = {
+              id: visitId,
+              documentType: visitDocumentType,
+              number: visitId,
+              documentDate: visitDate,
+              status: 'DRAFT',
+              head: {
+                routeLineId,
+                dateBegin: visitDate,
+                beginGeoPoint,
+                takenType: 'ON_PLACE',
+              },
+              creationDate: visitDate,
+              editionDate: visitDate,
+            };
+            dispatch(documentActions.addDocument(newVisit));
+          }
+
+          dispatch(documentActions.addDocument(newDoc));
+        }
+        navigation.navigate('OrderView', { id: newId, routeId });
+      } catch (e) {
+        setScreenState('idle');
+      }
+    } else {
+      docDispatch(documentActions.addDocument(newDoc));
+      navigation.navigate('OrderView', { id: newId, routeId });
+    }
+    setScreenState('copied');
+  }, [order, routeId, orderList, routeLineId, navigation, visit, dispatch, docDispatch]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
@@ -147,7 +244,7 @@ const OrderViewScreen = () => {
     ]);
   }, [delList, dispatch, id]);
 
-  const sendDoc = useSendDocs([order]);
+  const sendDoc = useSendDocs(order ? [order] : []);
 
   const handleSendDocument = useCallback(() => {
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
@@ -166,6 +263,9 @@ const OrderViewScreen = () => {
   }, [sendDoc]);
 
   const handleSaveDocument = useCallback(() => {
+    if (!order) {
+      return;
+    }
     dispatch(
       documentActions.updateDocument({
         docId: id,
@@ -176,46 +276,85 @@ const OrderViewScreen = () => {
   }, [dispatch, id, navigation, order]);
 
   useEffect(() => {
-    if (screenState === 'sent' || screenState === 'deleted') {
+    if (screenState === 'sent' || screenState === 'deleted' || screenState === 'copied') {
       setScreenState('idle');
-      navigation.goBack();
+      if (screenState !== 'copied') {
+        navigation.goBack();
+      }
     }
   }, [navigation, screenState]);
 
   const actionsMenu = useCallback(() => {
-    showActionSheet([
-      {
-        title: 'Добавить товар',
-        onPress: handleAddOrderLine,
-      },
-      {
-        title: 'Редактировать данные',
-        onPress: handleEditOrderHead,
-      },
-      {
-        title: 'Копировать заявку',
-        onPress: handleCopyOrder,
-      },
-      {
-        title: 'Удалить заявку',
-        type: 'destructive',
-        onPress: handleDelete,
-      },
-      {
-        title: 'Отмена',
-        type: 'cancel',
-      },
-    ]);
-  }, [showActionSheet, handleAddOrderLine, handleEditOrderHead, handleCopyOrder, handleDelete]);
+    showActionSheet(
+      isBlocked
+        ? order?.status === 'SENT' || readonly
+          ? [
+              {
+                title: 'Копировать заявку',
+                onPress: handleCopyOrder,
+              },
+              {
+                title: 'Отмена',
+                type: 'cancel',
+              },
+            ]
+          : [
+              {
+                title: 'Копировать заявку',
+                onPress: handleCopyOrder,
+              },
+              {
+                title: 'Удалить заявку',
+                type: 'destructive',
+                onPress: handleDelete,
+              },
+              {
+                title: 'Отмена',
+                type: 'cancel',
+              },
+            ]
+        : [
+            {
+              title: 'Добавить товар',
+              onPress: handleAddOrderLine,
+            },
+            {
+              title: 'Редактировать данные',
+              onPress: handleEditOrderHead,
+            },
+            {
+              title: 'Копировать заявку',
+              onPress: handleCopyOrder,
+            },
+            {
+              title: 'Удалить заявку',
+              type: 'destructive',
+              onPress: handleDelete,
+            },
+            {
+              title: 'Отмена',
+              type: 'cancel',
+            },
+          ],
+    );
+  }, [
+    showActionSheet,
+    isBlocked,
+    order?.status,
+    readonly,
+    handleCopyOrder,
+    handleDelete,
+    handleAddOrderLine,
+    handleEditOrderHead,
+  ]);
 
   const renderRight = useCallback(
     () =>
       isBlocked ? (
-        order?.status === 'READY' ? (
-          <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
-        ) : (
-          order?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
-        )
+        <View style={styles.buttons}>
+          {order?.status === 'READY' && <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />}
+          <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
+        </View>
       ) : (
         <View style={styles.buttons}>
           {isDelList ? (
@@ -258,9 +397,11 @@ const OrderViewScreen = () => {
     });
   }, [delList.length, isDelList, navigation, renderLeft, renderRight]);
 
+  const [orderLine, setOrderLine] = useState<IOrderItemLine | undefined>();
+
   const handlePressOrderLine = useCallback(
-    (item: IOrderLine) => !isBlocked && navigation.navigate('OrderLine', { mode: 1, docId: id, item }),
-    [id, isBlocked, navigation],
+    (item: IOrderLine) => !isBlocked && setOrderLine({ mode: 1, docId: id, item }),
+    [id, isBlocked],
   );
 
   const renderItem = useCallback(
@@ -272,12 +413,12 @@ const OrderViewScreen = () => {
           item={item}
           onPress={() => handlePressOrderLine(item)}
           isChecked={checkedId ? true : false}
-          onLongPress={() => handleAddDeletelList(item.id, checkedId)}
+          onLongPress={() => !isBlocked && handleAddDeletelList(item.id, checkedId)}
           isDelList={isDelList}
         />
       );
     },
-    [delList, handleAddDeletelList, handlePressOrderLine, isDelList],
+    [delList, handleAddDeletelList, handlePressOrderLine, isBlocked, isDelList],
   );
 
   const isFocused = useIsFocused();
@@ -285,11 +426,11 @@ const OrderViewScreen = () => {
     return <AppActivityIndicator />;
   }
 
-  if (screenState === 'deleting') {
+  if (screenState === 'deleting' || screenState === 'copying') {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
-          <LargeText>Удаление документа...</LargeText>
+          <LargeText>{screenState === 'deleting' ? 'Удаление документа...' : 'Копирование документа...'}</LargeText>
           <AppActivityIndicator style={{}} />
         </View>
       </View>
@@ -307,18 +448,20 @@ const OrderViewScreen = () => {
   return (
     <>
       <View style={styles.container}>
+        {orderLine && <OrderLineEdit orderLine={orderLine} onDismiss={() => setOrderLine(undefined)} />}
         <InfoBlock
           colorLabel={getStatusColor(order?.status || 'DRAFT')}
           title={order.head?.outlet?.name}
           onPress={handleEditOrderHead}
           disabled={isDelList || !['DRAFT', 'READY'].includes(order.status)}
           isBlocked={isBlocked}
+          isFromRoute={order.head.route ? true : false}
         >
           <View style={styles.directionColumn}>
+            <MediumText>Адрес: {address}</MediumText>
             <MediumText>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
               order.head?.onDate,
             )}`}</MediumText>
-            <MediumText>Адрес: {address}</MediumText>
             <MediumText style={debtTextStyle}>
               {(!!debt?.saldo && debt.saldo < 0
                 ? `Предоплата: ${formatValue({ type: 'currency', decimals: 2 }, Math.abs(debt.saldo))}`
@@ -342,10 +485,9 @@ const OrderViewScreen = () => {
           data={order.lines}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
-          initialNumToRender={6}
-          maxToRenderPerBatch={6}
+          initialNumToRender={20}
+          maxToRenderPerBatch={20}
           updateCellsBatchingPeriod={100}
-          windowSize={7}
           ItemSeparatorComponent={ItemSeparator}
         />
       </View>

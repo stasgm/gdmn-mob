@@ -32,6 +32,7 @@ export type MessageType = ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>> | IDocum
 export interface IMessage<T = MessageType> {
   id: string;
   status: StatusType;
+  errorMessage?: string;
   version?: string;
   head: IHeadMessage;
   body: {

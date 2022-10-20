@@ -33,12 +33,29 @@ export interface IOrderFormParam extends IFormParam {
   comment?: string;
 }
 
+export interface IOrderListFormParam extends IFormParam {
+  filterContact?: IReferenceData;
+  filterOutlet?: IReferenceData;
+  filterDateBegin?: string;
+  filterDateEnd?: string;
+  filterGood?: IReferenceData;
+}
+
+export interface IReportListFormParam extends IFormParam {
+  filterReportContact?: IReferenceData;
+  filterReportOutlet?: IReferenceData;
+  filterReportDateBegin?: string;
+  filterReportDateEnd?: string;
+  filterReportGood?: IReferenceData;
+}
+
 export interface IRouteFormParam extends IFormParam {
   routeItemId?: number;
 }
 
 export interface IGroupFormParam extends IFormParam {
-  goodItemId?: number;
+  parentGroupId?: string;
+  groupId?: string;
 }
 
 export interface ISellBillFormParam extends IFormParam {

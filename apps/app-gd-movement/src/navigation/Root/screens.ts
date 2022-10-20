@@ -17,7 +17,7 @@ import { ScanListScreen, ScanViewScreen, ScanEditScreen, ScanGoodScreen } from '
 
 export const docScreens = {
   DocEdit: { title: 'Документ', component: DocEditScreen },
-  DocView: { title: 'Документ', component: DocViewScreen },
+  DocView: { title: '', component: DocViewScreen },
   DocLine: { title: 'Позиция документа', component: DocLineScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
   SelectGoodItem: { title: 'Выбор товара', component: SelectGoodScreen },
