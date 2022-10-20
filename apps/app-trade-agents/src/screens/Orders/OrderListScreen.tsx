@@ -119,8 +119,8 @@ const OrderListScreen = () => {
         )
         ?.sort(
           (a, b) =>
-            new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
-            new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
+            new Date(b.documentDate.slice(0, 10)).getTime() - new Date(a.documentDate.slice(0, 10)).getTime() ||
+            new Date(b.head.onDate.slice(0, 10)).getTime() - new Date(a.head.onDate.slice(0, 10)).getTime(),
         ),
     [orders, outlets, searchQuery],
   );

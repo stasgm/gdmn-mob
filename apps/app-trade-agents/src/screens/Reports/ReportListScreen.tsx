@@ -142,7 +142,11 @@ const ReportListScreen = () => {
             }
             return prev;
           }, [])
-          ?.sort((a, b) => new Date(b.onDate).getTime() - new Date(a.onDate).getTime() && (a.name < b.name ? -1 : 1))
+          ?.sort(
+            (a, b) =>
+              new Date(b.onDate.slice(0, 10)).getTime() - new Date(a.onDate.slice(0, 10)).getTime() ||
+              (a.name < b.name ? -1 : 1),
+          )
       : [];
   }, [filteredOrderList, orders, outlets]);
 
