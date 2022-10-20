@@ -20,6 +20,7 @@ import {
   MediumText,
   SelectableInput,
   SearchButton,
+  PrimeButton,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -68,6 +69,12 @@ const OrderListScreen = () => {
     return () => {
       dispatch(appActions.clearFormParams());
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleCleanFormParams = useCallback(() => {
+    dispatch(appActions.clearFormParams());
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -377,6 +384,15 @@ const OrderListScreen = () => {
                 />
               </View>
             </View>
+            <View style={localStyles.container}>
+              <PrimeButton
+                icon={'delete-outline'}
+                onPress={handleCleanFormParams}
+                disabled={!(filterContact || filterOutlet || filterDateBegin || filterDateEnd)}
+              >
+                {'Очистить'}
+              </PrimeButton>
+            </View>
           </View>
           <ItemSeparator />
         </>
@@ -435,5 +451,9 @@ const localStyles = StyleSheet.create({
   rightInput: {
     marginLeft: 6,
     marginRight: 10,
+  },
+  container: {
+    alignItems: 'center',
+    marginTop: -10,
   },
 });
