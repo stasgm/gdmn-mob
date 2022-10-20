@@ -244,7 +244,7 @@ const ReportListScreen = () => {
               label="С даты отгрузки"
               value={filterDateBegin ? getDateString(filterDateBegin) : ''}
               onPress={handlePresentDateBegin}
-              style={filterDateBegin ? localStyles.leftInput : [localStyles.leftInput, localStyles.font]}
+              style={!filterDateBegin && localStyles.fontSize}
             />
           </View>
           <View style={localStyles.width}>
@@ -252,7 +252,7 @@ const ReportListScreen = () => {
               label="По дату отгрузки"
               value={filterDateEnd ? getDateString(filterDateEnd || '') : ''}
               onPress={handlePresentDateEnd}
-              style={filterDateEnd ? localStyles.rightInput : [localStyles.rightInput, localStyles.font]}
+              style={[!filterDateEnd && localStyles.fontSize, localStyles.marginInput]}
             />
           </View>
         </View>
@@ -301,14 +301,13 @@ const localStyles = StyleSheet.create({
   marginTop: {
     marginTop: -5,
   },
-  width: { width: '50%' },
-  font: { fontSize: 14 },
-  leftInput: {
-    marginLeft: 10,
-    marginRight: 6,
+  width: {
+    width: '50%',
   },
-  rightInput: {
-    marginLeft: 6,
-    marginRight: 10,
+  fontSize: {
+    fontSize: 14,
+  },
+  marginInput: {
+    marginLeft: 5,
   },
 });

@@ -425,9 +425,7 @@ const VisitScreen = () => {
                   <LargeText style={localStyles.contract}>{`Визит начат: ${getDateString(
                     dateBegin,
                   )} ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())}`}</LargeText>
-                  {geo && (
-                    <MediumText style={debtTextStyle}>{`Координаты: ${geo.latitude}, ${geo.longitude}`}</MediumText>
-                  )}
+                  {geo && <MediumText>{`Координаты: ${geo.latitude}, ${geo.longitude}`}</MediumText>}
                 </View>
               )}
             </>
