@@ -87,11 +87,11 @@ const OrderListTotal = ({ sectionOrders }: IItem) => {
       <Divider style={{ backgroundColor: colors.primary }} />
       <View style={[styles.directionColumn, localStyles.margins]}>
         <View style={styles.itemNoMargin}>
-          <LargeText style={styles.textTotal}>Количество принятых заявок: </LargeText>
+          <LargeText style={styles.textTotal}>Принятых заявок: </LargeText>
           <MediumText>{sectionOrders.data.length}</MediumText>
         </View>
         <View style={styles.itemNoMargin}>
-          <LargeText style={styles.textTotal}>Количество одобренных заявок: </LargeText>
+          <LargeText style={styles.textTotal}>Одобренных заявок: </LargeText>
           <MediumText>{sectionOrders.data.filter((i) => i.status === 'PROCESSED').length}</MediumText>
         </View>
       </View>

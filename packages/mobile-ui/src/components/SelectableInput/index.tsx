@@ -1,6 +1,8 @@
 import React from 'react';
-import { View } from 'react-native';
-import { TextInput, useTheme } from 'react-native-paper';
+import { StyleProp, TextStyle, View } from 'react-native';
+import { IconButton, TextInput, useTheme } from 'react-native-paper';
+
+import buttonStyles from '../../styles/buttonRippleStyle';
 
 import styles from './styles';
 
@@ -12,11 +14,12 @@ interface Props {
   editable?: boolean;
   disabled?: boolean;
   required?: boolean;
+  style?: StyleProp<TextStyle>;
 }
 
 const truncate = (str: string, l: number | undefined = 40) => (str.length > l ? `${str.substring(0, l)}...` : str);
 
-const SelectableInput = ({ value, onPress, label, placeholder, editable = false, disabled }: Props) => {
+const SelectableInput = ({ value, onPress, label, placeholder, editable = false, disabled, style }: Props) => {
   const { colors } = useTheme();
 
   return (
@@ -34,14 +37,16 @@ const SelectableInput = ({ value, onPress, label, placeholder, editable = false,
             },
           }}
           mode="outlined"
-          style={styles.input}
+          style={style ? [styles.input, style] : styles.input}
           placeholderTextColor={colors.text}
           placeholder={placeholder}
-          right={!disabled && <TextInput.Icon name="chevron-right" style={{ marginTop: 14 }} onPress={onPress} />}
           editable={editable}
           disabled={disabled}
           children={undefined}
         />
+      </View>
+      <View style={buttonStyles.viewRight_24}>
+        <IconButton icon="chevron-right" size={24} style={buttonStyles.icon_24} onPress={onPress} disabled={disabled} />
       </View>
     </View>
   );

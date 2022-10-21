@@ -167,7 +167,9 @@ const findMany = (params: Record<string, string>): IDeviceBinding[] => {
 
       const device = devices.findById(i.deviceId);
       if (!device) {
-        throw new DataNotFoundException(`Устройство с ИД = ${i.deviceId} не найдено в таблице устройств`);
+        throw new DataNotFoundException(
+          `В таблице устройств не найдена запись с ИД = ${i.deviceId},ссылка на кот. указана в устройстве с ИД ${i.id}`,
+        );
       }
 
       let companyIdFound = true;

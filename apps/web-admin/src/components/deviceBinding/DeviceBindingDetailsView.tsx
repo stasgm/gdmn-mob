@@ -9,9 +9,10 @@ import { deviceStates, adminPath } from '../../utils/constants';
 interface IProps {
   deviceBinding: IDeviceBinding;
   activationCode?: string;
+  uid?: string;
 }
 
-const DeviceBindingDetailsView = ({ deviceBinding }: IProps) => {
+const DeviceBindingDetailsView = ({ deviceBinding, uid = '' }: IProps) => {
   return (
     <Card>
       <CardHeader title="Общая информация" />
@@ -52,6 +53,16 @@ const DeviceBindingDetailsView = ({ deviceBinding }: IProps) => {
               <Grid item md={10} xs={6}>
                 <Typography variant="h4" gutterBottom>
                   {deviceStates[deviceBinding.state]}
+                </Typography>
+              </Grid>
+              <Grid item md={2} xs={6}>
+                <Typography variant="subtitle1" gutterBottom>
+                  UID
+                </Typography>
+              </Grid>
+              <Grid item md={10} xs={6}>
+                <Typography variant="h4" gutterBottom>
+                  {uid}
                 </Typography>
               </Grid>
             </Grid>

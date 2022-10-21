@@ -24,6 +24,8 @@ export interface IUser extends INamedEntity, IExternalSystemProps {
   creator?: INamedEntity;
   company?: INamedEntity;
   settings?: IUserSettings;
+  externalId?: string;
+  disabled?: boolean;
 }
 
 export type n = Omit<IUser, 'id' | 'name'>;
@@ -31,6 +33,8 @@ export type n = Omit<IUser, 'id' | 'name'>;
 export type NewUser = Omit<IUser, 'id'> & { password: string; verifyPassword?: string };
 
 export type IUserCredentials = Pick<IUser, 'name' | 'email'> & { password: string; verifyPassword?: string };
+
+export type IUserWithDevice = IUser & { deviceUids?: string[] };
 
 export interface ICompany extends INamedEntity, IExternalSystemProps {
   city?: string;

@@ -17,7 +17,7 @@ import {
 
 import { extraPredicate } from '@lib/mobile-app';
 
-import { IReferenceData } from '@lib/types';
+import { IReferenceData, ScreenState } from '@lib/types';
 
 import { useDispatch } from '../store';
 import { RefParamList } from '../navigation/Root/types';
@@ -57,7 +57,7 @@ const SelectRefItemScreen = () => {
 
   const title = refObj?.description || refObj?.name;
 
-  const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
+  const [screenState, setScreenState] = useState<ScreenState>('idle');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);

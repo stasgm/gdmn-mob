@@ -44,7 +44,11 @@ const ReferenceListScreen = () => {
         ItemSeparatorComponent={Divider}
         scrollEventThrottle={400}
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
-        ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
+        ListEmptyComponent={
+          !loading ? (
+            <Text style={styles.emptyList}>{'Список пуст. \nПожалуйста, выполните синхронизацию.'}</Text>
+          ) : null
+        }
       />
     </AppScreen>
   );

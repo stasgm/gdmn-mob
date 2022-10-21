@@ -15,7 +15,7 @@ import {
   AppActivityIndicator,
   navBackButton,
 } from '@lib/mobile-ui';
-import { IDepartment, IDocumentType, IReference } from '@lib/types';
+import { IDepartment, IDocumentType, IReference, ScreenState } from '@lib/types';
 
 import { getDateString } from '@lib/mobile-app';
 
@@ -31,7 +31,7 @@ const ShipmentEditScreen = () => {
 
   const { colors } = useTheme();
 
-  const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
+  const [screenState, setScreenState] = useState<ScreenState>('idle');
 
   const shipment = docSelectors.selectByDocId<IShipmentDocument>(id);
 
