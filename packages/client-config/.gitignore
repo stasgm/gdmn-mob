@@ -1,4 +1,4 @@
 #config
 src/*
 !src/index.ts
-!src/config.sample
+!src/dev.ts.sample
