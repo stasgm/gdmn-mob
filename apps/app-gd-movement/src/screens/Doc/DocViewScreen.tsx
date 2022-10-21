@@ -108,7 +108,7 @@ export const DocViewScreen = () => {
     }
   }, [navigation, screenState]);
 
-  const sendDoc = useSendDocs([doc]);
+  const sendDoc = useSendDocs(doc ? [doc] : []);
 
   const handleSendDocument = useCallback(() => {
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
@@ -149,6 +149,10 @@ export const DocViewScreen = () => {
   }, [showActionSheet, handleAddDocLine, handleDelete, handleEditDocHead]);
 
   const handleSaveDocument = useCallback(() => {
+    if (!doc) {
+      return;
+    }
+
     dispatch(
       documentActions.updateDocument({
         docId: id,
