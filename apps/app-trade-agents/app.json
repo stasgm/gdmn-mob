@@ -2,7 +2,7 @@
   "expo": {
     "name": "GDMN Агент",
     "slug": "gdmn-sales-representative",
-    "version": "0.6.3",
+    "version": "0.7.1",
     "githubUrl": "https://github.com/stasgm/gdmn-mob",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
