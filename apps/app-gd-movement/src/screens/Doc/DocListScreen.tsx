@@ -132,7 +132,7 @@ export const DocListScreen = () => {
       if (!searchQuery) {
         setFilteredList({
           searchQuery,
-          list,
+          list: list.filter((i) => i.documentType.name !== 'scan'),
         });
       } else {
         const lower = searchQuery.toLowerCase();
@@ -154,7 +154,8 @@ export const DocListScreen = () => {
         ) {
           gr = filteredList.list.filter(fn);
         } else {
-          gr = list.filter(fn);
+          const newList = list.filter((i) => i.documentType.name !== 'scan');
+          gr = newList.filter(fn);
         }
 
         setFilteredList({

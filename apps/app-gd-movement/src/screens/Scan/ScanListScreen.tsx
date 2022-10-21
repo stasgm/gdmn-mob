@@ -132,13 +132,15 @@ export const ScanListScreen = () => {
       if (!searchQuery) {
         setFilteredList({
           searchQuery,
-          list,
+          list: list
+            .filter((i) => i.documentType.name === 'scan')
+            .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()),
         });
       } else {
         const lower = searchQuery.toLowerCase();
 
         const fn = ({ head, documentDate, number }: IScanDocument) =>
-          head.contact?.name?.toLowerCase().includes(lower) ||
+          head.department?.name?.toLowerCase().includes(lower) ||
           number.toLowerCase().includes(lower) ||
           getDateString(documentDate).toLowerCase().includes(lower);
 
@@ -151,7 +153,10 @@ export const ScanListScreen = () => {
         ) {
           gr = filteredList.list.filter(fn);
         } else {
-          gr = list.filter(fn);
+          const newList = list
+            .filter((i) => i.documentType.name === 'scan')
+            .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
+          gr = newList.filter(fn);
         }
 
         setFilteredList({

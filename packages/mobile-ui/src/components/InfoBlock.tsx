@@ -15,9 +15,18 @@ interface IProps {
   onSwipeOpen?: () => void;
   onSwipeClose?: () => void;
   isSwipeable?: boolean;
+  isFromRoute?: boolean;
 }
 
-const InfoBlock = ({ colorLabel, title, children, disabled = false, onPress, isBlocked = false }: IProps) => {
+const InfoBlock = ({
+  colorLabel,
+  title,
+  children,
+  disabled = false,
+  onPress,
+  isBlocked = false,
+  isFromRoute = false,
+}: IProps) => {
   return (
     <View style={[styles.flexDirectionRow, localStyles.box]}>
       <View style={[localStyles.label, { backgroundColor: colorLabel }]} />
@@ -33,6 +42,7 @@ const InfoBlock = ({ colorLabel, title, children, disabled = false, onPress, isB
           <Divider />
           <View style={localStyles.infoContainer}>
             <View style={{ alignSelf: 'center', flexGrow: 1, width: '80%' }}>{children}</View>
+            {isFromRoute && <MaterialCommunityIcons name="routes" size={20} style={localStyles.iconEdit} />}
             {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} style={localStyles.iconEdit} /> : null}
             {!disabled && onPress ? (
               <MaterialCommunityIcons name="file-document-edit-outline" size={20} style={localStyles.iconEdit} />

@@ -84,9 +84,6 @@ deploy
 #.editorconfig
 .idea
 
-# test
-reports
-
 # typescript composite build info
 tsconfig.tsbuildinfo
 .now

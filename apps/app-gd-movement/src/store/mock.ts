@@ -42,6 +42,7 @@ export const messageGdMovement: IMessage<MessageType>[] = [
               toType: 'department',
               toRequired: true,
               sortOrder: 1,
+              subtype: 'inventory',
             },
             {
               id: '187034606',
@@ -56,11 +57,14 @@ export const messageGdMovement: IMessage<MessageType>[] = [
               toType: 'department',
               toRequired: true,
               sortOrder: 2,
+              subtype: 'inventory',
             },
             {
               id: '189548606',
               name: 'scan',
               description: 'Сканирование',
+              sortOrder: 3,
+              subtype: 'scan',
             },
           ],
         },

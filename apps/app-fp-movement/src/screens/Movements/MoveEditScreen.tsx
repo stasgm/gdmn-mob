@@ -21,7 +21,7 @@ import { useDispatch, documentActions, appActions, useSelector, refSelectors } f
 
 import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-app';
 
-import { IDocumentType, IReference } from '@lib/types';
+import { IDocumentType, IReference, ScreenState } from '@lib/types';
 
 import { MoveStackParamList } from '../../navigation/Root/types';
 import { IMoveFormParam, IMoveDocument } from '../../store/types';
@@ -35,7 +35,7 @@ export const MoveEditScreen = () => {
 
   const { colors } = useTheme();
 
-  const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
+  const [screenState, setScreenState] = useState<ScreenState>('idle');
 
   const formParams = useSelector((state) => state.app.formParams as IMoveFormParam);
 
