@@ -1,6 +1,6 @@
 import { ActionType, createAction } from 'typesafe-actions';
 
-import { IFormParam, IAppState } from './types';
+import { IFormParam, IAppState, IRequestNotice } from './types';
 
 const init = createAction('APP/INIT')();
 
@@ -12,6 +12,9 @@ const setSyncDate = createAction('APP/SET_SYNC_DATE')<Date>();
 const loadData = createAction('APP/LOAD_DATA')<IAppState>();
 const setLoadingData = createAction('APP/SET_LOADING_DATA')<boolean>();
 const setLoadingError = createAction('APP/SET_LOADING_ERROR')<string>();
+
+const addRequestNotice = createAction('APP/ADD_REQUEST_NOTICE')<IRequestNotice>();
+const removeRequestNotice = createAction('APP/REMOVE_REQUEST_NOTICE')<string>();
 
 /**
  * Для ускорения работы программы мы кэшируем часть данных
@@ -49,6 +52,8 @@ export const appActions = {
   loadData,
   setLoadingData,
   setLoadingError,
+  addRequestNotice,
+  removeRequestNotice,
 };
 
 export type AppActionType = ActionType<typeof appActions>;

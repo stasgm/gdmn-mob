@@ -11,6 +11,7 @@ export const initialState: Readonly<IAppState> = {
   errorList: [],
   loadingData: false,
   loadingError: '',
+  requestNotice: [],
 };
 
 const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action): IAppState => {
@@ -59,6 +60,12 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
         ...state,
         loadingError: action.payload,
       };
+
+    case getType(appActions.addRequestNotice):
+      return { ...state, requestNotice: [...state.requestNotice, action.payload] };
+
+    case getType(appActions.removeRequestNotice):
+      return { ...state, requestNotice: [...state.requestNotice.filter((i) => i.id !== action.payload)] };
 
     default:
       return state;

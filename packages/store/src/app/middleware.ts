@@ -40,7 +40,9 @@ export const appMiddlewareFactory: PersistedMiddleware =
     if (store.getState().auth.user?.id) {
       switch (action.type) {
         case getType(appActions.init):
-        case getType(appActions.setSyncDate): {
+        case getType(appActions.setSyncDate):
+        case getType(appActions.addRequestNotice):
+        case getType(appActions.removeRequestNotice): {
           const result = next(action);
 
           save('app', store.getState().app, store.getState().auth.user?.id).catch((err) => {
