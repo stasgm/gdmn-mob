@@ -77,6 +77,10 @@ export const MoveViewScreen = () => {
 
   const handleGetBarcode = useCallback(
     (brc: string) => {
+      if (!doc) {
+        return;
+      }
+
       if (!brc.match(/^-{0,1}\d+$/)) {
         setErrorMessage('Штрих-код неверного формата');
         return;
@@ -123,7 +127,7 @@ export const MoveViewScreen = () => {
       }
     },
 
-    [minBarcodeLength, goodBarcodeSettings, goods, doc?.lines, dispatch, id],
+    [doc, minBarcodeLength, goodBarcodeSettings, goods, dispatch, id],
   );
 
   const handleShowDialog = () => {
@@ -172,10 +176,16 @@ export const MoveViewScreen = () => {
   const hanldeCancelLastScan = useCallback(() => {
     const lastId = doc?.lines?.[0]?.id;
 
-    dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
+    if (lastId) {
+      dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
+    }
   }, [dispatch, doc?.lines, id]);
 
   const handleSaveDocument = useCallback(() => {
+    if (!doc) {
+      return;
+    }
+
     dispatch(
       documentActions.updateDocument({
         docId: id,
@@ -185,7 +195,7 @@ export const MoveViewScreen = () => {
     navigation.goBack();
   }, [dispatch, id, navigation, doc]);
 
-  const sendDoc = useSendDocs([doc]);
+  const sendDoc = useSendDocs(doc ? [doc] : []);
 
   const handleSendDocument = useCallback(() => {
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
@@ -311,6 +321,10 @@ export const MoveViewScreen = () => {
 
   const getScannedObject = useCallback(
     (brc: string) => {
+      if (!doc) {
+        return;
+      }
+
       if (!brc.match(/^-{0,1}\d+$/)) {
         Alert.alert('Внимание!', 'Штрих-код не определен. Повторите сканирование!', [{ text: 'OK' }]);
         setScanned(false);
@@ -360,7 +374,7 @@ export const MoveViewScreen = () => {
       setScanned(false);
     },
 
-    [minBarcodeLength, goodBarcodeSettings, goods, doc?.lines, dispatch, id],
+    [doc, minBarcodeLength, goodBarcodeSettings, goods, dispatch, id],
   );
 
   const [key, setKey] = useState(1);
@@ -450,7 +464,7 @@ export const MoveViewScreen = () => {
         updateCellsBatchingPeriod={100}
         windowSize={7}
       />
-      {doc?.lines?.length ? <ViewTotal quantity={lineSum} weight={lines?.length || 0} /> : null}
+      {doc?.lines?.length ? <ViewTotal quantity={lineSum || 0} weight={lines?.length || 0} /> : null}
       <AppDialog
         title="Введите штрих-код"
         visible={visibleDialog}
