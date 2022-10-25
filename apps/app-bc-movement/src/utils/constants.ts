@@ -1,4 +1,4 @@
-import { baseSettingGroup } from '@lib/store/src/settings/reducer';
+import { baseSettingGroup } from '@lib/store';
 import { Settings, StatusType } from '@lib/types';
 
 const statusColors = ['#E91E63', '#06567D', '#80B12C', '#FFA700'] as const;
@@ -35,7 +35,7 @@ export const getStatusColor = (status: StatusType) => {
 
 export const appSettings: Settings = {
   scannerUse: {
-    id: '4',
+    id: 'scannerUse',
     sortOrder: 3,
     description: 'Использовать сканер',
     data: true,

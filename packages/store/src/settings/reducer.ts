@@ -7,19 +7,40 @@ import { actions, SettingsActionType } from './actions';
 
 import { SettingsState } from './types';
 
-export const baseSettingGroup = { id: '1', name: 'Настройки приложения', sortOrder: 1 };
+export const baseSettingGroup = { id: 'base', name: 'Настройки приложения', sortOrder: 1 };
+export const synchSettingGroup = { id: 'synch', name: 'Настройки синхронизации', sortOrder: 0 };
 
 const baseSettings: Settings<IBaseSettings> = {
-  serverAutoCheck: {
-    id: '1',
+  autoSync: {
+    id: 'autoSync',
     sortOrder: 1,
-    description: 'Опрашивать сервер автоматически',
+    visible: true,
+    description: 'Автоматическая синхронизация',
     data: true,
     type: 'boolean',
+    group: synchSettingGroup,
+  },
+  synchPeriod: {
+    id: 'synchPeriod',
+    description: 'Период синхронизации, мин.',
+    data: 1,
+    type: 'number',
+    sortOrder: 2,
+    visible: true,
+    group: synchSettingGroup,
+    readonly: true,
+  },
+  getReferences: {
+    id: 'getReferences',
+    description: 'Запрашивать справочники',
+    data: true,
+    type: 'boolean',
+    sortOrder: 1,
+    visible: true,
     group: baseSettingGroup,
   },
   refLoadType: {
-    id: '2',
+    id: 'refLoadType',
     description: 'Перезаписывать справочники',
     data: true,
     type: 'boolean',
@@ -28,32 +49,13 @@ const baseSettings: Settings<IBaseSettings> = {
     group: baseSettingGroup,
   },
   cleanDocTime: {
-    id: '3',
+    id: 'cleanDocTime',
     description: 'Хранение документов, дн.',
     data: 60,
     type: 'number',
-    sortOrder: 4,
-    visible: true,
-    group: baseSettingGroup,
-  },
-  getReferences: {
-    id: '4',
-    description: 'Запрашивать справочники',
-    data: true,
-    type: 'boolean',
     sortOrder: 3,
     visible: true,
     group: baseSettingGroup,
-  },
-  synchPeriod: {
-    id: 'synchPeriod',
-    description: 'Период синхронизации',
-    data: 10,
-    type: 'number',
-    sortOrder: 5,
-    visible: true,
-    group: baseSettingGroup,
-    readonly: true,
   },
 };
 

@@ -1,8 +1,8 @@
-import { BodyType, INamedEntity, StatusType } from './common';
+import { BodyType, CmdName, INamedEntity, StatusType } from './common';
 import { IDocument, IDocumentType } from './document';
 import { IReferences } from './references';
 
-import { IUserSettings } from './models';
+import { IAppSystemSettings, IUserSettings } from './models';
 
 export interface IHeadMessage {
   appSystem: INamedEntity;
@@ -23,11 +23,16 @@ export interface ICmdParams<T = any> {
 }
 
 export interface ICmd<T extends ICmdParams[] | Pick<ICmdParams, 'data'> = ICmdParams[]> {
-  name: string;
+  name: CmdName;
   params?: T;
 }
 
-export type MessageType = ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>> | IDocument[] | IReferences | IUserSettings;
+export type MessageType =
+  | ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>>
+  | IDocument[]
+  | IReferences
+  | IUserSettings
+  | IAppSystemSettings;
 
 export interface IMessage<T = MessageType> {
   id: string;

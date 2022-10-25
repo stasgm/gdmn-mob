@@ -17,10 +17,11 @@ type Settings<T = Record<string, SettingValue>> = {
 };
 
 interface IBaseSettings {
-  serverAutoCheck: boolean;
+  autoSync: boolean;
   refLoadType: boolean;
   cleanDocTime: number;
-  scannerUse: boolean;
+  getReferences: boolean;
+  synchPeriod: number;
   [name: string]: SettingValue;
 }
 

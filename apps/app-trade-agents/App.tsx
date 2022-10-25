@@ -7,7 +7,6 @@ import { INavItem, GDMN_PHONE, GDMN_EMAIL, GDMN_SITE_ADDRESS } from '@lib/mobile
 import {
   appActions,
   appSelectors,
-  authSelectors,
   referenceActions,
   documentActions,
   settingsActions,
@@ -94,7 +93,7 @@ const Root = () => {
 
   //Загружаем в стор дополнительные настройки приложения
   const isInit = useSelector((state) => state.settings.isInit);
-  const { isGetReferences, synchPeriod } = useSelector((state) => state.settings?.data);
+  const getReferences = useSelector((state) => state.settings?.data?.getReferences);
   const isDemo = useSelector((state) => state.auth.isDemo);
 
   const refDispatch = useRefThunkDispatch();
@@ -117,7 +116,7 @@ const Root = () => {
       dispatch(
         settingsActions.updateOption({
           optionName: 'getReferences',
-          value: { ...isGetReferences, data: false } as ISettingsOption,
+          value: { ...getReferences, data: false } as ISettingsOption,
         }),
       );
     }
@@ -127,24 +126,8 @@ const Root = () => {
   const appDataLoading = appSelectors.selectLoading();
   const authLoading = useSelector((state) => state.auth.loadingData);
   const tradeLoading = useAppTradeSelector((state) => state.appTrade.loadingData);
-  const isLogged = authSelectors.isLoggedWithCompany();
   const tradeLoadingError = useAppTradeSelector<string>((state) => state.appTrade.loadingError);
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
-
-  useEffect(() => {
-    if (isLogged) {
-      dispatch(appActions.loadSuperDataFromDisc());
-      //Временно устанавливаем время синхронизации на сервере 10 мин
-      //В будущем, брать из приходящих настроек от ERP
-      dispatch(
-        settingsActions.updateOption({
-          optionName: 'synchPeriod',
-          value: { ...synchPeriod, data: 10 } as ISettingsOption,
-        }),
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, isLogged]);
 
   const [loading, setLoading] = useState(true);
 

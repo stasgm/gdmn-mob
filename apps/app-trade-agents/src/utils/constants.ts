@@ -43,7 +43,7 @@ export const UNKNOWN_GROUP = { id: 'unknown', name: 'Другое' };
 
 export const appSettings: Settings = {
   isUseNetPrice: {
-    id: '5',
+    id: 'isUseNetPrice',
     description: 'Использовать матрицы',
     data: true,
     type: 'boolean',

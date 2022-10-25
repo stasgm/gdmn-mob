@@ -67,7 +67,7 @@ export const MoveViewScreen = () => {
   const settings = useSelector((state) => state.settings?.data);
 
   const goodBarcodeSettings = Object.entries(settings).reduce((prev: barcodeSettings, [idx, item]) => {
-    if (item && item.group?.id !== '1' && typeof item.data === 'number') {
+    if (item && item.group?.id !== 'base' && typeof item.data === 'number') {
       prev[idx] = item.data;
     }
     return prev;

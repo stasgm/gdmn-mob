@@ -17,6 +17,7 @@ import {
   AuthLogOut,
   BodyType,
   IAppSystem,
+  IAppSystemSettings,
   IDocument,
   IMessage,
   IReferences,
@@ -24,10 +25,25 @@ import {
   IUserSettings,
   Settings,
 } from '@lib/types';
-import api from '@lib/client-api';
+import api, { sleep } from '@lib/client-api';
 import { Alert } from 'react-native';
 
+import { isNamedEntity } from '../utils/helpers';
+
 import { getNextOrder } from './orderCounter';
+
+const isIReferences = (obj: any): obj is IReferences => {
+  if (typeof obj === 'object') {
+    const data = Object.values(obj);
+    if (Array.isArray(data)) {
+      const refData = data[0];
+      return (
+        typeof refData === 'object' && isNamedEntity(refData) && 'data' in refData && Array.isArray(refData['data'])
+      );
+    }
+  }
+  return false;
+};
 
 const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>): (() => void) => {
   const docDispatch = useDocThunkDispatch();
@@ -103,6 +119,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
         }
 
         if (!onSync && appSystem) {
+          await sleep(5000);
           // Если нет функции из пропсов
           const params = {
             appSystemId: appSystem.id,
@@ -378,6 +395,39 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
         break;
       }
 
+      case 'REF': {
+        //TODO: проверка данных, приведение к типу
+        if ((msg.body.version || 1) !== refVersion) {
+          errList.push(
+            `Структура загружаемых данных для справочника с версией '${msg.body.version}' не поддерживается приложением`,
+          );
+          break;
+        }
+
+        if (isIReferences(msg.body.payload)) {
+          const loadRef = Object.entries(msg.body.payload);
+          const [refName, refData] = loadRef[0];
+
+          //Записываем новый справочник из сообщения
+          const setRefResponse = await refDispatch(referenceActions.setOneReference({ refName, refData }));
+
+          //Если удачно сохранился справочник, удаляем сообщение в json
+          if (setRefResponse.type === 'REFERENCES/SET_ONE_SUCCESS') {
+            const removeMess = await api.message.removeMessage(msg.id, params, authMiddleware);
+            if (removeMess.type === 'ERROR') {
+              errList.push(`Справочник ${refName} загружен, но сообщение на сервере не удалено: ${removeMess.message}`);
+            }
+            okList.push(`Обновлен справочник ${refName}`);
+          } else if (setRefResponse.type === 'REFERENCES/SET_ONE_FAILURE') {
+            errList.push(`Справочник ${refName} не загружен в хранилище`);
+          }
+        } else {
+          errList.push(`Неверный тип данных объекта справочника в cообщении ${msg.id}`);
+        }
+
+        break;
+      }
+
       case 'DOCS': {
         if ((msg.body.version || 1) !== docVersion) {
           errList.push(
@@ -442,10 +492,15 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
         }
 
         try {
-          const appSetts = Object.entries(msg.body.payload as Settings);
+          const appSetts = Object.entries(msg.body.payload as IAppSystemSettings);
           for (const [optionName, value] of appSetts) {
-            if (value) {
-              settDispatch(settingsActions.updateOption({ optionName, value }));
+            if (value && settings[optionName]) {
+              settDispatch(
+                settingsActions.updateOption({
+                  optionName,
+                  value: { ...settings[optionName], data: (value.data as number) / 60 } as ISettingsOption,
+                }),
+              );
             }
           }
 
