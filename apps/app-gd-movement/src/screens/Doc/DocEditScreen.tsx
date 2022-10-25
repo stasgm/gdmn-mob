@@ -383,7 +383,7 @@ export const DocEditScreen = () => {
 
   return (
     <AppScreen>
-      <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }}>
+      <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} keyboardShouldPersistTaps={'handled'}>
         <SubTitle>{statusName}</SubTitle>
         <Divider />
         <ScrollView>
@@ -401,6 +401,7 @@ export const DocEditScreen = () => {
             onChangeText={handleChangeNumber}
             disabled={isBlocked}
             clearInput={true}
+            keyboardType="url"
           />
           <SelectableInput
             label="Дата"
