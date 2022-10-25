@@ -85,10 +85,18 @@ const MobileApp = ({ store, loadingErrors, onClearLoadingErrors, ...props }: IAp
   );
 
   const [barVisible, setBarVisible] = useState(false);
+  const [noticeVisible, setNoticeVisible] = useState(false);
+  const { requestNotice, loading } = useSelector((state) => state.app);
 
   useEffect(() => {
     if (errList.length) {
       setBarVisible(true);
+    }
+  }, [errList]);
+
+  useEffect(() => {
+    if (requestNotice.length) {
+      setNoticeVisible(true);
     }
   }, [errList]);
 
@@ -101,6 +109,7 @@ const MobileApp = ({ store, loadingErrors, onClearLoadingErrors, ...props }: IAp
     setBarVisible(false);
   };
 
+  console.log('notice', requestNotice);
   const SnackbarComponent = () => (
     <Snackbar
       visible={barVisible}
@@ -118,10 +127,46 @@ const MobileApp = ({ store, loadingErrors, onClearLoadingErrors, ...props }: IAp
     </Snackbar>
   );
 
+  const RequestNoticeComponent = () => (
+    // <Snackbar
+    //   visible={noticeVisible}
+    //   // onDismiss={closeSnackbar}
+    //   style={{ backgroundColor: defaultTheme.colors.accent }}
+    //   action={{
+    //     icon: 'close',
+    //     label: '',
+    //     onPress: () => setNoticeVisible(false),
+    //   }}
+    // >
+    <>
+      {/* {!!loading   && ( */}
+      <View
+        style={[
+          // globalStyles.container,
+          {
+            alignItems: 'center',
+            // zIndex: 1,
+            height: 40,
+            backgroundColor: defaultTheme.colors.accent,
+            // marginHorizontal: 5,
+            justifyContent: 'center',
+            opacity: 0.8,
+          },
+        ]}
+      >
+        {!!requestNotice?.length && <Text>{requestNotice?.[requestNotice?.length - 1].message}</Text>}
+      </View>
+      {/* )} */}
+    </>
+  );
+  // );
+  // </Snackbar>
+
   return (
     <NavigationContainer theme={defaultTheme}>
       {authSelectors.isLoggedWithCompany() ? <AppRoot {...props} /> : <AuthNavigator />}
       <SnackbarComponent />
+      <RequestNoticeComponent />
     </NavigationContainer>
   );
 };
