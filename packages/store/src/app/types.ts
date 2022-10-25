@@ -8,6 +8,14 @@ export interface IAppState {
   errorList: string[];
   formParams?: IFormParam;
   syncDate?: Date;
+  requestNotice: IRequestNotice[];
   readonly loadingData: boolean;
   readonly loadingError: string;
+}
+
+export interface IRequestNotice {
+  id: string;
+  url: string;
+  message: string;
+  started: Date;
 }

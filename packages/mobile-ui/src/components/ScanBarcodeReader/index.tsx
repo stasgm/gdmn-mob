@@ -125,7 +125,8 @@ const ScanBarcodeReader = ({
           <View style={[styles.scannerContainer, styles.notScannedContainer]}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
               <TextInput
-                style={styles.scanFocus}
+                style={{ width: 1 }}
+                selectionColor="transparent"
                 autoFocus={true}
                 ref={ref}
                 showSoftInputOnFocus={false}

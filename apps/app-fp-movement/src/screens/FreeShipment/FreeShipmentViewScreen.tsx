@@ -74,6 +74,10 @@ export const FreeShipmentViewScreen = () => {
 
   const handleGetBarcode = useCallback(
     (brc: string) => {
+      if (!doc) {
+        return;
+      }
+
       if (!brc.match(/^-{0,1}\d+$/)) {
         setErrorMessage('Штрих-код неверного формата');
         return;
@@ -120,7 +124,7 @@ export const FreeShipmentViewScreen = () => {
       }
     },
 
-    [dispatch, doc?.lines, goodBarcodeSettings, goods, id, minBarcodeLength],
+    [dispatch, doc, goodBarcodeSettings, goods, id, minBarcodeLength],
   );
 
   const handleShowDialog = () => {
@@ -172,7 +176,7 @@ export const FreeShipmentViewScreen = () => {
     }
   }, [dispatch, id, lines]);
 
-  const sendDoc = useSendDocs([doc]);
+  const sendDoc = useSendDocs(doc ? [doc] : []);
 
   const handleSendDocument = useCallback(() => {
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
@@ -217,6 +221,10 @@ export const FreeShipmentViewScreen = () => {
   }, [showActionSheet, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
 
   const handleSaveDocument = useCallback(() => {
+    if (!doc) {
+      return;
+    }
+
     dispatch(
       documentActions.updateDocument({
         docId: id,
@@ -290,6 +298,10 @@ export const FreeShipmentViewScreen = () => {
 
   const getScannedObject = useCallback(
     (brc: string) => {
+      if (!doc) {
+        return;
+      }
+
       if (!brc.match(/^-{0,1}\d+$/)) {
         Alert.alert('Внимание!', 'Штрих-код не определен. Повторите сканирование!', [{ text: 'OK' }]);
         setScanned(false);
@@ -339,7 +351,7 @@ export const FreeShipmentViewScreen = () => {
       setScanned(false);
     },
 
-    [minBarcodeLength, goodBarcodeSettings, goods, doc?.lines, dispatch, id],
+    [doc, minBarcodeLength, goodBarcodeSettings, goods, dispatch, id],
   );
 
   const [key, setKey] = useState(1);
@@ -424,7 +436,7 @@ export const FreeShipmentViewScreen = () => {
         updateCellsBatchingPeriod={100}
         windowSize={7}
       />
-      {lines?.length ? <ViewTotal quantity={lineSum} weight={lines?.length || 0} /> : null}
+      {lines?.length ? <ViewTotal quantity={lineSum || 0} weight={lines?.length || 0} /> : null}
       <AppDialog
         title="Введите штрих-код"
         visible={visibleDialog}

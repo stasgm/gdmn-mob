@@ -36,7 +36,7 @@
     "react-redux": "^7.2.9"
   },
   "devDependencies": {
-    "@babel/core": "^7.19.3",
+    "@babel/core": "^7.19.6",
     "@config/eslint-config": "*",
     "@config/eslint-config-react-native": "*",
     "@config/prettier-config": "*",
