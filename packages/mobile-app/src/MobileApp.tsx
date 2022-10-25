@@ -23,9 +23,7 @@ import { View, Text, Alert, AppState } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 
 import { AuthLogOut } from '@lib/types';
-
-import { useSync } from './hooks';
-import { truncate } from './utils/helpers';
+import { truncate, useSync } from '@lib/mobile-hooks';
 
 export interface IApp {
   items?: INavItem[];

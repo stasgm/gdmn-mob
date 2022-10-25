@@ -18,7 +18,7 @@ import {
 
 import { Searchbar } from 'react-native-paper';
 
-import { getDateString, keyExtractor, shortenString } from '@lib/mobile-app';
+import { getDateString, keyExtractor, shortenString } from '@lib/mobile-hooks';
 
 import { IApplDocument } from '../../store/types';
 
@@ -123,7 +123,7 @@ const ApplListScreen = () => {
   }, [colors.card, filterVisible, navigation, renderRight]);
 
   const renderSectionHeader = useCallback(
-    ({ section }) => <SubTitle style={[styles.header]}>{section.title}</SubTitle>,
+    ({ section }: { section: any }) => <SubTitle style={[styles.header]}>{section.title}</SubTitle>,
     [],
   );
 

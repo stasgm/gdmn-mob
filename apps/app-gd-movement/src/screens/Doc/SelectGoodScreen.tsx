@@ -11,7 +11,7 @@ import { INamedEntity } from '@lib/types';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { generateId } from '@lib/mobile-app';
+import { generateId } from '@lib/mobile-hooks';
 
 import { InventoryStackParamList } from '../../navigation/Root/types';
 import { IGood } from '../../store/app/types';

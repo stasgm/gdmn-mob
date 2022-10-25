@@ -31,7 +31,7 @@ import {
   keyExtractor,
   shortenString,
   useSendDocs,
-} from '@lib/mobile-app';
+} from '@lib/mobile-hooks';
 
 import { sleep } from '@lib/client-api';
 

@@ -6,7 +6,7 @@ import { useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 import { globalStyles, navBackButton } from '@lib/mobile-ui';
 import { useSelector, docSelectors, useDispatch, documentActions } from '@lib/store';
 
-import { generateId } from '@lib/mobile-app';
+import { generateId } from '@lib/mobile-hooks';
 
 import { MovementStackParamList } from '../../navigation/Root/types';
 import { IMovementLine, IMovementDocument } from '../../store/types';

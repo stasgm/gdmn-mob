@@ -523,5 +523,3 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
 
   return sync;
 };
-
-export default useSync;

@@ -35,6 +35,7 @@
     "@lib/mobile-navigation": "*",
     "@lib/mobile-types": "*",
     "@lib/mobile-ui": "*",
+    "@lib/mobile-hooks": "*",
     "@lib/store": "*",
     "@lib/types": "*",
     "@react-native-community/datetimepicker": "6.2.0",

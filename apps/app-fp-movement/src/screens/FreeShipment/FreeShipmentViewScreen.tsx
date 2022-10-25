@@ -20,7 +20,7 @@ import {
   SaveDocument,
 } from '@lib/mobile-ui';
 
-import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
+import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-hooks';
 
 import { sleep } from '@lib/client-api';
 
@@ -54,7 +54,7 @@ export const FreeShipmentViewScreen = () => {
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
 
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
-  const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0);
+  const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0) || 0;
   const isBlocked = doc?.status !== 'DRAFT';
   const goods = refSelectors.selectByName<IGood>('good').data;
   const settings = useSelector((state) => state.settings?.data);
@@ -224,7 +224,6 @@ export const FreeShipmentViewScreen = () => {
     if (!doc) {
       return;
     }
-
     dispatch(
       documentActions.updateDocument({
         docId: id,

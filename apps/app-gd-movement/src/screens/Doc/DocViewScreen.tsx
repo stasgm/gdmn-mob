@@ -22,7 +22,7 @@ import {
   SaveDocument,
 } from '@lib/mobile-ui';
 
-import { deleteSelectedLineItems, getDateString, getDelLineList, keyExtractor, useSendDocs } from '@lib/mobile-app';
+import { deleteSelectedLineItems, getDateString, getDelLineList, keyExtractor, useSendDocs } from '@lib/mobile-hooks';
 
 import { sleep } from '@lib/client-api';
 
@@ -152,7 +152,6 @@ export const DocViewScreen = () => {
     if (!doc) {
       return;
     }
-
     dispatch(
       documentActions.updateDocument({
         docId: id,

@@ -14,7 +14,7 @@ import {
   navBackButton,
 } from '@lib/mobile-ui';
 
-import { extraPredicate } from '@lib/mobile-app';
+import { extraPredicate } from '@lib/mobile-hooks';
 
 import { useDispatch } from '../store';
 import { IFormParam } from '../store/types';

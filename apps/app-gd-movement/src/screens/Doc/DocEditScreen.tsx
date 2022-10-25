@@ -20,7 +20,7 @@ import {
 } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
-import { generateId, getDateString } from '@lib/mobile-app';
+import { generateId, getDateString } from '@lib/mobile-hooks';
 
 import { IDocumentType } from '@lib/types';
 

@@ -18,7 +18,7 @@ import {
   navBackButton,
 } from '@lib/mobile-ui';
 
-import { generateId, getDateString } from '@lib/mobile-app';
+import { generateId, getDateString } from '@lib/mobile-hooks';
 
 import { MovementStackParamList } from '../../navigation/Root/types';
 import { IDepartment, IMovementFormParam, IMovementDocument } from '../../store/types';

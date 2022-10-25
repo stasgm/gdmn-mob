@@ -4,7 +4,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { globalStyles as styles, MediumText } from '@lib/mobile-ui';
 
-import { getDateString } from '@lib/mobile-app';
+import { getDateString } from '@lib/mobile-hooks';
 
 import { IRouteDocument } from '../../../store/types';
 import { getStatusColor } from '../../../utils/constants';

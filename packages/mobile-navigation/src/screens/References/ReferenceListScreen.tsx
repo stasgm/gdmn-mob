@@ -1,11 +1,13 @@
-import React, { useLayoutEffect, useMemo } from 'react';
-import { FlatList, RefreshControl, Text } from 'react-native';
-import { Divider } from 'react-native-paper';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { Alert, FlatList, RefreshControl, Text } from 'react-native';
+import { Divider, IconButton } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useSelector } from '@lib/store';
-import { AppScreen, navBackDrawer } from '@lib/mobile-ui';
+import { AppScreen, MenuButton, navBackDrawer, SendButton, useActionSheet } from '@lib/mobile-ui';
+
+import { useSendRefsRequest } from '@lib/mobile-hooks';
 
 import { ReferenceStackParamList } from '../../navigation/Root/types';
 
@@ -27,9 +29,35 @@ const ReferenceListScreen = () => {
 
   const navigation = useNavigation<ViewScreenProp>();
 
+  const showActionSheet = useActionSheet();
+
+  const sendRequest = useSendRefsRequest();
+
+  const handleSendRefsRequest = async () => {
+    if (sendRequest) {
+      await sendRequest();
+    }
+  };
+
+  const actionsMenu = useCallback(() => {
+    showActionSheet([
+      {
+        title: 'Отправить запрос на получение справочников',
+        onPress: handleSendRefsRequest,
+      },
+      {
+        title: 'Отмена',
+        type: 'cancel',
+      },
+    ]);
+  }, []);
+
+  const renderRight = useCallback(() => <MenuButton actionsMenu={actionsMenu} />, []);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackDrawer,
+      headerRight: renderRight,
     });
   }, [navigation]);
 
@@ -43,7 +71,7 @@ const ReferenceListScreen = () => {
         renderItem={renderItem}
         ItemSeparatorComponent={Divider}
         scrollEventThrottle={400}
-        refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
+        refreshControl={<RefreshControl refreshing={loading} />}
         ListEmptyComponent={
           !loading ? (
             <Text style={styles.emptyList}>{'Список пуст. \nПожалуйста, выполните синхронизацию.'}</Text>

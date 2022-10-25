@@ -1,7 +1,8 @@
 import { Linking, TouchableOpacity } from 'react-native';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Provider } from 'react-redux';
-import { dialCall, MobileApp } from '@lib/mobile-app';
+import { MobileApp } from '@lib/mobile-app';
+import { dialCall } from '@lib/mobile-hooks';
 import { INavItem, GDMN_PHONE, GDMN_EMAIL, GDMN_SITE_ADDRESS } from '@lib/mobile-navigation';
 
 import {

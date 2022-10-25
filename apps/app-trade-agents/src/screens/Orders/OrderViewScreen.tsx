@@ -21,7 +21,7 @@ import {
   SaveDocument,
 } from '@lib/mobile-ui';
 
-import { formatValue, generateId, getDateString, useSendDocs, keyExtractor } from '@lib/mobile-app';
+import { formatValue, generateId, getDateString, useSendDocs, keyExtractor } from '@lib/mobile-hooks';
 
 import { INamedEntity, ScreenState } from '@lib/types';
 

@@ -11,7 +11,7 @@ import { refSelectors } from '@lib/store';
 
 import { IListItem } from '@lib/mobile-types';
 
-import { getDateString, useFilteredDocList } from '@lib/mobile-app';
+import { getDateString, useFilteredDocList } from '@lib/mobile-hooks';
 
 import { useDispatch, useSelector } from '../../store';
 import { geoActions } from '../../store/geo/actions';

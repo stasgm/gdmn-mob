@@ -5,7 +5,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles, LargeText, MediumText } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 
-import { getDateString, useFilteredDocList } from '@lib/mobile-app';
+import { getDateString, useFilteredDocList } from '@lib/mobile-hooks';
 
 import { IOutlet, IRouteLine, IVisitDocument } from '../../../store/types';
 

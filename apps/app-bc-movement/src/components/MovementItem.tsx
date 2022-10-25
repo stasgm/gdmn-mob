@@ -15,8 +15,8 @@ export const MovementItem = ({ item }: IProps) => {
   const { colors } = useTheme();
 
   return (
-    <View style={[styles.item]}>
-      <View style={[styles.icon]}>
+    <View style={styles.item}>
+      <View style={styles.icon}>
         <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
       </View>
       <View style={styles.details}>

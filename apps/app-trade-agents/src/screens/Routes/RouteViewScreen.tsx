@@ -18,7 +18,7 @@ import {
 } from '@lib/mobile-ui';
 import { documentActions, docSelectors, useDocThunkDispatch, appActions, useSelector } from '@lib/store';
 
-import { getDateString, keyExtractor, useFilteredDocList } from '@lib/mobile-app';
+import { getDateString, keyExtractor, useFilteredDocList } from '@lib/mobile-hooks';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 

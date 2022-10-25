@@ -20,7 +20,7 @@ import {
   SaveDocument,
 } from '@lib/mobile-ui';
 
-import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
+import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-hooks';
 
 import { sleep } from '@lib/client-api';
 
@@ -59,7 +59,7 @@ export const MoveViewScreen = () => {
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
 
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
-  const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0);
+  const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0) || 0;
 
   const isBlocked = doc?.status !== 'DRAFT';
 
@@ -115,7 +115,7 @@ export const MoveViewScreen = () => {
           barcode: barc.barcode,
           workDate: barc.workDate,
           numReceived: barc.numReceived,
-          sortOrder: doc?.lines?.length + 1,
+          sortOrder: (doc?.lines?.length || 0) + 1,
         };
         setErrorMessage('');
         dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
@@ -175,7 +175,6 @@ export const MoveViewScreen = () => {
 
   const hanldeCancelLastScan = useCallback(() => {
     const lastId = doc?.lines?.[0]?.id;
-
     if (lastId) {
       dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
     }
@@ -185,7 +184,6 @@ export const MoveViewScreen = () => {
     if (!doc) {
       return;
     }
-
     dispatch(
       documentActions.updateDocument({
         docId: id,
@@ -351,7 +349,7 @@ export const MoveViewScreen = () => {
         return;
       }
 
-      const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
+      const line = doc.lines?.find((i) => i.barcode === barc.barcode);
 
       if (line) {
         Alert.alert('Внимание!', 'Данный штрих-код уже добавлен!', [{ text: 'OK' }]);
@@ -366,7 +364,7 @@ export const MoveViewScreen = () => {
         barcode: barc.barcode,
         workDate: barc.workDate,
         numReceived: barc.numReceived,
-        sortOrder: doc?.lines?.length + 1,
+        sortOrder: doc.lines?.length + 1,
       };
 
       dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));

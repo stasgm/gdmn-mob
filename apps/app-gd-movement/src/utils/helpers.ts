@@ -1,4 +1,4 @@
-import { log } from '@lib/mobile-app';
+import { log } from '@lib/mobile-hooks';
 import { IDocument } from '@lib/types';
 
 import { IGood, IMGoodData, IMGoodRemain, IModelRem, IRemainsData, IRemGood } from '../store/app/types';

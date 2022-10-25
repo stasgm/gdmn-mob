@@ -16,7 +16,7 @@ import {
   navBackButton,
 } from '@lib/mobile-ui';
 
-import { getDateString } from '@lib/mobile-app';
+import { getDateString } from '@lib/mobile-hooks';
 
 import { IInventoryDocument, IDocLine } from '../../store/types';
 import { DocStackParamList } from '../../navigation/Root/types';

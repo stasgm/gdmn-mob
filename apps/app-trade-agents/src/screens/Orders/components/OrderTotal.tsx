@@ -5,7 +5,7 @@ import { DataTable, IconButton } from 'react-native-paper';
 
 import { useTheme } from '@react-navigation/native';
 
-import { formatValue, round } from '@lib/mobile-app';
+import { formatValue, round } from '@lib/mobile-hooks';
 
 import { globalColors, globalStyles } from '@lib/mobile-ui';
 

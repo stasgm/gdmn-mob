@@ -6,7 +6,7 @@ import { Divider } from 'react-native-paper';
 
 import { useTheme } from '@react-navigation/native';
 
-import { round, useFilteredDocList } from '@lib/mobile-app';
+import { round, useFilteredDocList } from '@lib/mobile-hooks';
 
 import { IGoodGroup, IOrderDocument, IOrderLine, IOrderTotalLine } from '../../../store/types';
 import { totalList, totalListByGroup } from '../../../utils/helpers';

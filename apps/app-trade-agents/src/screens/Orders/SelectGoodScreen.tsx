@@ -23,7 +23,7 @@ import {
 } from '@lib/mobile-ui';
 import { appActions, docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 
-import { generateId, getDateString, keyExtractor, shortenString } from '@lib/mobile-app';
+import { generateId, getDateString, keyExtractor, shortenString } from '@lib/mobile-hooks';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
