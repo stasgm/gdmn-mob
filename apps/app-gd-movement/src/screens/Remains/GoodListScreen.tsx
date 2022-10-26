@@ -2,14 +2,14 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } fro
 import { FlatList, View, Text, StyleSheet } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
 import { Searchbar } from 'react-native-paper';
-import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import { RouteProp, /*useIsFocused,*/ useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import {
   AppScreen,
   ItemSeparator,
   SubTitle,
   globalStyles,
   Menu,
-  AppActivityIndicator,
+  // AppActivityIndicator,
   SearchButton,
   navBackButton,
 } from '@lib/mobile-ui';
@@ -159,10 +159,10 @@ const GoodListScreen = () => {
 
   const renderItem = ({ item }: { item: IRemGood }) => <GoodItem item={item} />;
 
-  const isFocused = useIsFocused();
-  if (!isFocused) {
-    return <AppActivityIndicator />;
-  }
+  // const isFocused = useIsFocused();
+  // if (!isFocused) {
+  //   return <AppActivityIndicator />;
+  // }
 
   return (
     <AppScreen>

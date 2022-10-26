@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
 import { StyleSheet, SectionList, ListRenderItem, SectionListData, View, Text } from 'react-native';
-import { useFocusEffect, useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
+import { useFocusEffect, /*useIsFocused,*/ useNavigation, useTheme } from '@react-navigation/native';
 import { Searchbar } from 'react-native-paper';
 
 import {
@@ -16,7 +16,7 @@ import {
   DeleteButton,
   CloseButton,
   EmptyList,
-  AppActivityIndicator,
+  // AppActivityIndicator,
   SearchButton,
   navBackDrawer,
 } from '@lib/mobile-ui';
@@ -322,10 +322,10 @@ export const DocListScreen = () => {
     [],
   );
 
-  const isFocused = useIsFocused();
-  if (!isFocused) {
-    return <AppActivityIndicator />;
-  }
+  // const isFocused = useIsFocused();
+  // if (!isFocused) {
+  //   return <AppActivityIndicator />;
+  // }
 
   return (
     <AppScreen>

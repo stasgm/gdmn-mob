@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
 import { SectionList, ListRenderItem, SectionListData, View } from 'react-native';
-import { useFocusEffect, useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
+import { useFocusEffect, /*useIsFocused,*/ useNavigation, useTheme } from '@react-navigation/native';
 import { Searchbar } from 'react-native-paper';
 
 import {
@@ -16,7 +16,7 @@ import {
   DeleteButton,
   CloseButton,
   EmptyList,
-  AppActivityIndicator,
+  // AppActivityIndicator,
   SearchButton,
   MediumText,
   navBackDrawer,
@@ -248,10 +248,10 @@ export const ScanListScreen = () => {
     [],
   );
 
-  const isFocused = useIsFocused();
-  if (!isFocused) {
-    return <AppActivityIndicator />;
-  }
+  // const isFocused = useIsFocused();
+  // if (!isFocused) {
+  //   return <AppActivityIndicator />;
+  // }
 
   return (
     <AppScreen>

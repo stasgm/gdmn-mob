@@ -473,6 +473,7 @@ export const DocEditScreen = () => {
             }}
             disabled={isBlocked}
             clearInput={true}
+            keyboardType="url"
           />
         </ScrollView>
         {showDate && (

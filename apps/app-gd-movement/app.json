@@ -2,7 +2,7 @@
   "expo": {
     "name": "GDMN Склад",
     "slug": "gdmn-gd-movement",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "githubUrl": "https://github.com/stasgm/gdmn-mob",
     "orientation": "default",
     "icon": "./assets/icon.png",
@@ -19,14 +19,14 @@
       "fallbackToCacheTimeout": 0,
       "enabled": false
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": ["**/*", "../../node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"],
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "package": "com.gsbelarus.gdmovement",
       "permissions": ["CAMERA", "ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "VIBRATE"],
-      "versionCode": 4
+      "versionCode": 5
     },
     "web": {
       "favicon": "./assets/favicon.png"

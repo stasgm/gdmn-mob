@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
-import { View, FlatList, TouchableOpacity, Text, RefreshControl } from 'react-native';
-import { Searchbar, Divider } from 'react-native-paper';
+import { View, FlatList, TouchableOpacity, Text, RefreshControl, StyleSheet } from 'react-native';
+import { Searchbar, Divider, Chip } from 'react-native-paper';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 
 import {
@@ -14,8 +14,9 @@ import {
   MediumText,
   LargeText,
   navBackButton,
+  globalColors,
 } from '@lib/mobile-ui';
-import { refSelectors, useSelector } from '@lib/store';
+import { docSelectors, refSelectors, useSelector } from '@lib/store';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -43,9 +44,18 @@ interface IProp {
   onPressGood: (goodItem: IRemGood) => void;
 }
 
-const GoodRemains = ({ item, onPressGood }: IProp) => {
+const GoodRemains = ({ item, onPressGood, docId }: IProp) => {
   const { colors } = useTheme();
   const barcode = !!item.good.barcode;
+
+  const doc = docSelectors.selectByDocId(docId) as IMovementDocument;
+  const lines = doc?.lines?.filter((i) => i.good.id === item.good.id);
+  const isAdded = !!lines?.length;
+
+  const iconStyle = [styles.icon, { backgroundColor: isAdded ? '#06567D' : '#E91E63' }];
+  const goodStyle = {
+    backgroundColor: isAdded ? globalColors.backgroundLight : 'transparent',
+  };
 
   const barcodeTextStyle = useMemo(
     () => [styles.number, styles.flexDirectionRow, { color: colors.text }],
@@ -56,19 +66,34 @@ const GoodRemains = ({ item, onPressGood }: IProp) => {
 
   return (
     <TouchableOpacity onPress={handlePressGood}>
-      <View style={[styles.item]}>
-        <View style={[styles.icon]}>
+      <View style={[localStyles.goodItem, goodStyle]}>
+        <View style={iconStyle}>
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-          <View style={[styles.directionRow]}>
+          <LargeText style={styles.textBold}>
+            {item.good.alias ? `${item.good.name}, арт. ${item.good.alias}` : item.good.name}
+          </LargeText>
+          <View style={styles.directionRow}>
             <MediumText>
               {item.remains} {item.good.valueName} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)}{' '}
               руб.
             </MediumText>
             {barcode && <Text style={barcodeTextStyle}>{item.good.barcode}</Text>}
           </View>
+          {isAdded && (
+            <View style={localStyles.lineView}>
+              {lines.map((line) => (
+                <Chip
+                  key={line.id}
+                  style={[localStyles.lineChip, { borderColor: colors.primary }]}
+                  // onPress={() => setSelectedLine(line)}
+                >
+                  {line.quantity} кг
+                </Chip>
+              ))}
+            </View>
+          )}
         </View>
       </View>
     </TouchableOpacity>
@@ -155,11 +180,11 @@ export const SelectRemainsScreen = () => {
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={true} />
+        <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={filterVisible} />
         {isScanerReader && <ScanButton onPress={handleScanner} />}
       </View>
     ),
-    [handleScanner, isScanerReader],
+    [filterVisible, handleScanner, isScanerReader],
   );
 
   useLayoutEffect(() => {
@@ -212,6 +237,7 @@ export const SelectRemainsScreen = () => {
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
               selectionColor={searchStyle}
+              keyboardType="url"
             />
           </View>
           <ItemSeparator />
@@ -230,7 +256,23 @@ export const SelectRemainsScreen = () => {
         maxToRenderPerBatch={6} // Reduce number in each render batch
         updateCellsBatchingPeriod={100} // Increase time between renders
         windowSize={7} // Reduce the window size
+        keyboardShouldPersistTaps="handled"
       />
     </AppScreen>
   );
 };
+
+const localStyles = StyleSheet.create({
+  goodItem: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    padding: 3,
+    minHeight: 50,
+    fontWeight: 'bold',
+    opacity: 0.9,
+  },
+  lineView: { display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginTop: 6 },
+  lineChip: {
+    margin: 2,
+  },
+});
