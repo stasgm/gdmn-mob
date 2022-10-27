@@ -30,6 +30,7 @@ import { getRemGoodListByContact } from '../../utils/helpers';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IMovementDocument } from '../../store/types';
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
+import { DocLineDialog } from '../../components/DocLineDialog';
 
 interface IFilteredList {
   searchQuery: string;
@@ -89,7 +90,7 @@ const GoodRemains = ({ item, onPressGood, docId }: IProp) => {
                   style={[localStyles.lineChip, { borderColor: colors.primary }]}
                   // onPress={() => setSelectedLine(line)}
                 >
-                  {line.quantity} кг
+                  {line.quantity} шт.
                 </Chip>
               ))}
             </View>
@@ -177,6 +178,9 @@ export const SelectRemainsScreen = () => {
     navigation.navigate('ScanBarcode', { docId: docId });
   }, [navigation, docId]);
 
+  const [selectedLine, setSelectedLine] = useState<IMovementLine | undefined>(undefined);
+  const [selectedGood, setSelectedGood] = useState<IGood | undefined>(undefined);
+
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
@@ -213,16 +217,22 @@ export const SelectRemainsScreen = () => {
       }),
     [docId, navigation],
   );
+
+  const hadndleDismissDialog = () => {
+    setSelectedLine(undefined);
+    setSelectedGood(undefined);
+  };
+
   const renderItem = ({ item }: { item: IRemGood }) => (
     <GoodRemains item={item} docId={docId} onPressGood={pressGood} />
   );
 
   const RC = useMemo(() => <RefreshControl refreshing={!goodRemains} title="загрузка данных..." />, [goodRemains]);
 
-  const isFocused = useIsFocused();
-  if (!isFocused) {
-    return <AppActivityIndicator />;
-  }
+  // const isFocused = useIsFocused();
+  // if (!isFocused) {
+  //   return <AppActivityIndicator />;
+  // }
 
   return (
     <AppScreen>
@@ -258,6 +268,16 @@ export const SelectRemainsScreen = () => {
         windowSize={7} // Reduce the window size
         keyboardShouldPersistTaps="handled"
       />
+      {(selectedLine || selectedGood) && (
+        <DocLineDialog
+          selectedLine={selectedLine}
+          goodName={selectedLine?.good.name || selectedGood?.name || ''}
+          onEditLine={handleEditLine}
+          onAddLine={handleAddLine}
+          onDeleteLine={handleDeleteLine}
+          onDismissDialog={hadndleDismissDialog}
+        />
+      )}
     </AppScreen>
   );
 };

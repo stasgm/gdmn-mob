@@ -43,10 +43,16 @@ const ScanGoodScreen = () => {
       return;
     }
 
-    dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
+    if (!doc) {
+      return;
+    }
+
+    const line: IScanLine = { ...scannedObject, sortOrder: doc?.lines?.length + 1 };
+
+    dispatch(documentActions.addDocumentLine({ docId, line }));
 
     setScaner({ state: 'init' });
-  }, [scannedObject, dispatch, docId]);
+  }, [scannedObject, doc, dispatch, docId]);
 
   const handleClearScaner = () => setScaner({ state: 'init' });
 
