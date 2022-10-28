@@ -54,6 +54,11 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
 
   const handleClearScaner = () => setScaner({ state: 'init' });
 
+  const handleCancel = () => {
+    setDoScanned(false);
+    setScaner({ state: 'init' });
+  };
+
   const handleQuantityChange = useCallback((value: string) => {
     setGoodQty((prev) => {
       value = value.replace(',', '.');
@@ -94,6 +99,8 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
             onClearScannedObject={handleClearScaner}
             scaner={scaner}
             barCodeTypes={[BarCodeScanner.Constants.BarCodeType.datamatrix]}
+            isLeftButton={true}
+            onCancel={handleCancel}
           />
         )}
       </Modal>
