@@ -7,6 +7,7 @@ import { IMovementLine } from '../store/types';
 
 interface IProps {
   goodName: string;
+  goodValueName?: string;
   onDismissDialog: () => void;
   onEditLine: () => void;
   onAddLine: () => void;
@@ -16,6 +17,7 @@ interface IProps {
 
 export const DocLineDialog = ({
   goodName,
+  goodValueName,
   selectedLine,
   onDismissDialog,
   onEditLine,
@@ -31,7 +33,9 @@ export const DocLineDialog = ({
       {selectedLine ? (
         <>
           <Dialog.Content>
-            <LargeText>Количество: {selectedLine?.quantity} шт.</LargeText>
+            <LargeText>
+              Количество: {selectedLine?.quantity} {goodValueName || ''}
+            </LargeText>
             <ItemSeparator />
           </Dialog.Content>
           <Dialog.Actions style={localStyles.action}>

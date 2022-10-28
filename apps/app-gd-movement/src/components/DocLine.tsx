@@ -92,6 +92,8 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
             onGetScannedObject={handleGetScannedObject}
             onClearScannedObject={handleClearScaner}
             scaner={scaner}
+            isLeftButton={true}
+            onCancel={handleCancel}
           />
         ) : (
           <ScanBarcode

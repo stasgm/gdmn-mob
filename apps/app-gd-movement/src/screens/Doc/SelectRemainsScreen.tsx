@@ -285,7 +285,7 @@ export const SelectRemainsScreen = () => {
                       style={[localStyles.lineChip, { borderColor: colors.primary }]}
                       onPress={() => setSelectedLine(line)}
                     >
-                      {line.quantity} шт.
+                      {line.quantity} {item.good.valueName}
                     </Chip>
                   ))}
                 </View>
@@ -315,6 +315,7 @@ export const SelectRemainsScreen = () => {
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
               selectionColor={searchStyle}
+              // keyboardType=""
             />
           </View>
           <ItemSeparator />
@@ -343,6 +344,9 @@ export const SelectRemainsScreen = () => {
           onAddLine={handleAddLine}
           onDeleteLine={handleDeleteLine}
           onDismissDialog={hadndleDismissDialog}
+          goodValueName={
+            selectedGood?.good.valueName || goods.find((i) => i.id === selectedLine?.good.id)?.valueName || ''
+          }
         />
       )}
     </AppScreen>
