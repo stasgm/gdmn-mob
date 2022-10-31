@@ -9,8 +9,10 @@ import { SaveButton, globalStyles as styles, AppActivityIndicator, AppScreen, na
 import { ScreenState } from '@lib/types';
 
 import { DocStackParamList } from '../../navigation/Root/types';
-import { DocLine } from '../../components/DocLine';
+
 import { IMovementLine } from '../../store/types';
+
+import { DocLine } from './components/DocLine';
 
 export const DocLineScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList | DocStackParamList, 'DocLine'>>();

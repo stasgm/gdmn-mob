@@ -54,9 +54,9 @@ export interface IProps {
   onSyncClick?: () => void;
 }
 
-const DrawerNavigator = ({ onSyncClick, ...props }: IProps) => {
+const DrawerNavigator = ({ onSyncClick, items }: IProps) => {
   const { colors } = useTheme();
-  const navList: INavItem[] = [...(props?.items || []), ...baseNavList];
+  const navList: INavItem[] = [...(items || []), ...baseNavList];
   const appLoading = useSelector((state) => state.app.loading);
 
   return (
@@ -72,6 +72,7 @@ const DrawerNavigator = ({ onSyncClick, ...props }: IProps) => {
         screenOptions={{
           drawerActiveBackgroundColor: colors.primary,
           drawerActiveTintColor: '#ffffff',
+          drawerStyle: { width: 270 },
         }}
         drawerContent={(props) => <DrawerContent {...props} onSync={onSyncClick} />}
       >

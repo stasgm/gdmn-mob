@@ -29,7 +29,8 @@ import { getRemGoodListByContact } from '../../utils/helpers';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IMovementDocument, IMovementLine } from '../../store/types';
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
-import { DocLineDialog } from '../../components/DocLineDialog';
+
+import { DocLineDialog } from './components/DocLineDialog';
 
 interface IFilteredList {
   searchQuery: string;
@@ -315,7 +316,6 @@ export const SelectRemainsScreen = () => {
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
               selectionColor={searchStyle}
-              // keyboardType=""
             />
           </View>
           <ItemSeparator />

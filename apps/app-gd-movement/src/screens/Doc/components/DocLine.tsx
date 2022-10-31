@@ -13,9 +13,9 @@ import { BarCodeScanner } from 'expo-barcode-scanner';
 
 import { IScannedObject } from '@lib/client-types';
 
-import { IMovementLine } from '../store/types';
+import { IMovementLine } from '../../../store/types';
 
-import { ONE_SECOND_IN_MS } from '../utils/constants';
+import { ONE_SECOND_IN_MS } from '../../../utils/constants';
 
 interface IProps {
   item: IMovementLine;

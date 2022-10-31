@@ -20,7 +20,7 @@
     "@lib/mobile-ui": "*",
     "@react-navigation/drawer": "^6.5.0",
     "@react-navigation/native": "^6.0.13",
-    "@react-navigation/stack": "^6.3.2",
+    "@react-navigation/stack": "^6.3.3",
     "@reduxjs/toolkit": "^1.8.6",
     "axios": "^0.27.2",
     "expo-constants": "~13.2.4",
@@ -41,7 +41,7 @@
     "@config/eslint-config-react-native": "*",
     "@config/prettier-config": "*",
     "@libs/hello": "*",
-    "@types/react": "~18.0.21",
+    "@types/react": "~18.0.24",
     "@types/react-native": "0.69.5",
     "@types/redux-logger": "^3.0.9",
     "redux-logger": "^3.0.6",
@@ -59,7 +59,7 @@
   },
   "prettier": "@config/prettier-config",
   "resolutions": {
-    "@types/react": "~18.0.21",
+    "@types/react": "~18.0.24",
     "@types/react-dom": "~18.0.0"
   }
 }
