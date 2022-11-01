@@ -401,7 +401,6 @@ export const DocEditScreen = () => {
             onChangeText={handleChangeNumber}
             disabled={isBlocked}
             clearInput={true}
-            keyboardType="url"
           />
           <SelectableInput
             label="Дата"

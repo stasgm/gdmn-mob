@@ -234,7 +234,6 @@ export const ScanEditScreen = () => {
             onChangeText={handleChangeNumber}
             disabled={isBlocked}
             clearInput={true}
-            keyboardType="url"
           />
           <SelectableInput
             label="Дата"

@@ -17,7 +17,7 @@ export const getNextDocNumber = (documents: IDocument[]) => {
     "111111111" : { good: { id: '3', name: 'Товар 3', value: 'шт.', ...}},
   }
 */
-const getRemGoodByContact = (goods: IGood[], remains: IRemainsData[], isRemains: boolean | undefined = false) => {
+const getRemGoodByContact = (goods: IGood[], remains: IRemainsData[] = [], isRemains: boolean | undefined = false) => {
   log('getRemGoodByContact', 'Начало построения модели товаров по подразделению в разрезе штрихкодов');
 
   const remGoods: IMGoodData<IMGoodRemain> = {};
@@ -57,7 +57,11 @@ const getRemGoodByContact = (goods: IGood[], remains: IRemainsData[], isRemains:
     { good: { id: '2', name: 'Товар 2', value: 'шт.', ...}, price: 0, remains: 0}
   ]
 */
-const getRemGoodListByContact = (goods: IGood[], remains: IRemainsData[], isRemains: boolean | undefined = false) => {
+const getRemGoodListByContact = (
+  goods: IGood[],
+  remains: IRemainsData[] = [],
+  isRemains: boolean | undefined = false,
+) => {
   log('getRemGoodListByContact', 'Начало построения массива товаров по подразделению');
 
   const remGoods: IRemGood[] = [];

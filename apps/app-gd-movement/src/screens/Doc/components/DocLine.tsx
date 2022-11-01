@@ -13,9 +13,9 @@ import { BarCodeScanner } from 'expo-barcode-scanner';
 
 import { IScannedObject } from '@lib/client-types';
 
-import { IMovementLine } from '../store/types';
+import { IMovementLine } from '../../../store/types';
 
-import { ONE_SECOND_IN_MS } from '../utils/constants';
+import { ONE_SECOND_IN_MS } from '../../../utils/constants';
 
 interface IProps {
   item: IMovementLine;
@@ -54,6 +54,11 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
 
   const handleClearScaner = () => setScaner({ state: 'init' });
 
+  const handleCancel = () => {
+    setDoScanned(false);
+    setScaner({ state: 'init' });
+  };
+
   const handleQuantityChange = useCallback((value: string) => {
     setGoodQty((prev) => {
       value = value.replace(',', '.');
@@ -87,6 +92,8 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
             onGetScannedObject={handleGetScannedObject}
             onClearScannedObject={handleClearScaner}
             scaner={scaner}
+            isLeftButton={true}
+            onCancel={handleCancel}
           />
         ) : (
           <ScanBarcode
@@ -94,10 +101,12 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
             onClearScannedObject={handleClearScaner}
             scaner={scaner}
             barCodeTypes={[BarCodeScanner.Constants.BarCodeType.datamatrix]}
+            isLeftButton={true}
+            onCancel={handleCancel}
           />
         )}
       </Modal>
-      <ScrollView>
+      <ScrollView keyboardShouldPersistTaps="handled">
         <View style={[styles.content]}>
           <View style={[styles.item]}>
             <View style={styles.details}>

@@ -248,6 +248,16 @@ const globalStyles = StyleSheet.create({
     bottom: 20,
     left: 20,
   },
+  infoButtons: {
+    position: 'absolute',
+    bottom: 20,
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    width: '100%',
+    marginHorizontal: 5,
+  },
+  scrollContainer: { marginTop: 35, marginBottom: 45 },
+  contentContainerStyle: { flexGrow: 1, justifyContent: 'center' },
   textReference: {
     textDecorationLine: 'underline',
   },

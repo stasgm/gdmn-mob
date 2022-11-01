@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { View, FlatList, Alert, ListRenderItem } from 'react-native';
-import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
@@ -32,7 +32,8 @@ import { IMovementDocument, IMovementLine } from '../../store/types';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 import { IGood } from '../../store/app/types';
-import DocTotal from '../../components/DocTotal';
+
+import DocTotal from './components/DocTotal';
 
 export const DocViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -225,7 +226,7 @@ export const DocViewScreen = () => {
               ? setDelList(getDelLineList(delList, item.id))
               : !isBlocked && navigation.navigate('DocLine', { mode: 1, docId: id, item })
           }
-          onLongPress={() => setDelList(getDelLineList(delList, item.id))}
+          onLongPress={() => !isBlocked && setDelList(getDelLineList(delList, item.id))}
           checked={delList.includes(item.id)}
         >
           <View style={styles.details}>
@@ -241,11 +242,6 @@ export const DocViewScreen = () => {
     },
     [goods, delList, isDelList, isBlocked, navigation, id],
   );
-
-  const isFocused = useIsFocused();
-  if (!isFocused) {
-    return <AppActivityIndicator />;
-  }
 
   if (screenState === 'deleting' || screenState === 'sending') {
     return (

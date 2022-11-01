@@ -84,6 +84,9 @@ const styles = StyleSheet.create({
   scanFocus: {
     width: 0,
   },
+  scanFocusWithWidth: {
+    width: 1,
+  },
 });
 
 export default styles;
