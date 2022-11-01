@@ -22,9 +22,14 @@ import {
   SaveDocument,
 } from '@lib/mobile-ui';
 
-import { deleteSelectedLineItems, getDateString, getDelLineList, keyExtractor, useSendDocs } from '@lib/mobile-hooks';
-
-import { sleep } from '@lib/client-api';
+import {
+  deleteSelectedLineItems,
+  getDateString,
+  getDelLineList,
+  keyExtractor,
+  useSendDocs,
+  sleep,
+} from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
 

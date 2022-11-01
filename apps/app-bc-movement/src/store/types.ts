@@ -2,10 +2,7 @@ import { AnyAction } from 'redux';
 import { ThunkAction } from 'redux-thunk';
 
 import { INamedEntity, IEntity, IDocument, MandateProps, IHead, StatusType } from '@lib/types';
-
-export interface IFormParam {
-  [fieldName: string]: unknown;
-}
+import { IFormParam } from '@lib/store';
 
 export interface IMovementFormParam extends IFormParam {
   number?: string;

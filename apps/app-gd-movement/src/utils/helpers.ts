@@ -17,7 +17,7 @@ export const getNextDocNumber = (documents: IDocument[]) => {
     "111111111" : { good: { id: '3', name: 'Товар 3', value: 'шт.', ...}},
   }
 */
-const getRemGoodByContact = (goods: IGood[], remains: IRemainsData[], isRemains: boolean | undefined = false) => {
+const getRemGoodByContact = (goods: IGood[], remains: IRemainsData[] = [], isRemains: boolean | undefined = false) => {
   log('getRemGoodByContact', 'Начало построения модели товаров по подразделению в разрезе штрихкодов');
 
   const remGoods: IMGoodData<IMGoodRemain> = {};

@@ -1,8 +1,10 @@
-import { IEntity, INamedEntity } from '@lib/types';
+import { IEntity, INamedEntity, IReferences } from '@lib/types';
 import 'react-native-get-random-values';
 import { customAlphabet } from 'nanoid';
 import { Alert, Linking, Platform } from 'react-native';
 import { IDelList } from '@lib/mobile-types';
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const truncate = (str: string, l: number | undefined = 40) => (str.length > l ? `${str.substring(0, l)}...` : str);
 
@@ -46,6 +48,19 @@ const shortenString = (word: string, maxLenght: number) => {
 
 const isNamedEntity = (obj: any): obj is INamedEntity => {
   return typeof obj === 'object' && 'name' in obj;
+};
+
+const isIReferences = (obj: any): obj is IReferences => {
+  if (typeof obj === 'object') {
+    const data = Object.values(obj);
+    if (Array.isArray(data)) {
+      const refData = data[0];
+      return (
+        typeof refData === 'object' && isNamedEntity(refData) && 'data' in refData && Array.isArray(refData['data'])
+      );
+    }
+  }
+  return false;
 };
 
 type NumberFormat = 'currency' | 'number' | 'percentage';
@@ -161,6 +176,7 @@ export {
   shortenString,
   extraPredicate,
   isNamedEntity,
+  isIReferences,
   formatValue,
   round,
   generateId,
@@ -170,4 +186,5 @@ export {
   deleteSelectedItems,
   getDelLineList,
   deleteSelectedLineItems,
+  sleep,
 };

@@ -12,14 +12,12 @@ import {
   INamedEntity,
 } from '@lib/types';
 
+import { IFormParam } from '@lib/store';
+
 import { ICoords } from './geo/types';
 import { IGood } from './app/types';
 
 export * from './app/types';
-
-export interface IFormParam {
-  [fieldName: string]: unknown;
-}
 
 export interface IOrderFormParam extends IFormParam {
   contact?: IReferenceData;

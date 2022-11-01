@@ -20,9 +20,7 @@ import {
   SaveDocument,
 } from '@lib/mobile-ui';
 
-import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-hooks';
-
-import { sleep } from '@lib/client-api';
+import { generateId, getDateString, keyExtractor, useSendDocs, sleep } from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
 

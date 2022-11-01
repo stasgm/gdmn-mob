@@ -21,11 +21,9 @@ import {
   SaveDocument,
 } from '@lib/mobile-ui';
 
-import { formatValue, generateId, getDateString, useSendDocs, keyExtractor } from '@lib/mobile-hooks';
+import { formatValue, generateId, getDateString, useSendDocs, keyExtractor, sleep } from '@lib/mobile-hooks';
 
 import { INamedEntity, ScreenState } from '@lib/types';
-
-import { sleep } from '@lib/client-api';
 
 import { useTheme } from 'react-native-paper';
 

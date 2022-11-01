@@ -23,7 +23,7 @@ const baseSettings: Settings<IBaseSettings> = {
   synchPeriod: {
     id: 'synchPeriod',
     description: 'Период синхронизации, мин.',
-    data: 1,
+    data: 10,
     type: 'number',
     sortOrder: 2,
     visible: true,

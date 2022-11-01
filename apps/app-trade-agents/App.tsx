@@ -2,7 +2,7 @@ import { Linking, TouchableOpacity } from 'react-native';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
-import { dialCall } from '@lib/mobile-hooks';
+import { dialCall, sleep } from '@lib/mobile-hooks';
 import { INavItem, GDMN_PHONE, GDMN_EMAIL, GDMN_SITE_ADDRESS } from '@lib/mobile-navigation';
 
 import {
@@ -15,6 +15,7 @@ import {
   useRefThunkDispatch,
   useDocThunkDispatch,
   useSelector,
+  authSelectors,
 } from '@lib/store';
 
 import {
@@ -28,8 +29,6 @@ import {
 import { ActivityIndicator, Caption, Text } from 'react-native-paper';
 
 import { IDocument, IReferences, ISettingsOption } from '@lib/types';
-
-import { sleep } from '@lib/client-api';
 
 import Constants from 'expo-constants';
 
@@ -129,8 +128,15 @@ const Root = () => {
   const tradeLoading = useAppTradeSelector((state) => state.appTrade.loadingData);
   const tradeLoadingError = useAppTradeSelector<string>((state) => state.appTrade.loadingError);
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
+  const isLogged = authSelectors.isLoggedWithCompany();
 
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (isLogged) {
+      dispatch(appActions.loadSuperDataFromDisc());
+    }
+  }, [dispatch, isLogged]);
 
   useEffect(() => {
     //Для отрисовки при первом подключении

@@ -27,7 +27,6 @@
     "@expo/react-native-action-sheet": "^3.14.0",
     "@expo/vector-icons": "^13.0.0",
     "@gorhom/bottom-sheet": "^4.4.5",
-    "@lib/client-api": "*",
     "@lib/client-types": "*",
     "@lib/mobile-app": "*",
     "@lib/mobile-auth": "*",

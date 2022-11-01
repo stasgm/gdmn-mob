@@ -31,13 +31,11 @@ import { ActivityIndicator, Caption, Text } from 'react-native-paper';
 
 import { IDocument, IReferences, IUserSettings } from '@lib/types';
 
-import { sleep } from '@lib/client-api';
+import { sleep, dialCall } from '@lib/mobile-hooks';
 
 import { TouchableOpacity, Linking } from 'react-native';
 
 import Constants from 'expo-constants';
-
-import { dialCall } from '@lib/mobile-hooks';
 
 import { MoveNavigator } from './src/navigation/MoveNavigator';
 
@@ -228,12 +226,7 @@ const Root = () => {
           </Caption>
         </AppScreen>
       ) : (
-        <MobileApp
-          items={navItems}
-          loadingErrors={[fpLoadingError]}
-          onClearLoadingErrors={onClearLoadingErrors}
-          onGetMessages={isDemo ? getMessages : undefined}
-        />
+        <MobileApp items={navItems} loadingErrors={[fpLoadingError]} onClearLoadingErrors={onClearLoadingErrors} />
       )}
     </ErrorBoundary>
   );

@@ -45,7 +45,7 @@ export const useSendDocs = (readyDocs: IDocument[]) => {
     }
 
     dispatch(documentActions.setLoading(true));
-    dispatch(appActions.setErrorList([]));
+    // dispatch(appActions.setErrorList([]));
 
     const errList: string[] = [];
 
@@ -107,7 +107,7 @@ export const useSendDocs = (readyDocs: IDocument[]) => {
     }
 
     dispatch(documentActions.setLoading(false));
-    dispatch(appActions.setErrorList(errList));
+    // dispatch(appActions.setErrorList(errList));
 
     if (errList?.length) {
       Alert.alert('Внимание!', `Во время отправки документов произошли ошибки:\n${errList.join('\n')}`, [

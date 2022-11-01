@@ -21,9 +21,7 @@ import {
   SaveDocument,
 } from '@lib/mobile-ui';
 
-import { sleep } from '@lib/client-api';
-
-import { generateId, getDateString, round, useSendDocs } from '@lib/mobile-hooks';
+import { sleep, generateId, getDateString, round, useSendDocs } from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
 

@@ -26,7 +26,9 @@ const getDeviceByUid = (
 ): AppThunk<
   Promise<ActionType<typeof actions.getDeviceByUidAsync>>,
   AuthState,
-  ActionType<typeof actions.getDeviceByUidAsync> | ActionType<typeof appActions.loadSuperDataFromDisc>
+  | ActionType<typeof actions.getDeviceByUidAsync>
+  | ActionType<typeof actions.setAppSystem>
+  | ActionType<typeof appActions.loadSuperDataFromDisc>
 > => {
   return async (dispatch) => {
     dispatch(actions.getDeviceByUidAsync.request(''));
@@ -51,6 +53,8 @@ const getDeviceByUid = (
             ),
           );
         }
+        //Записываем наименование подсистемы в хранилище
+        dispatch(actions.setAppSystem(getErpUser.user.appSystem));
       }
 
       return dispatch(actions.getDeviceByUidAsync.success(response.devices[0]));

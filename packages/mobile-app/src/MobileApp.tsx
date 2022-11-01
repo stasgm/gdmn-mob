@@ -29,57 +29,57 @@ export interface IApp {
   items?: INavItem[];
   store?: Store<any, any>;
   onSync?: () => Promise<any>;
-  onGetMessages?: () => Promise<any>;
   loadingErrors?: string[];
   onClearLoadingErrors?: () => void;
 }
 
-const getMinsUntilNextSynch = (lastSyncTime: Date, synchPeriod: number) => {
-  const nextTime = new Date(lastSyncTime);
-  nextTime.setMinutes(nextTime.getMinutes() + synchPeriod);
-  return Math.round((nextTime.getTime() - new Date().getTime()) / 60000);
-};
+// const getMinsUntilNextSynch = (lastSyncTime: Date, synchPeriod: number) => {
+//   const nextTime = new Date(lastSyncTime);
+//   nextTime.setMinutes(nextTime.getMinutes() + synchPeriod);
+//   return Math.round((nextTime.getTime() - new Date().getTime()) / 60000);
+// };
 
-const AppRoot = ({ items, onSync, onGetMessages }: Omit<IApp, 'store'>) => {
-  const sync = useSync(onSync, onGetMessages);
+const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
+  const sync = useSync(onSync);
 
   const syncDate = useSelector((state) => state.app.syncDate) as Date;
-  const synchPeriod = (useSelector((state) => state.settings?.data.synchPeriod)?.data as number) || 10;
+  const settings = useSelector((state) => state.settings?.data);
+  const synchPeriod = (settings.synchPeriod?.data as number) || 10;
+  const autoSync = (settings.autoSync?.data as boolean) || false;
   const { config, user } = useSelector((state) => state.auth);
   const loading = useSelector((state) => state.app.loading);
+  // const [manualSync, setManualSync] = useState(false);
+  // console.log('synchPeriod', synchPeriod);
 
-  // const minsUntilNextSynch = useMemo(() => {
-  //   const nextTime = new Date(syncDate);
-  //   nextTime.setMinutes(nextTime.getMinutes() + synchPeriod);
-  //   return Math.round((nextTime.getTime() - new Date().getTime()) / 60000);
-  // }, [syncDate, synchPeriod]);
+  // useEffect(() => {
+  //   if (!loading) {
+  //     setManualSync(false);
+  //   }
+  // }, [loading]);
 
-  const handleSyncData = useCallback(() => {
-    if (loading) {
-      return;
-    }
+  // const handleSyncData = useCallback(() => {
+  //   if (loading) {
+  //     return;
+  //   }
 
-    if (!syncDate) {
-      sync();
-      return;
-    }
+  //   if (!syncDate) {
+  //     sync();
+  //     return;
+  //   }
 
-    // const nextTime = new Date(syncDate);
-    // nextTime.setMinutes(nextTime.getMinutes() + synchPeriod);
-    const mins = getMinsUntilNextSynch(syncDate, synchPeriod);
-    console.log('minsUntilNextSynch 111', mins);
+  //   const mins = getMinsUntilNextSynch(syncDate, synchPeriod);
 
-    if (mins > 0) {
-      Alert.alert(
-        'Внимание!',
-        // eslint-disable-next-line max-len
-        `В настоящее время сервер обрабатывает ваш запрос.\nПовторная синхронизация возможна через ${mins} мин.`,
-        [{ text: 'OK' }],
-      );
-    } else {
-      sync();
-    }
-  }, [loading, syncDate, synchPeriod]);
+  //   if (mins > 0) {
+  //     Alert.alert(
+  //       'Внимание!',
+  //       // eslint-disable-next-line max-len
+  //       `В настоящее время сервер обрабатывает запрос.\nПовторная синхронизация возможна через ${mins} мин.`,
+  //       [{ text: 'OK' }],
+  //     );
+  //   } else {
+  //     sync();
+  //   }
+  // }, [loading, syncDate, synchPeriod]);
 
   useEffect(() => {
     //При запуске приложения записываем настройки в апи
@@ -109,47 +109,23 @@ const AppRoot = ({ items, onSync, onGetMessages }: Omit<IApp, 'store'>) => {
   const timeOutRef = useRef<NodeJS.Timer | null>(null);
 
   useEffect(() => {
-    if (loading) {
+    if (loading || !autoSync) {
       return;
     }
-
-    timeOutRef.current = setTimeout(() => {
+    timeOutRef.current = setInterval(() => {
       if (!loading) {
-        // const mins = getMinsUntilNextSynch(syncDate, synchPeriod);
-        console.log('auto synch syncDate', new Date());
-        // if (mins <= 0) {
-
         sync();
-        // }
       }
     }, synchPeriod * 60 * 1000);
+
     return () => {
       if (timeOutRef.current) {
-        console.log('del 2');
         clearInterval(timeOutRef.current);
       }
     };
-  }, [synchPeriod]);
+  }, [synchPeriod, autoSync]);
 
-  // useEffect(() => {
-  //   if (!loading) {
-  //     sync();
-  //   }
-
-  //   // if (minsUntilNextSynch <= 0) {
-  //   //   sync();
-  //   //   return;
-  //   // }
-  //   return () => {
-  //     console.log('del 1');
-  //     if (timeOutRef.current) {
-  //       console.log('del 2');
-  //       clearInterval(timeOutRef.current);
-  //     }
-  //   };
-  // }, []);
-
-  return <DrawerNavigator items={items} onSyncClick={handleSyncData} />;
+  return <DrawerNavigator items={items} onSyncClick={sync} />;
 };
 
 const MobileApp = ({ store, loadingErrors, onClearLoadingErrors, ...props }: IApp) => {

@@ -1,20 +1,23 @@
 import { ActionType, createAction } from 'typesafe-actions';
 
-import { IFormParam, IAppState, IRequestNotice } from './types';
+import { IFormParam, IAppState, IRequestNotice, ILog } from './types';
 
 const init = createAction('APP/INIT')();
 
 const setFormParams = createAction('APP/SET_FORM_PARAMS')<IFormParam>();
 const clearFormParams = createAction('APP/CLEAR_FORM_PARAMS')();
 const setLoading = createAction('APP/SET_LOADING')<boolean>();
-const setErrorList = createAction('APP/SET_ERROR_LIST')<string[]>();
+const setAutoSync = createAction('APP/SET_AUTO_SYNC')<boolean>();
+const setLoadedWithError = createAction('APP/SET_LOADED_WITH_ERROR')<boolean>();
+const addError = createAction('APP/ADD_ERROR')<ILog>();
+const removeErrors = createAction('APP/REMOVE_MANY_ERROR')<string[]>();
 const setSyncDate = createAction('APP/SET_SYNC_DATE')<Date>();
 const loadData = createAction('APP/LOAD_DATA')<IAppState>();
 const setLoadingData = createAction('APP/SET_LOADING_DATA')<boolean>();
 const setLoadingError = createAction('APP/SET_LOADING_ERROR')<string>();
 
 const addRequestNotice = createAction('APP/ADD_REQUEST_NOTICE')<IRequestNotice>();
-const removeRequestNotice = createAction('APP/REMOVE_REQUEST_NOTICE')<string>();
+const clearRequestNotice = createAction('APP/CLEAR_REQUEST_NOTICE')();
 
 /**
  * Для ускорения работы программы мы кэшируем часть данных
@@ -45,7 +48,10 @@ export const appActions = {
   setFormParams,
   clearFormParams,
   setLoading,
-  setErrorList,
+  setLoadedWithError,
+  setAutoSync,
+  addError,
+  removeErrors,
   setSyncDate,
   loadGlobalDataFromDisc,
   loadSuperDataFromDisc,
@@ -53,7 +59,7 @@ export const appActions = {
   setLoadingData,
   setLoadingError,
   addRequestNotice,
-  removeRequestNotice,
+  clearRequestNotice,
 };
 
 export type AppActionType = ActionType<typeof appActions>;

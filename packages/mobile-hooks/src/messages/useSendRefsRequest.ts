@@ -2,32 +2,46 @@
 import { useDispatch, useSelector, appActions, authActions, useAuthThunkDispatch, referenceActions } from '@lib/store';
 
 import { AuthLogOut, IMessage } from '@lib/types';
-import api from '@lib/client-api';
+import api, { sleep } from '@lib/client-api';
 import { Alert } from 'react-native';
 
-import { getMessageParams, getNextOrder } from './helpers';
+import { generateId } from '../utils';
+
+import { getNextOrder } from './helpers';
 
 export const useSendRefsRequest = () => {
   const dispatch = useDispatch();
   const authDispatch = useAuthThunkDispatch();
 
   const authMiddleware: AuthLogOut = () => authDispatch(authActions.logout());
-  const { user, company, config } = useSelector((state) => state.auth);
+  const { user, company, config, appSystem } = useSelector((state) => state.auth);
   const refVersion = 1;
   const deviceId = config.deviceId!;
 
   return async () => {
-    dispatch(referenceActions.setLoading(true));
-    //Получаем параметры, необходимые для отправки сообщений
-    const { params, errorMessage } = await getMessageParams({ user, company, authMiddleware });
+    dispatch(appActions.clearRequestNotice());
 
-    if (!params || errorMessage) {
-      Alert.alert('Внимание!', `Запрос не может быть отправлен!\n${errorMessage}`, [{ text: 'OK' }]);
-      dispatch(referenceActions.setLoading(false));
+    if (!user || !company || !appSystem || !user.erpUser) {
+      dispatch(
+        appActions.addError({
+          id: generateId(),
+          date: new Date(),
+          message: `useSendRefsRequest: Не определены данные: пользователь ${user?.name}, компания ${company?.name}, подсистема ${appSystem?.name}, пользователь ERP ${user?.erpUser?.name}`,
+        }),
+      );
+      Alert.alert(
+        'Внимание!',
+        'Отправка запроса не может быть выпонена!\nПодробную информацию можно просмотреть в истории ошибок.',
+        [{ text: 'OK' }],
+      );
+
       return;
     }
 
-    const messageCompany = { id: params?.company?.id, name: params?.company?.name };
+    dispatch(appActions.setLoading(true));
+
+    const messageCompany = { id: company.id, name: company.name };
+    const consumer = user.erpUser;
 
     //Формируем запрос на получение справочников
     const messageGetRef: IMessage['body'] = {
@@ -38,11 +52,18 @@ export const useSendRefsRequest = () => {
       },
     };
 
+    dispatch(
+      appActions.addRequestNotice({
+        started: new Date(),
+        message: 'Отправка запроса на получение справочников',
+      }),
+    );
+
     //Отправляем запрос на получение справочников
     const sendMesRefResponse = await api.message.sendMessages(
-      params.appSystem,
+      appSystem,
       messageCompany,
-      params.consumer,
+      consumer,
       messageGetRef,
       getNextOrder(),
       deviceId,
@@ -50,15 +71,22 @@ export const useSendRefsRequest = () => {
     );
 
     if (sendMesRefResponse?.type === 'ERROR') {
+      dispatch(
+        appActions.addError({
+          id: generateId(),
+          date: new Date(),
+          message: 'Получение подсистемы приложения',
+        }),
+      );
       Alert.alert(
         'Внимание!',
-        `Во время отправки запроса произошли ошибки:\n$Запрос на получение справочников не отправлен: ${sendMesRefResponse.message}`,
+        'Запрос за справочниками не отправлен!\nПодробную информацию можно просмотреть в истории ошибок.',
         [{ text: 'OK' }],
       );
     } else {
-      Alert.alert('Внимание!', 'Запрос отправлен.\nСинхронизируйте данные через несколько минут.', [{ text: 'OK' }]);
       dispatch(appActions.setSyncDate(new Date()));
     }
-    dispatch(referenceActions.setLoading(false));
+
+    dispatch(appActions.setLoading(false));
   };
 };

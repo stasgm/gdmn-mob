@@ -1,5 +1,5 @@
 import React, { useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, Linking, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, Linking, TouchableOpacity, Platform, StyleProp, TextStyle } from 'react-native';
 import { Avatar, Divider } from 'react-native-paper';
 import { useNavigation, useTheme } from '@react-navigation/native';
 
@@ -19,6 +19,15 @@ const dialCall = (number: string) => {
   Linking.openURL(phoneNumber);
 };
 
+interface IProfileItem {
+  id: string;
+  icon: any;
+  title: string;
+  text: string;
+  onPress?: () => void;
+  style?: StyleProp<TextStyle>;
+}
+
 const InformationScreen = () => {
   const { colors } = useTheme();
 
@@ -30,87 +39,89 @@ const InformationScreen = () => {
     });
   }, [navigation]);
 
+  const appList: IProfileItem[] = [
+    {
+      id: 'version',
+      icon: 'cog-outline',
+      title: 'Версия',
+      text: `${Constants.manifest?.extra?.appVesion}-${Constants.manifest?.extra?.buildVersion || 0}`,
+    },
+    {
+      id: 'doc',
+      icon: 'file-document-edit-outline',
+      title: 'Документация',
+      text: Constants.manifest?.extra?.name,
+      onPress: () => Linking.openURL(Constants.manifest?.extra?.documentationUrl),
+      style: { textDecorationLine: 'underline' },
+    },
+    {
+      id: 'log',
+      icon: 'history',
+      title: 'Дополнительная информация',
+      text: 'История синхронизации',
+      onPress: () => Linking.openURL(Constants.manifest?.extra?.documentationUrl),
+      style: { textDecorationLine: 'underline' },
+    },
+  ];
+
+  const developList: IProfileItem[] = [
+    { id: 'companyName', icon: 'office-building', title: GDMN_COMPANY_NAME, text: GDMN_TRADEMARK },
+    {
+      id: 'phone',
+      icon: 'phone',
+      title: 'Телефон',
+      text: GDMN_PHONE,
+      onPress: () => dialCall(GDMN_PHONE),
+    },
+    {
+      id: 'email',
+      icon: 'email-outline',
+      title: 'Email',
+      text: GDMN_EMAIL,
+      onPress: () => Linking.openURL(`mailto:${GDMN_EMAIL}`),
+    },
+    {
+      id: 'web',
+      icon: 'web',
+      title: 'Сайт',
+      text: GDMN_SITE_ADDRESS,
+      onPress: () => Linking.openURL(GDMN_SITE_ADDRESS),
+      style: { textDecorationLine: 'underline' },
+    },
+  ];
+
+  const iconStyle = { backgroundColor: colors.primary };
+
+  const ProfileItem = ({ item }: { item: IProfileItem }) => (
+    <View>
+      <Divider />
+      <View style={localStyles.profileContainer}>
+        <View style={localStyles.profileIcon}>
+          <Avatar.Icon size={40} icon={item.icon} style={iconStyle} />
+        </View>
+        <View style={localStyles.profileInfo}>
+          <LargeText style={styles.textBold}>{item.title}</LargeText>
+          <TouchableOpacity onPress={item.onPress}>
+            <MediumText selectable={true} style={item.style}>
+              {item.text}
+            </MediumText>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
+
   return (
     <AppScreen>
       <View style={localStyles.container}>
-        <Text style={[styles.title]}>Приложение {Constants.manifest?.extra?.name}</Text>
-        <Divider />
-        <View style={[localStyles.profileContainer]}>
-          <View style={localStyles.profileIcon}>
-            <Avatar.Icon size={40} icon="cog-outline" style={{ backgroundColor: colors.primary }} />
-          </View>
-          <View style={localStyles.profileInfo}>
-            <LargeText style={styles.textBold}>Версия</LargeText>
-            <MediumText>
-              {Constants.manifest?.extra?.appVesion}-{Constants.manifest?.extra?.buildVersion || 0}
-            </MediumText>
-          </View>
-        </View>
-        <Divider />
-        <View style={[localStyles.profileContainer]}>
-          <View style={localStyles.profileIcon}>
-            <Avatar.Icon size={40} icon="file-document-edit-outline" style={{ backgroundColor: colors.primary }} />
-          </View>
-          <View style={localStyles.profileInfo}>
-            <LargeText style={styles.textBold}>Документация</LargeText>
-            <TouchableOpacity onPress={() => Linking.openURL(Constants.manifest?.extra?.documentationUrl)}>
-              <MediumText selectable={true} style={{ textDecorationLine: 'underline' }}>
-                {Constants.manifest?.extra?.name}
-              </MediumText>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <Text style={[styles.title]}>О разработчике</Text>
-        <Divider />
-        <View style={[localStyles.profileContainer]}>
-          <View style={localStyles.profileIcon}>
-            <Avatar.Icon size={40} icon="office-building" style={{ backgroundColor: colors.primary }} />
-          </View>
-          <View style={localStyles.profileInfo}>
-            <LargeText style={styles.textBold} selectable={true}>
-              {GDMN_COMPANY_NAME}
-            </LargeText>
-            <MediumText selectable={true}>{GDMN_TRADEMARK}</MediumText>
-          </View>
-        </View>
-        <Divider />
-        <View style={[localStyles.profileContainer]}>
-          <View style={localStyles.profileIcon}>
-            <Avatar.Icon size={40} icon="phone" style={{ backgroundColor: colors.primary }} />
-          </View>
-          <View style={localStyles.profileInfo}>
-            <LargeText style={styles.textBold}>Телефон</LargeText>
-            <TouchableOpacity onPress={() => dialCall(GDMN_PHONE)}>
-              <MediumText selectable={true}>{GDMN_PHONE}</MediumText>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <Divider />
-        <View style={[localStyles.profileContainer]}>
-          <View style={localStyles.profileIcon}>
-            <Avatar.Icon size={40} icon="email-outline" style={{ backgroundColor: colors.primary }} />
-          </View>
-          <View style={localStyles.profileInfo}>
-            <LargeText style={styles.textBold}>Email</LargeText>
-            <TouchableOpacity onPress={() => Linking.openURL(`mailto:${GDMN_EMAIL}`)}>
-              <MediumText selectable={true}>{GDMN_EMAIL}</MediumText>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <Divider />
-        <View style={[localStyles.profileContainer]}>
-          <View style={localStyles.profileIcon}>
-            <Avatar.Icon size={40} icon="web" style={{ backgroundColor: colors.primary }} />
-          </View>
-          <View style={localStyles.profileInfo}>
-            <LargeText style={styles.textBold}>Сайт</LargeText>
-            <TouchableOpacity onPress={() => Linking.openURL(GDMN_SITE_ADDRESS)}>
-              <MediumText selectable={true} style={{ textDecorationLine: 'underline' }}>
-                {GDMN_SITE_ADDRESS}
-              </MediumText>
-            </TouchableOpacity>
-          </View>
-        </View>
+        <Text style={styles.title}>Приложение {Constants.manifest?.extra?.name}</Text>
+        {appList.map((item) => (
+          <ProfileItem key={item.id} item={item} />
+        ))}
+        <Text style={styles.title}>О разработчике</Text>
+        {developList.map((item) => (
+          <ProfileItem key={item.id} item={item} />
+        ))}
       </View>
     </AppScreen>
   );

@@ -4,8 +4,6 @@ import { View, Keyboard } from 'react-native';
 import { IUserCredentials } from '@lib/types';
 import { useSelector } from '@lib/store';
 import { AppInputScreen, globalStyles as styles, Input, PrimeButton, RoundButton, ScreenTitle } from '@lib/mobile-ui';
-// import api from '@lib/client-api';
-// import { user as mockUser } from '@lib/mock';
 
 /*
   Порядок работы:

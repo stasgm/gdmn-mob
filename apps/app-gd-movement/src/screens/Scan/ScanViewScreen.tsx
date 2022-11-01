@@ -31,9 +31,8 @@ import {
   keyExtractor,
   shortenString,
   useSendDocs,
+  sleep,
 } from '@lib/mobile-hooks';
-
-import { sleep } from '@lib/client-api';
 
 import { ScreenState } from '@lib/types';
 

@@ -6,6 +6,8 @@ import { IAppState } from './types';
 
 export const initialState: Readonly<IAppState> = {
   loading: false,
+  loadedWithError: false,
+  autoSync: false,
   errorMessage: '',
   formParams: {},
   errorList: [],
@@ -37,11 +39,26 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
         loading: action.payload,
       };
 
-    case getType(appActions.setErrorList):
+    case getType(appActions.setAutoSync):
       return {
         ...state,
-        errorList: action.payload,
+        autoSync: action.payload,
       };
+
+    case getType(appActions.setLoadedWithError):
+      return {
+        ...state,
+        loadedWithError: action.payload,
+      };
+
+    case getType(appActions.addError):
+      return {
+        ...state,
+        errorList: [...state.errorList, action.payload],
+      };
+
+    case getType(appActions.removeErrors):
+      return { ...state, errorList: state.errorList.filter((i) => action.payload.indexOf(i.id) === -1) };
 
     case getType(appActions.setSyncDate):
       return {
@@ -64,8 +81,8 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
     case getType(appActions.addRequestNotice):
       return { ...state, requestNotice: [...state.requestNotice, action.payload] };
 
-    case getType(appActions.removeRequestNotice):
-      return { ...state, requestNotice: [...state.requestNotice.filter((i) => i.id !== action.payload)] };
+    case getType(appActions.clearRequestNotice):
+      return { ...state, requestNotice: [] };
 
     default:
       return state;

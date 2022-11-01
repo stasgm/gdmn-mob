@@ -3,7 +3,7 @@ import { View, FlatList, Alert, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, Divider, useTheme, Checkbox } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
 import { INamedEntity } from '@lib/types';
-import { appActions, refSelectors, useSelector } from '@lib/store';
+import { appActions, IFormParam, refSelectors, useSelector } from '@lib/store';
 import {
   AppScreen,
   ItemSeparator,
@@ -17,7 +17,6 @@ import {
 import { extraPredicate } from '@lib/mobile-hooks';
 
 import { useDispatch } from '../store';
-import { IFormParam } from '../store/types';
 import { RefParamList } from '../navigation/Root/types';
 
 export const SelectRefItemScreen = () => {
