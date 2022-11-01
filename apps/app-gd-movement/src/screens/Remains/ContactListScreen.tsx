@@ -1,6 +1,5 @@
 import { getDateString, keyExtractor } from '@lib/mobile-app';
 import {
-  // AppActivityIndicator,
   AppScreen,
   EmptyList,
   globalStyles as styles,
@@ -11,7 +10,7 @@ import {
 } from '@lib/mobile-ui';
 import { refSelectors, useSelector } from '@lib/store';
 import { IDepartment, IReference } from '@lib/types';
-import { /*useIsFocused,*/ useNavigation, useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { SectionList, SectionListData, View } from 'react-native';
@@ -97,11 +96,6 @@ const ContactListScreen = () => {
     ({ section }: any) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
     [],
   );
-
-  // const isFocused = useIsFocused();
-  // if (!isFocused) {
-  //   return <AppActivityIndicator />;
-  // }
 
   return (
     <AppScreen>

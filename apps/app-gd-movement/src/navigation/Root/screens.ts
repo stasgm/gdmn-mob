@@ -1,13 +1,6 @@
 import { SelectRefItemScreen } from '../../components/SelectRefItemScreen';
 
-import {
-  DocListScreen,
-  DocEditScreen,
-  DocViewScreen,
-  DocLineScreen,
-  SelectGoodScreen,
-  SelectRemainsScreen,
-} from '../../screens/Doc';
+import { DocListScreen, DocEditScreen, DocViewScreen, DocLineScreen, SelectRemainsScreen } from '../../screens/Doc';
 
 import ScanBarcodeScreen from '../../screens/Doc/ScanBarcodeScreen';
 
@@ -20,7 +13,6 @@ export const docScreens = {
   DocView: { title: '', component: DocViewScreen },
   DocLine: { title: 'Позиция документа', component: DocLineScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
-  SelectGoodItem: { title: 'Выбор товара', component: SelectGoodScreen },
   SelectRemainsItem: { title: 'Выбор из остатков', component: SelectRemainsScreen },
   ScanBarcode: { title: 'Сканер', component: ScanBarcodeScreen },
 };

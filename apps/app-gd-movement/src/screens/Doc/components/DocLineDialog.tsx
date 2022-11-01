@@ -3,7 +3,7 @@ import React from 'react';
 import { Button, Dialog, useTheme } from 'react-native-paper';
 import { StyleSheet } from 'react-native';
 
-import { IMovementLine } from '../store/types';
+import { IMovementLine } from '../../../store/types';
 
 interface IProps {
   goodName: string;

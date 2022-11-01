@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
 import { SectionList, ListRenderItem, SectionListData, View } from 'react-native';
-import { useFocusEffect, /*useIsFocused,*/ useNavigation, useTheme } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
 import { Searchbar } from 'react-native-paper';
 
 import {
@@ -16,7 +16,6 @@ import {
   DeleteButton,
   CloseButton,
   EmptyList,
-  // AppActivityIndicator,
   SearchButton,
   MediumText,
   navBackDrawer,
@@ -116,7 +115,6 @@ export const ScanListScreen = () => {
   useFocusEffect(
     React.useCallback(() => {
       if (!searchQuery) {
-        // setFilteredList({ searchQuery, list: list.filter((i) => i.documentType.name !== 'scan') });
         setFilteredList({
           searchQuery,
           list: list
@@ -248,11 +246,6 @@ export const ScanListScreen = () => {
     [],
   );
 
-  // const isFocused = useIsFocused();
-  // if (!isFocused) {
-  //   return <AppActivityIndicator />;
-  // }
-
   return (
     <AppScreen>
       <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} />
@@ -277,7 +270,6 @@ export const ScanListScreen = () => {
         keyExtractor={keyExtractor}
         ItemSeparatorComponent={ItemSeparator}
         renderSectionHeader={renderSectionHeader}
-        // refreshControl={<RefreshControl refreshing={loading} title="идет загрузка данных..." />}
         ListEmptyComponent={EmptyList}
       />
     </AppScreen>
