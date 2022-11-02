@@ -188,6 +188,7 @@ export const DocEditScreen = () => {
         };
 
         dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
+        setScreenState('idle');
         navigation.navigate('DocView', { id });
       }
     }
