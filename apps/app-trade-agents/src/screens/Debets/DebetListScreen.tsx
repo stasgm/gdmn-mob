@@ -6,6 +6,7 @@ import {
   EmptyList,
   globalStyles as styles,
   ItemSeparator,
+  LargeText,
   Menu,
   navBackDrawer,
   SearchButton,
@@ -16,8 +17,8 @@ import { IReference } from '@lib/types';
 import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { FlatList, SectionListData, View } from 'react-native';
-import { Divider, Searchbar } from 'react-native-paper';
+import { FlatList, SectionListData, View, StyleSheet } from 'react-native';
+import { Button, Dialog, Divider, Searchbar } from 'react-native-paper';
 
 import { DebetStackParamList } from '../../navigation/Root/types';
 import { IDebt } from '../../store/types';
@@ -39,6 +40,8 @@ const DebetListScreen = () => {
   const [filterVisible, setFilterVisible] = useState(false);
   const [visibleType, setVisibleType] = useState(false);
   const [debetType, setDebetType] = useState(debetTypes[0]);
+
+  const [visibleDialog, setVisibleDialog] = useState(false);
 
   const { colors } = useTheme();
 
@@ -83,7 +86,7 @@ const DebetListScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  const renderItem = ({ item }: { item: IDebt }) => <DebetItem item={item} />;
+  const renderItem = ({ item }: { item: IDebt }) => <DebetItem item={item} onPress={() => setVisibleDialog(true)} />;
 
   const isFocused = useIsFocused();
   if (!isFocused) {
@@ -130,8 +133,36 @@ const DebetListScreen = () => {
         ListEmptyComponent={!debets ? EmptyList : null}
         keyboardShouldPersistTaps={'handled'}
       />
+      <Dialog visible={visibleDialog} onDismiss={() => setVisibleDialog(false)}>
+        <Dialog.Title style={localStyles.titleSize}>
+          Отправить запрос на получение дебиторской задолженности?
+        </Dialog.Title>
+
+        <Dialog.Content>
+          <LargeText>Это может занять некоторое время</LargeText>
+        </Dialog.Content>
+        <Dialog.Actions style={localStyles.action}>
+          <Button color={colors.primary} onPress={() => setVisibleDialog(false)}>
+            Отправить
+          </Button>
+          <Button color={colors.primary} onPress={() => setVisibleDialog(false)}>
+            Отмена
+          </Button>
+        </Dialog.Actions>
+      </Dialog>
     </AppScreen>
   );
 };
+
+const localStyles = StyleSheet.create({
+  titleSize: {
+    fontSize: 18,
+    lineHeight: 18,
+  },
+  action: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+});
 
 export default DebetListScreen;
