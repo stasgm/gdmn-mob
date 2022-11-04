@@ -9,6 +9,7 @@ import {
   Users as UsersIcon,
   List as ProcessIcon,
   Server as AppSystemsIcon,
+  MessageCircle as MessageIcon,
 } from 'react-feather';
 
 import { useDispatch, useSelector } from '@lib/store';
@@ -58,6 +59,11 @@ const items = [
     href: `${adminPath}/app/processes`,
     icon: ProcessIcon,
     title: 'Процессы',
+  },
+  {
+    href: `${adminPath}/app/messages`,
+    icon: MessageIcon,
+    title: 'Сообщения',
   },
   {
     href: `${adminPath}/app/account`,
