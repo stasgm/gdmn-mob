@@ -383,6 +383,7 @@
 
 Если ответ будет *"Только один раз"*, то программа снова запросит разрешение на доступ к данным при следующем открытии приложения. 
 
+<img src="img/5.Routes/5.ResolutionGeolocation.jpg" alt="drawing" height="400"/>
 
 Из экрана **Визит** пользователь имеет возможность:
 - создать заявку
@@ -395,11 +396,11 @@
  
  Для создания заявки из экрана **Визит** нажимаем на верхнюю правую кнопку " **✚** " **Добавить документ**, после чего откроется экран заявки.
 
- <img src="img/5.Routes/5.TypeOrder.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderView.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderEdit.jpg" alt="drawing" height="400"/>
+  <img src="img/5.Routes/5.VisitTwo.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.Request.jpg" alt="drawing" height="400"/>
 
 Добавим товар, выбрав иконку **✚**.
 
-<img src="img/5.Routes/5.Group.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderPosition.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderGood.jpg" alt="drawing" height="400"/>
+<img src="img/5.Routes/5.ProductSelect.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderPosition.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderGood.jpg" alt="drawing" height="400"/>
 
  У всех документов будет изменен статус на **Готов к отправке** и отобразится кнопка **Отправить**.
 
