@@ -400,13 +400,13 @@
 
 Добавим товар, выбрав иконку **✚**.
 
-<img src="img/5.Routes/5.ProductSelect.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderPosition.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderGood.jpg" alt="drawing" height="400"/>
+<img src="img/5.Routes/5.ProductSelect.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderPosition.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.ProductSelectTwo.jpg" alt="drawing" height="400"/>
 
  У всех документов будет изменен статус на **Готов к отправке** и отобразится кнопка **Отправить**.
 
 Отправим данные визита нажатием на кнопку **Отправить**.
 
-<img src="img/5.Routes/5.VisitOrderReturn.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.VisitEnd.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.VisitSent.jpg" alt="drawing" height="400"/>
+<img src="img/5.Routes/5.VisitOrderReturn.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.VisitEnd.jpg" alt="drawing" height="400"/> 
 
 Данный визит в окне просмотра визитов отобразится как завершенный (кружок с галочкой). Активный визит обозначается кружком с треугольником.
 
