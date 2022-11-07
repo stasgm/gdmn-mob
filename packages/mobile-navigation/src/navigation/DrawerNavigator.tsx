@@ -67,14 +67,15 @@ const DrawerNavigator = ({ onSyncClick, items }: IProps) => {
   const [errorListVisible, setErrorListVisible] = useState(false);
 
   const onSync = () => {
-    //Отрисовать окно синхронизации
-    dispatch(appActions.setShowSyncInfo(true));
     //Если идет процесс, то выходим
     if (loading) {
+      //Отрисовать окно синхронизации
+      dispatch(appActions.setShowSyncInfo(true));
       return;
     }
     //В первый раз выполняем синхронизацию
     if (!syncDate) {
+      dispatch(appActions.setShowSyncInfo(true));
       onSyncClick();
       return;
     }
@@ -91,6 +92,7 @@ const DrawerNavigator = ({ onSyncClick, items }: IProps) => {
         [{ text: 'OK' }],
       );
     } else {
+      dispatch(appActions.setShowSyncInfo(true));
       onSyncClick();
     }
   };

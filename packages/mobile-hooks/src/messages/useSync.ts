@@ -339,6 +339,7 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
       } catch (err) {
         addErrorNotice('useSync', `Проблемы с передачей данных ${err}`);
       }
+
       if (!errorNotice.length) {
         dispatch(appActions.setSyncDate(new Date()));
       }
@@ -388,7 +389,7 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
             if (removeMess.type === 'ERROR') {
               addErrorNotice(
                 'useSync: api.message.removeMessage',
-                `Справочники загружены, но сообщение на сервере не удалено: ${removeMess.message}`,
+                `Справочники загружены, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
               );
             }
           } else if (setRefResponse.type === 'REFERENCES/SET_ALL_FAILURE') {
@@ -404,7 +405,7 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
             if (removeMess.type === 'ERROR') {
               addErrorNotice(
                 'useSync: removeMessage',
-                `Справочники добавлены, но сообщение на сервере не удалено: ${removeMess.message}`,
+                `Справочники добавлены, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
               );
             }
           } else if (addRefResponse.type === 'REFERENCES/ADD_FAILURE') {
@@ -440,7 +441,7 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
             if (removeMess.type === 'ERROR') {
               addErrorNotice(
                 'useSync: removeMessage',
-                `Справочник ${refName} загружен, но сообщение на сервере не удалено: ${removeMess.message}`,
+                `Справочник ${refName} загружен, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
               );
             }
           } else if (setRefResponse.type === 'REFERENCES/SET_ONE_FAILURE') {
@@ -478,7 +479,7 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
           if (removeMess.type === 'ERROR') {
             addErrorNotice(
               'useSync: api.message.removeMessage',
-              `Документы загружены, но сообщение на сервере не удалено: ${removeMess.message}`,
+              `Документы загружены, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
             );
           }
         } else if (setDocResponse.type === 'DOCUMENTS/SET_ALL_FAILURE') {
@@ -511,7 +512,7 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
           if (removeMess.type === 'ERROR') {
             addErrorNotice(
               'useSync: api.message.removeMessage',
-              `Настройки пользователя загружены, но сообщение на сервере не удалено: ${removeMess.message}`,
+              `Настройки пользователя загружены, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
             );
           }
         } else if (setUserSettingsResponse.type === 'AUTH/SET_USER_SETTINGS_FAILURE') {
@@ -549,7 +550,7 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
           if (removeMess.type === 'ERROR') {
             addErrorNotice(
               'useSync: api.message.removeMessage',
-              `Настройки приложения загружены, но сообщение на сервере не удалено: ${removeMess.message}`,
+              `Настройки приложения загружены, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
             );
           }
         } catch (err) {
