@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Store } from 'redux';
 
 import {
@@ -18,7 +18,7 @@ import { globalStyles, Theme as defaultTheme } from '@lib/mobile-ui';
 import api from '@lib/client-api';
 
 import { Snackbar } from 'react-native-paper';
-import { View, Text, Alert, AppState } from 'react-native';
+import { View, Text, AppState } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
 
@@ -33,64 +33,22 @@ export interface IApp {
   onClearLoadingErrors?: () => void;
 }
 
-// const getMinsUntilNextSynch = (lastSyncTime: Date, synchPeriod: number) => {
-//   const nextTime = new Date(lastSyncTime);
-//   nextTime.setMinutes(nextTime.getMinutes() + synchPeriod);
-//   return Math.round((nextTime.getTime() - new Date().getTime()) / 60000);
-// };
-
 const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
   const sync = useSync(onSync);
-
-  const syncDate = useSelector((state) => state.app.syncDate) as Date;
   const settings = useSelector((state) => state.settings?.data);
   const synchPeriod = (settings.synchPeriod?.data as number) || 10;
   const autoSync = (settings.autoSync?.data as boolean) || false;
   const { config, user } = useSelector((state) => state.auth);
   const loading = useSelector((state) => state.app.loading);
-  // const [manualSync, setManualSync] = useState(false);
-  // console.log('synchPeriod', synchPeriod);
 
-  // useEffect(() => {
-  //   if (!loading) {
-  //     setManualSync(false);
-  //   }
-  // }, [loading]);
-
-  // const handleSyncData = useCallback(() => {
-  //   if (loading) {
-  //     return;
-  //   }
-
-  //   if (!syncDate) {
-  //     sync();
-  //     return;
-  //   }
-
-  //   const mins = getMinsUntilNextSynch(syncDate, synchPeriod);
-
-  //   if (mins > 0) {
-  //     Alert.alert(
-  //       'Внимание!',
-  //       // eslint-disable-next-line max-len
-  //       `В настоящее время сервер обрабатывает запрос.\nПовторная синхронизация возможна через ${mins} мин.`,
-  //       [{ text: 'OK' }],
-  //     );
-  //   } else {
-  //     sync();
-  //   }
-  // }, [loading, syncDate, synchPeriod]);
+  const appState = useRef(AppState.currentState);
+  const authDispatch = useAuthThunkDispatch();
+  const authMiddleware: AuthLogOut = () => authDispatch(authActions.logout());
 
   useEffect(() => {
     //При запуске приложения записываем настройки в апи
     api.config = { ...api.config, ...config };
   }, []);
-
-  const appState = useRef(AppState.currentState);
-
-  const authDispatch = useAuthThunkDispatch();
-
-  const authMiddleware: AuthLogOut = () => authDispatch(authActions.logout());
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', async (nextAppState) => {
@@ -108,11 +66,15 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
 
   const timeOutRef = useRef<NodeJS.Timer | null>(null);
 
+  //Если в параметрах указана Автосинхронизация,
+  //устанавливаем автосинхронизацию каждые synchPeriod минут
   useEffect(() => {
-    if (loading || !autoSync) {
+    if (!autoSync) {
       return;
     }
+
     timeOutRef.current = setInterval(() => {
+      //Если в данный момент срабатывает другой запрос, то синхронизацию не выполняем
       if (!loading) {
         sync();
       }

@@ -61,7 +61,7 @@ import {
 import { ICoords } from '../../store/geo/types';
 import { getCurrentPosition } from '../../utils/expoFunctions';
 import { lineTypes } from '../../utils/constants';
-import { getNextDocNumber, twoDigits } from '../../utils/helpers';
+import { getNextDocNumber } from '../../utils/helpers';
 
 export interface VisitListSectionProps {
   title: string;
@@ -79,7 +79,6 @@ const VisitScreen = () => {
   const dateBegin = visit ? new Date(visit?.head.dateBegin) : undefined;
   const geo = visit?.head.beginGeoPoint;
   const [screenState, setScreenState] = useState<ScreenState>('idle');
-  // const [sendLoading, setSendLoading] = useState(false);
   const [lineType, setLineType] = useState(lineTypes[0].id);
 
   const route = useMemo(() => ({ id: routeId, name: '' } as INamedEntity), [routeId]);
@@ -486,9 +485,9 @@ const VisitScreen = () => {
               <Divider />
               {visit && dateBegin && (
                 <View>
-                  <LargeText style={localStyles.contract}>{`Визит начат: ${getDateString(
-                    dateBegin,
-                  )} ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())}`}</LargeText>
+                  <LargeText style={localStyles.contract}>
+                    {`Визит начат: ${getDateString(dateBegin)} ${new Date(dateBegin).toLocaleTimeString()}`}
+                  </LargeText>
                   {geo && <MediumText>{`Координаты: ${geo.latitude}, ${geo.longitude}`}</MediumText>}
                 </View>
               )}

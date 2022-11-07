@@ -6,14 +6,14 @@ import { IAppState } from './types';
 
 export const initialState: Readonly<IAppState> = {
   loading: false,
-  loadedWithError: false,
+  showSyncInfo: false,
   autoSync: false,
-  errorMessage: '',
   formParams: {},
   errorList: [],
   loadingData: false,
   loadingError: '',
   requestNotice: [],
+  errorNotice: [],
 };
 
 const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action): IAppState => {
@@ -45,10 +45,10 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
         autoSync: action.payload,
       };
 
-    case getType(appActions.setLoadedWithError):
+    case getType(appActions.setShowSyncInfo):
       return {
         ...state,
-        loadedWithError: action.payload,
+        showSyncInfo: action.payload,
       };
 
     case getType(appActions.addError):
@@ -67,7 +67,7 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
       };
 
     case getType(appActions.loadData):
-      return { ...action.payload, loading: false, errorMessage: '' };
+      return { ...action.payload, loading: false };
 
     case getType(appActions.setLoadingData):
       return { ...state, loadingData: action.payload };
@@ -83,6 +83,12 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
 
     case getType(appActions.clearRequestNotice):
       return { ...state, requestNotice: [] };
+
+    case getType(appActions.addErrorNotice):
+      return { ...state, errorNotice: [...state.errorNotice, action.payload] };
+
+    case getType(appActions.clearErrorNotice):
+      return { ...state, errorNotice: [] };
 
     default:
       return state;

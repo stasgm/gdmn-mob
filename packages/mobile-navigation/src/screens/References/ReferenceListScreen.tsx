@@ -19,6 +19,7 @@ type ViewScreenProp = StackNavigationProp<ReferenceStackParamList, 'ReferenceVie
 
 const ReferenceListScreen = () => {
   const { list, loading } = useSelector((state) => state.references);
+  const appLoading = useSelector((state) => state.app.loading);
 
   const refData = useMemo(() => {
     return Object.entries(list)
@@ -52,14 +53,14 @@ const ReferenceListScreen = () => {
     ]);
   }, []);
 
-  const renderRight = useCallback(() => <MenuButton actionsMenu={actionsMenu} />, []);
+  const renderRight = useCallback(() => <MenuButton actionsMenu={actionsMenu} disabled={appLoading} />, [appLoading]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackDrawer,
       headerRight: renderRight,
     });
-  }, [navigation]);
+  }, [navigation, appLoading]);
 
   const renderItem = ({ item }: { item: RefListItem }) => <ReferenceItem item={item} />;
 

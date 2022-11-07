@@ -1,13 +1,11 @@
-import React, { useEffect, useState } from 'react';
-
-import { useTheme } from '@react-navigation/native';
+import React, { useState } from 'react';
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import { appActions, useDispatch, useSelector } from '@lib/store';
 import { StyleSheet, Modal, View, ScrollView, Alert } from 'react-native';
 
-import { Button, Dialog } from 'react-native-paper';
+import { Button, Dialog, useTheme } from 'react-native-paper';
 
 import { AppActivityIndicator, globalStyles as styles, LargeText, MediumText } from '@lib/mobile-ui';
 
@@ -63,81 +61,98 @@ const DrawerNavigator = ({ onSyncClick, items }: IProps) => {
   const { colors } = useTheme();
   const dispatch = useDispatch();
   const navList: INavItem[] = [...(items || []), ...baseNavList];
-  const appLoading = useSelector((state) => state.app.loading);
-  const requestNotice = useSelector((state) => state.app.requestNotice);
-  const syncDate = useSelector((state) => state.app.syncDate) as Date;
+  const { requestNotice, errorNotice, syncDate, showSyncInfo, loading } = useSelector((state) => state.app);
   const settings = useSelector((state) => state.settings?.data);
   const synchPeriod = (settings.synchPeriod?.data as number) || 10;
-  const autoSync = (settings.autoSync?.data as boolean) || false;
-
-  const [syncLoading, setSyncLoading] = useState(appLoading);
+  const [errorListVisible, setErrorListVisible] = useState(false);
 
   const onSync = () => {
-    if (appLoading) {
-      setSyncLoading(true);
+    //Отрисовать окно синхронизации
+    dispatch(appActions.setShowSyncInfo(true));
+    //Если идет процесс, то выходим
+    if (loading) {
+      return;
+    }
+    //В первый раз выполняем синхронизацию
+    if (!syncDate) {
+      onSyncClick();
+      return;
+    }
+    //Определяем, сколько минут с прошлой синхронизации
+    //и если меньше, чем synchPeriod, то предупреждаем и выходим
+    //иначе - выполняем синхронизацию
+    const mins = getMinsUntilNextSynch(syncDate, synchPeriod);
+
+    if (mins > 0) {
+      Alert.alert(
+        'Внимание!',
+        // eslint-disable-next-line max-len
+        `В настоящее время сервер обрабатывает запрос.\nПовторная синхронизация возможна через ${mins} мин.`,
+        [{ text: 'OK' }],
+      );
     } else {
-      if (!syncDate) {
-        onSyncClick();
-        return;
-      }
-
-      const mins = getMinsUntilNextSynch(syncDate, synchPeriod);
-
-      if (mins > 0) {
-        Alert.alert(
-          'Внимание!',
-          // eslint-disable-next-line max-len
-          `В настоящее время сервер обрабатывает запрос.\nПовторная синхронизация возможна через ${mins} мин.`,
-          [{ text: 'OK' }],
-        );
-      } else {
-        onSyncClick();
-      }
+      onSyncClick();
     }
   };
 
   const onDismissDialog = () => {
-    setSyncLoading(false);
-    if (!appLoading) {
+    dispatch(appActions.setShowSyncInfo(false));
+    setErrorListVisible(false);
+    if (!loading) {
       dispatch(appActions.clearRequestNotice());
+      dispatch(appActions.clearErrorNotice());
     }
   };
 
-  useEffect(() => {
-    if (appLoading && !autoSync) {
-      setSyncLoading(appLoading);
-    }
-  }, [appLoading]);
-
   return (
     <>
-      <Modal animationType="none" visible={syncLoading} statusBarTranslucent={true}>
-        <Dialog visible={true} onDismiss={onDismissDialog}>
+      <Modal animationType="fade" visible={showSyncInfo} statusBarTranslucent={true}>
+        <Dialog visible={showSyncInfo} onDismiss={onDismissDialog} style={localStyles.dialog}>
           <Dialog.Title>
             <View style={styles.containerCenter}>
-              <LargeText style={localStyles.titleSize}>
-                {appLoading ? 'Выполняются операции...' : 'Завершены операции:'}
+              <LargeText style={localStyles.dialogTitle}>
+                {loading
+                  ? 'Выполняются операции:'
+                  : errorNotice.length
+                  ? 'Выполнено с ошибками!'
+                  : 'Выполнено успешно!'}
               </LargeText>
-              {appLoading && <AppActivityIndicator style={{}} />}
             </View>
           </Dialog.Title>
-          <Dialog.Content style={{ height: 200 }}>
+          <Dialog.Content style={localStyles.content}>
             <ScrollView>
-              {requestNotice.length ? (
+              {errorListVisible && errorNotice.length ? (
+                errorNotice
+                  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                  .map((note, key) => (
+                    <MediumText key={key}>
+                      {errorNotice.length - key}. {note.message}
+                      {key === 0 && loading ? '...' : ''}
+                    </MediumText>
+                  ))
+              ) : requestNotice.length ? (
                 requestNotice
                   .sort((a, b) => new Date(b.started).getTime() - new Date(a.started).getTime())
                   .map((note, key) => (
-                    <MediumText key={key}>
-                      {requestNotice.length - key}. {note.message}
-                      {key === 0 && appLoading ? '...' : ''}
-                    </MediumText>
+                    <View key={key} style={{ flexDirection: 'row' }}>
+                      <MediumText>
+                        {requestNotice.length - key}. {note.message}
+                        {key === 0 && loading ? '...' : ''}
+                      </MediumText>
+                      {key === 0 && loading && <AppActivityIndicator style={{}} />}
+                    </View>
                   ))
               ) : (
-                <MediumText>{`Синхронизация данных${appLoading ? '...' : ''}`}</MediumText>
+                <MediumText>{`Синхронизация данных${loading ? '...' : ''}`}</MediumText>
               )}
             </ScrollView>
           </Dialog.Content>
-          <Dialog.Actions>
+          <Dialog.Actions style={localStyles.action}>
+            {!!errorNotice.length && !loading ? (
+              <Button onPress={() => setErrorListVisible(!errorListVisible)}>
+                {errorListVisible ? 'Просмотреть операции' : 'Проcмотреть ошибки'}
+              </Button>
+            ) : null}
             <Button onPress={onDismissDialog}>Продолжить работу в приложении</Button>
           </Dialog.Actions>
         </Dialog>
@@ -164,13 +179,64 @@ const DrawerNavigator = ({ onSyncClick, items }: IProps) => {
           />
         ))}
       </Drawer.Navigator>
+      {loading && (
+        <View
+          style={{
+            backgroundColor: 'transparent',
+            position: 'absolute',
+            bottom: 10,
+            right: 10,
+          }}
+        >
+          <Button
+            style={{ opacity: 0.7, borderRadius: 20 }}
+            icon="sync"
+            mode="contained"
+            loading={true}
+            onPress={() => dispatch(appActions.setShowSyncInfo(true))}
+            uppercase={false}
+            compact={true}
+          >
+            <MediumText style={localStyles.syncInfoText}>Синхронизация</MediumText>
+          </Button>
+        </View>
+      )}
     </>
   );
 };
 const localStyles = StyleSheet.create({
-  titleSize: {
+  dialog: {
+    height: 380,
+  },
+  dialogTitle: {
     fontSize: 18,
     lineHeight: 18,
+    fontWeight: '500',
+  },
+  text: {
+    marginTop: -16,
+  },
+  content: {
+    height: 240,
+  },
+  action: {
+    height: 70,
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+  },
+  syncInfo: {
+    position: 'absolute',
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    paddingLeft: 6,
+    paddingVertical: 10,
+    opacity: 0.5,
+    bottom: 0,
+  },
+  syncInfoText: {
+    fontSize: 8,
+    color: 'white',
   },
 });
 

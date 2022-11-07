@@ -7,7 +7,10 @@ import { AppScreen, globalStyles as styles, LargeText, MediumText, navBackDrawer
 
 import Constants from 'expo-constants';
 
+import { StackNavigationProp } from '@react-navigation/stack';
+
 import { GDMN_COMPANY_NAME, GDMN_EMAIL, GDMN_PHONE, GDMN_SITE_ADDRESS, GDMN_TRADEMARK } from '../constants';
+import { InformationStackParamList } from '../navigation/Root/types';
 
 const dialCall = (number: string) => {
   let phoneNumber = '';
@@ -31,7 +34,7 @@ interface IProfileItem {
 const InformationScreen = () => {
   const { colors } = useTheme();
 
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<InformationStackParamList, 'Information'>>();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -58,8 +61,8 @@ const InformationScreen = () => {
       id: 'log',
       icon: 'history',
       title: 'Дополнительная информация',
-      text: 'История синхронизации',
-      onPress: () => Linking.openURL(Constants.manifest?.extra?.documentationUrl),
+      text: 'История ошибок',
+      onPress: () => navigation.navigate('Log'),
       style: { textDecorationLine: 'underline' },
     },
   ];
@@ -93,7 +96,7 @@ const InformationScreen = () => {
   const iconStyle = { backgroundColor: colors.primary };
 
   const ProfileItem = ({ item }: { item: IProfileItem }) => (
-    <View>
+    <>
       <Divider />
       <View style={localStyles.profileContainer}>
         <View style={localStyles.profileIcon}>
@@ -108,7 +111,7 @@ const InformationScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </>
   );
 
   return (
@@ -164,5 +167,16 @@ const localStyles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     margin: 10,
+  },
+  dialogTitle: {
+    fontSize: 18,
+    lineHeight: 18,
+    fontWeight: '500',
+  },
+  dialog: {
+    height: 380,
+  },
+  content: {
+    height: 240,
   },
 });

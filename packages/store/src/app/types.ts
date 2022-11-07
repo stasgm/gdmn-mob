@@ -2,21 +2,15 @@ export interface IFormParam {
   [fieldName: string]: unknown;
 }
 
-export interface ISyncInfo {
-  requestList: IRequestNotice[];
-  errorList: ILog[];
-}
-
 export interface IAppState {
   loading: boolean;
-  loadedWithError: boolean;
+  showSyncInfo: boolean;
   autoSync: boolean;
-  errorMessage: string;
-  errorList: ILog[];
+  errorList: IErrorNotice[];
   formParams?: IFormParam;
   syncDate?: Date;
-  // syncInfo?: ISyncInfo;
   requestNotice: IRequestNotice[];
+  errorNotice: IErrorNotice[];
   readonly loadingData: boolean;
   readonly loadingError: string;
 }
@@ -26,8 +20,9 @@ export interface IRequestNotice {
   started: Date;
 }
 
-export interface ILog {
+export interface IErrorNotice {
   id: string;
-  message: string;
+  name: string;
   date: Date;
+  message: string;
 }
