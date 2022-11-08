@@ -414,17 +414,14 @@
 
  - либо сразу отправить заявку с помощью иконки <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>
  
- <img src="img/5.Routes/5.Order.jpg" alt="drawing" height="400"/>
+ <img src="img/5.Routes/5.DraftOrder.jpg" alt="drawing" height="400"/>
 
  Когда у всех документов будет статус **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.JPG" alt="drawing" height="22"/>  из экрана **Визит** можно отправить все заявки сразу с помощью иконки <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>.
 
- <img src="img/5.Routes/5.DraftOrder.jpg" alt="drawing" height="400"/>
+ <img src="img/5.Routes/5.AllOrders.jpg" alt="drawing" height="400"/>
+<img src="img/5.Routes/5.QuestionSendOrder.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.EndVisit.jpg" alt="drawing" height="400"/> 
 
-Отправим данные визита нажатием на кнопку **Отправить**.
-
-<img src="img/5.Routes/5.VisitOrderReturn.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.VisitEnd.jpg" alt="drawing" height="400"/> 
-
-Данный визит в окне просмотра визитов отобразится как завершенный (кружок с галочкой). Активный визит обозначается кружком с треугольником.
+Данный визит в окне просмотра визитов обозначится треугольником в кружке.
 
 <img src="img/5.Routes/5.RouteVisit.jpg" alt="drawing" height="400"/>
 
