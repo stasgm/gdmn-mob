@@ -173,7 +173,7 @@
 
 <img src="img/3.Orders/3.ViewMenu.jpg" alt="drawing" height="400"/>
 
-После того, как выберем необходимый товар, откроется экран позиции документа для ввода количества мест товара и выбора упаковки. 
+После того, как выберем необходимый товар, откроется экран **Позиция заявки** для ввода количества мест товара и выбора упаковки. 
 
 <img src="img/3.Orders/3.GoodsWithoutCont.jpg" alt="drawing" height="400"/>  <img src="img/3.Orders/3.GoodsWithCont.jpg" alt="drawing" height="400"/>
 
@@ -398,11 +398,27 @@
 
   <img src="img/5.Routes/5.VisitTwo.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.Request.jpg" alt="drawing" height="400"/>
 
-Добавим товар, выбрав иконку **✚**.
+Из экрана **Визит** добавим в заявку необходимый товар: нажав иконку **✚**, выбрав необходимое количество мест товара и нажав иконку **✓**. 
 
-<img src="img/5.Routes/5.ProductSelect.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderPosition.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.ProductSelectTwo.jpg" alt="drawing" height="400"/>
+<img src="img/5.Routes/5.ProductSelect.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderPosition.jpg" alt="drawing" height="400"/> 
 
- У всех документов будет изменен статус на **Готов к отправке** и отобразится кнопка **Отправить**.
+ Выбранный товар будет выделен в списках товаров серым цветом с указанием количества и вида упаковки, а иконка товара поменяет цвет с красного на синий.
+
+ <img src="img/5.Routes/5.ProductSelectTwo.jpg" alt="drawing" height="400"/>
+
+### Отправка заявки
+
+ По нажатии на иконку " **✓** " позиция сохранится и приложение перейдет на экран **Выбор товара**. После того, как будут выбраны все необходимые позиции товаров, необходимо вернуться на экран **Заявка** и 
+ 
+ - либо перевести документ в состояние "Готов к отправке" с помощью кнопки <img src="img/1.Connection/1.IconAutoTransl.jpg" alt="drawing" height="22"/> (или вручную, нажав на шапку документа) и отослать заявку попозже.
+
+ - либо сразу отправить заявку с помощью иконки <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>
+ 
+ <img src="img/5.Routes/5.Order.jpg" alt="drawing" height="400"/>
+
+ Когда у всех документов будет статус **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.JPG" alt="drawing" height="22"/>  из экрана **Визит** можно отправить все заявки сразу с помощью иконки <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>.
+
+ <img src="img/5.Routes/5.DraftOrder.jpg" alt="drawing" height="400"/>
 
 Отправим данные визита нажатием на кнопку **Отправить**.
 
