@@ -30,9 +30,11 @@ import { ActivityIndicator, Caption, Text } from 'react-native-paper';
 
 import { IDocument, IReferences } from '@lib/types';
 
-import { TouchableOpacity, Linking } from 'react-native';
+import { TouchableOpacity, Linking, View } from 'react-native';
 
 import Constants from 'expo-constants';
+
+import { ScrollView } from 'react-native-gesture-handler';
 
 import { DocNavigator } from './src/navigation/DocNavigator';
 
@@ -149,23 +151,30 @@ const Root = () => {
     <ErrorBoundary FallbackComponent={AppFallback}>
       {infoWindow === 1 ? (
         <AppScreen>
-          <Text style={styles.textInfo}>
-            {
-              'Добро пожаловать в GDMN Склад!\n\nНаше приложение облегчает процесс инвентаризации и позволяет выполнить следующие действия: \n\n1. Оформить инвентаризацию товаров\n\n2. Оформить приход товаров\n\n3. Вести складской учет' // \n\n3. Планировать посещение торговых объектов, составлять маршрут и просматривать его на карте\n\n4. Оперативно контролировать задолженность за поставленную продукцию\n\n5. Просматривать юридический адрес, адрес разгрузки и иные реквизиты покупателя\n\n6. Гибко настраивать цены и скидки для конкретного покупателя или группы покупателей'
-            }
-          </Text>
-          <TouchableOpacity
-            style={styles.buttonPrev}
-            onPress={() => {
-              setInfoWindow(0);
-              dispatch(appActions.loadGlobalDataFromDisc());
-            }}
+          <ScrollView
+            contentContainerStyle={styles.contentContainerStyle}
+            maintainVisibleContentPosition={{ autoscrollToTopThreshold: 1, minIndexForVisible: 0 }}
+            style={styles.scrollContainer}
           >
-            <Text style={styles.textInfo}>{'« Назад'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonNext} onPress={handleSetInfoWindow_2}>
-            <Text style={styles.textInfo}>{'Далее »'}</Text>
-          </TouchableOpacity>
+            <Text style={[styles.textInfo]}>
+              {
+                'Добро пожаловать в GDMN Склад!\n\nПриложение облегчает ведение складского учета и позволяет выполнить следующие действия: \n\n1. Оформить документы складского движения, такие как "Приход", "Внутреннее перемещение", "Возврат поставщику" и т.д. \n\n2. Провести инвентаризацию товаров \n\n3. Зарегистрировать операции при помощи сканера штрих-кодов'
+              }
+            </Text>
+          </ScrollView>
+          <View style={styles.infoButtons}>
+            <TouchableOpacity
+              onPress={() => {
+                setInfoWindow(0);
+                dispatch(appActions.loadGlobalDataFromDisc());
+              }}
+            >
+              <Text style={[styles.textInfo]}>{'« Назад'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleSetInfoWindow_2}>
+              <Text style={[styles.textInfo]}>{'Далее »'}</Text>
+            </TouchableOpacity>
+          </View>
         </AppScreen>
       ) : infoWindow === 2 ? (
         <AppScreen>
@@ -183,12 +192,14 @@ const Root = () => {
           <TouchableOpacity onPress={() => Linking.openURL(GDMN_SITE_ADDRESS)}>
             <Text style={[styles.textInfo, styles.textReference]}>{GDMN_SITE_ADDRESS}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonPrev} onPress={handleSetInfoWindow_1}>
-            <Text style={styles.textInfo}>{'« Назад'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonNext} onPress={handleSetInfoWindow_3}>
-            <Text style={styles.textInfo}>{'Далее »'}</Text>
-          </TouchableOpacity>
+          <View style={styles.infoButtons}>
+            <TouchableOpacity onPress={handleSetInfoWindow_1}>
+              <Text style={styles.textInfo}>{'« Назад'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleSetInfoWindow_3}>
+              <Text style={styles.textInfo}>{'Далее »'}</Text>
+            </TouchableOpacity>
+          </View>
         </AppScreen>
       ) : infoWindow === 3 ? (
         <AppScreen>
@@ -201,9 +212,11 @@ const Root = () => {
               '\nВыявленные ошибки и пожелания оставляйте в системе регистрации.\n\nСпасибо за использование GDMN Склад!\n\n'
             }
           </Text>
-          <TouchableOpacity style={styles.buttonPrev} onPress={handleSetInfoWindow_2}>
-            <Text style={styles.textInfo}>{'« Назад'}</Text>
-          </TouchableOpacity>
+          <View style={styles.infoButtons}>
+            <TouchableOpacity onPress={handleSetInfoWindow_2}>
+              <Text style={styles.textInfo}>{'« Назад'}</Text>
+            </TouchableOpacity>
+          </View>
           <PrimeButton icon={'presentation-play'} onPress={handleSetInfoWindow_0}>
             {'Начать работу'}
           </PrimeButton>

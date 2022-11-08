@@ -57,7 +57,11 @@ const getRemGoodByContact = (goods: IGood[], remains: IRemainsData[] = [], isRem
     { good: { id: '2', name: 'Товар 2', value: 'шт.', ...}, price: 0, remains: 0}
   ]
 */
-const getRemGoodListByContact = (goods: IGood[], remains: IRemainsData[], isRemains: boolean | undefined = false) => {
+const getRemGoodListByContact = (
+  goods: IGood[],
+  remains: IRemainsData[] = [],
+  isRemains: boolean | undefined = false,
+) => {
   log('getRemGoodListByContact', 'Начало построения массива товаров по подразделению');
 
   const remGoods: IRemGood[] = [];

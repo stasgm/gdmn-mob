@@ -18,7 +18,6 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { SectionListData, View, StyleSheet, SectionList, ListRenderItem, Platform, Keyboard } from 'react-native';
-import { Divider } from 'react-native-paper';
 
 import { ReportStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IReportListFormParam, IOutlet } from '../../store/types';
@@ -252,7 +251,6 @@ const ReportListScreen = () => {
 
   return (
     <AppScreen>
-      <Divider />
       <View style={[localStyles.filter, { borderColor: colors.primary }]}>
         <SelectableInput label="Организация" value={filterReportContact?.name || ''} onPress={handleSearchContact} />
         <View style={localStyles.marginTop}>

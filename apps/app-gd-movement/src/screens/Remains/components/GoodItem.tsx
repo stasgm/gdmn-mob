@@ -30,13 +30,13 @@ const GoodItem = ({ item }: IProps) => {
         navigation.navigate('GoodLine', { item });
       }}
     >
-      <View style={[styles.item]}>
-        <View style={[styles.icon]}>
+      <View style={styles.item}>
+        <View style={styles.icon}>
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
           <Text style={styles.name}>{item?.good.name}</Text>
-          <View style={[styles.directionRow]}>
+          <View style={styles.directionRow}>
             <Text style={textStyle}>
               {item.remains} {item.good.valueName} - {(item?.price || 0).toString()} р.
             </Text>

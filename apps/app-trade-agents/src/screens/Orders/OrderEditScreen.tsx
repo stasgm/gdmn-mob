@@ -345,13 +345,7 @@ const OrderEditScreen = () => {
             directionRow={true}
           />
         </View>
-        <Input
-          label="Номер"
-          value={docNumber}
-          onChangeText={handleChangeNumber}
-          disabled={isBlocked}
-          keyboardType="url"
-        />
+        <Input label="Номер" value={docNumber} onChangeText={handleChangeNumber} disabled={isBlocked} />
         <SelectableInput
           label="Дата отгрузки"
           value={getDateString(docOnDate || '')}
@@ -380,7 +374,6 @@ const OrderEditScreen = () => {
           }}
           disabled={docStatus !== 'DRAFT'}
           clearInput={true}
-          keyboardType="url"
         />
       </ScrollView>
       {showOnDate && (

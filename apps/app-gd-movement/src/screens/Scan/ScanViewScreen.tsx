@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { View, FlatList, TextInput, Alert, ListRenderItem } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -51,6 +51,7 @@ export const ScanViewScreen = () => {
 
   const id = useRoute<RouteProp<ScanStackParamList, 'ScanView'>>().params?.id;
   const doc = docSelectors.selectByDocId<IScanDocument>(id);
+  const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
 
   const isBlocked = doc?.status !== 'DRAFT';
 
@@ -115,6 +116,14 @@ export const ScanViewScreen = () => {
     navigation.goBack();
   }, [dispatch, id, doc, navigation]);
 
+  const hanldeCancelLastScan = useCallback(() => {
+    const lastId = doc?.lines?.[0]?.id;
+
+    if (lastId) {
+      dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
+    }
+  }, [dispatch, doc?.lines, id]);
+
   const sendDoc = useSendDocs(doc ? [doc] : []);
 
   const handleSendDocument = useCallback(() => {
@@ -136,6 +145,10 @@ export const ScanViewScreen = () => {
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
+        title: 'Отменить последнее сканирование',
+        onPress: hanldeCancelLastScan,
+      },
+      {
         title: 'Редактировать данные',
         onPress: handleEditDocHead,
       },
@@ -149,7 +162,7 @@ export const ScanViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleDelete, handleEditDocHead]);
+  }, [showActionSheet, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
 
   const renderRight = useCallback(
     () =>
@@ -218,7 +231,9 @@ export const ScanViewScreen = () => {
       readonly={true}
     >
       <View style={styles.details}>
-        <LargeText style={styles.textBold}>Сканирование {(index + 1)?.toString()}</LargeText>
+        <LargeText style={styles.textBold}>
+          Сканирование {(lines?.length ? lines?.length - index : 1 + index)?.toString()}
+        </LargeText>
         <MediumText>{shortenString(item.barcode, 30)}</MediumText>
       </View>
     </ListItemLine>
@@ -232,13 +247,17 @@ export const ScanViewScreen = () => {
 
   const getScannedObject = useCallback(
     (brc: string) => {
-      const line: IScanLine = { id: generateId(), barcode: brc };
+      if (!doc) {
+        return;
+      }
+
+      const line: IScanLine = { id: generateId(), barcode: brc, sortOrder: doc?.lines?.length + 1 };
       dispatch(documentActions.addDocumentLine({ docId: id, line }));
 
       setScanned(false);
     },
 
-    [dispatch, id],
+    [dispatch, doc, id],
   );
 
   const setScan = (brc: string) => {
@@ -312,7 +331,7 @@ export const ScanViewScreen = () => {
           onChangeText={(text) => !scanned && setScan(text)}
         />
         <FlatList
-          data={doc.lines}
+          data={lines}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
           initialNumToRender={6}

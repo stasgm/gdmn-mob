@@ -164,6 +164,7 @@ const DrawerNavigator = ({ onSyncClick, items }: IProps) => {
         screenOptions={{
           drawerActiveBackgroundColor: colors.primary,
           drawerActiveTintColor: '#ffffff',
+          drawerStyle: { width: 270 },
         }}
         drawerContent={(props) => <DrawerContent {...props} onSync={onSync} />}
       >

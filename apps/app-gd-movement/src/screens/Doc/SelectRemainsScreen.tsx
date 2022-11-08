@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
-import { View, FlatList, TouchableOpacity, Text, RefreshControl } from 'react-native';
-import { Searchbar, Divider } from 'react-native-paper';
-import { RouteProp, useIsFocused, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
+import { View, FlatList, TouchableOpacity, Text, RefreshControl, StyleSheet, Alert } from 'react-native';
+import { Searchbar, Divider, Chip } from 'react-native-paper';
+import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 
 import {
   AppScreen,
@@ -9,13 +9,13 @@ import {
   ItemSeparator,
   globalStyles as styles,
   SearchButton,
-  AppActivityIndicator,
   EmptyList,
   MediumText,
   LargeText,
   navBackButton,
+  globalColors,
 } from '@lib/mobile-ui';
-import { refSelectors, useSelector } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -27,8 +27,10 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { getRemGoodListByContact } from '../../utils/helpers';
 import { DocStackParamList } from '../../navigation/Root/types';
-import { IMovementDocument } from '../../store/types';
+import { IMovementDocument, IMovementLine } from '../../store/types';
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
+
+import { DocLineDialog } from './components/DocLineDialog';
 
 interface IFilteredList {
   searchQuery: string;
@@ -37,47 +39,11 @@ interface IFilteredList {
 
 const keyExtractor = (item: IRemGood) => String(item.good.id);
 
-interface IProp {
-  docId: string;
-  item: IRemGood;
-  onPressGood: (goodItem: IRemGood) => void;
-}
-
-const GoodRemains = ({ item, onPressGood }: IProp) => {
-  const { colors } = useTheme();
-  const barcode = !!item.good.barcode;
-
-  const barcodeTextStyle = useMemo(
-    () => [styles.number, styles.flexDirectionRow, { color: colors.text }],
-    [colors.text],
-  );
-
-  const handlePressGood = useCallback(() => onPressGood(item), [item, onPressGood]);
-
-  return (
-    <TouchableOpacity onPress={handlePressGood}>
-      <View style={[styles.item]}>
-        <View style={[styles.icon]}>
-          <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
-        </View>
-        <View style={styles.details}>
-          <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-          <View style={[styles.directionRow]}>
-            <MediumText>
-              {item.remains} {item.good.valueName} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)}{' '}
-              руб.
-            </MediumText>
-            {barcode && <Text style={barcodeTextStyle}>{item.good.barcode}</Text>}
-          </View>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-};
-
 export const SelectRemainsScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'SelectRemainsItem'>>();
   const { docId } = useRoute<RouteProp<DocStackParamList, 'SelectRemainsItem'>>().params;
+
+  const dispatch = useDispatch();
 
   const { colors } = useTheme();
   const searchStyle = useMemo(() => colors.primary, [colors.primary]);
@@ -86,7 +52,6 @@ export const SelectRemainsScreen = () => {
 
   const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
 
-  // const docId = useRoute<RouteProp<DocStackParamList, 'SelectRemainsItem'>>().params?.docId;
   const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IMovementDocument;
 
   const goods = refSelectors.selectByName<IGood>('good')?.data;
@@ -126,7 +91,10 @@ export const SelectRemainsScreen = () => {
 
         const fn = isNaN(Number(lower))
           ? ({ good }: IRemGood) => good.name?.toLowerCase().includes(lower)
-          : ({ good }: IRemGood) => good.barcode?.includes(searchQuery) || good.name?.toLowerCase().includes(lower);
+          : ({ good }: IRemGood) =>
+              good.barcode?.includes(searchQuery) ||
+              good.name?.toLowerCase().includes(lower) ||
+              good.alias?.toLowerCase().includes(lower);
 
         let gr;
 
@@ -152,14 +120,17 @@ export const SelectRemainsScreen = () => {
     navigation.navigate('ScanBarcode', { docId: docId });
   }, [navigation, docId]);
 
+  const [selectedLine, setSelectedLine] = useState<IMovementLine | undefined>(undefined);
+  const [selectedGood, setSelectedGood] = useState<IRemGood | undefined>(undefined);
+
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={true} />
+        <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={filterVisible} />
         {isScanerReader && <ScanButton onPress={handleScanner} />}
       </View>
     ),
-    [handleScanner, isScanerReader],
+    [filterVisible, handleScanner, isScanerReader],
   );
 
   useLayoutEffect(() => {
@@ -172,32 +143,165 @@ export const SelectRemainsScreen = () => {
   const refList = useRef<FlatList<IRemGood>>(null);
   useScrollToTop(refList);
 
-  const pressGood = useCallback(
-    (item: IRemGood) =>
+  const handleAddLine = useCallback(
+    (item?: IRemGood) => {
+      if (selectedLine) {
+        navigation.navigate('DocLine', {
+          docId,
+          mode: 0,
+          item: {
+            id: generateId(),
+            good: { id: selectedLine.good.id, name: selectedLine.good.name },
+            quantity: 0,
+            remains: selectedLine.remains,
+            price: selectedLine.price,
+            buyingPrice: selectedLine.buyingPrice,
+          },
+        });
+        setSelectedLine(undefined);
+      } else if (selectedGood) {
+        navigation.navigate('DocLine', {
+          docId,
+          mode: 0,
+          item: {
+            id: generateId(),
+            good: selectedGood.good,
+            quantity: 0,
+            remains: selectedGood.remains,
+            price: selectedGood.price,
+            buyingPrice: selectedGood.buyingPrice,
+          },
+        });
+        setSelectedGood(undefined);
+      } else if (item) {
+        navigation.navigate('DocLine', {
+          docId,
+          mode: 0,
+          item: {
+            id: generateId(),
+            good: { id: item.good.id, name: item.good.name },
+            quantity: 0,
+            remains: item.remains,
+            price: item.price,
+            buyingPrice: item.buyingPrice,
+          },
+        });
+      }
+    },
+    [docId, navigation, selectedGood, selectedLine],
+  );
+
+  const handleEditLine = useCallback(() => {
+    if (selectedLine) {
       navigation.navigate('DocLine', {
         docId,
-        mode: 0,
-        item: {
-          id: generateId(),
-          good: { id: item.good.id, name: item.good.name },
-          quantity: 0,
-          remains: item.remains,
-          price: item.price,
-          buyingPrice: item.buyingPrice,
+        mode: 1,
+        item: selectedLine,
+      });
+      setSelectedLine(undefined);
+    }
+  }, [docId, navigation, selectedLine]);
+
+  const handleDeleteLine = useCallback(() => {
+    if (selectedLine) {
+      Alert.alert('Вы уверены, что хотите удалить позицию?', '', [
+        {
+          text: 'Да',
+          onPress: () => {
+            dispatch(documentActions.removeDocumentLine({ docId, lineId: selectedLine.id }));
+          },
         },
-      }),
-    [docId, navigation],
+        {
+          text: 'Отмена',
+        },
+      ]);
+      setSelectedLine(undefined);
+    } else if (selectedGood && document) {
+      const lineIds: string[] = document.lines?.filter((i) => i.good.id === selectedGood?.good.id)?.map((i) => i.id);
+      Alert.alert(`Вы уверены, что хотите удалить ${lineIds.length > 1 ? 'все позиции' : 'позицию'} ?`, '', [
+        {
+          text: 'Да',
+          onPress: () => {
+            dispatch(documentActions.removeDocumentLines({ docId, lineIds }));
+          },
+        },
+        {
+          text: 'Отмена',
+        },
+      ]);
+      setSelectedGood(undefined);
+    }
+  }, [dispatch, docId, document, selectedGood, selectedLine]);
+
+  const hadndleDismissDialog = () => {
+    setSelectedLine(undefined);
+    setSelectedGood(undefined);
+  };
+
+  const GoodRemains = useCallback(
+    ({ item }: { item: IRemGood }) => {
+      const barcode = !!item.good.barcode;
+
+      const doc = docSelectors.selectByDocId(docId) as IMovementDocument;
+      const lines = doc?.lines?.filter((i) => i.good.id === item.good.id);
+      const isAdded = !!lines?.length;
+
+      const iconStyle = [styles.icon, { backgroundColor: isAdded ? '#06567D' : '#E91E63' }];
+      const goodStyle = {
+        backgroundColor: isAdded ? globalColors.backgroundLight : 'transparent',
+      };
+
+      const barcodeTextStyle = [styles.number, styles.flexDirectionRow, { color: colors.text }];
+
+      return (
+        <TouchableOpacity
+          onPress={() => {
+            if (isAdded) {
+              setSelectedGood(item);
+            } else {
+              handleAddLine(item);
+            }
+          }}
+        >
+          <View style={[localStyles.goodItem, goodStyle]}>
+            <View style={iconStyle}>
+              <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
+            </View>
+            <View style={styles.details}>
+              <LargeText style={styles.textBold}>
+                {item.good.alias ? `${item.good.name}, арт. ${item.good.alias}` : item.good.name}
+              </LargeText>
+              <View style={styles.directionRow}>
+                <MediumText>
+                  {item.remains} {item.good.valueName} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)}{' '}
+                  руб.
+                </MediumText>
+                {barcode && <Text style={barcodeTextStyle}>{item.good.barcode}</Text>}
+              </View>
+              {isAdded && (
+                <View style={localStyles.lineView}>
+                  {lines.map((line) => (
+                    <Chip
+                      key={line.id}
+                      style={[localStyles.lineChip, { borderColor: colors.primary }]}
+                      onPress={() => setSelectedLine(line)}
+                    >
+                      {line.quantity} {item.good.valueName}
+                    </Chip>
+                  ))}
+                </View>
+              )}
+            </View>
+          </View>
+        </TouchableOpacity>
+      );
+    },
+    [colors.primary, colors.text, docId, handleAddLine],
   );
-  const renderItem = ({ item }: { item: IRemGood }) => (
-    <GoodRemains item={item} docId={docId} onPressGood={pressGood} />
-  );
+
+  const renderItem = ({ item }: { item: IRemGood }) => <GoodRemains item={item} />;
 
   const RC = useMemo(() => <RefreshControl refreshing={!goodRemains} title="загрузка данных..." />, [goodRemains]);
-
-  const isFocused = useIsFocused();
-  if (!isFocused) {
-    return <AppActivityIndicator />;
-  }
 
   return (
     <AppScreen>
@@ -206,7 +310,7 @@ export const SelectRemainsScreen = () => {
         <>
           <View style={styles.flexDirectionRow}>
             <Searchbar
-              placeholder="Поиск (штрихкод, наименование)"
+              placeholder="Поиск (штрихкод, наименование, артикул)"
               onChangeText={setSearchQuery}
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
@@ -230,7 +334,36 @@ export const SelectRemainsScreen = () => {
         maxToRenderPerBatch={6} // Reduce number in each render batch
         updateCellsBatchingPeriod={100} // Increase time between renders
         windowSize={7} // Reduce the window size
+        keyboardShouldPersistTaps="handled"
       />
+      {(selectedLine || selectedGood) && (
+        <DocLineDialog
+          selectedLine={selectedLine}
+          goodName={selectedLine?.good.name || selectedGood?.good.name || ''}
+          onEditLine={handleEditLine}
+          onAddLine={handleAddLine}
+          onDeleteLine={handleDeleteLine}
+          onDismissDialog={hadndleDismissDialog}
+          goodValueName={
+            selectedGood?.good.valueName || goods.find((i) => i.id === selectedLine?.good.id)?.valueName || ''
+          }
+        />
+      )}
     </AppScreen>
   );
 };
+
+const localStyles = StyleSheet.create({
+  goodItem: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    padding: 3,
+    minHeight: 50,
+    fontWeight: 'bold',
+    opacity: 0.9,
+  },
+  lineView: { display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginTop: 6 },
+  lineChip: {
+    margin: 2,
+  },
+});

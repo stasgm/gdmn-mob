@@ -12,6 +12,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 10,
     fontSize: 17,
+    paddingRight: 18,
   },
   containerInput: {
     flexDirection: 'row',

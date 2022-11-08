@@ -357,7 +357,6 @@ const OrderListScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               selectionColor={searchStyle}
-              keyboardType="url"
             />
           </View>
           <View style={[localStyles.filter, { borderColor: colors.primary }]}>

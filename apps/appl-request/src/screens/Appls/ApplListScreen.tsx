@@ -1,6 +1,6 @@
 import React, { useState, useLayoutEffect, useMemo, useCallback } from 'react';
 import { ListRenderItem, SectionList, SectionListData, View } from 'react-native';
-import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 
 import { docSelectors } from '@lib/store';
 import {
@@ -12,7 +12,6 @@ import {
   ItemSeparator,
   SearchButton,
   EmptyList,
-  AppActivityIndicator,
   navBackDrawer,
 } from '@lib/mobile-ui';
 
@@ -123,14 +122,9 @@ const ApplListScreen = () => {
   }, [colors.card, filterVisible, navigation, renderRight]);
 
   const renderSectionHeader = useCallback(
-    ({ section }: { section: any }) => <SubTitle style={[styles.header]}>{section.title}</SubTitle>,
+    ({ section }: any) => <SubTitle style={[styles.header]}>{section.title}</SubTitle>,
     [],
   );
-
-  const isFocused = useIsFocused();
-  if (!isFocused) {
-    return <AppActivityIndicator />;
-  }
 
   return (
     <AppScreen>
