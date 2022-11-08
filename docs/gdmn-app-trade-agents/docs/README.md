@@ -414,20 +414,29 @@
 
  - либо сразу отправить заявку с помощью иконки <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>
  
- <img src="img/5.Routes/5.DraftOrder.jpg" alt="drawing" height="400"/>
+ <img src="img/5.Routes/5.DraftOrder.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.Order.jpg" alt="drawing" height="400"/>
 
  Когда у всех документов будет статус **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.JPG" alt="drawing" height="22"/>  из экрана **Визит** можно отправить все заявки сразу с помощью иконки <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>.
 
  <img src="img/5.Routes/5.AllOrders.jpg" alt="drawing" height="400"/>
 <img src="img/5.Routes/5.QuestionSendOrder.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.EndVisit.jpg" alt="drawing" height="400"/> 
 
-Данный визит в окне просмотра визитов обозначится треугольником в кружке.
+### Синхронизация
+
+После ввода всех заявок и отправления их на сервер далее следует синхронизировать данные через кнопку <img src="img/1.Connection/1.Sync.jpg" alt="drawing" height="27"/>, чтобы получить ответ от сервера успешно ли созданы заявки в Гедымине или отклонены по разным причинам. 
+
+
+Данный визит в окне просмотра визитов обозначится кружком с треугольником.
 
 <img src="img/5.Routes/5.RouteVisit.jpg" alt="drawing" height="400"/>
 
 Заявки из визитов также можно просмотреть в пунктах бокового меню **Заявки**.
 
-<img src="img/5.Routes/5.OrdersVisit.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.ReturnsVisit.jpg" alt="drawing" height="400"/>
+<img src="img/5.Routes/5.MainMenuOrders.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.RoutesInOrders.jpg" alt="drawing" height="400"/> 
+
+Далее, из окна просмотра **Точки маршрута** можно переходить к следующему визиту.
+
+<img src="img/5.Routes/5.RoutesNew.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.RouteVisit.jpg" alt="drawing" height="400"/> 
 
 ## 10. Карта
 
