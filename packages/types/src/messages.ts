@@ -15,24 +15,21 @@ export interface IHeadMessage {
   deviceId: string;
 }
 
-export interface ICmdParams<T = any> {
-  dateBegin: string;
-  dateEnd: string;
-  documentType?: IDocumentType;
-  data?: T;
+export interface ICmdParams {
+  [paramName: string]: unknown;
 }
 
-export interface ICmd<T extends ICmdParams[] | Pick<ICmdParams, 'data'> = ICmdParams[]> {
+export interface ICmd<T = ICmdParams | IRefCmd> {
   name: CmdName;
   params?: T;
 }
 
-export type MessageType =
-  | ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>>
-  | IDocument[]
-  | IReferences
-  | IUserSettings
-  | IAppSystemSettings;
+export interface IRefCmd {
+  refName: string;
+  contactId?: string;
+}
+
+export type MessageType = ICmd | IDocument[] | IReferences | IUserSettings | IAppSystemSettings;
 
 export interface IMessage<T = MessageType> {
   id: string;

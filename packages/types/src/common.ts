@@ -35,7 +35,7 @@ export type StatusType =
   | 'PROCESSED_INCORRECT'
   | 'PROCESSED_DEADLOCK';
 
-export type BodyType = 'CMD' | 'REFS' | 'REF' | 'DOCS' | 'SETTINGS' | 'APP_SYSTEM_SETTINGS';
+export type BodyType = 'CMD' | 'REFS' | 'ONE_REF' | 'DOCS' | 'SETTINGS' | 'APP_SYSTEM_SETTINGS';
 
 export type CmdName = 'GET_REF' | 'GET_ONE_REF' | 'GET_DOCUMENTS' | 'GET_USER_SETTINGS' | 'GET_APP_SYSTEM_SETTINGS';
 

@@ -261,7 +261,7 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
               .filter(
                 (d) =>
                   (d.status === 'PROCESSED' || d.status === 'ARCHIVE') &&
-                  new Date(d.documentDate).getTime() <= maxDocDate.getDate(),
+                  new Date(d.documentDate).getTime() <= maxDocDate.getTime(),
               )
               .map((d) => d.id);
 
@@ -342,7 +342,10 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
 
       if (!errorNotice.length) {
         dispatch(appActions.setSyncDate(new Date()));
+      } else {
+        dispatch(appActions.setShowSyncInfo(true));
       }
+
       dispatch(appActions.setLoading(false));
     };
 
@@ -416,7 +419,7 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
         break;
       }
 
-      case 'REF': {
+      case 'ONE_REF': {
         //TODO: проверка данных, приведение к типу
         if ((msg.body.version || 1) !== refVersion) {
           addErrorNotice(
@@ -463,9 +466,20 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
           break;
         }
 
+        const removeMes = async () => {
+          const removeMess = await api.message.removeMessage(msg.id, params, authMiddleware);
+          if (removeMess.type === 'ERROR') {
+            addErrorNotice(
+              'useSync: api.message.removeMessage',
+              `Документы загружены, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
+            );
+          }
+        };
+
         const loadDocs = msg.body.payload as IDocument[];
 
         if (!loadDocs.length) {
+          removeMes();
           break;
         }
 
@@ -475,13 +489,7 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
 
         //Если удачно сохранились документы, удаляем сообщение в json
         if (setDocResponse.type === 'DOCUMENTS/SET_ALL_SUCCESS') {
-          const removeMess = await api.message.removeMessage(msg.id, params, authMiddleware);
-          if (removeMess.type === 'ERROR') {
-            addErrorNotice(
-              'useSync: api.message.removeMessage',
-              `Документы загружены, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
-            );
-          }
+          removeMes();
         } else if (setDocResponse.type === 'DOCUMENTS/SET_ALL_FAILURE') {
           addErrorNotice('useSync: setDocuments', 'Документы не загружены в хранилище');
         }
@@ -540,7 +548,10 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
               settDispatch(
                 settingsActions.updateOption({
                   optionName,
-                  value: { ...settings[optionName], data: (value.data as number) / 60 } as ISettingsOption,
+                  value: {
+                    ...settings[optionName],
+                    data: optionName === 'synchPeriod' ? ((value.data as number) || 600) / 60 : value.data,
+                  } as ISettingsOption,
                 }),
               );
             }
@@ -554,13 +565,13 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
             );
           }
         } catch (err) {
-          addErrorNotice('useSync', 'Настройки приложения не загружены в хранилище');
+          addErrorNotice('useSync', `Настройки приложения не загружены в хранилище: ${err}`);
         }
         break;
       }
 
       default:
-        addErrorNotice('useSync: processMessage', 'Настройки приложения не загружены в хранилище');
+        addErrorNotice('useSync: processMessage', `Команда ${msg.body.type} не поддерживается приложением`);
         break;
     }
   };

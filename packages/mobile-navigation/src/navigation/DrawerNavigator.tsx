@@ -51,10 +51,10 @@ export interface IProps {
   onSyncClick: () => void;
 }
 
-const getMinsUntilNextSynch = (lastSyncTime: Date, synchPeriod: number) => {
+const getTimeUntilNextSynch = (lastSyncTime: Date, synchPeriod: number) => {
   const nextTime = new Date(lastSyncTime);
   nextTime.setMinutes(nextTime.getMinutes() + synchPeriod);
-  return Math.round((nextTime.getTime() - new Date().getTime()) / 60000);
+  return nextTime.getTime() - new Date().getTime();
 };
 
 const DrawerNavigator = ({ onSyncClick, items }: IProps) => {
@@ -82,13 +82,15 @@ const DrawerNavigator = ({ onSyncClick, items }: IProps) => {
     //Определяем, сколько минут с прошлой синхронизации
     //и если меньше, чем synchPeriod, то предупреждаем и выходим
     //иначе - выполняем синхронизацию
-    const mins = getMinsUntilNextSynch(syncDate, synchPeriod);
+    const timeUntilNextSynch = getTimeUntilNextSynch(syncDate, synchPeriod);
 
-    if (mins > 0) {
+    if (timeUntilNextSynch > 0) {
       Alert.alert(
         'Внимание!',
         // eslint-disable-next-line max-len
-        `В настоящее время сервер обрабатывает запрос.\nПовторная синхронизация возможна через ${mins} мин.`,
+        `В настоящее время сервер обрабатывает запрос.\nПовторная синхронизация возможна через ${Math.ceil(
+          timeUntilNextSynch / 60000,
+        )} мин.`,
         [{ text: 'OK' }],
       );
     } else {

@@ -1,4 +1,4 @@
-import { keyExtractor } from '@lib/mobile-hooks';
+import { keyExtractor, useSendOneRefRequest } from '@lib/mobile-hooks';
 import { IListItem } from '@lib/mobile-types';
 import {
   AppActivityIndicator,
@@ -12,7 +12,7 @@ import {
   SearchButton,
   SubTitle,
 } from '@lib/mobile-ui';
-import { refSelectors } from '@lib/store';
+import { refSelectors, useSelector } from '@lib/store';
 import { IReference } from '@lib/types';
 import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -36,10 +36,13 @@ export type SectionDataProps = SectionListData<IDebt, DebetListSectionProps>[];
 
 const DebetListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DebetStackParamList, 'DebetList'>>();
+  const loading = useSelector((state) => state.app.loading);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
   const [visibleType, setVisibleType] = useState(false);
   const [debetType, setDebetType] = useState(debetTypes[0]);
+  const [contactId, setContactId] = useState<string | undefined>();
 
   const [visibleDialog, setVisibleDialog] = useState(false);
 
@@ -86,7 +89,29 @@ const DebetListScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  const renderItem = ({ item }: { item: IDebt }) => <DebetItem item={item} onPress={() => setVisibleDialog(true)} />;
+  const handlePressItem = useCallback(
+    (id: string) => {
+      if (!loading) {
+        setContactId(id);
+        setVisibleDialog(true);
+      }
+    },
+    [loading],
+  );
+
+  const renderItem = useCallback(
+    ({ item }: { item: IDebt }) => <DebetItem item={item} onPress={() => handlePressItem(item.id)} />,
+    [handlePressItem],
+  );
+
+  const sendRequest = useSendOneRefRequest('Дебиторская задолженность', { name: 'debt', contactId });
+
+  const handleSendDebtRequest = async () => {
+    if (sendRequest) {
+      await sendRequest();
+    }
+    setVisibleDialog(false);
+  };
 
   const isFocused = useIsFocused();
   if (!isFocused) {
@@ -134,15 +159,16 @@ const DebetListScreen = () => {
         keyboardShouldPersistTaps={'handled'}
       />
       <Dialog visible={visibleDialog} onDismiss={() => setVisibleDialog(false)}>
-        <Dialog.Title style={localStyles.titleSize}>
-          Отправить запрос на получение дебиторской задолженности?
-        </Dialog.Title>
-
+        <Dialog.Title>Внимание!</Dialog.Title>
         <Dialog.Content>
-          <LargeText>Это может занять некоторое время</LargeText>
+          <LargeText>
+            {
+              'Отправить запрос на получение дебиторской задолженности?\n\nВыполнение запроса может занять некоторое время.'
+            }
+          </LargeText>
         </Dialog.Content>
         <Dialog.Actions style={localStyles.action}>
-          <Button color={colors.primary} onPress={() => setVisibleDialog(false)}>
+          <Button color={colors.primary} onPress={handleSendDebtRequest} disabled={loading}>
             Отправить
           </Button>
           <Button color={colors.primary} onPress={() => setVisibleDialog(false)}>
@@ -155,10 +181,6 @@ const DebetListScreen = () => {
 };
 
 const localStyles = StyleSheet.create({
-  titleSize: {
-    fontSize: 18,
-    lineHeight: 18,
-  },
   action: {
     flexDirection: 'row',
     alignItems: 'flex-end',

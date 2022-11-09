@@ -67,25 +67,23 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
   const timeOutRef = useRef<NodeJS.Timer | null>(null);
 
   //Если в параметрах указана Автосинхронизация,
-  //устанавливаем автосинхронизацию каждые synchPeriod минут
+  //устанавливаем запуск следующей синхронизации через synchPeriod минут
   useEffect(() => {
-    if (!autoSync) {
+    if (!autoSync || loading) {
       return;
     }
 
-    timeOutRef.current = setInterval(() => {
-      //Если в данный момент срабатывает другой запрос, то синхронизацию не выполняем
-      if (!loading) {
-        sync();
-      }
+    timeOutRef.current = setTimeout(() => {
+      sync();
     }, synchPeriod * 60 * 1000);
 
     return () => {
       if (timeOutRef.current) {
         clearInterval(timeOutRef.current);
+        timeOutRef.current = null;
       }
     };
-  }, [synchPeriod, autoSync]);
+  }, [synchPeriod, autoSync, loading]);
 
   return <DrawerNavigator items={items} onSyncClick={sync} />;
 };
