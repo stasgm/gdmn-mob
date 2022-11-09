@@ -61,7 +61,7 @@ const InformationScreen = () => {
       id: 'log',
       icon: 'history',
       title: 'Дополнительная информация',
-      text: 'История ошибок',
+      text: 'Журнал ошибок',
       onPress: () => navigation.navigate('Log'),
       style: { textDecorationLine: 'underline' },
     },
