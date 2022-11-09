@@ -278,21 +278,6 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
             }
           }
 
-          //5.1. Отправляем ошибки на сервер
-          if (errorList.length) {
-            // addRequestNotice('Отправка списка ошибок на сервер');
-            //TODO: вызвать апи
-            //5.2. Чистим старые ошибки
-            const toDate = new Date();
-            toDate.setDate(toDate.getDate() - (cleanDocTime || 7));
-            const delErrors = errorList
-              .filter((err) => new Date(err.date).getTime() < toDate.getTime())
-              .map((err) => err.id);
-            if (delErrors.length) {
-              dispatch(appActions.removeErrors(delErrors));
-            }
-          }
-
           addRequestNotice('Запрос настроек пользователя');
 
           //7. Отправляем запрос на получение настроек пользователя
@@ -343,6 +328,21 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
       if (!errorNotice.length) {
         dispatch(appActions.setSyncDate(new Date()));
       } else {
+        // Отправляем ошибки на сервер
+        if (errorList.length) {
+          // addRequestNotice('Отправка списка ошибок на сервер');
+          //TODO: вызвать апи
+          //Чистим старые ошибки
+          const toDate = new Date();
+          toDate.setDate(toDate.getDate() - (cleanDocTime || 7));
+          const delErrors = errorList
+            .filter((err) => new Date(err.date).getTime() < toDate.getTime())
+            .map((err) => err.id);
+          if (delErrors.length) {
+            dispatch(appActions.removeErrors(delErrors));
+          }
+        }
+
         dispatch(appActions.setShowSyncInfo(true));
       }
 
