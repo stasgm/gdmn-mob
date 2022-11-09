@@ -6,3 +6,4 @@ export * from './src/models';
 export * from './src/requests';
 export * from './src/settings';
 export * from './src/processes';
+export * from './src/notice';

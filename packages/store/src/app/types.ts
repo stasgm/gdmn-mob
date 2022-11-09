@@ -11,3 +11,10 @@ export interface IAppState {
   readonly loadingData: boolean;
   readonly loadingError: string;
 }
+
+export interface IErrorNotice {
+  id: string;
+  name: string;
+  date: Date;
+  message: string;
+}

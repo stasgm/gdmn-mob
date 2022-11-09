@@ -1,4 +1,6 @@
-import { IDBUser, IUser, NewUser, IUserWithDevice } from '@lib/types';
+import { IDBUser, IUser, NewUser, IUserWithDevice, IFileNoticeInfo } from '@lib/types';
+
+import { IErrorNotice } from '@lib/store';
 
 import { DataNotFoundException, ConflictException, InvalidParameterException, ForbiddenException } from '../exceptions';
 
@@ -7,7 +9,7 @@ import { extraPredicate, getListPart } from '../utils/helpers';
 import { processValidation } from '../validations';
 
 import { getDb } from './dao/db';
-import { device } from './data/devices';
+import { insertNotice } from './errorNotice';
 
 import { users as mockUsers } from './data/user';
 
@@ -366,6 +368,59 @@ export const makeUser = (user: IDBUser): IUser => {
     erpUser: user.erpUserId ? users.getNamedItem(user.erpUserId) : undefined,
     disabled: user.disabled,
   };
+};
+
+/**
+ * Добавляет одно сообщение
+ * @param {NewErrorNotice} NewErrorNotice - сообщение с ошибкой
+ * @param {string} producerId - идентификатор отправителя
+ * @param {string} appSystemId - идентификатор системы
+ * @param {string} companyId - идентификатор организация
+ * @param {string} deviceId- идентификатор устройства
+ * @return void
+ * */
+/**
+ * Добавляет запись с ошибкой в файл
+ * по пользователю и устройству
+ */
+export const addOneNotice = async ({
+  NewErrorNotice,
+  producerId,
+  appSystemId,
+  companyId,
+  deviceId,
+}: {
+  NewErrorNotice: IErrorNotice;
+  producerId: string;
+  appSystemId: string;
+  companyId: string;
+  deviceId: string;
+}): Promise<void> => {
+  const { companies, appSystems, users, devices } = getDb();
+  if (!companies.findById(companyId)) {
+    throw new DataNotFoundException('Компания не найдена');
+  }
+
+  if (!users.findById(producerId)) {
+    throw new DataNotFoundException('Отправитель не найден');
+  }
+
+  const appSystem = appSystems.findById(appSystemId);
+
+  if (!appSystem) {
+    throw new DataNotFoundException('Подсистема не найдена');
+  }
+
+  if (!devices.data.find((el: any) => el.uid === deviceId)) {
+    throw new DataNotFoundException('Устройство не найдено');
+  }
+
+  const fileInfo: IFileNoticeInfo = {
+    producerId,
+    deviceId,
+  };
+
+  return await insertNotice(NewErrorNotice, { companyId, appSystemId: appSystem.id }, fileInfo);
 };
 
 export { findOne, findMany, findByName, addOne, updateOne, deleteOne, getUserPassword };

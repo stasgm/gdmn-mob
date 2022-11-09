@@ -8,11 +8,14 @@ import {
   updateUser,
   getUsersWithDevice,
   getUserWithDevice,
+  addErrrorNotice,
 } from '../controllers/user';
+
 import { authMiddleware } from '../middleware/authRequired';
 import { deviceMiddleware } from '../middleware/deviceRequired';
 import { permissionMiddleware } from '../middleware/permissionRequired';
 import { roleBasedParamsMiddlware } from '../middleware/roleBasedParams';
+import { messageMiddleware } from '../middleware/messageRequired';
 
 import { userValidation } from '../validations';
 
@@ -26,5 +29,13 @@ users.get('/:id', userValidation.getUser, authMiddleware, deviceMiddleware, getU
 users.get('/', authMiddleware, deviceMiddleware, roleBasedParamsMiddlware, getUsers);
 users.patch('/:id', userValidation.updateUser, authMiddleware, permissionMiddleware, updateUser);
 users.delete('/:id', userValidation.removeUser, authMiddleware, permissionMiddleware, removeUser);
+users.post(
+  '/mobileErrors',
+  userValidation.addNotice,
+  authMiddleware,
+  deviceMiddleware,
+  messageMiddleware,
+  addErrrorNotice,
+);
 
 export default users;

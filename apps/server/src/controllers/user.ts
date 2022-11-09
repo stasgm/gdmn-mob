@@ -2,6 +2,8 @@ import { Context, ParameterizedContext } from 'koa';
 
 import { IUser, NewUser } from '@lib/types';
 
+import { IErrorNotice } from '@lib/store';
+
 import { userService } from '../services';
 
 import { created, ok } from '../utils/apiHelpers';
@@ -196,4 +198,38 @@ const getUsersWithDevice = async (ctx: ParameterizedContext) => {
   ok(ctx as Context, users, 'getUsersWithDevice: users are successfully received');
 };
 
-export { addUser, updateUser, removeUser, getUser, getUsers, getUsersWithDevice, getUserWithDevice };
+const addErrrorNotice = async (ctx: ParameterizedContext): Promise<void> => {
+  const message = ctx.request.body as IErrorNotice;
+  const { companyId, appSystemId, deviceId } = ctx.query;
+  const user = ctx.state.user as IUser;
+
+  const params: Record<string, string> = {};
+
+  if (typeof companyId === 'string') {
+    params.companyId = companyId;
+  }
+
+  if (typeof appSystemId === 'string') {
+    params.appSystemId = appSystemId;
+  }
+
+  if (typeof deviceId === 'string') {
+    params.deviceId = deviceId;
+  }
+
+  if (typeof companyId === 'string') {
+    params.companyId = companyId;
+  }
+
+  const newNotice = userService.addOneNotice({
+    NewErrorNotice: message,
+    producerId: user.id,
+    appSystemId: params.appSystemId,
+    companyId: params.companyId,
+    deviceId: params.deviceId,
+  });
+
+  created(ctx as Context, newNotice, `add errorNotice: Notice для функции '${message.name}' is successfully created'`);
+};
+
+export { addUser, updateUser, removeUser, getUser, getUsers, getUsersWithDevice, getUserWithDevice, addErrrorNotice };
