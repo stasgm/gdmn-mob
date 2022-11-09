@@ -1,7 +1,16 @@
-import React, { useLayoutEffect } from 'react';
-import { FlatList, View, Text } from 'react-native';
-import { IErrorNotice, useSelector } from '@lib/store';
-import { AppScreen, globalStyles as styles, MediumText, ItemSeparator, EmptyList, navBackButton } from '@lib/mobile-ui';
+import React, { useCallback, useLayoutEffect } from 'react';
+import { FlatList, View, Text, Alert } from 'react-native';
+import { appActions, IErrorNotice, useDispatch, useSelector } from '@lib/store';
+import {
+  AppScreen,
+  globalStyles as styles,
+  MediumText,
+  ItemSeparator,
+  EmptyList,
+  navBackButton,
+  useActionSheet,
+  MenuButton,
+} from '@lib/mobile-ui';
 
 import { getDateString, keyExtractor } from '@lib/mobile-hooks';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -13,10 +22,41 @@ import { InformationStackParamList } from '../navigation/Root/types';
 
 const InformationLogScreen = () => {
   const navigation = useNavigation<StackNavigationProp<InformationStackParamList, 'Log'>>();
+  const showActionSheet = useActionSheet();
+  const dispatch = useDispatch();
+
+  const handleClearLog = () => {
+    Alert.alert('Вы уверены, что хотите удалить всю историю ошибок?', '', [
+      {
+        text: 'Да',
+        onPress: () => {
+          dispatch(appActions.clearErrors());
+        },
+      },
+      {
+        text: 'Отмена',
+      },
+    ]);
+  };
+
+  const actionsMenu = useCallback(() => {
+    showActionSheet([
+      {
+        title: 'Удалить историю ошибок',
+        type: 'destructive',
+        onPress: handleClearLog,
+      },
+      {
+        title: 'Отмена',
+        type: 'cancel',
+      },
+    ]);
+  }, [handleClearLog]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackButton,
+      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
     });
   }, []);
 

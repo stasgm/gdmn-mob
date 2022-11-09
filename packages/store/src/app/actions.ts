@@ -11,6 +11,7 @@ const setAutoSync = createAction('APP/SET_AUTO_SYNC')<boolean>();
 const setLoadedWithError = createAction('APP/SET_LOADED_WITH_ERROR')<boolean>();
 const addError = createAction('APP/ADD_ERROR')<IErrorNotice>();
 const removeErrors = createAction('APP/REMOVE_MANY_ERROR')<string[]>();
+const clearErrors = createAction('APP/VLEAR_ERROR')();
 const setSyncDate = createAction('APP/SET_SYNC_DATE')<Date>();
 const loadData = createAction('APP/LOAD_DATA')<IAppState>();
 const setLoadingData = createAction('APP/SET_LOADING_DATA')<boolean>();
@@ -55,6 +56,7 @@ export const appActions = {
   setAutoSync,
   addError,
   removeErrors,
+  clearErrors,
   setSyncDate,
   loadGlobalDataFromDisc,
   loadSuperDataFromDisc,

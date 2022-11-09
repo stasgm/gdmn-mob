@@ -60,6 +60,12 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
     case getType(appActions.removeErrors):
       return { ...state, errorList: state.errorList.filter((i) => action.payload.indexOf(i.id) === -1) };
 
+    case getType(appActions.clearErrors):
+      return {
+        ...state,
+        errorList: [],
+      };
+
     case getType(appActions.setSyncDate):
       return {
         ...state,
