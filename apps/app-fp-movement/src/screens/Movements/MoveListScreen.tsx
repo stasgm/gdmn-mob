@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { ListRenderItem, SectionList, SectionListData, View, StyleSheet } from 'react-native';
-import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 import { documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 import {
@@ -14,7 +14,6 @@ import {
   IListItemProps,
   DeleteButton,
   CloseButton,
-  AppActivityIndicator,
   EmptyList,
   MediumText,
   Menu,
@@ -198,11 +197,6 @@ export const MoveListScreen = () => {
   const renderSectionHeader = ({ section }: any) => (
     <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
-
-  const isFocused = useIsFocused();
-  if (!isFocused) {
-    return <AppActivityIndicator />;
-  }
 
   return (
     <AppScreen>

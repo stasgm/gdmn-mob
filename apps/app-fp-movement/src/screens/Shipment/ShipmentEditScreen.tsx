@@ -1,20 +1,12 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, View, StyleSheet, ScrollView } from 'react-native';
-import { RouteProp, useNavigation, useRoute, useTheme, useIsFocused } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Divider } from 'react-native-paper';
 
 import { docSelectors, documentActions, refSelectors, useSelector, appActions, useDispatch } from '@lib/store';
-import {
-  AppInputScreen,
-  Input,
-  SaveButton,
-  SubTitle,
-  RadioGroup,
-  AppActivityIndicator,
-  navBackButton,
-} from '@lib/mobile-ui';
+import { AppInputScreen, Input, SaveButton, SubTitle, RadioGroup, navBackButton } from '@lib/mobile-ui';
 import { IDepartment, IDocumentType, IReference, ScreenState } from '@lib/types';
 
 import { getDateString } from '@lib/mobile-app';
@@ -44,14 +36,12 @@ const ShipmentEditScreen = () => {
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'shipment');
 
-  const formParams = useSelector((state) => state.app.formParams as IShipmentFormParam);
-
   // Подразделение по умолчанию
   const depart = useSelector((state) => state.auth.user?.settings?.depart?.data) as IDepartment;
 
-  const { documentDate: docDocumentDate, status: docStatus } = useMemo(() => {
-    return formParams;
-  }, [formParams]);
+  const { documentDate: docDocumentDate, status: docStatus } = useSelector(
+    (state) => state.app.formParams as IShipmentFormParam,
+  );
 
   useEffect(() => {
     return () => {
@@ -158,11 +148,6 @@ const ShipmentEditScreen = () => {
     ],
     [colors.card, colors.primary],
   );
-
-  const isFocused = useIsFocused();
-  if (!isFocused) {
-    return <AppActivityIndicator />;
-  }
 
   return (
     <AppInputScreen>
