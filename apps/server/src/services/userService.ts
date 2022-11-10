@@ -390,7 +390,7 @@ export const addOneNotice = async ({
   companyId,
   deviceId,
 }: {
-  NewErrorNotice: IErrorNotice;
+  NewErrorNotice: IErrorNotice[];
   producerId: string;
   appSystemId: string;
   companyId: string;

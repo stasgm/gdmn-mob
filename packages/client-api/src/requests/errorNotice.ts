@@ -1,8 +1,7 @@
-import { IMessageParams, INamedEntity, IResponse } from '@lib/types';
-import { IErrorNotice } from '@lib/store';
+import { IResponse, INoticeParams } from '@lib/types';
 
 import { error, errorNotice as types } from '../types';
-import { generateId, sleep } from '../utils';
+import { sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 
@@ -11,7 +10,7 @@ class ErrorNotice extends BaseRequest {
     super(api);
   }
 
-  addErrorNotice = async (newErrorNotice: IErrorNotice, params: IMessageParams) => {
+  addErrorNotice = async (body: INoticeParams) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -21,12 +20,7 @@ class ErrorNotice extends BaseRequest {
     }
 
     try {
-      const body = { ...newErrorNotice, id: generateId(), date: new Date() };
-
-      const res = await this.api.axios.post<IResponse<void>>(
-        `/users/mobileErrors?companyId=${params.companyId}&appSystemId=${params.appSystemId}`,
-        body,
-      );
+      const res = await this.api.axios.post<IResponse<void>>('/users/mobileErrors', body);
       const resData = res.data;
 
       if (resData.result) {

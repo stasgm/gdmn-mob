@@ -7,7 +7,7 @@ export const deviceStates = {
 
 export const adminPath = '/admin';
 
-export const messageFolders = ['messages', 'error', 'prepared', 'log', 'unknown', 'mobileLogs'];
+export const messageFolders = ['messages', 'error', 'prepared', 'log', 'unknown', 'deviceLogs'];
 
 export const BYTES_PER_MB = 1024 ** 2;
 export const MSEС_IN_MIN = 60000;

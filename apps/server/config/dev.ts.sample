@@ -21,4 +21,6 @@ export default {
   PROCESS_CHECK_PERIOD_IN_MIN: 10,
   /** Количество дней действия кода активации */
   ACTIVE_CODE_DAYS: 7,
+   /**максимальное количество записей в журнале ошибок устройства*/
+  DEVICE_LOG_MAX_LINES: 1000,
 };

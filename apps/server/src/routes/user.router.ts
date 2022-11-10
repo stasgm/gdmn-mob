@@ -29,13 +29,6 @@ users.get('/:id', userValidation.getUser, authMiddleware, deviceMiddleware, getU
 users.get('/', authMiddleware, deviceMiddleware, roleBasedParamsMiddlware, getUsers);
 users.patch('/:id', userValidation.updateUser, authMiddleware, permissionMiddleware, updateUser);
 users.delete('/:id', userValidation.removeUser, authMiddleware, permissionMiddleware, removeUser);
-users.post(
-  '/mobileErrors',
-  userValidation.addNotice,
-  authMiddleware,
-  deviceMiddleware,
-  messageMiddleware,
-  addErrrorNotice,
-);
+users.post('/mobileErrors', userValidation.addNotice, authMiddleware, deviceMiddleware, addErrrorNotice);
 
 export default users;

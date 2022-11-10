@@ -1,3 +1,5 @@
+import { INamedEntity } from '@lib/types';
+
 export interface IFormParam {
   [fieldName: string]: unknown;
 }
@@ -12,9 +14,11 @@ export interface IAppState {
   readonly loadingError: string;
 }
 
-export interface IErrorNotice {
-  id: string;
-  name: string;
-  date: Date;
+export interface IErrorNotice extends INamedEntity {
+  date: string;
   message: string;
+}
+
+export interface IErrorLogs extends IErrorNotice {
+  isSent?: boolean;
 }
