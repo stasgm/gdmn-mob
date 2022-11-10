@@ -25,7 +25,7 @@ import {
 } from '@lib/types';
 import api from '@lib/client-api';
 
-import { generateId, getDateString, isIReferences, sleep } from '../utils';
+import { generateId, getDateString, isIReferences } from '../utils';
 
 import { getNextOrder } from './helpers';
 
@@ -40,7 +40,7 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
     const err = {
       id: generateId(),
       name,
-      date: new Date(),
+      date: new Date().toISOString(),
       message,
     };
     dispatch(appActions.addErrorNotice(err));
@@ -57,7 +57,7 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
   };
 
   const { user, company, config, appSystem } = useSelector((state) => state.auth);
-  const { errorNotice, errorList } = useSelector((state) => state.app);
+  const { errorNotice, errorLog } = useSelector((state) => state.app);
   const documents = useSelector((state) => state.documents.list);
   const settings = useSelector((state) => state.settings.data);
 
@@ -317,6 +317,17 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
               `Запрос на получение настроек подсистемы не отправлен: ${sendMesAppSettResponse.message}`,
             );
           }
+
+          // Отправляем ошибки на сервер
+          const sendingErrors = errorLog?.filter((err) => !err.isSent);
+          if (sendingErrors?.length) {
+            // addRequestNotice('Отправка списка ошибок на сервер');
+            //TODO: вызвать апи
+            //Устанавливаем признак 'Отправлен на сервер' отправленным записям
+            dispatch(appActions.setSentErrors(sendingErrors.map((l) => l.id)));
+            //Чистим старые ошибки
+            dispatch(appActions.clearErrors('old'));
+          }
         } else if (onSync) {
           // Если передан внешний обработчик то вызываем
           await onSync();
@@ -328,21 +339,6 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
       if (!errorNotice.length) {
         dispatch(appActions.setSyncDate(new Date()));
       } else {
-        // Отправляем ошибки на сервер
-        if (errorList.length) {
-          // addRequestNotice('Отправка списка ошибок на сервер');
-          //TODO: вызвать апи
-          //Чистим старые ошибки
-          const toDate = new Date();
-          toDate.setDate(toDate.getDate() - (cleanDocTime || 7));
-          const delErrors = errorList
-            .filter((err) => new Date(err.date).getTime() < toDate.getTime())
-            .map((err) => err.id);
-          if (delErrors.length) {
-            dispatch(appActions.removeErrors(delErrors));
-          }
-        }
-
         dispatch(appActions.setShowSyncInfo(true));
       }
 

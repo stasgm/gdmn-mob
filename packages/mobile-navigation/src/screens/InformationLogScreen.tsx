@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect } from 'react';
 import { FlatList, View, Text, Alert } from 'react-native';
-import { appActions, IErrorNotice, useDispatch, useSelector } from '@lib/store';
+import { appActions, IErrorLog, useDispatch, useSelector } from '@lib/store';
 import {
   AppScreen,
   globalStyles as styles,
@@ -30,7 +30,7 @@ const InformationLogScreen = () => {
       {
         text: 'Да',
         onPress: () => {
-          dispatch(appActions.clearErrors());
+          dispatch(appActions.clearErrors('all'));
         },
       },
       {
@@ -60,11 +60,11 @@ const InformationLogScreen = () => {
     });
   }, []);
 
-  const errorList = useSelector((state) => state.app.errorList).sort(
+  const errorLog = useSelector((state) => state.app.errorLog).sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   );
 
-  const renderItem = ({ item }: { item: IErrorNotice }) => {
+  const renderItem = ({ item }: { item: IErrorLog }) => {
     const errDate = new Date(item.date);
     return (
       <View style={styles.item}>
@@ -85,7 +85,7 @@ const InformationLogScreen = () => {
   return (
     <AppScreen style={styles.contentTop}>
       <FlatList
-        data={errorList}
+        data={errorLog}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}

@@ -1,6 +1,6 @@
 import { ActionType, createAction } from 'typesafe-actions';
 
-import { IFormParam, IAppState, IRequestNotice, IErrorNotice } from './types';
+import { IFormParam, IAppState, IRequestNotice, IErrorNotice, IErrorLog } from './types';
 
 const init = createAction('APP/INIT')();
 
@@ -9,9 +9,9 @@ const clearFormParams = createAction('APP/CLEAR_FORM_PARAMS')();
 const setLoading = createAction('APP/SET_LOADING')<boolean>();
 const setAutoSync = createAction('APP/SET_AUTO_SYNC')<boolean>();
 const setLoadedWithError = createAction('APP/SET_LOADED_WITH_ERROR')<boolean>();
-const addError = createAction('APP/ADD_ERROR')<IErrorNotice>();
-const removeErrors = createAction('APP/REMOVE_MANY_ERROR')<string[]>();
-const clearErrors = createAction('APP/VLEAR_ERROR')();
+const addError = createAction('APP/ADD_ERROR')<IErrorLog>();
+const setSentErrors = createAction('APP/SET_SENT_ERROR')<string[]>();
+const clearErrors = createAction('APP/CLEAR_ERROR')<'all' | 'old'>();
 const setSyncDate = createAction('APP/SET_SYNC_DATE')<Date>();
 const loadData = createAction('APP/LOAD_DATA')<IAppState>();
 const setLoadingData = createAction('APP/SET_LOADING_DATA')<boolean>();
@@ -55,7 +55,7 @@ export const appActions = {
   setLoadedWithError,
   setAutoSync,
   addError,
-  removeErrors,
+  setSentErrors,
   clearErrors,
   setSyncDate,
   loadGlobalDataFromDisc,

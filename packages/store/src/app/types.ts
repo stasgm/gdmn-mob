@@ -1,3 +1,5 @@
+import { INamedEntity } from '@lib/types';
+
 export interface IFormParam {
   [fieldName: string]: unknown;
 }
@@ -6,7 +8,7 @@ export interface IAppState {
   loading: boolean;
   showSyncInfo: boolean;
   autoSync: boolean;
-  errorList: IErrorNotice[];
+  errorLog: IErrorLog[];
   formParams?: IFormParam;
   syncDate?: Date;
   requestNotice: IRequestNotice[];
@@ -20,9 +22,11 @@ export interface IRequestNotice {
   started: Date;
 }
 
-export interface IErrorNotice {
-  id: string;
-  name: string;
-  date: Date;
+export interface IErrorNotice extends INamedEntity {
+  date: string;
   message: string;
+}
+
+export interface IErrorLog extends IErrorNotice {
+  isSent?: boolean;
 }

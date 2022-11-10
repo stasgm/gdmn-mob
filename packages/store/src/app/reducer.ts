@@ -9,12 +9,14 @@ export const initialState: Readonly<IAppState> = {
   showSyncInfo: false,
   autoSync: false,
   formParams: {},
-  errorList: [],
+  errorLog: [],
   loadingData: false,
   loadingError: '',
   requestNotice: [],
   errorNotice: [],
 };
+
+const LOG_MAX_LINES = 1000;
 
 const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action): IAppState => {
   switch (action.type) {
@@ -54,16 +56,19 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
     case getType(appActions.addError):
       return {
         ...state,
-        errorList: [...state.errorList, action.payload],
+        errorLog: [...state.errorLog, action.payload],
       };
 
-    case getType(appActions.removeErrors):
-      return { ...state, errorList: state.errorList.filter((i) => action.payload.indexOf(i.id) === -1) };
+    case getType(appActions.setSentErrors):
+      return {
+        ...state,
+        errorLog: state.errorLog.map((i) => (action.payload.indexOf(i.id) === -1 ? i : { ...i, isSent: true })),
+      };
 
     case getType(appActions.clearErrors):
       return {
         ...state,
-        errorList: [],
+        errorLog: action.payload === 'old' ? state.errorLog.filter((i) => i.isSent).slice(0, LOG_MAX_LINES) : [],
       };
 
     case getType(appActions.setSyncDate):
