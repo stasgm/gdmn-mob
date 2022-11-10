@@ -10,7 +10,7 @@ import {
   SectionListData,
 } from 'react-native';
 import { RouteProp, useFocusEffect, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
-import { docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   SubTitle,
   globalStyles as styles,
@@ -71,6 +71,7 @@ export type SectionDataProps = SectionListData<IListItemProps, VisitListSectionP
 
 const VisitScreen = () => {
   const dispatch = useDispatch();
+  const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'Visit'>>();
   const { routeId, id } = useRoute<RouteProp<RoutesStackParamList, 'Visit'>>().params;
   const { colors } = useTheme();
@@ -296,12 +297,12 @@ const VisitScreen = () => {
     const docIds = Object.keys(delList);
 
     const deleteDocs = () => {
-      dispatch(documentActions.removeDocuments(docIds));
+      docDispatch(documentActions.removeDocuments(docIds));
       setDelList({});
     };
 
     deleteSelectedItems(delList, deleteDocs);
-  }, [delList, dispatch]);
+  }, [delList, docDispatch]);
 
   const handleSendDocuments = useCallback(() => {
     Alert.alert('Вы уверены, что хотите отправить документы?', '', [

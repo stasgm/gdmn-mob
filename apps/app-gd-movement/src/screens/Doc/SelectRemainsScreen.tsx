@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
-import { View, FlatList, TouchableOpacity, Text, RefreshControl, StyleSheet, Alert } from 'react-native';
+import { View, FlatList, TouchableOpacity, RefreshControl, StyleSheet, Alert } from 'react-native';
 import { Searchbar, Divider, Chip } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 
@@ -251,8 +251,6 @@ export const SelectRemainsScreen = () => {
         backgroundColor: isAdded ? globalColors.backgroundLight : 'transparent',
       };
 
-      const barcodeTextStyle = [styles.number, styles.flexDirectionRow, { color: colors.text }];
-
       return (
         <TouchableOpacity
           onPress={() => {
@@ -276,7 +274,9 @@ export const SelectRemainsScreen = () => {
                   {item.remains} {item.good.valueName} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)}{' '}
                   руб.
                 </MediumText>
-                {barcode && <Text style={barcodeTextStyle}>{item.good.barcode}</Text>}
+                {barcode && (
+                  <MediumText style={[styles.number, styles.flexDirectionRow]}>{item.good.barcode}</MediumText>
+                )}
               </View>
               {isAdded && (
                 <View style={localStyles.lineView}>
@@ -296,7 +296,7 @@ export const SelectRemainsScreen = () => {
         </TouchableOpacity>
       );
     },
-    [colors.primary, colors.text, docId, handleAddLine],
+    [colors.primary, docId, handleAddLine],
   );
 
   const renderItem = ({ item }: { item: IRemGood }) => <GoodRemains item={item} />;

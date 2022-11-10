@@ -25,10 +25,6 @@ export interface IModelData<T = unknown> {
 export interface IMGoodData<T = unknown> {
   [id: string]: T;
 }
-
-// export interface IMGoodRemain extends IGood {
-//   remains?: IModelRem[];
-// }
 export interface IMGoodRemains extends IGood {
   remains?: IModelRem[];
 }
@@ -37,12 +33,6 @@ export interface IModelRem {
   price: number;
   buyingPrice?: number;
   q: number;
-}
-
-export interface IRem extends IGood {
-  remains?: number;
-  price?: number;
-  buyingPrice?: number;
 }
 
 export interface IRemains {

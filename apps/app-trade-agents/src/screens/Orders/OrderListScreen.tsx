@@ -28,7 +28,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { deleteSelectedItems, formatValue, getDateString, getDelList, keyExtractor } from '@lib/mobile-app';
 
-import { appActions, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
+import { appActions, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 
 import { IDelList } from '@lib/mobile-types';
 
@@ -48,6 +48,7 @@ export type SectionDataProps = SectionListData<IListItemProps, OrderListSectionP
 const OrderListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
   const dispatch = useDispatch();
+  const docDispatch = useDocThunkDispatch();
 
   const { colors } = useTheme();
 
@@ -209,12 +210,12 @@ const OrderListScreen = () => {
     const docIds = Object.keys(delList);
 
     const deleteDocs = () => {
-      dispatch(documentActions.removeDocuments(docIds));
+      docDispatch(documentActions.removeDocuments(docIds));
       setDelList({});
     };
 
     deleteSelectedItems(delList, deleteDocs);
-  }, [delList, dispatch]);
+  }, [delList, docDispatch]);
 
   const handleAddDocument = useCallback(() => {
     navigation.navigate('OrderEdit');

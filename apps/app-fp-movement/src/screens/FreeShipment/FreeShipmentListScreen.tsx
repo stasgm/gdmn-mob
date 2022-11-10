@@ -2,7 +2,7 @@ import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { ListRenderItem, SectionList, SectionListData, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import { documentActions, useDispatch, useSelector } from '@lib/store';
+import { documentActions, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   AddButton,
@@ -36,7 +36,7 @@ export type SectionDataProps = SectionListData<IListItemProps, FreeShipmentListS
 
 export const FreeShipmentListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<FreeShipmentStackParamList, 'FreeShipmentList'>>();
-  const dispatch = useDispatch();
+  const docDispatch = useDocThunkDispatch();
 
   const list = (
     useSelector((state) => state.documents.list)?.filter(
@@ -99,12 +99,12 @@ export const FreeShipmentListScreen = () => {
     const docIds = Object.keys(delList);
 
     const deleteDocs = () => {
-      dispatch(documentActions.removeDocuments(docIds));
+      docDispatch(documentActions.removeDocuments(docIds));
       setDelList({});
     };
 
     deleteSelectedItems(delList, deleteDocs);
-  }, [delList, dispatch]);
+  }, [delList, docDispatch]);
 
   const renderRight = useCallback(
     () => (
