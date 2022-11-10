@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect } from 'react';
 import { FlatList, View, Text, Alert } from 'react-native';
-import { appActions, IErrorLog, useDispatch, useSelector } from '@lib/store';
+import { appActions, IDeviceLog, useDispatch, useSelector } from '@lib/store';
 import {
   AppScreen,
   globalStyles as styles,
@@ -64,7 +64,7 @@ const InformationLogScreen = () => {
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   );
 
-  const renderItem = ({ item }: { item: IErrorLog }) => {
+  const renderItem = ({ item }: { item: IDeviceLog }) => {
     const errDate = new Date(item.date);
     return (
       <View style={styles.item}>

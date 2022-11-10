@@ -1,6 +1,6 @@
 export { configureStore, useDispatch, useThunkDispatch, useSelector, AppDispatch, RootState } from './src';
 export { PersistedMiddleware, SaveDataToDisk, LoadDataFromDisk, AppStorage } from './src/types';
-export { IFormParam, IRequestNotice, IErrorNotice, IErrorLog } from './src/app/types';
+export { IFormParam, IRequestNotice, IErrorNotice } from './src/app/types';
 export { default as authActions } from './src/auth';
 export { useAuthThunkDispatch } from './src/auth';
 export { default as authSelectors } from './src/auth/selectors';

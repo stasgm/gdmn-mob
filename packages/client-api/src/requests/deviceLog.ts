@@ -1,32 +1,32 @@
-import { IResponse, INoticeParams } from '@lib/types';
+import { IResponse, IDeviceLogParams } from '@lib/types';
 
 import { error, errorNotice as types } from '../types';
 import { sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 
-class ErrorNotice extends BaseRequest {
+class DeviceLog extends BaseRequest {
   constructor(api: BaseApi) {
     super(api);
   }
 
-  addErrorNotice = async (body: INoticeParams) => {
+  addDeviceLog = async (body: IDeviceLogParams) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
-        type: 'ADD_NOTICE',
-      } as types.IAddErrorNoticeResponse;
+        type: 'ADD_DEVICELOG',
+      } as types.IAddDeviceLogResponse;
     }
 
     try {
-      const res = await this.api.axios.post<IResponse<void>>('/users/mobileErrors', body);
+      const res = await this.api.axios.post<IResponse<void>>('/deviceLogs/', body);
       const resData = res.data;
 
       if (resData.result) {
         return {
-          type: 'ADD_NOTICE',
-        } as types.IAddErrorNoticeResponse;
+          type: 'ADD_DEVICELOG',
+        } as types.IAddDeviceLogResponse;
       }
 
       return {
@@ -36,9 +36,9 @@ class ErrorNotice extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка отправки сообщения с ошибкой',
+        message: err instanceof TypeError ? err.message : 'ошибка сохранения журнала ошибок устройства',
       } as error.INetworkError;
     }
   };
 }
-export default ErrorNotice;
+export default DeviceLog;

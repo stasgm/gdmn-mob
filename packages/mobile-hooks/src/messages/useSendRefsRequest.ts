@@ -20,7 +20,7 @@ export const useSendRefsRequest = () => {
     const err = {
       id: generateId(),
       name,
-      date: new Date(),
+      date: new Date().toISOString(),
       message,
     };
     dispatch(appActions.addErrorNotice(err));
