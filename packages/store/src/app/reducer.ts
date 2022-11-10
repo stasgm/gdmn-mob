@@ -16,7 +16,7 @@ export const initialState: Readonly<IAppState> = {
   errorNotice: [],
 };
 
-const LOG_MAX_LINES = 1000;
+const LOG_MAX_LINES = 5;
 
 const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action): IAppState => {
   switch (action.type) {
@@ -65,11 +65,20 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
         errorLog: state.errorLog.map((i) => (action.payload.indexOf(i.id) === -1 ? i : { ...i, isSent: true })),
       };
 
-    case getType(appActions.clearErrors):
+    case getType(appActions.clearErrors): {
+      if (action.payload === 'old') {
+        const sentLog = state.errorLog.filter((i) => i.isSent);
+        const delCount = sentLog.length - LOG_MAX_LINES;
+        return {
+          ...state,
+          errorLog: delCount > 0 ? sentLog.slice(delCount) : sentLog,
+        };
+      }
       return {
         ...state,
-        errorLog: action.payload === 'old' ? state.errorLog.filter((i) => i.isSent).slice(0, LOG_MAX_LINES) : [],
+        errorLog: [],
       };
+    }
 
     case getType(appActions.setSyncDate):
       return {

@@ -318,9 +318,19 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
             );
           }
 
+          addErrorNotice('useSync: api.message.sendMessages', '11111');
+          addErrorNotice('useSync: api.message.sendMessages', '33333');
+          addErrorNotice('useSync: api.message.sendMessages', '444444');
+          addErrorNotice('useSync: api.message.sendMessages', '555555');
+          addErrorNotice('useSync: api.message.sendMessages', '666666');
+          addErrorNotice('useSync: api.message.sendMessages', '77777');
+          addErrorNotice('useSync: api.message.sendMessages', '888888');
+          console.log(11111);
+
           // Отправляем ошибки на сервер
           const sendingErrors = errorLog?.filter((err) => !err.isSent);
           if (sendingErrors?.length) {
+            console.log(22222);
             // addRequestNotice('Отправка списка ошибок на сервер');
             //TODO: вызвать апи
             //Устанавливаем признак 'Отправлен на сервер' отправленным записям

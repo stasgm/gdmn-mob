@@ -40,6 +40,7 @@ export const appMiddlewareFactory: PersistedMiddleware =
     if (store.getState().auth.user?.id) {
       switch (action.type) {
         case getType(appActions.init):
+        case getType(appActions.addError):
         case getType(appActions.setSyncDate): {
           const result = next(action);
 

@@ -60,7 +60,7 @@ const InformationLogScreen = () => {
     });
   }, []);
 
-  const errorLog = useSelector((state) => state.app.errorLog).sort(
+  const errorLog = useSelector((state) => state.app.errorLog)?.sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   );
 
