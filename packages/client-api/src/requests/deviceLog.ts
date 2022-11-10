@@ -1,6 +1,6 @@
 import { IResponse, IDeviceLogParams } from '@lib/types';
 
-import { error, errorNotice as types } from '../types';
+import { error, deviceLog as types } from '../types';
 import { sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
