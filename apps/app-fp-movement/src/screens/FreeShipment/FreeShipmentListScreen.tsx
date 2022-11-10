@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { ListRenderItem, SectionList, SectionListData, View } from 'react-native';
-import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 import { documentActions, useDispatch, useSelector } from '@lib/store';
 import {
@@ -15,7 +15,6 @@ import {
   IListItemProps,
   DeleteButton,
   CloseButton,
-  AppActivityIndicator,
   EmptyList,
   navBackDrawer,
 } from '@lib/mobile-ui';
@@ -150,11 +149,6 @@ export const FreeShipmentListScreen = () => {
   const renderSectionHeader = ({ section }: any) => (
     <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
-
-  const isFocused = useIsFocused();
-  if (!isFocused) {
-    return <AppActivityIndicator />;
-  }
 
   return (
     <AppScreen>

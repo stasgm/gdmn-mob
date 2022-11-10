@@ -29,6 +29,8 @@ interface IProps {
   barCodeTypes: string[];
   children?: ReactNode;
   onSearch?: () => void;
+  isLeftButton?: boolean;
+  onCancel?: () => void;
 }
 
 const ScanBarcode = ({
@@ -39,6 +41,8 @@ const ScanBarcode = ({
   barCodeTypes,
   children,
   onSearch,
+  isLeftButton,
+  onCancel,
 }: IProps) => {
   const [flashMode, setFlashMode] = useState(false);
   const [vibroMode, setVibroMode] = useState(false);
@@ -132,6 +136,9 @@ const ScanBarcode = ({
         style={cameraStyle}
       >
         <View style={styles.header}>
+          {isLeftButton ? (
+            <IconButton icon="arrow-left" color={'#FFF'} size={30} style={styles.transparent} onPress={onCancel} />
+          ) : null}
           <IconButton
             icon={flashMode ? 'flash' : 'flash-off'}
             size={30}

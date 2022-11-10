@@ -216,7 +216,7 @@ export const ScanEditScreen = () => {
 
   return (
     <AppScreen>
-      <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }}>
+      <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} keyboardShouldPersistTaps={'handled'}>
         <SubTitle>{statusName}</SubTitle>
         <Divider />
         <ScrollView>

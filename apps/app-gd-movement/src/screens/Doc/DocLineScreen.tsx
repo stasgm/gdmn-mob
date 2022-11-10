@@ -1,5 +1,5 @@
 import React, { useCallback, useLayoutEffect, useState, useEffect } from 'react';
-import { View } from 'react-native';
+import { Alert, View } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 
@@ -9,8 +9,10 @@ import { SaveButton, globalStyles as styles, AppActivityIndicator, AppScreen, na
 import { ScreenState } from '@lib/types';
 
 import { DocStackParamList } from '../../navigation/Root/types';
-import { DocLine } from '../../components/DocLine';
+
 import { IMovementLine } from '../../store/types';
+
+import { DocLine } from './components/DocLine';
 
 export const DocLineScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList | DocStackParamList, 'DocLine'>>();
@@ -22,12 +24,29 @@ export const DocLineScreen = () => {
 
   useEffect(() => {
     if (screenState === 'saving') {
-      dispatch(
-        mode === 0
-          ? documentActions.addDocumentLine({ docId, line })
-          : documentActions.updateDocumentLine({ docId, line }),
-      );
-      navigation.goBack();
+      if (line.quantity) {
+        dispatch(
+          mode === 0
+            ? documentActions.addDocumentLine({ docId, line })
+            : documentActions.updateDocumentLine({ docId, line }),
+        );
+        navigation.goBack();
+      } else {
+        Alert.alert('Внимание!', 'В позиции не указано количество товара.\nВсе равно продолжить сохранение?', [
+          {
+            text: 'Да',
+            onPress: () => {
+              dispatch(
+                mode === 0
+                  ? documentActions.addDocumentLine({ docId, line })
+                  : documentActions.updateDocumentLine({ docId, line }),
+              );
+              navigation.goBack();
+            },
+          },
+          { text: 'Отмена', onPress: () => setScreenState('idle') },
+        ]);
+      }
     }
   }, [dispatch, docId, line, mode, navigation, screenState]);
 
