@@ -3,10 +3,10 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Divider, IconButton } from 'react-native-paper';
 import { useNavigation, useTheme } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { baseSettingGroup, settingsActions, useDispatch, useSelector } from '@lib/store';
 import { MenuButton, useActionSheet, SettingsGroup, AppScreen, MediumText, navBackDrawer } from '@lib/mobile-ui';
 import { INamedEntity, ISettingsOption, Settings, SettingValue } from '@lib/types';
-import { StackNavigationProp } from '@react-navigation/stack';
 
 import { SettingsStackParamList } from '../navigation/Root/types';
 

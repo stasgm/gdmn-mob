@@ -3,7 +3,15 @@ import { Alert, View, StyleSheet } from 'react-native';
 import { Avatar, Divider } from 'react-native-paper';
 import { useNavigation, useTheme } from '@react-navigation/native';
 
-import { authActions, useSelector, useDispatch, documentActions, referenceActions, appActions } from '@lib/store';
+import {
+  authActions,
+  useSelector,
+  useDispatch,
+  documentActions,
+  referenceActions,
+  appActions,
+  useAuthThunkDispatch,
+} from '@lib/store';
 
 import {
   MenuButton,
@@ -27,6 +35,7 @@ const ProfileScreen = () => {
   const userSettings = user?.settings;
 
   const dispatch = useDispatch();
+  const authDispatch = useAuthThunkDispatch();
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
 
@@ -51,7 +60,7 @@ const ProfileScreen = () => {
       {
         text: 'Да',
         onPress: () => {
-          dispatch(authActions.setUserSettings({}));
+          authDispatch(authActions.setUserSettings({}));
         },
       },
       {
@@ -87,7 +96,7 @@ const ProfileScreen = () => {
   }, [navigation]);
 
   const handleLogout = () => {
-    dispatch(authActions.logout());
+    authDispatch(authActions.logout());
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
   };
 

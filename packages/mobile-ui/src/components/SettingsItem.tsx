@@ -1,6 +1,7 @@
 import React from 'react';
-import { SettingValue } from '@lib/types';
+
 import { View, StyleSheet } from 'react-native';
+import { SettingValue } from '@lib/types';
 
 import Input from './Input';
 import { MediumText } from './AppText';

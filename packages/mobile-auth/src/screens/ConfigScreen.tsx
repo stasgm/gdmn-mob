@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { HelperText } from 'react-native-paper';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import { IApiConfig } from '@lib/client-types';
 import { AppScreen, Input, PrimeButton, ScreenTitle } from '@lib/mobile-ui';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-
-import { StackNavigationProp } from '@react-navigation/stack';
 
 import { AuthStackParamList } from '../navigation/types';
 

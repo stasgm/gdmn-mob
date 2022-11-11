@@ -1,3 +1,6 @@
+import React, { ReactNode } from 'react';
+import { StyleSheet, View, Text, LogBox } from 'react-native';
+
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   BottomSheetBackdrop,
@@ -7,8 +10,6 @@ import {
   TouchableOpacity,
 } from '@gorhom/bottom-sheet';
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import React, { ReactNode } from 'react';
-import { StyleSheet, View, Text, LogBox } from 'react-native';
 
 import { ItemSeparator } from './ItemSeparator';
 

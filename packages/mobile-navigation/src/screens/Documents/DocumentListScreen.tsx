@@ -1,9 +1,9 @@
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import { FlatList, RefreshControl, Text } from 'react-native';
 
-import { IDocument } from '@lib/types';
-import { useDispatch, useSelector, documentActions } from '@lib/store';
 import { useNavigation } from '@react-navigation/native';
+import { IDocument } from '@lib/types';
+import { useDispatch, useSelector, documentActions, useDocThunkDispatch } from '@lib/store';
 import { documentsMock } from '@lib/mock';
 import {
   MenuButton,
@@ -27,9 +27,10 @@ const DocumentListScreen = () => {
   const showActionSheet = useActionSheet();
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const docDispatch = useDocThunkDispatch();
 
   const handleLoad = () => {
-    dispatch(documentActions.addDocuments(documentsMock));
+    docDispatch(documentActions.addDocuments(documentsMock));
   };
 
   const handleReset = () => {

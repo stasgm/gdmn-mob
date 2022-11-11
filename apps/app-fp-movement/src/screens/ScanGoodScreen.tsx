@@ -96,7 +96,7 @@ const ScanGoodScreen = () => {
         workDate: barc.workDate,
         numReceived: barc.numReceived,
         quantPack: barc.quantPack,
-        sortOrder: shipmentLines?.length + 1,
+        sortOrder: (shipmentLines?.length || 0) + 1,
       });
 
       setScaner({ state: 'found' });
@@ -152,7 +152,7 @@ const ScanGoodScreen = () => {
           },
         ]);
       }
-    } else if (shipment.documentType.name === 'shipment' || shipment.documentType.name === 'currShipment') {
+    } else if (shipment?.documentType.name === 'shipment' || shipment?.documentType.name === 'currShipment') {
       Alert.alert('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', [
         {
           text: 'Да',
@@ -169,7 +169,7 @@ const ScanGoodScreen = () => {
       dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
       setScaner({ state: 'init' });
     }
-  }, [scannedObject, tempOrder, shipment.documentType.name, fpDispatch, dispatch, docId]);
+  }, [scannedObject, tempOrder, shipment?.documentType.name, fpDispatch, dispatch, docId]);
 
   const handleClearScaner = () => setScaner({ state: 'init' });
 

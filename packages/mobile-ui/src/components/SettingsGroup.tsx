@@ -1,7 +1,8 @@
 import React from 'react';
-import { ISettingsOption } from '@lib/types';
 import { View, StyleSheet } from 'react-native';
 import { Divider, useTheme } from 'react-native-paper';
+
+import { ISettingsOption } from '@lib/types';
 
 import SettingsItem from './SettingsItem';
 import { LargeText } from './AppText';

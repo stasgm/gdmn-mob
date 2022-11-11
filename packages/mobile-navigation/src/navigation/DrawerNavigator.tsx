@@ -1,14 +1,13 @@
 import React from 'react';
+import { Modal, View } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
-import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-
-import { useSelector } from '@lib/store';
-
 import { ActivityIndicator, Caption } from 'react-native-paper';
 
-import { Modal, View } from 'react-native';
+import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
+
+import { useSelector } from '@lib/store';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
 

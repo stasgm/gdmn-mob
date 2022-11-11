@@ -1,7 +1,10 @@
-import { IEntity, INamedEntity } from '@lib/types';
+import { Alert, Linking, Platform } from 'react-native';
+
 import 'react-native-get-random-values';
 import { customAlphabet } from 'nanoid';
-import { Alert, Linking, Platform } from 'react-native';
+
+import { IEntity, INamedEntity } from '@lib/types';
+
 import { IDelList } from '@lib/mobile-types';
 
 const truncate = (str: string, l: number | undefined = 40) => (str.length > l ? `${str.substring(0, l)}...` : str);

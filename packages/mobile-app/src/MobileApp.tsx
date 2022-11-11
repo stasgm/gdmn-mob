@@ -1,5 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { View, Text, AppState } from 'react-native';
 import { Store } from 'redux';
+
+import { NavigationContainer } from '@react-navigation/native';
+import { Snackbar } from 'react-native-paper';
 
 import {
   authActions,
@@ -16,11 +20,6 @@ import { DrawerNavigator, INavItem } from '@lib/mobile-navigation';
 import { globalStyles, Theme as defaultTheme } from '@lib/mobile-ui';
 
 import api from '@lib/client-api';
-
-import { Snackbar } from 'react-native-paper';
-import { View, Text, AppState } from 'react-native';
-
-import { NavigationContainer } from '@react-navigation/native';
 
 import { AuthLogOut } from '@lib/types';
 

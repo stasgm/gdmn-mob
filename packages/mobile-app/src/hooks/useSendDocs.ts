@@ -1,4 +1,6 @@
 /* eslint-disable max-len */
+import { Alert } from 'react-native';
+
 import {
   useDispatch,
   useDocThunkDispatch,
@@ -11,7 +13,6 @@ import {
 
 import { AuthLogOut, IAppSystem, IDocument, IMessage } from '@lib/types';
 import api from '@lib/client-api';
-import { Alert } from 'react-native';
 
 import { getNextOrder } from './orderCounter';
 
