@@ -37,6 +37,11 @@ export const getDeviceLogFullFileName = (params: IPathParams, fileInfo: IFileDev
   return path.join(filePath, getParamsDeviceLogFileName(fileInfo));
 };
 
+const readJsonFile = async (fileName: string): Promise<IDeviceLog[]> => {
+  const check = await checkFileExists(fileName);
+  return check ? JSON.parse((await readFile(fileName)).toString()) : [];
+};
+
 /**
  * Inserts an object into the file.
  */
@@ -47,12 +52,7 @@ export const saveDeviceLogFile = async (
 ): Promise<void> => {
   try {
     const fileName = getDeviceLogFullFileName(pathParams, fileInfo);
-    const check = await checkFileExists(fileName);
-    let oldDeviceLog: IDeviceLog[] = [];
-    if (check) {
-      const list = await readFile(fileName);
-      oldDeviceLog = JSON.parse(list.toString());
-    }
+    const oldDeviceLog: IDeviceLog[] = await readJsonFile(fileName);
 
     const delta = oldDeviceLog.length + newDeviceLog.length - config.DEVICE_LOG_MAX_LINES;
 
