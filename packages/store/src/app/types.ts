@@ -22,6 +22,4 @@ export interface IRequestNotice {
   started: Date;
 }
 
-export interface IErrorNotice extends IDeviceLog {
-  isSent?: boolean;
-}
+export type IErrorNotice = Omit<IDeviceLog, 'isSent'>;

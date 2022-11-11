@@ -1,8 +1,9 @@
-import { INamedEntity } from './common';
-
-export interface IDeviceLog extends INamedEntity {
+export interface IDeviceLog {
+  id: string;
+  name: string;
   date: string;
   message: string;
+  isSent?: boolean;
 }
 
 export interface IFileDeviceLogInfo {

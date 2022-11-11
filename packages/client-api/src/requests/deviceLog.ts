@@ -1,4 +1,4 @@
-import { IResponse, IDeviceLogParams } from '@lib/types';
+import { IDeviceLog, IDeviceLogParams, IResponse } from '@lib/types';
 
 import { error, deviceLog as types } from '../types';
 import { sleep } from '../utils';
@@ -10,7 +10,7 @@ class DeviceLog extends BaseRequest {
     super(api);
   }
 
-  addDeviceLog = async (body: IDeviceLogParams) => {
+  addDeviceLog = async (companyId: string, appSystemId: string, deviceLog: IDeviceLog[]) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -20,6 +20,11 @@ class DeviceLog extends BaseRequest {
     }
 
     try {
+      const body: IDeviceLogParams = {
+        companyId,
+        appSystemId,
+        deviceLog,
+      };
       const res = await this.api.axios.post<IResponse<void>>('/deviceLogs/', body);
       const resData = res.data;
 

@@ -1,12 +1,12 @@
 import { Context, ParameterizedContext } from 'koa';
 
-import { IAppSystem, IDeviceLogParams, IUser, NewAppSystem } from '@lib/types';
+import { IDeviceLogParams, IUser } from '@lib/types';
 
 import { deviceLogService } from '../services';
 
-import { DataNotFoundException, InvalidParameterException } from '../exceptions';
+import { InvalidParameterException } from '../exceptions';
 
-import { created, ok } from '../utils/apiHelpers';
+import { created } from '../utils/apiHelpers';
 
 const addDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
   const { deviceLog, companyId, appSystemId } = ctx.request.body as IDeviceLogParams;

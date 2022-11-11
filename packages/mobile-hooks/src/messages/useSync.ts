@@ -330,11 +330,20 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
           // Отправляем ошибки на сервер
           const sendingErrors = errorLog?.filter((err) => !err.isSent);
           if (sendingErrors?.length) {
-            console.log(22222);
             // addRequestNotice('Отправка списка ошибок на сервер');
             //TODO: вызвать апи
-            //Устанавливаем признак 'Отправлен на сервер' отправленным записям
-            dispatch(appActions.setSentErrors(sendingErrors.map((l) => l.id)));
+
+            const addDeviceLogResponse = await api.deviceLog.addDeviceLog(company.id, appSystem.id, sendingErrors);
+            if (addDeviceLogResponse.type === 'ERROR') {
+              addErrorNotice(
+                'useSync: api.deviceLog.addDeviceLog',
+                `Запрос на сохранение ошибок на сервере не отправлен: ${addDeviceLogResponse.message}`,
+              );
+            } else {
+              //Устанавливаем признак 'Отправлен на сервер' отправленным записям
+              dispatch(appActions.setSentErrors(sendingErrors.map((l) => l.id)));
+            }
+
             //Чистим старые ошибки
             dispatch(appActions.clearErrors('old'));
           }
