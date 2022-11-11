@@ -8,6 +8,8 @@ import { IPathParams, IFileNoticeInfo } from '@lib/types';
 
 import { IErrorNotice } from '@lib/store';
 
+import { InnerErrorException } from '../exceptions';
+
 import config from '../../config';
 
 import { getDb } from './dao/db';
@@ -40,7 +42,10 @@ export const notice2FullFileName = (params: IPathParams, fileInfo: IFileNoticeIn
   return path.join(filePath, params2noticeFileName(fileInfo));
 };
 
-export let noticeList: IErrorNotice[];
+const readJsonFile = async (fileName: string): Promise<IErrorNotice[]> => {
+  const check = await checkFileExists(fileName);
+  return check ? JSON.parse((await readFile(fileName)).toString()) : [];
+};
 
 /**
  * Inserts an object into the file.
@@ -52,13 +57,7 @@ export const insertNotice = async (
 ): Promise<void> => {
   try {
     const fileName = notice2FullFileName(params, fileInfo);
-    const check = await checkFileExists(fileName);
-    if (check) {
-      const list = await readFile(fileName);
-      noticeList = JSON.parse(list.toString());
-    } else {
-      noticeList = [];
-    }
+    const noticeList: IErrorNotice[] = await readJsonFile(fileName);
 
     const delta = noticeList.length + obj.length - config.DEVICE_LOG_MAX_LINES;
 
@@ -66,6 +65,10 @@ export const insertNotice = async (
 
     return writeFile(fileName, JSON.stringify([...noticeList, ...obj], undefined, 2), { encoding: 'utf8' });
   } catch (err) {
-    throw new Error(`Ошибка записи данных в файл - ${err}`);
+    throw new InnerErrorException(`Ошибка записи данных в файл - ${err}`);
   }
+};
+
+export const getNotices = async (params: IPathParams): Promise<IErrorNotice[]> => {
+  return [];
 };
