@@ -1,68 +1,10 @@
-import path from 'path';
-import { access, writeFile, readFile } from 'fs/promises';
-import { constants } from 'fs';
+import { IDeviceLog } from '@lib/types';
 
-import { IPathParams, IFileDeviceLogInfo, IDeviceLog } from '@lib/types';
+import { DataNotFoundException } from '../exceptions';
 
-import config from '../../config';
-import { DataNotFoundException, InnerErrorException } from '../exceptions';
+import { saveDeviceLogFile } from './errorLogUtils';
 
 import { getDb } from './dao/db';
-
-export const checkFileExists = async (path: string): Promise<boolean> => {
-  try {
-    await access(path, constants.R_OK | constants.W_OK);
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-export const getPath = (folders: string[], fn = '') => {
-  const folderPath = path.join(getDb().dbPath, ...folders);
-  checkFileExists(folderPath);
-  return path.join(folderPath, fn);
-};
-
-export const getPathSystem = ({ companyId, appSystemId }: IPathParams) =>
-  `DB_${companyId}/${getDb().appSystems.findById(appSystemId)?.name}`;
-
-export const getPathDeviceLog = (params: IPathParams, fn = '') => getPath([getPathSystem(params), 'deviceLogs'], fn);
-
-export const getParamsDeviceLogFileName = ({ producerId, deviceId }: IFileDeviceLogInfo) =>
-  `from_${producerId}_dev_${deviceId}.json`;
-
-export const getDeviceLogFullFileName = (params: IPathParams, fileInfo: IFileDeviceLogInfo): string => {
-  const filePath = getPathDeviceLog(params);
-  return path.join(filePath, getParamsDeviceLogFileName(fileInfo));
-};
-
-const readJsonFile = async (fileName: string): Promise<IDeviceLog[]> => {
-  const check = await checkFileExists(fileName);
-  return check ? JSON.parse((await readFile(fileName)).toString()) : [];
-};
-
-/**
- * Inserts an object into the file.
- */
-export const saveDeviceLogFile = async (
-  newDeviceLog: IDeviceLog[],
-  pathParams: IPathParams,
-  fileInfo: IFileDeviceLogInfo,
-): Promise<void> => {
-  try {
-    const fileName = getDeviceLogFullFileName(pathParams, fileInfo);
-    const oldDeviceLog: IDeviceLog[] = await readJsonFile(fileName);
-
-    const delta = oldDeviceLog.length + newDeviceLog.length - config.DEVICE_LOG_MAX_LINES;
-
-    if (delta > 0) oldDeviceLog.splice(0, delta);
-
-    return writeFile(fileName, JSON.stringify([...oldDeviceLog, ...newDeviceLog], undefined, 2), { encoding: 'utf8' });
-  } catch (err) {
-    throw new InnerErrorException(`Ошибка записи журнала ошибок устройства с uid=${fileInfo.deviceId} в файл - ${err}`);
-  }
-};
 
 /**
  * Добавляет запись с ошибкой в файл
