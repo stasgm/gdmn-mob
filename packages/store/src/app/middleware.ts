@@ -41,6 +41,8 @@ export const appMiddlewareFactory: PersistedMiddleware =
       switch (action.type) {
         case getType(appActions.init):
         case getType(appActions.addError):
+        case getType(appActions.setSentErrors):
+        case getType(appActions.clearErrors):
         case getType(appActions.setSyncDate): {
           const result = next(action);
 

@@ -9,66 +9,60 @@ import {
   useAuthThunkDispatch,
 } from '@lib/store';
 
-import { AuthLogOut, IAppSystem, IDocument, IMessage } from '@lib/types';
+import { AuthLogOut, IDocument, IMessage } from '@lib/types';
 import api from '@lib/client-api';
-import { Alert } from 'react-native';
+
+import { generateId } from '../utils';
 
 import { getNextOrder } from './helpers';
+import { useSaveErrors } from './useSaveErrors';
 
 export const useSendDocs = (readyDocs: IDocument[]) => {
   const docDispatch = useDocThunkDispatch();
   const authDispatch = useAuthThunkDispatch();
   const dispatch = useDispatch();
 
-  const { user, company, config } = useSelector((state) => state.auth);
+  const { user, company, config, appSystem } = useSelector((state) => state.auth);
 
   const docVersion = 1;
   const authMiddleware: AuthLogOut = () => authDispatch(authActions.logout());
+  const { saveErrors } = useSaveErrors();
+
+  const addError = (name: string, message: string) => {
+    const err = {
+      id: generateId(),
+      name,
+      date: new Date().toISOString(),
+      message,
+    };
+    dispatch(appActions.addErrorNotice(err));
+    dispatch(appActions.addError(err));
+  };
+
+  const addRequestNotice = (message: string) => {
+    dispatch(
+      appActions.addRequestNotice({
+        started: new Date(),
+        message,
+      }),
+    );
+  };
 
   return async () => {
-    if (!user || !user.erpUser) {
-      Alert.alert(
-        'Внимание!',
-        `Для ${user?.name} не указан пользователь ERP!\nПожалуйста, обратитесь к администратору.`,
-        [{ text: 'OK' }],
+    dispatch(appActions.setLoading(true));
+    dispatch(appActions.clearRequestNotice());
+    dispatch(appActions.clearErrorNotice());
+    addRequestNotice('Отправка документов');
+
+    if (!user || !company || !appSystem || !user.erpUser) {
+      addError(
+        'useSendRefsRequest',
+        // eslint-disable-next-line max-len
+        `Не определены данные: пользователь ${user?.name}, компания ${company?.name}, подсистема ${appSystem?.name}, пользователь ERP ${user?.erpUser?.name}`,
       );
-      return;
-    }
-
-    if (!company) {
-      Alert.alert(
-        'Внимание!',
-        `Для пользователя ${user.name} не определена компания!\nПожалуйста, выполните выход из профиля и заново залогиньтесь под вашей учетной записью`,
-        [{ text: 'OK' }],
-      );
-      return;
-    }
-
-    dispatch(documentActions.setLoading(true));
-    // dispatch(appActions.setErrorList([]));
-
-    const errList: string[] = [];
-
-    const consumer = user.erpUser;
-
-    const deviceId = config.deviceId!;
-
-    const getErpUser = await api.user.getUser(consumer.id, authMiddleware);
-
-    let appSystem: IAppSystem | undefined;
-    if (getErpUser.type === 'ERROR') {
-      errList.push(`Пользователь ERP не определен: ${getErpUser.message}`);
-    }
-
-    if (getErpUser.type === 'GET_USER') {
-      if (!getErpUser.user.appSystem) {
-        errList.push('У пользователя ERP не установлена подсистема!\nПожалуйста, обратитесь к администратору.');
-      } else {
-        appSystem = getErpUser.user.appSystem;
-      }
-    }
-
-    if (appSystem) {
+    } else {
+      const consumer = user.erpUser;
+      const deviceId = config.deviceId!;
       const messageCompany = { id: company.id, name: company.name };
 
       // 1. Если есть документы, готовые для отправки (status = 'READY'),
@@ -81,6 +75,7 @@ export const useSendDocs = (readyDocs: IDocument[]) => {
           version: docVersion,
           payload: readyDocs,
         };
+        addError('useSendDocs: updateDocuments', 'dfsddgsdgsdv');
 
         const sendMessageResponse = await api.message.sendMessages(
           appSystem,
@@ -98,21 +93,14 @@ export const useSendDocs = (readyDocs: IDocument[]) => {
           );
 
           if (updateDocResponse.type === 'DOCUMENTS/UPDATE_MANY_FAILURE') {
-            errList.push(updateDocResponse.payload);
+            addError('useSendDocs: updateDocuments', updateDocResponse.payload);
           }
         } else {
-          errList.push(sendMessageResponse.message);
+          addError('useSendDocs: api.message.sendMessages', sendMessageResponse.message);
         }
       }
     }
-
-    dispatch(documentActions.setLoading(false));
-    // dispatch(appActions.setErrorList(errList));
-
-    if (errList?.length) {
-      Alert.alert('Внимание!', `Во время отправки документов произошли ошибки:\n${errList.join('\n')}`, [
-        { text: 'OK' },
-      ]);
-    }
+    saveErrors();
+    dispatch(appActions.setLoading(false));
   };
 };

@@ -17,6 +17,7 @@ import {
   AuthLogOut,
   BodyType,
   IAppSystemSettings,
+  IDeviceLog,
   IDocument,
   IMessage,
   IReferences,
@@ -25,18 +26,22 @@ import {
 } from '@lib/types';
 import api from '@lib/client-api';
 
+import { useCallback, useMemo } from 'react';
+
 import { generateId, getDateString, isIReferences } from '../utils';
 
 import { getNextOrder } from './helpers';
+import { useSaveErrors } from './useSaveErrors';
 
-export const useSync = (onSync?: () => Promise<any>): (() => void) => {
+export const useSync = (onSync?: () => Promise<any>) => {
   const docDispatch = useDocThunkDispatch();
   const refDispatch = useRefThunkDispatch();
   const authDispatch = useAuthThunkDispatch();
   const settDispatch = useSettingThunkDispatch();
   const dispatch = useDispatch();
+  let withError = false;
 
-  const addErrorNotice = (name: string, message: string) => {
+  const addError = (name: string, message: string) => {
     const err = {
       id: generateId(),
       name,
@@ -45,6 +50,7 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
     };
     dispatch(appActions.addErrorNotice(err));
     dispatch(appActions.addError(err));
+    withError = true;
   };
 
   const addRequestNotice = (message: string) => {
@@ -57,7 +63,6 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
   };
 
   const { user, company, config, appSystem } = useSelector((state) => state.auth);
-  const { errorNotice, errorLog } = useSelector((state) => state.app);
   const documents = useSelector((state) => state.documents.list);
   const settings = useSelector((state) => state.settings.data);
 
@@ -71,37 +76,256 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
   const setVersion = 1;
 
   const authMiddleware: AuthLogOut = () => authDispatch(authActions.logout());
+  const { saveErrors } = useSaveErrors();
+  const params = useMemo(() => ({ appSystemId: appSystem!.id, companyId: company!.id }), [appSystem, company]);
 
-  const sync = () => {
-    /*
+  const processMessage = useCallback(
+    async (msg: IMessage) => {
+      if (!msg) {
+        return;
+      }
+
+      //Если пришло сообщение, статус которого ошибка обработки, то добавляем ошибку с текстом из errorMessage
+      if (msg.status === 'PROCESSED_DEADLOCK' || msg.status === 'PROCESSED_INCORRECT') {
+        addError('useSync: processMessage', `Ошибка обработки сообщения id=${msg.id}: ${msg.errorMessage}`);
+        return;
+      }
+
+      switch (msg.body.type as BodyType) {
+        case 'CMD':
+          //TODO: обработка
+          break;
+
+        case 'REFS': {
+          //TODO: проверка данных, приведение к типу
+          if ((msg.body.version || 1) !== refVersion) {
+            addError(
+              'useSync: processMessage',
+              `Структура загружаемых данных для справочников с версией '${msg.body.version}' не поддерживается приложением`,
+            );
+            break;
+          }
+
+          const loadRefs = msg.body.payload as IReferences;
+
+          addRequestNotice('Сохранение справочников');
+
+          if (refLoadType) {
+            //Записываем новые справочники из сообщения
+            const setRefResponse = await refDispatch(referenceActions.setReferences(loadRefs));
+
+            //Если удачно сохранились справочники, удаляем сообщение в json
+            if (setRefResponse.type === 'REFERENCES/SET_ALL_SUCCESS') {
+              const removeMess = await api.message.removeMessage(msg.id, params, authMiddleware);
+              if (removeMess.type === 'ERROR') {
+                addError(
+                  'useSync: api.message.removeMessage',
+                  `Справочники загружены, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
+                );
+              }
+            } else if (setRefResponse.type === 'REFERENCES/SET_ALL_FAILURE') {
+              addError('useSync: setReferences', 'Справочники не загружены в хранилище');
+            }
+          } else {
+            //Записываем новые справочники из сообщения
+            const addRefResponse = await refDispatch(referenceActions.addReferences(loadRefs));
+
+            //Если удачно сохранились справочники, удаляем сообщение в json
+            if (addRefResponse.type === 'REFERENCES/ADD_SUCCESS') {
+              const removeMess = await api.message.removeMessage(msg.id, params, authMiddleware);
+              if (removeMess.type === 'ERROR') {
+                addError(
+                  'useSync: removeMessage',
+                  `Справочники добавлены, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
+                );
+              }
+            } else if (addRefResponse.type === 'REFERENCES/ADD_FAILURE') {
+              addError('useSync: addReferences', 'Справочники не добавлены в хранилище');
+            }
+          }
+
+          break;
+        }
+
+        case 'ONE_REF': {
+          //TODO: проверка данных, приведение к типу
+          if ((msg.body.version || 1) !== refVersion) {
+            addError(
+              'useSync: processMessage',
+              `Структура загружаемых данных для справочника с версией '${msg.body.version}' не поддерживается приложением`,
+            );
+            break;
+          }
+
+          if (isIReferences(msg.body.payload)) {
+            const loadRef = Object.entries(msg.body.payload);
+            const [refName, refData] = loadRef[0];
+
+            addRequestNotice(`Сохранение справочника ${refName}`);
+
+            //Записываем новый справочник из сообщения
+            const setRefResponse = await refDispatch(referenceActions.setOneReference({ refName, refData }));
+
+            //Если удачно сохранился справочник, удаляем сообщение в json
+            if (setRefResponse.type === 'REFERENCES/SET_ONE_SUCCESS') {
+              const removeMess = await api.message.removeMessage(msg.id, params, authMiddleware);
+              if (removeMess.type === 'ERROR') {
+                addError(
+                  'useSync: removeMessage',
+                  `Справочник ${refName} загружен, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
+                );
+              }
+            } else if (setRefResponse.type === 'REFERENCES/SET_ONE_FAILURE') {
+              addError('useSync: setOneReference', `Справочник ${refName} не загружен в хранилище`);
+            }
+          } else {
+            addError('useSync', `Неверный тип данных объекта справочника в cообщении ${msg.id}`);
+          }
+
+          break;
+        }
+
+        case 'DOCS': {
+          if ((msg.body.version || 1) !== docVersion) {
+            addError(
+              'useSync: processMessage',
+              `Структура загружаемых данных для документов с версией '${msg.body.version}' не поддерживается приложением`,
+            );
+            break;
+          }
+
+          const removeMes = async () => {
+            const removeMess = await api.message.removeMessage(msg.id, params, authMiddleware);
+            if (removeMess.type === 'ERROR') {
+              addError(
+                'useSync: api.message.removeMessage',
+                `Документы загружены, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
+              );
+            }
+          };
+
+          const loadDocs = msg.body.payload as IDocument[];
+
+          if (!loadDocs.length) {
+            removeMes();
+            break;
+          }
+
+          addRequestNotice(`Сохранение документов (${loadDocs.length})`);
+
+          const setDocResponse = await docDispatch(documentActions.setDocuments(loadDocs));
+
+          //Если удачно сохранились документы, удаляем сообщение в json
+          if (setDocResponse.type === 'DOCUMENTS/SET_ALL_SUCCESS') {
+            removeMes();
+          } else if (setDocResponse.type === 'DOCUMENTS/SET_ALL_FAILURE') {
+            addError('useSync: setDocuments', 'Документы не загружены в хранилище');
+          }
+
+          break;
+        }
+
+        case 'SETTINGS': {
+          //TODO: обработка
+          if ((msg.body.version || 1) !== setVersion) {
+            addError(
+              'useSync: processMessage',
+              `Структура загружаемых данных для настроек пользователя с версией '${msg.body.version}' не поддерживается приложением`,
+            );
+            break;
+          }
+
+          addRequestNotice('Сохранение настроек пользователя');
+
+          const setUserSettingsResponse = await authDispatch(
+            authActions.setUserSettings(msg.body.payload as IUserSettings),
+          );
+
+          //Если удачно сохранились настройки, удаляем сообщение в json
+          if (setUserSettingsResponse.type === 'AUTH/SET_USER_SETTINGS_SUCCESS') {
+            const removeMess = await api.message.removeMessage(msg.id, params, authMiddleware);
+
+            if (removeMess.type === 'ERROR') {
+              addError(
+                'useSync: api.message.removeMessage',
+                `Настройки пользователя загружены, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
+              );
+            }
+          } else if (setUserSettingsResponse.type === 'AUTH/SET_USER_SETTINGS_FAILURE') {
+            addError('useSync: setUserSettings', 'Настройки пользователя не загружены в хранилище');
+          }
+          break;
+        }
+
+        case 'APP_SYSTEM_SETTINGS': {
+          //TODO: обработка
+          if ((msg.body.version || 1) !== setVersion) {
+            addError(
+              'useSync: processMessage',
+              `Структура загружаемых данных для настроек приложения с версией '${msg.body.version}' не поддерживается приложением`,
+            );
+            break;
+          }
+
+          try {
+            addRequestNotice('Сохранение настроек подсистемы');
+
+            const appSetts = Object.entries(msg.body.payload as IAppSystemSettings);
+            for (const [optionName, value] of appSetts) {
+              if (value && settings[optionName]) {
+                settDispatch(
+                  settingsActions.updateOption({
+                    optionName,
+                    value: {
+                      ...settings[optionName],
+                      data: optionName === 'synchPeriod' ? ((value.data as number) || 600) / 60 : value.data,
+                    } as ISettingsOption,
+                  }),
+                );
+              }
+            }
+
+            const removeMess = await api.message.removeMessage(msg.id, params, authMiddleware);
+            if (removeMess.type === 'ERROR') {
+              addError(
+                'useSync: api.message.removeMessage',
+                `Настройки приложения загружены, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
+              );
+            }
+          } catch (err) {
+            addError('useSync', `Настройки приложения не загружены в хранилище: ${err}`);
+          }
+          break;
+        }
+
+        default:
+          addError('useSync: processMessage', `Команда ${msg.body.type} не поддерживается приложением`);
+          break;
+      }
+    },
+    [authMiddleware, params],
+  );
+
+  // const sync = () => {
+  /*
       Поддержка платформы:
       - загрузка сообщений
       - обработка сообщение
     */
-    const syncData = async () => {
-      // Загрузка данных
-      try {
-        dispatch(appActions.setLoading(true));
-        dispatch(appActions.clearRequestNotice());
-        dispatch(appActions.clearErrorNotice());
+  const syncData = async () => {
+    dispatch(appActions.setLoading(true));
+    dispatch(appActions.clearRequestNotice());
+    dispatch(appActions.clearErrorNotice());
 
-        if (!user || !company || !appSystem || !user.erpUser) {
-          addErrorNotice(
-            'useSync',
-            `Не определены данные: пользователь ${user?.name}, компания ${company?.name}, подсистема ${appSystem?.name}, пользователь ERP ${user?.erpUser?.name}`,
-          );
-
-          dispatch(appActions.setShowSyncInfo(true));
-          dispatch(appActions.setLoading(false));
-          return;
-        }
-
+    try {
+      if (!user || !company || !appSystem || !user.erpUser) {
+        addError(
+          'useSync',
+          `Не определены данные: пользователь ${user?.name}, компания ${company?.name}, подсистема ${appSystem?.name}, пользователь ERP ${user?.erpUser?.name}`,
+        );
+      } else {
         if (!onSync) {
           // Если нет функции из пропсов
-          const mesParams = {
-            appSystemId: appSystem.id,
-            companyId: company.id,
-          };
           const messageCompany = { id: company.id, name: company.name };
           const consumer = user.erpUser;
 
@@ -136,13 +360,13 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
               );
 
               if (updateDocResponse.type === 'DOCUMENTS/UPDATE_MANY_FAILURE') {
-                addErrorNotice(
+                addError(
                   'useSync: updateDocuments',
                   `Документы ${readyDocs.map((doc) => doc.number).join(', ')} отправлены, но статус не обновлен`,
                 );
               }
             } else {
-              addErrorNotice(
+              addError(
                 'useSync: api.message.sendMessages',
                 `Документы ${readyDocs.map((doc) => doc.number).join(', ')} не отправлены, ${
                   sendMessageResponse.message
@@ -154,7 +378,13 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
           addRequestNotice('Получение данных');
 
           //2. Получаем все сообщения для мобильного
-          const getMessagesResponse = await api.message.getMessages(mesParams, authMiddleware);
+          const getMessagesResponse = await api.message.getMessages(
+            {
+              appSystemId: appSystem.id,
+              companyId: company.id,
+            },
+            authMiddleware,
+          );
 
           //Если сообщения получены успешно, то
           //  справочники: очищаем старые и записываем в хранилище новые данные
@@ -163,7 +393,7 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
             const sortedMessages = getMessagesResponse.messageList.sort((a, b) => a.head.order - b.head.order);
             for (const message of sortedMessages) {
               // eslint-disable-next-line no-await-in-loop
-              await processMessage(message, mesParams);
+              await processMessage(message);
             }
             // await Promise.all(
             //   getMessagesResponse.messageList
@@ -171,7 +401,7 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
             //     ?.map((message) => processMessage(message, errList, okList, params)),
             // );
           } else {
-            addErrorNotice('useSync: api.message.getMessages', `Сообщения не получены: ${getMessagesResponse.message}`);
+            addError('useSync: api.message.getMessages', `Сообщения не получены: ${getMessagesResponse.message}`);
           }
 
           //Формируем запрос на получение документов для следующего раза
@@ -225,7 +455,7 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
             );
 
             if (sendMesRefResponse?.type === 'ERROR') {
-              addErrorNotice(
+              addError(
                 'useSync: api.message.sendMessages',
                 `Запрос на получение справочников не отправлен: ${sendMesRefResponse.message}`,
               );
@@ -246,7 +476,7 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
           );
 
           if (sendMesDocRespone.type === 'ERROR') {
-            addErrorNotice(
+            addError(
               'useSync: api.message.sendMessages',
               `Запрос на получение документов не отправлен: ${sendMesDocRespone.message}`,
             );
@@ -270,7 +500,7 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
 
               const delDocResponse = await docDispatch(documentActions.removeDocuments(delDocs));
               if (delDocResponse.type === 'DOCUMENTS/REMOVE_MANY_FAILURE') {
-                addErrorNotice(
+                addError(
                   'useSync: removeDocuments',
                   `Обработанные документы, дата которых менее ${getDateString(maxDocDate)}, не удалены`,
                 );
@@ -292,7 +522,7 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
           );
 
           if (sendMesUserSettResponse.type === 'ERROR') {
-            addErrorNotice(
+            addError(
               'useSync: api.message.sendMessages',
               `Запрос на получение настроек пользователя не отправлен: ${sendMesUserSettResponse.message}`,
             );
@@ -312,284 +542,30 @@ export const useSync = (onSync?: () => Promise<any>): (() => void) => {
           );
 
           if (sendMesAppSettResponse.type === 'ERROR') {
-            addErrorNotice(
+            addError(
               'useSync: api.message.sendMessages',
               `Запрос на получение настроек подсистемы не отправлен: ${sendMesAppSettResponse.message}`,
             );
-          }
-
-          addErrorNotice('useSync: api.message.sendMessages', '11111');
-          addErrorNotice('useSync: api.message.sendMessages', '33333');
-          addErrorNotice('useSync: api.message.sendMessages', '444444');
-          addErrorNotice('useSync: api.message.sendMessages', '555555');
-          addErrorNotice('useSync: api.message.sendMessages', '666666');
-          addErrorNotice('useSync: api.message.sendMessages', '77777');
-          addErrorNotice('useSync: api.message.sendMessages', '888888');
-          console.log(11111);
-
-          // Отправляем ошибки на сервер
-          const sendingErrors = errorLog?.filter((err) => !err.isSent);
-          if (sendingErrors?.length) {
-            // addRequestNotice('Отправка списка ошибок на сервер');
-            //TODO: вызвать апи
-
-            const addDeviceLogResponse = await api.deviceLog.addDeviceLog(company.id, appSystem.id, sendingErrors);
-            if (addDeviceLogResponse.type === 'ERROR') {
-              addErrorNotice(
-                'useSync: api.deviceLog.addDeviceLog',
-                `Запрос на сохранение ошибок на сервере не отправлен: ${addDeviceLogResponse.message}`,
-              );
-            } else {
-              //Устанавливаем признак 'Отправлен на сервер' отправленным записям
-              dispatch(appActions.setSentErrors(sendingErrors.map((l) => l.id)));
-            }
-
-            //Чистим старые ошибки
-            dispatch(appActions.clearErrors('old'));
           }
         } else if (onSync) {
           // Если передан внешний обработчик то вызываем
           await onSync();
         }
-      } catch (err) {
-        addErrorNotice('useSync', `Проблемы с передачей данных ${err}`);
       }
+    } catch (err) {
+      addError('useSync', `Проблемы с передачей данных ${err}`);
+    }
+    addError('useSync: api.message.getMessages', '1111111111111');
+    saveErrors();
 
-      if (!errorNotice.length) {
-        dispatch(appActions.setSyncDate(new Date()));
-      } else {
-        dispatch(appActions.setShowSyncInfo(true));
-      }
+    if (withError) {
+      dispatch(appActions.setShowSyncInfo(true));
+    } else {
+      dispatch(appActions.setSyncDate(new Date()));
+    }
 
-      dispatch(appActions.setLoading(false));
-    };
-
-    syncData();
+    dispatch(appActions.setLoading(false));
   };
 
-  const processMessage = async (msg: IMessage, params: { appSystemId: string; companyId: string }) => {
-    if (!msg) {
-      return;
-    }
-
-    //Если пришло сообщение, статус которого ошибка обработки, то добавляем ошибку с текстом из errorMessage
-    if (msg.status === 'PROCESSED_DEADLOCK' || msg.status === 'PROCESSED_INCORRECT') {
-      addErrorNotice('useSync: processMessage', `Ошибка обработки сообщения id=${msg.id}: ${msg.errorMessage}`);
-      return;
-    }
-
-    switch (msg.body.type as BodyType) {
-      case 'CMD':
-        //TODO: обработка
-        break;
-
-      case 'REFS': {
-        //TODO: проверка данных, приведение к типу
-        if ((msg.body.version || 1) !== refVersion) {
-          addErrorNotice(
-            'useSync: processMessage',
-            `Структура загружаемых данных для справочников с версией '${msg.body.version}' не поддерживается приложением`,
-          );
-          break;
-        }
-
-        const loadRefs = msg.body.payload as IReferences;
-
-        addRequestNotice('Сохранение справочников');
-
-        if (refLoadType) {
-          //Записываем новые справочники из сообщения
-          const setRefResponse = await refDispatch(referenceActions.setReferences(loadRefs));
-
-          //Если удачно сохранились справочники, удаляем сообщение в json
-          if (setRefResponse.type === 'REFERENCES/SET_ALL_SUCCESS') {
-            const removeMess = await api.message.removeMessage(msg.id, params, authMiddleware);
-            if (removeMess.type === 'ERROR') {
-              addErrorNotice(
-                'useSync: api.message.removeMessage',
-                `Справочники загружены, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
-              );
-            }
-          } else if (setRefResponse.type === 'REFERENCES/SET_ALL_FAILURE') {
-            addErrorNotice('useSync: setReferences', 'Справочники не загружены в хранилище');
-          }
-        } else {
-          //Записываем новые справочники из сообщения
-          const addRefResponse = await refDispatch(referenceActions.addReferences(loadRefs));
-
-          //Если удачно сохранились справочники, удаляем сообщение в json
-          if (addRefResponse.type === 'REFERENCES/ADD_SUCCESS') {
-            const removeMess = await api.message.removeMessage(msg.id, params, authMiddleware);
-            if (removeMess.type === 'ERROR') {
-              addErrorNotice(
-                'useSync: removeMessage',
-                `Справочники добавлены, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
-              );
-            }
-          } else if (addRefResponse.type === 'REFERENCES/ADD_FAILURE') {
-            addErrorNotice('useSync: addReferences', 'Справочники не добавлены в хранилище');
-          }
-        }
-
-        break;
-      }
-
-      case 'ONE_REF': {
-        //TODO: проверка данных, приведение к типу
-        if ((msg.body.version || 1) !== refVersion) {
-          addErrorNotice(
-            'useSync: processMessage',
-            `Структура загружаемых данных для справочника с версией '${msg.body.version}' не поддерживается приложением`,
-          );
-          break;
-        }
-
-        if (isIReferences(msg.body.payload)) {
-          const loadRef = Object.entries(msg.body.payload);
-          const [refName, refData] = loadRef[0];
-
-          addRequestNotice(`Сохранение справочника ${refName}`);
-
-          //Записываем новый справочник из сообщения
-          const setRefResponse = await refDispatch(referenceActions.setOneReference({ refName, refData }));
-
-          //Если удачно сохранился справочник, удаляем сообщение в json
-          if (setRefResponse.type === 'REFERENCES/SET_ONE_SUCCESS') {
-            const removeMess = await api.message.removeMessage(msg.id, params, authMiddleware);
-            if (removeMess.type === 'ERROR') {
-              addErrorNotice(
-                'useSync: removeMessage',
-                `Справочник ${refName} загружен, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
-              );
-            }
-          } else if (setRefResponse.type === 'REFERENCES/SET_ONE_FAILURE') {
-            addErrorNotice('useSync: setOneReference', `Справочник ${refName} не загружен в хранилище`);
-          }
-        } else {
-          addErrorNotice('useSync', `Неверный тип данных объекта справочника в cообщении ${msg.id}`);
-        }
-
-        break;
-      }
-
-      case 'DOCS': {
-        if ((msg.body.version || 1) !== docVersion) {
-          addErrorNotice(
-            'useSync: processMessage',
-            `Структура загружаемых данных для документов с версией '${msg.body.version}' не поддерживается приложением`,
-          );
-          break;
-        }
-
-        const removeMes = async () => {
-          const removeMess = await api.message.removeMessage(msg.id, params, authMiddleware);
-          if (removeMess.type === 'ERROR') {
-            addErrorNotice(
-              'useSync: api.message.removeMessage',
-              `Документы загружены, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
-            );
-          }
-        };
-
-        const loadDocs = msg.body.payload as IDocument[];
-
-        if (!loadDocs.length) {
-          removeMes();
-          break;
-        }
-
-        addRequestNotice(`Сохранение документов (${loadDocs.length})`);
-
-        const setDocResponse = await docDispatch(documentActions.setDocuments(loadDocs));
-
-        //Если удачно сохранились документы, удаляем сообщение в json
-        if (setDocResponse.type === 'DOCUMENTS/SET_ALL_SUCCESS') {
-          removeMes();
-        } else if (setDocResponse.type === 'DOCUMENTS/SET_ALL_FAILURE') {
-          addErrorNotice('useSync: setDocuments', 'Документы не загружены в хранилище');
-        }
-
-        break;
-      }
-
-      case 'SETTINGS': {
-        //TODO: обработка
-        if ((msg.body.version || 1) !== setVersion) {
-          addErrorNotice(
-            'useSync: processMessage',
-            `Структура загружаемых данных для настроек пользователя с версией '${msg.body.version}' не поддерживается приложением`,
-          );
-          break;
-        }
-
-        addRequestNotice('Сохранение настроек пользователя');
-
-        const setUserSettingsResponse = await authDispatch(
-          authActions.setUserSettings(msg.body.payload as IUserSettings),
-        );
-
-        //Если удачно сохранились настройки, удаляем сообщение в json
-        if (setUserSettingsResponse.type === 'AUTH/SET_USER_SETTINGS_SUCCESS') {
-          const removeMess = await api.message.removeMessage(msg.id, params, authMiddleware);
-
-          if (removeMess.type === 'ERROR') {
-            addErrorNotice(
-              'useSync: api.message.removeMessage',
-              `Настройки пользователя загружены, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
-            );
-          }
-        } else if (setUserSettingsResponse.type === 'AUTH/SET_USER_SETTINGS_FAILURE') {
-          addErrorNotice('useSync: setUserSettings', 'Настройки пользователя не загружены в хранилище');
-        }
-        break;
-      }
-
-      case 'APP_SYSTEM_SETTINGS': {
-        //TODO: обработка
-        if ((msg.body.version || 1) !== setVersion) {
-          addErrorNotice(
-            'useSync: processMessage',
-            `Структура загружаемых данных для настроек приложения с версией '${msg.body.version}' не поддерживается приложением`,
-          );
-          break;
-        }
-
-        try {
-          addRequestNotice('Сохранение настроек подсистемы');
-
-          const appSetts = Object.entries(msg.body.payload as IAppSystemSettings);
-          for (const [optionName, value] of appSetts) {
-            if (value && settings[optionName]) {
-              settDispatch(
-                settingsActions.updateOption({
-                  optionName,
-                  value: {
-                    ...settings[optionName],
-                    data: optionName === 'synchPeriod' ? ((value.data as number) || 600) / 60 : value.data,
-                  } as ISettingsOption,
-                }),
-              );
-            }
-          }
-
-          const removeMess = await api.message.removeMessage(msg.id, params, authMiddleware);
-          if (removeMess.type === 'ERROR') {
-            addErrorNotice(
-              'useSync: api.message.removeMessage',
-              `Настройки приложения загружены, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
-            );
-          }
-        } catch (err) {
-          addErrorNotice('useSync', `Настройки приложения не загружены в хранилище: ${err}`);
-        }
-        break;
-      }
-
-      default:
-        addErrorNotice('useSync: processMessage', `Команда ${msg.body.type} не поддерживается приложением`);
-        break;
-    }
-  };
-
-  return sync;
+  return { syncData };
 };

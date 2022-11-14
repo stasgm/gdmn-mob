@@ -67,17 +67,20 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
 
     case getType(appActions.clearErrors): {
       if (action.payload === 'old') {
-        const sentLog = state.errorLog.filter((i) => i.isSent);
-        const delCount = sentLog.length - LOG_MAX_LINES;
+        const sentLog = state.errorLog
+          .filter((i) => i.isSent)
+          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        const c = sentLog.length - LOG_MAX_LINES;
         return {
           ...state,
-          errorLog: delCount > 0 ? sentLog.slice(delCount) : sentLog,
+          errorLog: c > 0 ? sentLog.slice(c) : sentLog,
+        };
+      } else {
+        return {
+          ...state,
+          errorLog: [],
         };
       }
-      return {
-        ...state,
-        errorLog: [],
-      };
     }
 
     case getType(appActions.setSyncDate):

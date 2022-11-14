@@ -34,7 +34,7 @@ export interface IApp {
 }
 
 const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
-  const sync = useSync(onSync);
+  const { syncData } = useSync(onSync);
   const settings = useSelector((state) => state.settings?.data);
   const synchPeriod = (settings.synchPeriod?.data as number) || 10;
   const autoSync = (settings.autoSync?.data as boolean) || false;
@@ -74,7 +74,7 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
     }
 
     timeOutRef.current = setTimeout(() => {
-      sync();
+      syncData();
     }, synchPeriod * 60 * 1000);
 
     return () => {
@@ -85,7 +85,7 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
     };
   }, [synchPeriod, autoSync, loading]);
 
-  return <DrawerNavigator items={items} onSyncClick={sync} />;
+  return <DrawerNavigator items={items} onSyncClick={syncData} />;
 };
 
 const MobileApp = ({ store, loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
