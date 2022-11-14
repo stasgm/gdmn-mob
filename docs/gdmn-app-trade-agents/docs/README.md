@@ -212,14 +212,14 @@
 
 <img src="img/3.Orders/3.GoodsWithCont.jpg" alt="drawing" height="400"/>  <img src="img/3.Orders/3.GoodsSomeContDiff.jpg" alt="drawing" height="400"/>
 
-Для этого нужно из экрана **Заявка** нажать " **✚** ", перейти к экрану **Выбор товара**, повторно выбрать из списка необходимую позицию нажатием, далее выбрать из дополнительного меню - пункт **Добавить**.
+Для этого нужно из экрана **Заявка** нажать " **✚** ", передя к экрану **Выбор товара**, повторно выбрать из списка необходимую позицию нажатием, далее выбрать из дополнительного меню - пункт **Добавить**.
 
   <img src="img/3.Orders/3.ReferenceBookOfGoods.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.AddMenuAddGoods.jpg" alt="drawing" height="400"/>
 
 
  И далее действовать по уже знакомой схеме - ввести количество товара, необходимый вид упаковки и нажать на иконку " **✓** ". Выбранный повторно товар не отразится в списках товаров, но будет виден в самой заявке.
 
- <img src="img/3.Orders/3.ReferenceBookOfGoods.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.OrderViewGoodsTwo.jpg" alt="drawing" height="400"/>
+ <img src="img/3.Orders/3.ReferenceBookOfGoods2.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.OrderViewGoodsTwo.jpg" alt="drawing" height="400"/>
 
 #### Редакция позиции
 
