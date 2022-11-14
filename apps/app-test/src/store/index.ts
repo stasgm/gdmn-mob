@@ -5,7 +5,11 @@ import { configureStore } from '@lib/store';
 
 import { loadDataFromDisk, saveDataToDisk } from '@lib/mobile-app';
 
-export const reducers = {};
+import appTestReducer from './app/reducer';
+
+export const reducers = {
+  appTest: appTestReducer,
+};
 
 const rootReducer = combineReducers(reducers);
 
