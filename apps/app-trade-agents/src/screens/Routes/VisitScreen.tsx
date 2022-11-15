@@ -304,10 +304,10 @@ const VisitScreen = () => {
     deleteSelectedItems(delList, deleteDocs);
   }, [delList, dispatch]);
 
-  const [visibleDialog, setVisibleDialog] = useState(false);
+  const [visibleSendDialog, setVisibleSendDialog] = useState(false);
 
   const handleSendDocuments = useCallback(async () => {
-    setVisibleDialog(false);
+    setVisibleSendDialog(false);
     setScreenState('sending');
     await sendDoc();
     setScreenState('sent');
@@ -322,7 +322,7 @@ const VisitScreen = () => {
         ) : (
           <>
             <SendButton
-              onPress={() => setVisibleDialog(true)}
+              onPress={() => setVisibleSendDialog(true)}
               disabled={
                 screenState === 'sending' ||
                 screenState !== 'idle' ||
@@ -515,10 +515,10 @@ const VisitScreen = () => {
         />
       )}
       <SimpleDialog
-        visible={visibleDialog}
+        visible={visibleSendDialog}
         title={'Внимание!'}
-        text={'Отправить готовые документы?'}
-        onCancel={() => setVisibleDialog(false)}
+        text={'Вы уверены, что хотите отправить документы?'}
+        onCancel={() => setVisibleSendDialog(false)}
         onOk={handleSendDocuments}
         okDisabled={loading}
       />

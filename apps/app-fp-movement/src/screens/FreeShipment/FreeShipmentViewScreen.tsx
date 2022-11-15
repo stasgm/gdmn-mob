@@ -18,6 +18,7 @@ import {
   ScanButton,
   navBackButton,
   SaveDocument,
+  SimpleDialog,
 } from '@lib/mobile-ui';
 
 import { generateId, getDateString, keyExtractor, useSendDocs, sleep } from '@lib/mobile-hooks';
@@ -56,6 +57,7 @@ export const FreeShipmentViewScreen = () => {
   const isBlocked = doc?.status !== 'DRAFT';
   const goods = refSelectors.selectByName<IGood>('good').data;
   const settings = useSelector((state) => state.settings?.data);
+  const loading = useSelector((state) => state.app.loading);
   const goodBarcodeSettings = Object.entries(settings).reduce((prev: barcodeSettings, [idx, item]) => {
     if (item && item.group?.id !== 'base' && typeof item.data === 'number') {
       prev[idx] = item.data;
@@ -176,20 +178,13 @@ export const FreeShipmentViewScreen = () => {
 
   const sendDoc = useSendDocs(doc ? [doc] : []);
 
-  const handleSendDocument = useCallback(() => {
-    Alert.alert('Вы уверены, что хотите отправить документ?', '', [
-      {
-        text: 'Да',
-        onPress: async () => {
-          setScreenState('sending');
-          await sendDoc();
-          setScreenState('sent');
-        },
-      },
-      {
-        text: 'Отмена',
-      },
-    ]);
+  const [visibleSendDialog, setVisibleSendDialog] = useState(false);
+
+  const handleSendDocument = useCallback(async () => {
+    setVisibleSendDialog(false);
+    setScreenState('sending');
+    await sendDoc();
+    setScreenState('sent');
   }, [sendDoc]);
 
   const actionsMenu = useCallback(() => {
@@ -235,14 +230,14 @@ export const FreeShipmentViewScreen = () => {
     () =>
       isBlocked ? (
         doc?.status === 'READY' ? (
-          <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+          <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
         ) : (
           doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
         )
       ) : (
         <View style={styles.buttons}>
           {doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />}
-          <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+          <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
           {!isScanerReader && (
             <ScanButton
               onPress={() => navigation.navigate('ScanGood', { docId: id })}
@@ -252,17 +247,7 @@ export const FreeShipmentViewScreen = () => {
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [
-      actionsMenu,
-      doc?.status,
-      handleSaveDocument,
-      handleSendDocument,
-      id,
-      isBlocked,
-      isScanerReader,
-      navigation,
-      screenState,
-    ],
+    [actionsMenu, doc?.status, handleSaveDocument, id, isBlocked, isScanerReader, loading, navigation, screenState],
   );
 
   useLayoutEffect(() => {
@@ -443,6 +428,14 @@ export const FreeShipmentViewScreen = () => {
         onOk={handleSearchBarcode}
         okLabel={'Найти'}
         errorMessage={errorMessage}
+      />
+      <SimpleDialog
+        visible={visibleSendDialog}
+        title={'Внимание!'}
+        text={'Вы уверены, что хотите отправить документ?'}
+        onCancel={() => setVisibleSendDialog(false)}
+        onOk={handleSendDocument}
+        okDisabled={loading}
       />
     </View>
   );

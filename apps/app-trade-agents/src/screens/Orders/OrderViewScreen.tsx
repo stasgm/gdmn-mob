@@ -3,7 +3,7 @@ import { Alert, View, FlatList } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   AddButton,
   MenuButton,
@@ -19,6 +19,7 @@ import {
   navBackButton,
   ItemSeparator,
   SaveDocument,
+  SimpleDialog,
 } from '@lib/mobile-ui';
 
 import { formatValue, generateId, getDateString, useSendDocs, keyExtractor, sleep } from '@lib/mobile-hooks';
@@ -64,7 +65,7 @@ const OrderViewScreen = () => {
   const isDelList = !!Object.keys(delList).length;
 
   const [isGroupVisible, setIsGroupVisible] = useState(false);
-
+  const loading = useSelector((state) => state.app.loading);
   const order = docSelectors.selectByDocId<IOrderDocument>(id);
 
   const isBlocked = readonly || order?.status !== 'DRAFT';
@@ -244,20 +245,13 @@ const OrderViewScreen = () => {
 
   const sendDoc = useSendDocs(order ? [order] : []);
 
-  const handleSendDocument = useCallback(() => {
-    Alert.alert('Вы уверены, что хотите отправить документ?', '', [
-      {
-        text: 'Да',
-        onPress: () => {
-          setScreenState('sending');
-          sendDoc();
-          setScreenState('sent');
-        },
-      },
-      {
-        text: 'Отмена',
-      },
-    ]);
+  const [visibleSendDialog, setVisibleSendDialog] = useState(false);
+
+  const handleSendDocument = useCallback(async () => {
+    setVisibleSendDialog(false);
+    setScreenState('sending');
+    await sendDoc();
+    setScreenState('sent');
   }, [sendDoc]);
 
   const handleSaveDocument = useCallback(() => {
@@ -350,7 +344,9 @@ const OrderViewScreen = () => {
     () =>
       isBlocked ? (
         <View style={styles.buttons}>
-          {order?.status === 'READY' && <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />}
+          {order?.status === 'READY' && (
+            <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
+          )}
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ) : (
@@ -362,7 +358,7 @@ const OrderViewScreen = () => {
               {order?.status === 'DRAFT' && (
                 <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
               )}
-              <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+              <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
               <AddButton onPress={handleAddOrderLine} disabled={screenState !== 'idle'} />
               <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
             </>
@@ -372,13 +368,13 @@ const OrderViewScreen = () => {
     [
       isBlocked,
       order?.status,
-      handleSendDocument,
       screenState,
-      handleSaveDocument,
+      actionsMenu,
       isDelList,
       handleDeleteDocLine,
+      handleSaveDocument,
+      loading,
       handleAddOrderLine,
-      actionsMenu,
     ],
   );
 
@@ -492,6 +488,14 @@ const OrderViewScreen = () => {
       {!!order.lines.length && (
         <OrderTotal onPress={() => setIsGroupVisible(!isGroupVisible)} isGroupVisible={isGroupVisible} order={order} />
       )}
+      <SimpleDialog
+        visible={visibleSendDialog}
+        title={'Внимание!'}
+        text={'Вы уверены, что хотите отправить документ?'}
+        onCancel={() => setVisibleSendDialog(false)}
+        onOk={handleSendDocument}
+        okDisabled={loading}
+      />
     </>
   );
 };

@@ -3,7 +3,7 @@ import { View, FlatList, Alert, ListRenderItem } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   MenuButton,
   useActionSheet,
@@ -20,6 +20,7 @@ import {
   ListItemLine,
   navBackButton,
   SaveDocument,
+  SimpleDialog,
 } from '@lib/mobile-ui';
 
 import {
@@ -51,6 +52,7 @@ export const DocViewScreen = () => {
   const id = useRoute<RouteProp<DocStackParamList, 'DocView'>>().params?.id;
 
   const doc = docSelectors.selectByDocId<IMovementDocument>(id);
+  const loading = useSelector((state) => state.app.loading);
 
   const docLineQuantity = doc?.lines?.reduce((sum, line) => sum + line.quantity, 0) || 0;
   const docLineSum = doc?.lines?.reduce((sum, line) => sum + line.quantity * (line?.price || 0), 0) || 0;
@@ -116,20 +118,13 @@ export const DocViewScreen = () => {
 
   const sendDoc = useSendDocs(doc ? [doc] : []);
 
-  const handleSendDocument = useCallback(() => {
-    Alert.alert('Вы уверены, что хотите отправить документ?', '', [
-      {
-        text: 'Да',
-        onPress: async () => {
-          setScreenState('sending');
-          await sendDoc();
-          setScreenState('sent');
-        },
-      },
-      {
-        text: 'Отмена',
-      },
-    ]);
+  const [visibleSendDialog, setVisibleSendDialog] = useState(false);
+
+  const handleSendDocument = useCallback(async () => {
+    setVisibleSendDialog(false);
+    setScreenState('sending');
+    await sendDoc();
+    setScreenState('sent');
   }, [sendDoc]);
 
   const actionsMenu = useCallback(() => {
@@ -171,7 +166,7 @@ export const DocViewScreen = () => {
     () =>
       isBlocked ? (
         doc?.status === 'READY' ? (
-          <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+          <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
         ) : (
           doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
         )
@@ -184,7 +179,7 @@ export const DocViewScreen = () => {
               {doc?.status === 'DRAFT' && (
                 <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
               )}
-              <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+              <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
               <ScanButton onPress={handleDoScan} disabled={screenState !== 'idle'} />
               <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
             </>
@@ -197,9 +192,9 @@ export const DocViewScreen = () => {
       handleDeleteDocs,
       handleDoScan,
       handleSaveDocument,
-      handleSendDocument,
       isBlocked,
       isDelList,
+      loading,
       screenState,
     ],
   );
@@ -297,6 +292,14 @@ export const DocViewScreen = () => {
       {doc.lines.length ? (
         <DocTotal lineCount={doc.lines?.length || 0} sum={docLineSum} quantity={docLineQuantity} />
       ) : null}
+      <SimpleDialog
+        visible={visibleSendDialog}
+        title={'Внимание!'}
+        text={'Вы уверены, что хотите отправить документ?'}
+        onCancel={() => setVisibleSendDialog(false)}
+        onOk={handleSendDocument}
+        okDisabled={loading}
+      />
     </View>
   );
 };

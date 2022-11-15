@@ -17,7 +17,6 @@ import {
   AuthLogOut,
   BodyType,
   IAppSystemSettings,
-  IDeviceLog,
   IDocument,
   IMessage,
   IReferences,
@@ -90,7 +89,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
         addError('useSync: processMessage', `Ошибка обработки сообщения id=${msg.id}: ${msg.errorMessage}`);
         return;
       }
-
+      console.log('msg.body.type', msg.body.type);
       switch (msg.body.type as BodyType) {
         case 'CMD':
           //TODO: обработка
@@ -391,10 +390,15 @@ export const useSync = (onSync?: () => Promise<any>) => {
           //  документы: добавляем новые, а старые заменеям только если был статус 'DRAFT'
           if (getMessagesResponse.type === 'GET_MESSAGES') {
             const sortedMessages = getMessagesResponse.messageList.sort((a, b) => a.head.order - b.head.order);
+            console.log('getMessagesResponse.messageList 1', sortedMessages.length, new Date());
+            let i = 1;
             for (const message of sortedMessages) {
               // eslint-disable-next-line no-await-in-loop
               await processMessage(message);
+              console.log('i', i);
+              i++;
             }
+            console.log('getMessagesResponse.messageList 2', new Date());
             // await Promise.all(
             //   getMessagesResponse.messageList
             //     .sort((a, b) => a.head.order - b.head.order)
