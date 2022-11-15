@@ -28,6 +28,7 @@ import {
   IListItemProps,
   DeleteButton,
   CloseButton,
+  SimpleDialog,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -95,6 +96,7 @@ const VisitScreen = () => {
   const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity | undefined;
 
   const orderList = docSelectors.selectByDocType<IOrderDocument>('order');
+  const loading = useSelector((state) => state.app.loading);
 
   const orderDocs = useMemo(
     () =>
@@ -302,22 +304,14 @@ const VisitScreen = () => {
     deleteSelectedItems(delList, deleteDocs);
   }, [delList, dispatch]);
 
-  const handleSendDocuments = useCallback(() => {
-    Alert.alert('Вы уверены, что хотите отправить документы?', '', [
-      {
-        text: 'Да',
-        onPress: async () => {
-          setScreenState('sending');
-          await sendDoc();
-          setScreenState('sent');
+  const [visibleDialog, setVisibleDialog] = useState(false);
 
-          navigation.navigate('RouteView', { id: route.id });
-        },
-      },
-      {
-        text: 'Отмена',
-      },
-    ]);
+  const handleSendDocuments = useCallback(async () => {
+    setVisibleDialog(false);
+    setScreenState('sending');
+    await sendDoc();
+    setScreenState('sent');
+    navigation.navigate('RouteView', { id: route.id });
   }, [navigation, route.id, sendDoc]);
 
   const renderRight = useCallback(
@@ -328,7 +322,7 @@ const VisitScreen = () => {
         ) : (
           <>
             <SendButton
-              onPress={handleSendDocuments}
+              onPress={() => setVisibleDialog(true)}
               disabled={
                 screenState === 'sending' ||
                 screenState !== 'idle' ||
@@ -340,7 +334,7 @@ const VisitScreen = () => {
         )}
       </View>
     ),
-    [handleDeleteDocs, handleSendDocuments, isDelList, orderDocs, screenState],
+    [handleDeleteDocs, isDelList, orderDocs, screenState],
   );
 
   const renderLeft = useCallback(() => isDelList && <CloseButton onPress={() => setDelList({})} />, [isDelList]);
@@ -520,6 +514,14 @@ const VisitScreen = () => {
           ListEmptyComponent={EmptyList}
         />
       )}
+      <SimpleDialog
+        visible={visibleDialog}
+        title={'Внимание!'}
+        text={'Отправить готовые документы?'}
+        onCancel={() => setVisibleDialog(false)}
+        onOk={handleSendDocuments}
+        okDisabled={loading}
+      />
     </AppScreen>
   );
 };

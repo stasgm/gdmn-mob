@@ -15,6 +15,7 @@ export const useSendOneRefRequest = (description: string, params: ICmdParams) =>
 
   const { user, company, config, appSystem } = useSelector((state) => state.auth);
   const refVersion = 1;
+  let withError = false;
   const deviceId = config.deviceId!;
   const { saveErrors } = useSaveErrors();
 
@@ -36,13 +37,13 @@ export const useSendOneRefRequest = (description: string, params: ICmdParams) =>
     };
     dispatch(appActions.addErrorNotice(err));
     dispatch(appActions.addError(err));
+    withError = true;
   };
 
   return async () => {
     dispatch(appActions.setLoading(true));
     dispatch(appActions.clearRequestNotice());
     dispatch(appActions.clearErrorNotice());
-    dispatch(appActions.setShowSyncInfo(true));
     addRequestNotice(`Запрос на получение справочника: ${description}`);
 
     if (!user || !company || !appSystem || !user.erpUser) {
@@ -81,6 +82,11 @@ export const useSendOneRefRequest = (description: string, params: ICmdParams) =>
       }
     }
     saveErrors();
+
+    if (withError) {
+      dispatch(appActions.setShowSyncInfo(true));
+    }
+
     dispatch(appActions.setLoading(false));
   };
 };

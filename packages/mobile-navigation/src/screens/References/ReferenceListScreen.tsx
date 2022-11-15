@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Alert, FlatList, RefreshControl, Text } from 'react-native';
-import { Divider, IconButton } from 'react-native-paper';
+import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
+import { FlatList, RefreshControl, Text } from 'react-native';
+import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useSelector } from '@lib/store';
-import { AppScreen, MenuButton, navBackDrawer, SendButton, useActionSheet } from '@lib/mobile-ui';
+import { AppScreen, MenuButton, navBackDrawer, useActionSheet } from '@lib/mobile-ui';
 
 import { useSendRefsRequest } from '@lib/mobile-hooks';
 
@@ -35,9 +35,7 @@ const ReferenceListScreen = () => {
   const sendRequest = useSendRefsRequest();
 
   const handleSendRefsRequest = async () => {
-    if (sendRequest) {
-      await sendRequest();
-    }
+    await sendRequest();
   };
 
   const actionsMenu = useCallback(() => {

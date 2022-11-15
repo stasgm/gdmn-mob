@@ -6,10 +6,10 @@ import {
   EmptyList,
   globalStyles as styles,
   ItemSeparator,
-  LargeText,
   Menu,
   navBackDrawer,
   SearchButton,
+  SimpleDialog,
   SubTitle,
 } from '@lib/mobile-ui';
 import { refSelectors, useSelector } from '@lib/store';
@@ -17,8 +17,8 @@ import { IReference } from '@lib/types';
 import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { FlatList, SectionListData, View, StyleSheet } from 'react-native';
-import { Button, Dialog, Divider, Searchbar } from 'react-native-paper';
+import { FlatList, SectionListData, View } from 'react-native';
+import { Divider, Searchbar } from 'react-native-paper';
 
 import { DebetStackParamList } from '../../navigation/Root/types';
 import { IDebt } from '../../store/types';
@@ -106,12 +106,10 @@ const DebetListScreen = () => {
 
   const sendRequest = useSendOneRefRequest('Дебиторская задолженность', { name: 'debt', contactId });
 
-  const handleSendDebtRequest = async () => {
-    if (sendRequest) {
-      await sendRequest();
-    }
+  const handleSendDebtRequest = useCallback(async () => {
     setVisibleDialog(false);
-  };
+    await sendRequest();
+  }, [sendRequest]);
 
   const isFocused = useIsFocused();
   if (!isFocused) {
@@ -158,33 +156,16 @@ const DebetListScreen = () => {
         ListEmptyComponent={!debets ? EmptyList : null}
         keyboardShouldPersistTaps={'handled'}
       />
-      <Dialog visible={visibleDialog} onDismiss={() => setVisibleDialog(false)}>
-        <Dialog.Title>Внимание!</Dialog.Title>
-        <Dialog.Content>
-          <LargeText>
-            {
-              'Отправить запрос на получение дебиторской задолженности?\n\nВыполнение запроса может занять некоторое время.'
-            }
-          </LargeText>
-        </Dialog.Content>
-        <Dialog.Actions style={localStyles.action}>
-          <Button color={colors.primary} onPress={handleSendDebtRequest} disabled={loading}>
-            Отправить
-          </Button>
-          <Button color={colors.primary} onPress={() => setVisibleDialog(false)}>
-            Отмена
-          </Button>
-        </Dialog.Actions>
-      </Dialog>
+      <SimpleDialog
+        visible={visibleDialog}
+        title={'Внимание!'}
+        text={'Отправить запрос на получение дебиторской задолженности?'}
+        onCancel={() => setVisibleDialog(false)}
+        onOk={handleSendDebtRequest}
+        okDisabled={loading}
+      />
     </AppScreen>
   );
 };
-
-const localStyles = StyleSheet.create({
-  action: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-  },
-});
 
 export default DebetListScreen;

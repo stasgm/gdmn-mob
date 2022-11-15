@@ -15,6 +15,7 @@ export const useSendRefsRequest = () => {
 
   const { user, company, config, appSystem } = useSelector((state) => state.auth);
   const refVersion = 1;
+  let withError = false;
   const deviceId = config.deviceId!;
   const { saveErrors } = useSaveErrors();
 
@@ -36,13 +37,13 @@ export const useSendRefsRequest = () => {
     };
     dispatch(appActions.addErrorNotice(err));
     dispatch(appActions.addError(err));
+    withError = true;
   };
 
   return async () => {
     dispatch(appActions.setLoading(true));
     dispatch(appActions.clearRequestNotice());
     dispatch(appActions.clearErrorNotice());
-    dispatch(appActions.setShowSyncInfo(true));
     addRequestNotice('Запрос на получение справочников');
 
     if (!user || !company || !appSystem || !user.erpUser) {
@@ -79,7 +80,12 @@ export const useSendRefsRequest = () => {
         addError('useSendRefsRequest: api.message.sendMessages', sendMesRefResponse.message);
       }
     }
+    if (withError) {
+      dispatch(appActions.setShowSyncInfo(true));
+    }
+
     saveErrors();
+
     dispatch(appActions.setLoading(false));
   };
 };

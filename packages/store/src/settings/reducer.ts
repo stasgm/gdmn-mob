@@ -16,7 +16,7 @@ const baseSettings: Settings<IBaseSettings> = {
     sortOrder: 1,
     visible: true,
     description: 'Автоматическая синхронизация',
-    data: true,
+    data: false,
     type: 'boolean',
     group: synchSettingGroup,
   },

@@ -25,6 +25,7 @@ export const useSendDocs = (readyDocs: IDocument[]) => {
   const { user, company, config, appSystem } = useSelector((state) => state.auth);
 
   const docVersion = 1;
+  let withError = false;
   const authMiddleware: AuthLogOut = () => authDispatch(authActions.logout());
   const { saveErrors } = useSaveErrors();
 
@@ -37,6 +38,7 @@ export const useSendDocs = (readyDocs: IDocument[]) => {
     };
     dispatch(appActions.addErrorNotice(err));
     dispatch(appActions.addError(err));
+    withError = true;
   };
 
   const addRequestNotice = (message: string) => {
@@ -75,7 +77,6 @@ export const useSendDocs = (readyDocs: IDocument[]) => {
           version: docVersion,
           payload: readyDocs,
         };
-        addError('useSendDocs: updateDocuments', 'dfsddgsdgsdv');
 
         const sendMessageResponse = await api.message.sendMessages(
           appSystem,
@@ -100,7 +101,13 @@ export const useSendDocs = (readyDocs: IDocument[]) => {
         }
       }
     }
+
     saveErrors();
+
+    if (withError) {
+      dispatch(appActions.setShowSyncInfo(true));
+    }
+
     dispatch(appActions.setLoading(false));
   };
 };

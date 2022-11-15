@@ -28,7 +28,7 @@ import api from '@lib/client-api';
 
 import { useCallback, useMemo } from 'react';
 
-import { generateId, getDateString, isIReferences } from '../utils';
+import { generateId, getDateString, isIReferences, sleep } from '../utils';
 
 import { getNextOrder } from './helpers';
 import { useSaveErrors } from './useSaveErrors';
@@ -555,7 +555,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
     } catch (err) {
       addError('useSync', `Проблемы с передачей данных ${err}`);
     }
-    addError('useSync: api.message.getMessages', '1111111111111');
+
     saveErrors();
 
     if (withError) {
