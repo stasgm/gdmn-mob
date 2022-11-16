@@ -10,7 +10,7 @@ import config from '../../config';
 
 import log from '../utils/logger';
 
-import { BYTES_PER_MB } from '../utils/constants';
+import { BYTES_PER_KB } from '../utils/constants';
 
 import { getDb } from './dao/db';
 
@@ -183,7 +183,7 @@ const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined
   const fullFileName = getDeviceLogFullFileName(pathParams, fileInfo);
 
   const fileStat = statSync(fullFileName);
-  const fileSize = (fileStat.size / BYTES_PER_MB).toString();
+  const fileSize = (fileStat.size / BYTES_PER_KB).toString();
   const fileDate = fileStat.birthtime.toString();
 
   return {
