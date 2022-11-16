@@ -1,17 +1,28 @@
+import { IDeviceLog } from '@lib/types';
 import { ActionType, createAction } from 'typesafe-actions';
 
-import { IFormParam, IAppState } from './types';
+import { IFormParam, IAppState, IRequestNotice, IErrorNotice } from './types';
 
 const init = createAction('APP/INIT')();
 
 const setFormParams = createAction('APP/SET_FORM_PARAMS')<IFormParam>();
 const clearFormParams = createAction('APP/CLEAR_FORM_PARAMS')();
 const setLoading = createAction('APP/SET_LOADING')<boolean>();
-const setErrorList = createAction('APP/SET_ERROR_LIST')<string[]>();
+const setAutoSync = createAction('APP/SET_AUTO_SYNC')<boolean>();
+const setLoadedWithError = createAction('APP/SET_LOADED_WITH_ERROR')<boolean>();
+const addError = createAction('APP/ADD_ERROR')<IDeviceLog>();
+const setSentErrors = createAction('APP/SET_SENT_ERROR')<string[]>();
+const clearErrors = createAction('APP/CLEAR_ERROR')<'all' | 'old'>();
 const setSyncDate = createAction('APP/SET_SYNC_DATE')<Date>();
 const loadData = createAction('APP/LOAD_DATA')<IAppState>();
 const setLoadingData = createAction('APP/SET_LOADING_DATA')<boolean>();
 const setLoadingError = createAction('APP/SET_LOADING_ERROR')<string>();
+const setShowSyncInfo = createAction('APP/SET_SHOW_SYNCH_INFO')<boolean>();
+
+const addRequestNotice = createAction('APP/ADD_REQUEST_NOTICE')<IRequestNotice>();
+const clearRequestNotice = createAction('APP/CLEAR_REQUEST_NOTICE')();
+const addErrorNotice = createAction('APP/ADD_ERROR_NOTICE')<IErrorNotice>();
+const clearErrorNotice = createAction('APP/CLEAR_ERROR_NOTICE')();
 
 /**
  * Для ускорения работы программы мы кэшируем часть данных
@@ -42,13 +53,22 @@ export const appActions = {
   setFormParams,
   clearFormParams,
   setLoading,
-  setErrorList,
+  setLoadedWithError,
+  setAutoSync,
+  addError,
+  setSentErrors,
+  clearErrors,
   setSyncDate,
   loadGlobalDataFromDisc,
   loadSuperDataFromDisc,
   loadData,
   setLoadingData,
   setLoadingError,
+  addRequestNotice,
+  clearRequestNotice,
+  addErrorNotice,
+  clearErrorNotice,
+  setShowSyncInfo,
 };
 
 export type AppActionType = ActionType<typeof appActions>;

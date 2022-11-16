@@ -15,6 +15,7 @@ import Message from './requests/message';
 import User from './requests/user';
 import AppSystem from './requests/appSystem';
 import Process from './requests/process';
+import DeviceLog from './requests/deviceLog';
 
 class Api extends BaseApi {
   protected _config: IApiConfig = {} as IApiConfig;
@@ -29,6 +30,7 @@ class Api extends BaseApi {
   public user: User;
   public appSystem: AppSystem;
   public process: Process;
+  public deviceLog: DeviceLog;
 
   constructor(config: IApiConfig) {
     super();
@@ -42,6 +44,7 @@ class Api extends BaseApi {
     this.user = new User(this);
     this.appSystem = new AppSystem(this);
     this.process = new Process(this);
+    this.deviceLog = new DeviceLog(this);
     this.setAxios(config);
   }
 

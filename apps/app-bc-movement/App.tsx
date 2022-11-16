@@ -26,7 +26,7 @@ import {
 
 import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
-import { sleep } from '@lib/client-api';
+import { sleep } from '@lib/mobile-hooks';
 
 import { IDocument, IReferences } from '@lib/types';
 

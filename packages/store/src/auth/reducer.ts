@@ -21,6 +21,7 @@ export const initialState: Readonly<AuthState> = {
   user: undefined,
   device: undefined,
   company: undefined,
+  appSystem: undefined,
   connectionStatus: 'not-connected',
   config: {
     apiPath,
@@ -141,6 +142,9 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
 
     case getType(actions.setCompany):
       return { ...state, company: action.payload };
+
+    case getType(actions.setAppSystem):
+      return { ...state, appSystem: action.payload };
 
     case getType(actions.disconnectAsync.request):
       return { ...state, error: false, status: '', loading: true };

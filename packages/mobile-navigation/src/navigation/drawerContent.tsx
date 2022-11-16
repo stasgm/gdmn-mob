@@ -6,17 +6,7 @@ import Animated from 'react-native-reanimated';
 import { useSelector } from '@lib/store';
 import { useTheme } from '@react-navigation/native';
 import { PrimeButton } from '@lib/mobile-ui';
-
-const getDateString = (_date: string | Date) => {
-  if (!_date) {
-    return '-';
-  }
-  const date = new Date(_date);
-  return `${('0' + date.getDate()).toString().slice(-2, 3)}.${('0' + (date.getMonth() + 1).toString()).slice(
-    -2,
-    3,
-  )}.${date.getFullYear()}`;
-};
+import { getDateString } from '@lib/mobile-hooks';
 
 interface ICutsomProps {
   onSync?: () => void;
@@ -25,10 +15,9 @@ interface ICutsomProps {
 
 type Props = DrawerContentComponentProps & ICutsomProps;
 
-export function DrawerContent({ onSync, syncing, ...props }: Props) {
+export const DrawerContent = ({ onSync, syncing, ...props }: Props) => {
   const { colors } = useTheme();
   const { user, company, isDemo } = useSelector((state) => state.auth);
-
   const syncDate = useSelector((state) => state.app.syncDate) as Date;
 
   return (
@@ -80,7 +69,7 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
       )}
     </>
   );
-}
+};
 
 const styles = StyleSheet.create({
   drawerContent: {

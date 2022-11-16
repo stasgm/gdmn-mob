@@ -1,4 +1,4 @@
-import { IReferences } from '@lib/types';
+import { IReference, IReferences } from '@lib/types';
 import { ThunkDispatch } from 'redux-thunk';
 import { useDispatch } from 'react-redux';
 
@@ -27,6 +27,28 @@ export const setReferences = (
       return dispatch(actions.setReferencesAsync.success(references));
     } catch {
       return dispatch(actions.setReferencesAsync.failure('Ошибка записи справочников'));
+    }
+  };
+};
+
+export const setOneReference = ({
+  refName,
+  refData,
+}: {
+  refName: string;
+  refData: IReference;
+}): AppThunk<
+  Promise<ActionType<typeof actions.setOneReferenceAsync>>,
+  ReferenceState,
+  ActionType<typeof actions.setOneReferenceAsync>
+> => {
+  return async (dispatch) => {
+    dispatch(actions.setOneReferenceAsync.request(''));
+
+    try {
+      return dispatch(actions.setOneReferenceAsync.success({ refName, refData }));
+    } catch {
+      return dispatch(actions.setOneReferenceAsync.failure('Ошибка записи справочника'));
     }
   };
 };
@@ -85,6 +107,7 @@ const clearReferences = (): AppThunk<
 
 export default {
   setReferences,
+  setOneReference,
   addReferences,
   removeReference,
   clearReferences,

@@ -44,7 +44,7 @@ const ConfigScreen = (props: Props) => {
       port: parseInt(serverPort, 10),
       timeout: parseInt(timeout, 10),
       server,
-      // deviceId,
+      // deviceId: config?.deviceId || '',
     };
 
     onSetConfig(newConfig);

@@ -10,6 +10,7 @@ import ActivationCode from './activationCode.router';
 import TestServer from './test.router';
 import Process from './process.router';
 import AppSystem from './appSystem.router';
+import DeviceLog from './deviceLog.router';
 
 const rootRouter = new Router();
 
@@ -33,6 +34,7 @@ rootRouter
   .use(DeviceBinding.middleware())
   .use(TestServer.middleware())
   .use(Process.middleware())
-  .use(AppSystem.middleware());
+  .use(AppSystem.middleware())
+  .use(DeviceLog.middleware());
 
 export default rootRouter;

@@ -2,10 +2,8 @@ import { AnyAction } from 'redux';
 import { ThunkAction } from 'redux-thunk';
 
 import { INamedEntity, IEntity, IDocument, MandateProps, IHead, StatusType } from '@lib/types';
+import { IFormParam } from '@lib/store';
 
-export interface IFormParam {
-  [fieldName: string]: unknown;
-}
 export interface IInventoryFormParam extends IFormParam {
   number?: string;
   documentDate?: string;

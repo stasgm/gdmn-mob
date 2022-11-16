@@ -15,7 +15,7 @@ import {
 
 import { refSelectors } from '@lib/store';
 
-import { keyExtractor } from '@lib/mobile-app';
+import { keyExtractor } from '@lib/mobile-hooks';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
 import { IContact, IGood, IGoodMatrix } from '../../store/types';

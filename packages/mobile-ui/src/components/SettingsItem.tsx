@@ -9,10 +9,11 @@ import Switch from './Switch';
 type Props = {
   label: string;
   value: SettingValue;
+  disabled?: boolean;
   onValueChange: (newValue: SettingValue) => void;
 };
 
-const SettingsItem = ({ label, value, onValueChange }: Props) => {
+const SettingsItem = ({ label, value, disabled = false, onValueChange }: Props) => {
   return (
     <View>
       {typeof value === 'boolean' ? (
@@ -30,6 +31,7 @@ const SettingsItem = ({ label, value, onValueChange }: Props) => {
               keyboardType={'numeric'}
               clearInput={true}
               autoCapitalize="none"
+              disabled={disabled}
             />
           ) : (
             <Input

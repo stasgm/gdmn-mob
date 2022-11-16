@@ -4,7 +4,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/build/MaterialCommunityIc
 
 import { globalStyles as styles } from '@lib/mobile-ui';
 
-import { getDateString } from '@lib/mobile-app';
+import { getDateString } from '@lib/mobile-hooks';
 
 import { IApplDocument } from '../../../store/types';
 

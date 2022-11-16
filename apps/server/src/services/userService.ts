@@ -1,13 +1,10 @@
 import { IDBUser, IUser, NewUser, IUserWithDevice } from '@lib/types';
 
 import { DataNotFoundException, ConflictException, InvalidParameterException, ForbiddenException } from '../exceptions';
-
 import { hashPassword } from '../utils/crypt';
 import { extraPredicate, getListPart } from '../utils/helpers';
-import { processValidation } from '../validations';
 
 import { getDb } from './dao/db';
-import { device } from './data/devices';
 
 import { users as mockUsers } from './data/user';
 

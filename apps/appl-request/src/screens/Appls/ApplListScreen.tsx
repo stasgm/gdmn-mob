@@ -17,7 +17,7 @@ import {
 
 import { Searchbar } from 'react-native-paper';
 
-import { getDateString, keyExtractor, shortenString } from '@lib/mobile-app';
+import { getDateString, keyExtractor, shortenString } from '@lib/mobile-hooks';
 
 import { IApplDocument } from '../../store/types';
 

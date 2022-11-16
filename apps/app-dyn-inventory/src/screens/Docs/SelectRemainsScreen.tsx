@@ -15,7 +15,7 @@ import { docSelectors, useSelector } from '@lib/store';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { formatValue, generateId } from '@lib/mobile-app';
+import { formatValue, generateId } from '@lib/mobile-hooks';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 

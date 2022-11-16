@@ -1,11 +1,13 @@
-import React, { useLayoutEffect, useMemo } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { FlatList, RefreshControl, Text } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useSelector } from '@lib/store';
-import { AppScreen, navBackDrawer } from '@lib/mobile-ui';
+import { AppScreen, MenuButton, navBackDrawer, useActionSheet } from '@lib/mobile-ui';
+
+import { useSendRefsRequest } from '@lib/mobile-hooks';
 
 import { ReferenceStackParamList } from '../../navigation/Root/types';
 
@@ -17,6 +19,7 @@ type ViewScreenProp = StackNavigationProp<ReferenceStackParamList, 'ReferenceVie
 
 const ReferenceListScreen = () => {
   const { list, loading } = useSelector((state) => state.references);
+  const appLoading = useSelector((state) => state.app.loading);
 
   const refData = useMemo(() => {
     return Object.entries(list)
@@ -27,11 +30,35 @@ const ReferenceListScreen = () => {
 
   const navigation = useNavigation<ViewScreenProp>();
 
+  const showActionSheet = useActionSheet();
+
+  const sendRequest = useSendRefsRequest();
+
+  const handleSendRefsRequest = async () => {
+    await sendRequest();
+  };
+
+  const actionsMenu = useCallback(() => {
+    showActionSheet([
+      {
+        title: 'Отправить запрос на получение справочников',
+        onPress: handleSendRefsRequest,
+      },
+      {
+        title: 'Отмена',
+        type: 'cancel',
+      },
+    ]);
+  }, []);
+
+  const renderRight = useCallback(() => <MenuButton actionsMenu={actionsMenu} disabled={appLoading} />, [appLoading]);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackDrawer,
+      headerRight: renderRight,
     });
-  }, [navigation]);
+  }, [navigation, appLoading]);
 
   const renderItem = ({ item }: { item: RefListItem }) => <ReferenceItem item={item} />;
 
@@ -43,7 +70,7 @@ const ReferenceListScreen = () => {
         renderItem={renderItem}
         ItemSeparatorComponent={Divider}
         scrollEventThrottle={400}
-        refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
+        refreshControl={<RefreshControl refreshing={loading} />}
         ListEmptyComponent={
           !loading ? (
             <Text style={styles.emptyList}>{'Список пуст. \nПожалуйста, выполните синхронизацию.'}</Text>

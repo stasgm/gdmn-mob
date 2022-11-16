@@ -4,7 +4,6 @@ import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 import { SettingsState } from './types';
 
 const init = createAction('SETTINGS/INIT')();
-const addOption = createAction('SETTINGS/ADD_ONE')<{ optionName: string; value: ISettingsOption }>();
 const updateOption = createAction('SETTINGS/UPDATE_ONE')<{ optionName: string; value: ISettingsOption }>();
 const addSettings = createAction('SETTINGS/ADD_MANY')<Settings>();
 const deleteOption = createAction('SETTINGS/DELETE_ONE')<keyof IBaseSettings>();
@@ -23,7 +22,6 @@ const addSettingsAsync = createAsyncAction('SETTINGS/ADD', 'SETTINGS/ADD_SUCCESS
 
 export const actions = {
   addSettingsAsync,
-  addOption,
   updateOption,
   addSettings,
   deleteOption,

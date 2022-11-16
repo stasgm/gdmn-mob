@@ -6,7 +6,7 @@ import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigat
 import { AppActivityIndicator, globalStyles, MediumText, navBackButton, ScanBarcode } from '@lib/mobile-ui';
 import { refSelectors, docSelectors, useDispatch, documentActions, useSelector } from '@lib/store';
 
-import { generateId, getDateString, round } from '@lib/mobile-app';
+import { generateId, getDateString, round } from '@lib/mobile-hooks';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -35,7 +35,7 @@ const ScanGoodScreen = () => {
   const [scannedObject, setScannedObject] = useState<IShipmentLine>();
 
   const goodBarcodeSettings = Object.entries(settings).reduce((prev: barcodeSettings, [idx, item]) => {
-    if (item && item.group?.id !== '1' && typeof item.data === 'number') {
+    if (item && item.group?.id !== 'base' && typeof item.data === 'number') {
       prev[idx] = item.data;
     }
     return prev;
@@ -96,7 +96,7 @@ const ScanGoodScreen = () => {
         workDate: barc.workDate,
         numReceived: barc.numReceived,
         quantPack: barc.quantPack,
-        sortOrder: shipmentLines?.length + 1,
+        sortOrder: (shipmentLines?.length || 0) + 1,
       });
 
       setScaner({ state: 'found' });
@@ -152,7 +152,7 @@ const ScanGoodScreen = () => {
           },
         ]);
       }
-    } else if (shipment.documentType.name === 'shipment' || shipment.documentType.name === 'currShipment') {
+    } else if (shipment?.documentType.name === 'shipment' || shipment?.documentType.name === 'currShipment') {
       Alert.alert('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', [
         {
           text: 'Да',
@@ -169,7 +169,7 @@ const ScanGoodScreen = () => {
       dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
       setScaner({ state: 'init' });
     }
-  }, [scannedObject, tempOrder, shipment.documentType.name, fpDispatch, dispatch, docId]);
+  }, [scannedObject, tempOrder, shipment?.documentType.name, fpDispatch, dispatch, docId]);
 
   const handleClearScaner = () => setScaner({ state: 'init' });
 

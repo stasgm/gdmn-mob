@@ -22,7 +22,7 @@ export const appMiddlewareFactory: PersistedMiddleware =
       store.dispatch(appActions.setLoadingData(true));
       load('app', store.getState().auth.user?.id)
         .then((data) => {
-          return store.dispatch(appActions.loadData(data || initialState));
+          return store.dispatch(appActions.loadData({ ...(data || initialState), showSyncInfo: false }));
         })
         .finally(() => {
           store.dispatch(appActions.setLoadingData(false));
@@ -40,6 +40,9 @@ export const appMiddlewareFactory: PersistedMiddleware =
     if (store.getState().auth.user?.id) {
       switch (action.type) {
         case getType(appActions.init):
+        case getType(appActions.addError):
+        case getType(appActions.setSentErrors):
+        case getType(appActions.clearErrors):
         case getType(appActions.setSyncDate): {
           const result = next(action);
 

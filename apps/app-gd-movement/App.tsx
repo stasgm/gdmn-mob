@@ -1,6 +1,7 @@
 import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import { Provider } from 'react-redux';
-import { dialCall, MobileApp } from '@lib/mobile-app';
+import { MobileApp } from '@lib/mobile-app';
+import { dialCall, sleep } from '@lib/mobile-hooks';
 import { GDMN_EMAIL, GDMN_PHONE, GDMN_SITE_ADDRESS, INavItem } from '@lib/mobile-navigation';
 import ErrorBoundary from 'react-native-error-boundary';
 
@@ -28,8 +29,6 @@ import {
 import { ActivityIndicator, Caption, Text } from 'react-native-paper';
 
 import { IDocument, IReferences } from '@lib/types';
-
-import { sleep } from '@lib/client-api';
 
 import { TouchableOpacity, Linking, View } from 'react-native';
 

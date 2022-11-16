@@ -21,7 +21,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { IDocumentType } from '@lib/types';
 
-import { formatValue, generateId } from '@lib/mobile-app';
+import { formatValue, generateId } from '@lib/mobile-hooks';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 

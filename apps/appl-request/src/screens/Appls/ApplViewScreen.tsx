@@ -19,7 +19,7 @@ import {
   navBackButton,
 } from '@lib/mobile-ui';
 
-import { getDateString, keyExtractor } from '@lib/mobile-app';
+import { getDateString, keyExtractor } from '@lib/mobile-hooks';
 
 import { IApplDocument, IApplLine } from '../../store/types';
 

@@ -6,7 +6,7 @@ import { documentActions, useDispatch } from '@lib/store';
 import { IDocument } from '@lib/types';
 
 import { SwipeItem } from '@lib/mobile-ui';
-import { generateId } from '@lib/mobile-app';
+import { generateId } from '@lib/mobile-hooks';
 
 interface IProps {
   children?: ReactNode;

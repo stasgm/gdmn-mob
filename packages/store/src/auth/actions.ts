@@ -1,5 +1,5 @@
 import { IApiConfig } from '@lib/client-types';
-import { IDevice, IUser, ICompany, DeviceState, IUserSettings } from '@lib/types';
+import { IDevice, IUser, ICompany, DeviceState, IUserSettings, INamedEntity } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
 import { AuthState, ConnectionStatus } from './types';
@@ -9,6 +9,7 @@ const clearError = createAction('AUTH/CLEAR_ERROR')();
 const loadData = createAction('AUTH/LOAD_DATA')<AuthState>();
 const setConfig = createAction('AUTH/SET_CONFIG')<IApiConfig>();
 const setCompany = createAction('AUTH/SET_COMPANY')<ICompany | undefined>();
+const setAppSystem = createAction('AUTH/SET_APP_SYSTEM')<INamedEntity | undefined>();
 const setConnectionStatus = createAction('AUTH/SET_CONNECTION_STATUS')<ConnectionStatus>();
 const setLoading = createAction('AUTH/SET_LOADING')<boolean>();
 const setLoadingData = createAction('AUTH/SET_LOADING_DATA')<boolean>();
@@ -100,6 +101,7 @@ export const actions = {
   setInit,
   setIsConfigFirst,
   setIsLogOut,
+  setAppSystem,
 };
 
 export type AuthActionType = ActionType<typeof actions>;

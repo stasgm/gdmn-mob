@@ -88,12 +88,12 @@ export const getStatusColor = (status: StatusType) => {
   return statusColor;
 };
 
-const goodGroup = { id: '2', name: 'Код товара', sortOrder: 2, description: 'Количество символов' };
-const orderGroup = { id: '3', name: 'Код заявки', sortOrder: 3, description: 'Количество символов' };
+const goodGroup = { id: 'goodScan', name: 'Код товара', sortOrder: 2, description: 'Количество символов' };
+const orderGroup = { id: 'orderScan', name: 'Код заявки', sortOrder: 3, description: 'Количество символов' };
 
 export const appSettings: Settings = {
   scannerUse: {
-    id: '4',
+    id: 'scannerUse',
     sortOrder: 3,
     description: 'Использовать сканер',
     data: true,
@@ -102,7 +102,7 @@ export const appSettings: Settings = {
     group: baseSettingGroup,
   },
   minBarcodeLength: {
-    id: '6',
+    id: 'minBarcodeLength',
     sortOrder: 6,
     description: 'Мин. длина штрих-кода',
     data: 28,
@@ -111,7 +111,7 @@ export const appSettings: Settings = {
     group: goodGroup,
   },
   countWeight: {
-    id: '7',
+    id: 'countWeight',
     sortOrder: 7,
     description: 'Вес товара, гр',
     data: 6,
@@ -120,7 +120,7 @@ export const appSettings: Settings = {
     group: goodGroup,
   },
   countDay: {
-    id: '8',
+    id: 'countDay',
     sortOrder: 8,
     description: 'Дата (число)',
     data: 2,
@@ -129,7 +129,7 @@ export const appSettings: Settings = {
     group: goodGroup,
   },
   countMonth: {
-    id: '9',
+    id: 'countMonth',
     sortOrder: 9,
     description: 'Дата (месяц)',
     data: 2,
@@ -138,7 +138,7 @@ export const appSettings: Settings = {
     group: goodGroup,
   },
   countYear: {
-    id: '10',
+    id: 'countYear',
     sortOrder: 10,
     description: 'Дата (год)',
     data: 2,
@@ -147,7 +147,7 @@ export const appSettings: Settings = {
     group: goodGroup,
   },
   countCode: {
-    id: '11',
+    id: 'countCode',
     sortOrder: 11,
     description: 'Код товара',
     data: 4,
@@ -156,7 +156,7 @@ export const appSettings: Settings = {
     group: goodGroup,
   },
   countQuantPack: {
-    id: '12',
+    id: 'countQuantPack',
     sortOrder: 12,
     description: 'Номер взвешивания',
     data: 3,
@@ -165,7 +165,7 @@ export const appSettings: Settings = {
     group: goodGroup,
   },
   countType: {
-    id: '13',
+    id: 'countType',
     sortOrder: 13,
     description: 'Тип взвешивания',
     data: 1,
@@ -174,7 +174,7 @@ export const appSettings: Settings = {
     group: goodGroup,
   },
   countNumReceived: {
-    id: '14',
+    id: 'countNumReceived',
     sortOrder: 14,
     description: 'Номер партии',
     data: 6,
@@ -183,7 +183,7 @@ export const appSettings: Settings = {
     group: goodGroup,
   },
   countOrderBarcodeLentgh: {
-    id: '15',
+    id: 'countOrderBarcodeLentgh',
     sortOrder: 15,
     description: 'Мин. длина штрих-кода',
     data: 15,
@@ -192,7 +192,7 @@ export const appSettings: Settings = {
     group: orderGroup,
   },
   countCodeDepart: {
-    id: '16',
+    id: 'countCodeDepart',
     sortOrder: 16,
     description: 'Код подразделения',
     data: 3,
@@ -201,7 +201,7 @@ export const appSettings: Settings = {
     group: orderGroup,
   },
   countOrderDay: {
-    id: '17',
+    id: 'countOrderDay',
     sortOrder: 17,
     description: 'Дата (число)',
     data: 2,
@@ -210,7 +210,7 @@ export const appSettings: Settings = {
     group: orderGroup,
   },
   countOrderMonth: {
-    id: '18',
+    id: 'countOrderMonth',
     sortOrder: 18,
     description: 'Дата (месяц)',
     data: 2,
@@ -219,7 +219,7 @@ export const appSettings: Settings = {
     group: orderGroup,
   },
   countOrderYear: {
-    id: '19',
+    id: 'countOrderYear',
     sortOrder: 19,
     description: 'Дата (год)',
     data: 4,
@@ -228,7 +228,7 @@ export const appSettings: Settings = {
     group: orderGroup,
   },
   countID: {
-    id: '20',
+    id: 'countID',
     sortOrder: 20,
     description: 'Идентификатор заявки',
     data: 11,

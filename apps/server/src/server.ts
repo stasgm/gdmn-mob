@@ -107,7 +107,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
     .use(
       bodyParser({
         formLimit: '10mb',
-        jsonLimit: '20mb',
+        jsonLimit: '150mb',
         textLimit: '10mb',
         enableTypes: ['application/json', 'text', 'json'],
       }),

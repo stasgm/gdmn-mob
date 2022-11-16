@@ -6,7 +6,7 @@ import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigat
 import { AppActivityIndicator, globalStyles, MediumText, navBackButton, ScanBarcode } from '@lib/mobile-ui';
 import { docSelectors, useDispatch, documentActions } from '@lib/store';
 
-import { generateId } from '@lib/mobile-app';
+import { generateId } from '@lib/mobile-hooks';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 

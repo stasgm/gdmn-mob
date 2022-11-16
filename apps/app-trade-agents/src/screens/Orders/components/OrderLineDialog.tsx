@@ -1,7 +1,6 @@
-import { ItemSeparator, LargeText } from '@lib/mobile-ui';
+import { ItemSeparator, LargeText, globalStyles as styles } from '@lib/mobile-ui';
 import React from 'react';
 import { Button, Dialog, useTheme } from 'react-native-paper';
-import { StyleSheet } from 'react-native';
 
 import { IOrderLine } from '../../../store/types';
 
@@ -27,7 +26,7 @@ export const OrderLineDialog = ({
 
   return (
     <Dialog visible={true} onDismiss={onDismissDialog}>
-      <Dialog.Title style={localStyles.titleSize}>{goodName}</Dialog.Title>
+      <Dialog.Title style={styles.text18}>{goodName}</Dialog.Title>
       {selectedLine ? (
         <>
           <Dialog.Content>
@@ -35,7 +34,7 @@ export const OrderLineDialog = ({
             <LargeText>Упаковка: {selectedLine?.package ? selectedLine.package.name : 'без упаковки'}</LargeText>
             <ItemSeparator />
           </Dialog.Content>
-          <Dialog.Actions style={localStyles.action}>
+          <Dialog.Actions style={styles.columnAlignEnd}>
             <Button labelStyle={labelStyle} color={colors.primary} onPress={onEditLine}>
               Редактировать позицию
             </Button>
@@ -49,7 +48,7 @@ export const OrderLineDialog = ({
         </>
       ) : (
         <>
-          <Dialog.Actions style={localStyles.action}>
+          <Dialog.Actions style={styles.columnAlignEnd}>
             <Button labelStyle={labelStyle} color={colors.primary} onPress={onAddLine}>
               Добавить позицию
             </Button>
@@ -65,14 +64,3 @@ export const OrderLineDialog = ({
     </Dialog>
   );
 };
-
-const localStyles = StyleSheet.create({
-  titleSize: {
-    fontSize: 18,
-    lineHeight: 18,
-  },
-  action: {
-    flexDirection: 'column',
-    alignItems: 'flex-end',
-  },
-});

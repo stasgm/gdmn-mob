@@ -11,7 +11,7 @@ import {
   navBackDrawer,
 } from '@lib/mobile-ui';
 
-import { keyExtractor, useFilteredDocList } from '@lib/mobile-app';
+import { keyExtractor, useFilteredDocList } from '@lib/mobile-hooks';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
