@@ -1,8 +1,8 @@
-import { IDeviceLog } from '@lib/types';
+import { IDeviceLog, IDeviceLogFiles } from '@lib/types';
 
 import { DataNotFoundException } from '../exceptions';
 
-import { saveDeviceLogFile } from './errorLogUtils';
+import { saveDeviceLogFile, getFilesObject } from './errorLogUtils';
 
 import { getDb } from './dao/db';
 
@@ -29,7 +29,7 @@ const addOne = async ({
   companyId: string;
   deviceId: string;
 }): Promise<void> => {
-  const { companies, appSystems, users, devices } = getDb();
+  const { companies, appSystems, users } = getDb();
   if (!companies.findById(companyId)) {
     throw new DataNotFoundException('Компания не найдена');
   }
@@ -115,41 +115,8 @@ const addOne = async ({
 //  * @param params Параметры поиска
 //  * @returns Массив объектов подсистем
 //  */
-// const findMany = (params: Record<string, string | number>): IAppSystem[] => {
-//   let appSystemList;
-//   if (process.env.MOCK) {
-//     appSystemList = mockAppSystems;
-//   } else {
-//     appSystemList = getDb().appSystems.data;
-//   }
+const findMany = async (): Promise<IDeviceLogFiles[]> => {
+  return await getFilesObject();
+};
 
-//   appSystemList = appSystemList.filter((item) => {
-//     const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
-
-//     /* filtering data */
-//     let filteredAppSystems = true;
-//     if ('filterText' in newParams) {
-//       const filterText: string = (newParams.filterText as string).toUpperCase();
-
-//       if (filterText) {
-//         const name = item.name.toUpperCase();
-//         const description = item.description?.toUpperCase() || '';
-//         const creationDate = new Date(item.creationDate || '').toLocaleString('ru', { hour12: false });
-//         const editionDate = new Date(item.editionDate || '').toLocaleString('ru', { hour12: false });
-
-//         filteredAppSystems =
-//           name.includes(filterText) ||
-//           description.includes(filterText) ||
-//           creationDate.includes(filterText) ||
-//           editionDate.includes(filterText);
-//       }
-//       delete newParams['filterText'];
-//     }
-
-//     return filteredAppSystems && extraPredicate(item, newParams as Record<string, string>);
-//   });
-
-//   return getListPart(appSystemList, params);
-// };
-
-export { addOne };
+export { addOne, findMany };
