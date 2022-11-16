@@ -10,34 +10,35 @@ import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/device';
 import processActions from '../../store/process';
 import companyActions from '../../store/company';
-import { IMessageHead, IPageParam, IToolBarButton } from '../../types';
+import { deviceLogFiles, IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
 import ProcessListTable from '../../components/process/ProcessListTable';
-import MessageListTable from '../../components/message/MessageListTable';
+import DeviceLogsListTable from '../../components/deviceLogs/DeviceLogsListTable';
 
-const MessageList = () => {
+const DeviceLogsList = () => {
   const dispatch = useDispatch();
 
   const { list: processes, loading, errorMessage, pageParams } = useSelector((state) => state.processes);
   const companies = useSelector((state) => state.companies.list);
 
-  const messageList: IMessageHead[] = [
+  const messageList: deviceLogFiles[] = [
     {
       appSystem: {
         id: '5c66190ef4',
         name: 'gdmn-sales-representative',
       },
       company: { id: 'a60dfec9cf', name: 'Company' },
-      consumer: {
+      contact: {
         id: '407436c548',
         name: 'User',
       },
-      producer: { id: 'd5cf297beb', name: 'gdmn' },
-      createdDate: new Date(),
-      device: { id: 'b8a193619c', name: 'Android' },
       id: generateId(),
-      message: 'r6c391349b_from_d5cf297beb_to_407436c548_dev_b8a193619c.json',
+
+      date: new Date().toISOString(),
+      device: { id: 'b8a193619c', name: 'Android' },
+      path: 'r6c391349b_from_d5cf297beb_to_407436c548_dev_b8a193619c.json',
+      size: '0.04',
     },
     {
       appSystem: {
@@ -45,31 +46,125 @@ const MessageList = () => {
         name: 'gdmn-sales-representative',
       },
       company: { id: 'a60dfec9cf', name: 'Company' },
-      consumer: {
+      contact: {
         id: '495079182b',
         name: 'User1',
       },
-      producer: { id: 'd5cf297beb', name: 'gdmn' },
-      createdDate: new Date(),
-      device: { id: 'f39a2e5af4', name: 'Xiaomi' },
       id: generateId(),
-      message: '78dj2q940a_from_d5cf297beb_to_495079182b_dev_f39a2e5af4.json',
+
+      date: new Date().toISOString(),
+      device: { id: 'f39a2e5af4', name: 'Xiaomi' },
+      path: '78dj2q940a_from_d5cf297beb_to_495079182b_dev_f39a2e5af4.json',
+      size: '0.04',
     },
     {
       appSystem: {
         id: '5c66190ef4',
         name: 'gdmn-sales-representative',
       },
+      id: generateId(),
       company: { id: 'a60dfec9cf', name: 'Company' },
-      consumer: {
+      contact: {
         id: 'e3dfc0ae8f',
         name: 'User2',
       },
-      producer: { id: 'd5cf297beb', name: 'gdmn' },
-      createdDate: new Date(),
+      date: new Date().toString(),
       device: { id: '7a403b958a', name: 'iphone' },
-      id: generateId(),
-      message: 'd6c330949b_from_d5cf297beb_to_e3dfc0ae8f_dev_7a403b958a.json',
+      path: 'd6c330949b_from_d5cf297beb_to_e3dfc0ae8f_dev_7a403b958a.json',
+      size: '0.04',
+    },
+
+    {
+      id: '32b23af795',
+      company: {
+        id: 'a481a7c0-1aeb-11ec-8f86-395fc49b2922',
+        name: 'Бройлерная птицефабрика',
+      },
+      appSystem: {
+        id: 'e5a7ca30-c7cb-11ec-b6db-ed9e2491e4fd',
+        name: 'gdmn-sales-representative',
+      },
+      contact: {
+        id: '89ebee20-1aeb-11ec-8f86-395fc49b2922',
+        name: 'admin',
+      },
+      device: {
+        id: '003b0820-6c8d-11ec-9200-b37a986cab43',
+        name: 'dr',
+      },
+      // eslint-disable-next-line max-len
+      path: 'C:\\d\\.DB\\DB_a481a7c0-1aeb-11ec-8f86-395fc49b2922\\gdmn-sales-representative\\deviceLogs\\from_89ebee20-1aeb-11ec-8f86-395fc49b2922_dev_003b0820-6c8d-11ec-9200-b37a986cab43.json',
+      date: 'Fri Nov 11 2022 13:58:03 GMT+0300 (Москва, стандартное время)',
+      size: '0.0018939971923828125',
+    },
+    {
+      id: 'b24467fec2',
+      company: {
+        id: 'a481a7c0-1aeb-11ec-8f86-395fc49b2922',
+        name: 'Бройлерная птицефабрика',
+      },
+      appSystem: {
+        id: 'e5a7ca30-c7cb-11ec-b6db-ed9e2491e4fd',
+        name: 'gdmn-sales-representative',
+      },
+      contact: {
+        id: '89ebee20-1aeb-11ec-8f86-395fc49b2922',
+        name: 'admin',
+      },
+      device: {
+        id: 'fbdcefc0-1aeb-11ec-8f86-395fc49b2922',
+        name: 'gdmn',
+      },
+      // eslint-disable-next-line max-len
+      path: 'C:\\d\\.DB\\DB_a481a7c0-1aeb-11ec-8f86-395fc49b2922\\gdmn-sales-representative\\deviceLogs\\from_89ebee20-1aeb-11ec-8f86-395fc49b2922_dev_fbdcefc0-1aeb-11ec-8f86-395fc49b2922.json',
+      date: 'Wed Nov 16 2022 14:15:29 GMT+0300 (Москва, стандартное время)',
+      size: '0.0009479522705078125',
+    },
+    {
+      id: 'eb0c06393b',
+      company: {
+        id: 'a481a7c0-1aeb-11ec-8f86-395fc49b2923',
+        name: 'птицефабрика',
+      },
+      appSystem: {
+        id: 'e5a7ca30-c7cb-11ec-b6db-ed9e2491e4fd',
+        name: 'gdmn-sales-representative',
+      },
+      contact: {
+        id: '89ebee20-1aeb-11ec-8f86-395fc49b2922',
+        name: 'admin',
+      },
+      device: {
+        id: '003b0820-6c8d-11ec-9200-b37a986cab43',
+        name: 'dr',
+      },
+      // eslint-disable-next-line max-len
+      path: 'C:\\d\\.DB\\DB_a481a7c0-1aeb-11ec-8f86-395fc49b2923\\gdmn-sales-representative\\deviceLogs\\from_89ebee20-1aeb-11ec-8f86-395fc49b2922_dev_003b0820-6c8d-11ec-9200-b37a986cab43.json',
+      date: 'Tue Nov 15 2022 13:23:01 GMT+0300 (Москва, стандартное время)',
+      size: '0.0018939971923828125',
+    },
+    {
+      id: 'e8ee9d04ad',
+      company: {
+        id: 'a481a7c0-1aeb-11ec-8f86-395fc49b2923',
+        name: 'птицефабрика',
+      },
+      appSystem: {
+        id: 'e5a7ca30-c7cb-11ec-b6db-ed9e2491e4fd',
+        name: 'gdmn-sales-representative',
+      },
+      contact: {
+        id: '89ebee20-1aeb-11ec-8f86-395fc49b2922',
+        name: 'admin',
+      },
+      device: {
+        id: 'ff824cdfa6',
+        name: 'dev5',
+      },
+      // eslint-disable-next-line max-len
+      path: 'C:\\d\\.DB\\DB_a481a7c0-1aeb-11ec-8f86-395fc49b2923\\gdmn-sales-representative\\deviceLogs\\from_89ebee20-1aeb-11ec-8f86-395fc49b2922_dev_ff824cdfa6.json',
+      date: 'Tue Nov 15 2022 18:31:43 GMT+0300 (Москва, стандартное время)',
+      size: '0.0018939971923828125',
     },
   ];
 
@@ -164,7 +259,7 @@ const MessageList = () => {
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <MessageListTable messages={messageList} />
+              <DeviceLogsListTable messages={messageList} />
             </Box>
           )}
         </Container>
@@ -174,4 +269,4 @@ const MessageList = () => {
   );
 };
 
-export default MessageList;
+export default DeviceLogsList;

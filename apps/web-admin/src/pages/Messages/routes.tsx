@@ -1,12 +1,12 @@
 import { Navigate, useRoutes } from 'react-router-dom';
 import { RouteObject } from 'react-router';
 
-import MessageView from './MessageView';
-import MessageList from './MessageList';
+import DeviceLogsView from './DeviceLogsView';
+import DevicelogsList from './DeviceLogsList';
 
 const routes: RouteObject[] = [
-  { path: '/', element: <MessageList /> },
-  { path: '/:id', element: <MessageView /> },
+  { path: '/', element: <DevicelogsList /> },
+  { path: '/:id', element: <DeviceLogsView /> },
   { path: '*', element: <Navigate to="/" /> },
 ];
 

@@ -17,22 +17,22 @@ import {
 } from '@material-ui/core';
 
 import { adminPath } from '../../utils/constants';
-import { IMessageHead } from '../../types';
+import { deviceLogFiles } from '../../types';
 
 interface IProps {
-  messages: IMessageHead[];
-  selectedMessages?: IMessageHead[];
+  messages: deviceLogFiles[];
+  selectedMessages?: deviceLogFiles[];
   limitRows?: number;
   onChangeSelectedMessages?: (newSelectedDeviceIds: any[]) => void;
 }
 
-const MessageListTable = ({
+const DeviceLogsListTable = ({
   messages = [],
   onChangeSelectedMessages,
   selectedMessages = [],
   limitRows = 0,
 }: IProps) => {
-  const [selectedMessageIds, setSelectedMessageIds] = useState<IMessageHead[]>(selectedMessages);
+  const [selectedMessageIds, setSelectedMessageIds] = useState<deviceLogFiles[]>(selectedMessages);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
 
@@ -49,10 +49,10 @@ const MessageListTable = ({
     onChangeSelectedMessages && onChangeSelectedMessages(newSelectedMessageIds);
   };
 
-  const handleSelectOne = (_event: any, message: IMessageHead) => {
-    const selectedIndex = selectedMessageIds.map((item: IMessageHead) => item.id).indexOf(message.id);
+  const handleSelectOne = (_event: any, message: deviceLogFiles) => {
+    const selectedIndex = selectedMessageIds.map((item: deviceLogFiles) => item.id).indexOf(message.id);
 
-    let newSelectedMessageIds: IMessageHead[] = [];
+    let newSelectedMessageIds: deviceLogFiles[] = [];
 
     if (selectedIndex === -1) {
       newSelectedMessageIds = newSelectedMessageIds.concat(selectedMessageIds, message);
@@ -87,7 +87,7 @@ const MessageListTable = ({
 
     if (selectedMessageIds.length === 0) {
       if (selectedMessages.length > 0) {
-        const newSelectedMessageIds = selectedMessages.map((message: IMessageHead) => message);
+        const newSelectedMessageIds = selectedMessages.map((message: deviceLogFiles) => message);
 
         setSelectedMessageIds(newSelectedMessageIds);
       }
@@ -95,14 +95,14 @@ const MessageListTable = ({
   }, [limitRows, selectedMessageIds.length, selectedMessages]);
 
   const TableRows = () => {
-    const messageList = messages.slice(page * limit, page * limit + limit).map((message: IMessageHead) => {
+    const messageList = messages.slice(page * limit, page * limit + limit).map((message: deviceLogFiles) => {
       return (
         <TableRow hover key={message.id} selected={selectedMessageIds.findIndex((d) => d.id === message?.id) !== -1}>
           <TableCell padding="checkbox">
             <Checkbox
               checked={
                 selectedMessageIds
-                  .map((item: IMessageHead) => {
+                  .map((item: deviceLogFiles) => {
                     return item.id;
                   })
                   .indexOf(message.id) !== -1
@@ -120,17 +120,19 @@ const MessageListTable = ({
             >
               <NavLink to={`${adminPath}/app/messages/${message.id}`}>
                 <Typography color="textPrimary" variant="body1" key={message.id}>
-                  {message.message}
+                  {message.path}
                 </Typography>
               </NavLink>
             </Box>
           </TableCell>
           <TableCell>{message.company.name}</TableCell>
           <TableCell>{message.appSystem.name}</TableCell>
-          <TableCell>{message.producer.name}</TableCell>
-          <TableCell>{message.consumer.name}</TableCell>
+          <TableCell>{message.appSystem.name}</TableCell>
+          {/* <TableCell>{message.producer.name}</TableCell>
+          <TableCell>{message.consumer.name}</TableCell> */}
           <TableCell>{message.device.name}</TableCell>
-          <TableCell>{new Date(message.createdDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
+          <TableCell>{new Date(message.date || '').toLocaleString('ru', { hour12: false })}</TableCell>
+          <TableCell>{message.size} мб</TableCell>
         </TableRow>
       );
     });
@@ -167,10 +169,12 @@ const MessageListTable = ({
                 <TableCell>Название</TableCell>
                 <TableCell>Компания</TableCell>
                 <TableCell>Подсистема</TableCell>
-                <TableCell>Отправитель</TableCell>
-                <TableCell>Получатель</TableCell>
+                <TableCell>Пользователь</TableCell>
+                {/* <TableCell>Отправитель</TableCell>
+                <TableCell>Получатель</TableCell> */}
                 <TableCell>Устройство</TableCell>
                 <TableCell>Дата</TableCell>
+                <TableCell>Размер</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -192,4 +196,4 @@ const MessageListTable = ({
   );
 };
 
-export default MessageListTable;
+export default DeviceLogsListTable;

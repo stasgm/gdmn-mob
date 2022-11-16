@@ -1,4 +1,4 @@
-import { INamedEntity } from '@lib/types';
+import { IEntity, INamedEntity } from '@lib/types';
 
 export interface IToolBarButton {
   name: string;
@@ -33,4 +33,14 @@ export interface IMessageHead {
   consumer: INamedEntity;
   device: INamedEntity;
   message: string;
+}
+
+export interface deviceLogFiles extends IEntity {
+  company: INamedEntity;
+  appSystem: INamedEntity;
+  contact: INamedEntity;
+  device: INamedEntity;
+  date: string;
+  size: string;
+  path: string;
 }

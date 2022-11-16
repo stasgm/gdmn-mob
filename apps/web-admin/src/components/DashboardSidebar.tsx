@@ -63,7 +63,7 @@ const items = [
   {
     href: `${adminPath}/app/messages`,
     icon: MessageIcon,
-    title: 'Сообщения',
+    title: 'Журнал ошибок',
   },
   {
     href: `${adminPath}/app/account`,

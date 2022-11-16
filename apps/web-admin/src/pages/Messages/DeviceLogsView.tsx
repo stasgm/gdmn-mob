@@ -34,7 +34,7 @@ export type Params = {
   id: string;
 };
 
-const MessageView = () => {
+const DeviceLogsView = () => {
   const { id } = useParams<keyof Params>() as Params;
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -179,4 +179,4 @@ const MessageView = () => {
   );
 };
 
-export default MessageView;
+export default DeviceLogsView;
