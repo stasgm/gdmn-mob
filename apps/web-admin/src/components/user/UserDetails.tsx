@@ -104,6 +104,8 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
     userERP ? setUserERP(false) : setUserERP(true);
   };
 
+  console.log('user.role', user.role);
+
   return (
     <FormikProvider value={formik}>
       <Box
@@ -240,7 +242,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                   <TextField
                     error={formik.touched.externalId && Boolean(formik.errors.externalId)}
                     fullWidth
-                    required={userERP || user.role !== 'User' ? false : true}
+                    required={userERP || (user.role && user.role !== 'User') ? false : true}
                     label="ID"
                     name="externalId"
                     variant="outlined"
