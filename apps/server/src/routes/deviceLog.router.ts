@@ -1,20 +1,17 @@
 import route from 'koa-joi-router';
 
 import { authMiddleware } from '../middleware/authRequired';
-import { companyMiddleware } from '../middleware/companyRequired';
-import { appSystemMiddleware } from '../middleware/appSystemRequired';
-import { roleBasedParamsMiddlware } from '../middleware/roleBasedParams';
 import { deviceLogValidation } from '../validations';
 import { deviceMiddleware } from '../middleware/deviceRequired';
-import { addDeviceLog, getDeviceLogs, getDeviceLog } from '../controllers/deviceLog';
+import { addDeviceLog, getDeviceLogs, getDeviceLog, removeDeviceLog } from '../controllers/deviceLog';
 
 const deviceLog = route();
 
 deviceLog.prefix('/deviceLogs');
 deviceLog.post('/', deviceLogValidation.addDeviceLog, authMiddleware, deviceMiddleware, addDeviceLog);
-deviceLog.get('/:id', authMiddleware, deviceMiddleware, getDeviceLog);
+deviceLog.get('/:id', deviceLogValidation.getDeviceLog, authMiddleware, deviceMiddleware, getDeviceLog);
 deviceLog.get('/', authMiddleware, deviceMiddleware, getDeviceLogs);
-// deviceLog.patch('/:id', appSystemValidation.updateAppSystem, authMiddleware, appSystemMiddleware, updateAppSystem);
-// deviceLog.delete('/:id', appSystemValidation.removeAppSystem, authMiddleware, appSystemMiddleware, removeAppSystem);
+// deviceLog.patch('/:id', appSystemValidation.updateAppSystem, authMiddleware, updateAppSystem);
+deviceLog.delete('/:id', deviceLogValidation.removeDeviceLog, authMiddleware, removeDeviceLog);
 
 export default deviceLog;

@@ -36,24 +36,13 @@ const getDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
   ok(ctx as Context, deviceLog, 'getDeviceLog: DeviceLog is successfully  received');
 };
 
-// const updateAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
-//   const { id } = ctx.params;
+const removeDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
+  const { id } = ctx.params;
 
-//   const appSystemData = ctx.request.body as Partial<IAppSystem>;
+  await deviceLogService.deleteOne(id);
 
-//   const updatedAppSystem = appSystemService.updateOne(id, appSystemData);
-
-//   ok(ctx as Context, updatedAppSystem,
-//`updateAppSystem: appSystem '${updatedAppSystem.id}' is successfully updated`);
-// };
-
-// const removeAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
-//   const { id } = ctx.params;
-
-//   appSystemService.deleteOne(id);
-
-//   ok(ctx as Context, undefined, `removeAppSystem: appSystem '${id}' is successfully removed`);
-// };
+  ok(ctx as Context, undefined, `removeDeviceLog: DeviceLog '${id}' is successfully removed`);
+};
 
 const getDeviceLogs = async (ctx: ParameterizedContext): Promise<void> => {
   const deviceLogList = await deviceLogService.findMany();
@@ -61,4 +50,4 @@ const getDeviceLogs = async (ctx: ParameterizedContext): Promise<void> => {
   ok(ctx as Context, deviceLogList, 'getDeviceLogs: deviceLogs are successfully received');
 };
 
-export { addDeviceLog, getDeviceLogs, getDeviceLog };
+export { addDeviceLog, getDeviceLogs, getDeviceLog, removeDeviceLog };
