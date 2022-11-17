@@ -12,7 +12,8 @@ import Companies from './pages/Companies';
 import Devices from './pages/Devices';
 import Processes from './pages/Processes';
 import AppSystems from './pages/AppSystems';
-import Messages from './pages/Messages';
+import DeviceLogs from './pages/DeviceLogs';
+// import Messages from './pages/Messages';
 import Register from './pages/Register';
 import Login from './pages/Login';
 // import CompanyDetails from './components/company/CompanyDetails';
@@ -30,7 +31,7 @@ const routes = (isLoggedIn: boolean): RouteObject[] => [
       { path: 'devices/*', element: <Devices /> },
       { path: 'processes/*', element: <Processes /> },
       { path: 'appSystems/*', element: <AppSystems /> },
-      { path: 'messages/*', element: <Messages /> },
+      { path: 'deviceLogs/*', element: <DeviceLogs /> },
       { path: '', element: <Dashboard /> },
       { path: '*', element: <Navigate to={`${adminPath}/404`} /> },
     ],

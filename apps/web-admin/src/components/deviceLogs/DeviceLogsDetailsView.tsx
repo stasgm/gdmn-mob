@@ -1,4 +1,4 @@
-import { IProcess } from '@lib/types';
+import { IDeviceLogFiles, IProcess } from '@lib/types';
 import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@material-ui/core';
 
 import { NavLink } from 'react-router-dom';
@@ -6,10 +6,10 @@ import { NavLink } from 'react-router-dom';
 import { adminPath } from '../../utils/constants';
 
 interface IProps {
-  process: IProcess;
+  deviceLogs: IDeviceLogFiles;
 }
 
-const ProcessDetailsView = ({ process }: IProps) => {
+const DeviceLogsDetailsView = ({ deviceLogs }: IProps) => {
   return (
     <Card>
       <CardHeader title="Общая информация" />
@@ -24,9 +24,9 @@ const ProcessDetailsView = ({ process }: IProps) => {
                 </Typography>
               </Grid>
               <Grid item md={10} xs={6}>
-                <NavLink to={`${adminPath}/app/companies/${process.company?.id}`} key={process.company?.id}>
-                  <Typography color="textPrimary" variant="h4" key={process.company?.id} gutterBottom>
-                    {process.company.name}
+                <NavLink to={`${adminPath}/app/companies/${deviceLogs.company?.id}`} key={deviceLogs.company?.id}>
+                  <Typography color="textPrimary" variant="h4" key={deviceLogs.company?.id} gutterBottom>
+                    {deviceLogs.company.name}
                   </Typography>
                 </NavLink>
               </Grid>
@@ -37,37 +37,37 @@ const ProcessDetailsView = ({ process }: IProps) => {
               </Grid>
               <Grid item md={10} xs={6}>
                 <Typography variant="h4" gutterBottom>
-                  {process.appSystem.name}
+                  {deviceLogs.appSystem.name}
                 </Typography>
               </Grid>
               <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>
-                  Статус
+                  Устройство
                 </Typography>
               </Grid>
               <Grid item md={10} xs={6}>
                 <Typography variant="h4" gutterBottom>
-                  {process.status}
+                  {deviceLogs.device.name}
                 </Typography>
               </Grid>
               <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>
-                  Дата создания
+                  Идентификатор
                 </Typography>
               </Grid>
               <Grid item md={10} xs={6}>
                 <Typography variant="h4" gutterBottom>
-                  {new Date(process.dateBegin || '').toLocaleString('ru', { hour12: false })}
+                  {deviceLogs.device.id}
                 </Typography>
               </Grid>
               <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>
-                  Дата окончания
+                  Пользователь
                 </Typography>
               </Grid>
               <Grid item md={10} xs={6}>
                 <Typography variant="h4" gutterBottom>
-                  {new Date(process.dateEnd || '').toLocaleString('ru', { hour12: false })}
+                  {deviceLogs.contact.name}
                 </Typography>
               </Grid>
             </Grid>
@@ -78,4 +78,4 @@ const ProcessDetailsView = ({ process }: IProps) => {
   );
 };
 
-export default ProcessDetailsView;
+export default DeviceLogsDetailsView;

@@ -1,8 +1,6 @@
 import { ThunkAction } from 'redux-thunk';
 import api from '@lib/client-api';
 
-import { IAppSystem, NewAppSystem } from '@lib/types';
-
 import { AppState } from '..';
 
 import { deviceLogActions, DeviceLogActionType } from './actions';
@@ -29,8 +27,44 @@ const fetchDeviceLogs = (): AppThunk => {
       return dispatch(deviceLogActions.fetchDeviceLogsAsync.failure(response.message));
     }
 
-    return dispatch(deviceLogActions.fetchDeviceLogsAsync.failure('Ошибка получения данных о подсистемах'));
+    return dispatch(deviceLogActions.fetchDeviceLogsAsync.failure('Ошибка получения данных о журнале ошибок'));
   };
 };
 
-export default { fetchDeviceLogs };
+const fetchDeviceLog = (id: string): AppThunk => {
+  return async (dispatch) => {
+    dispatch(deviceLogActions.fetchDeviceLogAsync.request(''));
+
+    const response = await api.deviceLog.getDeviceLog(id);
+
+    if (response.type === 'GET_DEVICELOG') {
+      return dispatch(deviceLogActions.fetchDeviceLogAsync.success(response.deviceLog));
+    }
+
+    if (response.type === 'ERROR') {
+      return dispatch(deviceLogActions.fetchDeviceLogAsync.failure(response.message));
+    }
+
+    return dispatch(deviceLogActions.fetchDeviceLogAsync.failure('Ошибка получения данных о журнале ошибок'));
+  };
+};
+
+const removeDeviceLog = (id: string): AppThunk => {
+  return async (dispatch) => {
+    dispatch(deviceLogActions.fetchDeviceLogAsync.request(''));
+
+    const response = await api.deviceLog.removeDeviceLog(id);
+
+    if (response.type === 'REMOVE_DEVICELOG') {
+      return dispatch(deviceLogActions.removeDeviceLogsAsync.success(id));
+    }
+
+    if (response.type === 'ERROR') {
+      return dispatch(deviceLogActions.removeDeviceLogsAsync.failure(response.message));
+    }
+
+    return dispatch(deviceLogActions.removeDeviceLogsAsync.failure('Ошибка получения данных о журнале ошибок'));
+  };
+};
+
+export default { fetchDeviceLogs, fetchDeviceLog, removeDeviceLog };

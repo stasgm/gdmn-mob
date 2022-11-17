@@ -16,12 +16,13 @@ import {
   Typography,
 } from '@material-ui/core';
 
+import { IDeviceLogFiles } from '@lib/types';
+
 import { adminPath } from '../../utils/constants';
-import { deviceLogFiles } from '../../types';
 
 interface IProps {
-  messages: deviceLogFiles[];
-  selectedMessages?: deviceLogFiles[];
+  messages: IDeviceLogFiles[];
+  selectedMessages?: IDeviceLogFiles[];
   limitRows?: number;
   onChangeSelectedMessages?: (newSelectedDeviceIds: any[]) => void;
 }
@@ -32,7 +33,7 @@ const DeviceLogsListTable = ({
   selectedMessages = [],
   limitRows = 0,
 }: IProps) => {
-  const [selectedMessageIds, setSelectedMessageIds] = useState<deviceLogFiles[]>(selectedMessages);
+  const [selectedMessageIds, setSelectedMessageIds] = useState<IDeviceLogFiles[]>(selectedMessages);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
 
@@ -49,10 +50,10 @@ const DeviceLogsListTable = ({
     onChangeSelectedMessages && onChangeSelectedMessages(newSelectedMessageIds);
   };
 
-  const handleSelectOne = (_event: any, message: deviceLogFiles) => {
-    const selectedIndex = selectedMessageIds.map((item: deviceLogFiles) => item.id).indexOf(message.id);
+  const handleSelectOne = (_event: any, message: IDeviceLogFiles) => {
+    const selectedIndex = selectedMessageIds.map((item: IDeviceLogFiles) => item.id).indexOf(message.id);
 
-    let newSelectedMessageIds: deviceLogFiles[] = [];
+    let newSelectedMessageIds: IDeviceLogFiles[] = [];
 
     if (selectedIndex === -1) {
       newSelectedMessageIds = newSelectedMessageIds.concat(selectedMessageIds, message);
@@ -87,7 +88,7 @@ const DeviceLogsListTable = ({
 
     if (selectedMessageIds.length === 0) {
       if (selectedMessages.length > 0) {
-        const newSelectedMessageIds = selectedMessages.map((message: deviceLogFiles) => message);
+        const newSelectedMessageIds = selectedMessages.map((message: IDeviceLogFiles) => message);
 
         setSelectedMessageIds(newSelectedMessageIds);
       }
@@ -95,14 +96,14 @@ const DeviceLogsListTable = ({
   }, [limitRows, selectedMessageIds.length, selectedMessages]);
 
   const TableRows = () => {
-    const messageList = messages.slice(page * limit, page * limit + limit).map((message: deviceLogFiles) => {
+    const messageList = messages.slice(page * limit, page * limit + limit).map((message: IDeviceLogFiles) => {
       return (
         <TableRow hover key={message.id} selected={selectedMessageIds.findIndex((d) => d.id === message?.id) !== -1}>
           <TableCell padding="checkbox">
             <Checkbox
               checked={
                 selectedMessageIds
-                  .map((item: deviceLogFiles) => {
+                  .map((item: IDeviceLogFiles) => {
                     return item.id;
                   })
                   .indexOf(message.id) !== -1
@@ -118,7 +119,7 @@ const DeviceLogsListTable = ({
                 display: 'flex',
               }}
             >
-              <NavLink to={`${adminPath}/app/messages/${message.id}`}>
+              <NavLink to={`${adminPath}/app/deviceLogs/${message.alias}`}>
                 <Typography color="textPrimary" variant="body1" key={message.id}>
                   {message.path}
                 </Typography>
@@ -134,7 +135,7 @@ const DeviceLogsListTable = ({
           <TableCell>{message.device.id}</TableCell>
           <TableCell>{new Date(message.date || '').toLocaleString('ru', { hour12: false })}</TableCell>
           {/* <TableCell>{message.size} кб</TableCell> */}
-          <TableCell>{Math.ceil(Number(message.size))} кб</TableCell>
+          <TableCell>{Math.ceil(message.size).toString()} кб</TableCell>
         </TableRow>
       );
     });
@@ -175,7 +176,7 @@ const DeviceLogsListTable = ({
                 {/* <TableCell>Отправитель</TableCell>
                 <TableCell>Получатель</TableCell> */}
                 <TableCell>Устройство</TableCell>
-                <TableCell>UID</TableCell>
+                <TableCell>Идентификатор</TableCell>
                 <TableCell>Дата</TableCell>
                 <TableCell>Размер</TableCell>
               </TableRow>

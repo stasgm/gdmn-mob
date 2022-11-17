@@ -10,7 +10,7 @@ import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/device';
 import processActions from '../../store/process';
 import companyActions from '../../store/company';
-import { deviceLogFiles, IPageParam, IToolBarButton } from '../../types';
+import { IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
 import ProcessListTable from '../../components/process/ProcessListTable';
@@ -20,8 +20,7 @@ import deviceLogActions from '../../store/deviceLog';
 const DeviceLogsList = () => {
   const dispatch = useDispatch();
 
-  const { list, loading, errorMessage, pageParams } = useSelector((state) => state.deviceLogs);
-  const companies = useSelector((state) => state.companies.list);
+  const { filesList, loading, errorMessage, pageParams } = useSelector((state) => state.deviceLogs);
 
   const fetchDeviceLogs = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
@@ -35,7 +34,7 @@ const DeviceLogsList = () => {
     fetchDeviceLogs(pageParams?.filterText as string);
   }, [fetchDeviceLogs, pageParams?.filterText]);
 
-  console.log('list', list);
+  console.log('list', filesList);
 
   const fetchProcesses = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
@@ -128,7 +127,7 @@ const DeviceLogsList = () => {
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <DeviceLogsListTable messages={list} />
+              <DeviceLogsListTable messages={filesList} />
             </Box>
           )}
         </Container>

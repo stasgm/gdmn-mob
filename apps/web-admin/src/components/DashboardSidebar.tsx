@@ -61,10 +61,15 @@ const items = [
     title: 'Процессы',
   },
   {
-    href: `${adminPath}/app/messages`,
+    href: `${adminPath}/app/deviceLogs`,
     icon: MessageIcon,
     title: 'Журнал ошибок',
   },
+  // {
+  //   href: `${adminPath}/app/messages`,
+  //   icon: MessageIcon,
+  //   title: 'Журнал ошибок',
+  // },
   {
     href: `${adminPath}/app/account`,
     icon: SettingsIcon,

@@ -34,13 +34,3 @@ export interface IMessageHead {
   device: INamedEntity;
   message: string;
 }
-
-export interface deviceLogFiles extends IEntity {
-  company: INamedEntity;
-  appSystem: INamedEntity;
-  contact: INamedEntity;
-  device: INamedEntity;
-  date: string;
-  size: string;
-  path: string;
-}

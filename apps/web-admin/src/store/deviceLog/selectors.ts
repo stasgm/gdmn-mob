@@ -1,7 +1,7 @@
 import { useSelector } from '..';
 
-const appSystemById = (id: string) => {
-  return useSelector((state) => state.appSystems.list.find((d) => d.id === id));
+const deviceLogById = (id: string) => {
+  return useSelector((state) => state.deviceLogs.filesList.find((d) => d.alias === id));
 };
 
-export default { appSystemById };
+export default { deviceLogById };

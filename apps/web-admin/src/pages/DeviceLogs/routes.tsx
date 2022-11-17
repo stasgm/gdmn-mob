@@ -10,6 +10,6 @@ const routes: RouteObject[] = [
   { path: '*', element: <Navigate to="/" /> },
 ];
 
-export default function Messages() {
+export default function DeviceLogs() {
   return useRoutes(routes);
 }

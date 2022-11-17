@@ -20,15 +20,15 @@ import { IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 
 import processSelectors from '../../store/process/selectors';
-import companySelectors from '../../store/company/selectors';
-import appSystemSelectors from '../../store/appSystem/selectors';
+import deviceLogSelectors from '../../store/deviceLog/selectors';
 import SnackBar from '../../components/SnackBar';
 
-import ProcessDetailsView from '../../components/process/ProcessDetailsView';
-import processActions from '../../store/process';
+import DeviceLogsDetailsView from '../../components/deviceLogs/DeviceLogsDetailsView';
+import deviceLogActions from '../../store/deviceLog';
 import ProcessFiles from '../../components/process/ProcessFiles';
 import ProcessFilesProcessed from '../../components/process/ProcessFilesProcessed';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
+import DeviceLogTable from '../../components/deviceLogs/DeviceLogTable';
 
 export type Params = {
   id: string;
@@ -36,12 +36,25 @@ export type Params = {
 
 const DeviceLogsView = () => {
   const { id } = useParams<keyof Params>() as Params;
+  console.log('id', id);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading, errorMessage } = useSelector((state) => state.processes);
+  const { loading, errorMessage, list, pageParams } = useSelector((state) => state.deviceLogs);
 
-  const process = processSelectors.processById(id);
+  const fetchDeviceLogs = useCallback(
+    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+      dispatch(deviceLogActions.fetchDeviceLog(id));
+    },
+    [dispatch, id],
+  );
+
+  useEffect(() => {
+    // Загружаем данные при загрузке компонента.
+    fetchDeviceLogs(pageParams?.filterText as string);
+  }, [fetchDeviceLogs, pageParams?.filterText]);
+
+  const process = deviceLogSelectors.deviceLogById(id);
   // const company = process?.companyId ? companySelectors.companyById(process.companyId) : undefined;
   // const appSystem = process?.appSystemId ? appSystemSelectors.appSystemById(process.appSystemId) : undefined;
 
@@ -60,7 +73,7 @@ const DeviceLogsView = () => {
   };
 
   const refreshData = useCallback(() => {
-    dispatch(processActions.fetchProcesses());
+    dispatch(deviceLogActions.fetchDeviceLogs());
   }, [dispatch]);
 
   useEffect(() => {
@@ -76,7 +89,7 @@ const DeviceLogsView = () => {
   };
 
   const handleClearError = () => {
-    dispatch(processActions.processActions.clearError());
+    dispatch(deviceLogActions.deviceLogActions.clearError());
   };
 
   if (!process) {
@@ -162,16 +175,16 @@ const DeviceLogsView = () => {
             minHeight: '100%',
           }}
         >
-          <ProcessDetailsView process={process} />
+          <DeviceLogsDetailsView deviceLogs={process} />
         </Box>
         <Box>
           <CardHeader sx={{ mx: 2 }} />
-          <ProcessFiles files={process.files} />
+          <DeviceLogTable deviceLog={list} />
         </Box>
-        <Box>
+        {/*  <Box>
           <CardHeader sx={{ mx: 2 }} />
           <ProcessFilesProcessed processedFilesList={process.processedFiles} />
-        </Box>
+        </Box> */}
       </Box>
 
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
