@@ -2,7 +2,7 @@ import { IDeviceLog, IDeviceLogFiles } from '@lib/types';
 
 import { DataNotFoundException } from '../exceptions';
 
-import { saveDeviceLogFile, getFilesObject } from './errorLogUtils';
+import { saveDeviceLogFile, getFilesObject, getFile } from './errorLogUtils';
 
 import { getDb } from './dao/db';
 
@@ -95,28 +95,21 @@ const addOne = async ({
 //   appSystems.deleteById(id);
 // };
 
-// /**
-//  * Возвращает подсистему по ИД
-//  * @param id ИД подсистемы
-//  * @returns Объект найденной подсистемы
+//**
+//  * Возвращает содержание файла ошибок  по ИД
+//  * @param id ИД сформированный из названия файла
+//  * @returns Объект из JSON  найденного файла
 //  */
-// const findOne = (id: string): IAppSystem => {
-//   const appSystem = getDb().appSystems.findById(id);
+const findOne = async (id: string): Promise<IDeviceLog[]> => {
+  return await getFile(id);
+};
 
-//   if (!appSystem) {
-//     throw new DataNotFoundException('Подсистема не найдена');
-//   }
-
-//   return appSystem;
-// };
-
-// /**
-//  * Возвращает множество подсистем по указанным параметрам
-//  * @param params Параметры поиска
-//  * @returns Массив объектов подсистем
-//  */
+/**
+ * Возвращает множество файлов ошибок по указанным параметрам
+ * @returns Массив объектов файлов ошибок
+ */
 const findMany = async (): Promise<IDeviceLogFiles[]> => {
   return await getFilesObject();
 };
 
-export { addOne, findMany };
+export { addOne, findMany, findOne };
