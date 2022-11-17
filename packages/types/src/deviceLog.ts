@@ -28,6 +28,7 @@ export interface IDeviceLogFiles extends IEntity {
   contact: INamedEntity;
   device: INamedEntity;
   date: string;
-  size: string;
+  size: number;
   path: string;
+  alias: string;
 }

@@ -28,6 +28,14 @@ const addDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
   created(ctx as Context, undefined, `add deviceLog: DeviceLog for device uid=${deviceId} is successfully created`);
 };
 
+const getDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
+  const { id } = ctx.params;
+
+  const deviceLog = await deviceLogService.findOne(id);
+
+  ok(ctx as Context, deviceLog, 'getDeviceLog: DeviceLog is successfully  received');
+};
+
 // const updateAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
 //   const { id } = ctx.params;
 
@@ -53,4 +61,4 @@ const getDeviceLogs = async (ctx: ParameterizedContext): Promise<void> => {
   ok(ctx as Context, deviceLogList, 'getDeviceLogs: deviceLogs are successfully received');
 };
 
-export { addDeviceLog, getDeviceLogs };
+export { addDeviceLog, getDeviceLogs, getDeviceLog };

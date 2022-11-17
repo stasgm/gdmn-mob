@@ -42,6 +42,24 @@ export const getDeviceLogFullFileName = (params: IPathParams, fileInfo: IFileDev
   return path.join(filePath, getParamsDeviceLogFileName(fileInfo));
 };
 
+export const fullFileName2alias = (fullFileName: string): string | undefined => {
+  const re = /db_(.+)/gi;
+  const match = re.exec(fullFileName);
+  const shortName = (match ? match[1] : fullFileName).split('\\');
+  if (shortName.length !== 4) return undefined;
+  return `db_${shortName[0]}_app_${shortName[1]}_dir_${shortName[2]}_${shortName[3]}`;
+};
+
+export const alias2fullFileName = (alias: string): string | undefined => {
+  const re = /db_(.+)_app_(.+)_dir_(.+)_from_(.+)/gi;
+  const match = re.exec(alias);
+  if (!match) {
+    log.error(`Invalid deviceLogs file alias ${alias}`);
+    return undefined;
+  }
+  return getPath([`db_${match[1]}\\${match[2]}\\${match[3]}\\from_${match[4]}`]);
+};
+
 const readJsonFile = async (fileName: string): Promise<IDeviceLog[] | string> => {
   const check = await checkFileExists(fileName);
   try {
@@ -183,8 +201,14 @@ const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined
   const fullFileName = getDeviceLogFullFileName(pathParams, fileInfo);
 
   const fileStat = statSync(fullFileName);
-  const fileSize = (fileStat.size / BYTES_PER_KB).toString();
+  const fileSize = fileStat.size / BYTES_PER_KB;
   const fileDate = fileStat.birthtime.toString();
+
+  const alias = fullFileName2alias(fullFileName);
+  if (!alias) {
+    log.error(`Invalid deviceLogs file name ${fullFileName}`);
+    return undefined;
+  }
 
   return {
     id: generateId(),
@@ -195,6 +219,7 @@ const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined
     path: fullFileName,
     date: fileDate,
     size: fileSize,
+    alias: alias,
   };
 };
 
@@ -209,4 +234,18 @@ export const getFilesObject = async (): Promise<IDeviceLogFiles[]> => {
     if (fileObj) fileObjs = [...fileObjs, fileObj];
   }
   return fileObjs;
+};
+
+export const getFile = async (fid: string): Promise<IDeviceLog[]> => {
+  const fullName = alias2fullFileName(fid);
+  if (!fullName) {
+    log.error(`Неправильный параметр ID '${fid} в запросе`);
+    return [];
+  }
+  const deviceLog = await readJsonFile(fullName);
+  if (typeof deviceLog === 'string') {
+    log.error(deviceLog);
+    return [];
+  }
+  return deviceLog;
 };
