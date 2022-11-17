@@ -30,5 +30,4 @@ export interface IDeviceLogFiles extends IEntity {
   date: string;
   size: number;
   path: string;
-  alias: string;
 }

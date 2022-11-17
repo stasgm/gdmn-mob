@@ -1,5 +1,5 @@
 import path from 'path';
-import { access, writeFile, readFile, readdir, stat } from 'fs/promises';
+import { access, writeFile, readFile, readdir, unlink } from 'fs/promises';
 import { constants, statSync } from 'fs';
 
 import { IPathParams, IFileDeviceLogInfo, IDeviceLog, IDeviceLogFiles } from '@lib/types';
@@ -25,7 +25,6 @@ export const checkFileExists = async (path: string): Promise<boolean> => {
 
 export const getPath = (folders: string[], fn = '') => {
   const folderPath = path.join(getDb().dbPath, ...folders);
-  checkFileExists(folderPath);
   return path.join(folderPath, fn);
 };
 
@@ -211,7 +210,7 @@ const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined
   }
 
   return {
-    id: generateId(),
+    id: alias,
     company: { id: arr[0], name: companyName },
     appSystem: { id: appSystemId, name: arr[1] },
     contact: { id: match[1], name: contactName },
@@ -219,7 +218,6 @@ const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined
     path: fullFileName,
     date: fileDate,
     size: fileSize,
-    alias: alias,
   };
 };
 
@@ -248,4 +246,23 @@ export const getFile = async (fid: string): Promise<IDeviceLog[]> => {
     return [];
   }
   return deviceLog;
+};
+
+export const deleteFileById = async (fid: string): Promise<void> => {
+  const fullName = alias2fullFileName(fid);
+  if (!fullName) {
+    log.error(`Неправильный параметр ID '${fid} в запросе`);
+    return;
+  }
+  const deviceLog = await readJsonFile(fullName);
+  if (typeof deviceLog === 'string') {
+    log.error(deviceLog);
+    return;
+  }
+  const check = await checkFileExists(fullName);
+  if (!check) {
+    log.error(`Файл '${fullName} не найден`);
+    return;
+  }
+  return unlink(fullName);
 };

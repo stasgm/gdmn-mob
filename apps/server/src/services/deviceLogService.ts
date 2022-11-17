@@ -2,7 +2,7 @@ import { IDeviceLog, IDeviceLogFiles } from '@lib/types';
 
 import { DataNotFoundException } from '../exceptions';
 
-import { saveDeviceLogFile, getFilesObject, getFile } from './errorLogUtils';
+import { saveDeviceLogFile, getFilesObject, getFile, deleteFileById } from './errorLogUtils';
 
 import { getDb } from './dao/db';
 
@@ -45,55 +45,13 @@ const addOne = async ({
   return await saveDeviceLogFile(deviceLog, { companyId, appSystemId }, { producerId, deviceId });
 };
 
-// /**
-//  * Обновляет подсистему по ИД
-//  * @param id ИД подсистемы
-//  * @param appSystemData Новые данные подсистемы
-//  * @returns Обновленный объект подсистемы
-//  */
-// const updateOne = (id: string, appSystemData: Partial<IAppSystem>): IAppSystem => {
-//   const { appSystems } = getDb();
-
-//   const appSystemObj = appSystems.findById(id);
-
-//   if (!appSystemObj) {
-//     throw new DataNotFoundException('Подсистема не найдена');
-//   }
-
-//   if (appSystems.data.find((el) => el.name === appSystemData.name && el.id !== appSystemData.id)) {
-//     throw new ConflictException(`Подсистема с названием ${appSystemData.name} уже существует`);
-//   }
-
-//   appSystems.update({
-//     id,
-//     name: appSystemData.name || appSystemObj.name,
-//     description: appSystemData.description === undefined ? appSystemObj.description : appSystemData.description,
-//     creationDate: appSystemObj.creationDate,
-//     editionDate: new Date().toISOString(),
-//   });
-
-//   const updatedAppSystem = appSystems.findById(id);
-
-//   if (!updatedAppSystem) {
-//     throw new DataNotFoundException('Подсистема не найдена');
-//   }
-
-//   return updatedAppSystem;
-// };
-
-// /**
-//  * Удаляет подсистему по ИД
-//  * @param id ИД подсистемы
-//  */
-// const deleteOne = (id: string): void => {
-//   const { appSystems } = getDb();
-
-//   if (!appSystems.findById(id)) {
-//     throw new DataNotFoundException('Подсистема не найдена');
-//   }
-
-//   appSystems.deleteById(id);
-// };
+/**
+/* Удаляет  файла по ИД
+/* @param id ИД файла
+*/
+const deleteOne = async (id: string): Promise<void> => {
+  return await deleteFileById(id);
+};
 
 //**
 //  * Возвращает содержание файла ошибок  по ИД
@@ -112,4 +70,4 @@ const findMany = async (): Promise<IDeviceLogFiles[]> => {
   return await getFilesObject();
 };
 
-export { addOne, findMany, findOne };
+export { addOne, findMany, findOne, deleteOne };
