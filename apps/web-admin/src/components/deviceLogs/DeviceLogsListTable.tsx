@@ -127,12 +127,14 @@ const DeviceLogsListTable = ({
           </TableCell>
           <TableCell>{message.company.name}</TableCell>
           <TableCell>{message.appSystem.name}</TableCell>
-          <TableCell>{message.appSystem.name}</TableCell>
+          <TableCell>{message.contact.name}</TableCell>
           {/* <TableCell>{message.producer.name}</TableCell>
           <TableCell>{message.consumer.name}</TableCell> */}
           <TableCell>{message.device.name}</TableCell>
+          <TableCell>{message.device.id}</TableCell>
           <TableCell>{new Date(message.date || '').toLocaleString('ru', { hour12: false })}</TableCell>
-          <TableCell>{message.size} мб</TableCell>
+          {/* <TableCell>{message.size} кб</TableCell> */}
+          <TableCell>{Math.ceil(Number(message.size))} кб</TableCell>
         </TableRow>
       );
     });
@@ -173,6 +175,7 @@ const DeviceLogsListTable = ({
                 {/* <TableCell>Отправитель</TableCell>
                 <TableCell>Получатель</TableCell> */}
                 <TableCell>Устройство</TableCell>
+                <TableCell>UID</TableCell>
                 <TableCell>Дата</TableCell>
                 <TableCell>Размер</TableCell>
               </TableRow>

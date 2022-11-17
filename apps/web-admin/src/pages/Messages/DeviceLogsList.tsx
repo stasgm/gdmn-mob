@@ -15,158 +15,27 @@ import CircularProgressWithContent from '../../components/CircularProgressWidthC
 import SnackBar from '../../components/SnackBar';
 import ProcessListTable from '../../components/process/ProcessListTable';
 import DeviceLogsListTable from '../../components/deviceLogs/DeviceLogsListTable';
+import deviceLogActions from '../../store/deviceLog';
 
 const DeviceLogsList = () => {
   const dispatch = useDispatch();
 
-  const { list: processes, loading, errorMessage, pageParams } = useSelector((state) => state.processes);
+  const { list, loading, errorMessage, pageParams } = useSelector((state) => state.deviceLogs);
   const companies = useSelector((state) => state.companies.list);
 
-  const messageList: deviceLogFiles[] = [
-    {
-      appSystem: {
-        id: '5c66190ef4',
-        name: 'gdmn-sales-representative',
-      },
-      company: { id: 'a60dfec9cf', name: 'Company' },
-      contact: {
-        id: '407436c548',
-        name: 'User',
-      },
-      id: generateId(),
+  const fetchDeviceLogs = useCallback(
+    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+      dispatch(deviceLogActions.fetchDeviceLogs());
+    },
+    [dispatch],
+  );
 
-      date: new Date().toISOString(),
-      device: { id: 'b8a193619c', name: 'Android' },
-      path: 'r6c391349b_from_d5cf297beb_to_407436c548_dev_b8a193619c.json',
-      size: '0.04',
-    },
-    {
-      appSystem: {
-        id: '5c66190ef4',
-        name: 'gdmn-sales-representative',
-      },
-      company: { id: 'a60dfec9cf', name: 'Company' },
-      contact: {
-        id: '495079182b',
-        name: 'User1',
-      },
-      id: generateId(),
+  useEffect(() => {
+    // Загружаем данные при загрузке компонента.
+    fetchDeviceLogs(pageParams?.filterText as string);
+  }, [fetchDeviceLogs, pageParams?.filterText]);
 
-      date: new Date().toISOString(),
-      device: { id: 'f39a2e5af4', name: 'Xiaomi' },
-      path: '78dj2q940a_from_d5cf297beb_to_495079182b_dev_f39a2e5af4.json',
-      size: '0.04',
-    },
-    {
-      appSystem: {
-        id: '5c66190ef4',
-        name: 'gdmn-sales-representative',
-      },
-      id: generateId(),
-      company: { id: 'a60dfec9cf', name: 'Company' },
-      contact: {
-        id: 'e3dfc0ae8f',
-        name: 'User2',
-      },
-      date: new Date().toString(),
-      device: { id: '7a403b958a', name: 'iphone' },
-      path: 'd6c330949b_from_d5cf297beb_to_e3dfc0ae8f_dev_7a403b958a.json',
-      size: '0.04',
-    },
-
-    {
-      id: '32b23af795',
-      company: {
-        id: 'a481a7c0-1aeb-11ec-8f86-395fc49b2922',
-        name: 'Бройлерная птицефабрика',
-      },
-      appSystem: {
-        id: 'e5a7ca30-c7cb-11ec-b6db-ed9e2491e4fd',
-        name: 'gdmn-sales-representative',
-      },
-      contact: {
-        id: '89ebee20-1aeb-11ec-8f86-395fc49b2922',
-        name: 'admin',
-      },
-      device: {
-        id: '003b0820-6c8d-11ec-9200-b37a986cab43',
-        name: 'dr',
-      },
-      // eslint-disable-next-line max-len
-      path: 'C:\\d\\.DB\\DB_a481a7c0-1aeb-11ec-8f86-395fc49b2922\\gdmn-sales-representative\\deviceLogs\\from_89ebee20-1aeb-11ec-8f86-395fc49b2922_dev_003b0820-6c8d-11ec-9200-b37a986cab43.json',
-      date: 'Fri Nov 11 2022 13:58:03 GMT+0300 (Москва, стандартное время)',
-      size: '0.0018939971923828125',
-    },
-    {
-      id: 'b24467fec2',
-      company: {
-        id: 'a481a7c0-1aeb-11ec-8f86-395fc49b2922',
-        name: 'Бройлерная птицефабрика',
-      },
-      appSystem: {
-        id: 'e5a7ca30-c7cb-11ec-b6db-ed9e2491e4fd',
-        name: 'gdmn-sales-representative',
-      },
-      contact: {
-        id: '89ebee20-1aeb-11ec-8f86-395fc49b2922',
-        name: 'admin',
-      },
-      device: {
-        id: 'fbdcefc0-1aeb-11ec-8f86-395fc49b2922',
-        name: 'gdmn',
-      },
-      // eslint-disable-next-line max-len
-      path: 'C:\\d\\.DB\\DB_a481a7c0-1aeb-11ec-8f86-395fc49b2922\\gdmn-sales-representative\\deviceLogs\\from_89ebee20-1aeb-11ec-8f86-395fc49b2922_dev_fbdcefc0-1aeb-11ec-8f86-395fc49b2922.json',
-      date: 'Wed Nov 16 2022 14:15:29 GMT+0300 (Москва, стандартное время)',
-      size: '0.0009479522705078125',
-    },
-    {
-      id: 'eb0c06393b',
-      company: {
-        id: 'a481a7c0-1aeb-11ec-8f86-395fc49b2923',
-        name: 'птицефабрика',
-      },
-      appSystem: {
-        id: 'e5a7ca30-c7cb-11ec-b6db-ed9e2491e4fd',
-        name: 'gdmn-sales-representative',
-      },
-      contact: {
-        id: '89ebee20-1aeb-11ec-8f86-395fc49b2922',
-        name: 'admin',
-      },
-      device: {
-        id: '003b0820-6c8d-11ec-9200-b37a986cab43',
-        name: 'dr',
-      },
-      // eslint-disable-next-line max-len
-      path: 'C:\\d\\.DB\\DB_a481a7c0-1aeb-11ec-8f86-395fc49b2923\\gdmn-sales-representative\\deviceLogs\\from_89ebee20-1aeb-11ec-8f86-395fc49b2922_dev_003b0820-6c8d-11ec-9200-b37a986cab43.json',
-      date: 'Tue Nov 15 2022 13:23:01 GMT+0300 (Москва, стандартное время)',
-      size: '0.0018939971923828125',
-    },
-    {
-      id: 'e8ee9d04ad',
-      company: {
-        id: 'a481a7c0-1aeb-11ec-8f86-395fc49b2923',
-        name: 'птицефабрика',
-      },
-      appSystem: {
-        id: 'e5a7ca30-c7cb-11ec-b6db-ed9e2491e4fd',
-        name: 'gdmn-sales-representative',
-      },
-      contact: {
-        id: '89ebee20-1aeb-11ec-8f86-395fc49b2922',
-        name: 'admin',
-      },
-      device: {
-        id: 'ff824cdfa6',
-        name: 'dev5',
-      },
-      // eslint-disable-next-line max-len
-      path: 'C:\\d\\.DB\\DB_a481a7c0-1aeb-11ec-8f86-395fc49b2923\\gdmn-sales-representative\\deviceLogs\\from_89ebee20-1aeb-11ec-8f86-395fc49b2922_dev_ff824cdfa6.json',
-      date: 'Tue Nov 15 2022 18:31:43 GMT+0300 (Москва, стандартное время)',
-      size: '0.0018939971923828125',
-    },
-  ];
+  console.log('list', list);
 
   const fetchProcesses = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
@@ -259,7 +128,7 @@ const DeviceLogsList = () => {
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <DeviceLogsListTable messages={messageList} />
+              <DeviceLogsListTable messages={list} />
             </Box>
           )}
         </Container>

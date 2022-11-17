@@ -1,4 +1,4 @@
-import { IDeviceLog } from '@lib/types';
+import { IDeviceLogFiles } from '@lib/types';
 
 export interface IDeviceLogQueryResponse {
   type: 'GET_DEVICELOGS' | 'ADD_DEVICELOG';
@@ -6,7 +6,7 @@ export interface IDeviceLogQueryResponse {
 
 export interface IGetDeviceLogsResponse extends IDeviceLogQueryResponse {
   type: 'GET_DEVICELOGS';
-  deviceLogs: IDeviceLog[];
+  deviceLogs: IDeviceLogFiles[];
 }
 
 export interface IAddDeviceLogResponse extends IDeviceLogQueryResponse {
