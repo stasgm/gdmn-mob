@@ -21,16 +21,16 @@ import { IDeviceLogFiles } from '@lib/types';
 import { adminPath } from '../../utils/constants';
 
 interface IProps {
-  messages: IDeviceLogFiles[];
-  selectedMessages?: IDeviceLogFiles[];
+  deviceLogFiles: IDeviceLogFiles[];
+  selectedDeviceLogFiles?: IDeviceLogFiles[];
   limitRows?: number;
   onChangeSelectedMessages?: (newSelectedDeviceIds: any[]) => void;
 }
 
-const DeviceLogsListTable = ({
-  messages = [],
+const DeviceLogFilesListTable = ({
+  deviceLogFiles = [],
   onChangeSelectedMessages,
-  selectedMessages = [],
+  selectedDeviceLogFiles = [],
   limitRows = 0,
 }: IProps) => {
   const [selectedMessageIds, setSelectedMessageIds] = useState<IDeviceLogFiles[]>(selectedMessages);
@@ -119,7 +119,7 @@ const DeviceLogsListTable = ({
                 display: 'flex',
               }}
             >
-              <NavLink to={`${adminPath}/app/deviceLogs/${message.alias}`}>
+              <NavLink to={`${adminPath}/app/deviceLogs/${message.id}`}>
                 <Typography color="textPrimary" variant="body1" key={message.id}>
                   {message.path}
                 </Typography>
@@ -200,4 +200,4 @@ const DeviceLogsListTable = ({
   );
 };
 
-export default DeviceLogsListTable;
+export default DeviceLogFilesListTable;

@@ -3,62 +3,33 @@ import { Box, Container } from '@material-ui/core';
 import { useCallback, useEffect, useState } from 'react';
 import CachedIcon from '@material-ui/icons/Cached';
 
-import { generateId } from '@lib/client-api/dist/src/utils';
-
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/device';
-import processActions from '../../store/process';
-import companyActions from '../../store/company';
 import { IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
-import ProcessListTable from '../../components/process/ProcessListTable';
-import DeviceLogsListTable from '../../components/deviceLogs/DeviceLogsListTable';
+import DeviceLogFilesListTable from '../../components/deviceLogs/DeviceLogFilesListTable';
 import deviceLogActions from '../../store/deviceLog';
 
-const DeviceLogsList = () => {
+const DeviceLogFilesList = () => {
   const dispatch = useDispatch();
 
   const { filesList, loading, errorMessage, pageParams } = useSelector((state) => state.deviceLogs);
 
-  const fetchDeviceLogs = useCallback(
+  const fetchDeviceLogFiles = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(deviceLogActions.fetchDeviceLogs());
+      dispatch(deviceLogActions.fetchDeviceLogFiles());
     },
     [dispatch],
   );
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchDeviceLogs(pageParams?.filterText as string);
-  }, [fetchDeviceLogs, pageParams?.filterText]);
+    fetchDeviceLogFiles(pageParams?.filterText as string);
+  }, [fetchDeviceLogFiles, pageParams?.filterText]);
 
   console.log('list', filesList);
-
-  const fetchProcesses = useCallback(
-    (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(processActions.fetchProcesses(filterText, fromRecord, toRecord));
-    },
-    [dispatch],
-  );
-
-  useEffect(() => {
-    // Загружаем данные при загрузке компонента.
-    fetchProcesses(pageParams?.filterText as string);
-  }, [fetchProcesses, pageParams?.filterText]);
-
-  const fetchCompanies = useCallback(async () => {
-    await dispatch(companyActions.fetchCompanies());
-  }, [dispatch]);
-
-  useEffect(() => {
-    // Загружаем данные при загрузке компонента.
-    fetchCompanies();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
@@ -74,10 +45,7 @@ const DeviceLogsList = () => {
 
   const handleSearchClick = () => {
     dispatch(actions.deviceActions.setPageParam({ filterText: pageParamLocal?.filterText }));
-    fetchProcesses(pageParamLocal?.filterText as string);
-
-    // const inputValue = valueRef?.current?.value;
-    // fetchDevices(inputValue);
+    fetchDeviceLogFiles(pageParamLocal?.filterText as string);
   };
 
   const handleKeyPress = (key: string) => {
@@ -96,7 +64,7 @@ const DeviceLogsList = () => {
     {
       name: 'Обновить',
       sx: { mx: 1 },
-      onClick: () => fetchProcesses(),
+      onClick: () => fetchDeviceLogFiles(),
       icon: <CachedIcon />,
     },
   ];
@@ -104,7 +72,7 @@ const DeviceLogsList = () => {
   return (
     <>
       <Helmet>
-        <title>Процессы</title>
+        <title>Журнал ошибок</title>
       </Helmet>
       <Box
         sx={{
@@ -116,7 +84,7 @@ const DeviceLogsList = () => {
         <Container maxWidth={false}>
           <ToolbarActionsWithSearch
             buttons={buttons}
-            searchTitle={'Найти сообщение'}
+            searchTitle={'Найти файл'}
             //valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
@@ -127,7 +95,7 @@ const DeviceLogsList = () => {
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <DeviceLogsListTable messages={filesList} />
+              <DeviceLogFilesListTable deviceLogFiles={filesList} />
             </Box>
           )}
         </Container>
@@ -137,4 +105,4 @@ const DeviceLogsList = () => {
   );
 };
 
-export default DeviceLogsList;
+export default DeviceLogFilesList;

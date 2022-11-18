@@ -91,14 +91,14 @@ class DeviceLog extends BaseRequest {
     }
   };
 
-  getDeviceLogs = async (params?: Record<string, string | number>) => {
+  getDeviceLogFiles = async (params?: Record<string, string | number>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'GET_DEVICELOGS',
         // deviceLogs: mockDeviceLogs,
-      } as types.IGetDeviceLogsResponse;
+      } as types.IGetDeviceLogFilesResponse;
     }
 
     let paramText = params ? getParams(params) : '';
@@ -117,7 +117,7 @@ class DeviceLog extends BaseRequest {
         return {
           type: 'GET_DEVICELOGS',
           deviceLogs: resData?.data || [],
-        } as types.IGetDeviceLogsResponse;
+        } as types.IGetDeviceLogFilesResponse;
       }
 
       return {

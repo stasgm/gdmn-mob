@@ -19,14 +19,11 @@ import { useSelector, useDispatch } from '../../store';
 import { IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 
-import processSelectors from '../../store/process/selectors';
 import deviceLogSelectors from '../../store/deviceLog/selectors';
 import SnackBar from '../../components/SnackBar';
 
-import DeviceLogsDetailsView from '../../components/deviceLogs/DeviceLogsDetailsView';
+import DeviceLogsDetailsView from '../../components/deviceLogs/DeviceLogDetailsView';
 import deviceLogActions from '../../store/deviceLog';
-import ProcessFiles from '../../components/process/ProcessFiles';
-import ProcessFilesProcessed from '../../components/process/ProcessFilesProcessed';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import DeviceLogTable from '../../components/deviceLogs/DeviceLogTable';
 
@@ -34,13 +31,13 @@ export type Params = {
   id: string;
 };
 
-const DeviceLogsView = () => {
+const DeviceLogView = () => {
   const { id } = useParams<keyof Params>() as Params;
   console.log('id', id);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading, errorMessage, list, pageParams } = useSelector((state) => state.deviceLogs);
+  const { loading, errorMessage, logList, pageParams } = useSelector((state) => state.deviceLogs);
 
   const fetchDeviceLogs = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
@@ -55,8 +52,6 @@ const DeviceLogsView = () => {
   }, [fetchDeviceLogs, pageParams?.filterText]);
 
   const process = deviceLogSelectors.deviceLogById(id);
-  // const company = process?.companyId ? companySelectors.companyById(process.companyId) : undefined;
-  // const appSystem = process?.appSystemId ? appSystemSelectors.appSystemById(process.appSystemId) : undefined;
 
   const [open, setOpen] = useState(false);
 
@@ -66,14 +61,14 @@ const DeviceLogsView = () => {
 
   const handleDelete = async () => {
     setOpen(false);
-    const res = await dispatch(processActions.removeProcess(id));
-    if (res.type === 'PROCESS/REMOVE_SUCCESS') {
+    const res = await dispatch(deviceLogActions.removeDeviceLog(id));
+    if (res.type === 'DEVICE_LOG/REMOVE_DEVICE_LOG_SUCCESS') {
       navigate(-1);
     }
   };
 
   const refreshData = useCallback(() => {
-    dispatch(deviceLogActions.fetchDeviceLogs());
+    dispatch(deviceLogActions.fetchDeviceLogFiles());
   }, [dispatch]);
 
   useEffect(() => {
@@ -130,7 +125,7 @@ const DeviceLogsView = () => {
       <Box>
         <Dialog open={open} onClose={handleClose}>
           <DialogContent>
-            <DialogContentText color="black">Вы действительно хотите удалить процесс?</DialogContentText>
+            <DialogContentText color="black">Вы действительно хотите удалить журнал ошибок?</DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleDelete} color="primary" variant="contained">
@@ -179,7 +174,7 @@ const DeviceLogsView = () => {
         </Box>
         <Box>
           <CardHeader sx={{ mx: 2 }} />
-          <DeviceLogTable deviceLog={list} />
+          <DeviceLogTable deviceLog={logList} />
         </Box>
         {/*  <Box>
           <CardHeader sx={{ mx: 2 }} />
@@ -192,4 +187,4 @@ const DeviceLogsView = () => {
   );
 };
 
-export default DeviceLogsView;
+export default DeviceLogView;

@@ -4,7 +4,7 @@ export interface IDeviceLogQueryResponse {
   type: 'GET_DEVICELOGS' | 'GET_DEVICELOG' | 'ADD_DEVICELOG' | 'REMOVE_DEVICELOG';
 }
 
-export interface IGetDeviceLogsResponse extends IDeviceLogQueryResponse {
+export interface IGetDeviceLogFilesResponse extends IDeviceLogQueryResponse {
   type: 'GET_DEVICELOGS';
   deviceLogs: IDeviceLogFiles[];
 }

@@ -5,7 +5,7 @@ import { IDeviceLogState } from './types';
 import { DeviceLogActionType, deviceLogActions } from './actions';
 
 const initialState: Readonly<IDeviceLogState> = {
-  list: [],
+  logList: [],
   filesList: [],
   loading: false,
   errorMessage: '',
@@ -23,17 +23,17 @@ const reducer: Reducer<IDeviceLogState, DeviceLogActionType> = (state = initialS
     case getType(deviceLogActions.setError):
       return { ...state, errorMessage: 'Подсистема уже существует' };
 
-    case getType(deviceLogActions.fetchDeviceLogsAsync.request):
+    case getType(deviceLogActions.fetchDeviceLogFilesAsync.request):
       return { ...state, loading: true, filesList: [], errorMessage: '' };
 
-    case getType(deviceLogActions.fetchDeviceLogsAsync.success):
+    case getType(deviceLogActions.fetchDeviceLogFilesAsync.success):
       return {
         ...state,
         filesList: action.payload,
         loading: false,
       };
 
-    case getType(deviceLogActions.fetchDeviceLogsAsync.failure):
+    case getType(deviceLogActions.fetchDeviceLogFilesAsync.failure):
       return {
         ...state,
         loading: false,
@@ -41,12 +41,12 @@ const reducer: Reducer<IDeviceLogState, DeviceLogActionType> = (state = initialS
       };
 
     case getType(deviceLogActions.fetchDeviceLogAsync.request):
-      return { ...state, loading: true, list: [], errorMessage: '' };
+      return { ...state, loading: true, logList: [], errorMessage: '' };
 
     case getType(deviceLogActions.fetchDeviceLogAsync.success):
       return {
         ...state,
-        list: action.payload,
+        logList: action.payload,
         loading: false,
       };
 
@@ -58,7 +58,7 @@ const reducer: Reducer<IDeviceLogState, DeviceLogActionType> = (state = initialS
       };
 
     case getType(deviceLogActions.removeDeviceLogsAsync.request):
-      return { ...state, loading: true, list: [], errorMessage: '' };
+      return { ...state, loading: true, logList: [], errorMessage: '' };
 
     case getType(deviceLogActions.removeDeviceLogsAsync.success):
       return {

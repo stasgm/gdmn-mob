@@ -9,7 +9,7 @@ interface IProps {
   deviceLogs: IDeviceLogFiles;
 }
 
-const DeviceLogsDetailsView = ({ deviceLogs }: IProps) => {
+const DeviceLogDetailsView = ({ deviceLogs }: IProps) => {
   return (
     <Card>
       <CardHeader title="Общая информация" />
@@ -78,4 +78,4 @@ const DeviceLogsDetailsView = ({ deviceLogs }: IProps) => {
   );
 };
 
-export default DeviceLogsDetailsView;
+export default DeviceLogDetailsView;
