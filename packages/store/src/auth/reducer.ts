@@ -41,6 +41,7 @@ export const initialState: Readonly<AuthState> = {
   isInit: false,
   isConfigFirst: true,
   isLogout: false,
+  errorMessage: '',
 };
 
 const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, action): AuthState => {
@@ -220,6 +221,9 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
 
     case getType(actions.setDemoModeAsync.failure):
       return { ...state, loadingData: false, status: '', error: true };
+
+    case getType(actions.setErrorMessage):
+      return { ...state, errorMessage: action.payload };
 
     default:
       return state;

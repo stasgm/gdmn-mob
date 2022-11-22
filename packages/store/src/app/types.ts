@@ -1,4 +1,4 @@
-import { IDeviceLog, INamedEntity } from '@lib/types';
+import { IDeviceLog } from '@lib/types';
 
 export interface IFormParam {
   [fieldName: string]: unknown;

@@ -25,11 +25,7 @@ const fetchAppSystems = (filterText?: string, fromRecord?: number, toRecord?: nu
       return dispatch(appSystemActions.fetchAppSystemsAsync.success(response.appSystems));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(appSystemActions.fetchAppSystemsAsync.failure(response.message));
-    }
-
-    return dispatch(appSystemActions.fetchAppSystemsAsync.failure('Ошибка получения данных о подсистемах'));
+    return dispatch(appSystemActions.fetchAppSystemsAsync.failure(response.message));
   };
 };
 
@@ -43,11 +39,7 @@ const fetchAppSystemById = (id: string): AppThunk => {
       return dispatch(appSystemActions.fetchAppSystemAsync.success(response.appSystem));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(appSystemActions.fetchAppSystemAsync.failure(response.message));
-    }
-
-    return dispatch(appSystemActions.fetchAppSystemAsync.failure('Ошибка получения данных о подсистеме'));
+    return dispatch(appSystemActions.fetchAppSystemAsync.failure(response.message));
   };
 };
 
@@ -61,11 +53,7 @@ const addAppSystem = (appSystem: NewAppSystem): AppThunk => {
       return dispatch(appSystemActions.addAppSystemAsync.success(response.appSystem));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(appSystemActions.addAppSystemAsync.failure(response.message));
-    }
-
-    return dispatch(appSystemActions.addAppSystemAsync.failure('Ошибка добавления подсистемы'));
+    return dispatch(appSystemActions.addAppSystemAsync.failure(response.message));
   };
 };
 
@@ -79,11 +67,7 @@ const updateAppSystem = (appSystem: IAppSystem): AppThunk => {
       return dispatch(appSystemActions.updateAppSystemAsync.success(response.appSystem));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(appSystemActions.updateAppSystemAsync.failure(response.message));
-    }
-
-    return dispatch(appSystemActions.updateAppSystemAsync.failure('Ошибка обновления подсистемы'));
+    return dispatch(appSystemActions.updateAppSystemAsync.failure(response.message));
   };
 };
 
@@ -97,11 +81,7 @@ const removeAppSystem = (id: string): AppThunk => {
       return dispatch(appSystemActions.removeAppSystemAsync.success(id));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(appSystemActions.removeAppSystemAsync.failure(response.message));
-    }
-
-    return dispatch(appSystemActions.removeAppSystemAsync.failure('Ошибка удаления подсистемы'));
+    return dispatch(appSystemActions.removeAppSystemAsync.failure(response.message));
   };
 };
 

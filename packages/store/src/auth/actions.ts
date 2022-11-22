@@ -17,6 +17,7 @@ const setLoadingError = createAction('AUTH/SET_LOADING_ERROR')<string>();
 const setInit = createAction('AUTH/SET_IS_INIT')<boolean>();
 const setIsConfigFirst = createAction('AUTH/SET_IS_CONFIGFIRST')<boolean>();
 const setIsLogOut = createAction('AUTH/SET_IS_LOGOUT')<boolean>();
+const setErrorMessage = createAction('AUTH/SET_ERROR_MESSAGE')<string>();
 
 const getDeviceByUidAsync = createAsyncAction('AUTH/GET_DEVICE', 'AUTH/GET_DEVICE_SUCCESS', 'AUTH/GET_DEVICE_FAILURE')<
   string | undefined,
@@ -102,6 +103,7 @@ export const actions = {
   setIsConfigFirst,
   setIsLogOut,
   setAppSystem,
+  setErrorMessage,
 };
 
 export type AuthActionType = ActionType<typeof actions>;

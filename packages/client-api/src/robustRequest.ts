@@ -2,19 +2,23 @@ import { IResponse } from '@lib/types';
 import { AxiosResponse } from 'axios';
 import { config } from '@lib/client-config';
 
-import api from './api';
+// import api from './api';
+
+/** Функция, вызывается при неверной авторизации */
+export type AuthLogOut = () => Promise<any>;
 
 /** Валидатор проверяет полученные данные на корректность. В случае ошибки генерирует исключение. */
 type Validator = (data: Record<string, unknown>) => void;
 
 /** Десериализатор, если есть, может одновременно являться  и валидатором. */
-type Deserializer = (data: Record<string, unknown>) => Record<string, unknown>;
+type Deserializer = <T>(data: Record<string, unknown>) => T;
 
 interface IURLParams {
   [paramName: string]: string | number;
 }
 
-interface IRequestParams {
+export interface IRequestParams {
+  api: any;
   /** method HTTP. По умолчанию подставляется GET. */
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
   /** Базовый УРЛ. Если задан, то итоговый УРЛ получается слиянием базового и УРЛ. Может содержать маску.*/
@@ -33,19 +37,25 @@ interface IRequestParams {
   timeout?: number;
 }
 
-type RequestResult<T> = IServerResponseResult<T> | IServerUnreacheableResult | IErrorResult;
+export type RequestResult = IServerResponseResult | IServerUnreacheableResult | IErrorResult;
 
-interface IServerResponseResult<T> {
+// export interface IResponse {
+//   /** HTTP response status */
+//   status: number;
+//   data?: any;
+// }
+
+interface IServerResponseResult {
   /** 2xx, 4xx, 5xx */
   result: 'OK' | 'CLIENT_ERROR' | 'SERVER_ERROR';
   response: {
     /** HTTP response status */
     status: number;
-    data?: T;
+    data?: any;
   };
 }
 
-interface IServerUnreacheableResult {
+export interface IServerUnreacheableResult {
   result: 'NO_CONNECTION' | 'TIMEOUT';
 }
 
@@ -55,9 +65,10 @@ interface IErrorResult {
   message?: string;
 }
 
-export type RobustRequestMiddleware = <T>(params: IRequestParams) => Promise<RequestResult<IResponse<T>>>;
+export type RobustRequest = (params: IRequestParams) => Promise<RequestResult>;
 
-export const robustRequest: RobustRequestMiddleware = async <T>({
+export const robustRequest: RobustRequest = async ({
+  api,
   method,
   baseUrl,
   url,
@@ -66,7 +77,7 @@ export const robustRequest: RobustRequestMiddleware = async <T>({
   validator,
   deserializer,
   timeout = config.timeout,
-}: IRequestParams) => {
+}) => {
   let urlParams: URLSearchParams | undefined;
 
   if (params) {
@@ -86,39 +97,59 @@ export const robustRequest: RobustRequestMiddleware = async <T>({
   try {
     const config = { params: urlParams, signal: controller.signal };
 
-    let res: AxiosResponse<IResponse<T>, any> | undefined = undefined;
+    let res: AxiosResponse<IResponse, any> | undefined = undefined;
 
     switch (method) {
       case 'GET': {
-        res = await api.axios.get<IResponse<T>>(url, config);
+        console.log('get', url, config);
+        res = await api.axios.get(url, config);
         break;
       }
       case 'POST': {
-        res = await api.axios.post<IResponse<T>>(url, data, config);
+        console.log('post', url, config, data);
+        res = await api.axios.post(url, data, config);
         break;
       }
       case 'PUT': {
-        res = await api.axios.put<IResponse<T>>(url, data, config);
+        res = await api.axios.put(url, data, config);
         break;
       }
       case 'DELETE': {
-        res = await api.axios.delete<IResponse<T>>(url, config);
+        res = await api.axios.delete(url, config);
         break;
       }
     }
 
     clearTimeout(rTimeout);
 
-    //TODO Проверка данных validator
-    //TODO Десериализация данных deserializer
+    let objData = res?.data;
+
+    // if (res?.data.status === 401 && authFunc) {
+    //   await authFunc();
+    // } else {
+    //Проверка данных validator
+    if (res?.data?.data) {
+      if (validator) {
+        validator(res.data.data);
+      }
+
+      //Десериализация данных deserializer
+      objData = { ...res.data, data: deserializer ? deserializer(res.data.data) : res.data.data };
+    } else if (validator) {
+      return {
+        result: 'INVALID_DATA',
+        message: 'Empty server response',
+      };
+    }
+    // }
 
     return {
       result: 'OK',
       response: {
         status: res!.status || 200,
-        data: res?.data,
+        data: objData,
       },
-    } as IServerResponseResult<T>;
+    } as IServerResponseResult;
   } catch (err) {
     clearTimeout(rTimeout);
 
@@ -128,11 +159,22 @@ export const robustRequest: RobustRequestMiddleware = async <T>({
       };
     }
 
+    console.log('err', err);
+    // //Если пришел ответ с ошибкой сети
+    // if (err instanceof AxiosError) {
+    //   const code = err.code;
+    //   if (code === 'ECONNABORTED' || code === 'ERR_NETWORK') {
+    //     return {
+    //       result: code === 'ECONNABORTED' ? 'TIMEOUT' : 'NO_CONNECTION',
+    //     };
+    //   }
+    // }
+
     return {
       result: 'SERVER_ERROR',
       response: {
         status: 500,
-        // data: err,
+        data: err,
       },
     };
   }

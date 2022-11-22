@@ -30,13 +30,7 @@ const fetchDeviceBindings = (
       return dispatch(deviceBindingActions.fetchDeviceBindingsAsync.success(response.deviceBindings));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(deviceBindingActions.fetchDeviceBindingsAsync.failure(response.message));
-    }
-
-    return dispatch(
-      deviceBindingActions.fetchDeviceBindingsAsync.failure('Ошибка получения данных связи устройства с пользователем'),
-    );
+    return dispatch(deviceBindingActions.fetchDeviceBindingsAsync.failure(response.message));
   };
 };
 
@@ -50,13 +44,7 @@ const fetchDeviceBindingById = (id: string): AppThunk => {
       return dispatch(deviceBindingActions.fetchDeviceBindingAsync.success(response.deviceBinding));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(deviceBindingActions.fetchDeviceBindingAsync.failure(response.message));
-    }
-
-    return dispatch(
-      deviceBindingActions.fetchDeviceBindingsAsync.failure('Ошибка получения данных связи устройства с пользователем'),
-    );
+    return dispatch(deviceBindingActions.fetchDeviceBindingAsync.failure(response.message));
   };
 };
 
@@ -70,13 +58,7 @@ const addDeviceBinding = (deviceBinding: NewDeviceBinding): AppThunk => {
       return dispatch(deviceBindingActions.addDeviceBindingAsync.success(response.deviceBinding));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(deviceBindingActions.addDeviceBindingAsync.failure(response.message));
-    }
-
-    return dispatch(
-      deviceBindingActions.addDeviceBindingAsync.failure('Ошибка добавления связи устройства с пользователем'),
-    );
+    return dispatch(deviceBindingActions.addDeviceBindingAsync.failure(response.message));
   };
 };
 
@@ -90,13 +72,7 @@ const updateDeviceBinding = (deviceBinding: IDeviceBinding): AppThunk => {
       return dispatch(deviceBindingActions.updateDeviceBindingAsync.success(response.deviceBinding));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(deviceBindingActions.updateDeviceBindingAsync.failure(response.message));
-    }
-
-    return dispatch(
-      deviceBindingActions.updateDeviceBindingAsync.failure('Ошибка обновления связи устройства с пользователем'),
-    );
+    return dispatch(deviceBindingActions.updateDeviceBindingAsync.failure(response.message));
   };
 };
 
@@ -110,13 +86,7 @@ const removeDeviceBinding = (id: string): AppThunk => {
       return dispatch(deviceBindingActions.removeDeviceBindingAsync.success());
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(deviceBindingActions.removeDeviceBindingAsync.failure(response.message));
-    }
-
-    return dispatch(
-      deviceBindingActions.removeDeviceBindingAsync.failure('Ошибка удаления связи устройства с пользователем'),
-    );
+    return dispatch(deviceBindingActions.removeDeviceBindingAsync.failure(response.message));
   };
 };
 

@@ -19,11 +19,7 @@ const fetchCompanyById = (id: string): AppThunk => {
       return dispatch(companyActions.fetchCompanyAsync.success(response.company));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(companyActions.fetchCompanyAsync.failure(response.message));
-    }
-
-    return dispatch(companyActions.fetchCompaniesAsync.failure('Ошибка получения данных о компании'));
+    return dispatch(companyActions.fetchCompanyAsync.failure(response.message));
   };
 };
 
@@ -43,11 +39,7 @@ const fetchCompanies = (filterText?: string, fromRecord?: number, toRecord?: num
       return dispatch(companyActions.fetchCompaniesAsync.success(response.companies));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(companyActions.fetchCompaniesAsync.failure(response.message));
-    }
-
-    return dispatch(companyActions.fetchCompaniesAsync.failure('Ошибка получения данных о компаниях'));
+    return dispatch(companyActions.fetchCompaniesAsync.failure(response.message));
   };
 };
 
@@ -61,11 +53,7 @@ const addCompany = (company: NewCompany): AppThunk => {
       return dispatch(companyActions.addCompanyAsync.success(response.company));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(companyActions.addCompanyAsync.failure(response.message));
-    }
-
-    return dispatch(companyActions.addCompanyAsync.failure('Ошибка добавления компании'));
+    return dispatch(companyActions.addCompanyAsync.failure(response.message));
   };
 };
 
@@ -79,11 +67,7 @@ const updateCompany = (company: ICompany): AppThunk => {
       return dispatch(companyActions.updateCompanyAsync.success(response.company));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(companyActions.updateCompanyAsync.failure(response.message));
-    }
-
-    return dispatch(companyActions.updateCompanyAsync.failure('Ошибка обновления компании'));
+    return dispatch(companyActions.updateCompanyAsync.failure(response.message));
   };
 };
 
@@ -97,11 +81,7 @@ const removeCompany = (id: string): AppThunk => {
       return dispatch(companyActions.removeCompanyAsync.success(id));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(companyActions.removeCompanyAsync.failure(response.message));
-    }
-
-    return dispatch(companyActions.removeCompanyAsync.failure('Ошибка удаления компании'));
+    return dispatch(companyActions.removeCompanyAsync.failure(response.message));
   };
 };
 

@@ -18,11 +18,7 @@ const fetchUserById = (id: string): AppThunk => {
       return dispatch(userActions.fetchUserAsync.success(response.user));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(userActions.fetchUserAsync.failure(response.message));
-    }
-
-    return dispatch(userActions.fetchUsersAsync.failure('something wrong'));
+    return dispatch(userActions.fetchUserAsync.failure(response.message));
   };
 };
 
@@ -43,11 +39,7 @@ const fetchUsers = (companyId?: string, filterText?: string, fromRecord?: number
       return dispatch(userActions.fetchUsersAsync.success(response.users));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(userActions.fetchUsersAsync.failure(response.message));
-    }
-
-    return dispatch(userActions.fetchUsersAsync.failure('something wrong'));
+    return dispatch(userActions.fetchUsersAsync.failure(response.message));
   };
 };
 
@@ -61,11 +53,7 @@ const addUser = (user: NewUser): AppThunk => {
       return dispatch(userActions.addUserAsync.success(response.user));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(userActions.addUserAsync.failure(response.message));
-    }
-
-    return dispatch(userActions.addUserAsync.failure('something wrong'));
+    return dispatch(userActions.addUserAsync.failure(response.message));
   };
 };
 
@@ -79,11 +67,7 @@ const updateUser = (user: IUser): AppThunk => {
       return dispatch(userActions.updateUserAsync.success(response.user));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(userActions.updateUserAsync.failure(response.message));
-    }
-
-    return dispatch(userActions.updateUserAsync.failure('something wrong'));
+    return dispatch(userActions.updateUserAsync.failure(response.message));
   };
 };
 
@@ -97,30 +81,8 @@ const removeUser = (id: string): AppThunk => {
       return dispatch(userActions.removeUserAsync.success(id));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(userActions.removeUserAsync.failure(response.message));
-    }
-
-    return dispatch(userActions.removeUserAsync.failure('Ошибка удаления компании'));
+    return dispatch(userActions.removeUserAsync.failure(response.message));
   };
 };
-
-// const addPageParams = (user: IUser): AppThunk => {
-//   return async (dispatch) => {
-//     dispatch(userActions.setPageParam.request(''));
-
-//     const response = await api.user.addUser(user);
-
-//     if (response.type === 'SET_PARAM') {
-//       return dispatch(userActions.addUserAsync.success(response.user));
-//     }
-
-//     if (response.type === 'ERROR') {
-//       return dispatch(userActions.addUserAsync.failure(response.message));
-//     }
-
-//     return dispatch(userActions.addUserAsync.failure('something wrong'));
-//   };
-// };
 
 export default { fetchUsers, fetchUserById, addUser, updateUser, removeUser };

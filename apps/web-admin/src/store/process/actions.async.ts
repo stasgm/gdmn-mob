@@ -24,11 +24,7 @@ const fetchProcesses = (filterText?: string, fromRecord?: number, toRecord?: num
       return dispatch(processActions.fetchProcessesAsync.success(response.processes));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(processActions.fetchProcessesAsync.failure(response.message));
-    }
-
-    return dispatch(processActions.fetchProcessesAsync.failure('Ошибка получения данных о процессах'));
+    return dispatch(processActions.fetchProcessesAsync.failure(response.message));
   };
 };
 
@@ -42,11 +38,7 @@ const removeProcess = (id: string): AppThunk => {
       return dispatch(processActions.removeProcessAsync.success(id));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(processActions.removeProcessAsync.failure(response.message));
-    }
-
-    return dispatch(processActions.removeProcessAsync.failure('Ошибка удаления процесса'));
+    return dispatch(processActions.removeProcessAsync.failure(response.message));
   };
 };
 

@@ -6,6 +6,7 @@ import { generateId, getParams, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 
 import { BaseRequest } from '../types/BaseRequest';
+import { RobustRequest, robustRequest } from '../robustRequest';
 
 class User extends BaseRequest {
   constructor(api: BaseApi) {
@@ -141,31 +142,21 @@ class User extends BaseRequest {
       } as error.INetworkError;
     }
 
-    try {
-      const res = await this.api.axios.get<IResponse<IUser>>(`/users/${userId}`);
-      const resData = res.data;
+    const res = await robustRequest({ api: this.api, method: 'GET', url: `/users/${userId}` });
+    // const res = await this.api.axios.get<IResponse<IUser>>(`/users/${userId}`);
+    console.log('res', res);
 
-      if (authFunc && resData.status === 401) {
-        await authFunc();
-      }
-
-      if (resData.result) {
-        return {
-          type: 'GET_USER',
-          user: resData.data,
-        } as types.IGetUserResponse;
-      }
-
+    if (res.result === 'OK') {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка получения данных о пользователе',
-      } as error.INetworkError;
+        type: 'GET_USER',
+        user: res.response.data?.data,
+      } as types.IGetUserResponse;
     }
+
+    return {
+      type: 'ERROR',
+      message: res.result === 'INVALID_DATA' || res.result === 'ERROR' ? res.message : 'ошибка добавления пользователя',
+    } as error.INetworkError;
   };
 
   getUsers = async (params?: Record<string, string | number>, authFunc?: AuthLogOut) => {

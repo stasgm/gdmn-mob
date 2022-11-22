@@ -1,5 +1,5 @@
 import { AuthLogOut, IUserCredentials, IUserSettings } from '@lib/types';
-import api from '@lib/client-api';
+import api, { customRequest } from '@lib/client-api';
 
 import { ActionType } from 'typesafe-actions';
 
@@ -124,21 +124,22 @@ const login = (
   return async (dispatch) => {
     dispatch(actions.loginUserAsync.request(''));
 
-    const response = await api.auth.login(credentials);
+    const response = await api.auth.login(credentials, customRequest(dispatch));
+    console.log('response login', response);
 
     if (response.type === 'LOGIN') {
       //Проверка на совпадение подсистемы приложения с подсистемой пользователя
-      if (response.user.erpUser?.id && appSystemName && logout) {
+      if (response.user.erpUser?.id && appSystemName) {
         const getErpUser = await api.user.getUser(response.user.erpUser?.id, logout);
         if (getErpUser.type === 'ERROR') {
           return dispatch(
-            actions.loginUserAsync.failure('Ошибка входа пользователя: невозможно получить данные о пользователе'),
+            actions.loginUserAsync.failure('Вход не выполнен: невозможно получить данные о пользователе'),
           );
         }
         if (appSystemName !== getErpUser.user.appSystem?.name) {
           return dispatch(
             actions.loginUserAsync.failure(
-              'Ошибка входа пользователя: подсистема пользователя не совпадает с подсистемой приложения',
+              'Вход не выполнен: подсистема пользователя не совпадает с подсистемой приложения',
             ),
           );
         }
@@ -146,11 +147,11 @@ const login = (
       return dispatch(actions.loginUserAsync.success(response.user));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(actions.loginUserAsync.failure(response.message));
-    }
+    // if (response.type === 'ERROR') {
+    return dispatch(actions.loginUserAsync.failure(response.message || 'Вход не выполнен'));
+    // }
 
-    return dispatch(actions.loginUserAsync.failure('Ошибка входа пользователя'));
+    // return dispatch(actions.loginUserAsync.failure('Ошибка входа пользователя'));
   };
 };
 

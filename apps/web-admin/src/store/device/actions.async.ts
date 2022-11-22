@@ -19,11 +19,7 @@ const fetchDeviceById = (id: string): AppThunk => {
       return dispatch(deviceActions.fetchDeviceAsync.success(response.device));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(deviceActions.fetchDeviceAsync.failure(response.message));
-    }
-
-    return dispatch(deviceActions.fetchDevicesAsync.failure('Ошибка получения данных об устройстве'));
+    return dispatch(deviceActions.fetchDeviceAsync.failure(response.message));
   };
 };
 
@@ -43,11 +39,7 @@ const fetchDevices = (filterText?: string, fromRecord?: number, toRecord?: numbe
       return dispatch(deviceActions.fetchDevicesAsync.success(response.devices));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(deviceActions.fetchDevicesAsync.failure(response.message));
-    }
-
-    return dispatch(deviceActions.fetchDevicesAsync.failure('Ошибка получения данных об устройствах'));
+    return dispatch(deviceActions.fetchDevicesAsync.failure(response.message));
   };
 };
 
@@ -61,11 +53,7 @@ const addDevice = (device: NewDevice): AppThunk => {
       return dispatch(deviceActions.addDeviceAsync.success(response.device));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(deviceActions.addDeviceAsync.failure(response.message));
-    }
-
-    return dispatch(deviceActions.addDeviceAsync.failure('Ошибка добавления устройства'));
+    return dispatch(deviceActions.addDeviceAsync.failure(response.message));
   };
 };
 
@@ -79,11 +67,7 @@ const updateDevice = (device: IDevice): AppThunk => {
       return dispatch(deviceActions.updateDeviceAsync.success(response.device));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(deviceActions.updateDeviceAsync.failure(response.message));
-    }
-
-    return dispatch(deviceActions.updateDeviceAsync.failure('Ошибка обновления устройства'));
+    return dispatch(deviceActions.updateDeviceAsync.failure(response.message));
   };
 };
 
@@ -97,11 +81,7 @@ const removeDevice = (id: string): AppThunk => {
       return dispatch(deviceActions.removeDeviceAsync.success(id));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(deviceActions.removeDeviceAsync.failure(response.message));
-    }
-
-    return dispatch(deviceActions.removeDeviceAsync.failure('Ошибка удаления устройства'));
+    return dispatch(deviceActions.removeDeviceAsync.failure(response.message));
   };
 };
 
