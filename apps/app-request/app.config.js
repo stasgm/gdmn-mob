@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 export default ({ config }) => ({
   ...config,
   android: {
@@ -11,7 +13,7 @@ export default ({ config }) => ({
     buildVersion: config.android.versionCode,
     slug: config.slug,
     eas: {
-      projectId: '9bf64645-64f3-49bf-837f-119812ef4cf2',
+      projectId: process.env.PROJECT_ID,
     },
   },
 });

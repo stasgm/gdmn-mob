@@ -18,6 +18,8 @@ import {
 import { globalStyles as styles, Theme as defaultTheme, Provider as UIProvider, AppScreen } from '@lib/mobile-ui';
 import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
+import { StatusBar } from 'expo-status-bar';
+
 import { IDocument, IReferences } from '@lib/types';
 
 import { sleep } from '@lib/client-api';
@@ -109,6 +111,7 @@ const App = () => (
   <Provider store={store}>
     <UIProvider theme={defaultTheme}>
       <Root />
+      <StatusBar style="auto" />
     </UIProvider>
   </Provider>
 );

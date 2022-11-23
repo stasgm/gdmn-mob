@@ -4,6 +4,8 @@ import { Provider } from 'react-redux';
 import { dialCall, MobileApp } from '@lib/mobile-app';
 import { INavItem, GDMN_PHONE, GDMN_EMAIL, GDMN_SITE_ADDRESS } from '@lib/mobile-navigation';
 
+import { StatusBar } from 'expo-status-bar';
+
 import {
   appActions,
   appSelectors,
@@ -254,6 +256,7 @@ const App = () => (
   <Provider store={store}>
     <UIProvider theme={defaultTheme}>
       <Root />
+      <StatusBar style="auto" />
     </UIProvider>
   </Provider>
 );

@@ -54,6 +54,8 @@ const localStyles = StyleSheet.create({
     paddingHorizontal: 12,
     fontSize: 20,
     justifyContent: 'space-between',
+    paddingVertical: 3,
+    marginVertical: 6,
   },
   settingsContainer: {
     flexDirection: 'column',

@@ -175,6 +175,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 12,
     fontSize: 20,
+    paddingVertical: 3,
+    marginVertical: 6,
   },
   subHeading: {
     width: '85%',

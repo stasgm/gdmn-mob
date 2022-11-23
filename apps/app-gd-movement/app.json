@@ -25,11 +25,14 @@
     },
     "android": {
       "package": "com.gsbelarus.gdmovement",
-      "permissions": ["CAMERA", "ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "VIBRATE"],
+      "permissions": ["CAMERA", "VIBRATE"],
       "versionCode": 10
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "androidStatusBar": {
+      "translucent": false
     }
   }
 }

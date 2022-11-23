@@ -28,7 +28,7 @@
     "@lib/mobile-ui": "*",
     "@lib/store": "*",
     "@react-native-community/masked-view": "0.1.11",
-    "@react-navigation/native": "^6.0.13",
+    "@react-navigation/native": "^6.0.14",
     "@types/node": "^18.11.9",
     "@types/react": "~18.0.25",
     "@types/react-native": "0.70.6",

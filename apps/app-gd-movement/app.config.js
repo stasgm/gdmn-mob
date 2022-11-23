@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 export default ({ config }) => {
   const appConfig = {
     ...config,
@@ -15,7 +17,7 @@ export default ({ config }) => {
       githubUrl: config.githubUrl,
       documentationUrl: `${config.githubUrl}/blob/dev/docs/gdmn-gd-movement/docs/README.md`,
       eas: {
-        projectId: '0b360ec9-1e41-47e5-98fe-18fd21260e48',
+        projectId: process.env.PROJECT_ID,
       },
     },
   };
