@@ -24,53 +24,53 @@ interface IProps {
   deviceLogFiles: IDeviceLogFiles[];
   selectedDeviceLogFiles?: IDeviceLogFiles[];
   limitRows?: number;
-  onChangeSelectedMessages?: (newSelectedDeviceIds: any[]) => void;
+  onChangeSelectedDeviceLogFiles?: (newSelectedDeviceIds: any[]) => void;
 }
 
 const DeviceLogFilesListTable = ({
   deviceLogFiles = [],
-  onChangeSelectedMessages,
+  onChangeSelectedDeviceLogFiles,
   selectedDeviceLogFiles = [],
   limitRows = 0,
 }: IProps) => {
-  const [selectedMessageIds, setSelectedMessageIds] = useState<IDeviceLogFiles[]>(selectedMessages);
+  const [selectedDeviceLogFileIds, setSelectedDeviceLogFileIds] = useState<IDeviceLogFiles[]>(selectedDeviceLogFiles);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
 
   const handleSelectAll = (event: any) => {
-    let newSelectedMessageIds;
+    let newSelectedDeviceLogFileIds;
 
     if (event.target.checked) {
-      newSelectedMessageIds = messages.map((message: any) => message);
+      newSelectedDeviceLogFileIds = deviceLogFiles.map((deviceLogFile: any) => deviceLogFile);
     } else {
-      newSelectedMessageIds = [];
+      newSelectedDeviceLogFileIds = [];
     }
 
-    setSelectedMessageIds(newSelectedMessageIds);
-    onChangeSelectedMessages && onChangeSelectedMessages(newSelectedMessageIds);
+    setSelectedDeviceLogFileIds(newSelectedDeviceLogFileIds);
+    onChangeSelectedDeviceLogFiles && onChangeSelectedDeviceLogFiles(newSelectedDeviceLogFileIds);
   };
 
-  const handleSelectOne = (_event: any, message: IDeviceLogFiles) => {
-    const selectedIndex = selectedMessageIds.map((item: IDeviceLogFiles) => item.id).indexOf(message.id);
+  const handleSelectOne = (_event: any, deviceLogFile: IDeviceLogFiles) => {
+    const selectedIndex = selectedDeviceLogFileIds.map((item: IDeviceLogFiles) => item.id).indexOf(deviceLogFile.id);
 
-    let newSelectedMessageIds: IDeviceLogFiles[] = [];
+    let newSelectedDeviceLogFileIds: IDeviceLogFiles[] = [];
 
     if (selectedIndex === -1) {
-      newSelectedMessageIds = newSelectedMessageIds.concat(selectedMessageIds, message);
+      newSelectedDeviceLogFileIds = newSelectedDeviceLogFileIds.concat(selectedDeviceLogFileIds, deviceLogFile);
     } else if (selectedIndex === 0) {
-      newSelectedMessageIds = newSelectedMessageIds.concat(selectedMessageIds.slice(1));
-    } else if (selectedIndex === selectedMessageIds.length - 1) {
-      newSelectedMessageIds = newSelectedMessageIds.concat(selectedMessageIds.slice(0, -1));
+      newSelectedDeviceLogFileIds = newSelectedDeviceLogFileIds.concat(selectedDeviceLogFileIds.slice(1));
+    } else if (selectedIndex === selectedDeviceLogFileIds.length - 1) {
+      newSelectedDeviceLogFileIds = newSelectedDeviceLogFileIds.concat(selectedDeviceLogFileIds.slice(0, -1));
     } else if (selectedIndex > 0) {
-      newSelectedMessageIds = newSelectedMessageIds.concat(
-        selectedMessageIds.slice(0, selectedIndex),
-        selectedMessageIds.slice(selectedIndex + 1),
+      newSelectedDeviceLogFileIds = newSelectedDeviceLogFileIds.concat(
+        selectedDeviceLogFileIds.slice(0, selectedIndex),
+        selectedDeviceLogFileIds.slice(selectedIndex + 1),
       );
     }
 
-    setSelectedMessageIds(newSelectedMessageIds);
+    setSelectedDeviceLogFileIds(newSelectedDeviceLogFileIds);
 
-    onChangeSelectedMessages && onChangeSelectedMessages(newSelectedMessageIds);
+    onChangeSelectedDeviceLogFiles && onChangeSelectedDeviceLogFiles(newSelectedDeviceLogFileIds);
   };
 
   const handleLimitChange = (event: any) => {
@@ -86,65 +86,73 @@ const DeviceLogFilesListTable = ({
       setLimit(limitRows);
     }
 
-    if (selectedMessageIds.length === 0) {
-      if (selectedMessages.length > 0) {
-        const newSelectedMessageIds = selectedMessages.map((message: IDeviceLogFiles) => message);
+    if (selectedDeviceLogFileIds.length === 0) {
+      if (selectedDeviceLogFiles.length > 0) {
+        const newSelectedDeviceLogFileIds = selectedDeviceLogFiles.map(
+          (deviceLogFile: IDeviceLogFiles) => deviceLogFile,
+        );
 
-        setSelectedMessageIds(newSelectedMessageIds);
+        setSelectedDeviceLogFileIds(newSelectedDeviceLogFileIds);
       }
     }
-  }, [limitRows, selectedMessageIds.length, selectedMessages]);
+  }, [limitRows, selectedDeviceLogFileIds.length, selectedDeviceLogFiles]);
 
   const TableRows = () => {
-    const messageList = messages.slice(page * limit, page * limit + limit).map((message: IDeviceLogFiles) => {
-      return (
-        <TableRow hover key={message.id} selected={selectedMessageIds.findIndex((d) => d.id === message?.id) !== -1}>
-          <TableCell padding="checkbox">
-            <Checkbox
-              checked={
-                selectedMessageIds
-                  .map((item: IDeviceLogFiles) => {
-                    return item.id;
-                  })
-                  .indexOf(message.id) !== -1
-              }
-              onChange={(event) => handleSelectOne(event, message)}
-              value="true"
-            />
-          </TableCell>
-          <TableCell style={{ padding: '0 16px' }}>
-            <Box
-              sx={{
-                alignItems: 'center',
-                display: 'flex',
-              }}
-            >
-              <NavLink to={`${adminPath}/app/deviceLogs/${message.id}`}>
-                <Typography color="textPrimary" variant="body1" key={message.id}>
-                  {message.path}
-                </Typography>
-              </NavLink>
-            </Box>
-          </TableCell>
-          <TableCell>{message.company.name}</TableCell>
-          <TableCell>{message.appSystem.name}</TableCell>
-          <TableCell>{message.contact.name}</TableCell>
-          {/* <TableCell>{message.producer.name}</TableCell>
+    const deviceLogFileList = deviceLogFiles
+      .slice(page * limit, page * limit + limit)
+      .map((deviceLogFile: IDeviceLogFiles) => {
+        return (
+          <TableRow
+            hover
+            key={deviceLogFile.id}
+            selected={selectedDeviceLogFileIds.findIndex((d) => d.id === deviceLogFile?.id) !== -1}
+          >
+            <TableCell padding="checkbox">
+              <Checkbox
+                checked={
+                  selectedDeviceLogFileIds
+                    .map((item: IDeviceLogFiles) => {
+                      return item.id;
+                    })
+                    .indexOf(deviceLogFile.id) !== -1
+                }
+                onChange={(event) => handleSelectOne(event, deviceLogFile)}
+                value="true"
+              />
+            </TableCell>
+            <TableCell style={{ padding: '0 16px' }}>
+              <Box
+                sx={{
+                  alignItems: 'center',
+                  display: 'flex',
+                }}
+              >
+                <NavLink to={`${adminPath}/app/deviceLogs/${deviceLogFile.id}`}>
+                  <Typography color="textPrimary" variant="body1" key={deviceLogFile.id}>
+                    {deviceLogFile.path}
+                  </Typography>
+                </NavLink>
+              </Box>
+            </TableCell>
+            <TableCell>{deviceLogFile.company.name}</TableCell>
+            <TableCell>{deviceLogFile.appSystem.name}</TableCell>
+            <TableCell>{deviceLogFile.contact.name}</TableCell>
+            {/* <TableCell>{message.producer.name}</TableCell>
           <TableCell>{message.consumer.name}</TableCell> */}
-          <TableCell>{message.device.name}</TableCell>
-          <TableCell>{message.device.id}</TableCell>
-          <TableCell>{new Date(message.date || '').toLocaleString('ru', { hour12: false })}</TableCell>
-          {/* <TableCell>{message.size} кб</TableCell> */}
-          <TableCell>{Math.ceil(message.size).toString()} кб</TableCell>
-        </TableRow>
-      );
-    });
+            <TableCell>{deviceLogFile.device.name}</TableCell>
+            <TableCell>{deviceLogFile.device.id}</TableCell>
+            <TableCell>{new Date(deviceLogFile.date || '').toLocaleString('ru', { hour12: false })}</TableCell>
+            {/* <TableCell>{message.size} кб</TableCell> */}
+            <TableCell>{Math.ceil(deviceLogFile.size).toString()} кб</TableCell>
+          </TableRow>
+        );
+      });
 
-    const emptyRows = limit - Math.min(limit, messages.length - page * limit);
+    const emptyRows = limit - Math.min(limit, deviceLogFiles.length - page * limit);
 
     return (
       <>
-        {messageList}
+        {deviceLogFileList}
         {emptyRows > 0 && page > 0 && (
           <TableRow style={{ height: 53 * emptyRows }}>
             <TableCell colSpan={4} />
@@ -163,9 +171,11 @@ const DeviceLogFilesListTable = ({
               <TableRow>
                 <TableCell padding="checkbox">
                   <Checkbox
-                    checked={selectedMessageIds.length === messages.length}
+                    checked={selectedDeviceLogFileIds.length === deviceLogFiles.length}
                     color="primary"
-                    indeterminate={selectedMessageIds.length > 0 && selectedMessageIds.length < messages.length}
+                    indeterminate={
+                      selectedDeviceLogFileIds.length > 0 && selectedDeviceLogFileIds.length < deviceLogFiles.length
+                    }
                     onChange={handleSelectAll}
                   />
                 </TableCell>
@@ -189,7 +199,7 @@ const DeviceLogFilesListTable = ({
       </PerfectScrollbar>
       <TablePagination
         component="div"
-        count={messages.length}
+        count={deviceLogFiles.length}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleLimitChange}
         page={page}

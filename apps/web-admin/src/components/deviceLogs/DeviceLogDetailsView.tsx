@@ -1,4 +1,4 @@
-import { IDeviceLogFiles, IProcess } from '@lib/types';
+import { IDeviceLogFiles } from '@lib/types';
 import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@material-ui/core';
 
 import { NavLink } from 'react-router-dom';

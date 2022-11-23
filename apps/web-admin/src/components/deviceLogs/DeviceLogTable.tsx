@@ -29,7 +29,7 @@ const DeviceLogTable = ({ deviceLog = [], limitRows = 0 }: IProps) => {
   }, [limitRows]);
 
   const TableRows = () => {
-    const deviceList = deviceLog.slice(page * limit, page * limit + limit).map((log: IDeviceLog) => {
+    const deviceLogList = deviceLog.slice(page * limit, page * limit + limit).map((log: IDeviceLog) => {
       return (
         <TableRow hover key={log.id}>
           <TableCell>{log.name}</TableCell>
@@ -43,7 +43,7 @@ const DeviceLogTable = ({ deviceLog = [], limitRows = 0 }: IProps) => {
 
     return (
       <>
-        {deviceList}
+        {deviceLogList}
         {emptyRows > 0 && page > 0 && (
           <TableRow style={{ height: 53 * emptyRows }}>
             <TableCell colSpan={4} />

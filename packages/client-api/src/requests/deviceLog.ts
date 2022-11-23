@@ -71,7 +71,6 @@ class DeviceLog extends BaseRequest {
       const res = await this.api.axios.get<IResponse<IDeviceLogFiles>>(`/deviceLogs/${deviceLogId}`);
       const resData = res.data;
 
-      console.log('res111', res);
       if (resData.result) {
         return {
           type: 'GET_DEVICELOG',

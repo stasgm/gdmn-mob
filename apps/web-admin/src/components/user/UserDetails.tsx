@@ -104,8 +104,6 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
     userERP ? setUserERP(false) : setUserERP(true);
   };
 
-  console.log('user.role', user.role);
-
   return (
     <FormikProvider value={formik}>
       <Box

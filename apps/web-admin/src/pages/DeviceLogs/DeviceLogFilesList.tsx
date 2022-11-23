@@ -29,8 +29,6 @@ const DeviceLogFilesList = () => {
     fetchDeviceLogFiles(pageParams?.filterText as string);
   }, [fetchDeviceLogFiles, pageParams?.filterText]);
 
-  console.log('list', filesList);
-
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
   const handleUpdateInput = (value: string) => {
