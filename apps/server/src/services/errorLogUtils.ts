@@ -46,7 +46,8 @@ export const fullFileName2alias = (fullFileName: string): string | undefined => 
   const match = re.exec(fullFileName);
   const shortName = (match ? match[1] : fullFileName).split('\\');
   if (shortName.length !== 4) return undefined;
-  return `db_${shortName[0]}_app_${shortName[1]}_dir_${shortName[2]}_${shortName[3]}`;
+  const nameWithoutExt = shortName[3].split('.')[0];
+  return `db_${shortName[0]}_app_${shortName[1]}_dir_${shortName[2]}_${nameWithoutExt}`;
 };
 
 export const alias2fullFileName = (alias: string): string | undefined => {
@@ -56,7 +57,8 @@ export const alias2fullFileName = (alias: string): string | undefined => {
     log.error(`Invalid deviceLogs file alias ${alias}`);
     return undefined;
   }
-  return getPath([`db_${match[1]}\\${match[2]}\\${match[3]}\\from_${match[4]}`]);
+
+  return getPath([`db_${match[1]}\\${match[2]}\\${match[3]}\\from_${match[4]}.json`]);
 };
 
 const readJsonFile = async (fileName: string): Promise<IDeviceLog[] | string> => {
@@ -181,7 +183,10 @@ const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined
     return undefined;
   }
 
-  const deviceName = devices.findById(match[2])?.name;
+  /*  match[2] - uid устройства */
+
+  const device = devices.data.find((el: any) => el.uid === match[2]);
+  const deviceName = device?.name;
 
   if (!deviceName) {
     log.error(`Устройство ${match[2]} не найдено`);
