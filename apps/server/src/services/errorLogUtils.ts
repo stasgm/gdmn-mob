@@ -1,10 +1,18 @@
 import path from 'path';
-import { access, writeFile, readFile, readdir, unlink } from 'fs/promises';
-import { constants, statSync } from 'fs';
+import { writeFile, readdir, unlink } from 'fs/promises';
+import { statSync } from 'fs';
 
 import { IPathParams, IFileDeviceLogInfo, IDeviceLog, IDeviceLogFiles } from '@lib/types';
 
-import { generateId } from '../utils/helpers';
+import {
+  checkFileExists,
+  getPath,
+  getPathSystem,
+  fullFileName2alias,
+  alias2fullFileName,
+  readJsonFile,
+  getAppSystemId,
+} from '../utils/fileHelper';
 
 import config from '../../config';
 
@@ -14,23 +22,6 @@ import { BYTES_PER_KB } from '../utils/constants';
 
 import { getDb } from './dao/db';
 
-export const checkFileExists = async (path: string): Promise<boolean> => {
-  try {
-    await access(path, constants.R_OK | constants.W_OK);
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-export const getPath = (folders: string[], fn = '') => {
-  const folderPath = path.join(getDb().dbPath, ...folders);
-  return path.join(folderPath, fn);
-};
-
-export const getPathSystem = ({ companyId, appSystemId }: IPathParams) =>
-  `DB_${companyId}/${getDb().appSystems.findById(appSystemId)?.name}`;
-
 export const getPathDeviceLog = (params: IPathParams, fn = '') => getPath([getPathSystem(params), 'deviceLogs'], fn);
 
 export const getParamsDeviceLogFileName = ({ producerId, deviceId }: IFileDeviceLogInfo) =>
@@ -39,35 +30,6 @@ export const getParamsDeviceLogFileName = ({ producerId, deviceId }: IFileDevice
 export const getDeviceLogFullFileName = (params: IPathParams, fileInfo: IFileDeviceLogInfo): string => {
   const filePath = getPathDeviceLog(params);
   return path.join(filePath, getParamsDeviceLogFileName(fileInfo));
-};
-
-export const fullFileName2alias = (fullFileName: string): string | undefined => {
-  const re = /db_(.+)/gi;
-  const match = re.exec(fullFileName);
-  const shortName = (match ? match[1] : fullFileName).split('\\');
-  if (shortName.length !== 4) return undefined;
-  const nameWithoutExt = shortName[3].split('.')[0];
-  return `db_${shortName[0]}_app_${shortName[1]}_dir_${shortName[2]}_${nameWithoutExt}`;
-};
-
-export const alias2fullFileName = (alias: string): string | undefined => {
-  const re = /db_(.+)_app_(.+)_dir_(.+)_from_(.+)/gi;
-  const match = re.exec(alias);
-  if (!match) {
-    log.error(`Invalid deviceLogs file alias ${alias}`);
-    return undefined;
-  }
-
-  return getPath([`db_${match[1]}\\${match[2]}\\${match[3]}\\from_${match[4]}.json`]);
-};
-
-const readJsonFile = async (fileName: string): Promise<IDeviceLog[] | string> => {
-  const check = await checkFileExists(fileName);
-  try {
-    return check ? JSON.parse((await readFile(fileName)).toString()) : [];
-  } catch (err) {
-    return `Ошибка записи журнала ошибок устройства - ${err} в файл ${fileName}`;
-  }
 };
 
 /**
@@ -130,11 +92,6 @@ const getListDirs = async (root: string): Promise<string[]> => {
     log.error(`Robust-protocol.errorDirectory: Ошибка чтения директории - ${err}`);
     return newDirs;
   }
-};
-
-const getAppSystemId = async (name: string): Promise<string> => {
-  const { appSystems } = getDb();
-  return appSystems.data.find((item) => item.name === name)?.id || '';
 };
 
 export const getDeviceLogsFolders = async (): Promise<string[]> => {
@@ -220,7 +177,6 @@ const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined
     appSystem: { id: appSystemId, name: arr[1] },
     contact: { id: match[1], name: contactName },
     device: { id: match[2], name: deviceName },
-    path: fullFileName,
     date: fileDate,
     size: fileSize,
   };
@@ -233,19 +189,19 @@ export const getFilesObject = async (): Promise<IDeviceLogFiles[]> => {
     const re = /db_(.+)/gi;
     const match = re.exec(item);
     // eslint-disable-next-line no-await-in-loop
-    const fileObj = await fileInfoToObj((match ? match[1] : item).split('\\'));
+    const fileObj = await fileInfoToObj((match ? match[1] : item).split('/').join('\\').split('\\'));
     if (fileObj) fileObjs = [...fileObjs, fileObj];
   }
   return fileObjs;
 };
 
-export const getFile = async (fid: string): Promise<IDeviceLog[]> => {
+export const getFile = async <IDeviceLog>(fid: string): Promise<IDeviceLog[]> => {
   const fullName = alias2fullFileName(fid);
   if (!fullName) {
     log.error(`Неправильный параметр ID '${fid} в запросе`);
     return [];
   }
-  const deviceLog = await readJsonFile(fullName);
+  const deviceLog: IDeviceLog[] | string = await readJsonFile(fullName);
   if (typeof deviceLog === 'string') {
     log.error(deviceLog);
     return [];
