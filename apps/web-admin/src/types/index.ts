@@ -22,6 +22,7 @@ export interface IHeadCells<T> {
   id: keyof T;
   label: string;
   sortEnable?: boolean;
+  filterEnable?: boolean;
 }
 
 export interface IMessageHead {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -14,9 +14,13 @@ import {
   TablePagination,
   TableRow,
   Typography,
+  TextField,
 } from '@material-ui/core';
 
 import { IDeviceLogFiles } from '@lib/types';
+
+import { useSettingThunkDispatch } from '@lib/store';
+import { useFormik } from 'formik';
 
 import { adminPath } from '../../utils/constants';
 
@@ -25,6 +29,8 @@ interface IProps {
   selectedDeviceLogFiles?: IDeviceLogFiles[];
   limitRows?: number;
   onChangeSelectedDeviceLogFiles?: (newSelectedDeviceIds: any[]) => void;
+  isFilterVisible?: boolean;
+  onSubmit: (values: any) => void;
 }
 
 const DeviceLogFilesListTable = ({
@@ -32,11 +38,74 @@ const DeviceLogFilesListTable = ({
   onChangeSelectedDeviceLogFiles,
   selectedDeviceLogFiles = [],
   limitRows = 0,
+  isFilterVisible = false,
+  onSubmit,
 }: IProps) => {
   const [selectedDeviceLogFileIds, setSelectedDeviceLogFileIds] = useState<IDeviceLogFiles[]>(selectedDeviceLogFiles);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
 
+  const formik = useFormik<any>({
+    enableReinitialize: true,
+    initialValues: {
+      // ...user,
+      appSystem: '',
+      company: '',
+      contact: '',
+      date: '',
+      device: '',
+      uid: '',
+      path: '',
+      size: '',
+    },
+
+    onSubmit: (values) => {
+      onSubmit(values);
+    },
+  });
+
+  const filtered = useMemo(() => {
+    if (
+      formik.values.appSystem ||
+      formik.values.company ||
+      formik.values.contact ||
+      formik.values.date ||
+      formik.values.device ||
+      formik.values.uid ||
+      formik.values.path
+    ) {
+      return deviceLogFiles.filter(
+        (i) =>
+          (formik.values.appSystem
+            ? i.appSystem.name.toUpperCase().includes(formik.values.appSystem.toUpperCase())
+            : true) &&
+          (formik.values.company ? i.company.name.toUpperCase().includes(formik.values.company.toUpperCase()) : true) &&
+          (formik.values.contact ? i.contact.name.toUpperCase().includes(formik.values.contact.toUpperCase()) : true) &&
+          (formik.values.date
+            ? new Date(i.date || '')
+                .toLocaleString('ru', { hour12: false })
+                .toUpperCase()
+                .includes(formik.values.date.toUpperCase())
+            : true) &&
+          (formik.values.device ? i.device.name.toUpperCase().includes(formik.values.device.toUpperCase()) : true) &&
+          (formik.values.uid ? i.device.id.toUpperCase().includes(formik.values.uid.toUpperCase()) : true) &&
+          (formik.values.path ? i.path.toUpperCase().includes(formik.values.path.toUpperCase()) : true),
+      );
+    } else {
+      return deviceLogFiles;
+    }
+  }, [
+    deviceLogFiles,
+    formik.values.appSystem,
+    formik.values.company,
+    formik.values.contact,
+    formik.values.date,
+    formik.values.device,
+    formik.values.path,
+    formik.values.uid,
+  ]);
+
+  // console.log('filtered', filtered);
   const handleSelectAll = (event: any) => {
     let newSelectedDeviceLogFileIds;
 
@@ -98,7 +167,7 @@ const DeviceLogFilesListTable = ({
   }, [limitRows, selectedDeviceLogFileIds.length, selectedDeviceLogFiles]);
 
   const TableRows = () => {
-    const deviceLogFileList = deviceLogFiles
+    const deviceLogFileList = filtered
       .slice(page * limit, page * limit + limit)
       .map((deviceLogFile: IDeviceLogFiles) => {
         return (
@@ -179,17 +248,379 @@ const DeviceLogFilesListTable = ({
                     onChange={handleSelectAll}
                   />
                 </TableCell>
-                <TableCell>Название</TableCell>
-                <TableCell>Компания</TableCell>
-                <TableCell>Подсистема</TableCell>
-                <TableCell>Пользователь</TableCell>
+                <TableCell style={{ flexDirection: 'column' }}>
+                  <Typography color="textPrimary" variant="inherit">
+                    Название
+                  </Typography>
+                  {/* {isFilterVisible ? (
+                    <TextField
+                      InputProps={{
+                        sx: {
+                          height: 30,
+                          // maxWidth: 100,
+                          fontSize: 13,
+                          '& .MuiOutlinedInput-input': {
+                            borderWidth: 0,
+                            padding: 0.5,
+                          },
+                        },
+                      }}
+                      // sx={{ maxWidth: 100 }}
+                      fullWidth
+                      name="path"
+                      required
+                      variant="outlined"
+                      type="search"
+                      value={formik.values.path}
+                      onChange={formik.handleChange}
+                    />
+                  ) : null} */}
+                </TableCell>
+
+                <TableCell style={{ flexDirection: 'column' }}>
+                  <Typography color="textPrimary" variant="inherit">
+                    Компания
+                  </Typography>
+                  {/* {isFilterVisible ? (
+                    <TextField
+                      InputProps={{
+                        sx: {
+                          height: 30,
+                          // maxWidth: 100,
+                          fontSize: 13,
+                          '& .MuiOutlinedInput-input': {
+                            borderWidth: 0,
+                            padding: 0.5,
+                          },
+                        },
+                      }}
+                      // sx={{ maxWidth: 100 }}
+                      fullWidth
+                      name="company"
+                      required
+                      variant="outlined"
+                      type="search"
+                      value={formik.values.company}
+                      onChange={formik.handleChange}
+                    />
+                  ) : null} */}
+                </TableCell>
+                <TableCell style={{ flexDirection: 'column' }}>
+                  <Typography color="textPrimary" variant="inherit">
+                    Подсистема
+                  </Typography>
+                  {/* {isFilterVisible ? (
+                    <TextField
+                      InputProps={{
+                        sx: {
+                          height: 30,
+                          // maxWidth: 100,
+                          fontSize: 13,
+                          '& .MuiOutlinedInput-input': {
+                            borderWidth: 0,
+                            padding: 0.5,
+                          },
+                        },
+                      }}
+                      // sx={{ maxWidth: 100 }}
+                      fullWidth
+                      name="appSystem"
+                      required
+                      variant="outlined"
+                      type="search"
+                      value={formik.values.appSystem}
+                      onChange={formik.handleChange}
+                    />
+                  ) : null} */}
+                </TableCell>
+                <TableCell style={{ flexDirection: 'column' }}>
+                  <Typography color="textPrimary" variant="inherit">
+                    Пользователь
+                  </Typography>
+                  {/* {isFilterVisible ? (
+                    <TextField
+                      InputProps={{
+                        sx: {
+                          height: 30,
+                          // maxWidth: 100,
+                          fontSize: 13,
+                          '& .MuiOutlinedInput-input': {
+                            borderWidth: 0,
+                            padding: 0.5,
+                          },
+                        },
+                      }}
+                      fullWidth
+                      name="contact"
+                      required
+                      variant="outlined"
+                      type="search"
+                      value={formik.values.contact}
+                      onChange={formik.handleChange}
+                    />
+                  ) : null} */}
+                </TableCell>
                 {/* <TableCell>Отправитель</TableCell>
                 <TableCell>Получатель</TableCell> */}
-                <TableCell>Устройство</TableCell>
-                <TableCell>Идентификатор</TableCell>
-                <TableCell>Дата</TableCell>
+                <TableCell style={{ flexDirection: 'column' }}>
+                  <Typography color="textPrimary" variant="inherit">
+                    Устройство
+                  </Typography>
+                  {/* {isFilterVisible ? (
+                    <TextField
+                      InputProps={{
+                        sx: {
+                          height: 30,
+                          // maxWidth: 100,
+                          fontSize: 13,
+                          '& .MuiOutlinedInput-input': {
+                            borderWidth: 0,
+                            padding: 0.5,
+                          },
+                        },
+                      }}
+                      fullWidth
+                      name="device"
+                      required
+                      variant="outlined"
+                      type="search"
+                      value={formik.values.device}
+                      onChange={formik.handleChange}
+                    />
+                  ) : null} */}
+                </TableCell>
+                <TableCell style={{ flexDirection: 'column' }}>
+                  <Typography color="textPrimary" variant="inherit">
+                    Идентификатор
+                  </Typography>
+                  {/* {isFilterVisible ? (
+                    <TextField
+                      InputProps={{
+                        sx: {
+                          height: 30,
+                          // maxWidth: 100,
+                          fontSize: 13,
+                          '& .MuiOutlinedInput-input': {
+                            borderWidth: 0,
+                            padding: 0.5,
+                          },
+                        },
+                      }}
+                      fullWidth
+                      name="uid"
+                      required
+                      variant="outlined"
+                      type="search"
+                      value={formik.values.uid}
+                      onChange={formik.handleChange}
+                    />
+                  ) : null} */}
+                </TableCell>
+                <TableCell style={{ flexDirection: 'column' }}>
+                  <Typography color="textPrimary" variant="inherit">
+                    Дата
+                  </Typography>
+                  {/* {isFilterVisible ? (
+                    <TextField
+                      InputProps={{
+                        sx: {
+                          height: 30,
+                          // maxWidth: 100,
+                          fontSize: 13,
+                          '& .MuiOutlinedInput-input': {
+                            borderWidth: 0,
+                            padding: 0.5,
+                          },
+                        },
+                      }}
+                      fullWidth
+                      name="date"
+                      required
+                      variant="outlined"
+                      type="search"
+                      value={formik.values.date}
+                      onChange={formik.handleChange}
+                    />
+                  ) : null} */}
+                </TableCell>
                 <TableCell>Размер</TableCell>
               </TableRow>
+              {isFilterVisible ? (
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell>
+                    {isFilterVisible ? (
+                      <TextField
+                        InputProps={{
+                          sx: {
+                            height: 30,
+                            // maxWidth: 100,
+                            fontSize: 13,
+                            '& .MuiOutlinedInput-input': {
+                              borderWidth: 0,
+                              padding: 0.5,
+                            },
+                          },
+                        }}
+                        // sx={{ maxWidth: 100 }}
+                        fullWidth
+                        name="path"
+                        required
+                        variant="outlined"
+                        type="search"
+                        value={formik.values.path}
+                        onChange={formik.handleChange}
+                      />
+                    ) : null}
+                  </TableCell>
+
+                  <TableCell>
+                    {isFilterVisible ? (
+                      <TextField
+                        InputProps={{
+                          sx: {
+                            height: 30,
+                            // maxWidth: 100,
+                            fontSize: 13,
+                            '& .MuiOutlinedInput-input': {
+                              borderWidth: 0,
+                              padding: 0.5,
+                            },
+                          },
+                        }}
+                        // sx={{ maxWidth: 100 }}
+                        fullWidth
+                        name="company"
+                        required
+                        variant="outlined"
+                        type="search"
+                        value={formik.values.company}
+                        onChange={formik.handleChange}
+                      />
+                    ) : null}
+                  </TableCell>
+                  <TableCell>
+                    {isFilterVisible ? (
+                      <TextField
+                        InputProps={{
+                          sx: {
+                            height: 30,
+                            // maxWidth: 100,
+                            fontSize: 13,
+                            '& .MuiOutlinedInput-input': {
+                              borderWidth: 0,
+                              padding: 0.5,
+                            },
+                          },
+                        }}
+                        fullWidth
+                        name="appSystem"
+                        required
+                        variant="outlined"
+                        type="search"
+                        value={formik.values.appSystem}
+                        onChange={formik.handleChange}
+                      />
+                    ) : null}
+                  </TableCell>
+                  <TableCell>
+                    {isFilterVisible ? (
+                      <TextField
+                        InputProps={{
+                          sx: {
+                            height: 30,
+                            fontSize: 13,
+                            '& .MuiOutlinedInput-input': {
+                              borderWidth: 0,
+                              padding: 0.5,
+                            },
+                          },
+                        }}
+                        fullWidth
+                        name="contact"
+                        required
+                        variant="outlined"
+                        type="search"
+                        value={formik.values.contact}
+                        onChange={formik.handleChange}
+                      />
+                    ) : null}
+                  </TableCell>
+                  <TableCell>
+                    {isFilterVisible ? (
+                      <TextField
+                        InputProps={{
+                          sx: {
+                            height: 30,
+                            // maxWidth: 100,
+                            fontSize: 13,
+                            '& .MuiOutlinedInput-input': {
+                              borderWidth: 0,
+                              padding: 0.5,
+                            },
+                          },
+                        }}
+                        fullWidth
+                        name="device"
+                        required
+                        variant="outlined"
+                        type="search"
+                        value={formik.values.device}
+                        onChange={formik.handleChange}
+                      />
+                    ) : null}
+                  </TableCell>
+                  <TableCell>
+                    {isFilterVisible ? (
+                      <TextField
+                        InputProps={{
+                          sx: {
+                            height: 30,
+                            // maxWidth: 100,
+                            fontSize: 13,
+                            '& .MuiOutlinedInput-input': {
+                              borderWidth: 0,
+                              padding: 0.5,
+                            },
+                          },
+                        }}
+                        fullWidth
+                        name="uid"
+                        required
+                        variant="outlined"
+                        type="search"
+                        value={formik.values.uid}
+                        onChange={formik.handleChange}
+                      />
+                    ) : null}
+                  </TableCell>
+                  <TableCell>
+                    {isFilterVisible ? (
+                      <TextField
+                        InputProps={{
+                          sx: {
+                            height: 30,
+                            // maxWidth: 100,
+                            fontSize: 13,
+                            '& .MuiOutlinedInput-input': {
+                              borderWidth: 0,
+                              padding: 0.5,
+                            },
+                          },
+                        }}
+                        fullWidth
+                        name="date"
+                        required
+                        variant="outlined"
+                        type="search"
+                        value={formik.values.date}
+                        onChange={formik.handleChange}
+                      />
+                    ) : null}
+                  </TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+              ) : null}
             </TableHead>
             <TableBody>
               <TableRows />
@@ -197,6 +628,23 @@ const DeviceLogFilesListTable = ({
           </Table>
         </Box>
       </PerfectScrollbar>
+      {/* <TextField
+        InputProps={{ sx: { height: 20 } }}
+        // sx={{
+        //   width: { sm: 200, md: 300 },
+        //   '& .MuiInputBase-root': {
+        //     height: 30,
+        //   },
+        // }}
+        sx={{ maxWidth: 100 }}
+        fullWidth
+        // label="Пользователь"
+        name="name"
+        required
+        variant="outlined"
+        type="name"
+        // value={formik.values.name}
+      /> */}
       <TablePagination
         component="div"
         count={deviceLogFiles.length}
