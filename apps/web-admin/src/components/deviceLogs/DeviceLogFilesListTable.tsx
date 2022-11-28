@@ -71,8 +71,9 @@ const DeviceLogFilesListTable = ({
       formik.values.contact ||
       formik.values.date ||
       formik.values.device ||
-      formik.values.uid ||
-      formik.values.path
+      formik.values.uid
+      // ||
+      // formik.values.path
     ) {
       return deviceLogFiles.filter(
         (i) =>
@@ -88,8 +89,9 @@ const DeviceLogFilesListTable = ({
                 .includes(formik.values.date.toUpperCase())
             : true) &&
           (formik.values.device ? i.device.name.toUpperCase().includes(formik.values.device.toUpperCase()) : true) &&
-          (formik.values.uid ? i.device.id.toUpperCase().includes(formik.values.uid.toUpperCase()) : true) &&
-          (formik.values.path ? i.path.toUpperCase().includes(formik.values.path.toUpperCase()) : true),
+          (formik.values.uid ? i.device.id.toUpperCase().includes(formik.values.uid.toUpperCase()) : true),
+        // &&
+        // (formik.values.path ? i.path.toUpperCase().includes(formik.values.path.toUpperCase()) : true),
       );
     } else {
       return deviceLogFiles;
@@ -101,7 +103,7 @@ const DeviceLogFilesListTable = ({
     formik.values.contact,
     formik.values.date,
     formik.values.device,
-    formik.values.path,
+
     formik.values.uid,
   ]);
 
@@ -176,6 +178,7 @@ const DeviceLogFilesListTable = ({
             key={deviceLogFile.id}
             selected={selectedDeviceLogFileIds.findIndex((d) => d.id === deviceLogFile?.id) !== -1}
           >
+            {/* <NavLink to={`${adminPath}/app/deviceLogs/${deviceLogFile.id}`}> */}
             <TableCell padding="checkbox">
               <Checkbox
                 checked={
@@ -189,7 +192,7 @@ const DeviceLogFilesListTable = ({
                 value="true"
               />
             </TableCell>
-            <TableCell style={{ padding: '0 16px' }}>
+            {/* <TableCell style={{ padding: '0 16px' }}>
               <Box
                 sx={{
                   alignItems: 'center',
@@ -202,8 +205,14 @@ const DeviceLogFilesListTable = ({
                   </Typography>
                 </NavLink>
               </Box>
+            </TableCell> */}
+            <TableCell>
+              <NavLink to={`${adminPath}/app/deviceLogs/${deviceLogFile.id}`}>
+                <Typography color="textPrimary" variant="body1" key={deviceLogFile.id}>
+                  {deviceLogFile.company.name}{' '}
+                </Typography>
+              </NavLink>
             </TableCell>
-            <TableCell>{deviceLogFile.company.name}</TableCell>
             <TableCell>{deviceLogFile.appSystem.name}</TableCell>
             <TableCell>{deviceLogFile.contact.name}</TableCell>
             {/* <TableCell>{message.producer.name}</TableCell>
@@ -213,6 +222,7 @@ const DeviceLogFilesListTable = ({
             <TableCell>{new Date(deviceLogFile.date || '').toLocaleString('ru', { hour12: false })}</TableCell>
             {/* <TableCell>{message.size} кб</TableCell> */}
             <TableCell>{Math.ceil(deviceLogFile.size).toString()} кб</TableCell>
+            {/* </NavLink> */}
           </TableRow>
         );
       });
@@ -250,35 +260,6 @@ const DeviceLogFilesListTable = ({
                 </TableCell>
                 <TableCell style={{ flexDirection: 'column' }}>
                   <Typography color="textPrimary" variant="inherit">
-                    Название
-                  </Typography>
-                  {/* {isFilterVisible ? (
-                    <TextField
-                      InputProps={{
-                        sx: {
-                          height: 30,
-                          // maxWidth: 100,
-                          fontSize: 13,
-                          '& .MuiOutlinedInput-input': {
-                            borderWidth: 0,
-                            padding: 0.5,
-                          },
-                        },
-                      }}
-                      // sx={{ maxWidth: 100 }}
-                      fullWidth
-                      name="path"
-                      required
-                      variant="outlined"
-                      type="search"
-                      value={formik.values.path}
-                      onChange={formik.handleChange}
-                    />
-                  ) : null} */}
-                </TableCell>
-
-                <TableCell style={{ flexDirection: 'column' }}>
-                  <Typography color="textPrimary" variant="inherit">
                     Компания
                   </Typography>
                   {/* {isFilterVisible ? (
@@ -309,56 +290,11 @@ const DeviceLogFilesListTable = ({
                   <Typography color="textPrimary" variant="inherit">
                     Подсистема
                   </Typography>
-                  {/* {isFilterVisible ? (
-                    <TextField
-                      InputProps={{
-                        sx: {
-                          height: 30,
-                          // maxWidth: 100,
-                          fontSize: 13,
-                          '& .MuiOutlinedInput-input': {
-                            borderWidth: 0,
-                            padding: 0.5,
-                          },
-                        },
-                      }}
-                      // sx={{ maxWidth: 100 }}
-                      fullWidth
-                      name="appSystem"
-                      required
-                      variant="outlined"
-                      type="search"
-                      value={formik.values.appSystem}
-                      onChange={formik.handleChange}
-                    />
-                  ) : null} */}
                 </TableCell>
                 <TableCell style={{ flexDirection: 'column' }}>
                   <Typography color="textPrimary" variant="inherit">
                     Пользователь
                   </Typography>
-                  {/* {isFilterVisible ? (
-                    <TextField
-                      InputProps={{
-                        sx: {
-                          height: 30,
-                          // maxWidth: 100,
-                          fontSize: 13,
-                          '& .MuiOutlinedInput-input': {
-                            borderWidth: 0,
-                            padding: 0.5,
-                          },
-                        },
-                      }}
-                      fullWidth
-                      name="contact"
-                      required
-                      variant="outlined"
-                      type="search"
-                      value={formik.values.contact}
-                      onChange={formik.handleChange}
-                    />
-                  ) : null} */}
                 </TableCell>
                 {/* <TableCell>Отправитель</TableCell>
                 <TableCell>Получатель</TableCell> */}
@@ -366,82 +302,16 @@ const DeviceLogFilesListTable = ({
                   <Typography color="textPrimary" variant="inherit">
                     Устройство
                   </Typography>
-                  {/* {isFilterVisible ? (
-                    <TextField
-                      InputProps={{
-                        sx: {
-                          height: 30,
-                          // maxWidth: 100,
-                          fontSize: 13,
-                          '& .MuiOutlinedInput-input': {
-                            borderWidth: 0,
-                            padding: 0.5,
-                          },
-                        },
-                      }}
-                      fullWidth
-                      name="device"
-                      required
-                      variant="outlined"
-                      type="search"
-                      value={formik.values.device}
-                      onChange={formik.handleChange}
-                    />
-                  ) : null} */}
                 </TableCell>
                 <TableCell style={{ flexDirection: 'column' }}>
                   <Typography color="textPrimary" variant="inherit">
                     Идентификатор
                   </Typography>
-                  {/* {isFilterVisible ? (
-                    <TextField
-                      InputProps={{
-                        sx: {
-                          height: 30,
-                          // maxWidth: 100,
-                          fontSize: 13,
-                          '& .MuiOutlinedInput-input': {
-                            borderWidth: 0,
-                            padding: 0.5,
-                          },
-                        },
-                      }}
-                      fullWidth
-                      name="uid"
-                      required
-                      variant="outlined"
-                      type="search"
-                      value={formik.values.uid}
-                      onChange={formik.handleChange}
-                    />
-                  ) : null} */}
                 </TableCell>
                 <TableCell style={{ flexDirection: 'column' }}>
                   <Typography color="textPrimary" variant="inherit">
                     Дата
                   </Typography>
-                  {/* {isFilterVisible ? (
-                    <TextField
-                      InputProps={{
-                        sx: {
-                          height: 30,
-                          // maxWidth: 100,
-                          fontSize: 13,
-                          '& .MuiOutlinedInput-input': {
-                            borderWidth: 0,
-                            padding: 0.5,
-                          },
-                        },
-                      }}
-                      fullWidth
-                      name="date"
-                      required
-                      variant="outlined"
-                      type="search"
-                      value={formik.values.date}
-                      onChange={formik.handleChange}
-                    />
-                  ) : null} */}
                 </TableCell>
                 <TableCell>Размер</TableCell>
               </TableRow>
@@ -454,7 +324,6 @@ const DeviceLogFilesListTable = ({
                         InputProps={{
                           sx: {
                             height: 30,
-                            // maxWidth: 100,
                             fontSize: 13,
                             '& .MuiOutlinedInput-input': {
                               borderWidth: 0,
@@ -462,33 +331,6 @@ const DeviceLogFilesListTable = ({
                             },
                           },
                         }}
-                        // sx={{ maxWidth: 100 }}
-                        fullWidth
-                        name="path"
-                        required
-                        variant="outlined"
-                        type="search"
-                        value={formik.values.path}
-                        onChange={formik.handleChange}
-                      />
-                    ) : null}
-                  </TableCell>
-
-                  <TableCell>
-                    {isFilterVisible ? (
-                      <TextField
-                        InputProps={{
-                          sx: {
-                            height: 30,
-                            // maxWidth: 100,
-                            fontSize: 13,
-                            '& .MuiOutlinedInput-input': {
-                              borderWidth: 0,
-                              padding: 0.5,
-                            },
-                          },
-                        }}
-                        // sx={{ maxWidth: 100 }}
                         fullWidth
                         name="company"
                         required
@@ -505,7 +347,6 @@ const DeviceLogFilesListTable = ({
                         InputProps={{
                           sx: {
                             height: 30,
-                            // maxWidth: 100,
                             fontSize: 13,
                             '& .MuiOutlinedInput-input': {
                               borderWidth: 0,
@@ -552,7 +393,6 @@ const DeviceLogFilesListTable = ({
                         InputProps={{
                           sx: {
                             height: 30,
-                            // maxWidth: 100,
                             fontSize: 13,
                             '& .MuiOutlinedInput-input': {
                               borderWidth: 0,
@@ -576,7 +416,6 @@ const DeviceLogFilesListTable = ({
                         InputProps={{
                           sx: {
                             height: 30,
-                            // maxWidth: 100,
                             fontSize: 13,
                             '& .MuiOutlinedInput-input': {
                               borderWidth: 0,
@@ -600,7 +439,6 @@ const DeviceLogFilesListTable = ({
                         InputProps={{
                           sx: {
                             height: 30,
-                            // maxWidth: 100,
                             fontSize: 13,
                             '& .MuiOutlinedInput-input': {
                               borderWidth: 0,
@@ -628,23 +466,6 @@ const DeviceLogFilesListTable = ({
           </Table>
         </Box>
       </PerfectScrollbar>
-      {/* <TextField
-        InputProps={{ sx: { height: 20 } }}
-        // sx={{
-        //   width: { sm: 200, md: 300 },
-        //   '& .MuiInputBase-root': {
-        //     height: 30,
-        //   },
-        // }}
-        sx={{ maxWidth: 100 }}
-        fullWidth
-        // label="Пользователь"
-        name="name"
-        required
-        variant="outlined"
-        type="name"
-        // value={formik.values.name}
-      /> */}
       <TablePagination
         component="div"
         count={deviceLogFiles.length}
