@@ -1,5 +1,5 @@
 import path from 'path';
-import { access, writeFile, readFile, readdir, unlink, stat } from 'fs/promises';
+import { readdir, unlink, stat } from 'fs/promises';
 import { constants, statSync } from 'fs';
 
 import { IFileSystem, IExtraFileInfo } from '@lib/types';
@@ -8,7 +8,7 @@ import { BYTES_PER_KB } from '../utils/constants';
 
 import log from '../utils/logger';
 
-import { fullFileName2alias, getAppSystemId } from '../utils/fileHelper';
+import { fullFileName2alias, getAppSystemId, alias2fullFileName, readJsonFile } from '../utils/fileHelper';
 
 import { getDb } from './dao/db';
 
@@ -105,6 +105,7 @@ const splitFilePath = async (path: string): Promise<IFileSystem | undefined> => 
   const fileDate = fileStat.birthtime.toString();
 
   const alias = fullFileName2alias(path);
+  console.log('alias=', alias);
 
   const fileInfo = await splitFileMessage(path);
   if (fileInfo) {
@@ -143,4 +144,18 @@ export const readListFiles = async (): Promise<IFileSystem[]> => {
     }
   }
   return files;
+};
+
+export const getFile = async (fid: string): Promise<any> => {
+  const fullName = alias2fullFileName(fid);
+  if (!fullName) {
+    log.error(`Неправильный параметр ID '${fid} в запросе`);
+    return undefined;
+  }
+  const fileJson: any | string = await readJsonFile(fullName);
+  if (typeof fileJson === 'string') {
+    log.error(fileJson);
+    return undefined;
+  }
+  return fileJson;
 };
