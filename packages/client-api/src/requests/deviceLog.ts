@@ -1,7 +1,5 @@
 import { IDeviceLog, IDeviceLogFiles, IDeviceLogParams, IResponse } from '@lib/types';
 
-import dev from '@lib/client-config/src/dev';
-
 import { error, deviceLog as types } from '../types';
 import { getParams, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
@@ -63,7 +61,7 @@ class DeviceLog extends BaseRequest {
 
       return {
         type: 'ERROR',
-        message: 'Подсистема не найдена',
+        message: 'Журнал ошибок не найден',
       } as error.INetworkError;
     }
 

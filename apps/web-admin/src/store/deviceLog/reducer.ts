@@ -21,7 +21,7 @@ const reducer: Reducer<IDeviceLogState, DeviceLogActionType> = (state = initialS
       return { ...state, errorMessage: '' };
 
     case getType(deviceLogActions.setError):
-      return { ...state, errorMessage: 'Подсистема уже существует' };
+      return { ...state, errorMessage: 'Журнал ошибок уже существует' };
 
     case getType(deviceLogActions.fetchDeviceLogFilesAsync.request):
       return { ...state, loading: true, filesList: [], errorMessage: '' };

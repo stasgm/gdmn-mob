@@ -220,7 +220,7 @@ const DeviceBindingListTable = ({
                   />
                 </TableCell>
                 <TableCell>Наименование</TableCell>
-                <TableCell>UID</TableCell>
+                <TableCell>Номер</TableCell>
                 <TableCell>Состояние</TableCell>
                 <TableCell>Код активации</TableCell>
                 <TableCell>Дата создания</TableCell>

@@ -10,6 +10,7 @@ import {
   List as ProcessIcon,
   Server as AppSystemsIcon,
   MessageCircle as MessageIcon,
+  File as FileIcon,
 } from 'react-feather';
 
 import { useDispatch, useSelector } from '@lib/store';
@@ -65,11 +66,11 @@ const items = [
     icon: MessageIcon,
     title: 'Журнал ошибок',
   },
-  // {
-  //   href: `${adminPath}/app/messages`,
-  //   icon: MessageIcon,
-  //   title: 'Журнал ошибок',
-  // },
+  {
+    href: `${adminPath}/app/files`,
+    icon: FileIcon,
+    title: 'Файловая система',
+  },
   {
     href: `${adminPath}/app/account`,
     icon: SettingsIcon,
