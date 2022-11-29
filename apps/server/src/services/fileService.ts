@@ -1,6 +1,6 @@
 import { IFileSystem } from '@lib/types';
 
-import { readListFiles } from './fileUtils';
+import { readListFiles, getFile } from './fileUtils';
 
 /**
  * Возвращает множество файлов
@@ -10,4 +10,13 @@ const findMany = async (): Promise<IFileSystem[]> => {
   return await readListFiles();
 };
 
-export { findMany };
+//**
+//  * Возвращает содержание файла  по ИД
+//  * @param id ИД сформированный из названия файла
+//  * @returns Объект из JSON  найденного файла
+//  */
+const findOne = async (id: string): Promise<any> => {
+  return await getFile(id);
+};
+
+export { findMany, findOne };

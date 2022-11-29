@@ -28,30 +28,28 @@ export const getPathSystem = ({ companyId, appSystemId }: IPathParams) =>
 export const fullFileName2alias = (fullFileName: string): string | undefined => {
   const re = /db_(.+)/gi;
   const match = re.exec(fullFileName);
-  if (!match) return undefined;
-  const shortName = (match ? match[1] : fullFileName).split('/').join('\\').split('\\');
-  if (shortName.length !== 4) return undefined;
-  const nameWithoutExt = shortName[3].split('.')[0];
-  return `db_${shortName[0]}_app_${shortName[1]}_dir_${shortName[2]}_name_${nameWithoutExt}`;
+  const fileNameArr = fullFileName.split(getDb().dbPath);
+  if (fileNameArr.length !== 2) return undefined;
+  const shortName = (match ? `db_${match[1]}` : fileNameArr[1]).split('/').join('\\').split('\\');
+  return shortName.reduce((str, prev, i, arr) => {
+    const nameWithoutExt = prev.split('.')[0];
+    const temp = i === arr.length - 1 ? nameWithoutExt : prev;
+    str += i === 0 ? temp : `_D_${temp}`;
+    return str;
+  }, '');
 };
 
 export const alias2fullFileName = (alias: string): string | undefined => {
-  const re = /db_(.+)_app_(.+)_dir_(.+)_name_(.+)/gi;
-  const match = re.exec(alias);
-  if (!match) {
-    log.error(`Invalid deviceLogs file alias ${alias}`);
-    return undefined;
-  }
-
-  return getPath([`db_${match[1]}\\${match[2]}\\${match[3]}\\${match[4]}.json`]);
+  const match = alias.split('_D_').join('\\') + '.json';
+  return getPath([match]);
 };
 
 export const readJsonFile = async <T>(fileName: string): Promise<T | string> => {
   const check = await checkFileExists(fileName);
   try {
-    return check ? JSON.parse((await readFile(fileName)).toString()) : [];
+    return check ? JSON.parse((await readFile(fileName)).toString()) : `Ошибка чтения файла ${fileName} `;
   } catch (err) {
-    return `Ошибка записи журнала ошибок устройства - ${err} в файл ${fileName}`;
+    return `Ошибка чтения файла ${fileName} - ${err} `;
   }
 };
 
