@@ -3,7 +3,11 @@ import api from '@lib/client-api';
 
 import { NewCompany, ICompany } from '@lib/types';
 
+import { authActions } from '@lib/store';
+
 import { AppState } from '../';
+
+import { webRequest } from '../webRequest';
 
 import { companyActions, CompanyActionType } from './actions';
 
@@ -13,7 +17,7 @@ const fetchCompanyById = (id: string): AppThunk => {
   return async (dispatch) => {
     dispatch(companyActions.fetchCompanyAsync.request(''));
 
-    const response = await api.company.getCompany(id);
+    const response = await api.company.getCompany(webRequest(dispatch, authActions), id);
 
     if (response.type === 'GET_COMPANY') {
       return dispatch(companyActions.fetchCompanyAsync.success(response.company));
@@ -33,7 +37,7 @@ const fetchCompanies = (filterText?: string, fromRecord?: number, toRecord?: num
     if (fromRecord) params.fromRecord = fromRecord;
     if (toRecord) params.toRecord = toRecord;
 
-    const response = await api.company.getCompanies(params);
+    const response = await api.company.getCompanies(webRequest(dispatch, authActions), params);
 
     if (response.type === 'GET_COMPANIES') {
       return dispatch(companyActions.fetchCompaniesAsync.success(response.companies));

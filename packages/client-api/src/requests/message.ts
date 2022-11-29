@@ -4,6 +4,7 @@ import { error, message as types } from '../types';
 import { generateId, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
+import { CustomRequest } from '../robustRequest';
 
 class Message extends BaseRequest {
   constructor(api: BaseApi) {
@@ -63,7 +64,7 @@ class Message extends BaseRequest {
     }
   };
 
-  getMessages = async (params: IMessageParams, authFunc?: AuthLogOut) => {
+  getMessages = async (customRequest: CustomRequest, params: IMessageParams) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -73,33 +74,39 @@ class Message extends BaseRequest {
       } as types.IGetMessagesResponse;
     }
 
-    try {
-      const res = await this.api.axios.get<IResponse<IMessage[]>>(
-        `/messages?companyId=${params.companyId}&appSystemId=${params.appSystemId}`,
-      );
-      const resData = res.data;
+    // try {
+    //   const res = await this.api.axios.get<IResponse<IMessage[]>>(
+    //     `/messages?companyId=${params.companyId}&appSystemId=${params.appSystemId}`,
+    //   );
+    //   const resData = res.data;
 
-      if (authFunc && resData.status === 401) {
-        await authFunc();
-      }
+    //   if (authFunc && resData.status === 401) {
+    //     await authFunc();
+    //   }
 
-      if (resData.result) {
-        return {
-          type: 'GET_MESSAGES',
-          messageList: resData.data,
-        } as types.IGetMessagesResponse;
-      }
+    const res = await customRequest<IMessage[]>({
+      api: this.api,
+      method: 'GET',
+      url: `/messages?companyId=${params.companyId}&appSystemId=${params.appSystemId}`,
+    });
 
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error || 'ошибка получения данных',
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка получения сообщения',
-      } as error.INetworkError;
+        type: 'GET_MESSAGES',
+        messageList: res.data,
+      } as types.IGetMessagesResponse;
     }
+
+    return {
+      type: 'ERROR',
+      message: res?.error || 'сообщения не получены',
+    } as error.INetworkError;
+    // } catch (err) {
+    //   return {
+    //     type: 'ERROR',
+    //     message: err instanceof TypeError ? err.message : 'ошибка получения сообщения',
+    //   } as error.INetworkError;
+    // }
   };
 
   removeMessage = async (messageId: string, params: IMessageParams, authFunc?: AuthLogOut) => {

@@ -14,10 +14,12 @@ import Logo from '../components/Logo';
 
 import { adminPath } from '../utils/constants';
 
+import { webRequest } from '../store/webRequest';
+
 const Login = () => {
   const dispatch = useDispatch();
 
-  const { error, loading, status } = useSelector((state) => state.auth);
+  const { error, loading, status, errorMessage } = useSelector((state) => state.auth);
 
   const formik = useFormik<IUserCredentials>({
     enableReinitialize: true,
@@ -30,7 +32,7 @@ const Login = () => {
       password: yup.string().required('Заполните это поле'),
     }),
     onSubmit: (values: IUserCredentials) => {
-      dispatch(authActions.login(values));
+      dispatch(authActions.login(webRequest(dispatch, authActions), values));
     },
   });
 
@@ -79,9 +81,9 @@ const Login = () => {
                 Вход
               </Typography>
               {loading && <CircularProgress size={20} sx={{ mx: 2 }} />}
-              {error && (
+              {(error || !!errorMessage) && (
                 <Typography color="error" variant="h5" sx={{ flexGrow: 1, textAlign: 'end' }}>
-                  {status}
+                  {errorMessage || status}
                 </Typography>
               )}
             </Box>

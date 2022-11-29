@@ -1,9 +1,11 @@
 import api from '@lib/client-api';
+import { authActions } from '@lib/store';
 import { IDeviceBinding, NewDeviceBinding } from '@lib/types';
 
 import { ThunkAction } from 'redux-thunk';
 
 import { AppState } from '..';
+import { webRequest } from '../webRequest';
 
 import { deviceBindingActions, DeviceBindingActionType } from './actions';
 
@@ -24,7 +26,7 @@ const fetchDeviceBindings = (
     if (fromRecord) params.fromRecord = fromRecord;
     if (toRecord) params.toRecord = toRecord;
 
-    const response = await api.deviceBinding.getDeviceBindings(/*userId ? { userId: userId } : undefined*/ params);
+    const response = await api.deviceBinding.getDeviceBindings(webRequest(dispatch, authActions), params);
 
     if (response.type === 'GET_DEVICEBINDINGS') {
       return dispatch(deviceBindingActions.fetchDeviceBindingsAsync.success(response.deviceBindings));
@@ -38,7 +40,7 @@ const fetchDeviceBindingById = (id: string): AppThunk => {
   return async (dispatch) => {
     dispatch(deviceBindingActions.fetchDeviceBindingAsync.request(''));
 
-    const response = await api.deviceBinding.getDeviceBinding(id);
+    const response = await api.deviceBinding.getDeviceBinding(webRequest(dispatch, authActions), id);
 
     if (response.type === 'GET_DEVICEBINDING') {
       return dispatch(deviceBindingActions.fetchDeviceBindingAsync.success(response.deviceBinding));

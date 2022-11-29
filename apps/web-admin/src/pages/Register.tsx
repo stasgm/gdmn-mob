@@ -9,8 +9,6 @@ import { useEffect } from 'react';
 
 import { authActions, useAuthThunkDispatch, useSelector } from '@lib/store';
 
-// import { useDispatch, useSelector } from '../store';
-
 import Logo from '../components/Logo';
 
 import { adminPath } from '../utils/constants';
@@ -18,7 +16,7 @@ import { adminPath } from '../utils/constants';
 const Register = () => {
   const navigate = useNavigate();
 
-  const { error, loading, status } = useSelector((state) => state.auth); //{ error: false, loading: false, status: '' };
+  const { error, loading, status } = useSelector((state) => state.auth);
 
   const dispatch = useAuthThunkDispatch();
 

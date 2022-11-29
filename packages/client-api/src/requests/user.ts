@@ -6,7 +6,7 @@ import { generateId, getParams, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 
 import { BaseRequest } from '../types/BaseRequest';
-import { RobustRequest, robustRequest } from '../robustRequest';
+import { CustomRequest } from '../robustRequest';
 
 class User extends BaseRequest {
   constructor(api: BaseApi) {
@@ -124,7 +124,7 @@ class User extends BaseRequest {
     }
   };
 
-  getUser = async (userId: string, authFunc?: AuthLogOut) => {
+  getUser = async (customRequest: CustomRequest, userId: string) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
       const user = mockUsers.find((item) => item.id === userId);
@@ -138,28 +138,27 @@ class User extends BaseRequest {
 
       return {
         type: 'ERROR',
-        message: 'Пользователь не найден',
+        message: 'данные о пользователе не получены',
       } as error.INetworkError;
     }
 
-    const res = await robustRequest({ api: this.api, method: 'GET', url: `/users/${userId}` });
+    const res = await customRequest<IUser>({ api: this.api, method: 'GET', url: `/users/${userId}` });
     // const res = await this.api.axios.get<IResponse<IUser>>(`/users/${userId}`);
-    console.log('res', res);
 
-    if (res.result === 'OK') {
+    if (res?.result) {
       return {
         type: 'GET_USER',
-        user: res.response.data?.data,
+        user: res.data,
       } as types.IGetUserResponse;
     }
 
     return {
       type: 'ERROR',
-      message: res.result === 'INVALID_DATA' || res.result === 'ERROR' ? res.message : 'ошибка добавления пользователя',
+      message: res?.error || 'данные о пользователе не получены',
     } as error.INetworkError;
   };
 
-  getUsers = async (params?: Record<string, string | number>, authFunc?: AuthLogOut) => {
+  getUsers = async (customRequest: CustomRequest, params?: Record<string, string | number>, authFunc?: AuthLogOut) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -172,41 +171,42 @@ class User extends BaseRequest {
 
       return {
         type: 'ERROR',
-        message: 'Пользователи не найдены',
+        message: 'данные о пользователях не получены',
       } as error.INetworkError;
     }
 
-    let paramText = params ? getParams(params) : '';
+    // let paramText = params ? getParams(params) : '';
 
-    if (paramText > '') {
-      paramText = `?${paramText}`;
-    }
+    // if (paramText > '') {
+    //   paramText = `?${paramText}`;
+    // }
 
-    try {
-      const res = await this.api.axios.get<IResponse<IUser[]>>(`/users${paramText}`);
-      const resData = res.data;
+    // try {
+    //   const res = await this.api.axios.get<IResponse<IUser[]>>(`/users${paramText}`);
+    //   const resData = res.data;
+    const res = await customRequest<IUser[]>({ api: this.api, method: 'GET', url: '/users', params });
 
-      if (authFunc && resData.status === 401) {
-        await authFunc();
-      }
+    // if (authFunc && resData.status === 401) {
+    //   await authFunc();
+    // }
 
-      if (resData.result) {
-        return {
-          type: 'GET_USERS',
-          users: resData.data,
-        } as types.IGetUsersResponse;
-      }
-
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка получения данных о пользователях',
-      } as error.INetworkError;
+        type: 'GET_USERS',
+        users: res.data,
+      } as types.IGetUsersResponse;
     }
+
+    return {
+      type: 'ERROR',
+      message: res?.error || 'данные о пользователях не получены',
+    } as error.INetworkError;
+    // } catch (err) {
+    //   return {
+    //     type: 'ERROR',
+    //     message: err instanceof TypeError ? err.message : 'ошибка получения данных о пользователях',
+    //   } as error.INetworkError;
+    // }
   };
 }
 export default User;

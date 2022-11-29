@@ -5,6 +5,7 @@ import { error, device as types } from '../types';
 import { generateId, getParams, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
+import { CustomRequest } from '../robustRequest';
 
 class Device extends BaseRequest {
   constructor(api: BaseApi) {
@@ -118,7 +119,7 @@ class Device extends BaseRequest {
     * @param string userId
     * @returns IDevice
     */
-  getDevice = async (deviceId?: string) => {
+  getDevice = async (customRequest: CustomRequest, deviceId?: string) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -128,28 +129,34 @@ class Device extends BaseRequest {
       } as types.IGetDeviceResponse;
     }
 
-    try {
-      const res = await this.api.axios.get<IResponse<IDevice>>(`/devices/${deviceId || this.api.config.deviceId}`);
+    const res = await customRequest<IDevice>({
+      api: this.api,
+      method: 'GET',
+      url: `/devices/${deviceId || this.api.config.deviceId}`,
+    });
 
-      const resData = res?.data;
+    // try {
+    //   const res = await this.api.axios.get<IResponse<IDevice>>(`/devices/${deviceId || this.api.config.deviceId}`);
 
-      if (resData?.result) {
-        return {
-          type: 'GET_DEVICE',
-          device: resData.data,
-        } as types.IGetDeviceResponse;
-      }
+    //   const resData = res?.data;
 
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка подключения',
-      } as error.INetworkError;
+        type: 'GET_DEVICE',
+        device: res.data,
+      } as types.IGetDeviceResponse;
     }
+
+    return {
+      type: 'ERROR',
+      message: res?.error || 'устройство не получено',
+    } as error.INetworkError;
+    // } catch (err) {
+    //   return {
+    //     type: 'ERROR',
+    //     message: err instanceof TypeError ? err.message : 'ошибка подключения',
+    //   } as error.INetworkError;
+    // }
   };
 
   /**
@@ -160,6 +167,7 @@ class Device extends BaseRequest {
     * @returns
     */
   getDevices = async (
+    customRequest: CustomRequest,
     params?: Record<string, string | number>,
   ): Promise<types.IGetDevicesResponse | error.INetworkError> => {
     if (this.api.config.debug?.isMock) {
@@ -177,49 +185,50 @@ class Device extends BaseRequest {
       paramText = `?${paramText}`;
     }
 
-    try {
-      const res = await this.api.axios.get<IResponse<IDevice[]>>(`/devices${paramText}`);
-      const resData = res.data;
+    // try {
+    // const res = await this.api.axios.get<IResponse<IDevice[]>>(`/devices${paramText}`);
+    const res = await customRequest<IDevice[]>({ api: this.api, method: 'GET', url: `/devices${paramText}` });
 
-      if (resData.result) {
-        return {
-          type: 'GET_DEVICES',
-          devices: resData?.data || [],
-        } as types.IGetDevicesResponse;
-      }
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData?.error || 'ошибка получения данных об устройствах',
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка получения данных об устройствах',
-      } as error.INetworkError;
+        type: 'GET_DEVICES',
+        devices: res.data || [],
+      } as types.IGetDevicesResponse;
     }
+    return {
+      type: 'ERROR',
+      message: res?.error || 'данные об устройствах не получены',
+    } as error.INetworkError;
+    // } catch (err) {
+    //   return {
+    //     type: 'ERROR',
+    //     message: err instanceof TypeError ? err.message : 'ошибка получения данных об устройствах',
+    //   } as error.INetworkError;
+    // }
   };
 
-  getUsersByDevice = async (deviceId: string) => {
-    try {
-      const res = await this.api.axios.get<IResponse<IDevice[]>>(`/devices/${deviceId}/users`);
-      const resData = res.data;
+  getUsersByDevice = async (customRequest: CustomRequest, deviceId: string) => {
+    // try {
+    //   const res = await this.api.axios.get<IResponse<IDevice[]>>(`/devices/${deviceId}/users`);
+    //   const resData = res.data;
+    const res = await customRequest<IDevice[]>({ api: this.api, method: 'GET', url: `/devices/${deviceId}/users` });
 
-      if (resData.result) {
-        return {
-          type: 'GET_USERS_BY_DEVICE',
-          userList: resData.data,
-        } as types.IGetUsersByDeviceResponse;
-      }
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка получения пользователей по устройству',
-      } as error.INetworkError;
+        type: 'GET_USERS_BY_DEVICE',
+        userList: res.data,
+      } as types.IGetUsersByDeviceResponse;
     }
+    return {
+      type: 'ERROR',
+      message: res?.error || 'данные о пользователях по устройству не получены',
+    } as error.INetworkError;
+    // } catch (err) {
+    //   return {
+    //     type: 'ERROR',
+    //     message: err instanceof TypeError ? err.message : 'ошибка получения пользователей по устройству',
+    //   } as error.INetworkError;
+    // }
   };
 }
 

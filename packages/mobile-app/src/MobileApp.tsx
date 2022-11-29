@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Store } from 'redux';
 
 import {
+  appActions,
   authActions,
   authSelectors,
   documentActions,
@@ -22,8 +23,7 @@ import { View, Text, AppState } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
 
-import { AuthLogOut } from '@lib/types';
-import { truncate, useSync } from '@lib/mobile-hooks';
+import { mobileRequest, truncate, useSync } from '@lib/mobile-hooks';
 
 export interface IApp {
   items?: INavItem[];
@@ -43,7 +43,7 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
 
   const appState = useRef(AppState.currentState);
   const authDispatch = useAuthThunkDispatch();
-  const authMiddleware: AuthLogOut = () => authDispatch(authActions.logout());
+  const appRequest = mobileRequest(authDispatch, authActions);
 
   useEffect(() => {
     //При запуске приложения записываем настройки в апи
@@ -54,7 +54,7 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
     const subscription = AppState.addEventListener('change', async (nextAppState) => {
       if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
         //Проверка сессии при фокусе приложения, можно getUser заменить на другую с Middleware
-        await api.user.getUser(user!.id, authMiddleware);
+        await api.user.getUser(appRequest, user!.id);
       }
       appState.current = nextAppState;
     });
@@ -94,6 +94,23 @@ const MobileApp = ({ store, loadingErrors, onClearLoadingErrors, ...props }: IAp
   const docsLoadingError = useSelector<string>((state) => state.documents.loadingError);
   const refsLoadingError = useSelector<string>((state) => state.references.loadingError);
   const setsLoadingError = useSelector<string>((state) => state.settings.loadingError);
+  // const isConnected = useSelector((state) => state.app.isConnected);
+  const errorMessage = useSelector((state) => state.auth.errorMessage);
+
+  // console.log('errorMessage', errorMessage);
+  //   console.log('isConnected', isConnected);
+
+  //   useEffect(() => {
+  //     const unsubscribe = NetInfo.addEventListener(state => {
+
+  //       dispatch(appActions.setIsConnected(state.isConnected || false))
+  //       setBarVisible(state.isConnected|| false)
+  //     });
+
+  //     return () => {
+  //       unsubscribe();
+  //     };
+  //   }, []);
 
   /**Массив ошибок при считывание\сохранении с диска данных из общего стора и из стора приложений  */
   const errList: string[] = useMemo(
@@ -121,6 +138,17 @@ const MobileApp = ({ store, loadingErrors, onClearLoadingErrors, ...props }: IAp
     setBarVisible(false);
   };
 
+  // const [errVisible, setErrVisible] = useState(false);
+  const closeErrBar = () => {
+    dispatch(authActions.setErrorMessage(''));
+  };
+
+  // useEffect(() => {
+  //   setErrVisible(!!errorMessage);
+  // }, [errorMessage]);
+
+  // console.log('!!errorMessage', !!errorMessage);
+
   const SnackbarComponent = () => (
     <Snackbar
       visible={barVisible}
@@ -140,6 +168,19 @@ const MobileApp = ({ store, loadingErrors, onClearLoadingErrors, ...props }: IAp
 
   return (
     <NavigationContainer theme={defaultTheme}>
+      <Snackbar
+        visible={!!errorMessage}
+        // duration={6000}
+        onDismiss={closeErrBar}
+        style={{ backgroundColor: defaultTheme.colors.error, zIndex: 1000 }}
+        action={{
+          icon: 'close',
+          label: '',
+          onPress: closeErrBar,
+        }}
+      >
+        <Text>{errorMessage}</Text>
+      </Snackbar>
       {authSelectors.isLoggedWithCompany() ? <AppRoot {...props} /> : <AuthNavigator />}
       <SnackbarComponent />
     </NavigationContainer>

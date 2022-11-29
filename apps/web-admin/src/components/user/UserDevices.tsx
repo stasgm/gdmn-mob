@@ -23,13 +23,8 @@ interface IProps {
 const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
   const dispatch = useDispatch();
   const authDispatch = useAuthThunkDispatch();
-
-  // const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
-
   const { pageParams } = useSelector((state) => state.deviceBindings);
-
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
-
   const { list: activationCodes } = useSelector((state) => state.activationCodes);
   const { list: devices } = useSelector((state) => state.devices);
 

@@ -23,6 +23,7 @@
     "@expo/webpack-config": "^0.17.3",
     "@lib/client-api": "*",
     "@lib/client-types": "*",
+    "@lib/mobile-hooks": "*",
     "@lib/mobile-ui": "*",
     "@lib/store": "*",
     "@lib/types": "*",

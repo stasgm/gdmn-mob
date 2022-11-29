@@ -7,6 +7,10 @@ import { config } from '@lib/client-config';
 /** Функция, вызывается при неверной авторизации */
 export type AuthLogOut = () => Promise<any>;
 
+export type CustomRequest = <T>(params: IRequestParams) => Promise<IResponse<T> | undefined>;
+
+export type CustomRequestProps = <T>(dispatch: any, actions: any) => CustomRequest;
+
 /** Валидатор проверяет полученные данные на корректность. В случае ошибки генерирует исключение. */
 type Validator = (data: Record<string, unknown>) => void;
 
@@ -101,12 +105,12 @@ export const robustRequest: RobustRequest = async ({
 
     switch (method) {
       case 'GET': {
-        console.log('get', url, config);
+        // console.log('get', url, config);
         res = await api.axios.get(url, config);
         break;
       }
       case 'POST': {
-        console.log('post', url, config, data);
+        // console.log('post', url, config, data);
         res = await api.axios.post(url, data, config);
         break;
       }
@@ -159,7 +163,7 @@ export const robustRequest: RobustRequest = async ({
       };
     }
 
-    console.log('err', err);
+    // console.log('err', err);
     // //Если пришел ответ с ошибкой сети
     // if (err instanceof AxiosError) {
     //   const code = err.code;

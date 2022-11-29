@@ -3,7 +3,11 @@ import api from '@lib/client-api';
 
 import { IAppSystem, NewAppSystem } from '@lib/types';
 
+import { authActions } from '@lib/store';
+
 import { AppState } from '../';
+
+import { webRequest } from '../webRequest';
 
 import { appSystemActions, AppSystemActionType } from './actions';
 
@@ -19,8 +23,7 @@ const fetchAppSystems = (filterText?: string, fromRecord?: number, toRecord?: nu
     if (fromRecord) params.fromRecord = fromRecord;
     if (toRecord) params.toRecord = toRecord;
 
-    const response = await api.appSystem.getAppSystems(params);
-
+    const response = await api.appSystem.getAppSystems(webRequest(dispatch, authActions), params);
     if (response.type === 'GET_APP_SYSTEMS') {
       return dispatch(appSystemActions.fetchAppSystemsAsync.success(response.appSystems));
     }
@@ -33,7 +36,7 @@ const fetchAppSystemById = (id: string): AppThunk => {
   return async (dispatch) => {
     dispatch(appSystemActions.fetchAppSystemAsync.request(''));
 
-    const response = await api.appSystem.getAppSystem(id);
+    const response = await api.appSystem.getAppSystem(webRequest(dispatch, authActions), id);
 
     if (response.type === 'GET_APP_SYSTEM') {
       return dispatch(appSystemActions.fetchAppSystemAsync.success(response.appSystem));

@@ -1,4 +1,4 @@
-import api from '@lib/client-api';
+import api, { CustomRequest } from '@lib/client-api';
 
 import { ThunkDispatch } from 'redux-thunk';
 import { useDispatch } from 'react-redux';
@@ -14,13 +14,16 @@ export type MsgDispatch = ThunkDispatch<MessagesState, any, MsgActionType>;
 
 export const useMsgThunkDispatch = () => useDispatch<MsgDispatch>();
 
-const fetchMessages = ({
-  appSystemId,
-  companyId,
-}: {
-  appSystemId: string;
-  companyId: string;
-}): AppThunk<
+const fetchMessages = (
+  customRequest: CustomRequest,
+  {
+    appSystemId,
+    companyId,
+  }: {
+    appSystemId: string;
+    companyId: string;
+  },
+): AppThunk<
   Promise<ActionType<typeof actions.fetchMessagesAsync>>,
   MessagesState,
   ActionType<typeof actions.fetchMessagesAsync>
@@ -28,17 +31,13 @@ const fetchMessages = ({
   return async (dispatch) => {
     dispatch(actions.fetchMessagesAsync.request(''));
 
-    const response = await api.message.getMessages({ appSystemId, companyId });
+    const response = await api.message.getMessages(customRequest, { appSystemId, companyId });
 
     if (response.type === 'GET_MESSAGES') {
       return dispatch(actions.fetchMessagesAsync.success(response.messageList));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(actions.fetchMessagesAsync.failure(response.message));
-    }
-
-    return dispatch(actions.fetchMessagesAsync.failure('something wrong'));
+    return dispatch(actions.fetchMessagesAsync.failure(response.message));
   };
 };
 

@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { IDevice, NewDevice } from '@lib/types';
 
 import DeviceDetails from '../../components/device/DeviceDetails';
-import SnackBar from '../../components/SnackBar';
-
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/device';
 
@@ -13,19 +11,11 @@ const DeviceCreate = () => {
 
   const dispatch: AppDispatch = useDispatch();
 
-  const { errorMessage, loading } = useSelector((state) => state.devices);
-
-  // useEffect(() => {
-  //   dispatch(actions.deviceActions.clearError());
-  // }, [dispatch]);
+  const { loading } = useSelector((state) => state.devices);
 
   const goBack = () => {
-    dispatch(actions.deviceActions.clearError());
+    dispatch(actions.clearError());
     navigate(-1);
-  }; // [dispatch]);
-
-  const handleClearError = () => {
-    dispatch(actions.deviceActions.clearError());
   };
 
   const handleSubmit = async (values: IDevice | NewDevice) => {
@@ -61,7 +51,6 @@ const DeviceCreate = () => {
           onCancel={goBack}
         />
       </Box>
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

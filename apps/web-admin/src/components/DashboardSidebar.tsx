@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Avatar, Box, Divider, Drawer, List, Typography } from '@material-ui/core';
 import {
@@ -11,11 +11,11 @@ import {
   Server as AppSystemsIcon,
 } from 'react-feather';
 
-import { useDispatch, useSelector } from '@lib/store';
+import { useSelector } from '@lib/store';
 
 import { adminPath } from '../utils/constants';
 
-import actions from '../store/user';
+import { useDispatch } from '../store';
 
 import NavItem from './NavItem';
 import NavToggle from './NavToggle';
@@ -78,20 +78,20 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
 
   const { user } = useSelector((state) => state.auth);
 
-  const fetchUser = useCallback(
-    async (id: string) => {
-      if (user?.id) {
-        dispatch(actions.fetchUserById(id));
-      }
-    },
-    [user?.id, dispatch],
-  );
+  // const fetchUser = useCallback(
+  //   async (id: string) => {
+  //     if (user?.id) {
+  //       dispatch(actions.fetchUserById(id));
+  //     }
+  //   },
+  //   [user?.id, dispatch],
+  // );
 
-  useEffect(() => {
-    if (user?.id) {
-      fetchUser(user.id);
-    }
-  }, [fetchUser, user]);
+  // useEffect(() => {
+  //   if (user?.id) {
+  //     fetchUser(user.id);
+  //   }
+  // }, [fetchUser, user]);
 
   const content = (
     <Box

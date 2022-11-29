@@ -16,8 +16,6 @@ import EditIcon from '@material-ui/icons/Edit';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
-import { IDevice } from '@lib/types';
-
 import { useSelector, useDispatch } from '../../store';
 import bindingActions from '../../store/deviceBinding';
 import deviceActions from '../../store/device';
@@ -26,7 +24,6 @@ import ToolBarAction from '../../components/ToolBarActions';
 
 import deviceBindingSelectors from '../../store/deviceBinding/selectors';
 import deviceSelectors from '../../store/device/selectors';
-import SnackBar from '../../components/SnackBar';
 
 import { adminPath } from '../../utils/constants';
 import DeviceBindingDetailsView from '../../components/deviceBinding/DeviceBindingDetailsView';
@@ -39,13 +36,9 @@ const UserDeviceView = () => {
   const { bindingid } = useParams<keyof Params>() as Params;
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const { loading, errorMessage } = useSelector((state) => state.devices);
-
+  const { loading } = useSelector((state) => state.devices);
   const deviceBinding = deviceBindingSelectors.bindingById(bindingid);
-
   const device = deviceSelectors.deviceById(deviceBinding?.device.id || '-1');
-
   const [open, setOpen] = useState(false);
 
   const handleCancel = () => {
@@ -80,9 +73,6 @@ const UserDeviceView = () => {
   const handleClose = () => {
     setOpen(false);
   };
-  const handleClearError = () => {
-    dispatch(bindingActions.deviceBindingActions.clearError());
-  };
 
   const buttons: IToolBarButton[] = [
     {
@@ -107,7 +97,7 @@ const UserDeviceView = () => {
       disabled: true,
       color: 'secondary',
       variant: 'contained',
-      onClick: handleClickOpen, //handleDelete,
+      onClick: handleClickOpen,
       icon: <DeleteIcon />,
     },
   ];
@@ -179,7 +169,6 @@ const UserDeviceView = () => {
           <DeviceBindingDetailsView deviceBinding={deviceBinding} uid={device?.uid} />
         </Box>
       </Box>
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

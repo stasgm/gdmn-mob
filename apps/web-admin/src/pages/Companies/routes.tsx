@@ -1,6 +1,12 @@
 import { Navigate, useRoutes } from 'react-router-dom';
 import { RouteObject } from 'react-router';
 
+import { useDispatch, useSelector } from '../../store';
+
+import SnackBar from '../../components/SnackBar';
+
+import { companyActions } from '../../store/company/actions';
+
 import CompanyView from './CompanyView';
 import CompanyEdit from './CompanyEdit';
 import CompanyCreate from './CompanyCreate';
@@ -15,5 +21,23 @@ const routes: RouteObject[] = [
 ];
 
 export default function Companies() {
-  return useRoutes(routes);
+  const routeComponent = useRoutes(routes);
+  const dispatch = useDispatch();
+  const companiesErrorMessage = useSelector((state) => state.companies.errorMessage);
+  const errorMessage = useSelector((state) => state.auth.errorMessage);
+
+  const handleClearError = () => {
+    dispatch(companyActions.clearError());
+  };
+
+  return (
+    <>
+      {routeComponent}
+      <SnackBar
+        visible={!!companiesErrorMessage && !errorMessage}
+        errorMessage={`Ошибка: ${companiesErrorMessage}`}
+        onClearError={handleClearError}
+      />
+    </>
+  );
 }

@@ -5,6 +5,7 @@ import { error, deviceBinding as types } from '../types';
 import { generateId, getParams, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
+import { CustomRequest } from '../robustRequest';
 
 class DeviceBinding extends BaseRequest {
   constructor(api: BaseApi) {
@@ -118,7 +119,7 @@ class DeviceBinding extends BaseRequest {
     * @param string userId
     * @returns IDevice
     */
-  getDeviceBinding = async (deviceId?: string) => {
+  getDeviceBinding = async (customRequest: CustomRequest, deviceId?: string) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -128,31 +129,36 @@ class DeviceBinding extends BaseRequest {
       } as types.IGetDeviceBindingResponse;
     }
 
-    try {
-      // || this.api.config.deviceId
-      const res = await this.api.axios.get<IResponse<IDeviceBinding>>(
-        `/binding/${deviceId || this.api.config.deviceId}`,
-      );
+    // try {
+    // const res = await this.api.axios.get<IResponse<IDeviceBinding>>(
+    //   `/binding/${deviceId || this.api.config.deviceId}`,
+    // );
 
-      const resData = res?.data;
+    const res = await customRequest<IDeviceBinding>({
+      api: this.api,
+      method: 'GET',
+      url: `/binding/${deviceId || this.api.config.deviceId}`,
+    });
 
-      if (resData?.result) {
-        return {
-          type: 'GET_DEVICEBINDING',
-          deviceBinding: resData.data,
-        } as types.IGetDeviceBindingResponse;
-      }
+    // const resData = res?.data;
 
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка подключения',
-      } as error.INetworkError;
+        type: 'GET_DEVICEBINDING',
+        deviceBinding: res?.data,
+      } as types.IGetDeviceBindingResponse;
     }
+
+    return {
+      type: 'ERROR',
+      message: res?.error || 'связанное устройство не получено',
+    } as error.INetworkError;
+    // } catch (err) {
+    //   return {
+    //     type: 'ERROR',
+    //     message: err instanceof TypeError ? err.message : 'ошибка подключения',
+    //   } as error.INetworkError;
+    // }
   };
 
   /**
@@ -163,6 +169,7 @@ class DeviceBinding extends BaseRequest {
     * @returns
     */
   getDeviceBindings = async (
+    customRequest: CustomRequest,
     params?: Record<string, string | number>,
   ): Promise<types.IGetDeviceBindingsResponse | error.INetworkError> => {
     if (this.api.config.debug?.isMock) {
@@ -174,32 +181,39 @@ class DeviceBinding extends BaseRequest {
       };
     }
 
-    let paramText = params ? getParams(params) : '';
+    // let paramText = params ? getParams(params) : '';
 
-    if (paramText > '') {
-      paramText = `?${paramText}`;
-    }
+    // if (paramText > '') {
+    //   paramText = `?${paramText}`;
+    // }
 
-    try {
-      const res = await this.api.axios.get<IResponse<IDeviceBinding[]>>(`/binding${paramText}`);
-      const resData = res.data;
+    // try {
+    //   const res = await this.api.axios.get<IResponse<IDeviceBinding[]>>(`/binding${paramText}`);
+    //   const resData = res.data;
 
-      if (resData.result) {
-        return {
-          type: 'GET_DEVICEBINDINGS',
-          deviceBindings: resData?.data || [],
-        };
-      }
+    const res = await customRequest<IDeviceBinding[]>({
+      api: this.api,
+      method: 'GET',
+      url: '/binding',
+      params,
+    });
+
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData?.error || 'ошибка получения данных об устройствах',
-      };
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка получения данных об устройствах',
+        type: 'GET_DEVICEBINDINGS',
+        deviceBindings: res.data || [],
       };
     }
+    return {
+      type: 'ERROR',
+      message: res?.error || 'данныe об устройствах не получены',
+    };
+    // } catch (err) {
+    //   return {
+    //     type: 'ERROR',
+    //     message: err instanceof TypeError ? err.message : 'ошибка получения данных об устройствах',
+    //   };
+    // }
   };
 
   // getUsersByDevice = async (deviceId: string) => {

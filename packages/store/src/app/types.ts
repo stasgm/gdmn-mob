@@ -13,6 +13,7 @@ export interface IAppState {
   syncDate?: Date;
   requestNotice: IRequestNotice[];
   errorNotice: IErrorNotice[];
+  isConnected: boolean;
   readonly loadingData: boolean;
   readonly loadingError: string;
 }

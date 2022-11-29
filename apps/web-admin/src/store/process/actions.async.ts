@@ -1,8 +1,10 @@
 import api from '@lib/client-api';
+import { authActions } from '@lib/store';
 
 import { ThunkAction } from 'redux-thunk';
 
 import { AppState } from '..';
+import { webRequest } from '../webRequest';
 
 import { processActions, ProcessActionType } from './actions';
 
@@ -18,7 +20,7 @@ const fetchProcesses = (filterText?: string, fromRecord?: number, toRecord?: num
     if (fromRecord) params.fromRecord = fromRecord;
     if (toRecord) params.toRecord = toRecord;
 
-    const response = await api.process.getProcesses(params);
+    const response = await api.process.getProcesses(webRequest(dispatch, authActions), params);
 
     if (response.type === 'GET_PROCESSES') {
       return dispatch(processActions.fetchProcessesAsync.success(response.processes));

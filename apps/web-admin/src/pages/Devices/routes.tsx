@@ -1,6 +1,12 @@
 import { Navigate, useRoutes } from 'react-router-dom';
 import { RouteObject } from 'react-router';
 
+import { useDispatch, useSelector } from '../../store';
+
+import SnackBar from '../../components/SnackBar';
+
+import { deviceActions } from '../../store/device/actions';
+
 import DeviceView from './DeviceView';
 import DeviceEdit from './DeviceEdit';
 import DeviceCreate from './DeviceCreate';
@@ -15,5 +21,23 @@ const routes: RouteObject[] = [
 ];
 
 export default function Devices() {
-  return useRoutes(routes);
+  const routeComponent = useRoutes(routes);
+  const dispatch = useDispatch();
+  const devicesErrorMessage = useSelector((state) => state.devices.errorMessage);
+  const errorMessage = useSelector((state) => state.auth.errorMessage);
+
+  const handleClearError = () => {
+    dispatch(deviceActions.clearError());
+  };
+
+  return (
+    <>
+      {routeComponent}
+      <SnackBar
+        visible={!!devicesErrorMessage && !errorMessage}
+        errorMessage={`Ошибка: ${devicesErrorMessage}`}
+        onClearError={handleClearError}
+      />
+    </>
+  );
 }

@@ -3,8 +3,6 @@ import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as u
 import { ThunkDispatch } from 'redux-thunk';
 import { configureStore } from '@lib/store';
 
-import { customRequest } from '@lib/client-api';
-
 import companyReducer from './company/reducer';
 import { CompanyActionType } from './company/actions';
 import userReducer from './user/reducer';
@@ -50,5 +48,3 @@ export type AppDispatch = ThunkDispatch<AppState & RootState, any, TActions>;
 
 export const useSelector: TypedUseSelectorHook<AppState> = useReduxSelector;
 export const useDispatch = () => useReduxDispatch<AppDispatch>();
-
-export const webRequest = customRequest(useDispatch);

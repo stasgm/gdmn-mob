@@ -5,10 +5,8 @@ import { useEffect } from 'react';
 
 import DeviceDetails from '../../components/device/DeviceDetails';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import SnackBar from '../../components/SnackBar';
 import selectors from '../../store/device/selectors';
 import actions from '../../store/device';
-
 import activationCodeSelectors from '../../store/activationCode/selectors';
 
 export type Params = {
@@ -17,12 +15,9 @@ export type Params = {
 
 const DeviceEdit = () => {
   const { id: deviceId } = useParams<keyof Params>() as Params;
-
   const navigate = useNavigate();
-
   const dispatch: AppDispatch = useDispatch();
-
-  const { errorMessage, loading } = useSelector((state) => state.devices);
+  const { loading } = useSelector((state) => state.devices);
   const device = selectors.deviceById(deviceId);
   const code = activationCodeSelectors.activationCodeByDeviceId(deviceId);
 
@@ -32,10 +27,6 @@ const DeviceEdit = () => {
 
   const goBack = () => {
     navigate(-1);
-  };
-
-  const handleClearError = () => {
-    dispatch(actions.deviceActions.clearError());
   };
 
   const handleSubmit = async (values: IDevice | NewDevice) => {
@@ -75,14 +66,13 @@ const DeviceEdit = () => {
         {loading && <CircularProgress size={40} />}
       </Box>
       <DeviceDetails
-        device={device /*as IDevice*/}
+        device={device}
         activationCode={code}
         loading={loading}
         onSubmit={handleSubmit}
         onCancel={goBack}
         //onCreateUid={handleCreateUid}
       />
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </Box>
   );
 };

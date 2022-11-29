@@ -1,14 +1,11 @@
 import { DeviceState, IResponse, IUser, IUserCredentials } from '@lib/types';
 import { user as mockUser } from '@lib/mock';
 
-import { AxiosError } from 'axios';
-
 import { error, auth as types } from '../types';
 import { sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
-import { RobustRequest, robustRequest } from '../robustRequest';
-import { CustomRequest } from '../customRequest';
+import { CustomRequest } from '../robustRequest';
 
 class Auth extends BaseRequest {
   constructor(api: BaseApi) {
@@ -57,7 +54,7 @@ class Auth extends BaseRequest {
     }
   };
 
-  login = async (userCredentials: IUserCredentials, customRequest: CustomRequest) => {
+  login = async (customRequest: CustomRequest, userCredentials: IUserCredentials) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -85,17 +82,16 @@ class Auth extends BaseRequest {
       data: body,
     });
 
-    console.log('login res', res);
     if (res?.result) {
       return {
         type: 'LOGIN',
-        user: res?.data,
+        user: res.data,
       } as types.ILoginResponse;
     }
 
     return {
       type: 'ERROR',
-      message: res?.error || 'ошибка подключения',
+      message: res?.error || 'вход в приложение не выполнен',
     } as error.INetworkError;
   };
 
@@ -129,32 +125,33 @@ class Auth extends BaseRequest {
     }
   };
 
-  getCurrentUser = async () => {
-    try {
-      const res = await this.api.axios.get<IResponse<IUser>>('/auth/user');
+  getCurrentUser = async (customRequest: CustomRequest) => {
+    const res = await customRequest<IUser>({ api: this.api, method: 'GET', url: '/auth/user' });
+    // try {
+    //   const res = await this.api.axios.get<IResponse<IUser>>('/auth/user');
 
-      const resData = res.data;
-      if (resData.result) {
-        return {
-          type: 'GET_CURRENT_USER',
-          user: resData.data,
-        } as types.IUserResponse;
-      }
-      if (!resData.result) {
-        return {
-          type: 'USER_NOT_AUTHENTICATED',
-        } as types.IUserNotAuthResponse;
-      }
+    //   const resData = res.data;
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка получения данных о пользователе',
-      } as error.INetworkError;
+        type: 'GET_CURRENT_USER',
+        user: res.data,
+      } as types.IUserResponse;
     }
+    // if (!res?.result) {
+    //   return {
+    //     type: 'USER_NOT_AUTHENTICATED',
+    //   } as types.IUserNotAuthResponse;
+    // }
+    return {
+      type: 'ERROR',
+      message: res?.error || 'данные о пользователе не получены',
+    } as error.INetworkError;
+    // } catch (err) {
+    //   return {
+    //     type: 'ERROR',
+    //     message: err instanceof TypeError ? err.message : 'ошибка получения данных о пользователе',
+    //   } as error.INetworkError;
+    // }
   };
 
   verifyCode = async (code: string) => {
@@ -184,7 +181,7 @@ class Auth extends BaseRequest {
     }
   };
 
-  getDeviceStatus = async (uid: string) => {
+  getDeviceStatus = async (customRequest: CustomRequest, uid: string) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -195,18 +192,18 @@ class Auth extends BaseRequest {
     }
 
     // try {
-    const res = await robustRequest({ api: this.api, method: 'GET', url: `/auth/deviceStatus/${uid}` });
+    const res = await customRequest<DeviceState>({ api: this.api, method: 'GET', url: `/auth/deviceStatus/${uid}` });
     // const res = await this.api.axios.get<IResponse<DeviceState>>(`/auth/deviceStatus/${uid}`);
-    console.log('getDeviceStatus res', res);
-    if (res.result === 'OK') {
+
+    if (res?.result) {
       return {
         type: 'GET_DEVICE_STATUS',
-        status: res.response.data?.data,
+        status: res.data,
       } as types.IDeviceStatusResponse;
     }
     return {
       type: 'ERROR',
-      message: res.result === 'INVALID_DATA' || res.result === 'ERROR' ? res.message : 'не получен статуса устройства',
+      message: res?.error || 'статус устройства не получен',
     } as error.INetworkError;
     // } catch (err) {
     //   return {

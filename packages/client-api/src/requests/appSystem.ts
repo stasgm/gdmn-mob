@@ -6,6 +6,7 @@ import { error, appSystem as types } from '../types';
 import { generateId, getParams, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
+import { CustomRequest } from '../robustRequest';
 
 class AppSystem extends BaseRequest {
   constructor(api: BaseApi) {
@@ -115,7 +116,7 @@ class AppSystem extends BaseRequest {
     }
   };
 
-  getAppSystem = async (appSystemId: string) => {
+  getAppSystem = async (customRequest: CustomRequest, appSystemId: string) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -130,33 +131,34 @@ class AppSystem extends BaseRequest {
 
       return {
         type: 'ERROR',
-        message: 'Подсистема не найдена',
+        message: 'подсистема не найдена',
       } as error.INetworkError;
     }
-    try {
-      const res = await this.api.axios.get<IResponse<IAppSystem>>(`/appSystems/${appSystemId}`);
-      const resData = res.data;
+    // try {
+    //   const res = await this.api.axios.get<IResponse<IAppSystem>>(`/appSystems/${appSystemId}`);
+    //   const resData = res.data;
+    const res = await customRequest<IAppSystem>({ api: this.api, method: 'GET', url: `/appSystems/${appSystemId}` });
 
-      if (resData.result) {
-        return {
-          type: 'GET_APP_SYSTEM',
-          appSystem: resData.data,
-        } as types.IGetAppSystemResponse;
-      }
-
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка получения данных о подсистеме',
-      } as error.INetworkError;
+        type: 'GET_APP_SYSTEM',
+        appSystem: res.data,
+      } as types.IGetAppSystemResponse;
     }
+
+    return {
+      type: 'ERROR',
+      message: res?.error || 'данные о подсистеме не получены',
+    } as error.INetworkError;
+    // } catch (err) {
+    //   return {
+    //     type: 'ERROR',
+    //     message: err instanceof TypeError ? err.message : 'ошибка получения данных о подсистеме',
+    //   } as error.INetworkError;
+    // }
   };
 
-  getAppSystems = async (params?: Record<string, string | number>) => {
+  getAppSystems = async (customRequest: CustomRequest, params?: Record<string, string | number>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -166,34 +168,35 @@ class AppSystem extends BaseRequest {
       } as types.IGetAppSystemsResponse;
     }
 
-    let paramText = params ? getParams(params) : '';
+    // let paramText = params ? getParams(params) : '';
 
-    if (paramText > '') {
-      paramText = `?${paramText}`;
+    // if (paramText > '') {
+    //   paramText = `?${paramText}`;
+    // }
+
+    // try {
+    //   const res = await this.api.axios.get<IResponse<IAppSystem[]>>(`/appSystems${paramText}`);
+    //   ///${this.api.config.version}
+    //   const resData = res.data;
+    const res = await customRequest<IAppSystem[]>({ api: this.api, method: 'GET', url: '/appSystems', params });
+
+    if (res?.result) {
+      return {
+        type: 'GET_APP_SYSTEMS',
+        appSystems: res.data,
+      } as types.IGetAppSystemsResponse;
     }
 
-    try {
-      const res = await this.api.axios.get<IResponse<IAppSystem[]>>(`/appSystems${paramText}`);
-      ///${this.api.config.version}
-      const resData = res.data;
-
-      if (resData.result) {
-        return {
-          type: 'GET_APP_SYSTEMS',
-          appSystems: resData.data,
-        } as types.IGetAppSystemsResponse;
-      }
-
-      return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка получения данных о системах',
-      } as error.INetworkError;
-    }
+    return {
+      type: 'ERROR',
+      message: res?.error || 'данные о подсистемах не получены',
+    } as error.INetworkError;
+    // } catch (err) {
+    //   return {
+    //     type: 'ERROR',
+    //     message: err instanceof TypeError ? err.message : 'ошибка получения данных о системах',
+    //   } as error.INetworkError;
+    // }
   };
 }
 

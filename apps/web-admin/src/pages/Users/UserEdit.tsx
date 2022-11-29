@@ -5,9 +5,9 @@ import { useEffect } from 'react';
 
 import UserDetails from '../../components/user/UserDetails';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import actions from '../../store/user';
+import appSystemActions from '../../store/appSystem';
+import userActions from '../../store/user';
 import selectors from '../../store/user/selectors';
-import SnackBar from '../../components/SnackBar';
 
 export type Params = {
   id: string;
@@ -20,23 +20,20 @@ const UserEdit = () => {
 
   const dispatch: AppDispatch = useDispatch();
 
-  const { errorMessage, loading } = useSelector((state) => state.users);
+  const { loading } = useSelector((state) => state.users);
   const user = selectors.userById(userId);
 
   useEffect(() => {
-    dispatch(actions.fetchUserById(userId));
-  }, [dispatch, userId]);
+    dispatch(appSystemActions.fetchAppSystems());
+    dispatch(userActions.fetchUsers());
+  }, [dispatch]);
 
   const goBack = () => {
     navigate(-1);
   };
 
-  const handleClearError = () => {
-    dispatch(actions.userActions.clearError());
-  };
-
   const handleSubmit = async (values: IUser | NewUser) => {
-    const res = await dispatch(actions.updateUser(values as IUser));
+    const res = await dispatch(userActions.updateUser(values as IUser));
     if (res.type === 'USER/UPDATE_SUCCESS') {
       goBack();
     }
@@ -72,7 +69,6 @@ const UserEdit = () => {
         {loading && <CircularProgress size={40} />}
       </Box>
       <UserDetails user={user} loading={loading} onSubmit={handleSubmit} onCancel={goBack} />
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </Box>
   );
 };

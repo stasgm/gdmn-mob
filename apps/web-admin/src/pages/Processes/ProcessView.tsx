@@ -20,9 +20,6 @@ import { IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 
 import processSelectors from '../../store/process/selectors';
-import companySelectors from '../../store/company/selectors';
-import appSystemSelectors from '../../store/appSystem/selectors';
-import SnackBar from '../../components/SnackBar';
 
 import ProcessDetailsView from '../../components/process/ProcessDetailsView';
 import processActions from '../../store/process';
@@ -38,13 +35,8 @@ const ProcessView = () => {
   const { id } = useParams<keyof Params>() as Params;
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const { loading, errorMessage } = useSelector((state) => state.processes);
-
+  const { loading } = useSelector((state) => state.processes);
   const process = processSelectors.processById(id);
-  // const company = process?.companyId ? companySelectors.companyById(process.companyId) : undefined;
-  // const appSystem = process?.appSystemId ? appSystemSelectors.appSystemById(process.appSystemId) : undefined;
-
   const [open, setOpen] = useState(false);
 
   const handleCancel = () => {
@@ -73,10 +65,6 @@ const ProcessView = () => {
 
   const handleClose = () => {
     setOpen(false);
-  };
-
-  const handleClearError = () => {
-    dispatch(processActions.processActions.clearError());
   };
 
   if (!process) {
@@ -173,8 +161,6 @@ const ProcessView = () => {
           <ProcessFilesProcessed processedFilesList={process.processedFiles} />
         </Box>
       </Box>
-
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

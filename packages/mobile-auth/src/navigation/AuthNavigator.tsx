@@ -2,10 +2,11 @@ import React, { useCallback, useEffect } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import { authActions, useSelector, useAuthThunkDispatch } from '@lib/store';
-import { AuthLogOut, IUserCredentials } from '@lib/types';
+import { IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
 import api from '@lib/client-api';
 import Constants from 'expo-constants';
+import { mobileRequest } from '@lib/mobile-hooks';
 
 import {
   SplashScreen,
@@ -26,7 +27,7 @@ const AuthNavigator: React.FC = () => {
   );
 
   const authDispatch = useAuthThunkDispatch();
-
+  const appRequest = mobileRequest(authDispatch, authActions);
   /*
     При запуске приложения
     - устанавливаем isInit, чтобы открылось окно выбора режима (демо или подключение к серверу).
@@ -61,15 +62,13 @@ const AuthNavigator: React.FC = () => {
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
   }, [authDispatch]);
 
-  const authMiddleware: AuthLogOut = useCallback(() => authDispatch(authActions.logout()), [authDispatch]);
-
   const checkDevice = useCallback(async () => {
     //Если в настройках записан deviceId, то получаем от сервера устройство,
     //иначе connectionStatus = 'not-activated', переходим на окно ввода кода
     if (isLogout && config?.deviceId && user) {
       logout();
     } else {
-      const objGetStatus = await authDispatch(authActions.getDeviceStatus(config?.deviceId));
+      const objGetStatus = await authDispatch(authActions.getDeviceStatus(appRequest, config?.deviceId));
       //TODO: надо обработать случай, если пришла ошибка, что не нашлось устройство по uid
       // if (objGetStatus.type === 'AUTH/GET_DEVICE_STATUS_FAILURE') {
       //   authDispatch(authActions.setConfig({ ...config, deviceId: undefined }));
@@ -79,16 +78,11 @@ const AuthNavigator: React.FC = () => {
       //Получим устройство по uid
       if (config?.deviceId && user && objGetStatus.type !== 'AUTH/GET_DEVICE_STATUS_FAILURE') {
         await authDispatch(
-          authActions.getDeviceByUid(
-            config.deviceId,
-            user.erpUser!.id,
-            Constants.manifest?.extra?.slug,
-            authMiddleware,
-          ),
+          authActions.getDeviceByUid(appRequest, config.deviceId, user.erpUser!.id, Constants.manifest?.extra?.slug),
         );
       }
     }
-  }, [authDispatch, authMiddleware, config.deviceId, isLogout, logout, user]);
+  }, [appRequest, authDispatch, config.deviceId, isLogout, logout, user]);
 
   const activateDevice = useCallback(
     async (code: string) => {
@@ -105,30 +99,30 @@ const AuthNavigator: React.FC = () => {
 
   const login = useCallback(
     async (credentials: IUserCredentials) => {
-      const res = await authDispatch(authActions.login(credentials, Constants.manifest?.extra?.slug, authMiddleware));
+      const res = await authDispatch(authActions.login(appRequest, credentials, Constants.manifest?.extra?.slug));
       if (config?.deviceId && res.type === 'AUTH/LOGIN_SUCCESS') {
         await authDispatch(
           authActions.getDeviceByUid(
+            appRequest,
             config.deviceId,
             res.payload?.erpUser?.id,
             Constants.manifest?.extra?.slug,
-            logout,
           ),
         );
       }
     },
-    [authDispatch, authMiddleware, config.deviceId, logout],
+    [appRequest, authDispatch, config.deviceId],
   );
 
   const setCompany = useCallback(async () => {
     if (!user?.company) {
       return;
     }
-    const res = await authDispatch(authActions.getCompany(user.company.id));
+    const res = await authDispatch(authActions.getCompany(appRequest, user.company.id));
     if (res.type === 'AUTH/GET_COMPANY_SUCCESS') {
       authDispatch(authActions.setCompany(res.payload));
     }
-  }, [authDispatch, user?.company]);
+  }, [appRequest, authDispatch, user?.company]);
 
   const SplashWithParams = useCallback(
     () => <SplashScreen settings={config} onCheckDevice={checkDevice} />,

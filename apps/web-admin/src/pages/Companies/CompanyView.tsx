@@ -16,7 +16,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { useCallback, useEffect, useState } from 'react';
 
-import SnackBar from '../../components/SnackBar';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/company';
 import userActions from '../../store/user';
@@ -35,22 +34,12 @@ export type Params = {
 
 const CompanyView = () => {
   const { id: companyId } = useParams<keyof Params>() as Params;
-
   const navigate = useNavigate();
-
   const dispatch: AppDispatch = useDispatch();
-
-  const { loading, errorMessage } = useSelector((state) => state.companies);
-
+  const { loading } = useSelector((state) => state.companies);
   const company = companySelectors.companyById(companyId);
-
   const users = userSelectors.usersByCompanyId(companyId);
-
   const [open, setOpen] = useState(false);
-
-  const handleClearError = () => {
-    dispatch(actions.companyActions.clearError());
-  };
 
   const handleCancel = () => {
     navigate(-1);
@@ -75,13 +64,6 @@ const CompanyView = () => {
   const handleClose = () => {
     setOpen(false);
   };
-
-  // const fetchUsers = useCallback(
-  //   (filterText?: string, fromRecord?: number, toRecord?: number) => {
-  //     dispatch(userActions.fetchUsers(companyId, filterText, fromRecord, toRecord));
-  //   },
-  //   [companyId, dispatch],
-  // );
 
   const refreshData = useCallback(() => {
     dispatch(actions.fetchCompanyById(companyId));
@@ -129,7 +111,7 @@ const CompanyView = () => {
       disabled: true,
       color: 'secondary',
       variant: 'contained',
-      onClick: handleClickOpen, // handleDelete,
+      onClick: handleClickOpen,
       icon: <DeleteIcon />,
     },
   ];
@@ -191,7 +173,6 @@ const CompanyView = () => {
         <CardHeader title={'Пользователи компании'} sx={{ mx: 2 }} />
         <CompanyUsers users={users} />
       </Box>
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

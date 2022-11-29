@@ -5,7 +5,7 @@ import { IPageParam } from '../../types';
 
 const init = createAction('APP_SYSTEM/INIT')();
 const clearError = createAction('APP_SYSTEM/CLEAR_ERROR')();
-const setError = createAction('APP_SYSTEM/SET_ERROR')();
+const setError = createAction('APP_SYSTEM/SET_ERROR')<string>();
 
 const fetchAppSystemsAsync = createAsyncAction(
   'APP_SYSTEM/FETCH_APP_SYSTEMS',

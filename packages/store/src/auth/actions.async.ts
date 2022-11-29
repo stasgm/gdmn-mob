@@ -1,5 +1,5 @@
-import { AuthLogOut, IUserCredentials, IUserSettings } from '@lib/types';
-import api, { customRequest } from '@lib/client-api';
+import { AuthLogOut, IDevice, IUser, IUserCredentials, IUserSettings } from '@lib/types';
+import api, { CustomRequest, CustomRequestProps } from '@lib/client-api';
 
 import { ActionType } from 'typesafe-actions';
 
@@ -19,10 +19,10 @@ export type AuthDispatch = ThunkDispatch<AuthState, any, AuthActionType>;
 export const useAuthThunkDispatch = () => useDispatch<AuthDispatch>();
 
 const getDeviceByUid = (
+  customRequest: CustomRequest,
   uid: string,
   erpUserId?: string,
   appSystemName?: string,
-  logout?: AuthLogOut,
 ): AppThunk<
   Promise<ActionType<typeof actions.getDeviceByUidAsync>>,
   AuthState,
@@ -33,12 +33,12 @@ const getDeviceByUid = (
   return async (dispatch) => {
     dispatch(actions.getDeviceByUidAsync.request(''));
 
-    const response = await api.device.getDevices({ uid });
+    const response = await api.device.getDevices(customRequest, { uid });
 
     if (response.type === 'GET_DEVICES') {
       //Проверка на совпадение подсистемы приложения с подсистемой пользователя
-      if (erpUserId && appSystemName && logout) {
-        const getErpUser = await api.user.getUser(erpUserId, logout);
+      if (erpUserId && appSystemName) {
+        const getErpUser = await api.user.getUser(customRequest, erpUserId);
         if (getErpUser.type === 'ERROR') {
           return dispatch(
             actions.getDeviceByUidAsync.failure(
@@ -60,11 +60,9 @@ const getDeviceByUid = (
       return dispatch(actions.getDeviceByUidAsync.success(response.devices[0]));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(actions.getDeviceByUidAsync.failure(response.message));
-    }
+    return dispatch(actions.getDeviceByUidAsync.failure(response.message));
 
-    return dispatch(actions.getDeviceByUidAsync.failure('Ошибка получения устройства по UId'));
+    // return dispatch(actions.getDeviceByUidAsync.failure('Ошибка получения устройства по UId'));
   };
 };
 
@@ -113,9 +111,9 @@ const signup = (
 };
 
 const login = (
+  customRequest: CustomRequest,
   credentials: IUserCredentials,
   appSystemName?: string,
-  logout?: AuthLogOut,
 ): AppThunk<
   Promise<ActionType<typeof actions.loginUserAsync>>,
   AuthState,
@@ -124,13 +122,12 @@ const login = (
   return async (dispatch) => {
     dispatch(actions.loginUserAsync.request(''));
 
-    const response = await api.auth.login(credentials, customRequest(dispatch));
-    console.log('response login', response);
+    const response = await api.auth.login(customRequest, credentials);
 
     if (response.type === 'LOGIN') {
       //Проверка на совпадение подсистемы приложения с подсистемой пользователя
       if (response.user.erpUser?.id && appSystemName) {
-        const getErpUser = await api.user.getUser(response.user.erpUser?.id, logout);
+        const getErpUser = await api.user.getUser(customRequest, response.user.erpUser?.id);
         if (getErpUser.type === 'ERROR') {
           return dispatch(
             actions.loginUserAsync.failure('Вход не выполнен: невозможно получить данные о пользователе'),
@@ -147,11 +144,7 @@ const login = (
       return dispatch(actions.loginUserAsync.success(response.user));
     }
 
-    // if (response.type === 'ERROR') {
-    return dispatch(actions.loginUserAsync.failure(response.message || 'Вход не выполнен'));
-    // }
-
-    // return dispatch(actions.loginUserAsync.failure('Ошибка входа пользователя'));
+    return dispatch(actions.loginUserAsync.failure(response.message));
   };
 };
 
@@ -211,6 +204,7 @@ const setUserSettings = (
 };
 
 const getDeviceStatus = (
+  customRequest: CustomRequest,
   uid?: string,
 ): AppThunk<
   Promise<ActionType<typeof actions.getDeviceStatusAsync>>,
@@ -221,24 +215,21 @@ const getDeviceStatus = (
     dispatch(actions.getDeviceStatusAsync.request('Получение статуса устройства'));
 
     if (uid) {
-      const response = await api.auth.getDeviceStatus(uid);
+      const response = await api.auth.getDeviceStatus(customRequest, uid);
 
       if (response.type === 'GET_DEVICE_STATUS') {
         return dispatch(actions.getDeviceStatusAsync.success(response.status));
       }
 
-      if (response.type === 'ERROR') {
-        return dispatch(actions.getDeviceStatusAsync.failure(response.message));
-      }
+      return dispatch(actions.getDeviceStatusAsync.failure(response.message));
     } else {
       return dispatch(actions.getDeviceStatusAsync.success('NON-ACTIVATED'));
     }
-
-    return dispatch(actions.getDeviceStatusAsync.failure('Ошибка получения статуса устройства'));
   };
 };
 
 const getCompany = (
+  customRequest: CustomRequest,
   companyId: string,
 ): AppThunk<
   Promise<ActionType<typeof actions.getCompanyAsync>>,
@@ -248,17 +239,13 @@ const getCompany = (
   return async (dispatch) => {
     dispatch(actions.getCompanyAsync.request('Получение компании'));
 
-    const response = await api.company.getCompany(companyId);
+    const response = await api.company.getCompany(customRequest, companyId);
 
     if (response.type === 'GET_COMPANY') {
       return dispatch(actions.getCompanyAsync.success(response.company));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(actions.getCompanyAsync.failure(response.message));
-    }
-
-    return dispatch(actions.getCompanyAsync.failure('Ошибка получения компании'));
+    return dispatch(actions.getCompanyAsync.failure(response.message));
   };
 };
 

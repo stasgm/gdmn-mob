@@ -1,8 +1,12 @@
 import { ThunkAction } from 'redux-thunk';
-import api from '@lib/client-api';
+import api, { CustomRequest } from '@lib/client-api';
 import { IUser, NewUser } from '@lib/types';
 
+import { authActions } from '@lib/store';
+
 import { AppState } from '../';
+
+import { webRequest } from '../webRequest';
 
 import { userActions, UserActionType } from './actions';
 
@@ -12,7 +16,7 @@ const fetchUserById = (id: string): AppThunk => {
   return async (dispatch) => {
     dispatch(userActions.fetchUserAsync.request(''));
 
-    const response = await api.user.getUser(id);
+    const response = await api.user.getUser(webRequest(dispatch, authActions), id);
 
     if (response.type === 'GET_USER') {
       return dispatch(userActions.fetchUserAsync.success(response.user));
@@ -33,7 +37,7 @@ const fetchUsers = (companyId?: string, filterText?: string, fromRecord?: number
     if (fromRecord) params.fromRecord = fromRecord;
     if (toRecord) params.toRecord = toRecord;
 
-    const response = await api.user.getUsers(params);
+    const response = await api.user.getUsers(webRequest(dispatch, authActions), params);
 
     if (response.type === 'GET_USERS') {
       return dispatch(userActions.fetchUsersAsync.success(response.users));

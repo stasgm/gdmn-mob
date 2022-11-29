@@ -1,16 +1,16 @@
 import { IRequestParams, robustRequest, CustomRequest } from '@lib/client-api';
 
-import { fetch } from '@react-native-community/netinfo';
-
-export const mobileRequest =
+export const webRequest =
   (dispatch: any, actions: any): CustomRequest =>
   async <T>(params: IRequestParams) => {
+    dispatch(actions.setErrorMessage(''));
     const res = await robustRequest(params);
+    console.log('res', res);
     switch (res.result) {
       case 'OK': {
         //Если пришел ответ, что не пройдена авторизация
         if (res.response.data.status === 401) {
-          dispatch(actions.setErrorMessage('Не пройдена авторизация. Повторите вход в приложение'));
+          dispatch(actions.setErrorMessage(res.response.data.error || 'не пройдена авторизация'));
           dispatch(actions.logout());
           break;
         } else {
@@ -18,16 +18,15 @@ export const mobileRequest =
         }
       }
       case 'TIMEOUT':
-        dispatch(actions.setErrorMessage('Не удается получить ответ от сервера. Проверьте настройки подключения'));
+        dispatch(actions.setErrorMessage('Не удается получить ответ от сервер'));
         break;
 
       case 'SERVER_ERROR': {
         //Если пришел ответ с ошибкой сети
-        const state = await fetch();
-        if (!state.isConnected) {
+        if (!navigator.onLine) {
           dispatch(actions.setErrorMessage('Отсутствует соединение с интернетом'));
         } else {
-          dispatch(actions.setErrorMessage('Не удается получить ответ от сервера. Проверьте настройки подключения'));
+          dispatch(actions.setErrorMessage('Не удается получить ответ от сервера'));
         }
       }
     }

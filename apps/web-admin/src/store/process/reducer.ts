@@ -20,7 +20,7 @@ const reducer: Reducer<IProcessState, ProcessActionType> = (state = initialState
       return { ...state, errorMessage: '' };
 
     case getType(processActions.setError):
-      return { ...state, errorMessage: 'Процесс уже существует' };
+      return { ...state, errorMessage: action.payload }; //'Процесс уже существует'
 
     case getType(processActions.fetchProcessesAsync.request):
       return { ...state, loading: true, list: [], errorMessage: '' };
@@ -58,6 +58,18 @@ const reducer: Reducer<IProcessState, ProcessActionType> = (state = initialState
         ...state,
         loading: false,
         errorMessage: action.payload || 'error',
+      };
+
+    case getType(processActions.setPageParam):
+      return {
+        ...state,
+        pageParams: { ...state.pageParams, ...action.payload },
+      };
+
+    case getType(processActions.clearPageParams):
+      return {
+        ...state,
+        pageParams: undefined,
       };
 
     default:
