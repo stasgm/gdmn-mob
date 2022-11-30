@@ -1,6 +1,6 @@
 import { IFileSystem } from '@lib/types';
 
-import { readListFiles, getFile } from './fileUtils';
+import { readListFiles, getFile, deleteFileById, updateById } from './fileUtils';
 
 /**
  * Возвращает множество файлов
@@ -19,4 +19,21 @@ const findOne = async (id: string): Promise<any> => {
   return await getFile(id);
 };
 
-export { findMany, findOne };
+/**
+/* Удаляет  файл по ИД
+/* @param id ИД файла
+*/
+const deleteOne = async (id: string): Promise<void> => {
+  return await deleteFileById(id);
+};
+
+/**
+/* Редактирует  файл по ИД
+/* @param id ИД файла
+ * @param fileData Новые данные файла
+*/
+const updateOne = async (id: string, fileData: any): Promise<void> => {
+  return await updateById(id, fileData);
+};
+
+export { findMany, findOne, deleteOne, updateOne };

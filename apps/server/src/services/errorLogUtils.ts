@@ -215,14 +215,9 @@ export const deleteFileById = async (fid: string): Promise<void> => {
     log.error(`Неправильный параметр ID '${fid} в запросе`);
     return;
   }
-  const deviceLog = await readJsonFile(fullName);
-  if (typeof deviceLog === 'string') {
-    log.error(deviceLog);
-    return;
-  }
   const check = await checkFileExists(fullName);
   if (!check) {
-    log.error(`Файл '${fullName} не найден`);
+    log.error(`Файл ${fullName} не существует`);
     return;
   }
   return unlink(fullName);
