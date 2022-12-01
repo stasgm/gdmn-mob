@@ -85,6 +85,7 @@
     "react-redux": "^7.2.9",
     "react-router": "^6.4.3",
     "react-router-dom": "^6.4.3",
+    "react-json-editor-viewer": "^1.0.7",
     "rimraf": "^3.0.2",
     "sass-loader": "^12.1.0",
     "style-loader": "^2.0.0",

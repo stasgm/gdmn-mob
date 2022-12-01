@@ -1,12 +1,11 @@
 import { Box, CircularProgress, CardHeader } from '@material-ui/core';
 import { useNavigate, useParams } from 'react-router-dom';
-import { IAppSystem, ICompany, NewAppSystem, NewCompany } from '@lib/types';
 
 import { useCallback, useEffect } from 'react';
 
-import AppSystemDetails from '../../components/appSystem/AppSystemDetails';
+import FileDetails from '../../components/file/FileDetails';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import actions from '../../store/appSystem';
+import fileActions from '../../store/file';
 import selectors from '../../store/appSystem/selectors';
 import SnackBar from '../../components/SnackBar';
 
@@ -14,32 +13,43 @@ export type Params = {
   id: string;
 };
 
-const AppSystemEdit = () => {
+const FileEdit = () => {
   const { id } = useParams<keyof Params>() as Params;
 
   const navigate = useNavigate();
 
   const dispatch: AppDispatch = useDispatch();
 
-  const { errorMessage, loading } = useSelector((state) => state.companies);
-  const appSystem = selectors.appSystemById(id);
+  const { loading, errorMessage, file, pageParams } = useSelector((state) => state.files);
+
+  const fetchFile = useCallback(
+    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+      dispatch(fileActions.fetchFile(id));
+    },
+    [dispatch, id],
+  );
+
+  useEffect(() => {
+    // Загружаем данные при загрузке компонента.
+    fetchFile(pageParams?.filterText as string);
+  }, [fetchFile, pageParams?.filterText]);
 
   const goBack = () => {
     navigate(-1);
   };
 
   const handleClearError = () => {
-    dispatch(actions.appSystemActions.clearError());
+    dispatch(fileActions.fileSystemActions.clearError());
   };
 
-  const handleSubmit = async (values: IAppSystem | NewAppSystem) => {
-    const res = await dispatch(actions.updateAppSystem(values as IAppSystem));
-    if (res.type === 'APP_SYSTEM/UPDATE_SUCCESS') {
-      goBack();
-    }
+  const handleSubmit = async (values: any) => {
+    // const res = await dispatch(fileActions.(values as any));
+    // if (res.type === 'APP_SYSTEM/UPDATE_SUCCESS') {
+    //   goBack();
+    // }
   };
 
-  if (!appSystem) {
+  if (!file) {
     return (
       <Box
         sx={{
@@ -48,7 +58,7 @@ const AppSystemEdit = () => {
           p: 3,
         }}
       >
-        Подсистема не найдена
+        Файл не найден
       </Box>
     );
   }
@@ -65,13 +75,13 @@ const AppSystemEdit = () => {
           alignItems: 'center',
         }}
       >
-        <CardHeader title={'Редактирование подсистемы'} />
+        <CardHeader title={'Редактирование файла'} />
         {loading && <CircularProgress size={40} />}
       </Box>
-      <AppSystemDetails appSystem={appSystem} loading={loading} onSubmit={handleSubmit} onCancel={goBack} />
+      <FileDetails file={file} loading={loading} onSubmit={handleSubmit} onCancel={goBack} />
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </Box>
   );
 };
 
-export default AppSystemEdit;
+export default FileEdit;

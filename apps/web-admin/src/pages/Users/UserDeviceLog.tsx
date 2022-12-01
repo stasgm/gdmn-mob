@@ -23,7 +23,7 @@ const UserDeviceLog = ({ userId, deviceId, onAddDevice }: IProps) => {
 
   const { filesList, loading, errorMessage, pageParams } = useSelector((state) => state.deviceLogs);
 
-  const logFilesList = filesList.filter
+  const logFilesList = filesList.filter;
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
   return (
