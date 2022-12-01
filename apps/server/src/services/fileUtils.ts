@@ -34,14 +34,14 @@ export const _readDir = async (root: string): Promise<string[]> => {
   }
 };
 
-const splitFileMessage = async (path: string): Promise<IExtraFileInfo | undefined> => {
+const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefined> => {
   const { devices, companies, users } = getDb();
-  const isMessageFile = path.includes('from_') && path.includes('_dev_') && path.includes('json');
+  const isMessageFile = root.includes('from_') && root.includes('_dev_') && root.includes('json');
   if (!isMessageFile) return undefined;
   const re = /db_(.+)/gi;
-  const match = re.exec(path);
+  const match = re.exec(root);
   if (!match) return undefined;
-  const arr = match[1].split('/').join('\\').split('\\');
+  const arr = match[1].split(path.sep);
   if (arr.length !== 4) return undefined;
 
   const appSystemId = await getAppSystemId(arr[1]);

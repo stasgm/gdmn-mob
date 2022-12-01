@@ -30,7 +30,7 @@ export const fullFileName2alias = (fullFileName: string): string | undefined => 
   const match = re.exec(fullFileName);
   const fileNameArr = fullFileName.split(getDb().dbPath);
   if (fileNameArr.length !== 2) return undefined;
-  const shortName = (match ? `db_${match[1]}` : fileNameArr[1]).split('/').join('\\').split('\\');
+  const shortName = (match ? `db_${match[1]}` : fileNameArr[1]).split(path.sep);
   return shortName.reduce((str, prev, i, arr) => {
     const nameWithoutExt = prev.split('.')[0];
     const temp = i === arr.length - 1 ? nameWithoutExt : prev;
@@ -40,7 +40,7 @@ export const fullFileName2alias = (fullFileName: string): string | undefined => 
 };
 
 export const alias2fullFileName = (alias: string): string | undefined => {
-  const match = alias.split('_D_').join('\\') + '.json';
+  const match = alias.split('_D_').join(path.sep) + '.json';
   return getPath([match]);
 };
 
