@@ -43,10 +43,11 @@ const FileEdit = () => {
   };
 
   const handleSubmit = async (values: any) => {
-    // const res = await dispatch(fileActions.(values as any));
-    // if (res.type === 'APP_SYSTEM/UPDATE_SUCCESS') {
-    //   goBack();
-    // }
+    console.log('values', values);
+    const res = await dispatch(fileActions.updateFile(values as any));
+    if (res.type === 'FILE/UPDATE_SUCCESS') {
+      goBack();
+    }
   };
 
   if (!file) {

@@ -8,7 +8,6 @@ interface IProps {
   list: IFileSystem;
 }
 const FileDetailsView = ({ list }: IProps) => {
-  console.log('list', list);
   return (
     <Card>
       <CardHeader title="Общая информация" />

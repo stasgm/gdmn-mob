@@ -44,7 +44,6 @@ const reducer: Reducer<IFileSystemState, FileSystemActionType> = (state = initia
       return { ...state, loading: true, file: [], errorMessage: '' };
 
     case getType(fileSystemActions.fetchFileAsync.success):
-      console.log('payload', action.payload);
       return {
         ...state,
         file: action.payload,
@@ -59,22 +58,39 @@ const reducer: Reducer<IFileSystemState, FileSystemActionType> = (state = initia
         errorMessage: action.payload || 'error',
       };
 
-    // case getType(fileSystemActions.removeFileAsync.request):
-    //   return { ...state, loading: true, list: [], errorMessage: '' };
+    case getType(fileSystemActions.updateFileAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
 
-    // case getType(fileSystemActions.removeFileAsync.success):
-    //   return {
-    //     ...state,
-    //     list: state.list.filter((i) => i.id !== action.payload),
-    //     loading: false,
-    //   };
+    case getType(fileSystemActions.updateFileAsync.success):
+      return {
+        ...state,
+        list: [...(state.list?.filter(({ id }) => id !== action.payload.id) || []), action.payload],
+        loading: false,
+      };
 
-    // case getType(fileSystemActions.removeFileAsync.failure):
-    //   return {
-    //     ...state,
-    //     loading: false,
-    //     errorMessage: action.payload || 'error',
-    //   };
+    case getType(fileSystemActions.updateFileAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
+      };
+
+    case getType(fileSystemActions.removeFileAsync.request):
+      return { ...state, loading: true, list: [], errorMessage: '' };
+
+    case getType(fileSystemActions.removeFileAsync.success):
+      return {
+        ...state,
+        list: state.list.filter((i) => i.id !== action.payload),
+        loading: false,
+      };
+
+    case getType(fileSystemActions.removeFileAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
+      };
 
     case getType(fileSystemActions.setPageParam):
       return {

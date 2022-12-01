@@ -1,6 +1,6 @@
 import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@material-ui/core';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 interface IProps {
   loading: boolean;
@@ -20,6 +20,11 @@ const FileDetails = ({ file, loading, onSubmit, onCancel }: IProps) => {
 
   const [fileJson, setFileJson] = useState(JSON.stringify(file));
 
+  const fun = useCallback(() => {
+    onSubmit(JSON.parse(fileJson));
+  }, [fileJson, onSubmit]);
+
+  console.log('fieeeee', fileJson);
   return (
     <>
       <Box
@@ -28,7 +33,7 @@ const FileDetails = ({ file, loading, onSubmit, onCancel }: IProps) => {
           minHeight: '100%',
         }}
       >
-        {/* <form onSubmit={formik.handleSubmit}> */}
+        {/* <form onSubmit={handleSubmit(onSubmit())}> */}
         <Card sx={{ p: 1 }}>
           <CardContent>
             <Grid container direction="column" item md={6} xs={12} spacing={3}>
@@ -54,7 +59,17 @@ const FileDetails = ({ file, loading, onSubmit, onCancel }: IProps) => {
           </CardContent>
           <Divider />
           <>
-            <Button color="primary" disabled={loading} type="submit" variant="contained" sx={{ m: 1 }}>
+            <Button
+              color="primary"
+              disabled={loading}
+              // type="submit"
+              variant="contained"
+              sx={{ m: 1 }}
+              onClick={fun}
+              // onClick={(event) => console.log('logg', event.currentTarget.value)}
+              // onClick={(event) => console.log(JSON.parse(event.currentTarget.value))}
+              // onClick={(event) => onSubmit(JSON.parse(event.currentTarget.value))}
+            >
               Сохранить
             </Button>
             <Button color="secondary" variant="contained" onClick={onCancel} disabled={loading}>
@@ -62,7 +77,6 @@ const FileDetails = ({ file, loading, onSubmit, onCancel }: IProps) => {
             </Button>
           </>
         </Card>
-        {/* </form> */}
       </Box>
     </>
   );

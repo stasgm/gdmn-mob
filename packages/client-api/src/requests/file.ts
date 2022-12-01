@@ -68,7 +68,6 @@ class File extends BaseRequest {
     try {
       const res = await this.api.axios.get<IResponse<any>>(`/files/${fileId}`);
       const resData = res.data;
-      console.log('ress', res.data);
 
       if (resData.result) {
         return {

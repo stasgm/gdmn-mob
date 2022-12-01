@@ -1,4 +1,4 @@
-import { IDeviceLog, IFileSystem } from '@lib/types';
+import { IFileSystem } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
 import { IPageParam } from '../../types';
@@ -19,6 +19,12 @@ const fetchFileAsync = createAsyncAction('FILE/FETCH_FILE', 'FILE/FETCH_FILE_SUC
   string
 >();
 
+const updateFileAsync = createAsyncAction('FILE/UPDATE', 'FILE/UPDATE_SUCCESS', 'FILE/UPDATE_FAILURE')<
+  string | undefined,
+  any,
+  string
+>();
+
 const removeFileAsync = createAsyncAction('FILE/REMOVE_FILE', 'FILE/REMOVE_FILE_SUCCESS', 'FILE/REMOVE_FILE_FAILURE')<
   string | undefined,
   string,
@@ -31,6 +37,7 @@ const clearPageParams = createAction('FILE/CLEAR_PARAMS')();
 export const fileSystemActions = {
   fetchFilesAsync,
   fetchFileAsync,
+  updateFileAsync,
   removeFileAsync,
   clearPageParams,
   setPageParam,

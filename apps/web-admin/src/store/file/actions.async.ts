@@ -38,7 +38,6 @@ const fetchFile = (id: string): AppThunk => {
     const response = await api.file.getFile(id);
 
     if (response.type === 'GET_FILE') {
-      console.log('1234', response.file);
       return dispatch(fileSystemActions.fetchFileAsync.success(response.file));
     }
 
@@ -50,22 +49,41 @@ const fetchFile = (id: string): AppThunk => {
   };
 };
 
-// const removeFile = (id: string): AppThunk => {
-//   return async (dispatch) => {
-//     dispatch(fileSystemActions.removeFileAsync.request(''));
+const updateFile = (file: any): AppThunk => {
+  return async (dispatch) => {
+    dispatch(fileSystemActions.updateFileAsync.request('Обновление файла'));
 
-//     const response = await api.file.removeFile(id);
+    console.log('ifil', file);
+    const response = await api.file.updateFile(file);
 
-//     if (response.type === 'REMOVE_FILE') {
-//       return dispatch(fileSystemActions.removeFileAsync.success(id));
-//     }
+    if (response.type === 'UPDATE_FILE') {
+      return dispatch(fileSystemActions.updateFileAsync.success(response.file));
+    }
 
-//     if (response.type === 'ERROR') {
-//       return dispatch(fileSystemActions.removeFileAsync.failure(response.message));
-//     }
+    if (response.type === 'ERROR') {
+      return dispatch(fileSystemActions.updateFileAsync.failure(response.message));
+    }
 
-//     return dispatch(fileSystemActions.removeFileAsync.failure('Ошибка получения данных о файле'));
-//   };
-// };
+    return dispatch(fileSystemActions.updateFileAsync.failure('Ошибка обновления файла'));
+  };
+};
 
-export default { fetchFiles, fetchFile };
+const removeFile = (id: string): AppThunk => {
+  return async (dispatch) => {
+    dispatch(fileSystemActions.removeFileAsync.request(''));
+
+    const response = await api.file.removeFile(id);
+
+    if (response.type === 'REMOVE_FILE') {
+      return dispatch(fileSystemActions.removeFileAsync.success(id));
+    }
+
+    if (response.type === 'ERROR') {
+      return dispatch(fileSystemActions.removeFileAsync.failure(response.message));
+    }
+
+    return dispatch(fileSystemActions.removeFileAsync.failure('Ошибка получения данных о файле'));
+  };
+};
+
+export default { fetchFiles, fetchFile, updateFile, removeFile };

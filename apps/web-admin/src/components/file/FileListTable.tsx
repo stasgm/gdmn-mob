@@ -122,7 +122,6 @@ const FileListTable = ({
     formik.values.uid,
   ]);
 
-  // console.log('filtered', filtered);
   const handleSelectAll = (event: any) => {
     let newSelectedFileIds;
 

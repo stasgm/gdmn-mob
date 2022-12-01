@@ -56,8 +56,6 @@ const FileView = () => {
 
   const process = fileSelectors.fileById(id);
 
-  console.log('process', process);
-
   const [open, setOpen] = useState(false);
 
   const handleCancel = () => {
@@ -68,13 +66,13 @@ const FileView = () => {
     navigate(`${adminPath}/app/files/${id}/edit`);
   };
 
-  // const handleDelete = async () => {
-  //   setOpen(false);
-  //   const res = await dispatch(fileActions.removeDeviceLog(id));
-  //   if (res.type === 'DEVICE_LOG/REMOVE_DEVICE_LOG_SUCCESS') {
-  //     navigate(-1);
-  //   }
-  // };
+  const handleDelete = async () => {
+    setOpen(false);
+    const res = await dispatch(fileActions.removeFile(id));
+    if (res.type === 'FILE/REMOVE_FILE_SUCCESS') {
+      navigate(-1);
+    }
+  };
 
   const refreshData = useCallback(() => {
     dispatch(fileActions.fetchFile(id));
@@ -143,12 +141,12 @@ const FileView = () => {
       <Box>
         <Dialog open={open} onClose={handleClose}>
           <DialogContent>
-            <DialogContentText color="black">Вы действительно хотите удалить журнал ошибок?</DialogContentText>
+            <DialogContentText color="black">Вы действительно хотите удалить файл?</DialogContentText>
           </DialogContent>
           <DialogActions>
-            {/* <Button onClick={handleDelete} color="primary" variant="contained">
+            <Button onClick={handleDelete} color="primary" variant="contained">
               Удалить
-            </Button> */}
+            </Button>
             <Button onClick={handleClose} color="secondary" variant="contained">
               Отмена
             </Button>
