@@ -1,9 +1,20 @@
 import React, { useCallback, useState } from 'react';
-import { View, Keyboard } from 'react-native';
+import { View, Keyboard, Linking } from 'react-native';
 
 import { IUserCredentials } from '@lib/types';
 import { useSelector } from '@lib/store';
-import { AppInputScreen, globalStyles as styles, Input, PrimeButton, RoundButton, ScreenTitle } from '@lib/mobile-ui';
+import {
+  AppInputScreen,
+  globalStyles as styles,
+  Input,
+  MediumText,
+  PrimeButton,
+  RoundButton,
+  ScreenTitle,
+} from '@lib/mobile-ui';
+import { IconButton } from 'react-native-paper';
+
+import localStyles from './styles';
 // import api from '@lib/client-api';
 // import { user as mockUser } from '@lib/mock';
 
@@ -30,6 +41,8 @@ const SignInScreen = (props: Props) => {
   const status = useSelector((state) => state.auth.status);
 
   const [credential, setCredentials] = useState<IUserCredentials>({ name: '', password: '' });
+
+  const [lo, setLo] = useState(false);
 
   const [visiblePassword, setVisiblePassword] = useState(false);
 
@@ -61,7 +74,30 @@ const SignInScreen = (props: Props) => {
           iconName={visiblePassword ? 'eye-outline' : 'eye-off-outline'}
           onIconPress={() => (visiblePassword ? setVisiblePassword(false) : setVisiblePassword(true))}
         />
-        <PrimeButton disabled={loading || !credential.name || !credential.password} icon="login" onPress={handleLogIn}>
+        <View style={[styles.flexDirectionRow, styles.alignItemsCenter]}>
+          <IconButton icon={lo ? 'checkbox-outline' : 'checkbox-blank-outline'} onPress={() => setLo(!lo)} />
+          <View style={[styles.directionColumn, localStyles.textWidth]}>
+            <MediumText>
+              {'Продолжая, Вы подтверждаете, что согласны с '}
+              <MediumText
+                onPress={() =>
+                  Linking.openURL('https://gsbelarus.com/gs/wiki/index.php/GedeminWiki:Политика_конфиденциальности')
+                }
+                selectable={true}
+                style={styles.textDecorationLine}
+              >
+                Политикой конфиденциальности
+              </MediumText>
+              "
+            </MediumText>
+          </View>
+        </View>
+
+        <PrimeButton
+          disabled={loading || !credential.name || !credential.password || !lo}
+          icon="login"
+          onPress={handleLogIn}
+        >
           Войти
         </PrimeButton>
       </AppInputScreen>

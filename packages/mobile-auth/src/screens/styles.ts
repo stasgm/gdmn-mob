@@ -28,6 +28,9 @@ const localStyles = StyleSheet.create({
   serverModeText: {
     fontSize: 18,
   },
+  textWidth: {
+    width: '86%',
+  },
 });
 
 export default localStyles;

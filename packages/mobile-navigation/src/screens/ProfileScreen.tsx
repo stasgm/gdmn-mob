@@ -11,6 +11,9 @@ import {
   referenceActions,
   appActions,
   useAuthThunkDispatch,
+  useDocThunkDispatch,
+  useSettingThunkDispatch,
+  settingsActions,
 } from '@lib/store';
 
 import {
@@ -36,6 +39,8 @@ const ProfileScreen = () => {
 
   const dispatch = useDispatch();
   const authDispatch = useAuthThunkDispatch();
+  const docDispatch = useDocThunkDispatch();
+  const settingsDispatch = useSettingThunkDispatch();
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
 
@@ -69,8 +74,32 @@ const ProfileScreen = () => {
     ]);
   };
 
+  const handleClearAll = () => {
+    Alert.alert('Вы уверены, что хотите удалить все данные?', 'После удаления данные не подлежат восстановлению.', [
+      {
+        text: 'Да',
+        onPress: () => {
+          authDispatch(authActions.setUserSettings({}));
+          docDispatch(documentActions.init());
+          dispatch(referenceActions.init());
+          dispatch(appActions.init());
+          settingsDispatch(settingsActions.init());
+          authDispatch(authActions.init());
+        },
+      },
+      {
+        text: 'Отмена',
+      },
+    ]);
+  };
+
   const actionsMenu = useCallback(() => {
     showActionSheet([
+      {
+        title: 'Удалить все данные',
+        type: 'destructive',
+        onPress: handleClearAll,
+      },
       {
         title: 'Удалить все справочники и документы',
         type: 'destructive',
