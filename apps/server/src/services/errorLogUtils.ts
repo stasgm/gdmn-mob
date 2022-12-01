@@ -189,7 +189,7 @@ export const getFilesObject = async (): Promise<IDeviceLogFiles[]> => {
     const re = /db_(.+)/gi;
     const match = re.exec(item);
     // eslint-disable-next-line no-await-in-loop
-    const fileObj = await fileInfoToObj((match ? match[1] : item).split('/').join('\\').split('\\'));
+    const fileObj = await fileInfoToObj((match ? match[1] : item).split(path.sep));
     if (fileObj) fileObjs = [...fileObjs, fileObj];
   }
   return fileObjs;
