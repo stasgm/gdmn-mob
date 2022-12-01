@@ -47,7 +47,7 @@ export const alias2fullFileName = (alias: string): string | undefined => {
 export const readJsonFile = async <T>(fileName: string): Promise<T | string> => {
   const check = await checkFileExists(fileName);
   try {
-    return check ? JSON.parse((await readFile(fileName)).toString()) : `Ошибка чтения файла ${fileName} `;
+    return check ? JSON.parse((await readFile(fileName, 'utf-8')).toString()) : `Ошибка чтения файла ${fileName} `;
   } catch (err) {
     return `Ошибка чтения файла ${fileName} - ${err} `;
   }

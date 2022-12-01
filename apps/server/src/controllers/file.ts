@@ -11,11 +11,29 @@ const getFiles = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getFile = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id } = ctx.params;
+  const { id } = ctx.request.params;
 
   const file = await fileService.findOne(id);
 
   ok(ctx as Context, file, 'getFile: file is successfully  received');
 };
 
-export { getFiles, getFile };
+const removeFile = async (ctx: ParameterizedContext): Promise<void> => {
+  const { id } = ctx.request.params;
+
+  await fileService.deleteOne(id);
+
+  ok(ctx as Context, undefined, 'removeFile: file is successfully  deleted');
+};
+
+const updateFile = async (ctx: ParameterizedContext): Promise<void> => {
+  const { id } = ctx.request.params;
+
+  const fileData = ctx.request.body as Partial<any>;
+
+  const updatedFile = fileService.updateOne(id, fileData);
+
+  ok(ctx as Context, updatedFile, `updateFile: file '${id}' is successfully updated`);
+};
+
+export { getFiles, getFile, removeFile, updateFile };

@@ -1,5 +1,5 @@
 import path from 'path';
-import { readdir, unlink, stat } from 'fs/promises';
+import { readdir, unlink, stat, writeFile } from 'fs/promises';
 import { constants, statSync } from 'fs';
 
 import { IFileSystem, IExtraFileInfo } from '@lib/types';
@@ -8,7 +8,13 @@ import { BYTES_PER_KB } from '../utils/constants';
 
 import log from '../utils/logger';
 
-import { fullFileName2alias, getAppSystemId, alias2fullFileName, readJsonFile } from '../utils/fileHelper';
+import {
+  fullFileName2alias,
+  getAppSystemId,
+  alias2fullFileName,
+  readJsonFile,
+  checkFileExists,
+} from '../utils/fileHelper';
 
 import { getDb } from './dao/db';
 
@@ -158,4 +164,33 @@ export const getFile = async (fid: string): Promise<any> => {
     return undefined;
   }
   return fileJson;
+};
+
+export const deleteFileById = async (fid: string): Promise<void> => {
+  const fullName = alias2fullFileName(fid);
+  if (!fullName) {
+    log.error(`Неправильный параметр ID '${fid} в запросе`);
+    return;
+  }
+
+  const check = await checkFileExists(fullName);
+  if (!check) {
+    log.error(`Файл ${fullName} не существует`);
+    return;
+  }
+  return unlink(fullName);
+};
+
+export const updateById = async <T>(id: string, fileData: Partial<Awaited<T>>): Promise<void> => {
+  const fullName = alias2fullFileName(id);
+  if (!fullName) {
+    log.error(`Неправильный параметр ID '${id} в запросе`);
+    return;
+  }
+
+  try {
+    return writeFile(fullName, JSON.stringify(fileData, undefined, 2), { encoding: 'utf8' });
+  } catch (err) {
+    log.error(`Ошибка редактирования файла ${fullName}  - ${err}`);
+  }
 };

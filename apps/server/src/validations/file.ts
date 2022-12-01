@@ -28,6 +28,11 @@ const updateFile: Config = {
       ...urlValidation.checkURL,
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор файла')),
     }),
+    type: 'json',
+    body: Joi.alternatives()
+      .try(Joi.object(), Joi.array())
+      .required()
+      .error(new InvalidParameterException('Некорректный формат содержимого файла')),
   },
 };
 
