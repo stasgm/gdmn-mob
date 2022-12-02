@@ -23,7 +23,7 @@ export const getPath = (folders: string[], fn = '') => {
 };
 
 export const getPathSystem = ({ companyId, appSystemId }: IPathParams) =>
-  `DB_${companyId}/${getDb().appSystems.findById(appSystemId)?.name}`;
+  `db_${companyId}/${getDb().appSystems.findById(appSystemId)?.name}`;
 
 export const fullFileName2alias = (fullFileName: string): string | undefined => {
   const re = /db_(.+)/gi;
