@@ -109,8 +109,11 @@ export const getDeviceLogsFiles = async (): Promise<string[]> => {
   let files: string[] = [];
   for (const item of folders) {
     // eslint-disable-next-line no-await-in-loop
-    const fileArr = await getListFiles(item);
-    files = [...files, ...fileArr];
+    if (await checkFileExists(item)) {
+      // eslint-disable-next-line no-await-in-loop
+      const fileArr = await getListFiles(item);
+      files = [...files, ...fileArr];
+    }
   }
   return files;
 };
@@ -163,26 +166,29 @@ const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined
   };
 
   const fullFileName = getDeviceLogFullFileName(pathParams, fileInfo);
+  try {
+    const fileStat = await stat(fullFileName);
+    const fileSize = fileStat.size / BYTES_PER_KB;
+    const fileDate = fileStat.birthtime.toString();
 
-  const fileStat = await stat(fullFileName);
-  const fileSize = fileStat.size / BYTES_PER_KB;
-  const fileDate = fileStat.birthtime.toString();
-
-  const alias = fullFileName2alias(fullFileName);
-  if (!alias) {
-    log.error(`Invalid deviceLogs file name ${fullFileName}`);
+    const alias = fullFileName2alias(fullFileName);
+    if (!alias) {
+      log.error(`Invalid deviceLogs file name ${fullFileName}`);
+      return undefined;
+    }
+    return {
+      id: alias,
+      company: { id: arr[0], name: companyName },
+      appSystem: { id: appSystemId, name: arr[1] },
+      contact: { id: match[1], name: contactName },
+      device: { id: match[2], name: deviceName },
+      date: fileDate,
+      size: fileSize,
+    };
+  } catch (err) {
+    console.error(`Ошибка чтения статистики файла-- ${err}`);
     return undefined;
   }
-
-  return {
-    id: alias,
-    company: { id: arr[0], name: companyName },
-    appSystem: { id: appSystemId, name: arr[1] },
-    contact: { id: match[1], name: contactName },
-    device: { id: match[2], name: deviceName },
-    date: fileDate,
-    size: fileSize,
-  };
 };
 
 export const getFilesObject = async (): Promise<IDeviceLogFiles[]> => {

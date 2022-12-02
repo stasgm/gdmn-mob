@@ -96,16 +96,16 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
 };
 
 const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => {
-  const re = /[^\\|/]+$/gi;
-  const match = re.exec(root);
-  if (!match) {
+  /* const re = /[^\\|/]+$/gi;
+  const match = re.exec(root);*/
+  const pathArr = root.split(path.sep);
+  const name = pathArr.pop();
+  if (!name) {
     log.error(`Invalid filename ${root}`);
     return undefined;
   }
-  const name = match[0];
-
   const nameWithoutExt = name.split('.')[0];
-  const subPath = root.split(name)[0];
+  const subPath = pathArr.join(path.sep);
   const fileStat = await stat(root);
   const fileSize = fileStat.size / BYTES_PER_KB;
   const fileDate = fileStat.birthtime.toString();
