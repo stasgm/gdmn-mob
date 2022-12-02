@@ -129,18 +129,18 @@ class File extends BaseRequest {
     }
   };
 
-  updateFile = async (file: Partial<any>) => {
-    if (this.api.config.debug?.isMock) {
-      await sleep(this.api.config.debug?.mockDelay || 0);
+  updateFile = async (id: string, file: Partial<any>) => {
+    // if (this.api.config.debug?.isMock) {
+    //   await sleep(this.api.config.debug?.mockDelay || 0);
 
-      return {
-        type: 'UPDATE_FILE',
-        file: { ...file, editionDate: new Date().toISOString() },
-      } as types.IUpdateFileResponse;
-    }
+    //   return {
+    //     type: 'UPDATE_FILE',
+    //     file: { ...file, editionDate: new Date().toISOString() },
+    //   } as types.IUpdateFileResponse;
+    // }
 
     try {
-      const res = await this.api.axios.patch<IResponse<any>>(`/files/${file.id}`, file);
+      const res = await this.api.axios.patch<IResponse<any>>(`/files/${id}`, file);
       const resData = res.data;
 
       if (resData.result) {

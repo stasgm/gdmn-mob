@@ -49,12 +49,11 @@ const fetchFile = (id: string): AppThunk => {
   };
 };
 
-const updateFile = (file: any): AppThunk => {
+const updateFile = (id: string, file: any): AppThunk => {
   return async (dispatch) => {
     dispatch(fileSystemActions.updateFileAsync.request('Обновление файла'));
 
-    console.log('ifil', file);
-    const response = await api.file.updateFile(file);
+    const response = await api.file.updateFile(id, file);
 
     if (response.type === 'UPDATE_FILE') {
       return dispatch(fileSystemActions.updateFileAsync.success(response.file));

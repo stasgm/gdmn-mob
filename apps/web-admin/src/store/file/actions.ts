@@ -19,7 +19,7 @@ const fetchFileAsync = createAsyncAction('FILE/FETCH_FILE', 'FILE/FETCH_FILE_SUC
   string
 >();
 
-const updateFileAsync = createAsyncAction('FILE/UPDATE', 'FILE/UPDATE_SUCCESS', 'FILE/UPDATE_FAILURE')<
+const updateFileAsync = createAsyncAction('FILE/UPDATE_FILE', 'FILE/UPDATE_FILE_SUCCESS', 'FILE/UPDATE_FILE_FAILURE')<
   string | undefined,
   any,
   string
