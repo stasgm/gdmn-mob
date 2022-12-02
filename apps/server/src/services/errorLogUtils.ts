@@ -1,6 +1,5 @@
 import path from 'path';
-import { writeFile, readdir, unlink } from 'fs/promises';
-import { statSync } from 'fs';
+import { writeFile, readdir, unlink, stat } from 'fs/promises';
 
 import { IPathParams, IFileDeviceLogInfo, IDeviceLog, IDeviceLogFiles } from '@lib/types';
 
@@ -61,7 +60,7 @@ export const saveDeviceLogFile = async (
 const getListFiles = async (root: string): Promise<string[]> => {
   let newFiles: string[] = [];
   if (!(await checkFileExists(root))) {
-    log.error(`Robust-protocol.errorFile: Ошибка чтения файла - ${root}`);
+    log.error(`Robust-protocol.errorDirectory: Ошибка чтения директории - ${root}`);
     return newFiles;
   }
   try {
@@ -79,7 +78,7 @@ const getListFiles = async (root: string): Promise<string[]> => {
 const getListDirs = async (root: string): Promise<string[]> => {
   let newDirs: string[] = [];
   if (!(await checkFileExists(root))) {
-    log.error(`Robust-protocol.errorFile: Ошибка чтения файла - ${root}`);
+    log.error(`errorDirectory: Ошибка чтения директории - ${root}`);
     return newDirs;
   }
   try {
@@ -118,6 +117,10 @@ export const getDeviceLogsFiles = async (): Promise<string[]> => {
 
 const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined> => {
   const { devices, companies, users } = getDb();
+  if (arr.length !== 4) {
+    log.error('Invalid deviceLogs');
+    return undefined;
+  }
   const re = /from_(.+)_dev_(.+)\.json/gi;
   const match = re.exec(arr[3]);
   if (!match) {
@@ -161,7 +164,7 @@ const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined
 
   const fullFileName = getDeviceLogFullFileName(pathParams, fileInfo);
 
-  const fileStat = statSync(fullFileName);
+  const fileStat = await stat(fullFileName);
   const fileSize = fileStat.size / BYTES_PER_KB;
   const fileDate = fileStat.birthtime.toString();
 

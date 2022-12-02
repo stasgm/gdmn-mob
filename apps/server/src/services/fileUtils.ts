@@ -1,6 +1,5 @@
 import path from 'path';
 import { readdir, unlink, stat, writeFile } from 'fs/promises';
-import { constants, statSync } from 'fs';
 
 import { IFileSystem, IExtraFileInfo } from '@lib/types';
 
@@ -80,7 +79,7 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
   const device = devices.data.find((el: any) => el.uid === deviceUid);
 
   if (!device) {
-    log.error(`Устройство ${matchMessage[3]} не найдено`);
+    log.error(`Устройство ${deviceUid}  не найдено`);
     return undefined;
   }
 
@@ -96,24 +95,25 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
   };
 };
 
-const splitFilePath = async (path: string): Promise<IFileSystem | undefined> => {
+const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => {
+  //const re = new RegExp(`[^(${path.sep})]+$`, 'gi');
   const re = /[^(\\|/)]+$/gi;
-  const match = re.exec(path);
+  const match = re.exec(root);
   if (!match) {
-    log.error(`Invalid filename ${path}`);
+    log.error(`Invalid filename ${root}`);
     return undefined;
   }
   const name = match[0];
+
   const nameWithoutExt = name.split('.')[0];
-  const subPath = path.split(match[0])[0];
-  const fileStat = statSync(path);
+  const subPath = root.split(match[0])[0];
+  const fileStat = await stat(root);
   const fileSize = fileStat.size / BYTES_PER_KB;
   const fileDate = fileStat.birthtime.toString();
 
-  const alias = fullFileName2alias(path);
-  console.log('alias=', alias);
+  const alias = fullFileName2alias(root);
 
-  const fileInfo = await splitFileMessage(path);
+  const fileInfo = await splitFileMessage(root);
   if (fileInfo) {
     return {
       id: alias ?? nameWithoutExt,
