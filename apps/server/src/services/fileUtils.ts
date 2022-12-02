@@ -105,7 +105,7 @@ const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => 
   const name = match[0];
 
   const nameWithoutExt = name.split('.')[0];
-  const subPath = root.split(match[0])[0];
+  const subPath = root.split(name)[0];
   const fileStat = await stat(root);
   const fileSize = fileStat.size / BYTES_PER_KB;
   const fileDate = fileStat.birthtime.toString();
