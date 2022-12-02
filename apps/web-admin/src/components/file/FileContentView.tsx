@@ -1,7 +1,7 @@
 import { IDeviceLogFiles } from '@lib/types';
 import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@material-ui/core';
 
-import { JSONViewer } from 'react-json-editor-viewer';
+import ReactJson from 'react-json-view';
 
 interface IProps {
   file: any;
@@ -26,7 +26,8 @@ const FileContentView = ({ file }: IProps) => {
             {/* </Grid> */}
           </Grid>
         </Grid>
-        <JSONViewer data={file} />
+        {/* <JSONViewer data={file} /> */}
+        <ReactJson src={file} theme="harmonic" />
       </CardContent>
     </Card>
   );
