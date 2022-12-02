@@ -96,8 +96,7 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
 };
 
 const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => {
-  //const re = new RegExp(`[^(${path.sep})]+$`, 'gi');
-  const re = /[^(\\|/)]+$/gi;
+  const re = /[^\\|/]+$/gi;
   const match = re.exec(root);
   if (!match) {
     log.error(`Invalid filename ${root}`);
