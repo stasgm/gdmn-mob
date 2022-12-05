@@ -13,6 +13,7 @@ import {
   alias2fullFileName,
   readJsonFile,
   checkFileExists,
+  writeIterableToFile,
 } from '../utils/fileHelper';
 
 import { getDb } from './dao/db';
@@ -188,7 +189,7 @@ export const updateById = async <T>(id: string, fileData: Partial<Awaited<T>>): 
   }
 
   try {
-    return writeFile(fullName, JSON.stringify(fileData, undefined, 2), { encoding: 'utf8' });
+    return writeIterableToFile(fullName, JSON.stringify(fileData, undefined, 2));
   } catch (err) {
     log.error(`Ошибка редактирования файла ${fullName}  - ${err}`);
   }

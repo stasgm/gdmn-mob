@@ -15,3 +15,4 @@ export const MSEС_IN_MIN = 60000;
 
 export const defMaxDataVolume = 20; // Mb
 export const defMaxFiles = 10;
+export const defMaxFilesSize = 50; //Mb

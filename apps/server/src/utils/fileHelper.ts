@@ -1,10 +1,16 @@
 import path from 'path';
 import { access, readFile } from 'fs/promises';
-import { constants } from 'fs';
+import { constants, createReadStream, createWriteStream } from 'fs';
+
+import { once } from 'events';
+
+import { finished } from 'stream';
+
+import { promisify } from 'util';
 
 import { IPathParams } from '@lib/types';
 
-import log from '../utils/logger';
+import { BYTES_PER_MB, defMaxFilesSize } from '../utils/constants';
 
 import { getDb } from '../services/dao/db';
 
@@ -39,18 +45,55 @@ export const fullFileName2alias = (fullFileName: string): string | undefined => 
   }, '');
 };
 
-export const alias2fullFileName = (alias: string): string | undefined => {
+export const alias2fullFileName = (alias: string): string => {
   const match = alias.split('_D_').join(path.sep) + '.json';
   return getPath([match]);
 };
 
+const readableToString = async (readable: any): Promise<string | Error> => {
+  const data = [];
+  let size = 0;
+  for await (const chunk of readable) {
+    data.push(chunk);
+
+    if (chunk.toString()[0] !== '{' && chunk.toString()[0] !== '[') throw new Error('Неправильный формат файла');
+
+    size += new Blob([chunk.toString()]).size / BYTES_PER_MB;
+
+    if (size > defMaxFilesSize) throw new Error('Слишком большой размер файла');
+  }
+  return data.join('');
+};
+
 export const readJsonFile = async <T>(fileName: string): Promise<T | string> => {
   const check = await checkFileExists(fileName);
+
   try {
-    return check ? JSON.parse((await readFile(fileName, 'utf-8')).toString()) : `Ошибка чтения файла ${fileName} `;
+    const streamRead = createReadStream(fileName, { encoding: 'utf8' });
+    try {
+      const result = await readableToString(streamRead);
+
+      return check ? JSON.parse(result.toString()) : `Ошибка чтения файла ${fileName} `;
+    } catch (err) {
+      return `Ошибка чтения файла ${fileName} - ${err} `;
+    }
+    //(await readFile(fileName, 'utf-8')).toString()
   } catch (err) {
     return `Ошибка чтения файла ${fileName} - ${err} `;
   }
+};
+
+const finishedPromisify = promisify(finished);
+
+export const writeIterableToFile = async (filename: string, iterable: string): Promise<void> => {
+  const writable = createWriteStream(filename, { encoding: 'utf8' });
+  for await (const chunk of iterable) {
+    if (!writable.write(chunk)) {
+      await once(writable, 'drain');
+    }
+  }
+  writable.end();
+  await finishedPromisify(writable);
 };
 
 export const getAppSystemId = async (name: string): Promise<string> => {
