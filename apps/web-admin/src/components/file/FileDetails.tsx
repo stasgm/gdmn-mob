@@ -10,7 +10,7 @@ interface IProps {
 }
 
 const FileDetails = ({ file, loading, onSubmit, onCancel }: IProps) => {
-  const [fileJson, setFileJson] = useState(JSON.stringify(file));
+  const [fileJson, setFileJson] = useState(JSON.stringify(file, null, '\t'));
 
   const handleSubmit = useCallback(() => {
     onSubmit(JSON.parse(fileJson));

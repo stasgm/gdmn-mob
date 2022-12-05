@@ -41,7 +41,7 @@ const reducer: Reducer<IFileSystemState, FileSystemActionType> = (state = initia
       };
 
     case getType(fileSystemActions.fetchFileAsync.request):
-      return { ...state, loading: true, file: [], errorMessage: '' };
+      return { ...state, loading: true, errorMessage: '' };
 
     case getType(fileSystemActions.fetchFileAsync.success):
       return {

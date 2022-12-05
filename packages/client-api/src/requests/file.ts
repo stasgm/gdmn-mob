@@ -72,7 +72,7 @@ class File extends BaseRequest {
       if (resData.result) {
         return {
           type: 'GET_FILE',
-          file: resData?.data || [],
+          file: resData?.data,
         } as types.IGetFileResponse;
       }
 

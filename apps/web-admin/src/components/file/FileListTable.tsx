@@ -45,10 +45,9 @@ const FileListTable = ({
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
 
-  const formik = useFormik<any>({
-    enableReinitialize: true,
-    initialValues: {
-      // ...user,
+  const initialValues = useMemo(() => {
+    // ...user,
+    return {
       appSystem: '',
       company: '',
       producer: '',
@@ -58,12 +57,34 @@ const FileListTable = ({
       uid: '',
       path: '',
       size: '',
-    },
-
+    };
+  }, []);
+  const formik = useFormik<any>({
+    enableReinitialize: true,
+    // initialValues: {
+    //   // ...user,
+    //   appSystem: '',
+    //   company: '',
+    //   producer: '',
+    //   consumer: '',
+    //   date: '',
+    //   device: '',
+    //   uid: '',
+    //   path: '',
+    //   size: '',
+    // },
+    initialValues: initialValues,
     onSubmit: (values) => {
       onSubmit(values);
     },
   });
+
+  useEffect(() => {
+    if (!isFilterVisible) {
+      formik.setValues(initialValues);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFilterVisible]);
 
   const filtered = useMemo(() => {
     if (

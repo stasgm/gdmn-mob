@@ -9,6 +9,8 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
+  Grid,
+  Typography,
 } from '@material-ui/core';
 import CachedIcon from '@material-ui/icons/Cached';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -180,19 +182,32 @@ const FileView = () => {
             <ToolBarAction buttons={buttons} />
           </Box>
         </Box>
-        <Box
-          sx={{
-            backgroundColor: 'background.default',
-            minHeight: '100%',
-          }}
-        >
-          <FileDetailsView list={process} />
-        </Box>
+        {file ? (
+          <>
+            <Box
+              sx={{
+                backgroundColor: 'background.default',
+                minHeight: '100%',
+              }}
+            >
+              <FileDetailsView list={process} />
+            </Box>
 
-        <Box>
-          <CardHeader sx={{ mx: 2 }} />
-          <FileContentView file={file} />
-        </Box>
+            <Box>
+              <CardHeader sx={{ mx: 2 }} />
+              <FileContentView file={file} />
+            </Box>
+          </>
+        ) : (
+          <Box>
+            <CardHeader sx={{ mx: 2 }} />
+            <Grid item>
+              <Typography variant="subtitle1" gutterBottom>
+                Данный файл не является файлом формата JSON
+              </Typography>
+            </Grid>
+          </Box>
+        )}
       </Box>
 
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
