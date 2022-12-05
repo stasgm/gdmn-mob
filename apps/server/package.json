@@ -18,7 +18,7 @@
     "precommit": "lint-staged",
     "test": "cross-env NODE_ENV=test jest --colors"
   },
-  "lint-staged": {
+  "lint-staged": { 
     "*.{ts,tsx}": [
       "yarn prettier:fix",
       "yarn lint"

@@ -11,6 +11,7 @@ import {
   alias2fullFileName,
   readJsonFile,
   getAppSystemId,
+  writeIterableToFile,
 } from '../utils/fileHelper';
 
 import config from '../../config';
@@ -51,7 +52,7 @@ export const saveDeviceLogFile = async (
 
     if (delta > 0) oldDeviceLog.splice(0, delta);
 
-    return writeFile(fileName, JSON.stringify([...oldDeviceLog, ...newDeviceLog], undefined, 2), { encoding: 'utf8' });
+    return writeIterableToFile(fileName, JSON.stringify([...oldDeviceLog, ...newDeviceLog], undefined, 2));
   } catch (err) {
     log.error(`Ошибка записи журнала ошибок устройства с uid=${fileInfo.deviceId} в файл - ${err}`);
   }
