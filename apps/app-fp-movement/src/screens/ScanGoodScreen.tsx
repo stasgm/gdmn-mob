@@ -6,7 +6,7 @@ import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigat
 import { AppActivityIndicator, globalStyles, MediumText, navBackButton, ScanBarcode } from '@lib/mobile-ui';
 import { refSelectors, docSelectors, useDispatch, documentActions, useSelector } from '@lib/store';
 
-import { generateId, getDateString, round } from '@lib/mobile-app';
+import { generateId, getDateString, round } from '@lib/mobile-hooks';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -35,7 +35,7 @@ const ScanGoodScreen = () => {
   const [scannedObject, setScannedObject] = useState<IShipmentLine>();
 
   const goodBarcodeSettings = Object.entries(settings).reduce((prev: barcodeSettings, [idx, item]) => {
-    if (item && item.group?.id !== '1' && typeof item.data === 'number') {
+    if (item && item.group?.id !== 'base' && typeof item.data === 'number') {
       prev[idx] = item.data;
     }
     return prev;

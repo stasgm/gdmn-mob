@@ -19,7 +19,7 @@ import { docSelectors, useSelector } from '@lib/store';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { getDateString } from '@lib/mobile-app';
+import { getDateString } from '@lib/mobile-hooks';
 
 import { IMovementDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';

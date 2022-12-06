@@ -70,6 +70,12 @@ const AuthNavigator: React.FC = () => {
       logout();
     } else {
       const objGetStatus = await authDispatch(authActions.getDeviceStatus(config?.deviceId));
+      //TODO: надо обработать случай, если пришла ошибка, что не нашлось устройство по uid
+      // if (objGetStatus.type === 'AUTH/GET_DEVICE_STATUS_FAILURE') {
+      //   authDispatch(authActions.setConfig({ ...config, deviceId: undefined }));
+      //   api.config = { ...api.config, deviceId: undefined };
+      //   return;
+      // }
       //Получим устройство по uid
       if (config?.deviceId && user && objGetStatus.type !== 'AUTH/GET_DEVICE_STATUS_FAILURE') {
         await authDispatch(

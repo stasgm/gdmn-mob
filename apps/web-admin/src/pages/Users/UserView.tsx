@@ -103,7 +103,7 @@ const UserView = () => {
   //     userBindingDevices.forEach((binding: IDeviceBinding) => {
   //       const dev = list.find((a) => binding.device.id === a.id);
   //       // /*return*/ list.find((a) => binding.device.id === a.id);
-  //       console.log('dev', dev);
+  //
   //       if (dev) {
   //         userDevices.push(dev);
   //       }

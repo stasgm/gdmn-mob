@@ -15,7 +15,7 @@ import {
   navBackButton,
 } from '@lib/mobile-ui';
 
-import { extraPredicate, keyExtractor } from '@lib/mobile-app';
+import { extraPredicate, keyExtractor } from '@lib/mobile-hooks';
 
 import { useDispatch } from '../store';
 

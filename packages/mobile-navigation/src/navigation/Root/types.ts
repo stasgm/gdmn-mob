@@ -23,6 +23,7 @@ type ProfileStackParamList = {
 
 type InformationStackParamList = {
   Information: undefined;
+  Log: undefined;
 };
 
 type ReferenceStackParamList = {

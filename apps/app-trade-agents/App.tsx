@@ -1,7 +1,8 @@
 import { Linking, ScrollView, TouchableOpacity, View } from 'react-native';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Provider } from 'react-redux';
-import { dialCall, MobileApp } from '@lib/mobile-app';
+import { MobileApp } from '@lib/mobile-app';
+import { dialCall, sleep } from '@lib/mobile-hooks';
 import { INavItem, GDMN_PHONE, GDMN_EMAIL, GDMN_SITE_ADDRESS } from '@lib/mobile-navigation';
 
 import { StatusBar } from 'expo-status-bar';
@@ -9,7 +10,6 @@ import { StatusBar } from 'expo-status-bar';
 import {
   appActions,
   appSelectors,
-  authSelectors,
   referenceActions,
   documentActions,
   settingsActions,
@@ -17,6 +17,7 @@ import {
   useRefThunkDispatch,
   useDocThunkDispatch,
   useSelector,
+  authSelectors,
 } from '@lib/store';
 
 import {
@@ -30,8 +31,6 @@ import {
 import { ActivityIndicator, Caption, Text } from 'react-native-paper';
 
 import { IDocument, IReferences, ISettingsOption } from '@lib/types';
-
-import { sleep } from '@lib/client-api';
 
 import Constants from 'expo-constants';
 
@@ -96,7 +95,7 @@ const Root = () => {
 
   //Загружаем в стор дополнительные настройки приложения
   const isInit = useSelector((state) => state.settings.isInit);
-  const isGetReferences = useSelector((state) => state.settings?.data.getReferences);
+  const getReferences = useSelector((state) => state.settings?.data?.getReferences);
   const isDemo = useSelector((state) => state.auth.isDemo);
 
   const refDispatch = useRefThunkDispatch();
@@ -119,7 +118,7 @@ const Root = () => {
       dispatch(
         settingsActions.updateOption({
           optionName: 'getReferences',
-          value: { ...isGetReferences, data: false } as ISettingsOption,
+          value: { ...getReferences, data: false } as ISettingsOption,
         }),
       );
     }
@@ -129,17 +128,17 @@ const Root = () => {
   const appDataLoading = appSelectors.selectLoading();
   const authLoading = useSelector((state) => state.auth.loadingData);
   const tradeLoading = useAppTradeSelector((state) => state.appTrade.loadingData);
-  const isLogged = authSelectors.isLoggedWithCompany();
   const tradeLoadingError = useAppTradeSelector<string>((state) => state.appTrade.loadingError);
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
+  const isLogged = authSelectors.isLoggedWithCompany();
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (isLogged) {
       dispatch(appActions.loadSuperDataFromDisc());
     }
   }, [dispatch, isLogged]);
-
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     //Для отрисовки при первом подключении

@@ -22,7 +22,7 @@ import { StatusBar } from 'expo-status-bar';
 
 import { IDocument, IReferences } from '@lib/types';
 
-import { sleep } from '@lib/client-api';
+import { sleep } from '@lib/mobile-hooks';
 
 import ApplNavigator from './src/navigation/Root/ApplNavigator';
 import { store } from './src/store';

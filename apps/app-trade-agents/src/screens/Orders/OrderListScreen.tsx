@@ -26,7 +26,7 @@ import {
 import { StackNavigationProp } from '@react-navigation/stack';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-import { deleteSelectedItems, formatValue, getDateString, getDelList, keyExtractor } from '@lib/mobile-app';
+import { deleteSelectedItems, formatValue, getDateString, getDelList, keyExtractor } from '@lib/mobile-hooks';
 
 import { appActions, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 

@@ -28,6 +28,7 @@ import {
   IListItemProps,
   DeleteButton,
   CloseButton,
+  SimpleDialog,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -40,7 +41,7 @@ import {
   getDelList,
   keyExtractor,
   useSendDocs,
-} from '@lib/mobile-app';
+} from '@lib/mobile-hooks';
 
 import { IDocumentType, INamedEntity, ScreenState } from '@lib/types';
 
@@ -61,7 +62,7 @@ import {
 import { ICoords } from '../../store/geo/types';
 import { getCurrentPosition } from '../../utils/expoFunctions';
 import { lineTypes } from '../../utils/constants';
-import { getNextDocNumber, twoDigits } from '../../utils/helpers';
+import { getNextDocNumber } from '../../utils/helpers';
 
 export interface VisitListSectionProps {
   title: string;
@@ -80,7 +81,6 @@ const VisitScreen = () => {
   const dateBegin = visit ? new Date(visit?.head.dateBegin) : undefined;
   const geo = visit?.head.beginGeoPoint;
   const [screenState, setScreenState] = useState<ScreenState>('idle');
-  // const [sendLoading, setSendLoading] = useState(false);
   const [lineType, setLineType] = useState(lineTypes[0].id);
 
   const route = useMemo(() => ({ id: routeId, name: '' } as INamedEntity), [routeId]);
@@ -97,6 +97,7 @@ const VisitScreen = () => {
   const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity | undefined;
 
   const orderList = docSelectors.selectByDocType<IOrderDocument>('order');
+  const loading = useSelector((state) => state.app.loading);
 
   const orderDocs = useMemo(
     () =>
@@ -304,22 +305,14 @@ const VisitScreen = () => {
     deleteSelectedItems(delList, deleteDocs);
   }, [delList, docDispatch]);
 
-  const handleSendDocuments = useCallback(() => {
-    Alert.alert('Вы уверены, что хотите отправить документы?', '', [
-      {
-        text: 'Да',
-        onPress: async () => {
-          setScreenState('sending');
-          await sendDoc();
-          setScreenState('sent');
+  const [visibleSendDialog, setVisibleSendDialog] = useState(false);
 
-          navigation.navigate('RouteView', { id: route.id });
-        },
-      },
-      {
-        text: 'Отмена',
-      },
-    ]);
+  const handleSendDocuments = useCallback(async () => {
+    setVisibleSendDialog(false);
+    setScreenState('sending');
+    await sendDoc();
+    setScreenState('sent');
+    navigation.navigate('RouteView', { id: route.id });
   }, [navigation, route.id, sendDoc]);
 
   const renderRight = useCallback(
@@ -330,7 +323,7 @@ const VisitScreen = () => {
         ) : (
           <>
             <SendButton
-              onPress={handleSendDocuments}
+              onPress={() => setVisibleSendDialog(true)}
               disabled={
                 screenState === 'sending' ||
                 screenState !== 'idle' ||
@@ -342,7 +335,7 @@ const VisitScreen = () => {
         )}
       </View>
     ),
-    [handleDeleteDocs, handleSendDocuments, isDelList, orderDocs, screenState],
+    [handleDeleteDocs, isDelList, orderDocs, screenState],
   );
 
   const renderLeft = useCallback(() => isDelList && <CloseButton onPress={() => setDelList({})} />, [isDelList]);
@@ -487,9 +480,9 @@ const VisitScreen = () => {
               <Divider />
               {visit && dateBegin && (
                 <View>
-                  <LargeText style={localStyles.contract}>{`Визит начат: ${getDateString(
-                    dateBegin,
-                  )} ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())}`}</LargeText>
+                  <LargeText style={localStyles.contract}>
+                    {`Визит начат: ${getDateString(dateBegin)} ${new Date(dateBegin).toLocaleTimeString()}`}
+                  </LargeText>
                   {geo && <MediumText>{`Координаты: ${geo.latitude}, ${geo.longitude}`}</MediumText>}
                 </View>
               )}
@@ -522,6 +515,14 @@ const VisitScreen = () => {
           ListEmptyComponent={EmptyList}
         />
       )}
+      <SimpleDialog
+        visible={visibleSendDialog}
+        title={'Внимание!'}
+        text={'Вы уверены, что хотите отправить документы?'}
+        onCancel={() => setVisibleSendDialog(false)}
+        onOk={handleSendDocuments}
+        okDisabled={loading}
+      />
     </AppScreen>
   );
 };

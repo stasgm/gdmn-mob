@@ -19,11 +19,10 @@ import {
   SendButton,
   ScanButton,
   SaveDocument,
+  SimpleDialog,
 } from '@lib/mobile-ui';
 
-import { sleep } from '@lib/client-api';
-
-import { generateId, getDateString, round, useSendDocs } from '@lib/mobile-app';
+import { sleep, generateId, getDateString, round, useSendDocs } from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
 
@@ -53,6 +52,7 @@ const ShipmentViewScreen = () => {
   const fpDispatch = useFpDispatch();
   const settings = useSelector((state) => state.settings?.data);
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
+  const loading = useSelector((state) => state.app.loading);
 
   const [lineType, setLineType] = useState(lineTypes[1].id);
 
@@ -77,7 +77,7 @@ const ShipmentViewScreen = () => {
   const goods = refSelectors.selectByName<IGood>('good').data;
 
   const goodBarcodeSettings = Object.entries(settings).reduce((prev: barcodeSettings, [idx, item]) => {
-    if (item && item.group?.id !== '1' && typeof item.data === 'number') {
+    if (item && item.group?.id !== 'base' && typeof item.data === 'number') {
       prev[idx] = item.data;
     }
     return prev;
@@ -289,27 +289,20 @@ const ShipmentViewScreen = () => {
 
   const sendDoc = useSendDocs(shipment ? [shipment] : []);
 
-  const handleSendDocument = useCallback(() => {
-    Alert.alert('Вы уверены, что хотите отправить документ?', '', [
-      {
-        text: 'Да',
-        onPress: async () => {
-          setScreenState('sending');
-          await sendDoc();
-          setScreenState('sent');
-        },
-      },
-      {
-        text: 'Отмена',
-      },
-    ]);
+  const [visibleSendDialog, setVisibleSendDialog] = useState(false);
+
+  const handleSendDocument = useCallback(async () => {
+    setVisibleSendDialog(false);
+    setScreenState('sending');
+    await sendDoc();
+    setScreenState('sent');
   }, [sendDoc]);
 
   const renderRight = useCallback(
     () =>
       isBlocked ? (
         shipment?.status === 'READY' ? (
-          <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+          <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
         ) : (
           shipment?.status === 'DRAFT' && (
             <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
@@ -320,7 +313,7 @@ const ShipmentViewScreen = () => {
           {shipment?.status === 'DRAFT' && (
             <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
           )}
-          <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+          <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
           {!isScanerReader && (
             <ScanButton
               onPress={() => navigation.navigate('ScanGood', { docId: id })}
@@ -333,10 +326,10 @@ const ShipmentViewScreen = () => {
     [
       actionsMenu,
       handleSaveDocument,
-      handleSendDocument,
       id,
       isBlocked,
       isScanerReader,
+      loading,
       navigation,
       screenState,
       shipment?.status,
@@ -628,6 +621,14 @@ const ShipmentViewScreen = () => {
         onOk={handleSearchBarcode}
         okLabel={'Найти'}
         errorMessage={errorMessage}
+      />
+      <SimpleDialog
+        visible={visibleSendDialog}
+        title={'Внимание!'}
+        text={'Вы уверены, что хотите отправить документ?'}
+        onCancel={() => setVisibleSendDialog(false)}
+        onOk={handleSendDocument}
+        okDisabled={loading}
       />
     </View>
   );

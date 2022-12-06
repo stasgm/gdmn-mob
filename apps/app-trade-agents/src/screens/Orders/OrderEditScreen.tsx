@@ -18,7 +18,7 @@ import {
 } from '@lib/mobile-ui';
 import { IDocumentType, IReference, ScreenState } from '@lib/types';
 
-import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-app';
+import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOutlet, IOrderFormParam } from '../../store/types';

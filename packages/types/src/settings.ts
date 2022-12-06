@@ -9,6 +9,7 @@ interface ISettingsOption<T = SettingValue> extends IEntity {
   sortOrder?: number;
   type: 'string' | 'date' | 'number' | 'boolean' | 'option' | 'ref';
   group?: ISettingsGroup;
+  readonly?: boolean;
 }
 
 type Settings<T = Record<string, SettingValue>> = {
@@ -16,10 +17,11 @@ type Settings<T = Record<string, SettingValue>> = {
 };
 
 interface IBaseSettings {
-  serverAutoCheck: boolean;
+  autoSync: boolean;
   refLoadType: boolean;
   cleanDocTime: number;
-  scannerUse: boolean;
+  getReferences: boolean;
+  synchPeriod: number;
   [name: string]: SettingValue;
 }
 

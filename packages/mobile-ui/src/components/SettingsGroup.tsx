@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Divider, useTheme } from 'react-native-paper';
+import { Divider } from 'react-native-paper';
 
 import { ISettingsOption } from '@lib/types';
 
@@ -30,6 +30,7 @@ const SettingsGroup = ({ groupDescription, list, onValueChange }: Props) => {
                 key={key}
                 label={item.description || key}
                 value={item.data}
+                disabled={item.readonly}
                 onValueChange={(newValue) => onValueChange(key, { ...item, data: newValue })}
               />
             </View>

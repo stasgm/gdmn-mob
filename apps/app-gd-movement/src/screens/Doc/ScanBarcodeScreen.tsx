@@ -15,7 +15,7 @@ import { useSelector, refSelectors } from '@lib/store';
 
 import { IDocumentType, INamedEntity, ISettingsOption } from '@lib/types';
 
-import { generateId } from '@lib/mobile-app';
+import { generateId } from '@lib/mobile-hooks';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 

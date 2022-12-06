@@ -19,7 +19,7 @@ import {
 } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
-import { generateId, getDateString } from '@lib/mobile-app';
+import { generateId, getDateString } from '@lib/mobile-hooks';
 
 import { IDocumentType, ScreenState } from '@lib/types';
 
@@ -414,6 +414,7 @@ export const DocEditScreen = () => {
             onChangeText={handleChangeNumber}
             disabled={isBlocked}
             clearInput={true}
+            keyboardType="url"
           />
           <SelectableInput
             label="Дата"

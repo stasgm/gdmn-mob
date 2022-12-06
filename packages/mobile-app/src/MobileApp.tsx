@@ -22,33 +22,32 @@ import { globalStyles, Theme as defaultTheme } from '@lib/mobile-ui';
 import api from '@lib/client-api';
 
 import { AuthLogOut } from '@lib/types';
-
-import { useSync } from './hooks';
-import { truncate } from './utils/helpers';
+import { truncate, useSync } from '@lib/mobile-hooks';
 
 export interface IApp {
   items?: INavItem[];
   store?: Store<any, any>;
   onSync?: () => Promise<any>;
-  onGetMessages?: () => Promise<any>;
   loadingErrors?: string[];
   onClearLoadingErrors?: () => void;
 }
 
-const AppRoot = ({ items, onSync, onGetMessages }: Omit<IApp, 'store'>) => {
-  const handleSyncData = useSync(onSync, onGetMessages);
+const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
+  const { syncData } = useSync(onSync);
+  const settings = useSelector((state) => state.settings?.data);
+  const synchPeriod = (settings.synchPeriod?.data as number) || 10;
+  const autoSync = (settings.autoSync?.data as boolean) || false;
   const { config, user } = useSelector((state) => state.auth);
+  const loading = useSelector((state) => state.app.loading);
+
+  const appState = useRef(AppState.currentState);
+  const authDispatch = useAuthThunkDispatch();
+  const authMiddleware: AuthLogOut = () => authDispatch(authActions.logout());
 
   useEffect(() => {
     //При запуске приложения записываем настройки в апи
     api.config = { ...api.config, ...config };
   }, []);
-
-  const appState = useRef(AppState.currentState);
-
-  const authDispatch = useAuthThunkDispatch();
-
-  const authMiddleware: AuthLogOut = () => authDispatch(authActions.logout());
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', async (nextAppState) => {
@@ -64,7 +63,28 @@ const AppRoot = ({ items, onSync, onGetMessages }: Omit<IApp, 'store'>) => {
     };
   }, []);
 
-  return <DrawerNavigator items={items} onSyncClick={handleSyncData} />;
+  const timeOutRef = useRef<NodeJS.Timer | null>(null);
+
+  //Если в параметрах указана Автосинхронизация,
+  //устанавливаем запуск следующей синхронизации через synchPeriod минут
+  useEffect(() => {
+    if (!autoSync || loading) {
+      return;
+    }
+
+    timeOutRef.current = setTimeout(() => {
+      syncData();
+    }, synchPeriod * 60 * 1000);
+
+    return () => {
+      if (timeOutRef.current) {
+        clearInterval(timeOutRef.current);
+        timeOutRef.current = null;
+      }
+    };
+  }, [synchPeriod, autoSync, loading]);
+
+  return <DrawerNavigator items={items} onSyncClick={syncData} />;
 };
 
 const MobileApp = ({ store, loadingErrors, onClearLoadingErrors, ...props }: IApp) => {

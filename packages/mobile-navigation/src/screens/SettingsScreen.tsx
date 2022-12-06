@@ -90,7 +90,7 @@ const SettingsScreen = () => {
               .sort(([, itema], [, itemb]) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0));
             return (
               <View key={groupKey}>
-                {group.id === '1' ? (
+                {group.id === 'base' ? (
                   <SettingsGroup key={groupKey} list={list} onValueChange={handleUpdate} />
                 ) : (
                   <View key={groupKey} style={localStyles.group}>

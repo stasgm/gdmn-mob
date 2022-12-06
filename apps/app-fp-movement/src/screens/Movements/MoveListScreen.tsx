@@ -22,7 +22,7 @@ import {
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@lib/mobile-app';
+import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@lib/mobile-hooks';
 
 import { INamedEntity } from '@lib/types';
 

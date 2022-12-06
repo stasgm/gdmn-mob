@@ -31,6 +31,8 @@ import SnackBar from '../../components/SnackBar';
 import { adminPath } from '../../utils/constants';
 import DeviceBindingDetailsView from '../../components/deviceBinding/DeviceBindingDetailsView';
 
+import UserDeviceLog from './UserDeviceLog';
+
 export type Params = {
   bindingid: string;
 };
@@ -179,6 +181,11 @@ const UserDeviceView = () => {
           <DeviceBindingDetailsView deviceBinding={deviceBinding} uid={device?.uid} />
         </Box>
       </Box>
+
+      {/* <Box>
+        <CardHeader title={'Журнал ошибок устройства пользователя'} sx={{ mx: 2 }} />
+        <UserDeviceLog deviceId={device?.id} />
+      </Box> */}
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );

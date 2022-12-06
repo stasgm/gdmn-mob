@@ -46,7 +46,6 @@ const OrderLine = ({ item, packages, onSetLine, visibleQuantityInput }: IProps) 
   }, [pack]);
 
   const textStyle = [styles.number, styles.field, { color: colors.text, blackgroundColor: 'transparent' }];
-  const textPackStyle = [localStyles.text, { color: colors.text }, { marginTop: 4 }];
 
   return (
     <ScrollView keyboardShouldPersistTaps={'handled'} style={{ backgroundColor: colors.background }}>
@@ -95,7 +94,7 @@ const OrderLine = ({ item, packages, onSetLine, visibleQuantityInput }: IProps) 
                 ))}
               </View>
             ) : (
-              <Text style={textPackStyle}>Без упаковки</Text>
+              <Text style={[textStyle, localStyles.pack]}>Без упаковки</Text>
             )}
           </View>
         </View>
@@ -110,10 +109,6 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
-  text: {
-    paddingHorizontal: 10,
-    paddingBottom: 10,
-  },
   item: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -122,6 +117,9 @@ const localStyles = StyleSheet.create({
   },
   quantityItem: {
     height: 28,
+  },
+  pack: {
+    marginVertical: 6,
   },
 });
 

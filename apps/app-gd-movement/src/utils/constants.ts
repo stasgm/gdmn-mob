@@ -1,5 +1,5 @@
 import { IListItem } from '@lib/mobile-types';
-import { baseSettingGroup } from '@lib/store/src/settings/reducer';
+import { baseSettingGroup } from '@lib/store';
 import { Settings, StatusType } from '@lib/types';
 
 import { IGood } from '../store/app/types';
@@ -87,11 +87,11 @@ export const getStatusColor = (status: StatusType) => {
   return statusColor;
 };
 
-const goodGroup = { id: '2', name: 'Весовой товар', sortOrder: 2 };
+const goodGroup = { id: 'goodScan', name: 'Весовой товар', sortOrder: 2 };
 
 export const appSettings: Settings = {
   scannerUse: {
-    id: '4',
+    id: 'scannerUse',
     sortOrder: 3,
     description: 'Использовать сканер',
     data: true,
@@ -100,7 +100,7 @@ export const appSettings: Settings = {
     group: baseSettingGroup,
   },
   weightCode: {
-    id: '5',
+    id: 'weightCode',
     sortOrder: 5,
     description: 'Идентификатор весового товара',
     data: '22',
@@ -109,7 +109,7 @@ export const appSettings: Settings = {
     group: goodGroup,
   },
   countCode: {
-    id: '6',
+    id: 'countCode',
     sortOrder: 6,
     description: 'Кол-во символов кода товара',
     data: 5,
@@ -118,7 +118,7 @@ export const appSettings: Settings = {
     group: goodGroup,
   },
   countWeight: {
-    id: '7',
+    id: 'countWeight',
     sortOrder: 7,
     description: 'Кол-во символов веса (в гр.)',
     data: 5,
