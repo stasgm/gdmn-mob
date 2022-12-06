@@ -162,7 +162,7 @@ export const getFile = async (fid: string): Promise<any> => {
   const fullNameArr = fullName.split('.');
   const fileExt = fullNameArr.pop();
 
-  if (!fileExt || fileExt !== 'json') {
+  if (!fileExt || fileExt.toLowerCase() !== 'json') {
     log.error(`Файл с некорректного формата '${fid} в запросе`);
     return undefined;
   }
@@ -194,6 +194,14 @@ export const updateById = async <T>(id: string, fileData: Partial<Awaited<T>>): 
   if (!fullName) {
     log.error(`Неправильный параметр ID '${id} в запросе`);
     return;
+  }
+
+  const fullNameArr = fullName.split('.');
+  const fileExt = fullNameArr.pop();
+
+  if (!fileExt || fileExt.toLowerCase() !== 'json') {
+    log.error(`Файл с некорректного формата '${id} в запросе`);
+    return undefined;
   }
 
   try {
