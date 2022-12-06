@@ -7,16 +7,7 @@ import { Button, Dialog, HelperText, IconButton } from 'react-native-paper';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import { IApiConfig } from '@lib/client-types';
-import {
-  AppScreen,
-  Input,
-  PrimeButton,
-  ScreenTitle,
-  useActionSheet,
-  globalStyles as styles,
-  MediumText,
-  RoundButton,
-} from '@lib/mobile-ui';
+import { AppScreen, Input, PrimeButton, ScreenTitle, globalStyles as styles, MediumText } from '@lib/mobile-ui';
 
 import { config as firstConfig } from '@lib/client-config';
 
@@ -33,8 +24,6 @@ export type Props = {
 const ConfigScreen = (props: Props) => {
   const navigation = useNavigation<StackNavigationProp<AuthStackParamList, 'Config'>>();
   const { colors } = useTheme();
-
-  const showActionSheet = useActionSheet();
 
   const { config, onSetConfig, onSetDemoMode } = props;
   const [serverName, setServerName] = useState(`${config?.protocol}${config?.server}` || '');
@@ -99,19 +88,11 @@ const ConfigScreen = (props: Props) => {
     }
   }, [initConfig, initDeviceID]);
 
-  const actionsMenu = useCallback(() => {
-    showActionSheet([
-      {
-        title: 'Установить настройки по умолчанию',
-        type: 'destructive',
-        onPress: () => setVisibleDialog(true),
-      },
-      {
-        title: 'Отмена',
-        type: 'cancel',
-      },
-    ]);
-  }, [showActionSheet]);
+  const handleVisibleFalse = () => {
+    setVisibleDialog(false);
+    setInitConfig(false);
+    setInitDeviceID(false);
+  };
 
   return (
     <>
@@ -134,6 +115,21 @@ const ConfigScreen = (props: Props) => {
           {/* <Input label="ID устройства" value={deviceId} onChangeText={setDeviceId} clearInput={true} /> */}
           <View style={localStyles.buttonsView}>
             <PrimeButton
+              outlined
+              icon="delete-outline"
+              onPress={() => setVisibleDialog(!visibleDialog)}
+              style={localStyles.button}
+            >
+              Сбросить настройки
+            </PrimeButton>
+          </View>
+          <View style={localStyles.buttonsView}>
+            <PrimeButton outlined icon="presentation-play" onPress={onSetDemoMode} style={localStyles.button}>
+              Демо режим
+            </PrimeButton>
+          </View>
+          <View style={localStyles.buttonsView}>
+            <PrimeButton
               icon="check"
               onPress={handleSaveConfig}
               style={localStyles.button}
@@ -145,14 +141,9 @@ const ConfigScreen = (props: Props) => {
               Отмена
             </PrimeButton>
           </View>
-          <View style={localStyles.buttonsView}>
-            <PrimeButton outlined icon="presentation-play" onPress={onSetDemoMode} style={localStyles.button}>
-              Демо режим
-            </PrimeButton>
-          </View>
         </KeyboardAwareScrollView>
       </AppScreen>
-      <Dialog visible={visibleDialog} onDismiss={() => setVisibleDialog(false)}>
+      <Dialog visible={visibleDialog} onDismiss={handleVisibleFalse}>
         <Dialog.Title>Укажите необходимые действия</Dialog.Title>
         <Dialog.Content>
           <View style={[styles.flexDirectionRow, styles.alignItemsCenter]}>
@@ -171,15 +162,7 @@ const ConfigScreen = (props: Props) => {
           </View>
         </Dialog.Content>
         <Dialog.Actions style={{ borderColor: colors.primary }}>
-          <Button
-            labelStyle={{ color: colors.primary }}
-            color={colors.primary}
-            onPress={() => {
-              setVisibleDialog(false);
-              setInitConfig(false);
-              setInitDeviceID(false);
-            }}
-          >
+          <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={handleVisibleFalse}>
             Отмена
           </Button>
           <Button
@@ -194,9 +177,6 @@ const ConfigScreen = (props: Props) => {
           </Button>
         </Dialog.Actions>
       </Dialog>
-      <View style={styles.buttons}>
-        <RoundButton icon="server" onPress={actionsMenu} />
-      </View>
     </>
   );
 };
