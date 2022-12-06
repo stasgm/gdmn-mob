@@ -37,10 +37,8 @@ export const fullFileName2alias = (fullFileName: string): string | undefined => 
   const fileNameArr = fullFileName.split(getDb().dbPath);
   if (fileNameArr.length !== 2) return undefined;
   const shortName = (match ? `db_${match[1]}` : fileNameArr[1]).split(path.sep);
-  return shortName.reduce((str, prev, i) => {
-    /*const nameWithoutExt = prev.split('.')[0];
-    const temp = i === arr.length - 1 ? nameWithoutExt : prev;*/
-    const temp = prev.replace('.', '_EXT_');
+  return shortName.reduce((str, prev, i, arr) => {
+    const temp = i === arr.length - 1 ? prev.replace('.', '_EXT_') : prev;
     str += i === 0 ? temp : `_D_${temp}`;
     return str;
   }, '');
@@ -59,7 +57,7 @@ const readableToString = async (readable: any): Promise<string | Error> => {
 
     if (chunk.toString()[0] !== '{' && chunk.toString()[0] !== '[') throw new Error('Неправильный формат файла');
 
-    size += new Blob([chunk.toString()]).size / BYTES_PER_MB;
+    size += Buffer.byteLength(chunk.toString()) / BYTES_PER_MB;
 
     if (size > defMaxFilesSize) throw new Error('Слишком большой размер файла');
   }
