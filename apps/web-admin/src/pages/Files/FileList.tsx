@@ -13,7 +13,6 @@ import { IHeadCells, IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
 import fileSystemActions from '../../store/file';
-// import SortableFilterTable from '../../components/SortableFilterTable';
 import FileListTable from '../../components/file/FileListTable';
 
 const FileList = () => {

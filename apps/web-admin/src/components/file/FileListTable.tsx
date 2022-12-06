@@ -259,9 +259,7 @@ const FileListTable = ({
           <TableCell>{file.device?.name}</TableCell>
           <TableCell>{file.device?.id}</TableCell>
           <TableCell>{new Date(file.date || '').toLocaleString('ru', { hour12: false })}</TableCell>
-          {/* <TableCell>{message.size} кб</TableCell> */}
           <TableCell>{Math.ceil(file.size).toString()} кб</TableCell>
-          {/* </NavLink> */}
         </TableRow>
       );
     });
@@ -309,29 +307,6 @@ const FileListTable = ({
                   <Typography color="textPrimary" variant="inherit">
                     Компания
                   </Typography>
-                  {/* {isFilterVisible ? (
-                    <TextField
-                      InputProps={{
-                        sx: {
-                          height: 30,
-                          // maxWidth: 100,
-                          fontSize: 13,
-                          '& .MuiOutlinedInput-input': {
-                            borderWidth: 0,
-                            padding: 0.5,
-                          },
-                        },
-                      }}
-                      // sx={{ maxWidth: 100 }}
-                      fullWidth
-                      name="company"
-                      required
-                      variant="outlined"
-                      type="search"
-                      value={formik.values.company}
-                      onChange={formik.handleChange}
-                    />
-                  ) : null} */}
                 </TableCell>
                 <TableCell style={{ flexDirection: 'column' }}>
                   <Typography color="textPrimary" variant="inherit">

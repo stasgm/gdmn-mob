@@ -46,7 +46,6 @@ const DeviceLogFilesListTable = ({
   const [page, setPage] = useState(0);
 
   const initialValues = {
-    // ...user,
     appSystem: '',
     company: '',
     contact: '',
@@ -242,29 +241,6 @@ const DeviceLogFilesListTable = ({
                   <Typography color="textPrimary" variant="inherit">
                     Компания
                   </Typography>
-                  {/* {isFilterVisible ? (
-                    <TextField
-                      InputProps={{
-                        sx: {
-                          height: 30,
-                          // maxWidth: 100,
-                          fontSize: 13,
-                          '& .MuiOutlinedInput-input': {
-                            borderWidth: 0,
-                            padding: 0.5,
-                          },
-                        },
-                      }}
-                      // sx={{ maxWidth: 100 }}
-                      fullWidth
-                      name="company"
-                      required
-                      variant="outlined"
-                      type="search"
-                      value={formik.values.company}
-                      onChange={formik.handleChange}
-                    />
-                  ) : null} */}
                 </TableCell>
                 <TableCell style={{ flexDirection: 'column' }}>
                   <Typography color="textPrimary" variant="inherit">

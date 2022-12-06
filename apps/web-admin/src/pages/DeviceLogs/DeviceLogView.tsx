@@ -176,10 +176,6 @@ const DeviceLogView = () => {
           <CardHeader sx={{ mx: 2 }} />
           <DeviceLogTable deviceLog={logList} />
         </Box>
-        {/*  <Box>
-          <CardHeader sx={{ mx: 2 }} />
-          <ProcessFilesProcessed processedFilesList={process.processedFiles} />
-        </Box> */}
       </Box>
 
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />

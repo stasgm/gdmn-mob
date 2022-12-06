@@ -14,8 +14,6 @@ import CircularProgressWithContent from '../../components/CircularProgressWidthC
 import SnackBar from '../../components/SnackBar';
 import DeviceLogFilesListTable from '../../components/deviceLogs/DeviceLogFilesListTable';
 import deviceLogActions from '../../store/deviceLog';
-import SortableFilterTable from '../../components/SortableFilterTable';
-import { fileSystemActions } from '../../store/file/actions';
 
 const DeviceLogFilesList = () => {
   const dispatch = useDispatch();
@@ -44,8 +42,6 @@ const DeviceLogFilesList = () => {
     setPageParamLocal({ filterText: value });
 
     if (inputValue) return;
-
-    // fetchDevices('');
   };
 
   const handleSearchClick = () => {

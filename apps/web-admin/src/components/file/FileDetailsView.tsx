@@ -35,11 +35,6 @@ const FileDetailsView = ({ list }: IProps) => {
                 {list.path}
               </Typography>
             </Grid>
-            {/*   <Grid item md={2} xs={6}>
-                <Typography variant="subtitle1" gutterBottom>
-                  {JSON.stringify(file)}
-                </Typography>
-              </Grid> */}
 
             {list.company ? (
               <>

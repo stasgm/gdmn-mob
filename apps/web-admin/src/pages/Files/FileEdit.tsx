@@ -43,7 +43,6 @@ const FileEdit = () => {
   };
 
   const handleSubmit = async (values: any) => {
-    console.log('values', values);
     const res = await dispatch(fileActions.updateFile(id, values as any));
     if (res.type === 'FILE/UPDATE_FILE_SUCCESS') {
       goBack();
