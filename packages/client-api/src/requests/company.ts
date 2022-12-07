@@ -1,8 +1,8 @@
-import { NewCompany, IResponse, ICompany } from '@lib/types';
+import { NewCompany, ICompany } from '@lib/types';
 import { user as mockUser, companies as mockCompanies } from '@lib/mock';
 
 import { error, company as types } from '../types';
-import { generateId, getParams, sleep } from '../utils';
+import { generateId, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
@@ -12,7 +12,7 @@ class Company extends BaseRequest {
     super(api);
   }
 
-  addCompany = async (company: NewCompany) => {
+  addCompany = async (customRequest: CustomRequest, company: NewCompany) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -28,31 +28,27 @@ class Company extends BaseRequest {
       } as types.IAddCompanyResponse;
     }
 
-    try {
-      const res = await this.api.axios.post<IResponse<ICompany>>('/companies', company);
-      const resData = res.data;
+    const res = await customRequest<ICompany>({
+      api: this.api.axios,
+      method: 'POST',
+      url: '/companies',
+      data: company,
+    });
 
-      if (resData?.result) {
-        return {
-          type: 'ADD_COMPANY',
-          company: resData?.data,
-        } as types.IAddCompanyResponse;
-      }
-
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка создания компании',
-        // message: err?.response?.data?.error || 'ошибка создания компании',
-      } as error.INetworkError;
+        type: 'ADD_COMPANY',
+        company: res?.data,
+      } as types.IAddCompanyResponse;
     }
+
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'компания не создана',
+    } as error.IServerError;
   };
 
-  updateCompany = async (company: Partial<ICompany>) => {
+  updateCompany = async (customRequest: CustomRequest, company: Partial<ICompany>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -68,34 +64,30 @@ class Company extends BaseRequest {
       return {
         type: 'ERROR',
         message: 'Компания не найдена',
-      } as error.INetworkError;
+      } as error.IServerError;
     }
 
-    try {
-      const res = await this.api.axios.patch<IResponse<ICompany>>(`/companies/${company.id}`, company);
-      const resData = res.data;
+    const res = await customRequest<ICompany>({
+      api: this.api.axios,
+      method: 'PATCH',
+      url: `/companies/${company.id}`,
+      data: company,
+    });
 
-      if (resData.result) {
-        return {
-          type: 'UPDATE_COMPANY',
-          company: resData.data,
-        } as types.IUpdateCompanyResponse;
-      }
-
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка обновления компании',
-        //err?.response?.data?.error || 'ошибка обновления компании',
-      } as error.INetworkError;
+        type: 'UPDATE_COMPANY',
+        company: res.data,
+      } as types.IUpdateCompanyResponse;
     }
+
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'компания не обновлена',
+    } as error.IServerError;
   };
 
-  removeCompany = async (companyId: string) => {
+  removeCompany = async (customRequest: CustomRequest, companyId: string) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -104,26 +96,22 @@ class Company extends BaseRequest {
       } as types.IRemoveCompanyResponse;
     }
 
-    try {
-      const res = await this.api.axios.delete<IResponse<void>>(`/companies/${companyId}`);
-      const resData = res.data;
+    const res = await customRequest<void>({
+      api: this.api.axios,
+      method: 'DELETE',
+      url: `/companies/${companyId}`,
+    });
 
-      if (resData.result) {
-        return {
-          type: 'REMOVE_COMPANY',
-        } as types.IRemoveCompanyResponse;
-      }
-
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка удаления компании',
-      } as error.INetworkError;
+        type: 'REMOVE_COMPANY',
+      } as types.IRemoveCompanyResponse;
     }
+
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'компания не удалена',
+    } as error.IServerError;
   };
 
   getCompany = async (customRequest: CustomRequest, companyId: string) => {
@@ -142,11 +130,10 @@ class Company extends BaseRequest {
       return {
         type: 'ERROR',
         message: 'данные о компании не получены',
-      } as error.INetworkError;
+      } as error.IServerError;
     }
-    // try {
-    // const res = await this.api.axios.get<IResponse<ICompany>>(`/companies/${companyId}`);
-    const res = await customRequest<ICompany>({ api: this.api, method: 'GET', url: `/companies/${companyId}` });
+
+    const res = await customRequest<ICompany>({ api: this.api.axios, method: 'GET', url: `/companies/${companyId}` });
 
     if (res?.result) {
       return {
@@ -156,15 +143,9 @@ class Company extends BaseRequest {
     }
 
     return {
-      type: 'ERROR',
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
       message: res?.error || 'данные о компании не получены',
-    } as error.INetworkError;
-    // } catch (err) {
-    //   return {
-    //     type: 'ERROR',
-    //     message: err instanceof TypeError ? err.message : 'ошибка получения данных о компании',
-    //   } as error.INetworkError;
-    // }
+    } as error.IServerError;
   };
 
   getCompanies = async (customRequest: CustomRequest, params?: Record<string, string | number>) => {
@@ -177,15 +158,7 @@ class Company extends BaseRequest {
       } as types.IGetCompaniesResponse;
     }
 
-    // let paramText = params ? getParams(params) : '';
-
-    // if (paramText > '') {
-    //   paramText = `?${paramText}`;
-    // }
-
-    // try {
-    //   const res = await this.api.axios.get<IResponse<ICompany[]>>(`/companies${paramText}`);
-    const res = await customRequest<ICompany[]>({ api: this.api, method: 'GET', url: '/companies', params });
+    const res = await customRequest<ICompany[]>({ api: this.api.axios, method: 'GET', url: '/companies', params });
 
     if (res?.result) {
       return {
@@ -195,15 +168,9 @@ class Company extends BaseRequest {
     }
 
     return {
-      type: 'ERROR',
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
       message: res?.error || 'данные о компаниях не получены',
-    } as error.INetworkError;
-    // } catch (err) {
-    //   return {
-    //     type: 'ERROR',
-    //     message: err instanceof TypeError ? err.message : 'ошибка получения данных о компаниях',
-    //   } as error.INetworkError;
-    // }
+    } as error.IServerError;
   };
 }
 

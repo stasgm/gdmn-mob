@@ -13,6 +13,7 @@ import actionsBinding from '../../store/deviceBinding';
 import deviceActions from '../../store/device';
 import codeActions from '../../store/activationCode';
 import DeviceBindingListTable from '../deviceBinding/DeviceBindingListTable';
+import { webRequest } from '../../store/webRequest';
 
 interface IProps {
   userId: string;
@@ -57,7 +58,7 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
   }, [fetchActivationCodes, fetchDeviceBindings, fetchDevices, pageParams?.filterText]);
 
   const handleCreateUid = async (code: string, deviceId: string) => {
-    await authDispatch(authActions.activateDevice(code));
+    await authDispatch(authActions.activateDevice(webRequest(authDispatch, authActions), code));
     dispatch(deviceActions.fetchDeviceById(deviceId));
     fetchActivationCodes(deviceId);
   };

@@ -83,7 +83,7 @@ class Api extends BaseApi {
           // Добавляем device_ID
           request.params.deviceId = this._config.deviceId;
         }
-        console.info('✉️ request', request.baseURL, request.url);
+        console.info('✉️ request', request.baseURL, request.url, request.params);
         return request;
       },
       (error) => {
@@ -92,7 +92,7 @@ class Api extends BaseApi {
         return {
           type: 'ERROR',
           message: error,
-        } as error.INetworkError;
+        } as error.IServerError;
       },
     );
 

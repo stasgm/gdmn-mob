@@ -51,7 +51,7 @@ const addUser = (user: NewUser): AppThunk => {
   return async (dispatch) => {
     dispatch(userActions.addUserAsync.request(''));
 
-    const response = await api.user.addUser(user);
+    const response = await api.user.addUser(webRequest(dispatch, authActions), user);
 
     if (response.type === 'ADD_USER') {
       return dispatch(userActions.addUserAsync.success(response.user));
@@ -65,7 +65,7 @@ const updateUser = (user: IUser): AppThunk => {
   return async (dispatch) => {
     dispatch(userActions.updateUserAsync.request('обновление пользователя'));
 
-    const response = await api.user.updateUser(user);
+    const response = await api.user.updateUser(webRequest(dispatch, authActions), user);
 
     if (response.type === 'UPDATE_USER') {
       return dispatch(userActions.updateUserAsync.success(response.user));
@@ -79,7 +79,7 @@ const removeUser = (id: string): AppThunk => {
   return async (dispatch) => {
     dispatch(userActions.removeUserAsync.request('Удаление пользователя'));
 
-    const response = await api.user.removeUser(id);
+    const response = await api.user.removeUser(webRequest(dispatch, authActions), id);
 
     if (response.type === 'REMOVE_USER') {
       return dispatch(userActions.removeUserAsync.success(id));

@@ -1,6 +1,8 @@
-import { IResponse } from '@lib/types';
-import { AxiosResponse } from 'axios';
+// import { URLSearchParams } from 'url';
+
 import { config } from '@lib/client-config';
+import { IResponse } from '@lib/types';
+import { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 
 // import api from './api';
 
@@ -22,9 +24,9 @@ interface IURLParams {
 }
 
 export interface IRequestParams {
-  api: any;
+  api: AxiosInstance;
   /** method HTTP. По умолчанию подставляется GET. */
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   /** Базовый УРЛ. Если задан, то итоговый УРЛ получается слиянием базового и УРЛ. Может содержать маску.*/
   baseUrl?: string;
   /** Адрес. Может содержать маску.*/
@@ -82,13 +84,13 @@ export const robustRequest: RobustRequest = async ({
   deserializer,
   timeout = config.timeout,
 }) => {
-  let urlParams: URLSearchParams | undefined;
+  let urlParams: IURLParams | undefined;
 
   if (params) {
-    urlParams = new URLSearchParams();
-    Object.entries(params).forEach(([field, value]) => {
-      urlParams!.append(field, `${value}`);
-    });
+    urlParams = Object.entries(params).reduce((prev: IURLParams, [field, value]) => {
+      prev[field] = `${value}`;
+      return prev;
+    }, {});
   }
 
   const controller = new AbortController();
@@ -101,38 +103,36 @@ export const robustRequest: RobustRequest = async ({
   try {
     const config = { params: urlParams, signal: controller.signal };
 
-    let res: AxiosResponse<IResponse, any> | undefined = undefined;
-
+    let res: AxiosResponse<IResponse<any>, any>;
     switch (method) {
       case 'GET': {
-        // console.log('get', url, config);
-        res = await api.axios.get(url, config);
+        res = await api.get(url, config);
         break;
       }
       case 'POST': {
-        // console.log('post', url, config, data);
-        res = await api.axios.post(url, data, config);
+        res = await api.post(url, data, config);
         break;
       }
       case 'PUT': {
-        res = await api.axios.put(url, data, config);
+        res = await api.put(url, data, config);
         break;
       }
       case 'DELETE': {
-        res = await api.axios.delete(url, config);
+        res = await api.delete(url, config);
         break;
       }
+      default:
+        return {
+          result: 'ERROR',
+          message: 'Неизвестный тип запроса',
+        };
     }
-
     clearTimeout(rTimeout);
 
-    let objData = res?.data;
+    let objData = res.data;
 
-    // if (res?.data.status === 401 && authFunc) {
-    //   await authFunc();
-    // } else {
     //Проверка данных validator
-    if (res?.data?.data) {
+    if (res.data?.data) {
       if (validator) {
         validator(res.data.data);
       }
@@ -142,19 +142,19 @@ export const robustRequest: RobustRequest = async ({
     } else if (validator) {
       return {
         result: 'INVALID_DATA',
-        message: 'Empty server response',
+        message: 'Пустой ответ сервера',
       };
     }
-    // }
 
     return {
       result: 'OK',
       response: {
-        status: res!.status || 200,
+        status: res.status,
         data: objData,
       },
     } as IServerResponseResult;
   } catch (err) {
+    console.log('rr catch', JSON.stringify(err));
     clearTimeout(rTimeout);
 
     if (controller.signal.aborted) {
@@ -163,23 +163,24 @@ export const robustRequest: RobustRequest = async ({
       };
     }
 
-    // console.log('err', err);
-    // //Если пришел ответ с ошибкой сети
-    // if (err instanceof AxiosError) {
-    //   const code = err.code;
-    //   if (code === 'ECONNABORTED' || code === 'ERR_NETWORK') {
-    //     return {
-    //       result: code === 'ECONNABORTED' ? 'TIMEOUT' : 'NO_CONNECTION',
-    //     };
-    //   }
-    // }
+    if (err instanceof AxiosError) {
+      if (err.response?.status) {
+        return {
+          result: 'SERVER_ERROR',
+          response: {
+            status: err.response?.status || 500,
+            data: err.response?.data,
+          },
+        };
+      } else {
+        return {
+          result: 'NO_CONNECTION',
+        };
+      }
+    }
 
     return {
-      result: 'SERVER_ERROR',
-      response: {
-        status: 500,
-        data: err,
-      },
+      result: 'ERROR',
     };
   }
 };

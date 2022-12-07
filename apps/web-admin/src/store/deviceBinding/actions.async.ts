@@ -54,7 +54,7 @@ const addDeviceBinding = (deviceBinding: NewDeviceBinding): AppThunk => {
   return async (dispatch) => {
     dispatch(deviceBindingActions.addDeviceBindingAsync.request(''));
 
-    const response = await api.deviceBinding.addDeviceBinding(deviceBinding);
+    const response = await api.deviceBinding.addDeviceBinding(webRequest(dispatch, authActions), deviceBinding);
 
     if (response.type === 'ADD_DEVICEBINDING') {
       return dispatch(deviceBindingActions.addDeviceBindingAsync.success(response.deviceBinding));
@@ -68,7 +68,7 @@ const updateDeviceBinding = (deviceBinding: IDeviceBinding): AppThunk => {
   return async (dispatch) => {
     dispatch(deviceBindingActions.updateDeviceBindingAsync.request('Обновление устройства'));
 
-    const response = await api.deviceBinding.updateDeviceBinding(deviceBinding);
+    const response = await api.deviceBinding.updateDeviceBinding(webRequest(dispatch, authActions), deviceBinding);
 
     if (response.type === 'UPDATE_DEVICEBINDING') {
       return dispatch(deviceBindingActions.updateDeviceBindingAsync.success(response.deviceBinding));
@@ -82,7 +82,7 @@ const removeDeviceBinding = (id: string): AppThunk => {
   return async (dispatch) => {
     dispatch(deviceBindingActions.removeDeviceBindingAsync.request('Удаление связи устройства с пользователем'));
 
-    const response = await api.deviceBinding.removeDeviceBinding(id);
+    const response = await api.deviceBinding.removeDeviceBinding(webRequest(dispatch, authActions), id);
 
     if (response.type === 'REMOVE_DEVICEBINDING') {
       return dispatch(deviceBindingActions.removeDeviceBindingAsync.success());

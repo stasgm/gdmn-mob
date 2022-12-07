@@ -1,5 +1,5 @@
-import { AuthLogOut, IDevice, IUser, IUserCredentials, IUserSettings } from '@lib/types';
-import api, { CustomRequest, CustomRequestProps } from '@lib/client-api';
+import api, { CustomRequest } from '@lib/client-api';
+import { IUserCredentials, IUserSettings } from '@lib/types';
 
 import { ActionType } from 'typesafe-actions';
 
@@ -39,7 +39,7 @@ const getDeviceByUid = (
       //Проверка на совпадение подсистемы приложения с подсистемой пользователя
       if (erpUserId && appSystemName) {
         const getErpUser = await api.user.getUser(customRequest, erpUserId);
-        if (getErpUser.type === 'ERROR') {
+        if (getErpUser.type !== 'GET_USER') {
           return dispatch(
             actions.getDeviceByUidAsync.failure(
               'Ошибка получения устройства по UId: невозможно получить данные о пользователе',
@@ -61,12 +61,11 @@ const getDeviceByUid = (
     }
 
     return dispatch(actions.getDeviceByUidAsync.failure(response.message));
-
-    // return dispatch(actions.getDeviceByUidAsync.failure('Ошибка получения устройства по UId'));
   };
 };
 
 const activateDevice = (
+  customRequest: CustomRequest,
   code: string,
 ): AppThunk<
   Promise<ActionType<typeof actions.activateDeviceAsync>>,
@@ -76,37 +75,30 @@ const activateDevice = (
   return async (dispatch) => {
     dispatch(actions.activateDeviceAsync.request(''));
 
-    const response = await api.auth.verifyCode(code);
+    const response = await api.auth.verifyCode(customRequest, code);
 
     if (response.type === 'VERIFY_CODE') {
       return dispatch(actions.activateDeviceAsync.success(response.uid));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(actions.activateDeviceAsync.failure(response.message));
-    }
-
-    return dispatch(actions.activateDeviceAsync.failure('Ошибка активации устройства'));
+    return dispatch(actions.activateDeviceAsync.failure(response.message));
   };
 };
 
 const signup = (
+  customRequest: CustomRequest,
   userCredentials: IUserCredentials,
 ): AppThunk<Promise<ActionType<typeof actions.signupAsync>>, AuthState, ActionType<typeof actions.signupAsync>> => {
   return async (dispatch) => {
     dispatch(actions.signupAsync.request(''));
 
-    const response = await api.auth.signup(userCredentials);
+    const response = await api.auth.signup(customRequest, userCredentials);
 
     if (response.type === 'SIGNUP') {
       return dispatch(actions.signupAsync.success());
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(actions.signupAsync.failure(response.message));
-    }
-
-    return dispatch(actions.signupAsync.failure('Ошибка регистрации пользователя'));
+    return dispatch(actions.signupAsync.failure(response.message));
   };
 };
 
@@ -128,16 +120,12 @@ const login = (
       //Проверка на совпадение подсистемы приложения с подсистемой пользователя
       if (response.user.erpUser?.id && appSystemName) {
         const getErpUser = await api.user.getUser(customRequest, response.user.erpUser?.id);
-        if (getErpUser.type === 'ERROR') {
-          return dispatch(
-            actions.loginUserAsync.failure('Вход не выполнен: невозможно получить данные о пользователе'),
-          );
+        if (getErpUser.type !== 'GET_USER') {
+          return dispatch(actions.loginUserAsync.failure('Невозможно получить данные об ERP-пользователе'));
         }
         if (appSystemName !== getErpUser.user.appSystem?.name) {
           return dispatch(
-            actions.loginUserAsync.failure(
-              'Вход не выполнен: подсистема пользователя не совпадает с подсистемой приложения',
-            ),
+            actions.loginUserAsync.failure('Подсистема пользователя не совпадает с подсистемой приложения'),
           );
         }
       }
@@ -151,7 +139,7 @@ const login = (
 const disconnect = (): AppThunk<
   Promise<ActionType<typeof actions.disconnectAsync>>,
   AuthState,
-  ActionType<typeof actions.disconnectAsync> | ActionType<typeof actions.setConnectionStatus>
+  ActionType<typeof actions.disconnectAsync>
 > => {
   return async (dispatch) => {
     dispatch(actions.disconnectAsync.request());
@@ -163,25 +151,27 @@ const disconnect = (): AppThunk<
   };
 };
 
-const logout = (): AppThunk<
+const logout = (
+  customRequest?: CustomRequest,
+): AppThunk<
   Promise<ActionType<typeof actions.logoutUserAsync>>,
   AuthState,
-  ActionType<typeof actions.logoutUserAsync> | ActionType<typeof actions.setConnectionStatus>
+  ActionType<typeof actions.logoutUserAsync>
 > => {
   return async (dispatch) => {
     dispatch(actions.logoutUserAsync.request());
 
-    const response = await api.auth.logout();
+    if (customRequest) {
+      const response = await api.auth.logout(customRequest);
 
-    if (response.type === 'LOGOUT') {
+      if (response.type === 'LOGOUT') {
+        return dispatch(actions.logoutUserAsync.success());
+      }
+
+      return dispatch(actions.logoutUserAsync.failure(response.message));
+    } else {
       return dispatch(actions.logoutUserAsync.success());
     }
-
-    if (response.type === 'ERROR') {
-      return dispatch(actions.logoutUserAsync.failure(response.message));
-    }
-
-    return dispatch(actions.logoutUserAsync.failure('Ошибка выхода из учетной записи'));
   };
 };
 
@@ -218,12 +208,16 @@ const getDeviceStatus = (
       const response = await api.auth.getDeviceStatus(customRequest, uid);
 
       if (response.type === 'GET_DEVICE_STATUS') {
-        return dispatch(actions.getDeviceStatusAsync.success(response.status));
+        return dispatch(
+          actions.getDeviceStatusAsync.success(response.status === 'ACTIVE' ? 'connected' : 'not-activated'),
+        );
+      } else if (response.type === 'CONNECT_ERROR') {
+        return dispatch(actions.getDeviceStatusAsync.success('not-checked'));
       }
 
       return dispatch(actions.getDeviceStatusAsync.failure(response.message));
     } else {
-      return dispatch(actions.getDeviceStatusAsync.success('NON-ACTIVATED'));
+      return dispatch(actions.getDeviceStatusAsync.success('not-activated'));
     }
   };
 };

@@ -4,10 +4,10 @@ import { getType } from 'typesafe-actions';
 
 import { config } from '@lib/client-config';
 
-import { device as mockDevice, user as mockUser, company as mockCompany } from '@lib/mock';
+import { company as mockCompany, device as mockDevice, user as mockUser } from '@lib/mock';
 
+import { actions, AuthActionType } from './actions';
 import { AuthState } from './types';
-import { AuthActionType, actions } from './actions';
 
 const {
   server: { name, port, protocol },
@@ -175,7 +175,8 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
         loading: false,
         status: '',
         error: false,
-        connectionStatus: action.payload === 'ACTIVE' ? 'connected' : 'not-activated',
+        connectionStatus: action.payload,
+        // connectionStatus: action.payload === 'ACTIVE' ? 'connected' : 'not-activated',
       };
 
     case getType(actions.getDeviceStatusAsync.failure):
@@ -224,6 +225,21 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
 
     case getType(actions.setErrorMessage):
       return { ...state, errorMessage: action.payload };
+
+    case getType(actions.getCompanyAsync.request):
+      return { ...state, loading: true, company: undefined, status: '', error: false };
+
+    case getType(actions.getCompanyAsync.success):
+      return {
+        ...state,
+        loading: false,
+        status: '',
+        error: false,
+        company: action.payload,
+      };
+
+    case getType(actions.getCompanyAsync.failure):
+      return { ...state, loading: false, status: action.payload, error: true };
 
     default:
       return state;

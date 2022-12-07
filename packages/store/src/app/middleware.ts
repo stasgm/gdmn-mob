@@ -20,6 +20,7 @@ export const appMiddlewareFactory: PersistedMiddleware =
     if (action.type === getType(appActions.loadSuperDataFromDisc) && store.getState().auth.user?.id) {
       // а здесь мы грузим данные для залогиненого пользователя
       store.dispatch(appActions.setLoadingData(true));
+      store.dispatch(appActions.setShowSyncInfo(false));
       load('app', store.getState().auth.user?.id)
         .then((data) => {
           return store.dispatch(

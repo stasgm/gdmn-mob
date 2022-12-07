@@ -50,7 +50,7 @@ const addAppSystem = (appSystem: NewAppSystem): AppThunk => {
   return async (dispatch) => {
     dispatch(appSystemActions.addAppSystemAsync.request(''));
 
-    const response = await api.appSystem.addAppSystem(appSystem);
+    const response = await api.appSystem.addAppSystem(webRequest(dispatch, authActions), appSystem);
 
     if (response.type === 'ADD_APP_SYSTEM') {
       return dispatch(appSystemActions.addAppSystemAsync.success(response.appSystem));
@@ -64,7 +64,7 @@ const updateAppSystem = (appSystem: IAppSystem): AppThunk => {
   return async (dispatch) => {
     dispatch(appSystemActions.updateAppSystemAsync.request('Обновление подсистемы'));
 
-    const response = await api.appSystem.updateAppSystem(appSystem);
+    const response = await api.appSystem.updateAppSystem(webRequest(dispatch, authActions), appSystem);
 
     if (response.type === 'UPDATE_APP_SYSTEM') {
       return dispatch(appSystemActions.updateAppSystemAsync.success(response.appSystem));
@@ -78,7 +78,7 @@ const removeAppSystem = (id: string): AppThunk => {
   return async (dispatch) => {
     dispatch(appSystemActions.removeAppSystemAsync.request('Удаление подсистемы'));
 
-    const response = await api.appSystem.removeAppSystem(id);
+    const response = await api.appSystem.removeAppSystem(webRequest(dispatch, authActions), id);
 
     if (response.type === 'REMOVE_APP_SYSTEM') {
       return dispatch(appSystemActions.removeAppSystemAsync.success(id));

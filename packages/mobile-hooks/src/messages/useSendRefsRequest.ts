@@ -1,9 +1,13 @@
 import { useDispatch, useSelector, appActions, authActions, useAuthThunkDispatch } from '@lib/store';
 
-import { AuthLogOut, IMessage } from '@lib/types';
+import { IDeviceLog, IMessage } from '@lib/types';
 import api from '@lib/client-api';
 
+import { useMemo } from 'react';
+
 import { generateId } from '../utils';
+
+import { mobileRequest } from '../mobileRequest';
 
 import { getNextOrder } from './helpers';
 import { useSaveErrors } from './useSaveErrors';
@@ -11,11 +15,11 @@ import { useSaveErrors } from './useSaveErrors';
 export const useSendRefsRequest = () => {
   const dispatch = useDispatch();
   const authDispatch = useAuthThunkDispatch();
-  const authMiddleware: AuthLogOut = () => authDispatch(authActions.logout());
+  const appRequest = useMemo(() => mobileRequest(authDispatch, authActions), [authDispatch]);
 
   const { user, company, config, appSystem } = useSelector((state) => state.auth);
   const refVersion = 1;
-  let withError = false;
+  // let withError = false;
   const deviceId = config.deviceId!;
   const { saveErrors } = useSaveErrors();
 
@@ -28,7 +32,7 @@ export const useSendRefsRequest = () => {
     );
   };
 
-  const addError = (name: string, message: string) => {
+  const addError = (name: string, message: string, tempErrs: IDeviceLog[]) => {
     const err = {
       id: generateId(),
       name,
@@ -36,55 +40,79 @@ export const useSendRefsRequest = () => {
       message,
     };
     dispatch(appActions.addErrorNotice(err));
-    dispatch(appActions.addError(err));
-    withError = true;
+    tempErrs.push(err);
+    // dispatch(appActions.addError(err));
   };
 
   return async () => {
     dispatch(appActions.setLoading(true));
     dispatch(appActions.clearRequestNotice());
     dispatch(appActions.clearErrorNotice());
-    addRequestNotice('Запрос на получение справочников');
+    const tempErrs: IDeviceLog[] = [];
+    let connectError = false;
 
     if (!user || !company || !appSystem || !user.erpUser) {
       addError(
         'useSendRefsRequest',
-        // eslint-disable-next-line max-len
         `Не определены данные: пользователь ${user?.name}, компания ${company?.name}, подсистема ${appSystem?.name}, пользователь ERP ${user?.erpUser?.name}`,
+        tempErrs,
       );
+      // withError = true;
     } else {
-      const messageCompany = { id: company.id, name: company.name };
-      const consumer = user.erpUser;
+      addRequestNotice('Проверка статуса устройства');
+      const statusRespone = await api.auth.getDeviceStatus(appRequest, deviceId);
+      if (statusRespone.type !== 'GET_DEVICE_STATUS') {
+        addError(
+          'useSendRefsRequest: getDeviceStatus',
+          `Статус устройства не получен: ${statusRespone.message}`,
+          tempErrs,
+        );
+        connectError = statusRespone.type === 'CONNECT_ERROR';
+        // withError = true;
+      } else {
+        authDispatch(
+          authActions.setConnectionStatus(statusRespone.status === 'ACTIVE' ? 'connected' : 'not-activated'),
+        );
+      }
+      if (!tempErrs.length) {
+        addRequestNotice('Запрос на получение справочников');
+        const messageCompany = { id: company.id, name: company.name };
+        const consumer = user.erpUser;
 
-      //Формируем запрос на получение справочников
-      const messageGetRef: IMessage['body'] = {
-        type: 'CMD',
-        version: refVersion,
-        payload: {
-          name: 'GET_REF',
-        },
-      };
+        //Формируем запрос на получение справочников
+        const messageGetRef: IMessage['body'] = {
+          type: 'CMD',
+          version: refVersion,
+          payload: {
+            name: 'GET_REF',
+          },
+        };
 
-      //Отправляем запрос на получение справочников
-      const sendMesRefResponse = await api.message.sendMessages(
-        appSystem,
-        messageCompany,
-        consumer,
-        messageGetRef,
-        getNextOrder(),
-        deviceId,
-        authMiddleware,
-      );
+        //Отправляем запрос на получение справочников
+        const sendMesRefResponse = await api.message.sendMessages(
+          appRequest,
+          appSystem,
+          messageCompany,
+          consumer,
+          messageGetRef,
+          getNextOrder(),
+          deviceId,
+        );
 
-      if (sendMesRefResponse?.type === 'ERROR') {
-        addError('useSendRefsRequest: api.message.sendMessages', sendMesRefResponse.message);
+        if (sendMesRefResponse?.type !== 'SEND_MESSAGE') {
+          addError('useSendRefsRequest: api.message.sendMessages', sendMesRefResponse.message, tempErrs);
+          // withError = true;
+        }
       }
     }
-    if (withError) {
+
+    if (tempErrs.length) {
       dispatch(appActions.setShowSyncInfo(true));
     }
 
-    saveErrors();
+    if (!connectError) {
+      saveErrors(tempErrs);
+    }
 
     dispatch(appActions.setLoading(false));
   };

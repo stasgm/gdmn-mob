@@ -1,4 +1,4 @@
-import { IProcess, IResponse } from '@lib/types';
+import { IProcess } from '@lib/types';
 import { processes as mockProcesses } from '@lib/mock';
 
 import { error, process as types } from '../types';
@@ -22,18 +22,8 @@ class Process extends BaseRequest {
       } as types.IGetProcessesResponse;
     }
 
-    // let paramText = params ? getParams(params) : '';
-
-    // if (paramText > '') {
-    //   paramText = `?${paramText}`;
-    // }
-
-    // try {
-    //   const res = await this.api.axios.get<IResponse<IProcess[]>>(`/processes${paramText}`);
-    //   const resData = res.data;
-
     const res = await customRequest<IProcess[]>({
-      api: this.api,
+      api: this.api.axios,
       method: 'GET',
       url: '/processes',
       params,
@@ -47,18 +37,12 @@ class Process extends BaseRequest {
     }
 
     return {
-      type: 'ERROR',
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
       message: res?.error || 'данные о процессах не получены',
-    } as error.INetworkError;
-    // } catch (err) {
-    //   return {
-    //     type: 'ERROR',
-    //     message: err instanceof TypeError ? err.message : 'ошибка получения данных о процессах',
-    //   } as error.INetworkError;
-    // }
+    } as error.IServerError;
   };
 
-  removeProcess = async (processId: string) => {
+  removeProcess = async (customRequest: CustomRequest, processId: string) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -67,26 +51,22 @@ class Process extends BaseRequest {
       } as types.IRemoveProcessResponse;
     }
 
-    try {
-      const res = await this.api.axios.delete<IResponse<void>>(`/processes/${processId}`);
-      const resData = res.data;
+    const res = await customRequest<void>({
+      api: this.api.axios,
+      method: 'DELETE',
+      url: `/processes/${processId}`,
+    });
 
-      if (resData.result) {
-        return {
-          type: 'REMOVE_PROCESS',
-        } as types.IRemoveProcessResponse;
-      }
-
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка удаления процесса',
-      } as error.INetworkError;
+        type: 'REMOVE_PROCESS',
+      } as types.IRemoveProcessResponse;
     }
+
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'процесс не удален',
+    } as error.IServerError;
   };
 }
 

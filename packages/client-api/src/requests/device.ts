@@ -1,8 +1,8 @@
-import { IDevice, IResponse, NewDevice } from '@lib/types';
+import { IDevice, NewDevice } from '@lib/types';
 import { device as mockDevice } from '@lib/mock';
 
 import { error, device as types } from '../types';
-import { generateId, getParams, sleep } from '../utils';
+import { generateId, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
@@ -12,7 +12,7 @@ class Device extends BaseRequest {
     super(api);
   }
 
-  addDevice = async (newDevice: NewDevice) => {
+  addDevice = async (customRequest: CustomRequest, newDevice: NewDevice) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -27,29 +27,26 @@ class Device extends BaseRequest {
       } as types.IAddDeviceResponse;
     }
 
-    try {
-      const res = await this.api.axios.post<IResponse<IDevice>>('/devices', newDevice);
-      const resData = res.data;
+    const res = await customRequest<IDevice>({
+      api: this.api.axios,
+      method: 'POST',
+      url: '/devices',
+      data: newDevice,
+    });
 
-      if (resData.result) {
-        return {
-          type: 'ADD_DEVICE',
-          device: resData.data,
-        } as types.IAddDeviceResponse;
-      }
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка добавления устройства',
-      } as error.INetworkError;
+        type: 'ADD_DEVICE',
+        device: res.data,
+      } as types.IAddDeviceResponse;
     }
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'устройство не создано',
+    } as error.IServerError;
   };
 
-  updateDevice = async (device: Partial<IDevice>) => {
+  updateDevice = async (customRequest: CustomRequest, device: Partial<IDevice>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -59,29 +56,26 @@ class Device extends BaseRequest {
       } as types.IUpdateDeviceResponse;
     }
 
-    try {
-      const res = await this.api.axios.patch<IResponse<IDevice>>(`/devices/${device.id}`, device);
-      const resData = res.data;
+    const res = await customRequest<IDevice>({
+      api: this.api.axios,
+      method: 'PATCH',
+      url: `/devices/${device.id}`,
+      data: device,
+    });
 
-      if (resData.result) {
-        return {
-          type: 'UPDATE_DEVICE',
-          device: resData.data,
-        } as types.IUpdateDeviceResponse;
-      }
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка обновления устройства',
-      } as error.INetworkError;
+        type: 'UPDATE_DEVICE',
+        device: res.data,
+      } as types.IUpdateDeviceResponse;
     }
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'устройство не обновлено',
+    } as error.IServerError;
   };
 
-  removeDevice = async (deviceId: string) => {
+  removeDevice = async (customRequest: CustomRequest, deviceId: string) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -90,25 +84,21 @@ class Device extends BaseRequest {
       } as types.IRemoveDeviceResponse;
     }
 
-    try {
-      const res = await this.api.axios.delete<IResponse<void>>(`/devices/${deviceId}`);
-      const resData = res.data;
+    const res = await customRequest<void>({
+      api: this.api.axios,
+      method: 'DELETE',
+      url: `/devices/${deviceId}`,
+    });
 
-      if (resData.result) {
-        return {
-          type: 'REMOVE_DEVICE',
-        } as types.IRemoveDeviceResponse;
-      }
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка удаления устройства',
-      } as error.INetworkError;
+        type: 'REMOVE_DEVICE',
+      } as types.IRemoveDeviceResponse;
     }
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'устройство не удалено',
+    } as error.IServerError;
   };
 
   /**
@@ -130,15 +120,10 @@ class Device extends BaseRequest {
     }
 
     const res = await customRequest<IDevice>({
-      api: this.api,
+      api: this.api.axios,
       method: 'GET',
       url: `/devices/${deviceId || this.api.config.deviceId}`,
     });
-
-    // try {
-    //   const res = await this.api.axios.get<IResponse<IDevice>>(`/devices/${deviceId || this.api.config.deviceId}`);
-
-    //   const resData = res?.data;
 
     if (res?.result) {
       return {
@@ -148,15 +133,9 @@ class Device extends BaseRequest {
     }
 
     return {
-      type: 'ERROR',
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
       message: res?.error || 'устройство не получено',
-    } as error.INetworkError;
-    // } catch (err) {
-    //   return {
-    //     type: 'ERROR',
-    //     message: err instanceof TypeError ? err.message : 'ошибка подключения',
-    //   } as error.INetworkError;
-    // }
+    } as error.IServerError;
   };
 
   /**
@@ -169,7 +148,7 @@ class Device extends BaseRequest {
   getDevices = async (
     customRequest: CustomRequest,
     params?: Record<string, string | number>,
-  ): Promise<types.IGetDevicesResponse | error.INetworkError> => {
+  ): Promise<types.IGetDevicesResponse | error.IServerError> => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -179,15 +158,7 @@ class Device extends BaseRequest {
       };
     }
 
-    let paramText = params ? getParams(params) : '';
-
-    if (paramText > '') {
-      paramText = `?${paramText}`;
-    }
-
-    // try {
-    // const res = await this.api.axios.get<IResponse<IDevice[]>>(`/devices${paramText}`);
-    const res = await customRequest<IDevice[]>({ api: this.api, method: 'GET', url: `/devices${paramText}` });
+    const res = await customRequest<IDevice[]>({ api: this.api.axios, method: 'GET', url: '/devices', params });
 
     if (res?.result) {
       return {
@@ -196,22 +167,17 @@ class Device extends BaseRequest {
       } as types.IGetDevicesResponse;
     }
     return {
-      type: 'ERROR',
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
       message: res?.error || 'данные об устройствах не получены',
-    } as error.INetworkError;
-    // } catch (err) {
-    //   return {
-    //     type: 'ERROR',
-    //     message: err instanceof TypeError ? err.message : 'ошибка получения данных об устройствах',
-    //   } as error.INetworkError;
-    // }
+    } as error.IServerError;
   };
 
   getUsersByDevice = async (customRequest: CustomRequest, deviceId: string) => {
-    // try {
-    //   const res = await this.api.axios.get<IResponse<IDevice[]>>(`/devices/${deviceId}/users`);
-    //   const resData = res.data;
-    const res = await customRequest<IDevice[]>({ api: this.api, method: 'GET', url: `/devices/${deviceId}/users` });
+    const res = await customRequest<IDevice[]>({
+      api: this.api.axios,
+      method: 'GET',
+      url: `/devices/${deviceId}/users`,
+    });
 
     if (res?.result) {
       return {
@@ -220,15 +186,9 @@ class Device extends BaseRequest {
       } as types.IGetUsersByDeviceResponse;
     }
     return {
-      type: 'ERROR',
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
       message: res?.error || 'данные о пользователях по устройству не получены',
-    } as error.INetworkError;
-    // } catch (err) {
-    //   return {
-    //     type: 'ERROR',
-    //     message: err instanceof TypeError ? err.message : 'ошибка получения пользователей по устройству',
-    //   } as error.INetworkError;
-    // }
+    } as error.IServerError;
   };
 }
 

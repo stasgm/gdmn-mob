@@ -1,7 +1,7 @@
 import api, { CustomRequest } from '@lib/client-api';
 
-import { ThunkDispatch } from 'redux-thunk';
 import { useDispatch } from 'react-redux';
+import { ThunkDispatch } from 'redux-thunk';
 
 import { ActionType } from 'typesafe-actions';
 
@@ -41,11 +41,11 @@ const fetchMessages = (
   };
 };
 
-const clearMessages = (params: { appSystemId: string; companyId: string }): AppThunk => {
+const clearMessages = (customRequest: CustomRequest, params: { appSystemId: string; companyId: string }): AppThunk => {
   return async (dispatch) => {
     dispatch(actions.clearMessagesAsync.request('Удаление сообщений'));
 
-    const response = await api.message.clear(params);
+    const response = await api.message.clear(customRequest, params);
 
     if (response.type === 'CLEAR_MESSAGES') {
       return dispatch(actions.clearMessagesAsync.success());

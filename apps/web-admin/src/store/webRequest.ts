@@ -5,23 +5,24 @@ export const webRequest =
   async <T>(params: IRequestParams) => {
     dispatch(actions.setErrorMessage(''));
     const res = await robustRequest(params);
-    console.log('res', res);
+    console.log('webRequest res', res);
     switch (res.result) {
       case 'OK': {
         //Если пришел ответ, что не пройдена авторизация
         if (res.response.data.status === 401) {
-          dispatch(actions.setErrorMessage(res.response.data.error || 'не пройдена авторизация'));
+          dispatch(actions.setErrorMessage(res.response.data.erlror || 'не пройдена авторизация'));
           dispatch(actions.logout());
-          break;
-        } else {
-          return res.response.data as T;
         }
+        return res.response.data as T;
+      }
+      case 'SERVER_ERROR': {
+        return res.response.data;
       }
       case 'TIMEOUT':
         dispatch(actions.setErrorMessage('Не удается получить ответ от сервер'));
         break;
 
-      case 'SERVER_ERROR': {
+      case 'NO_CONNECTION': {
         //Если пришел ответ с ошибкой сети
         if (!navigator.onLine) {
           dispatch(actions.setErrorMessage('Отсутствует соединение с интернетом'));

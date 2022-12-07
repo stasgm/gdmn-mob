@@ -5,29 +5,32 @@ import { fetch } from '@react-native-community/netinfo';
 export const mobileRequest =
   (dispatch: any, actions: any): CustomRequest =>
   async <T>(params: IRequestParams) => {
+    dispatch(actions.setErrorMessage(''));
     const res = await robustRequest(params);
+    console.log('mobileRequest res', JSON.stringify(res));
     switch (res.result) {
       case 'OK': {
         //Если пришел ответ, что не пройдена авторизация
         if (res.response.data.status === 401) {
-          dispatch(actions.setErrorMessage('Не пройдена авторизация. Повторите вход в приложение'));
+          dispatch(actions.setErrorMessage('Не пройдена авторизация пользователя. Повторите вход в приложение'));
           dispatch(actions.logout());
-          break;
-        } else {
-          return res.response.data as T;
         }
+        return res.response.data as T;
+      }
+      case 'SERVER_ERROR': {
+        return res.response.data;
       }
       case 'TIMEOUT':
         dispatch(actions.setErrorMessage('Не удается получить ответ от сервера. Проверьте настройки подключения'));
         break;
 
-      case 'SERVER_ERROR': {
+      case 'NO_CONNECTION': {
         //Если пришел ответ с ошибкой сети
         const state = await fetch();
-        if (!state.isConnected) {
-          dispatch(actions.setErrorMessage('Отсутствует соединение с интернетом'));
-        } else {
+        if (state.isConnected) {
           dispatch(actions.setErrorMessage('Не удается получить ответ от сервера. Проверьте настройки подключения'));
+        } else {
+          dispatch(actions.setErrorMessage('Отсутствует соединение с интернетом'));
         }
       }
     }

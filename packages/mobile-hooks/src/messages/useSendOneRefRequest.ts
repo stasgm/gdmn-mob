@@ -1,9 +1,13 @@
 import { useDispatch, useSelector, appActions, authActions, useAuthThunkDispatch } from '@lib/store';
 
-import { AuthLogOut, ICmdParams, IMessage } from '@lib/types';
+import { ICmdParams, IDeviceLog, IMessage } from '@lib/types';
 import api from '@lib/client-api';
 
+import { useMemo } from 'react';
+
 import { generateId } from '../utils';
+
+import { mobileRequest } from '../mobileRequest';
 
 import { getNextOrder } from './helpers';
 import { useSaveErrors } from './useSaveErrors';
@@ -11,11 +15,11 @@ import { useSaveErrors } from './useSaveErrors';
 export const useSendOneRefRequest = (description: string, params: ICmdParams) => {
   const dispatch = useDispatch();
   const authDispatch = useAuthThunkDispatch();
-  const authMiddleware: AuthLogOut = () => authDispatch(authActions.logout());
+  const appRequest = useMemo(() => mobileRequest(authDispatch, authActions), [authDispatch]);
 
   const { user, company, config, appSystem } = useSelector((state) => state.auth);
   const refVersion = 1;
-  let withError = false;
+  // let withError = false;
   const deviceId = config.deviceId!;
   const { saveErrors } = useSaveErrors();
 
@@ -28,7 +32,7 @@ export const useSendOneRefRequest = (description: string, params: ICmdParams) =>
     );
   };
 
-  const addError = (name: string, message: string) => {
+  const addError = (name: string, message: string, tempErrs: IDeviceLog[]) => {
     const err = {
       id: generateId(),
       name,
@@ -36,55 +40,79 @@ export const useSendOneRefRequest = (description: string, params: ICmdParams) =>
       message,
     };
     dispatch(appActions.addErrorNotice(err));
-    dispatch(appActions.addError(err));
-    withError = true;
+    tempErrs.push(err);
+    // dispatch(appActions.addError(err));
   };
 
   return async () => {
     dispatch(appActions.setLoading(true));
     dispatch(appActions.clearRequestNotice());
     dispatch(appActions.clearErrorNotice());
-    addRequestNotice(`Запрос на получение справочника: ${description}`);
+    const tempErrs: IDeviceLog[] = [];
+    let connectError = false;
 
     if (!user || !company || !appSystem || !user.erpUser) {
       addError(
-        'useSendDebtRequest',
-        // eslint-disable-next-line max-len
+        'useSendOneRefRequest',
         `Не определены данные: пользователь ${user?.name}, компания ${company?.name}, подсистема ${appSystem?.name}, пользователь ERP ${user?.erpUser?.name}`,
+        tempErrs,
       );
+      // withError = true;
     } else {
-      const messageCompany = { id: company.id, name: company.name };
-      const consumer = user.erpUser;
+      addRequestNotice('Проверка статуса устройства');
+      const statusRespone = await api.auth.getDeviceStatus(appRequest, deviceId);
+      if (statusRespone.type !== 'GET_DEVICE_STATUS') {
+        addError(
+          'useSendOneRefRequest: getDeviceStatus',
+          `Статус устройства не получен: ${statusRespone.message}`,
+          tempErrs,
+        );
+        connectError = statusRespone.type === 'CONNECT_ERROR';
+        // withError = true;
+      } else {
+        authDispatch(
+          authActions.setConnectionStatus(statusRespone.status === 'ACTIVE' ? 'connected' : 'not-activated'),
+        );
+      }
+      if (!tempErrs.length) {
+        addRequestNotice(`Запрос на получение справочника: ${description}`);
 
-      //Формируем запрос на получение справочника
-      const messageGetRef: IMessage['body'] = {
-        type: 'CMD',
-        version: refVersion,
-        payload: {
-          name: 'GET_ONE_REF',
-          params,
-        },
-      };
+        const messageCompany = { id: company.id, name: company.name };
+        const consumer = user.erpUser;
 
-      //Отправляем запрос на получение справочника
-      const sendMesRefResponse = await api.message.sendMessages(
-        appSystem,
-        messageCompany,
-        consumer,
-        messageGetRef,
-        getNextOrder(),
-        deviceId,
-        authMiddleware,
-      );
+        //Формируем запрос на получение справочника
+        const messageGetRef: IMessage['body'] = {
+          type: 'CMD',
+          version: refVersion,
+          payload: {
+            name: 'GET_ONE_REF',
+            params,
+          },
+        };
 
-      if (sendMesRefResponse?.type === 'ERROR') {
-        addError('useSendOneRefRequest: api.message.sendMessages', sendMesRefResponse.message);
+        //Отправляем запрос на получение справочника
+        const sendMesRefResponse = await api.message.sendMessages(
+          appRequest,
+          appSystem,
+          messageCompany,
+          consumer,
+          messageGetRef,
+          getNextOrder(),
+          deviceId,
+        );
+
+        if (sendMesRefResponse?.type !== 'SEND_MESSAGE') {
+          addError('useSendOneRefRequest: api.message.sendMessages', sendMesRefResponse.message, tempErrs);
+          // withError = true;
+        }
       }
     }
-    saveErrors();
-
-    if (withError) {
+    if (tempErrs.length) {
       dispatch(appActions.setShowSyncInfo(true));
+    }
+
+    if (!connectError) {
+      saveErrors(tempErrs);
     }
 
     dispatch(appActions.setLoading(false));

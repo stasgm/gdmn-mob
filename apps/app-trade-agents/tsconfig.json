@@ -15,6 +15,6 @@
     "noEmit": true,
     "rootDir": "."
   },
-  "include": ["src/**/*", "__tests__/**/*", "./App.tsx", "../../packages/store/src/ReactotronConfig.ts"],
+  "include": ["src/**/*", "__tests__/**/*", "./App.tsx"],
   "exclude": ["dist", "node_modules", "*.sample"]
 }

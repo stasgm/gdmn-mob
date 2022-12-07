@@ -65,7 +65,7 @@ const getDeviceStatusAsync = createAsyncAction(
   'AUTH/GET_DEVICE_STATUS',
   'AUTH/GET_DEVICE_STATUS_SUCCESS',
   'AUTH/GET_DEVICE_STATUS_FAILURE',
-)<string, DeviceState | undefined, string>();
+)<string, ConnectionStatus, string>();
 
 const setUserSettingsAsync = createAsyncAction(
   'AUTH/SET_USER_SETTINGS',

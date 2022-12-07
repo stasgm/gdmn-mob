@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { StyleSheet, View, Text, AppState } from 'react-native';
 import { Store } from 'redux';
 
 import {
-  appActions,
   authActions,
   authSelectors,
   documentActions,
@@ -19,7 +19,6 @@ import { globalStyles, Theme as defaultTheme } from '@lib/mobile-ui';
 import api from '@lib/client-api';
 
 import { Snackbar } from 'react-native-paper';
-import { View, Text, AppState } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
 
@@ -43,18 +42,18 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
 
   const appState = useRef(AppState.currentState);
   const authDispatch = useAuthThunkDispatch();
-  const appRequest = mobileRequest(authDispatch, authActions);
 
   useEffect(() => {
     //При запуске приложения записываем настройки в апи
     api.config = { ...api.config, ...config };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', async (nextAppState) => {
       if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
         //Проверка сессии при фокусе приложения, можно getUser заменить на другую с Middleware
-        await api.user.getUser(appRequest, user!.id);
+        await api.user.getUser(mobileRequest(authDispatch, authActions), user!.id);
       }
       appState.current = nextAppState;
     });
@@ -62,7 +61,7 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
     return () => {
       subscription.remove();
     };
-  }, []);
+  }, [authDispatch, user]);
 
   const timeOutRef = useRef<NodeJS.Timer | null>(null);
 
@@ -83,34 +82,17 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
         timeOutRef.current = null;
       }
     };
-  }, [synchPeriod, autoSync, loading]);
+  }, [synchPeriod, autoSync, loading, syncData]);
 
   return <DrawerNavigator items={items} onSyncClick={syncData} />;
 };
 
-const MobileApp = ({ store, loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
+const MobileApp = ({ loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
   const dispatch = useDispatch();
-  const authLoadingError = useSelector<string>((state) => state.auth.loadingError);
+  const { loadingError: authLoadingError, errorMessage } = useSelector((state) => state.auth);
   const docsLoadingError = useSelector<string>((state) => state.documents.loadingError);
   const refsLoadingError = useSelector<string>((state) => state.references.loadingError);
   const setsLoadingError = useSelector<string>((state) => state.settings.loadingError);
-  // const isConnected = useSelector((state) => state.app.isConnected);
-  const errorMessage = useSelector((state) => state.auth.errorMessage);
-
-  // console.log('errorMessage', errorMessage);
-  //   console.log('isConnected', isConnected);
-
-  //   useEffect(() => {
-  //     const unsubscribe = NetInfo.addEventListener(state => {
-
-  //       dispatch(appActions.setIsConnected(state.isConnected || false))
-  //       setBarVisible(state.isConnected|| false)
-  //     });
-
-  //     return () => {
-  //       unsubscribe();
-  //     };
-  //   }, []);
 
   /**Массив ошибок при считывание\сохранении с диска данных из общего стора и из стора приложений  */
   const errList: string[] = useMemo(
@@ -129,62 +111,68 @@ const MobileApp = ({ store, loadingErrors, onClearLoadingErrors, ...props }: IAp
     }
   }, [errList]);
 
-  const closeSnackbar = () => {
+  const closeSnackbar = useCallback(() => {
     authLoadingError && dispatch(authActions.setLoadingError(''));
     docsLoadingError && dispatch(documentActions.setLoadingError(''));
     refsLoadingError && dispatch(referenceActions.setLoadingError(''));
     setsLoadingError && dispatch(settingsActions.setLoadingError(''));
     loadingErrors?.length && onClearLoadingErrors && onClearLoadingErrors();
     setBarVisible(false);
-  };
+  }, [
+    authLoadingError,
+    dispatch,
+    docsLoadingError,
+    loadingErrors?.length,
+    onClearLoadingErrors,
+    refsLoadingError,
+    setsLoadingError,
+  ]);
 
-  // const [errVisible, setErrVisible] = useState(false);
   const closeErrBar = () => {
     dispatch(authActions.setErrorMessage(''));
+    dispatch(authActions.clearError());
   };
-
-  // useEffect(() => {
-  //   setErrVisible(!!errorMessage);
-  // }, [errorMessage]);
-
-  // console.log('!!errorMessage', !!errorMessage);
-
-  const SnackbarComponent = () => (
-    <Snackbar
-      visible={barVisible}
-      onDismiss={closeSnackbar}
-      style={{ backgroundColor: defaultTheme.colors.error }}
-      action={{
-        icon: 'close',
-        label: '',
-        onPress: closeSnackbar,
-      }}
-    >
-      <View style={globalStyles.container}>
-        {!!errList?.length && errList.map((err, id) => <Text key={id}>{truncate(err)}</Text>)}
-      </View>
-    </Snackbar>
-  );
 
   return (
     <NavigationContainer theme={defaultTheme}>
       <Snackbar
         visible={!!errorMessage}
-        // duration={6000}
         onDismiss={closeErrBar}
-        style={{ backgroundColor: defaultTheme.colors.error, zIndex: 1000 }}
+        style={localStyles.snack}
         action={{
           icon: 'close',
           label: '',
           onPress: closeErrBar,
+          color: 'white',
         }}
       >
         <Text>{errorMessage}</Text>
       </Snackbar>
       {authSelectors.isLoggedWithCompany() ? <AppRoot {...props} /> : <AuthNavigator />}
-      <SnackbarComponent />
+      <Snackbar
+        visible={barVisible}
+        onDismiss={closeSnackbar}
+        style={{ backgroundColor: defaultTheme.colors.error }}
+        action={{
+          icon: 'close',
+          label: '',
+          onPress: closeSnackbar,
+          color: 'white',
+        }}
+      >
+        <View style={globalStyles.container}>
+          {!!errList?.length && errList.map((err, id) => <Text key={id}>{truncate(err)}</Text>)}
+        </View>
+      </Snackbar>
     </NavigationContainer>
   );
 };
 
 export default MobileApp;
+
+const localStyles = StyleSheet.create({
+  snack: {
+    backgroundColor: defaultTheme.colors.error,
+    zIndex: 1000,
+  },
+});

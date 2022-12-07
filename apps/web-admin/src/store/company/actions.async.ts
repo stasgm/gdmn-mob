@@ -51,7 +51,7 @@ const addCompany = (company: NewCompany): AppThunk => {
   return async (dispatch) => {
     dispatch(companyActions.addCompanyAsync.request(''));
 
-    const response = await api.company.addCompany(company);
+    const response = await api.company.addCompany(webRequest(dispatch, authActions), company);
 
     if (response.type === 'ADD_COMPANY') {
       return dispatch(companyActions.addCompanyAsync.success(response.company));
@@ -65,7 +65,7 @@ const updateCompany = (company: ICompany): AppThunk => {
   return async (dispatch) => {
     dispatch(companyActions.updateCompanyAsync.request('Обновление компании'));
 
-    const response = await api.company.updateCompany(company);
+    const response = await api.company.updateCompany(webRequest(dispatch, authActions), company);
 
     if (response.type === 'UPDATE_COMPANY') {
       return dispatch(companyActions.updateCompanyAsync.success(response.company));
@@ -79,7 +79,7 @@ const removeCompany = (id: string): AppThunk => {
   return async (dispatch) => {
     dispatch(companyActions.removeCompanyAsync.request('Удаление компании'));
 
-    const response = await api.company.removeCompany(id);
+    const response = await api.company.removeCompany(webRequest(dispatch, authActions), id);
 
     if (response.type === 'REMOVE_COMPANY') {
       return dispatch(companyActions.removeCompanyAsync.success(id));

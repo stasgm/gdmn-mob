@@ -49,7 +49,7 @@ const addDevice = (device: NewDevice): AppThunk => {
   return async (dispatch) => {
     dispatch(deviceActions.addDeviceAsync.request(''));
 
-    const response = await api.device.addDevice(device);
+    const response = await api.device.addDevice(webRequest(dispatch, authActions), device);
 
     if (response.type === 'ADD_DEVICE') {
       return dispatch(deviceActions.addDeviceAsync.success(response.device));
@@ -63,7 +63,7 @@ const updateDevice = (device: IDevice): AppThunk => {
   return async (dispatch) => {
     dispatch(deviceActions.updateDeviceAsync.request('Обновление устройства'));
 
-    const response = await api.device.updateDevice(device);
+    const response = await api.device.updateDevice(webRequest(dispatch, authActions), device);
 
     if (response.type === 'UPDATE_DEVICE') {
       return dispatch(deviceActions.updateDeviceAsync.success(response.device));
@@ -77,7 +77,7 @@ const removeDevice = (id: string): AppThunk => {
   return async (dispatch) => {
     dispatch(deviceActions.removeDeviceAsync.request('Удаление устройства'));
 
-    const response = await api.device.removeDevice(id);
+    const response = await api.device.removeDevice(webRequest(dispatch, authActions), id);
 
     if (response.type === 'REMOVE_DEVICE') {
       return dispatch(deviceActions.removeDeviceAsync.success(id));
