@@ -4,6 +4,8 @@ import api from '@lib/client-api';
 import { AppState } from '..';
 
 import { deviceLogActions, DeviceLogActionType } from './actions';
+import { webRequest } from '../webRequest';
+import { authActions } from '@lib/store';
 
 export type AppThunk = ThunkAction<Promise<DeviceLogActionType>, AppState, null, DeviceLogActionType>;
 
@@ -17,7 +19,7 @@ const fetchDeviceLogFiles = (): AppThunk => {
     // if (fromRecord) params.fromRecord = fromRecord;
     // if (toRecord) params.toRecord = toRecord;
 
-    const response = await api.deviceLog.getDeviceLogFiles(params);
+    const response = await api.deviceLog.getDeviceLogFiles(webRequest(dispatch, authActions), params);
 
     if (response.type === 'GET_DEVICELOGS') {
       return dispatch(deviceLogActions.fetchDeviceLogFilesAsync.success(response.deviceLogs));
@@ -35,7 +37,7 @@ const fetchDeviceLog = (id: string): AppThunk => {
   return async (dispatch) => {
     dispatch(deviceLogActions.fetchDeviceLogAsync.request(''));
 
-    const response = await api.deviceLog.getDeviceLog(id);
+    const response = await api.deviceLog.getDeviceLog(webRequest(dispatch, authActions), id);
 
     if (response.type === 'GET_DEVICELOG') {
       return dispatch(deviceLogActions.fetchDeviceLogAsync.success(response.deviceLog));
@@ -53,7 +55,7 @@ const removeDeviceLog = (id: string): AppThunk => {
   return async (dispatch) => {
     dispatch(deviceLogActions.fetchDeviceLogAsync.request(''));
 
-    const response = await api.deviceLog.removeDeviceLog(id);
+    const response = await api.deviceLog.removeDeviceLog(webRequest(dispatch, authActions), id);
 
     if (response.type === 'REMOVE_DEVICELOG') {
       return dispatch(deviceLogActions.removeDeviceLogsAsync.success(id));

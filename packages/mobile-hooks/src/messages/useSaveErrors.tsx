@@ -14,7 +14,9 @@ export const useSaveErrors = () => {
     async (errs: IDeviceLog[]) => {
       // Неотправленные ошибки, если есть, передаем на сервер
       const sendingErrors = errorLog.filter((err) => err.isSent !== true);
-      console.log('sendingErrors', sendingErrors, errs);
+      console.log('sendingErrors', sendingErrors);
+      console.log('errorLog',  errorLog);
+
       if (sendingErrors.length || errs.length) {
         const addDeviceLogResponse = await api.deviceLog.addDeviceLog(
           mobileRequest(dispatch, authActions),
@@ -23,7 +25,7 @@ export const useSaveErrors = () => {
           sendingErrors.concat(errs),
         );
         if (addDeviceLogResponse.type === 'ADD_DEVICELOG') {
-          dispatch(appActions.addErrors(errs.map((r) => ({ ...r, isSent: true }))));
+          // dispatch(appActions.addErrors(errs.map((r) => ({ ...r, isSent: true }))));
           //Устанавливаем признак 'Отправлен на сервер' переданным записям
           dispatch(appActions.setSentErrors(sendingErrors.map((l) => l.id)));
         }

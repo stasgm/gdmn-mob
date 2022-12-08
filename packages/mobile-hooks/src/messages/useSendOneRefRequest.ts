@@ -57,11 +57,12 @@ export const useSendOneRefRequest = (description: string, params: ICmdParams) =>
       );
     } else {
       addRequestNotice('Проверка статуса устройства');
+
       const statusRespone = await api.auth.getDeviceStatus(appRequest, deviceId);
       if (statusRespone.type !== 'GET_DEVICE_STATUS') {
         addError(
           'useSendOneRefRequest: getDeviceStatus',
-          `Статус устройства не получен: ${statusRespone.message}`,
+          `Ошибка ${statusRespone.type === 'CONNECT_ERROR' ? ' подключения к серверу' : ''}: ${statusRespone.message}`,
           tempErrs,
         );
         connectError = statusRespone.type === 'CONNECT_ERROR';
@@ -108,6 +109,8 @@ export const useSendOneRefRequest = (description: string, params: ICmdParams) =>
 
     if (!connectError) {
       saveErrors(tempErrs);
+    } else if (tempErrs.length) {
+      dispatch(appActions.addErrors(tempErrs));
     }
 
     dispatch(appActions.setLoading(false));

@@ -50,18 +50,9 @@ class DeviceLog extends BaseRequest {
     } as error.IServerError;
   };
 
-  getDeviceLog = async (deviceLogId: string) => {
+  getDeviceLog = async (customRequest: CustomRequest, deviceLogId: string) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
-
-      // const deviceLog = mockDeviceLog.find((item) => item.id === deviceLogId);
-
-      // if (deviceLog) {
-      //   return {
-      //     type: 'GET_DEVICELOG',
-      //     deviceLog,
-      //   } as types.IGetDeviceLogResponse;
-      // }
 
       return {
         type: 'ERROR',
@@ -69,71 +60,56 @@ class DeviceLog extends BaseRequest {
       } as error.IServerError;
     }
 
-    try {
-      const res = await this.api.axios.get<IResponse<IDeviceLogFiles>>(`/deviceLogs/${deviceLogId}`);
-      const resData = res.data;
+    const res = await customRequest<IDeviceLogFiles>({
+      api: this.api.axios,
+      method: 'GET',
+      url: `/deviceLogs/${deviceLogId}`,
+    });
 
-      if (resData.result) {
-        return {
-          type: 'GET_DEVICELOG',
-          deviceLog: resData?.data || [],
-        } as types.IGetDeviceLogResponse;
-      }
-
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.IServerError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка получения данных о журнале ошибок',
-      } as error.IServerError;
+        type: 'GET_DEVICELOG',
+        deviceLog: res.data || [],
+      } as types.IGetDeviceLogResponse;
     }
+
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'журнал ошибок не получен',
+    } as error.IServerError;
   };
 
-  getDeviceLogFiles = async (params?: Record<string, string | number>) => {
+  getDeviceLogFiles = async (customRequest: CustomRequest, params?: Record<string, string | number>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'GET_DEVICELOGS',
-        // deviceLogs: mockDeviceLogs,
+        deviceLogs: [],
       } as types.IGetDeviceLogFilesResponse;
     }
 
-    let paramText = params ? getParams(params) : '';
+    const res = await customRequest<IDeviceLogFiles[]>({
+      api: this.api.axios,
+      method: 'GET',
+      url: `/deviceLogs`,
+      params
+    });
 
-    if (paramText > '') {
-      paramText = `?${paramText}`;
+    if (res?.result) {
+      return {
+        type: 'GET_DEVICELOGS',
+        deviceLogs: res.data || [],
+      } as types.IGetDeviceLogFilesResponse;
     }
 
-    try {
-      const res = await this.api.axios.get<IResponse<IDeviceLogFiles[]>>(`/deviceLogs${paramText}`);
-
-      ///${this.api.config.version}
-      const resData = res.data;
-
-      if (resData.result) {
-        return {
-          type: 'GET_DEVICELOGS',
-          deviceLogs: resData?.data || [],
-        } as types.IGetDeviceLogFilesResponse;
-      }
-
-      return {
-        type: 'ERROR',
-        message: resData.error || 'ошибка получения данных об журнале ошібок',
-      } as error.IServerError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка получения данных о журнале ошибок устройства',
-      } as error.IServerError;
-    }
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'журналы ошибок не получены',
+    } as error.IServerError;
   };
 
-  removeDeviceLog = async (deviceLogId: string) => {
+  removeDeviceLog = async (customRequest: CustomRequest, deviceLogId: string) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -142,26 +118,22 @@ class DeviceLog extends BaseRequest {
       } as types.IRemoveDeviceLogResponse;
     }
 
-    try {
-      const res = await this.api.axios.delete<IResponse<void>>(`/deviceLogs/${deviceLogId}`);
-      const resData = res.data;
+    const res = await customRequest<void>({
+      api: this.api.axios,
+      method: 'DELETE',
+      url: `/deviceLogs/${deviceLogId}`,
+    });
 
-      if (resData.result) {
-        return {
-          type: 'REMOVE_DEVICELOG',
-        } as types.IRemoveDeviceLogResponse;
-      }
-
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.IServerError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка удаления журнала ошибок',
-      } as error.IServerError;
+        type: 'REMOVE_DEVICELOG',
+      } as types.IRemoveDeviceLogResponse;
     }
+
+    return {
+      type: 'ERROR',
+      message: res?.error || 'журнал ошибок не удален',
+    } as error.IServerError;
   };
 }
 export default DeviceLog;

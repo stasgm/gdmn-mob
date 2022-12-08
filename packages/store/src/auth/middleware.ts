@@ -60,6 +60,7 @@ export const authMiddlewareFactory: PersistedMiddleware =
       case getType(actions.setDemoModeAsync.success):
       case getType(actions.disconnectAsync.success):
       case getType(actions.logoutUserAsync.success):
+      case getType(actions.logoutUserAsync.failure):
       case getType(actions.getDeviceByUidAsync.success):
       case getType(actions.loginUserAsync.success):
       case getType(actions.setUserSettingsAsync.success): {
