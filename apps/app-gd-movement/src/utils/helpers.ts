@@ -29,8 +29,9 @@ const getRemGoodByContact = (goods: IGood[], remains: IRemainsData[] = [], isRem
 
       //Заполняем объект товаров по штрихкоду, если есть шк и (выбор не из остатков или есть остатки по товару)
       for (const good of goods) {
-        if (good.barcode && (!isRemains || remainsByGoodId[good.id])) {
-          remGoods[good.barcode] = {
+        const code = good.barcode || good.weightCode || good.alias;
+        if (code && (!isRemains || remainsByGoodId[good.id])) {
+          remGoods[code] = {
             good,
             remains: remainsByGoodId ? remainsByGoodId[good.id] : [],
           };
@@ -39,8 +40,9 @@ const getRemGoodByContact = (goods: IGood[], remains: IRemainsData[] = [], isRem
     } else if (!isRemains) {
       //Если по контакту нет остатков и  выбор не из остатков, добавляем объект товара без remains
       for (const good of goods) {
-        if (good.barcode) {
-          remGoods[good.barcode] = { good };
+        const code = good.barcode || good.weightCode || good.alias;
+        if (code) {
+          remGoods[code] = { good };
         }
       }
     }

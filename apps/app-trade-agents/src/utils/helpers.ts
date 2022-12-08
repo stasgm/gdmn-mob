@@ -157,7 +157,6 @@ const totalListByGroup = (
           (group) => (group.parent?.id === firstGr.id || group.id === firstGr.id) && group.id === l.good.goodgroup.id,
         ),
       );
-      console.log('123');
       const { quantity, sum, sumVat } = linesByParentGroup.reduce(
         (prev: any, line) => {
           const s1 = round((round(line.quantity, 3) / (line.good.invWeight || 1)) * line.good.priceFsn);
