@@ -113,8 +113,8 @@ export const robustRequest: RobustRequest = async ({
         res = await api.post(url, data, config);
         break;
       }
-      case 'PUT': {
-        res = await api.put(url, data, config);
+      case 'PATCH': {
+        res = await api.patch(url, data, config);
         break;
       }
       case 'DELETE': {

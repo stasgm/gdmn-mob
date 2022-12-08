@@ -54,12 +54,6 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
         showSyncInfo: action.payload,
       };
 
-    case getType(appActions.addError):
-      return {
-        ...state,
-        errorLog: [...state.errorLog, action.payload],
-      };
-
     case getType(appActions.addErrors):
       return {
         ...state,

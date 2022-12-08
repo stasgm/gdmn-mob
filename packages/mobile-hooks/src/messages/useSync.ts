@@ -39,8 +39,6 @@ export const useSync = (onSync?: () => Promise<any>) => {
   const authDispatch = useAuthThunkDispatch();
   const settDispatch = useSettingThunkDispatch();
   const dispatch = useDispatch();
-  // let withError = false;
-  // const [errs, setErrs] = useState<IDeviceLog[]>([]);
 
   const addError = useCallback(
     (name: string, message: string, errs: IDeviceLog[]) => {
@@ -50,12 +48,9 @@ export const useSync = (onSync?: () => Promise<any>) => {
         date: new Date().toISOString(),
         message,
       };
+      //Добавляем в список для отображения в окне процесса
       dispatch(appActions.addErrorNotice(err));
       errs.push(err);
-      // dispatch(appActions.addError(err));
-
-      // withError = true;
-      // setWithError(true);
     },
     [dispatch],
   );
@@ -99,7 +94,6 @@ export const useSync = (onSync?: () => Promise<any>) => {
       //Если пришло сообщение, статус которого ошибка обработки, то добавляем ошибку с текстом из errorMessage
       if (msg.status === 'PROCESSED_DEADLOCK' || msg.status === 'PROCESSED_INCORRECT') {
         addError('useSync: processMessage', `Ошибка обработки сообщения id=${msg.id}: ${msg.errorMessage}`, tempErrs);
-        // return false;
       }
 
       switch (msg.body.type as BodyType) {
@@ -360,37 +354,22 @@ export const useSync = (onSync?: () => Promise<any>) => {
         );
         // withError = true;
       } else {
+        // Если нет функции из пропсов
         if (!onSync) {
-          // Если нет функции из пропсов
           //Если статус приложения не проверен (не было сети при подключении) connectionStatus === 'not-checked'
           //то проверим его, и если статус не будет получен, прервем синхронизацию
-          // if (connectionStatus === 'not-checked') {
           addRequestNotice('Проверка статуса устройства');
           const statusRespone = await api.auth.getDeviceStatus(appRequest, deviceId);
           if (statusRespone.type !== 'GET_DEVICE_STATUS') {
-            addError('useSync: getDeviceStatus', `Статус устройства не получен: ${statusRespone.message}`, tempErrs);
+            addError('useSync: getDeviceStatus', `Ошибка ${statusRespone.type === 'CONNECT_ERROR' ? ' подключения к серверу' : ''}: ${statusRespone.message}`, tempErrs);
             connectError = statusRespone.type === 'CONNECT_ERROR';
-            // withError = true;
           } else {
             authDispatch(
               authActions.setConnectionStatus(statusRespone.status === 'ACTIVE' ? 'connected' : 'not-activated'),
             );
           }
-          // }
-          // console.log('connectionStatus 2', connectionStatus, connectError);
+
           if (!tempErrs.length) {
-            // const getDeviceStatusResponse = await api.auth.getDeviceStatus(appRequest, deviceId);
-            // //Так как при включении приложения без сети статус не проверяется,
-            // //проверим его здесь
-            // if (getDeviceStatusResponse.type !== 'GET_DEVICE_STATUS') {
-            //   addError('useSync: getDeviceStatus', `Статус устройства не получен: ${getDeviceStatusResponse.message}`);
-            //   connectError = getDeviceStatusResponse.type === 'CONNECT_ERROR';
-            // } else if (
-            //   getDeviceStatusResponse.type === 'GET_DEVICE_STATUS' &&
-            //   getDeviceStatusResponse.status !== 'ACTIVE'
-            // ) {
-            //   addError('useSync: getDeviceStatus', 'Устройство не активно');
-            // } else {
             const messageCompany = { id: company.id, name: company.name };
 
             const consumer = user.erpUser;
@@ -441,14 +420,11 @@ export const useSync = (onSync?: () => Promise<any>) => {
                   }`,
                   tempErrs,
                 );
-                // connectError = sendMessageResponse.type === 'CONNECT_ERROR';
               }
             }
 
-            // if (!connectError) {
-            // if (!withError) {
+
             addRequestNotice('Получение данных');
-            console.log('00000');
             //2. Получаем все сообщения для мобильного
             const getMessagesResponse = await api.message.getMessages(appRequest, {
               appSystemId: appSystem.id,
@@ -463,9 +439,6 @@ export const useSync = (onSync?: () => Promise<any>) => {
               for (const message of sortedMessages) {
                 // eslint-disable-next-line no-await-in-loop
                 await processMessage(message, tempErrs);
-                // if (!haveError && !withError) {
-                //   withError = true;
-                // }
               }
 
               // addError('useSync: api.message.sendMessages', new Date().toISOString(), tempErrs);
@@ -554,7 +527,6 @@ export const useSync = (onSync?: () => Promise<any>) => {
                   `Запрос на получение документов не отправлен: ${sendMesDocRespone.message}`,
                   tempErrs,
                 );
-                // withError = true;
               }
 
               if (cleanDocTime > 0) {
@@ -580,7 +552,6 @@ export const useSync = (onSync?: () => Promise<any>) => {
                       `Обработанные документы, дата которых менее ${getDateString(maxDocDate)}, не удалены`,
                       tempErrs,
                     );
-                    // withError = true;
                   }
                 }
               }
@@ -604,7 +575,6 @@ export const useSync = (onSync?: () => Promise<any>) => {
                   `Запрос на получение настроек пользователя не отправлен: ${sendMesUserSettResponse.message}`,
                   tempErrs,
                 );
-                // withError = true;
               }
 
               addRequestNotice('Запрос настроек подсистемы');
@@ -626,7 +596,6 @@ export const useSync = (onSync?: () => Promise<any>) => {
                   `Запрос на получение настроек подсистемы не отправлен: ${sendMesAppSettResponse.message}`,
                   tempErrs,
                 );
-                // withError = true;
               }
             } else {
               addError(
@@ -634,8 +603,6 @@ export const useSync = (onSync?: () => Promise<any>) => {
                 `Сообщения не получены: ${getMessagesResponse.message}`,
                 tempErrs,
               );
-              // connectError = getMessagesResponse.type === 'CONNECT_ERROR';
-              // withError = true;
             }
           }
         } else if (onSync) {
@@ -645,13 +612,11 @@ export const useSync = (onSync?: () => Promise<any>) => {
       }
     } catch (err) {
       addError('useSync', `Проблемы с передачей данных ${err}`, tempErrs);
-      // withError = true;
     }
-    // addError('useSync', new Date().toISOString());
+
     if (!connectError) {
       saveErrors(tempErrs);
     }
-    // console.log('withError', withError, tempErrs);
 
     if (tempErrs.length) {
       dispatch(appActions.setShowSyncInfo(true));

@@ -20,7 +20,6 @@ export const appMiddlewareFactory: PersistedMiddleware =
     if (action.type === getType(appActions.loadSuperDataFromDisc) && store.getState().auth.user?.id) {
       // а здесь мы грузим данные для залогиненого пользователя
       store.dispatch(appActions.setLoadingData(true));
-      store.dispatch(appActions.setShowSyncInfo(false));
       load('app', store.getState().auth.user?.id)
         .then((data) => {
           return store.dispatch(
@@ -43,7 +42,7 @@ export const appMiddlewareFactory: PersistedMiddleware =
     if (store.getState().auth.user?.id) {
       switch (action.type) {
         case getType(appActions.init):
-        case getType(appActions.addError):
+        case getType(appActions.addErrors):
         case getType(appActions.setSentErrors):
         case getType(appActions.clearErrors):
         case getType(appActions.setSyncDate): {

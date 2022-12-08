@@ -2,9 +2,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { StyleSheet, View, Text, AppState } from 'react-native';
 import { Store } from 'redux';
 
-import { NavigationContainer } from '@react-navigation/native';
-import { Snackbar } from 'react-native-paper';
-
 import {
   authActions,
   authSelectors,

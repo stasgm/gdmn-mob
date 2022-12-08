@@ -66,7 +66,7 @@ class DeviceLog extends BaseRequest {
       return {
         type: 'ERROR',
         message: 'Журнал ошибок не найден',
-      } as error.INetworkError;
+      } as error.IServerError;
     }
 
     try {
@@ -83,12 +83,12 @@ class DeviceLog extends BaseRequest {
       return {
         type: 'ERROR',
         message: resData.error,
-      } as error.INetworkError;
+      } as error.IServerError;
     } catch (err) {
       return {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка получения данных о журнале ошибок',
-      } as error.INetworkError;
+      } as error.IServerError;
     }
   };
 
@@ -124,12 +124,12 @@ class DeviceLog extends BaseRequest {
       return {
         type: 'ERROR',
         message: resData.error || 'ошибка получения данных об журнале ошібок',
-      } as error.INetworkError;
+      } as error.IServerError;
     } catch (err) {
       return {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка получения данных о журнале ошибок устройства',
-      } as error.INetworkError;
+      } as error.IServerError;
     }
   };
 
@@ -155,12 +155,12 @@ class DeviceLog extends BaseRequest {
       return {
         type: 'ERROR',
         message: resData.error,
-      } as error.INetworkError;
+      } as error.IServerError;
     } catch (err) {
       return {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка удаления журнала ошибок',
-      } as error.INetworkError;
+      } as error.IServerError;
     }
   };
 }

@@ -41,7 +41,6 @@ export const useSendDocs = (readyDocs: IDocument[]) => {
     };
     dispatch(appActions.addErrorNotice(err));
     tempErrs.push(err);
-    // dispatch(appActions.addError(err));
   };
 
   const addRequestNotice = (message: string) => {
@@ -66,7 +65,6 @@ export const useSendDocs = (readyDocs: IDocument[]) => {
         `Не определены данные: пользователь ${user?.name}, компания ${company?.name}, подсистема ${appSystem?.name}, пользователь ERP ${user?.erpUser?.name}`,
         tempErrs,
       );
-      // withError = true;
     } else {
       addRequestNotice('Проверка статуса устройства');
       const statusRespone = await api.auth.getDeviceStatus(appRequest, deviceId);
@@ -77,7 +75,6 @@ export const useSendDocs = (readyDocs: IDocument[]) => {
           tempErrs,
         );
         connectError = statusRespone.type === 'CONNECT_ERROR';
-        // withError = true;
       } else {
         authDispatch(
           authActions.setConnectionStatus(statusRespone.status === 'ACTIVE' ? 'connected' : 'not-activated'),
@@ -117,11 +114,9 @@ export const useSendDocs = (readyDocs: IDocument[]) => {
 
             if (updateDocResponse.type === 'DOCUMENTS/UPDATE_MANY_FAILURE') {
               addError('useSendDocs: updateDocuments', updateDocResponse.payload, tempErrs);
-              // withError = true;
             }
           } else {
             addError('useSendDocs: api.message.sendMessages', sendMessageResponse.message, tempErrs);
-            // withError = true;
           }
         }
       }

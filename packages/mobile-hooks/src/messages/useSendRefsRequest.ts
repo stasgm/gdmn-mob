@@ -19,7 +19,6 @@ export const useSendRefsRequest = () => {
 
   const { user, company, config, appSystem } = useSelector((state) => state.auth);
   const refVersion = 1;
-  // let withError = false;
   const deviceId = config.deviceId!;
   const { saveErrors } = useSaveErrors();
 
@@ -41,7 +40,6 @@ export const useSendRefsRequest = () => {
     };
     dispatch(appActions.addErrorNotice(err));
     tempErrs.push(err);
-    // dispatch(appActions.addError(err));
   };
 
   return async () => {
@@ -57,7 +55,6 @@ export const useSendRefsRequest = () => {
         `Не определены данные: пользователь ${user?.name}, компания ${company?.name}, подсистема ${appSystem?.name}, пользователь ERP ${user?.erpUser?.name}`,
         tempErrs,
       );
-      // withError = true;
     } else {
       addRequestNotice('Проверка статуса устройства');
       const statusRespone = await api.auth.getDeviceStatus(appRequest, deviceId);
@@ -68,7 +65,6 @@ export const useSendRefsRequest = () => {
           tempErrs,
         );
         connectError = statusRespone.type === 'CONNECT_ERROR';
-        // withError = true;
       } else {
         authDispatch(
           authActions.setConnectionStatus(statusRespone.status === 'ACTIVE' ? 'connected' : 'not-activated'),
@@ -101,7 +97,6 @@ export const useSendRefsRequest = () => {
 
         if (sendMesRefResponse?.type !== 'SEND_MESSAGE') {
           addError('useSendRefsRequest: api.message.sendMessages', sendMesRefResponse.message, tempErrs);
-          // withError = true;
         }
       }
     }
