@@ -22,10 +22,9 @@ import { IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 
 import appSystemSelectors from '../../store/appSystem/selectors';
-import SnackBar from '../../components/SnackBar';
 
 import AppSystemDetailsView from '../../components/appSystem/AppSystemDetailsView';
-import appSystemActions from '../../store/appSystem';
+import actions from '../../store/appSystem';
 
 import { adminPath } from '../../utils/constants';
 
@@ -38,7 +37,7 @@ const AppSystemView = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading, errorMessage } = useSelector((state) => state.appSystems);
+  const { loading } = useSelector((state) => state.appSystems);
 
   const appSystem = appSystemSelectors.appSystemById(id);
 
@@ -51,17 +50,18 @@ const AppSystemView = () => {
   const handleEdit = () => {
     navigate(`${adminPath}/app/appSystems/${id}/edit`);
   };
+
   const handleDelete = async () => {
     setOpen(false);
-    const res = await dispatch(appSystemActions.removeAppSystem(id));
+    const res = await dispatch(actions.removeAppSystem(id));
     if (res.type === 'APP_SYSTEM/REMOVE_SUCCESS') {
       navigate(-1);
     }
   };
 
   const refreshData = useCallback(() => {
-    dispatch(appSystemActions.fetchAppSystems());
-  }, [dispatch]);
+    dispatch(actions.fetchAppSystemById(id));
+  }, [dispatch, id]);
 
   useEffect(() => {
     refreshData();
@@ -76,7 +76,7 @@ const AppSystemView = () => {
   };
 
   const handleClearError = () => {
-    dispatch(appSystemActions.appSystemActions.clearError());
+    dispatch(actions.clearError());
   };
 
   if (!appSystem) {
@@ -116,7 +116,7 @@ const AppSystemView = () => {
       disabled: true,
       color: 'secondary',
       variant: 'contained',
-      onClick: handleClickOpen, //handleDelete,
+      onClick: handleClickOpen,
       icon: <DeleteIcon />,
     },
   ];
@@ -174,8 +174,6 @@ const AppSystemView = () => {
           <AppSystemDetailsView appSystem={appSystem} />
         </Box>
       </Box>
-
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

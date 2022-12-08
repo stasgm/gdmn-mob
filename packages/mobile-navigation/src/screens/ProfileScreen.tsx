@@ -29,6 +29,7 @@ import {
   navBackDrawer,
 } from '@lib/mobile-ui';
 import api from '@lib/client-api';
+import { mobileRequest } from '@lib/mobile-hooks';
 
 const ProfileScreen = () => {
   const { colors } = useTheme();
@@ -125,7 +126,7 @@ const ProfileScreen = () => {
   }, [navigation]);
 
   const handleLogout = () => {
-    authDispatch(authActions.logout());
+    authDispatch(authActions.logout(mobileRequest(dispatch, authActions)));
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
   };
 

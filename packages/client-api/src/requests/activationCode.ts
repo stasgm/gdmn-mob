@@ -1,10 +1,11 @@
-import { IActivationCode, IResponse } from '@lib/types';
+import { IActivationCode } from '@lib/types';
 import { activationCodes as mockActivationCodes } from '@lib/mock';
 
 import { error, activationCode as types } from '../types';
-import { getParams, sleep } from '../utils';
+import { sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
+import { CustomRequest } from '../robustRequest';
 
 class ActivationCode extends BaseRequest {
   constructor(api: BaseApi) {
@@ -20,8 +21,9 @@ class ActivationCode extends BaseRequest {
     */
 
   getActivationCodes = async (
+    customRequest: CustomRequest,
     params?: Record<string, string>,
-  ): Promise<types.IGetCodesResponse | error.INetworkError> => {
+  ): Promise<types.IGetCodesResponse | error.IServerError> => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -31,36 +33,25 @@ class ActivationCode extends BaseRequest {
       };
     }
 
-    let paramText = params ? getParams(params) : '';
+    const res = await customRequest<IActivationCode[]>({ api: this.api.axios, method: 'GET', url: '/codes', params });
 
-    if (paramText > '') {
-      paramText = `?${paramText}`;
+    if (res?.result) {
+      return {
+        type: 'GET_CODES',
+        codes: res.data || [],
+      } as types.IGetCodesResponse;
     }
 
-    try {
-      const res = await this.api.axios.get<IResponse<IActivationCode[]>>(`/codes${paramText}`);
-      const resData = res.data;
-
-      if (resData.result) {
-        return {
-          type: 'GET_CODES',
-          codes: resData?.data || [],
-        } as types.IGetCodesResponse;
-      }
-      return {
-        type: 'ERROR',
-        message: resData?.error || 'ошибка получения данных об активационных кодах',
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка получения данных об активационных кодах',
-        //err?.response?.data?.error || 'ошибка получения данных об активационных кодах',
-      } as error.INetworkError;
-    }
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'данные об активационных кодах не получены',
+    } as error.IServerError;
   };
 
-  createActivationCode = async (deviceId: string): Promise<types.ICreateCodeResponse | error.INetworkError> => {
+  createActivationCode = async (
+    customRequest: CustomRequest,
+    deviceId: string,
+  ): Promise<types.ICreateCodeResponse | error.IServerError> => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -80,27 +71,23 @@ class ActivationCode extends BaseRequest {
       };
     }
 
-    try {
-      const res = await this.api.axios.get<IResponse<IActivationCode>>(`/codes/device/${deviceId}/code`);
-      const resData = res.data;
+    const res = await customRequest<IActivationCode>({
+      api: this.api.axios,
+      method: 'GET',
+      url: `/codes/device/${deviceId}/code`,
+    });
 
-      if (resData.result) {
-        return {
-          type: 'CREATE_CODE',
-          code: resData.data,
-        } as types.ICreateCodeResponse;
-      }
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка создания кода',
-        //err?.response?.data?.error || 'ошибка создания кода',
-      } as error.INetworkError;
+        type: 'CREATE_CODE',
+        code: res.data,
+      } as types.ICreateCodeResponse;
     }
+
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'код активации не создан',
+    } as error.IServerError;
   };
 }
 

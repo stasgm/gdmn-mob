@@ -1,19 +1,18 @@
-import { DeviceState, IResponse, IUser, IUserCredentials } from '@lib/types';
+import { DeviceState, IUser, IUserCredentials } from '@lib/types';
 import { user as mockUser } from '@lib/mock';
-
-import { AxiosError } from 'axios';
 
 import { error, auth as types } from '../types';
 import { sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
+import { CustomRequest } from '../robustRequest';
 
 class Auth extends BaseRequest {
   constructor(api: BaseApi) {
     super(api);
   }
 
-  signup = async (userCredentials: IUserCredentials) => {
+  signup = async (customRequest: CustomRequest, userCredentials: IUserCredentials) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -27,35 +26,28 @@ class Auth extends BaseRequest {
       name: userCredentials.name,
       password: userCredentials.password,
       email: userCredentials.email,
-      // companies: companyId ? [companyId] : undefined,
-      // creatorId: creatorId ?? name,
     };
 
-    try {
-      const res = await this.api.axios.post<IResponse<IUser>>('/auth/signup', body);
-      const resData = res.data;
+    const res = await customRequest<IUser>({
+      api: this.api.axios,
+      method: 'POST',
+      url: '/auth/signup',
+      data: body,
+    });
 
-      if (resData.result) {
-        return {
-          type: 'SIGNUP',
-          //user: resData.data,
-        } as types.ISignUpResponse;
-      }
-
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка создания пользователя',
-        //err?.response?.data?.error || 'ошибка создания пользователя',
-      } as error.INetworkError;
+        type: 'SIGNUP',
+      } as types.ISignUpResponse;
     }
+
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'пользователь не создан',
+    } as error.IServerError;
   };
 
-  login = async (userCredentials: IUserCredentials) => {
+  login = async (customRequest: CustomRequest, userCredentials: IUserCredentials) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -67,8 +59,8 @@ class Auth extends BaseRequest {
       }
       return {
         type: 'ERROR',
-        message: 'Неверные данные',
-      } as error.INetworkError;
+        message: 'вход пользователя не выполнен',
+      } as error.IServerError;
     }
 
     const body = {
@@ -76,30 +68,27 @@ class Auth extends BaseRequest {
       password: userCredentials.password,
     };
 
-    try {
-      const res = await this.api.axios.post<IResponse<IUser>>('/auth/login', body);
-      const resData = res?.data;
+    const res = await customRequest<IUser>({
+      api: this.api.axios,
+      method: 'POST',
+      url: '/auth/login',
+      data: body,
+    });
 
-      if (resData?.result) {
-        return {
-          type: 'LOGIN',
-          user: resData?.data,
-        } as types.ILoginResponse;
-      }
-
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка подключения',
-      } as error.INetworkError;
+        type: 'LOGIN',
+        user: res.data,
+      } as types.ILoginResponse;
     }
+
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'вход пользователя не выполнен',
+    } as error.IServerError;
   };
 
-  logout = async () => {
+  logout = async (customRequest: CustomRequest) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -108,83 +97,61 @@ class Auth extends BaseRequest {
       } as types.ILogOutResponse;
     }
 
-    try {
-      const res = await this.api.axios.post<IResponse<undefined>>('/auth/logout');
-      const resData = res.data;
+    const res = await customRequest<undefined>({
+      api: this.api.axios,
+      method: 'POST',
+      url: '/auth/logout',
+    });
 
-      if (resData.result) {
-        return {
-          type: 'LOGOUT',
-        } as types.ILogOutResponse;
-      }
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка выхода',
-      } as error.INetworkError;
+        type: 'LOGOUT',
+      } as types.ILogOutResponse;
     }
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'выход из профиля не выполнен',
+    } as error.IServerError;
   };
 
-  getCurrentUser = async () => {
-    try {
-      const res = await this.api.axios.get<IResponse<IUser>>('/auth/user');
-
-      const resData = res.data;
-      if (resData.result) {
-        return {
-          type: 'GET_CURRENT_USER',
-          user: resData.data,
-        } as types.IUserResponse;
-      }
-      if (!resData.result) {
-        return {
-          type: 'USER_NOT_AUTHENTICATED',
-        } as types.IUserNotAuthResponse;
-      }
+  getCurrentUser = async (customRequest: CustomRequest) => {
+    const res = await customRequest<IUser>({ api: this.api.axios, method: 'GET', url: '/auth/user' });
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка получения данных о пользователе',
-      } as error.INetworkError;
+        type: 'GET_CURRENT_USER',
+        user: res.data,
+      } as types.IUserResponse;
     }
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'данные о пользователе не получены',
+    } as error.IServerError;
   };
 
-  verifyCode = async (code: string) => {
-    try {
-      const body = { code };
+  verifyCode = async (customRequest: CustomRequest, code: string) => {
+    const body = { code };
 
-      const res = await this.api.axios.post<IResponse<string>>('/auth/device/code', body);
+    const res = await customRequest<string>({
+      api: this.api.axios,
+      method: 'POST',
+      url: '/auth/device/code',
+      data: body,
+    });
 
-      const resData = res?.data;
-
-      if (resData?.result) {
-        return {
-          type: 'VERIFY_CODE',
-          uid: resData?.data,
-        } as types.IVerifyCodeResponse;
-      }
-
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData?.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка подключения',
-      } as error.INetworkError;
+        type: 'VERIFY_CODE',
+        uid: res.data,
+      } as types.IVerifyCodeResponse;
     }
+
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'невереный код активации',
+    } as error.IServerError;
   };
 
-  getDeviceStatus = async (uid: string) => {
+  getDeviceStatus = async (customRequest: CustomRequest, uid: string) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -194,31 +161,23 @@ class Auth extends BaseRequest {
       } as types.IDeviceStatusResponse; // активация устройства в mock
     }
 
-    try {
-      const res = await this.api.axios.get<IResponse<DeviceState>>(`/auth/deviceStatus/${uid}`);
-      const resData = res.data;
+    const res = await customRequest<DeviceState>({
+      api: this.api.axios,
+      method: 'GET',
+      url: `/auth/deviceStatus/${uid}`,
+    });
 
-      if (resData.result) {
-        return {
-          type: 'GET_DEVICE_STATUS',
-          status: resData.data,
-        } as types.IDeviceStatusResponse;
-      }
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message:
-          err instanceof TypeError
-            ? err.message
-            : err instanceof AxiosError && err.code === 'ECONNABORTED'
-            ? 'нет соединения с сервером'
-            : 'ошибка получения статуса устройства',
-      } as error.INetworkError;
+        type: 'GET_DEVICE_STATUS',
+        status: res.data,
+      } as types.IDeviceStatusResponse;
     }
+
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'статус устройства не получен',
+    } as error.IServerError;
   };
 }
 

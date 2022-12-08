@@ -36,7 +36,7 @@ const SplashScreen = (props: Props) => {
             onPress={!loading ? onCheckDevice : onBreakConnection}
             disabled={loading}
           >
-            {'Подключиться'}
+            Подключиться
           </PrimeButton>
         </View>
       </AppScreen>

@@ -1,22 +1,32 @@
-import { IResponse } from '@lib/types';
-import { AxiosResponse } from 'axios';
-import { config } from '@lib/client-config';
+// import { URLSearchParams } from 'url';
 
-import api from './api';
+import { config } from '@lib/client-config';
+import { IResponse } from '@lib/types';
+import { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
+
+// import api from './api';
+
+/** Функция, вызывается при неверной авторизации */
+export type AuthLogOut = () => Promise<any>;
+
+export type CustomRequest = <T>(params: IRequestParams) => Promise<IResponse<T> | undefined>;
+
+export type CustomRequestProps = <T>(dispatch: any, actions: any) => CustomRequest;
 
 /** Валидатор проверяет полученные данные на корректность. В случае ошибки генерирует исключение. */
 type Validator = (data: Record<string, unknown>) => void;
 
 /** Десериализатор, если есть, может одновременно являться  и валидатором. */
-type Deserializer = (data: Record<string, unknown>) => Record<string, unknown>;
+type Deserializer = <T>(data: Record<string, unknown>) => T;
 
 interface IURLParams {
   [paramName: string]: string | number;
 }
 
-interface IRequestParams {
+export interface IRequestParams {
+  api: AxiosInstance;
   /** method HTTP. По умолчанию подставляется GET. */
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   /** Базовый УРЛ. Если задан, то итоговый УРЛ получается слиянием базового и УРЛ. Может содержать маску.*/
   baseUrl?: string;
   /** Адрес. Может содержать маску.*/
@@ -33,19 +43,25 @@ interface IRequestParams {
   timeout?: number;
 }
 
-type RequestResult<T> = IServerResponseResult<T> | IServerUnreacheableResult | IErrorResult;
+export type RequestResult = IServerResponseResult | IServerUnreacheableResult | IErrorResult;
 
-interface IServerResponseResult<T> {
+// export interface IResponse {
+//   /** HTTP response status */
+//   status: number;
+//   data?: any;
+// }
+
+interface IServerResponseResult {
   /** 2xx, 4xx, 5xx */
   result: 'OK' | 'CLIENT_ERROR' | 'SERVER_ERROR';
   response: {
     /** HTTP response status */
     status: number;
-    data?: T;
+    data?: any;
   };
 }
 
-interface IServerUnreacheableResult {
+export interface IServerUnreacheableResult {
   result: 'NO_CONNECTION' | 'TIMEOUT';
 }
 
@@ -55,9 +71,10 @@ interface IErrorResult {
   message?: string;
 }
 
-export type RobustRequestMiddleware = <T>(params: IRequestParams) => Promise<RequestResult<IResponse<T>>>;
+export type RobustRequest = (params: IRequestParams) => Promise<RequestResult>;
 
-export const robustRequest: RobustRequestMiddleware = async <T>({
+export const robustRequest: RobustRequest = async ({
+  api,
   method,
   baseUrl,
   url,
@@ -66,14 +83,14 @@ export const robustRequest: RobustRequestMiddleware = async <T>({
   validator,
   deserializer,
   timeout = config.timeout,
-}: IRequestParams) => {
-  let urlParams: URLSearchParams | undefined;
+}) => {
+  let urlParams: IURLParams | undefined;
 
   if (params) {
-    urlParams = new URLSearchParams();
-    Object.entries(params).forEach(([field, value]) => {
-      urlParams!.append(field, `${value}`);
-    });
+    urlParams = Object.entries(params).reduce((prev: IURLParams, [field, value]) => {
+      prev[field] = `${value}`;
+      return prev;
+    }, {});
   }
 
   const controller = new AbortController();
@@ -86,40 +103,58 @@ export const robustRequest: RobustRequestMiddleware = async <T>({
   try {
     const config = { params: urlParams, signal: controller.signal };
 
-    let res: AxiosResponse<IResponse<T>, any> | undefined = undefined;
-
+    let res: AxiosResponse<IResponse<any>, any>;
     switch (method) {
       case 'GET': {
-        res = await api.axios.get<IResponse<T>>(url, config);
+        res = await api.get(url, config);
         break;
       }
       case 'POST': {
-        res = await api.axios.post<IResponse<T>>(url, data, config);
+        res = await api.post(url, data, config);
         break;
       }
-      case 'PUT': {
-        res = await api.axios.put<IResponse<T>>(url, data, config);
+      case 'PATCH': {
+        res = await api.patch(url, data, config);
         break;
       }
       case 'DELETE': {
-        res = await api.axios.delete<IResponse<T>>(url, config);
+        res = await api.delete(url, config);
         break;
       }
+      default:
+        return {
+          result: 'ERROR',
+          message: 'Неизвестный тип запроса',
+        };
     }
-
     clearTimeout(rTimeout);
 
-    //TODO Проверка данных validator
-    //TODO Десериализация данных deserializer
+    let objData = res.data;
+
+    //Проверка данных validator
+    if (res.data?.data) {
+      if (validator) {
+        validator(res.data.data);
+      }
+
+      //Десериализация данных deserializer
+      objData = { ...res.data, data: deserializer ? deserializer(res.data.data) : res.data.data };
+    } else if (validator) {
+      return {
+        result: 'INVALID_DATA',
+        message: 'Пустой ответ сервера',
+      };
+    }
 
     return {
       result: 'OK',
       response: {
-        status: res!.status || 200,
-        data: res?.data,
+        status: res.status,
+        data: objData,
       },
-    } as IServerResponseResult<T>;
+    } as IServerResponseResult;
   } catch (err) {
+    console.log('rr catch', JSON.stringify(err));
     clearTimeout(rTimeout);
 
     if (controller.signal.aborted) {
@@ -128,12 +163,24 @@ export const robustRequest: RobustRequestMiddleware = async <T>({
       };
     }
 
+    if (err instanceof AxiosError) {
+      if (err.response?.status) {
+        return {
+          result: 'SERVER_ERROR',
+          response: {
+            status: err.response?.status || 500,
+            data: err.response?.data,
+          },
+        };
+      } else {
+        return {
+          result: 'NO_CONNECTION',
+        };
+      }
+    }
+
     return {
-      result: 'SERVER_ERROR',
-      response: {
-        status: 500,
-        // data: err,
-      },
+      result: 'ERROR',
     };
   }
 };

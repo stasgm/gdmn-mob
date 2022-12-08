@@ -36,9 +36,7 @@ type Props = {
 const SignInScreen = (props: Props) => {
   const { onDisconnect, onSignIn } = props;
 
-  const error = useSelector((state) => state.auth.error);
-  const loading = useSelector((state) => state.auth.loading);
-  const status = useSelector((state) => state.auth.status);
+  const { error, loading, status } = useSelector((state) => state.auth);
 
   const [credential, setCredentials] = useState<IUserCredentials>({ name: '', password: '' });
 

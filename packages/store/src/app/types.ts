@@ -1,4 +1,4 @@
-import { IDeviceLog, INamedEntity } from '@lib/types';
+import { IDeviceLog } from '@lib/types';
 
 export interface IFormParam {
   [fieldName: string]: unknown;
@@ -13,6 +13,7 @@ export interface IAppState {
   syncDate?: Date;
   requestNotice: IRequestNotice[];
   errorNotice: IErrorNotice[];
+  isConnected: boolean;
   readonly loadingData: boolean;
   readonly loadingError: string;
 }

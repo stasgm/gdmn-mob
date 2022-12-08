@@ -14,9 +14,10 @@ export const initialState: Readonly<IAppState> = {
   loadingError: '',
   requestNotice: [],
   errorNotice: [],
+  isConnected: false,
 };
 
-const LOG_MAX_LINES = 5;
+const LOG_MAX_LINES = 1000;
 
 const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action): IAppState => {
   switch (action.type) {
@@ -53,10 +54,10 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
         showSyncInfo: action.payload,
       };
 
-    case getType(appActions.addError):
+    case getType(appActions.addErrors):
       return {
         ...state,
-        errorLog: [...state.errorLog, action.payload],
+        errorLog: [...state.errorLog, ...action.payload],
       };
 
     case getType(appActions.setSentErrors):
@@ -112,6 +113,12 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
 
     case getType(appActions.clearErrorNotice):
       return { ...state, errorNotice: [] };
+
+    case getType(appActions.setIsConnected):
+      return {
+        ...state,
+        isConnected: action.payload,
+      };
 
     default:
       return state;

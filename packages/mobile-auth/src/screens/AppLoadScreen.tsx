@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
-
-import { ScreenTitle, AppScreen, PrimeButton, globalStyles as styles, RoundButton } from '@lib/mobile-ui';
 import { INamedEntity } from '@lib/types';
+import { ScreenTitle, AppScreen, PrimeButton, globalStyles as styles, RoundButton } from '@lib/mobile-ui';
+
+import { useEffect } from 'react';
 
 import localStyles from './styles';
 
@@ -19,12 +19,8 @@ const AppLoadScreen = (props: Props) => {
   useEffect(() => {
     //Так как организация всегда только одна
     //заполнение компании перенесено выше
-    //Возможно, можно удалить компонент выбора компании
-    if (company) {
-      onSetCompany();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    onSetCompany();
+  }, [onSetCompany]);
 
   return (
     <>

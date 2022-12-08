@@ -16,7 +16,6 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-
 import { IUser } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
@@ -30,7 +29,6 @@ import { IToolBarButton, IHeadCells, IPageParam } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 // eslint-disable-next-line import/namespace
 import DeviceDetailsView from '../../components/device/DeviceDetailsView';
-//import UserListTable from '../../components/user/UserListTable';
 import userSelectors from '../../store/user/selectors';
 import deviceSelectors from '../../store/device/selectors';
 import activationCodeSelectors from '../../store/activationCode/selectors';
@@ -50,7 +48,7 @@ const DeviceView = () => {
   const dispatch = useDispatch();
   const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
-  const { loading, errorMessage } = useSelector((state) => state.devices);
+  const { loading } = useSelector((state) => state.devices);
 
   const device = deviceSelectors.deviceById(deviceId);
   const users = userSelectors.usersByDeviceId(deviceId);
@@ -145,10 +143,6 @@ const DeviceView = () => {
     // },
   ];
 
-  const handleClearError = () => {
-    dispatch(deviceActions.deviceActions.clearError());
-  };
-
   if (!device) {
     return (
       <Box
@@ -186,7 +180,7 @@ const DeviceView = () => {
       disabled: true,
       color: 'secondary',
       variant: 'contained',
-      onClick: handleClickOpen, //handleDelete,
+      onClick: handleClickOpen,
       icon: <DeleteIcon />,
     },
   ];
@@ -275,7 +269,6 @@ const DeviceView = () => {
           </Box>
         </Container>
       </Box>
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

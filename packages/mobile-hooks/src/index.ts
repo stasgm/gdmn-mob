@@ -5,3 +5,4 @@ export { useSendDocs } from './messages/useSendDocs';
 export { getNextOrder } from './messages/helpers';
 export { useSync } from './messages/useSync';
 export * from './utils';
+export { mobileRequest } from './mobileRequest';

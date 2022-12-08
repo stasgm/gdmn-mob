@@ -44,6 +44,8 @@
   },
   "devDependencies": {
     "@config/eslint-config": "*",
+    "@config/eslint-config-react": "*",
+    "@config/eslint-config-react-native": "*",
     "@config/prettier-config": "*",
     "lint-staged": "^13.0.3"
   }

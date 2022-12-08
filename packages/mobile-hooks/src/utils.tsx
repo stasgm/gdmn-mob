@@ -58,7 +58,10 @@ const isIReferences = (obj: any): obj is IReferences => {
     if (Array.isArray(data)) {
       const refData = data[0];
       return (
-        typeof refData === 'object' && isNamedEntity(refData) && 'data' in refData && Array.isArray(refData['data'])
+        typeof refData === 'object' &&
+        isNamedEntity(refData) &&
+        'data' in refData &&
+        Array.isArray((refData as any).data)
       );
     }
   }

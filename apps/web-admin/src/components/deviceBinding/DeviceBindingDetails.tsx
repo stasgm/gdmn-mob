@@ -4,12 +4,12 @@ import { IDeviceBinding, INamedEntity } from '@lib/types';
 import { Field, FormikProvider, useFormik } from 'formik';
 import * as yup from 'yup';
 
-import { useEffect, useState } from 'react';
-
-import api from '@lib/client-api';
+import { useEffect } from 'react';
 
 import ComboBox from '../ComboBox';
 import { deviceStates } from '../../utils/constants';
+import { useDispatch, useSelector } from '../../store';
+import deviceActions from '../../store/device';
 
 interface IProps {
   loading: boolean;
@@ -23,23 +23,30 @@ export interface IDeviceBindingFormik extends Omit<IDeviceBinding, 'state'> {
 }
 
 const DeviceBindingDetails = ({ deviceBinding, loading, onSubmit, onCancel }: IProps) => {
-  const [devices, setDevices] = useState<INamedEntity[]>([]);
-  const [loadingDevices, setLoadingDevices] = useState(true);
+  // const [devices, setDevices] = useState<INamedEntity[]>([]);
+  const { list: devices, loading: loadingDevices } = useSelector((state) => state.users);
+  // const [loadingDevices, setLoadingDevices] = useState(true);
+
+  // useEffect(() => {
+  //   let unmounted = false;
+  //   const getDevices = async () => {
+  //     const res = await api.device.getDevices();
+  //     if (res.type === 'GET_DEVICES' && !unmounted) {
+  //       setDevices(res.devices.map((d) => ({ id: d.id, name: d.name })));
+  //       setLoadingDevices(false);
+  //     }
+  //   };
+  //   getDevices();
+  //   return () => {
+  //     unmounted = true;
+  //   };
+  // }, []);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    let unmounted = false;
-    const getDevices = async () => {
-      const res = await api.device.getDevices();
-      if (res.type === 'GET_DEVICES' && !unmounted) {
-        setDevices(res.devices.map((d) => ({ id: d.id, name: d.name })));
-        setLoadingDevices(false);
-      }
-    };
-    getDevices();
-    return () => {
-      unmounted = true;
-    };
-  }, []);
+    dispatch(deviceActions.fetchDevices());
+  }, [dispatch]);
 
   const initialValues: IDeviceBindingFormik = {
     ...deviceBinding,

@@ -1,9 +1,6 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, AppState } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { StyleSheet, View, Text, AppState } from 'react-native';
 import { Store } from 'redux';
-
-import { NavigationContainer } from '@react-navigation/native';
-import { Snackbar } from 'react-native-paper';
 
 import {
   authActions,
@@ -21,8 +18,11 @@ import { globalStyles, Theme as defaultTheme } from '@lib/mobile-ui';
 
 import api from '@lib/client-api';
 
-import { AuthLogOut } from '@lib/types';
-import { truncate, useSync } from '@lib/mobile-hooks';
+import { Snackbar } from 'react-native-paper';
+
+import { NavigationContainer } from '@react-navigation/native';
+
+import { mobileRequest, truncate, useSync } from '@lib/mobile-hooks';
 
 export interface IApp {
   items?: INavItem[];
@@ -42,18 +42,18 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
 
   const appState = useRef(AppState.currentState);
   const authDispatch = useAuthThunkDispatch();
-  const authMiddleware: AuthLogOut = () => authDispatch(authActions.logout());
 
   useEffect(() => {
     //При запуске приложения записываем настройки в апи
     api.config = { ...api.config, ...config };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', async (nextAppState) => {
       if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
         //Проверка сессии при фокусе приложения, можно getUser заменить на другую с Middleware
-        await api.user.getUser(user!.id, authMiddleware);
+        await api.user.getUser(mobileRequest(authDispatch, authActions), user!.id);
       }
       appState.current = nextAppState;
     });
@@ -61,7 +61,7 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
     return () => {
       subscription.remove();
     };
-  }, []);
+  }, [authDispatch, user]);
 
   const timeOutRef = useRef<NodeJS.Timer | null>(null);
 
@@ -82,14 +82,14 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
         timeOutRef.current = null;
       }
     };
-  }, [synchPeriod, autoSync, loading]);
+  }, [synchPeriod, autoSync, loading, syncData]);
 
   return <DrawerNavigator items={items} onSyncClick={syncData} />;
 };
 
-const MobileApp = ({ store, loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
+const MobileApp = ({ loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
   const dispatch = useDispatch();
-  const authLoadingError = useSelector<string>((state) => state.auth.loadingError);
+  const { loadingError: authLoadingError, errorMessage } = useSelector((state) => state.auth);
   const docsLoadingError = useSelector<string>((state) => state.documents.loadingError);
   const refsLoadingError = useSelector<string>((state) => state.references.loadingError);
   const setsLoadingError = useSelector<string>((state) => state.settings.loadingError);
@@ -111,38 +111,68 @@ const MobileApp = ({ store, loadingErrors, onClearLoadingErrors, ...props }: IAp
     }
   }, [errList]);
 
-  const closeSnackbar = () => {
+  const closeSnackbar = useCallback(() => {
     authLoadingError && dispatch(authActions.setLoadingError(''));
     docsLoadingError && dispatch(documentActions.setLoadingError(''));
     refsLoadingError && dispatch(referenceActions.setLoadingError(''));
     setsLoadingError && dispatch(settingsActions.setLoadingError(''));
     loadingErrors?.length && onClearLoadingErrors && onClearLoadingErrors();
     setBarVisible(false);
-  };
+  }, [
+    authLoadingError,
+    dispatch,
+    docsLoadingError,
+    loadingErrors?.length,
+    onClearLoadingErrors,
+    refsLoadingError,
+    setsLoadingError,
+  ]);
 
-  const SnackbarComponent = () => (
-    <Snackbar
-      visible={barVisible}
-      onDismiss={closeSnackbar}
-      style={{ backgroundColor: defaultTheme.colors.error }}
-      action={{
-        icon: 'close',
-        label: '',
-        onPress: closeSnackbar,
-      }}
-    >
-      <View style={globalStyles.container}>
-        {!!errList?.length && errList.map((err, id) => <Text key={id}>{truncate(err)}</Text>)}
-      </View>
-    </Snackbar>
-  );
+  const closeErrBar = () => {
+    dispatch(authActions.setErrorMessage(''));
+    dispatch(authActions.clearError());
+  };
 
   return (
     <NavigationContainer theme={defaultTheme}>
+      <Snackbar
+        visible={!!errorMessage}
+        onDismiss={closeErrBar}
+        style={localStyles.snack}
+        action={{
+          icon: 'close',
+          label: '',
+          onPress: closeErrBar,
+          color: 'white',
+        }}
+      >
+        <Text>{errorMessage}</Text>
+      </Snackbar>
       {authSelectors.isLoggedWithCompany() ? <AppRoot {...props} /> : <AuthNavigator />}
-      <SnackbarComponent />
+      <Snackbar
+        visible={barVisible}
+        onDismiss={closeSnackbar}
+        style={{ backgroundColor: defaultTheme.colors.error }}
+        action={{
+          icon: 'close',
+          label: '',
+          onPress: closeSnackbar,
+          color: 'white',
+        }}
+      >
+        <View style={globalStyles.container}>
+          {!!errList?.length && errList.map((err, id) => <Text key={id}>{truncate(err)}</Text>)}
+        </View>
+      </Snackbar>
     </NavigationContainer>
   );
 };
 
 export default MobileApp;
+
+const localStyles = StyleSheet.create({
+  snack: {
+    backgroundColor: defaultTheme.colors.error,
+    zIndex: 1000,
+  },
+});

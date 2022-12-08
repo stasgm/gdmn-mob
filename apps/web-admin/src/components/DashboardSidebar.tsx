@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Avatar, Box, Divider, Drawer, List, Typography } from '@material-ui/core';
 import {
@@ -13,11 +13,11 @@ import {
   File as FileIcon,
 } from 'react-feather';
 
-import { useDispatch, useSelector } from '@lib/store';
+import { useSelector } from '@lib/store';
 
 import { adminPath } from '../utils/constants';
 
-import actions from '../store/user';
+import { useDispatch } from '../store';
 
 import NavItem from './NavItem';
 import NavToggle from './NavToggle';
@@ -36,11 +36,10 @@ interface IProps {
 }
 
 const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
-  const dispatch = useDispatch();
-
   const [isCompact, setCompact] = useState(false);
 
   const { user } = useSelector((state) => state.auth);
+  console.log('DashboardSidebar');
 
   const items =
     user?.role === 'SuperAdmin'
@@ -128,21 +127,6 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
             title: 'Профиль',
           },
         ];
-
-  const fetchUser = useCallback(
-    async (id: string) => {
-      if (user?.id) {
-        dispatch(actions.fetchUserById(id));
-      }
-    },
-    [user?.id, dispatch],
-  );
-
-  useEffect(() => {
-    if (user?.id) {
-      fetchUser(user.id);
-    }
-  }, [fetchUser, user]);
 
   const content = (
     <Box

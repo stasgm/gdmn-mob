@@ -37,12 +37,12 @@ class File extends BaseRequest {
   //     return {
   //       type: 'ERROR',
   //       message: resData.error,
-  //     } as error.INetworkError;
+  //     } as error.IServerError;
   //   } catch (err) {
   //     return {
   //       type: 'ERROR',
   //       message: err instanceof TypeError ? err.message : 'ошибка сохранения файла',
-  //     } as error.INetworkError;
+  //     } as error.IServerError;
   //   }
   // };
 
@@ -62,7 +62,7 @@ class File extends BaseRequest {
       return {
         type: 'ERROR',
         message: 'Файл не найден',
-      } as error.INetworkError;
+      } as error.IServerError;
     }
 
     try {
@@ -79,12 +79,12 @@ class File extends BaseRequest {
       return {
         type: 'ERROR',
         message: resData.error,
-      } as error.INetworkError;
+      } as error.IServerError;
     } catch (err) {
       return {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка получения данных о файле',
-      } as error.INetworkError;
+      } as error.IServerError;
     }
   };
 
@@ -120,12 +120,12 @@ class File extends BaseRequest {
       return {
         type: 'ERROR',
         message: resData.error || 'ошибка получения данных о файлах',
-      } as error.INetworkError;
+      } as error.IServerError;
     } catch (err) {
       return {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка получения данных о файлах',
-      } as error.INetworkError;
+      } as error.IServerError;
     }
   };
 
@@ -153,12 +153,12 @@ class File extends BaseRequest {
       return {
         type: 'ERROR',
         message: resData.error,
-      } as error.INetworkError;
+      } as error.IServerError;
     } catch (err) {
       return {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка обновления файла',
-      } as error.INetworkError;
+      } as error.IServerError;
     }
   };
 
@@ -184,12 +184,12 @@ class File extends BaseRequest {
       return {
         type: 'ERROR',
         message: resData.error,
-      } as error.INetworkError;
+      } as error.IServerError;
     } catch (err) {
       return {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка удаления файла',
-      } as error.INetworkError;
+      } as error.IServerError;
     }
   };
 }

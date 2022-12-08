@@ -1,3 +1,5 @@
+import { AxiosError } from 'axios';
+
 import * as auth from './auth';
 import * as user from './user';
 import * as company from './company';
@@ -22,6 +24,7 @@ export {
   error,
   process,
   appSystem,
+  AxiosError,
   deviceLog,
   file,
 };

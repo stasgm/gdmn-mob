@@ -1,18 +1,19 @@
-import { IResponse, IAppSystem, NewAppSystem } from '@lib/types';
+import { IAppSystem, NewAppSystem } from '@lib/types';
 
 import { appSystems as mockAppSystems } from '@lib/mock';
 
 import { error, appSystem as types } from '../types';
-import { generateId, getParams, sleep } from '../utils';
+import { generateId, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
+import { CustomRequest } from '../robustRequest';
 
 class AppSystem extends BaseRequest {
   constructor(api: BaseApi) {
     super(api);
   }
 
-  addAppSystem = async (appSystem: NewAppSystem) => {
+  addAppSystem = async (customRequest: CustomRequest, appSystem: NewAppSystem) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -27,31 +28,27 @@ class AppSystem extends BaseRequest {
       } as types.IAddAppSystemResponse;
     }
 
-    try {
-      const res = await this.api.axios.post<IResponse<IAppSystem>>('/appSystems', appSystem);
-      const resData = res.data;
+    const res = await customRequest<IAppSystem>({
+      api: this.api.axios,
+      method: 'POST',
+      url: '/appSystems',
+      data: appSystem,
+    });
 
-      if (resData?.result) {
-        return {
-          type: 'ADD_APP_SYSTEM',
-          appSystem: resData?.data,
-        } as types.IAddAppSystemResponse;
-      }
-
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка создания подсистемы',
-        // message: err?.response?.data?.error || 'ошибка создания подсистемы',
-      } as error.INetworkError;
+        type: 'ADD_APP_SYSTEM',
+        appSystem: res.data,
+      } as types.IAddAppSystemResponse;
     }
+
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'подсистема не создана',
+    } as error.IServerError;
   };
 
-  updateAppSystem = async (appSystem: Partial<IAppSystem>) => {
+  updateAppSystem = async (customRequest: CustomRequest, appSystem: Partial<IAppSystem>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -61,30 +58,27 @@ class AppSystem extends BaseRequest {
       } as types.IUpdateAppSystemResponse;
     }
 
-    try {
-      const res = await this.api.axios.patch<IResponse<IAppSystem>>(`/appSystems/${appSystem.id}`, appSystem);
-      const resData = res.data;
+    const res = await customRequest<IAppSystem>({
+      api: this.api.axios,
+      method: 'PATCH',
+      url: `/appSystems/${appSystem.id}`,
+      data: appSystem,
+    });
 
-      if (resData.result) {
-        return {
-          type: 'UPDATE_APP_SYSTEM',
-          appSystem: resData.data,
-        } as types.IUpdateAppSystemResponse;
-      }
-
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка обновления подсистемы',
-      } as error.INetworkError;
+        type: 'UPDATE_APP_SYSTEM',
+        appSystem: res.data,
+      } as types.IUpdateAppSystemResponse;
     }
+
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'подсистема не обновлена',
+    } as error.IServerError;
   };
 
-  removeAppSystem = async (appSystemId: string) => {
+  removeAppSystem = async (customRequest: CustomRequest, appSystemId: string) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -93,29 +87,25 @@ class AppSystem extends BaseRequest {
       } as types.IRemoveAppSystemResponse;
     }
 
-    try {
-      const res = await this.api.axios.delete<IResponse<void>>(`/appSystems/${appSystemId}`);
-      const resData = res.data;
+    const res = await customRequest<void>({
+      api: this.api.axios,
+      method: 'DELETE',
+      url: `/appSystems/${appSystemId}`,
+    });
 
-      if (resData.result) {
-        return {
-          type: 'REMOVE_APP_SYSTEM',
-        } as types.IRemoveAppSystemResponse;
-      }
-
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка удаления подсистемы',
-      } as error.INetworkError;
+        type: 'REMOVE_APP_SYSTEM',
+      } as types.IRemoveAppSystemResponse;
     }
+
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'подсистема не удалена',
+    } as error.IServerError;
   };
 
-  getAppSystem = async (appSystemId: string) => {
+  getAppSystem = async (customRequest: CustomRequest, appSystemId: string) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -130,33 +120,30 @@ class AppSystem extends BaseRequest {
 
       return {
         type: 'ERROR',
-        message: 'Подсистема не найдена',
-      } as error.INetworkError;
+        message: 'подсистема не найдена',
+      } as error.IServerError;
     }
-    try {
-      const res = await this.api.axios.get<IResponse<IAppSystem>>(`/appSystems/${appSystemId}`);
-      const resData = res.data;
 
-      if (resData.result) {
-        return {
-          type: 'GET_APP_SYSTEM',
-          appSystem: resData.data,
-        } as types.IGetAppSystemResponse;
-      }
+    const res = await customRequest<IAppSystem>({
+      api: this.api.axios,
+      method: 'GET',
+      url: `/appSystems/${appSystemId}`,
+    });
 
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка получения данных о подсистеме',
-      } as error.INetworkError;
+        type: 'GET_APP_SYSTEM',
+        appSystem: res.data,
+      } as types.IGetAppSystemResponse;
     }
+
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'данные о подсистеме не получены',
+    } as error.IServerError;
   };
 
-  getAppSystems = async (params?: Record<string, string | number>) => {
+  getAppSystems = async (customRequest: CustomRequest, params?: Record<string, string | number>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -166,34 +153,19 @@ class AppSystem extends BaseRequest {
       } as types.IGetAppSystemsResponse;
     }
 
-    let paramText = params ? getParams(params) : '';
+    const res = await customRequest<IAppSystem[]>({ api: this.api.axios, method: 'GET', url: '/appSystems', params });
 
-    if (paramText > '') {
-      paramText = `?${paramText}`;
+    if (res?.result) {
+      return {
+        type: 'GET_APP_SYSTEMS',
+        appSystems: res.data,
+      } as types.IGetAppSystemsResponse;
     }
 
-    try {
-      const res = await this.api.axios.get<IResponse<IAppSystem[]>>(`/appSystems${paramText}`);
-      ///${this.api.config.version}
-      const resData = res.data;
-
-      if (resData.result) {
-        return {
-          type: 'GET_APP_SYSTEMS',
-          appSystems: resData.data,
-        } as types.IGetAppSystemsResponse;
-      }
-
-      return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка получения данных о системах',
-      } as error.INetworkError;
-    }
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'данные о подсистемах не получены',
+    } as error.IServerError;
   };
 }
 

@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { Modal, View, StyleSheet, ScrollView, Alert } from 'react-native';
 
-import { useTheme } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { ActivityIndicator, Caption, Button, Dialog } from 'react-native-paper';
 
-import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
+import { appActions, authActions, useDispatch, useSelector } from '@lib/store';
 
-import { useSelector, appActions, useDispatch } from '@lib/store';
+import { Button, Dialog, Snackbar, useTheme, Text } from 'react-native-paper';
 
 import { globalStyles as styles, AppActivityIndicator, LargeText, MediumText } from '@lib/mobile-ui';
+
+import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 
 import { INavItem, RootDrawerParamList } from './types';
 
@@ -67,6 +67,7 @@ const DrawerNavigator = ({ onSyncClick, items }: IProps) => {
   const settings = useSelector((state) => state.settings?.data);
   const synchPeriod = (settings.synchPeriod?.data as number) || 10;
   const [errorListVisible, setErrorListVisible] = useState(false);
+  const { errorMessage } = useSelector((state) => state.auth);
 
   const onSync = () => {
     //Если идет процесс, то выходим
@@ -84,7 +85,7 @@ const DrawerNavigator = ({ onSyncClick, items }: IProps) => {
     //Определяем, сколько минут с прошлой синхронизации
     //и если меньше, чем synchPeriod, то предупреждаем и выходим
     //иначе - выполняем синхронизацию
-    const timeUntilNextSynch = getTimeUntilNextSynch(syncDate, synchPeriod);
+    const timeUntilNextSynch = 0; //getTimeUntilNextSynch(syncDate, synchPeriod);
 
     if (timeUntilNextSynch > 0) {
       Alert.alert(
@@ -110,17 +111,27 @@ const DrawerNavigator = ({ onSyncClick, items }: IProps) => {
     }
   };
 
+  const closeErrBar = () => {
+    dispatch(authActions.setErrorMessage(''));
+    dispatch(authActions.clearError());
+  };
+
   return (
     <>
       <Modal animationType="fade" visible={showSyncInfo} statusBarTranslucent={true}>
         <Dialog visible={showSyncInfo} onDismiss={onDismissDialog} style={localStyles.dialog}>
           <Dialog.Title>
             <View style={styles.containerCenter}>
-              <LargeText style={localStyles.dialogTitle}>
+              <LargeText
+                style={[
+                  localStyles.dialogTitle,
+                  { color: errorNotice.length && !loading ? colors.error : colors.text },
+                ]}
+              >
                 {loading
                   ? 'Выполняются операции:'
                   : errorNotice.length
-                  ? 'Выполнено с ошибками!'
+                  ? 'Закончено с ошибками!'
                   : 'Выполнено успешно!'}
               </LargeText>
             </View>
@@ -162,6 +173,19 @@ const DrawerNavigator = ({ onSyncClick, items }: IProps) => {
             <Button onPress={onDismissDialog}>Продолжить работу в приложении</Button>
           </Dialog.Actions>
         </Dialog>
+        <Snackbar
+          visible={!!errorMessage}
+          onDismiss={closeErrBar}
+          style={{ backgroundColor: colors.error }}
+          action={{
+            icon: 'close',
+            label: '',
+            onPress: closeErrBar,
+            color: 'white',
+          }}
+        >
+          <Text style={{ color: 'white' }}>{errorMessage}</Text>
+        </Snackbar>
       </Modal>
       <Drawer.Navigator
         useLegacyImplementation

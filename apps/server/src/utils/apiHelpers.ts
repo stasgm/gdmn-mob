@@ -32,8 +32,3 @@ export const created = (ctx: Context, data?: any, logMessage?: string, logData?:
     }
   }
 };
-
-export const notOk = (ctx: Context) => {
-  ctx.status = 201;
-  ctx.body = { result: false };
-};

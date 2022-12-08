@@ -24,6 +24,7 @@
   "dependencies": {
     "@lib/client-api": "*",
     "@lib/client-types": "*",
+    "@lib/client-config": "*",
     "@lib/mock": "*",
     "@lib/types": "*",
     "@redux-devtools/extension": "^3.2.3",

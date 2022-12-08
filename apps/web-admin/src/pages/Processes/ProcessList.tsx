@@ -5,23 +5,20 @@ import CachedIcon from '@material-ui/icons/Cached';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import actions from '../../store/device';
-import processActions from '../../store/process';
+import actions from '../../store/process';
 import companyActions from '../../store/company';
 import { IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-import SnackBar from '../../components/SnackBar';
 import ProcessListTable from '../../components/process/ProcessListTable';
 
 const ProcessList = () => {
   const dispatch = useDispatch();
-
-  const { list: processes, loading, errorMessage, pageParams } = useSelector((state) => state.processes);
+  const { list: processes, loading, pageParams } = useSelector((state) => state.processes);
   const companies = useSelector((state) => state.companies.list);
 
   const fetchProcesses = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(processActions.fetchProcesses(filterText, fromRecord, toRecord));
+      dispatch(actions.fetchProcesses(filterText, fromRecord, toRecord));
     },
     [dispatch],
   );
@@ -41,8 +38,6 @@ const ProcessList = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
-
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
   const handleUpdateInput = (value: string) => {
@@ -51,28 +46,16 @@ const ProcessList = () => {
     setPageParamLocal({ filterText: value });
 
     if (inputValue) return;
-
-    // fetchDevices('');
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.deviceActions.setPageParam({ filterText: pageParamLocal?.filterText }));
+    dispatch(actions.setPageParam({ filterText: pageParamLocal?.filterText }));
     fetchProcesses(pageParamLocal?.filterText as string);
-
-    // const inputValue = valueRef?.current?.value;
-    // fetchDevices(inputValue);
   };
 
   const handleKeyPress = (key: string) => {
     if (key !== 'Enter') return;
-
     handleSearchClick();
-    // const inputValue = valueRef?.current?.value;
-    // fetchDevices(inputValue);
-  };
-
-  const handleClearError = () => {
-    dispatch(actions.deviceActions.clearError());
   };
 
   const buttons: IToolBarButton[] = [
@@ -100,7 +83,6 @@ const ProcessList = () => {
           <ToolbarActionsWithSearch
             buttons={buttons}
             searchTitle={'Найти процесс'}
-            //valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
@@ -115,7 +97,6 @@ const ProcessList = () => {
           )}
         </Container>
       </Box>
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };
