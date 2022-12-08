@@ -35,3 +35,26 @@ export interface IMessageHead {
   device: INamedEntity;
   message: string;
 }
+
+export interface IFileFormik {
+  [fieldName: string]: unknown;
+  path: string;
+  fileName: string;
+  company: string;
+  appSystem: string;
+  producer: string;
+  consumer: string;
+  device: string;
+  uid: string;
+  date: string;
+}
+
+export interface IDeviceLogFileFormik {
+  [fieldName: string]: unknown;
+  company: string;
+  appSystem: string;
+  contact: string;
+  device: string;
+  uid: string;
+  date: string;
+}

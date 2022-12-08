@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
@@ -13,13 +13,11 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  Typography,
   TextField,
 } from '@material-ui/core';
 
 import { IDeviceLogFiles } from '@lib/types';
 
-import { useSettingThunkDispatch } from '@lib/store';
 import { useFormik } from 'formik';
 
 import { adminPath } from '../../utils/constants';
@@ -46,14 +44,12 @@ const DeviceLogFilesListTable = ({
   const [page, setPage] = useState(0);
 
   const initialValues = {
-    appSystem: '',
     company: '',
+    appSystem: '',
     contact: '',
-    date: '',
     device: '',
     uid: '',
-    path: '',
-    size: '',
+    date: '',
   };
 
   const formik = useFormik<any>({
@@ -237,43 +233,19 @@ const DeviceLogFilesListTable = ({
                     onChange={handleSelectAll}
                   />
                 </TableCell>
-                <TableCell style={{ flexDirection: 'column' }}>
-                  <Typography color="textPrimary" variant="inherit">
-                    Компания
-                  </Typography>
-                </TableCell>
-                <TableCell style={{ flexDirection: 'column' }}>
-                  <Typography color="textPrimary" variant="inherit">
-                    Подсистема
-                  </Typography>
-                </TableCell>
-                <TableCell style={{ flexDirection: 'column' }}>
-                  <Typography color="textPrimary" variant="inherit">
-                    Пользователь
-                  </Typography>
-                </TableCell>
-                <TableCell style={{ flexDirection: 'column' }}>
-                  <Typography color="textPrimary" variant="inherit">
-                    Устройство
-                  </Typography>
-                </TableCell>
-                <TableCell style={{ flexDirection: 'column' }}>
-                  <Typography color="textPrimary" variant="inherit">
-                    Идентификатор
-                  </Typography>
-                </TableCell>
-                <TableCell style={{ flexDirection: 'column' }}>
-                  <Typography color="textPrimary" variant="inherit">
-                    Дата
-                  </Typography>
-                </TableCell>
+                <TableCell>Компания</TableCell>
+                <TableCell>Подсистема</TableCell>
+                <TableCell>Пользователь</TableCell>
+                <TableCell>Устройство</TableCell>
+                <TableCell>Идентификатор</TableCell>
+                <TableCell>Дата</TableCell>
                 <TableCell>Размер</TableCell>
               </TableRow>
               {isFilterVisible ? (
                 <TableRow>
                   <TableCell></TableCell>
-                  <TableCell>
-                    {isFilterVisible ? (
+                  {Object.keys(initialValues).map((item) => (
+                    <TableCell key={item}>
                       <TextField
                         InputProps={{
                           sx: {
@@ -286,130 +258,15 @@ const DeviceLogFilesListTable = ({
                           },
                         }}
                         fullWidth
-                        name="company"
+                        name={item}
                         required
                         variant="outlined"
                         type="search"
-                        value={formik.values.company}
+                        value={formik.values[item]}
                         onChange={formik.handleChange}
                       />
-                    ) : null}
-                  </TableCell>
-                  <TableCell>
-                    {isFilterVisible ? (
-                      <TextField
-                        InputProps={{
-                          sx: {
-                            height: 30,
-                            fontSize: 13,
-                            '& .MuiOutlinedInput-input': {
-                              borderWidth: 0,
-                              padding: 0.5,
-                            },
-                          },
-                        }}
-                        fullWidth
-                        name="appSystem"
-                        required
-                        variant="outlined"
-                        type="search"
-                        value={formik.values.appSystem}
-                        onChange={formik.handleChange}
-                      />
-                    ) : null}
-                  </TableCell>
-                  <TableCell>
-                    {isFilterVisible ? (
-                      <TextField
-                        InputProps={{
-                          sx: {
-                            height: 30,
-                            fontSize: 13,
-                            '& .MuiOutlinedInput-input': {
-                              borderWidth: 0,
-                              padding: 0.5,
-                            },
-                          },
-                        }}
-                        fullWidth
-                        name="contact"
-                        required
-                        variant="outlined"
-                        type="search"
-                        value={formik.values.contact}
-                        onChange={formik.handleChange}
-                      />
-                    ) : null}
-                  </TableCell>
-                  <TableCell>
-                    {isFilterVisible ? (
-                      <TextField
-                        InputProps={{
-                          sx: {
-                            height: 30,
-                            fontSize: 13,
-                            '& .MuiOutlinedInput-input': {
-                              borderWidth: 0,
-                              padding: 0.5,
-                            },
-                          },
-                        }}
-                        fullWidth
-                        name="device"
-                        required
-                        variant="outlined"
-                        type="search"
-                        value={formik.values.device}
-                        onChange={formik.handleChange}
-                      />
-                    ) : null}
-                  </TableCell>
-                  <TableCell>
-                    {isFilterVisible ? (
-                      <TextField
-                        InputProps={{
-                          sx: {
-                            height: 30,
-                            fontSize: 13,
-                            '& .MuiOutlinedInput-input': {
-                              borderWidth: 0,
-                              padding: 0.5,
-                            },
-                          },
-                        }}
-                        fullWidth
-                        name="uid"
-                        required
-                        variant="outlined"
-                        type="search"
-                        value={formik.values.uid}
-                        onChange={formik.handleChange}
-                      />
-                    ) : null}
-                  </TableCell>
-                  <TableCell>
-                    {isFilterVisible ? (
-                      <TextField
-                        InputProps={{
-                          sx: {
-                            height: 30,
-                            fontSize: 13,
-                            '& .MuiOutlinedInput-input': {
-                              borderWidth: 0,
-                              padding: 0.5,
-                            },
-                          },
-                        }}
-                        fullWidth
-                        name="date"
-                        required
-                        variant="outlined"
-                        type="search"
-                        value={formik.values.date}
-                        onChange={formik.handleChange}
-                      />
-                    ) : null}
-                  </TableCell>
+                    </TableCell>
+                  ))}
                   <TableCell></TableCell>
                 </TableRow>
               ) : null}
