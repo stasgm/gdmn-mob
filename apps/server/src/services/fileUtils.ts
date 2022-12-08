@@ -52,14 +52,16 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
 
   if (!companyName) {
     log.error('Компания не найдена');
-    return undefined;
   }
 
   const reMessage = arr[3].includes('_to_') ? /_from_(.+)_to_(.+)_dev_(.+)\.json/gi : /from_(.+)_dev_(.+)\.json/gi;
   const matchMessage = reMessage.exec(arr[3]);
   if (!matchMessage) {
     log.error(`Invalid file name ${arr[3]}`);
-    return undefined;
+    return {
+      company: companyId && companyName ? { id: companyId, name: companyName } : undefined,
+      appSystem: appSystemName && appSystemName ? { id: appSystemId, name: appSystemName } : undefined,
+    };
   }
 
   const producerId = matchMessage[1];
@@ -67,7 +69,6 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
 
   if (!producerName) {
     log.error('Контакт-отправитель не найден');
-    return undefined;
   }
 
   const consumerId = arr[3].includes('_to_') ? matchMessage[2] : undefined;
@@ -81,18 +82,17 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
 
   if (!device) {
     log.error(`Устройство ${deviceUid}  не найдено`);
-    return undefined;
   }
 
   const deviceId = device?.id;
   const deviceName = device?.name;
 
   return {
-    company: { id: companyId, name: companyName },
-    appSystem: { id: appSystemId, name: appSystemName },
-    producer: { id: producerId, name: producerName },
+    company: companyId && companyName ? { id: companyId, name: companyName } : undefined,
+    appSystem: appSystemName && appSystemName ? { id: appSystemId, name: appSystemName } : undefined,
+    producer: producerName ? { id: producerId, name: producerName } : undefined,
     consumer: consumerId && consumerName ? { id: consumerId, name: consumerName } : undefined,
-    device: { id: deviceId, name: deviceName },
+    device: deviceId && deviceName ? { id: deviceId, name: deviceName } : undefined,
   };
 };
 
