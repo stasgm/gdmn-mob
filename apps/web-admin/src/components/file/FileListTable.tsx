@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
@@ -13,16 +13,15 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  Typography,
   TextField,
 } from '@material-ui/core';
 
 import { IFileSystem } from '@lib/types';
 
-import { useSettingThunkDispatch } from '@lib/store';
 import { useFormik } from 'formik';
 
 import { adminPath } from '../../utils/constants';
+import { IFileFormik } from '../../types';
 
 interface IProps {
   files: IFileSystem[];
@@ -46,33 +45,21 @@ const FileListTable = ({
   const [page, setPage] = useState(0);
 
   const initialValues = useMemo(() => {
-    // ...user,
     return {
-      appSystem: '',
+      path: '',
+      fileName: '',
       company: '',
+      appSystem: '',
       producer: '',
       consumer: '',
-      date: '',
       device: '',
       uid: '',
-      path: '',
-      size: '',
+      date: '',
     };
   }, []);
-  const formik = useFormik<any>({
+
+  const formik = useFormik<IFileFormik>({
     enableReinitialize: true,
-    // initialValues: {
-    //   // ...user,
-    //   appSystem: '',
-    //   company: '',
-    //   producer: '',
-    //   consumer: '',
-    //   date: '',
-    //   device: '',
-    //   uid: '',
-    //   path: '',
-    //   size: '',
-    // },
     initialValues: initialValues,
     onSubmit: (values) => {
       onSubmit(values);
@@ -96,8 +83,6 @@ const FileListTable = ({
       formik.values.date ||
       formik.values.device ||
       formik.values.uid
-      // ||
-      // formik.values.path
     ) {
       return files.filter(
         (i) =>
@@ -123,8 +108,6 @@ const FileListTable = ({
             : true) &&
           (formik.values.device ? i.device?.name.toUpperCase().includes(formik.values.device.toUpperCase()) : true) &&
           (formik.values.uid ? i.device?.id.toUpperCase().includes(formik.values.uid.toUpperCase()) : true),
-        // &&
-        // (formik.values.path ? i.path.toUpperCase().includes(formik.values.path.toUpperCase()) : true),
       );
     } else {
       return files;
@@ -204,7 +187,13 @@ const FileListTable = ({
   const TableRows = () => {
     const fileList = filtered.slice(page * limit, page * limit + limit).map((file: IFileSystem) => {
       return (
-        <TableRow hover key={file.id} selected={selectedFileIds.findIndex((d) => d.id === file?.id) !== -1}>
+        <TableRow
+          hover
+          key={file.id}
+          selected={selectedFileIds.findIndex((d) => d.id === file?.id) !== -1}
+          component={Link}
+          to={`${adminPath}/app/files/${file.id}`}
+        >
           <TableCell padding="checkbox">
             <Checkbox
               checked={
@@ -218,41 +207,9 @@ const FileListTable = ({
               value="true"
             />
           </TableCell>
-          <TableCell style={{ padding: '0 16px' }}>
-            <Box
-              sx={{
-                alignItems: 'center',
-                display: 'flex',
-              }}
-            >
-              <NavLink to={`${adminPath}/app/files/${file.id}`}>
-                <Typography color="textPrimary" variant="body1" key={file.id}>
-                  {file.fileName}
-                </Typography>
-              </NavLink>
-            </Box>
-          </TableCell>
-          <TableCell style={{ padding: '0 16px' }}>
-            <Box
-              sx={{
-                alignItems: 'center',
-                display: 'flex',
-              }}
-            >
-              <NavLink to={`${adminPath}/app/files/${file.id}`}>
-                <Typography color="textPrimary" variant="body1" key={file.id}>
-                  {file.path}
-                </Typography>
-              </NavLink>
-            </Box>
-          </TableCell>
-          <TableCell>
-            <NavLink to={`${adminPath}/app/files/${file.id}`}>
-              <Typography color="textPrimary" variant="body1" key={file.id}>
-                {file.company?.name}
-              </Typography>
-            </NavLink>
-          </TableCell>
+          <TableCell style={{ padding: '0 16px', width: 200 }}>{file.path}</TableCell>
+          <TableCell style={{ width: 10 }}>{file.fileName}</TableCell>
+          <TableCell>{file.company?.name}</TableCell>
           <TableCell>{file.appSystem?.name}</TableCell>
           <TableCell>{file.producer?.name}</TableCell>
           <TableCell>{file.consumer?.name}</TableCell>
@@ -293,55 +250,22 @@ const FileListTable = ({
                     onChange={handleSelectAll}
                   />
                 </TableCell>
-                <TableCell style={{ flexDirection: 'column' }}>
-                  <Typography color="textPrimary" variant="inherit">
-                    Название
-                  </Typography>
-                </TableCell>
-                <TableCell style={{ flexDirection: 'column' }}>
-                  <Typography color="textPrimary" variant="inherit">
-                    Путь
-                  </Typography>
-                </TableCell>
-                <TableCell style={{ flexDirection: 'column' }}>
-                  <Typography color="textPrimary" variant="inherit">
-                    Компания
-                  </Typography>
-                </TableCell>
-                <TableCell style={{ flexDirection: 'column' }}>
-                  <Typography color="textPrimary" variant="inherit">
-                    Подсистема
-                  </Typography>
-                </TableCell>
-                <TableCell style={{ flexDirection: 'column' }}>
-                  <Typography color="textPrimary" variant="inherit">
-                    Пользователь / Отправитель
-                  </Typography>
-                </TableCell>
-                {/* <TableCell>Отправитель</TableCell> */}
+                <TableCell>Путь</TableCell>
+                <TableCell>Название</TableCell>
+                <TableCell>Компания</TableCell>
+                <TableCell>Подсистема</TableCell>
+                <TableCell>Пользователь</TableCell>
                 <TableCell>Получатель</TableCell>
-                <TableCell style={{ flexDirection: 'column' }}>
-                  <Typography color="textPrimary" variant="inherit">
-                    Устройство
-                  </Typography>
-                </TableCell>
-                <TableCell style={{ flexDirection: 'column' }}>
-                  <Typography color="textPrimary" variant="inherit">
-                    Идентификатор
-                  </Typography>
-                </TableCell>
-                <TableCell style={{ flexDirection: 'column' }}>
-                  <Typography color="textPrimary" variant="inherit">
-                    Дата
-                  </Typography>
-                </TableCell>
+                <TableCell>Устройство</TableCell>
+                <TableCell>Идентификатор</TableCell>
+                <TableCell>Дата</TableCell>
                 <TableCell>Размер</TableCell>
               </TableRow>
               {isFilterVisible ? (
                 <TableRow>
                   <TableCell></TableCell>
-                  <TableCell>
-                    {isFilterVisible ? (
+                  {Object.keys(initialValues).map((item) => (
+                    <TableCell key={item}>
                       <TextField
                         InputProps={{
                           sx: {
@@ -354,199 +278,15 @@ const FileListTable = ({
                           },
                         }}
                         fullWidth
-                        name="fileName"
+                        name={item}
                         required
                         variant="outlined"
                         type="search"
-                        value={formik.values.fileName}
+                        value={formik.values[item]}
                         onChange={formik.handleChange}
                       />
-                    ) : null}
-                  </TableCell>
-                  <TableCell>
-                    {isFilterVisible ? (
-                      <TextField
-                        InputProps={{
-                          sx: {
-                            height: 30,
-                            fontSize: 13,
-                            '& .MuiOutlinedInput-input': {
-                              borderWidth: 0,
-                              padding: 0.5,
-                            },
-                          },
-                        }}
-                        fullWidth
-                        name="path"
-                        required
-                        variant="outlined"
-                        type="search"
-                        value={formik.values.path}
-                        onChange={formik.handleChange}
-                      />
-                    ) : null}
-                  </TableCell>
-                  <TableCell>
-                    {isFilterVisible ? (
-                      <TextField
-                        InputProps={{
-                          sx: {
-                            height: 30,
-                            fontSize: 13,
-                            '& .MuiOutlinedInput-input': {
-                              borderWidth: 0,
-                              padding: 0.5,
-                            },
-                          },
-                        }}
-                        fullWidth
-                        name="company"
-                        required
-                        variant="outlined"
-                        type="search"
-                        value={formik.values.company}
-                        onChange={formik.handleChange}
-                      />
-                    ) : null}
-                  </TableCell>
-                  <TableCell>
-                    {isFilterVisible ? (
-                      <TextField
-                        InputProps={{
-                          sx: {
-                            height: 30,
-                            fontSize: 13,
-                            '& .MuiOutlinedInput-input': {
-                              borderWidth: 0,
-                              padding: 0.5,
-                            },
-                          },
-                        }}
-                        fullWidth
-                        name="appSystem"
-                        required
-                        variant="outlined"
-                        type="search"
-                        value={formik.values.appSystem}
-                        onChange={formik.handleChange}
-                      />
-                    ) : null}
-                  </TableCell>
-                  <TableCell>
-                    {isFilterVisible ? (
-                      <TextField
-                        InputProps={{
-                          sx: {
-                            height: 30,
-                            fontSize: 13,
-                            '& .MuiOutlinedInput-input': {
-                              borderWidth: 0,
-                              padding: 0.5,
-                            },
-                          },
-                        }}
-                        fullWidth
-                        name="producer"
-                        required
-                        variant="outlined"
-                        type="search"
-                        value={formik.values.contact}
-                        onChange={formik.handleChange}
-                      />
-                    ) : null}
-                  </TableCell>
-                  <TableCell>
-                    {isFilterVisible ? (
-                      <TextField
-                        InputProps={{
-                          sx: {
-                            height: 30,
-                            fontSize: 13,
-                            '& .MuiOutlinedInput-input': {
-                              borderWidth: 0,
-                              padding: 0.5,
-                            },
-                          },
-                        }}
-                        fullWidth
-                        name="consumer"
-                        required
-                        variant="outlined"
-                        type="search"
-                        value={formik.values.consumer}
-                        onChange={formik.handleChange}
-                      />
-                    ) : null}
-                  </TableCell>
-                  <TableCell>
-                    {isFilterVisible ? (
-                      <TextField
-                        InputProps={{
-                          sx: {
-                            height: 30,
-                            fontSize: 13,
-                            '& .MuiOutlinedInput-input': {
-                              borderWidth: 0,
-                              padding: 0.5,
-                            },
-                          },
-                        }}
-                        fullWidth
-                        name="device"
-                        required
-                        variant="outlined"
-                        type="search"
-                        value={formik.values.device}
-                        onChange={formik.handleChange}
-                      />
-                    ) : null}
-                  </TableCell>
-                  <TableCell>
-                    {isFilterVisible ? (
-                      <TextField
-                        InputProps={{
-                          sx: {
-                            height: 30,
-                            fontSize: 13,
-                            '& .MuiOutlinedInput-input': {
-                              borderWidth: 0,
-                              padding: 0.5,
-                            },
-                          },
-                        }}
-                        fullWidth
-                        name="uid"
-                        required
-                        variant="outlined"
-                        type="search"
-                        value={formik.values.uid}
-                        onChange={formik.handleChange}
-                      />
-                    ) : null}
-                  </TableCell>
-                  <TableCell>
-                    {isFilterVisible ? (
-                      <TextField
-                        InputProps={{
-                          sx: {
-                            height: 30,
-                            fontSize: 13,
-                            '& .MuiOutlinedInput-input': {
-                              borderWidth: 0,
-                              padding: 0.5,
-                            },
-                          },
-                        }}
-                        fullWidth
-                        name="date"
-                        required
-                        variant="outlined"
-                        type="search"
-                        value={formik.values.date}
-                        onChange={formik.handleChange}
-                      />
-                    ) : null}
-                  </TableCell>
+                    </TableCell>
+                  ))}
                   <TableCell></TableCell>
                 </TableRow>
               ) : null}
