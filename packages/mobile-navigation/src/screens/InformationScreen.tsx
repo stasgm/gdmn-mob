@@ -3,10 +3,9 @@ import { View, Text, StyleSheet, Linking, TouchableOpacity, Platform, StyleProp,
 import { Avatar, Divider } from 'react-native-paper';
 import { useNavigation, useTheme } from '@react-navigation/native';
 
-import { AppScreen, globalStyles as styles, LargeText, MediumText, navBackDrawer } from '@lib/mobile-ui';
-
 import Constants from 'expo-constants';
 
+import { AppScreen, globalStyles as styles, LargeText, MediumText, navBackDrawer } from '@lib/mobile-ui';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { GDMN_COMPANY_NAME, GDMN_EMAIL, GDMN_PHONE, GDMN_SITE_ADDRESS, GDMN_TRADEMARK } from '../constants';

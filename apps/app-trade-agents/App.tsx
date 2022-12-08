@@ -5,6 +5,8 @@ import { MobileApp } from '@lib/mobile-app';
 import { dialCall, sleep } from '@lib/mobile-hooks';
 import { INavItem, GDMN_PHONE, GDMN_EMAIL, GDMN_SITE_ADDRESS } from '@lib/mobile-navigation';
 
+import { StatusBar } from 'expo-status-bar';
+
 import {
   appActions,
   appSelectors,
@@ -253,6 +255,7 @@ const App = () => (
   <Provider store={store}>
     <UIProvider theme={defaultTheme}>
       <Root />
+      <StatusBar style="auto" />
     </UIProvider>
   </Provider>
 );

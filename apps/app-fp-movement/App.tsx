@@ -4,6 +4,8 @@ import { MobileApp } from '@lib/mobile-app';
 import { GDMN_EMAIL, GDMN_PHONE, GDMN_SITE_ADDRESS, INavItem } from '@lib/mobile-navigation';
 import ErrorBoundary from 'react-native-error-boundary';
 
+import { StatusBar } from 'expo-status-bar';
+
 import {
   appActions,
   appSelectors,
@@ -247,6 +249,7 @@ const App = () => (
   <Provider store={store}>
     <UIProvider theme={defaultTheme}>
       <Root />
+      <StatusBar style="auto" />
     </UIProvider>
   </Provider>
 );

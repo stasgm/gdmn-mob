@@ -9,6 +9,8 @@ import {
   Users as UsersIcon,
   List as ProcessIcon,
   Server as AppSystemsIcon,
+  MessageCircle as MessageIcon,
+  File as FileIcon,
 } from 'react-feather';
 
 import { useSelector } from '@lib/store';
@@ -28,70 +30,102 @@ const userInfo = {
   name: 'Katarina Smith',
 };
 
-const items = [
-  {
-    href: `${adminPath}/app/dashboard`,
-    icon: BarChartIcon,
-    title: 'Сводка',
-  },
-  {
-    href: `${adminPath}/app/appSystems`,
-    icon: AppSystemsIcon,
-    title: 'Подсистемы',
-  },
-  {
-    href: `${adminPath}/app/companies`,
-    icon: UsersIcon,
-    title: 'Компании',
-  },
-  {
-    href: `${adminPath}/app/users`,
-    icon: ShoppingBagIcon,
-    title: 'Пользователи',
-  },
-  {
-    href: `${adminPath}/app/devices`,
-    icon: UserIcon,
-    title: 'Устройства',
-  },
-  {
-    href: `${adminPath}/app/processes`,
-    icon: ProcessIcon,
-    title: 'Процессы',
-  },
-  {
-    href: `${adminPath}/app/account`,
-    icon: SettingsIcon,
-    title: 'Профиль',
-  },
-];
-
 interface IProps {
   onMobileClose: () => void;
   openMobile: boolean;
 }
 
 const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
-  const dispatch = useDispatch();
-
   const [isCompact, setCompact] = useState(false);
 
   const { user } = useSelector((state) => state.auth);
 
-  // const fetchUser = useCallback(
-  //   async (id: string) => {
-  //     if (user?.id) {
-  //       dispatch(actions.fetchUserById(id));
-  //     }
-  //   },
-  //   [user?.id, dispatch],
-  // );
-
-  // useEffect(() => {
-  //   if (user?.id) {
-  //     fetchUser(user.id);
-  //   }
-  // }, [fetchUser, user]);
+  const items =
+    user?.role === 'SuperAdmin'
+      ? [
+          {
+            href: `${adminPath}/app/dashboard`,
+            icon: BarChartIcon,
+            title: 'Сводка',
+          },
+          {
+            href: `${adminPath}/app/appSystems`,
+            icon: AppSystemsIcon,
+            title: 'Подсистемы',
+          },
+          {
+            href: `${adminPath}/app/companies`,
+            icon: UsersIcon,
+            title: 'Компании',
+          },
+          {
+            href: `${adminPath}/app/users`,
+            icon: ShoppingBagIcon,
+            title: 'Пользователи',
+          },
+          {
+            href: `${adminPath}/app/devices`,
+            icon: UserIcon,
+            title: 'Устройства',
+          },
+          {
+            href: `${adminPath}/app/processes`,
+            icon: ProcessIcon,
+            title: 'Процессы',
+          },
+          {
+            href: `${adminPath}/app/deviceLogs`,
+            icon: MessageIcon,
+            title: 'Журнал ошибок',
+          },
+          {
+            href: `${adminPath}/app/files`,
+            icon: FileIcon,
+            title: 'Файловая система',
+          },
+          {
+            href: `${adminPath}/app/account`,
+            icon: SettingsIcon,
+            title: 'Профиль',
+          },
+        ]
+      : [
+          {
+            href: `${adminPath}/app/dashboard`,
+            icon: BarChartIcon,
+            title: 'Сводка',
+          },
+          {
+            href: `${adminPath}/app/appSystems`,
+            icon: AppSystemsIcon,
+            title: 'Подсистемы',
+          },
+          {
+            href: `${adminPath}/app/companies`,
+            icon: UsersIcon,
+            title: 'Компании',
+          },
+          {
+            href: `${adminPath}/app/users`,
+            icon: ShoppingBagIcon,
+            title: 'Пользователи',
+          },
+          {
+            href: `${adminPath}/app/devices`,
+            icon: UserIcon,
+            title: 'Устройства',
+          },
+          {
+            href: `${adminPath}/app/processes`,
+            icon: ProcessIcon,
+            title: 'Процессы',
+          },
+          {
+            href: `${adminPath}/app/account`,
+            icon: SettingsIcon,
+            title: 'Профиль',
+          },
+        ];
 
   const content = (
     <Box

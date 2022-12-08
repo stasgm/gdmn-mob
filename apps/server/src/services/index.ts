@@ -8,6 +8,7 @@ import * as deviceBindingService from './deviceBindingService';
 import * as processService from './processService';
 import * as appSystemService from './appSystemService';
 import * as deviceLogService from './deviceLogService';
+import * as fileService from './fileService';
 
 export {
   authService,
@@ -20,4 +21,5 @@ export {
   processService,
   appSystemService,
   deviceLogService,
+  fileService,
 };

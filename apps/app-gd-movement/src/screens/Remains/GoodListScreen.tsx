@@ -1,9 +1,18 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { FlatList, View, Text, StyleSheet } from 'react-native';
+import { FlatList, View, StyleSheet } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
 import { Searchbar } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
-import { AppScreen, ItemSeparator, SubTitle, globalStyles, Menu, SearchButton, navBackButton } from '@lib/mobile-ui';
+import {
+  AppScreen,
+  ItemSeparator,
+  SubTitle,
+  globalStyles,
+  Menu,
+  SearchButton,
+  navBackButton,
+  EmptyList,
+} from '@lib/mobile-ui';
 
 import { refSelectors, useSelector } from '@lib/store';
 
@@ -174,7 +183,7 @@ const GoodListScreen = () => {
         renderItem={renderItem}
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
-        ListEmptyComponent={!goods || !goodRemains.length ? <Text style={styles.emptyList}>Список пуст</Text> : null}
+        ListEmptyComponent={!goods || !goodRemains.length ? EmptyList : null}
       />
     </AppScreen>
   );

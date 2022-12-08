@@ -2,7 +2,7 @@ import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { ListRenderItem, SectionList, SectionListData, View, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import { documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
+import { documentActions, refSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   ItemSeparator,
@@ -39,7 +39,7 @@ export type SectionDataProps = SectionListData<IListItemProps, ShipmentListSecti
 
 export const ShipmentListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ShipmentList'>>();
-  const dispatch = useDispatch();
+  const docDispatch = useDocThunkDispatch();
 
   const docs = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
@@ -147,12 +147,12 @@ export const ShipmentListScreen = () => {
     const docIds = Object.keys(delList);
 
     const deleteDocs = () => {
-      dispatch(documentActions.removeDocuments(docIds));
+      docDispatch(documentActions.removeDocuments(docIds));
       setDelList({});
     };
 
     deleteSelectedItems(delList, deleteDocs);
-  }, [delList, dispatch]);
+  }, [delList, docDispatch]);
 
   const handleAddDocument = useCallback(
     (item: IListItem) => {

@@ -55,6 +55,7 @@ const reducer: Reducer<IAppSystemState, AppSystemActionType> = (state = initialS
         loading: false,
         errorMessage: action.payload || 'error',
       };
+
     case getType(appSystemActions.updateAppSystemAsync.request):
       return { ...state, loading: true, errorMessage: '' };
 

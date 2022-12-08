@@ -28,6 +28,8 @@ import deviceSelectors from '../../store/device/selectors';
 import { adminPath } from '../../utils/constants';
 import DeviceBindingDetailsView from '../../components/deviceBinding/DeviceBindingDetailsView';
 
+import UserDeviceLog from './UserDeviceLog';
+
 export type Params = {
   bindingid: string;
 };

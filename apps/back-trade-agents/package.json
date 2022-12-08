@@ -1,7 +1,7 @@
 {
-  "name": "return-server",
+  "name": "@apps/back-trade-agents",
   "version": "1.0.0",
-  "description": "return-server",
+  "description": "back-trade-agents",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
@@ -26,12 +26,12 @@
   "prettier": "@config/prettier-config",
   "dependencies": {
     "@types/express": "^4.17.13",
-    "@types/node": "^16.10.3",
+    "@types/node": "^18.11.9",
     "bcrypt": "^5.0.1",
     "express": "^4.17.1",
     "nedb": "^1.8.0",
     "node-firebird-driver-native": "^2.3.0",
-    "typescript": "^4.8.4"
+    "typescript": "^4.9.0"
   },
   "devDependencies": {
     "@config/eslint-config": "*",

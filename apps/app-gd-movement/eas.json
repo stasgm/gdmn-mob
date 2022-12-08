@@ -8,9 +8,12 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal"
+      "android": {
+        "distribution": "internal",
+        "buildType": "apk"
+      }
     },
-    "production": {}
+    "production": {"node": "16.14.0"}
   },
   "submit": {
     "production": {}

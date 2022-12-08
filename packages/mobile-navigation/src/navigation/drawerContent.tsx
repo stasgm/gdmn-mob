@@ -1,10 +1,11 @@
-import { DrawerContentComponentProps, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { DrawerContentComponentProps, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
+import { useTheme } from '@react-navigation/native';
 import { Avatar, Caption, Divider, Drawer, Title } from 'react-native-paper';
 import Animated from 'react-native-reanimated';
 import { useSelector } from '@lib/store';
-import { useTheme } from '@react-navigation/native';
+
 import { PrimeButton } from '@lib/mobile-ui';
 import { getDateString } from '@lib/mobile-hooks';
 

@@ -1,7 +1,8 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
 import { View, StyleSheet, Text, TouchableHighlight } from 'react-native';
 import { Divider } from 'react-native-paper';
+
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import styles from '../styles/global';
 

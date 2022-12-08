@@ -11,6 +11,7 @@ import TestServer from './test.router';
 import Process from './process.router';
 import AppSystem from './appSystem.router';
 import DeviceLog from './deviceLog.router';
+import File from './fille.router';
 
 const rootRouter = new Router();
 
@@ -35,6 +36,7 @@ rootRouter
   .use(TestServer.middleware())
   .use(Process.middleware())
   .use(AppSystem.middleware())
+  .use(File.middleware())
   .use(DeviceLog.middleware());
 
 export default rootRouter;

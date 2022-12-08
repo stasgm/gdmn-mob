@@ -1,3 +1,5 @@
+import { IEntity, INamedEntity } from '@lib/types';
+
 export interface IToolBarButton {
   name: string;
   onClick: () => void;
@@ -20,4 +22,16 @@ export interface IHeadCells<T> {
   id: keyof T;
   label: string;
   sortEnable?: boolean;
+  filterEnable?: boolean;
+}
+
+export interface IMessageHead {
+  id: string;
+  createdDate: Date;
+  company: INamedEntity;
+  appSystem: INamedEntity;
+  producer: INamedEntity;
+  consumer: INamedEntity;
+  device: INamedEntity;
+  message: string;
 }

@@ -25,33 +25,22 @@ const addDeviceLog: Config = {
   },
 };
 
-// const updateAppSystem: Config = {
-//   validate: {
-//     params: Joi.object({
-//       ...urlValidation.checkURL,
-//       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор подсистемы')),
-//     }),
-//     type: 'json',
-//     body: Joi.object().required().error(new InvalidParameterException('Не указана информация о подсистеме')),
-//   },
-// };
+const removeDeviceLog: Config = {
+  validate: {
+    params: Joi.object({
+      ...urlValidation.checkURL,
+      id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор файла логов  ошибок')),
+    }),
+  },
+};
 
-// const removeAppSystem: Config = {
-//   validate: {
-//     params: Joi.object({
-//       ...urlValidation.checkURL,
-//       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор подсистемы')),
-//     }),
-//   },
-// };
+const getDeviceLog: Config = {
+  validate: {
+    params: Joi.object({
+      ...urlValidation.checkURL,
+      id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор файла логов  ошибок')),
+    }),
+  },
+};
 
-// const getAppSystem: Config = {
-//   validate: {
-//     params: Joi.object({
-//       ...urlValidation.checkURL,
-//       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор подсистемы')),
-//     }),
-//   },
-// };
-
-export { addDeviceLog };
+export { addDeviceLog, removeDeviceLog, getDeviceLog };

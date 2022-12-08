@@ -1,6 +1,7 @@
 import React from 'react';
-import { SettingValue } from '@lib/types';
+
 import { View, StyleSheet } from 'react-native';
+import { SettingValue } from '@lib/types';
 
 import Input from './Input';
 import { MediumText } from './AppText';
@@ -55,6 +56,8 @@ const localStyles = StyleSheet.create({
     paddingHorizontal: 12,
     fontSize: 20,
     justifyContent: 'space-between',
+    paddingVertical: 3,
+    marginVertical: 6,
   },
   settingsContainer: {
     flexDirection: 'column',

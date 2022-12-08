@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
+import { Modal, View, StyleSheet, ScrollView, Alert } from 'react-native';
+
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import { appActions, authActions, useDispatch, useSelector } from '@lib/store';
-import { StyleSheet, Modal, View, ScrollView, Alert } from 'react-native';
 
 import { Button, Dialog, Snackbar, useTheme, Text } from 'react-native-paper';
 
-import { AppActivityIndicator, globalStyles as styles, LargeText, MediumText } from '@lib/mobile-ui';
+import { globalStyles as styles, AppActivityIndicator, LargeText, MediumText } from '@lib/mobile-ui';
 
-import { color } from 'react-native-reanimated';
+import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 
 import { INavItem, RootDrawerParamList } from './types';
 

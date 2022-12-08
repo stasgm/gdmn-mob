@@ -1,3 +1,5 @@
+import { IEntity, INamedEntity } from './common';
+
 export interface IDeviceLog {
   id: string;
   name: string;
@@ -18,4 +20,13 @@ export interface IPathParams {
 
 export interface IDeviceLogParams extends IPathParams {
   deviceLog: IDeviceLog[];
+}
+
+export interface IDeviceLogFiles extends IEntity {
+  company: INamedEntity;
+  appSystem: INamedEntity;
+  contact: INamedEntity;
+  device: INamedEntity;
+  date: string;
+  size: number;
 }

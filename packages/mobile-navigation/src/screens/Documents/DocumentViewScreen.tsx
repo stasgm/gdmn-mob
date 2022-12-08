@@ -1,12 +1,12 @@
 import React, { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 
+import { useRoute } from '@react-navigation/core';
+import { RouteProp, useNavigation } from '@react-navigation/native';
 import { useTheme } from 'react-native-paper';
 
 import { IEntity } from '@lib/types';
 import { useSelector } from '@lib/store';
-import { useRoute } from '@react-navigation/core';
-import { RouteProp, useNavigation } from '@react-navigation/native';
 
 import { MenuButton, useActionSheet, ItemSeparator, navBackButton } from '@lib/mobile-ui';
 

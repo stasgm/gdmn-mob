@@ -2,7 +2,7 @@
   "expo": {
     "name": "GDMN Отгрузка",
     "slug": "gdmn-fp-movement",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "githubUrl": "https://github.com/stasgm/gdmn-mob",
     "orientation": "default",
     "icon": "./assets/icon.png",
@@ -25,7 +25,7 @@
     },
     "android": {
       "package": "com.gsbelarus.fpmovement",
-      "permissions": ["CAMERA", "ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "VIBRATE"],
+      "permissions": ["CAMERA", "VIBRATE"],
       "versionCode": 1
     },
     "web": {

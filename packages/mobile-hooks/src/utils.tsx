@@ -1,7 +1,9 @@
+import { Alert, Linking, Platform } from 'react-native';
+
 import { IEntity, INamedEntity, IReferences } from '@lib/types';
 import 'react-native-get-random-values';
 import { customAlphabet } from 'nanoid';
-import { Alert, Linking, Platform } from 'react-native';
+
 import { IDelList } from '@lib/mobile-types';
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

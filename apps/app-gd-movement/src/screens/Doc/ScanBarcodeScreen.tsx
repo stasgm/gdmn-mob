@@ -3,7 +3,14 @@ import { Text, View, StyleSheet } from 'react-native';
 
 import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigation/native';
 
-import { AppActivityIndicator, globalStyles, navBackButton, ScanBarcode, ScanBarcodeReader } from '@lib/mobile-ui';
+import {
+  AppActivityIndicator,
+  globalStyles,
+  LargeText,
+  navBackButton,
+  ScanBarcode,
+  ScanBarcodeReader,
+} from '@lib/mobile-ui';
 import { useSelector, refSelectors } from '@lib/store';
 
 import { IDocumentType, INamedEntity, ISettingsOption } from '@lib/types';
@@ -156,7 +163,11 @@ const ScanBarcodeScreen = () => {
   }
 
   if (!document) {
-    return <Text style={globalStyles.title}>Документ не найден</Text>;
+    return (
+      <View style={[globalStyles.container, globalStyles.alignItemsCenter]}>
+        <LargeText>Документ не найден</LargeText>
+      </View>
+    );
   }
 
   return isScanerReader ? (
