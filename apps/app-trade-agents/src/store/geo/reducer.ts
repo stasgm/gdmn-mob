@@ -12,8 +12,10 @@ const initialState: Readonly<GeoState> = {
 
 const reducer: Reducer<GeoState, GeoActionType> = (state = initialState, action): GeoState => {
   switch (action.type) {
-    case getType(geoActions.init):
+    case getType(geoActions.init): {
+      console.log('init geo');
       return initialState;
+    }
 
     case getType(geoActions.addOne): {
       const id = `${(action.payload.coords.latitude % 1).toString().slice(2)}${(action.payload.coords.longitude % 1)

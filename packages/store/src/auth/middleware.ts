@@ -51,6 +51,10 @@ export const authMiddlewareFactory: PersistedMiddleware =
         });
     }
 
+    if (action.type === getType(appActions.clearSuperDataFromDisc)) {
+      store.dispatch(actions.init());
+    }
+
     switch (action.type) {
       case getType(actions.init):
       case getType(actions.setConfig):

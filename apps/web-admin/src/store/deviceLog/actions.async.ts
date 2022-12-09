@@ -1,11 +1,13 @@
 import { ThunkAction } from 'redux-thunk';
 import api from '@lib/client-api';
 
+import { authActions } from '@lib/store';
+
 import { AppState } from '..';
 
-import { deviceLogActions, DeviceLogActionType } from './actions';
 import { webRequest } from '../webRequest';
-import { authActions } from '@lib/store';
+
+import { deviceLogActions, DeviceLogActionType } from './actions';
 
 export type AppThunk = ThunkAction<Promise<DeviceLogActionType>, AppState, null, DeviceLogActionType>;
 

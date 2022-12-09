@@ -92,8 +92,8 @@ class DeviceLog extends BaseRequest {
     const res = await customRequest<IDeviceLogFiles[]>({
       api: this.api.axios,
       method: 'GET',
-      url: `/deviceLogs`,
-      params
+      url: '/deviceLogs',
+      params,
     });
 
     if (res?.result) {

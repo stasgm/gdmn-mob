@@ -49,6 +49,7 @@ const setIsConnected = createAction('APP/SET_CONNECTION')<boolean>();
 
 const loadGlobalDataFromDisc = createAction('APP/LOAD_GLOBAL_DATA_FROM_DISC')();
 const loadSuperDataFromDisc = createAction('APP/LOAD_SUPER_DATA_FROM_DISC')();
+const clearSuperDataFromDisc = createAction('APP/CLEAR_SUPER_DATA_FROM_DISC')();
 
 export const appActions = {
   init,
@@ -63,6 +64,7 @@ export const appActions = {
   setSyncDate,
   loadGlobalDataFromDisc,
   loadSuperDataFromDisc,
+  clearSuperDataFromDisc,
   loadData,
   setLoadingData,
   setLoadingError,

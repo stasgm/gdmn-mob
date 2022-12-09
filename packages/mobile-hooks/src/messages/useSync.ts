@@ -361,7 +361,13 @@ export const useSync = (onSync?: () => Promise<any>) => {
           addRequestNotice('Проверка статуса устройства');
           const statusRespone = await api.auth.getDeviceStatus(appRequest, deviceId);
           if (statusRespone.type !== 'GET_DEVICE_STATUS') {
-            addError('useSync: getDeviceStatus', `Ошибка ${statusRespone.type === 'CONNECT_ERROR' ? ' подключения к серверу' : ''}: ${statusRespone.message}`, tempErrs);
+            addError(
+              'useSync: getDeviceStatus',
+              `Ошибка ${statusRespone.type === 'CONNECT_ERROR' ? ' подключения к серверу' : ''}: ${
+                statusRespone.message
+              }`,
+              tempErrs,
+            );
             connectError = statusRespone.type === 'CONNECT_ERROR';
           } else {
             authDispatch(
@@ -421,7 +427,6 @@ export const useSync = (onSync?: () => Promise<any>) => {
                 );
               }
             }
-
 
             addRequestNotice('Получение данных');
             //2. Получаем все сообщения для мобильного

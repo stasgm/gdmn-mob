@@ -86,7 +86,6 @@ const SignInScreen = (props: Props) => {
               >
                 Политикой конфиденциальности
               </MediumText>
-              "
             </MediumText>
           </View>
         </View>

@@ -8,7 +8,7 @@ import { actions, SettingsActionType } from './actions';
 import { SettingsState } from './types';
 
 export const baseSettingGroup = { id: 'base', name: 'Настройки приложения', sortOrder: 1 };
-export const synchSettingGroup = { id: 'synch', name: 'Настройки синхронизации', sortOrder: 0 };
+export const synchSettingGroup = { id: 'synch', name: 'Синхронизация', sortOrder: 0 };
 
 const baseSettings: Settings<IBaseSettings> = {
   autoSync: {
