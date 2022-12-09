@@ -41,7 +41,7 @@ const FileListTable = ({
   onSubmit,
 }: IProps) => {
   const [selectedFileIds, setSelectedFileIds] = useState<IFileSystem[]>(selectedFiles);
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(25);
   const [page, setPage] = useState(0);
 
   const initialValues = useMemo(() => {
@@ -193,6 +193,7 @@ const FileListTable = ({
           selected={selectedFileIds.findIndex((d) => d.id === file?.id) !== -1}
           component={Link}
           to={`${adminPath}/app/files/${file.id}`}
+          sx={{ backgroundColor: file.appSystem && file.producer && !file.device ? '#ffcfd1' : 'white' }}
         >
           <TableCell padding="checkbox">
             <Checkbox
@@ -207,16 +208,18 @@ const FileListTable = ({
               value="true"
             />
           </TableCell>
-          <TableCell style={{ padding: '0 16px', width: 200 }}>{file.path}</TableCell>
-          <TableCell style={{ width: 10 }}>{file.fileName}</TableCell>
-          <TableCell>{file.company?.name}</TableCell>
-          <TableCell>{file.appSystem?.name}</TableCell>
-          <TableCell>{file.producer?.name}</TableCell>
-          <TableCell>{file.consumer?.name}</TableCell>
-          <TableCell>{file.device?.name}</TableCell>
-          <TableCell>{file.device?.id}</TableCell>
-          <TableCell>{new Date(file.date || '').toLocaleString('ru', { hour12: false })}</TableCell>
-          <TableCell>{Math.ceil(file.size).toString()} кб</TableCell>
+          <TableCell style={{ minWidth: 150 }}>{file.path}</TableCell>
+          <TableCell style={{ minWidth: 500 }}>{file.fileName}</TableCell>
+          <TableCell style={{ minWidth: 150 }}>{file.company?.name}</TableCell>
+          <TableCell style={{ minWidth: 150 }}>{file.appSystem?.name}</TableCell>
+          <TableCell style={{ minWidth: 100 }}>{file.producer?.name}</TableCell>
+          <TableCell style={{ minWidth: 100 }}>{file.consumer?.name}</TableCell>
+          <TableCell style={{ minWidth: 100 }}>{file.device?.name}</TableCell>
+          <TableCell style={{ minWidth: 100 }}>{file.device?.id}</TableCell>
+          <TableCell style={{ minWidth: 100 }}>
+            {new Date(file.date || '').toLocaleString('ru', { hour12: false })}
+          </TableCell>
+          <TableCell style={{ minWidth: 100 }}>{Math.ceil(file.size).toString()} кб</TableCell>
         </TableRow>
       );
     });
@@ -250,16 +253,16 @@ const FileListTable = ({
                     onChange={handleSelectAll}
                   />
                 </TableCell>
-                <TableCell>Путь</TableCell>
-                <TableCell>Название</TableCell>
-                <TableCell>Компания</TableCell>
-                <TableCell>Подсистема</TableCell>
-                <TableCell>Пользователь</TableCell>
-                <TableCell>Получатель</TableCell>
-                <TableCell>Устройство</TableCell>
-                <TableCell>Идентификатор</TableCell>
-                <TableCell>Дата</TableCell>
-                <TableCell>Размер</TableCell>
+                <TableCell style={{ minWidth: 150 }}>Путь</TableCell>
+                <TableCell style={{ minWidth: 500 }}>Название</TableCell>
+                <TableCell style={{ minWidth: 150 }}>Компания</TableCell>
+                <TableCell style={{ minWidth: 150 }}>Подсистема</TableCell>
+                <TableCell style={{ minWidth: 100 }}>Пользователь</TableCell>
+                <TableCell style={{ minWidth: 100 }}>Получатель</TableCell>
+                <TableCell style={{ minWidth: 100 }}>Устройство</TableCell>
+                <TableCell style={{ minWidth: 100 }}>Идентификатор</TableCell>
+                <TableCell style={{ minWidth: 100 }}>Дата</TableCell>
+                <TableCell style={{ minWidth: 100 }}>Размер</TableCell>
               </TableRow>
               {isFilterVisible ? (
                 <TableRow>

@@ -80,9 +80,9 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
 
   const device = devices.data.find((el: any) => el.uid === deviceUid);
 
-  if (!device) {
+  /*if (!device) {
     log.error(`Устройство ${deviceUid}  не найдено`);
-  }
+  }*/
 
   const deviceId = device?.id;
   const deviceName = device?.name;
@@ -205,7 +205,10 @@ export const updateById = async <T>(id: string, fileData: Partial<Awaited<T>>): 
   }
 
   try {
-    return writeIterableToFile(fullName, JSON.stringify(fileData, undefined, 2));
+    return writeIterableToFile(fullName, JSON.stringify(fileData, undefined, 2), {
+      encoding: 'utf8',
+      flag: 'a',
+    });
   } catch (err) {
     log.error(`Ошибка редактирования файла ${fullName}  - ${err}`);
   }
