@@ -410,7 +410,6 @@ export const useSync = (onSync?: () => Promise<any>) => {
                     `Документы ${readyDocs.map((doc) => doc.number).join(', ')} отправлены, но статус не обновлен`,
                     tempErrs,
                   );
-                  // withError = true;
                 }
               } else {
                 addError(
@@ -504,7 +503,6 @@ export const useSync = (onSync?: () => Promise<any>) => {
                     `Запрос на получение справочников не отправлен: ${sendMesRefResponse.message}`,
                     tempErrs,
                   );
-                  // withError = true;
                 }
               }
 
@@ -616,6 +614,8 @@ export const useSync = (onSync?: () => Promise<any>) => {
 
     if (!connectError) {
       saveErrors(tempErrs);
+    } else if (tempErrs.length) {
+      dispatch(appActions.addErrors(tempErrs));
     }
 
     if (tempErrs.length) {

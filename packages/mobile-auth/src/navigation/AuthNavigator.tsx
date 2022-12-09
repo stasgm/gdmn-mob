@@ -28,6 +28,7 @@ const AuthNavigator = () => {
   const { config, isDemo, isInit, user, isConfigFirst, connectionStatus, isLogout } = useSelector(
     (state) => state.auth,
   );
+    console.log('user', user);
 
   const authDispatch = useAuthThunkDispatch();
   // const appRequest = useMemo(() => mobileRequest(authDispatch, authActions), [authDispatch]);

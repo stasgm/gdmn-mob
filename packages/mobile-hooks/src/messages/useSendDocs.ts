@@ -67,11 +67,12 @@ export const useSendDocs = (readyDocs: IDocument[]) => {
       );
     } else {
       addRequestNotice('Проверка статуса устройства');
+
       const statusRespone = await api.auth.getDeviceStatus(appRequest, deviceId);
       if (statusRespone.type !== 'GET_DEVICE_STATUS') {
         addError(
           'useSendDocs: getDeviceStatus',
-          'Запрос на получение справочников не отправлен, так как статус устройства не получен',
+          `Ошибка ${statusRespone.type === 'CONNECT_ERROR' ? ' подключения к серверу' : ''}: ${statusRespone.message}`,
           tempErrs,
         );
         connectError = statusRespone.type === 'CONNECT_ERROR';
@@ -127,6 +128,8 @@ export const useSendDocs = (readyDocs: IDocument[]) => {
 
     if (!connectError) {
       saveErrors(tempErrs);
+    } else if (tempErrs.length) {
+      dispatch(appActions.addErrors(tempErrs));
     }
 
     dispatch(appActions.setLoading(false));

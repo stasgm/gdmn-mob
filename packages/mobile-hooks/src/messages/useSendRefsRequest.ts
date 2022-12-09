@@ -61,7 +61,7 @@ export const useSendRefsRequest = () => {
       if (statusRespone.type !== 'GET_DEVICE_STATUS') {
         addError(
           'useSendRefsRequest: getDeviceStatus',
-          `Статус устройства не получен: ${statusRespone.message}`,
+          `Ошибка ${statusRespone.type === 'CONNECT_ERROR' ? ' подключения к серверу' : ''}: ${statusRespone.message}`,
           tempErrs,
         );
         connectError = statusRespone.type === 'CONNECT_ERROR';
@@ -107,6 +107,8 @@ export const useSendRefsRequest = () => {
 
     if (!connectError) {
       saveErrors(tempErrs);
+    } else if (tempErrs.length) {
+      dispatch(appActions.addErrors(tempErrs));
     }
 
     dispatch(appActions.setLoading(false));

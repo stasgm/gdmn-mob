@@ -128,7 +128,7 @@ class DeviceBinding extends BaseRequest {
     if (res?.result) {
       return {
         type: 'GET_DEVICEBINDING',
-        deviceBinding: res?.data,
+        deviceBinding: res.data,
       } as types.IGetDeviceBindingResponse;
     }
 
