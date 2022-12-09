@@ -42,7 +42,9 @@ export const saveDeviceLogFile = async (
 ): Promise<void> => {
   try {
     const fileName = getDeviceLogFullFileName(pathParams, fileInfo);
-    const oldDeviceLog: IDeviceLog[] | string = await readJsonFile(fileName);
+    const check = await checkFileExists(fileName);
+
+    const oldDeviceLog: IDeviceLog[] | string = check ? await readJsonFile(fileName) : [];
     if (typeof oldDeviceLog === 'string') {
       log.error(oldDeviceLog);
       return;
@@ -52,7 +54,10 @@ export const saveDeviceLogFile = async (
 
     if (delta > 0) oldDeviceLog.splice(0, delta);
 
-    return writeIterableToFile(fileName, JSON.stringify([...oldDeviceLog, ...newDeviceLog], undefined, 2));
+    return writeIterableToFile(fileName, JSON.stringify([...oldDeviceLog, ...newDeviceLog], undefined, 2), {
+      encoding: 'utf8',
+      flag: 'a',
+    });
   } catch (err) {
     log.error(`Ошибка записи журнала ошибок устройства с uid=${fileInfo.deviceId} в файл - ${err}`);
   }
