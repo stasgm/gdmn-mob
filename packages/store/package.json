@@ -23,8 +23,8 @@
   "prettier": "@config/prettier-config",
   "dependencies": {
     "@lib/client-api": "*",
-    "@lib/client-types": "*",
     "@lib/client-config": "*",
+    "@lib/client-types": "*",
     "@lib/mock": "*",
     "@lib/types": "*",
     "@redux-devtools/extension": "^3.2.3",
@@ -41,6 +41,6 @@
     "@config/eslint-config": "*",
     "@config/prettier-config": "*",
     "lint-staged": "^13.0.3",
-    "typescript": "^4.9.0"
+    "typescript": "^4.8.4"
   }
 }
