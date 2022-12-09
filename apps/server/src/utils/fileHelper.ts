@@ -84,8 +84,8 @@ export const readJsonFile = async <T>(fileName: string): Promise<T | string> => 
 
 const finishedPromisify = promisify(finished);
 
-export const writeIterableToFile = async (filename: string, iterable: string): Promise<void> => {
-  const writable = createWriteStream(filename, { encoding: 'utf8' });
+export const writeIterableToFile = async (filename: string, iterable: string, options?: any): Promise<void> => {
+  const writable = createWriteStream(filename, options);
   for await (const chunk of iterable) {
     if (!writable.write(chunk)) {
       await once(writable, 'drain');
