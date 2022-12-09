@@ -76,28 +76,31 @@ const ProfileScreen = () => {
   };
 
   const handleClearAll = () => {
-    Alert.alert('Вы уверены, что хотите удалить все данные?', 'После удаления данные не подлежат восстановлению.', [
-      {
-        text: 'Да',
-        onPress: () => {
-          authDispatch(authActions.setUserSettings({}));
-          docDispatch(documentActions.init());
-          dispatch(referenceActions.init());
-          dispatch(appActions.init());
-          settingsDispatch(settingsActions.init());
-          authDispatch(authActions.init());
+    Alert.alert(
+      'Вы уверены, что хотите выйти и удалить все данные?',
+      'После удаления данные не подлежат восстановлению.',
+      [
+        {
+          text: 'Да',
+          onPress: () => {
+            docDispatch(documentActions.init());
+            dispatch(referenceActions.init());
+            dispatch(appActions.init());
+            settingsDispatch(settingsActions.init());
+            authDispatch(authActions.init());
+          },
         },
-      },
-      {
-        text: 'Отмена',
-      },
-    ]);
+        {
+          text: 'Отмена',
+        },
+      ],
+    );
   };
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
-        title: 'Удалить все данные',
+        title: 'Выйти и удалить все данные',
         type: 'destructive',
         onPress: handleClearAll,
       },
