@@ -119,12 +119,12 @@ class DeviceLog extends BaseRequest {
 
       return {
         type: 'ERROR',
-        message: resData.error || 'ошибка получения данных об журнале ошібок',
+        message: resData.error || 'ошибка получения данных о журнале ошибок устройств',
       } as error.INetworkError;
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка получения данных о журнале ошибок устройства',
+        message: err instanceof TypeError ? err.message : 'ошибка получения данных о журнале ошибок устройств',
       } as error.INetworkError;
     }
   };
