@@ -8,11 +8,10 @@ import { IDeviceLogFiles } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import actions from '../../store/device';
 import { IHeadCells, IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
-import fileSystemActions from '../../store/file';
+import actions from '../../store/file';
 import FileListTable from '../../components/file/FileListTable';
 
 const FileList = () => {
@@ -22,7 +21,7 @@ const FileList = () => {
 
   const fetchFiles = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(fileSystemActions.fetchFiles());
+      dispatch(actions.fetchFiles());
     },
     [dispatch],
   );
@@ -31,6 +30,8 @@ const FileList = () => {
     // Загружаем данные при загрузке компонента.
     fetchFiles(pageParams?.filterText as string);
   }, [fetchFiles, pageParams?.filterText]);
+
+  const sortedList = list.sort((a, b) => (a.path < b.path ? -1 : 1));
 
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
@@ -47,7 +48,7 @@ const FileList = () => {
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.deviceActions.setPageParam({ filterText: pageParamLocal?.filterText }));
+    dispatch(actions.fileSystemActions.setPageParam({ filterText: pageParamLocal?.filterText }));
     fetchFiles(pageParamLocal?.filterText as string);
   };
 
@@ -60,7 +61,7 @@ const FileList = () => {
   };
 
   const handleClearError = () => {
-    dispatch(actions.deviceActions.clearError());
+    dispatch(actions.fileSystemActions.clearError());
   };
 
   const buttons: IToolBarButton[] = [
@@ -114,7 +115,7 @@ const FileList = () => {
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <FileListTable files={list} isFilterVisible={filterVisible} onSubmit={fetchFiles} />
+              <FileListTable files={sortedList} isFilterVisible={filterVisible} onSubmit={fetchFiles} />
             </Box>
             // <Box sx={{ pt: 2 }}>
             //   <SortableFilterTable<IDeviceLogFiles>

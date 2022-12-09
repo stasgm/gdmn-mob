@@ -6,7 +6,6 @@ import { useCallback, useEffect } from 'react';
 import FileDetails from '../../components/file/FileDetails';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import fileActions from '../../store/file';
-import selectors from '../../store/appSystem/selectors';
 import SnackBar from '../../components/SnackBar';
 
 export type Params = {
