@@ -59,13 +59,13 @@ const Dashboard = () => {
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Grid container spacing={3}>
-              <Grid item lg={3} sm={6} xl={3} xs={12}>
+              <Grid item lg={4} sm={6} xl={3} xs={12}>
                 <TotalCompanies value={companies.length} />
               </Grid>
-              <Grid item lg={3} sm={6} xl={3} xs={12}>
+              <Grid item lg={4} sm={6} xl={3} xs={12}>
                 <TotalUsers value={users.length} />
               </Grid>
-              <Grid item lg={3} sm={6} xl={3} xs={12}>
+              <Grid item lg={4} sm={6} xl={3} xs={12}>
                 <TotalDevices value={devices.length} />
               </Grid>
             </Grid>

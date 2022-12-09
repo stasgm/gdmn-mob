@@ -167,7 +167,7 @@ export const ScanEditScreen = () => {
     setShowDate(false);
 
     if (selectedDate) {
-      dispatch(appActions.setFormParams({ documentDate: selectedDate.toISOString().slice(0, 10) }));
+      dispatch(appActions.setFormParams({ documentDate: selectedDate.toISOString() }));
     }
   };
 

@@ -82,12 +82,7 @@ const ProfileScreen = () => {
         {
           text: 'Да',
           onPress: () => {
-            // dispatch(documentActions.init());
-            // dispatch(referenceActions.init());
-            // dispatch(settingsActions.init());
-            // dispatch(appActions.init());
             dispatch(appActions.clearSuperDataFromDisc());
-            // dispatch(authActions.init());
             dispatch(authActions.setInit(true));
           },
         },

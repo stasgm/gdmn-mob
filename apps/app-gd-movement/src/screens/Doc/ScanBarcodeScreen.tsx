@@ -79,6 +79,7 @@ const ScanBarcodeScreen = () => {
       if (!brc) {
         return;
       }
+
       let charFrom = 0;
       let charTo = weightSettingsWeightCode.data.length;
 
@@ -88,6 +89,7 @@ const ScanBarcodeScreen = () => {
         // Находим товар из модели остатков по баркоду, если баркод не найден, то
         //   если выбор из остатков, то undefined,
         //   иначе подставляем unknownGood cо сканированным шк и добавляем в позицию документа
+
         if (!remItem) {
           setScaner({ state: 'error', message: 'Товар не найден' });
           return;

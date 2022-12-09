@@ -9,8 +9,8 @@ import {
   Users as UsersIcon,
   List as ProcessIcon,
   Server as AppSystemsIcon,
-  MessageCircle as MessageIcon,
   File as FileIcon,
+  AlertCircle as AlertIcon,
 } from 'react-feather';
 
 import { useSelector } from '@lib/store';
@@ -76,7 +76,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
           },
           {
             href: `${adminPath}/app/deviceLogs`,
-            icon: MessageIcon,
+            icon: AlertIcon,
             title: 'Журнал ошибок',
           },
           {
