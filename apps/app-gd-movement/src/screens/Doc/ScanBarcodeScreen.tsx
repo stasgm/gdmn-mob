@@ -38,6 +38,7 @@ const ScanBarcodeScreen = () => {
   const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>).data || 0;
   const weightSettingsCountWeight = (settings.countWeight as ISettingsOption<number>).data || 0;
   const isScanerReader = settings.scannerUse?.data;
+  const isInputQuantity = settings.quantityInput?.data;
 
   const [scaner, setScaner] = useState<IScannedObject>({ state: 'init' });
   const [scannedObject, setScannedObject] = useState<IMovementLine>();
@@ -98,7 +99,7 @@ const ScanBarcodeScreen = () => {
         setScannedObject({
           good: { id: remItem.good.id, name: remItem.good.name },
           id: generateId(),
-          quantity: 1,
+          quantity: isInputQuantity ? 0 : 1,
           price: remItem.remains?.length ? remItem.remains[0].price : 0,
           buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
@@ -141,6 +142,7 @@ const ScanBarcodeScreen = () => {
     [
       documentType?.isRemains,
       goodRemains,
+      isInputQuantity,
       weightSettingsCountCode,
       weightSettingsCountWeight,
       weightSettingsWeightCode.data,

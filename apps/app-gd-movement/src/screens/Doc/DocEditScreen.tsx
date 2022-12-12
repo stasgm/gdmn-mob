@@ -262,6 +262,7 @@ export const DocEditScreen = () => {
       refName: docFromContactType.id,
       fieldName: 'fromContact',
       value: docFromContact && [docFromContact],
+      descrFieldName: 'taxId',
     });
   };
 
@@ -281,6 +282,7 @@ export const DocEditScreen = () => {
       refName: docToContactType.id,
       fieldName: 'toContact',
       value: docToContact && [docToContact],
+      descrFieldName: 'taxId',
     });
   };
 

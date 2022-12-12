@@ -94,6 +94,7 @@ export const SelectRemainsScreen = () => {
           : ({ good }: IRemGood) =>
               good.barcode?.includes(searchQuery) ||
               good.name?.toLowerCase().includes(lower) ||
+              good.weightCode?.toLowerCase().includes(lower) ||
               good.alias?.toLowerCase().includes(lower);
 
         let gr;
@@ -266,9 +267,7 @@ export const SelectRemainsScreen = () => {
               <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
             </View>
             <View style={styles.details}>
-              <LargeText style={styles.textBold}>
-                {item.good.alias ? `${item.good.name}, арт. ${item.good.alias}` : item.good.name}
-              </LargeText>
+              <LargeText style={styles.textBold}>{item.good.name}</LargeText>
               <View style={styles.directionRow}>
                 <MediumText>
                   {item.remains} {item.good.valueName} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)}{' '}
@@ -278,6 +277,16 @@ export const SelectRemainsScreen = () => {
                   <MediumText style={[styles.number, styles.flexDirectionRow]}>{item.good.barcode}</MediumText>
                 )}
               </View>
+
+              {item.good.alias && item.good.weightCode ? (
+                <MediumText style={[styles.number, styles.flexDirectionRow]}>
+                  арт. {item.good.alias}, вес. код {item.good.weightCode}
+                </MediumText>
+              ) : item.good.alias ? (
+                <MediumText style={styles.number}>арт. {item.good.alias}</MediumText>
+              ) : item.good.weightCode ? (
+                <MediumText style={styles.number}>вес. код {item.good.weightCode}</MediumText>
+              ) : null}
               {isAdded && (
                 <View style={localStyles.lineView}>
                   {lines.map((line) => (
