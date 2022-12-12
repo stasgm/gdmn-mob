@@ -68,9 +68,7 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
 
     case getType(appActions.clearErrors): {
       if (action.payload === 'old') {
-        const sentLog = state.errorLog
-          .filter((i) => i.isSent)
-          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        const sentLog = state.errorLog.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
         const c = sentLog.length - LOG_MAX_LINES;
         return {
           ...state,
