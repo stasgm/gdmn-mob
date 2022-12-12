@@ -67,7 +67,7 @@ const DeviceLogFilesListTable = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFilterVisible]);
 
-  const filtered = useMemo(() => {
+  const filteredList = useMemo(() => {
     if (
       formik.values.appSystem ||
       formik.values.company ||
@@ -167,7 +167,7 @@ const DeviceLogFilesListTable = ({
   }, [limitRows, selectedDeviceLogFileIds.length, selectedDeviceLogFiles]);
 
   const TableRows = () => {
-    const deviceLogFileList = filtered
+    const deviceLogFileList = filteredList
       .slice(page * limit, page * limit + limit)
       .map((deviceLogFile: IDeviceLogFiles) => {
         return (
@@ -202,7 +202,7 @@ const DeviceLogFilesListTable = ({
         );
       });
 
-    const emptyRows = limit - Math.min(limit, deviceLogFiles.length - page * limit);
+    const emptyRows = limit - Math.min(limit, filteredList.length - page * limit);
 
     return (
       <>
@@ -225,10 +225,10 @@ const DeviceLogFilesListTable = ({
               <TableRow>
                 <TableCell padding="checkbox">
                   <Checkbox
-                    checked={selectedDeviceLogFileIds.length === deviceLogFiles.length}
+                    checked={selectedDeviceLogFileIds.length === filteredList.length}
                     color="primary"
                     indeterminate={
-                      selectedDeviceLogFileIds.length > 0 && selectedDeviceLogFileIds.length < deviceLogFiles.length
+                      selectedDeviceLogFileIds.length > 0 && selectedDeviceLogFileIds.length < filteredList.length
                     }
                     onChange={handleSelectAll}
                   />
@@ -279,7 +279,7 @@ const DeviceLogFilesListTable = ({
       </PerfectScrollbar>
       <TablePagination
         component="div"
-        count={deviceLogFiles.length}
+        count={filteredList.length}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleLimitChange}
         page={page}
