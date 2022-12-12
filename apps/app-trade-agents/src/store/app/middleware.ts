@@ -7,6 +7,8 @@
 import { appActions, PersistedMiddleware } from '@lib/store';
 import { getType } from 'typesafe-actions';
 
+import { geoActions } from '../geo/actions';
+
 import { actions } from './actions';
 
 import { initialState } from './reducer';
@@ -40,8 +42,14 @@ export const appTradeMiddlewareFactory: PersistedMiddleware =
         });
     }
 
+    if (action.type === getType(appActions.clearSuperDataFromDisc)) {
+      store.dispatch(actions.init());
+      store.dispatch(geoActions.init());
+    }
+
     if (store.getState().auth.user?.id) {
       switch (action.type) {
+        case getType(actions.init):
         case getType(actions.setGoodModelAsync.success): {
           const result = next(action);
 

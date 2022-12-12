@@ -40,5 +40,9 @@ export const appMovMiddlewareFactory: PersistedMiddleware =
         });
     }
 
+    if (action.type === getType(appActions.clearSuperDataFromDisc)) {
+      store.dispatch(appActions.init());
+    }
+
     return next(action);
   };

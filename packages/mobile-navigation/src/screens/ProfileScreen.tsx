@@ -40,7 +40,6 @@ const ProfileScreen = () => {
 
   const dispatch = useDispatch();
   const authDispatch = useAuthThunkDispatch();
-  const docDispatch = useDocThunkDispatch();
   const settingsDispatch = useSettingThunkDispatch();
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
@@ -83,11 +82,8 @@ const ProfileScreen = () => {
         {
           text: 'Да',
           onPress: () => {
-            docDispatch(documentActions.init());
-            dispatch(referenceActions.init());
-            dispatch(appActions.init());
-            settingsDispatch(settingsActions.init());
-            authDispatch(authActions.init());
+            dispatch(appActions.clearSuperDataFromDisc());
+            dispatch(authActions.setInit(true));
           },
         },
         {
