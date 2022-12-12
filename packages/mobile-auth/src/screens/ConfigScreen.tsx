@@ -162,9 +162,6 @@ const ConfigScreen = (props: Props) => {
           </View>
         </Dialog.Content>
         <Dialog.Actions style={{ borderColor: colors.primary }}>
-          <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={handleVisibleFalse}>
-            Отмена
-          </Button>
           <Button
             labelStyle={{ color: colors.primary }}
             color={colors.primary}
@@ -174,6 +171,9 @@ const ConfigScreen = (props: Props) => {
             }}
           >
             Ок
+          </Button>
+          <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={handleVisibleFalse}>
+            Отмена
           </Button>
         </Dialog.Actions>
       </Dialog>
