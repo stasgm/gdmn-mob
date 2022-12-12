@@ -44,7 +44,7 @@ class ActivationCode extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'данные об активационных кодах не получены',
+      message: res?.error || 'Данные об активационных кодах не получены',
     } as error.IServerError;
   };
 
@@ -86,7 +86,7 @@ class ActivationCode extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'код активации не создан',
+      message: res?.error || 'Код активации не создан',
     } as error.IServerError;
   };
 }

@@ -126,7 +126,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
               if (removeMess.type !== 'REMOVE_MESSAGE') {
                 addError(
                   'useSync: api.message.removeMessage',
-                  `Справочники загружены, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
+                  `Справочники загружены, но сообщение справочников с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
                   tempErrs,
                 );
               }
@@ -143,7 +143,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
               if (removeMess.type !== 'REMOVE_MESSAGE') {
                 addError(
                   'useSync: removeMessage',
-                  `Справочники добавлены, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
+                  `Справочники добавлены, но сообщение справочников с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
                   tempErrs,
                 );
               }
@@ -181,7 +181,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
               if (removeMess.type !== 'REMOVE_MESSAGE') {
                 addError(
                   'useSync: removeMessage',
-                  `Справочник ${refName} загружен, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
+                  `Справочник ${refName} загружен, но сообщение справочника с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
                   tempErrs,
                 );
               }
@@ -210,7 +210,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
             if (removeMess.type !== 'REMOVE_MESSAGE') {
               addError(
                 'useSync: api.message.removeMessage',
-                `Документы загружены, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
+                `Документы загружены, но сообщение документов с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
                 tempErrs,
               );
             }
@@ -219,20 +219,19 @@ export const useSync = (onSync?: () => Promise<any>) => {
           const loadDocs = msg.body.payload as IDocument[];
 
           if (!loadDocs.length) {
-            removeMes();
+            await removeMes();
+          } else {
+            addRequestNotice(`Сохранение документов (${loadDocs.length})`);
+
+            const setDocResponse = await docDispatch(documentActions.setDocuments(loadDocs));
+
+            //Если удачно сохранились документы, удаляем сообщение в json
+            if (setDocResponse.type === 'DOCUMENTS/SET_ALL_SUCCESS') {
+              await removeMes();
+            } else if (setDocResponse.type === 'DOCUMENTS/SET_ALL_FAILURE') {
+              addError('useSync: setDocuments', 'Документы не загружены в хранилище', tempErrs);
+            }
           }
-
-          addRequestNotice(`Сохранение документов (${loadDocs.length})`);
-
-          const setDocResponse = await docDispatch(documentActions.setDocuments(loadDocs));
-
-          //Если удачно сохранились документы, удаляем сообщение в json
-          if (setDocResponse.type === 'DOCUMENTS/SET_ALL_SUCCESS') {
-            removeMes();
-          } else if (setDocResponse.type === 'DOCUMENTS/SET_ALL_FAILURE') {
-            addError('useSync: setDocuments', 'Документы не загружены в хранилище', tempErrs);
-          }
-
           break;
         }
 
@@ -260,7 +259,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
             if (removeMess.type !== 'REMOVE_MESSAGE') {
               addError(
                 'useSync: api.message.removeMessage',
-                `Настройки пользователя загружены, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
+                `Настройки пользователя загружены, но сообщение настроек пользователя с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
                 tempErrs,
               );
             }
@@ -304,7 +303,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
             if (removeMess.type !== 'REMOVE_MESSAGE') {
               addError(
                 'useSync: api.message.removeMessage',
-                `Настройки приложения загружены, но сообщение с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
+                `Настройки приложения загружены, но сообщение настроек подсистемы с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
                 tempErrs,
               );
             }
@@ -617,6 +616,9 @@ export const useSync = (onSync?: () => Promise<any>) => {
       addError('useSync', `Проблемы с передачей данных ${err}`, tempErrs);
     }
 
+    console.log('tempErrs', tempErrs, tempErrs.length);
+
+    //Если не ошибка сети при проверке статуса устройства, то
     if (!connectError) {
       saveErrors(tempErrs);
     } else if (tempErrs.length) {

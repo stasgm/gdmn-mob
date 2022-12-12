@@ -12,6 +12,7 @@ import { authActions, useAuthThunkDispatch, useSelector } from '@lib/store';
 import Logo from '../components/Logo';
 
 import { adminPath } from '../utils/constants';
+import { webRequest } from '../store/webRequest';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ const Register = () => {
   const dispatch = useAuthThunkDispatch();
 
   const handleSubmit = async (values: IUserCredentials) => {
-    const res = await dispatch(authActions.signup(values));
+    const res = await dispatch(authActions.signup(webRequest(dispatch, authActions), values));
 
     if (res.type === 'AUTH/SIGNUP_SUCCESS') {
       navigate(`${adminPath}/login`);

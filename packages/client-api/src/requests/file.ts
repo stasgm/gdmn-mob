@@ -4,60 +4,16 @@ import { error, file as types } from '../types';
 import { getParams, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
+import { CustomRequest } from '../robustRequest';
 
 class File extends BaseRequest {
   constructor(api: BaseApi) {
     super(api);
   }
 
-  // addFile = async (companyId: string, appSystemId: string, file: IDeviceLog[]) => {
-  //   if (this.api.config.debug?.isMock) {
-  //     await sleep(this.api.config.debug?.mockDelay || 0);
-
-  //     return {
-  //       type: 'ADD_FILE',
-  //     } as types.IAddFileResponse;
-  //   }
-
-  //   try {
-  //     const body: IDeviceLogParams = {
-  //       companyId,
-  //       appSystemId,
-  //       deviceLog: file,
-  //     };
-  //     const res = await this.api.axios.post<IResponse<void>>('/files/', body);
-  //     const resData = res.data;
-
-  //     if (resData.result) {
-  //       return {
-  //         type: 'ADD_FILE',
-  //       } as types.IAddFileResponse;
-  //     }
-
-  //     return {
-  //       type: 'ERROR',
-  //       message: resData.error,
-  //     } as error.IServerError;
-  //   } catch (err) {
-  //     return {
-  //       type: 'ERROR',
-  //       message: err instanceof TypeError ? err.message : 'ошибка сохранения файла',
-  //     } as error.IServerError;
-  //   }
-  // };
-
-  getFile = async (fileId: string) => {
+  getFile = async (customRequest: CustomRequest, fileId: string) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
-
-      // const file = mocFiles.find((item) => item.id === fileId);
-
-      // if (file) {
-      //   return {
-      //     type: 'GET_FILE',
-      //     file,
-      //   } as types.IGetFileResponse;
-      // }
 
       return {
         type: 'ERROR',
@@ -65,30 +21,26 @@ class File extends BaseRequest {
       } as error.IServerError;
     }
 
-    try {
-      const res = await this.api.axios.get<IResponse<any>>(`/files/${fileId}`);
-      const resData = res.data;
+    const res = await customRequest<any>({
+      api: this.api.axios,
+      method: 'GET',
+      url: `/files/${fileId}`,
+    });
 
-      if (resData.result) {
-        return {
-          type: 'GET_FILE',
-          file: resData?.data,
-        } as types.IGetFileResponse;
-      }
-
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.IServerError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка получения данных о файле',
-      } as error.IServerError;
+        type: 'GET_FILE',
+        file: res?.data,
+      } as types.IGetFileResponse;
     }
+
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'Данные файла не получены',
+    } as error.IServerError;
   };
 
-  getFiles = async (params?: Record<string, string | number>) => {
+  getFiles = async (customRequest: CustomRequest, params?: Record<string, string | number>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -98,71 +50,48 @@ class File extends BaseRequest {
       } as types.IGetFilesResponse;
     }
 
-    let paramText = params ? getParams(params) : '';
+    const res = await customRequest<IFileSystem[]>({
+      api: this.api.axios,
+      method: 'GET',
+      url: '/files',
+      params,
+    });
 
-    if (paramText > '') {
-      paramText = `?${paramText}`;
+    if (res?.result) {
+      return {
+        type: 'GET_FILES',
+        files: res?.data || [],
+      } as types.IGetFilesResponse;
     }
 
-    try {
-      const res = await this.api.axios.get<IResponse<IFileSystem[]>>(`/files${paramText}`);
-
-      ///${this.api.config.version}
-      const resData = res.data;
-
-      if (resData.result) {
-        return {
-          type: 'GET_FILES',
-          files: resData?.data || [],
-        } as types.IGetFilesResponse;
-      }
-
-      return {
-        type: 'ERROR',
-        message: resData.error || 'ошибка получения данных о файлах',
-      } as error.IServerError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка получения данных о файлах',
-      } as error.IServerError;
-    }
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'Данные о файле не получены',
+    } as error.IServerError;
   };
 
-  updateFile = async (id: string, file: Partial<any>) => {
-    // if (this.api.config.debug?.isMock) {
-    //   await sleep(this.api.config.debug?.mockDelay || 0);
+  updateFile = async (customRequest: CustomRequest, id: string, file: Partial<any>) => {
+    const res = await customRequest<any>({
+      api: this.api.axios,
+      method: 'PATCH',
+      url: `/files/${id}`,
+      data: file,
+    });
 
-    //   return {
-    //     type: 'UPDATE_FILE',
-    //     file: { ...file, editionDate: new Date().toISOString() },
-    //   } as types.IUpdateFileResponse;
-    // }
-
-    try {
-      const res = await this.api.axios.patch<IResponse<any>>(`/files/${id}`, file);
-      const resData = res.data;
-
-      if (resData.result) {
-        return {
-          type: 'UPDATE_FILE',
-          file: resData.data,
-        } as types.IUpdateFileResponse;
-      }
-
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.IServerError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка обновления файла',
-      } as error.IServerError;
+        type: 'UPDATE_FILE',
+        file: res.data,
+      } as types.IUpdateFileResponse;
     }
+
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'Данные файла не обновлены',
+    } as error.IServerError;
   };
 
-  removeFile = async (fileId: string) => {
+  removeFile = async (customRequest: CustomRequest, fileId: string) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -171,26 +100,22 @@ class File extends BaseRequest {
       } as types.IRemoveFileResponse;
     }
 
-    try {
-      const res = await this.api.axios.delete<IResponse<void>>(`/files/${fileId}`);
-      const resData = res.data;
+    const res = await customRequest<void>({
+      api: this.api.axios,
+      method: 'DELETE',
+      url: `/files/${fileId}`,
+    });
 
-      if (resData.result) {
-        return {
-          type: 'REMOVE_FILE',
-        } as types.IRemoveFileResponse;
-      }
-
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.IServerError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка удаления файла',
-      } as error.IServerError;
+        type: 'REMOVE_FILE',
+      } as types.IRemoveFileResponse;
     }
+
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'Файл не удален',
+    } as error.IServerError;
   };
 }
 export default File;

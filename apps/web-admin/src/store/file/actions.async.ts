@@ -1,7 +1,11 @@
 import { ThunkAction } from 'redux-thunk';
 import api from '@lib/client-api';
 
+import { authActions } from '@lib/store';
+
 import { AppState } from '..';
+
+import { webRequest } from '../webRequest';
 
 import { fileSystemActions, FileSystemActionType } from './actions';
 
@@ -11,13 +15,7 @@ const fetchFiles = (): AppThunk => {
   return async (dispatch) => {
     dispatch(fileSystemActions.fetchFilesAsync.request(''));
 
-    const params: Record<string, string | number> = {};
-
-    // if (filterText) params.filterText = filterText;
-    // if (fromRecord) params.fromRecord = fromRecord;
-    // if (toRecord) params.toRecord = toRecord;
-
-    const response = await api.file.getFiles(params);
+    const response = await api.file.getFiles(webRequest(dispatch, authActions));
 
     if (response.type === 'GET_FILES') {
       return dispatch(fileSystemActions.fetchFilesAsync.success(response.files));
@@ -35,17 +33,13 @@ const fetchFile = (id: string): AppThunk => {
   return async (dispatch) => {
     dispatch(fileSystemActions.fetchFileAsync.request(''));
 
-    const response = await api.file.getFile(id);
+    const response = await api.file.getFile(webRequest(dispatch, authActions), id);
 
     if (response.type === 'GET_FILE') {
       return dispatch(fileSystemActions.fetchFileAsync.success(response.file));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(fileSystemActions.fetchFileAsync.failure(response.message));
-    }
-
-    return dispatch(fileSystemActions.fetchFileAsync.failure('Ошибка получения данных о файле'));
+    return dispatch(fileSystemActions.fetchFileAsync.failure(response.message));
   };
 };
 
@@ -53,17 +47,13 @@ const updateFile = (id: string, file: any): AppThunk => {
   return async (dispatch) => {
     dispatch(fileSystemActions.updateFileAsync.request('Обновление файла'));
 
-    const response = await api.file.updateFile(id, file);
+    const response = await api.file.updateFile(webRequest(dispatch, authActions), id, file);
 
     if (response.type === 'UPDATE_FILE') {
       return dispatch(fileSystemActions.updateFileAsync.success(response.file));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(fileSystemActions.updateFileAsync.failure(response.message));
-    }
-
-    return dispatch(fileSystemActions.updateFileAsync.failure('Ошибка обновления файла'));
+    return dispatch(fileSystemActions.updateFileAsync.failure(response.message));
   };
 };
 
@@ -71,17 +61,13 @@ const removeFile = (id: string): AppThunk => {
   return async (dispatch) => {
     dispatch(fileSystemActions.removeFileAsync.request(''));
 
-    const response = await api.file.removeFile(id);
+    const response = await api.file.removeFile(webRequest(dispatch, authActions), id);
 
     if (response.type === 'REMOVE_FILE') {
       return dispatch(fileSystemActions.removeFileAsync.success(id));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(fileSystemActions.removeFileAsync.failure(response.message));
-    }
-
-    return dispatch(fileSystemActions.removeFileAsync.failure('Ошибка получения данных о файле'));
+    return dispatch(fileSystemActions.removeFileAsync.failure(response.message));
   };
 };
 

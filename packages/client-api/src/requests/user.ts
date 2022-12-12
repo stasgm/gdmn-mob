@@ -86,7 +86,7 @@ class User extends BaseRequest {
     }
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'пользователь не обновлен',
+      message: res?.error || 'Пользователь не обновлен',
     } as error.IServerError;
   };
 
@@ -113,7 +113,7 @@ class User extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'пользователь не удален',
+      message: res?.error || 'Пользователь не удален',
     } as error.IServerError;
   };
 
@@ -131,7 +131,7 @@ class User extends BaseRequest {
 
       return {
         type: 'ERROR',
-        message: 'данные о пользователе не получены',
+        message: 'Данные о пользователе не получены',
       } as error.IServerError;
     }
 
@@ -146,7 +146,7 @@ class User extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'данные о пользователе не получены',
+      message: res?.error || 'Данные о пользователе не получены',
     } as error.IServerError;
   };
 
@@ -163,7 +163,7 @@ class User extends BaseRequest {
 
       return {
         type: 'ERROR',
-        message: 'данные о пользователях не получены',
+        message: 'Данные о пользователях не получены',
       } as error.IServerError;
     }
 
@@ -178,7 +178,7 @@ class User extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'данные о пользователях не получены',
+      message: res?.error || 'Данные о пользователях не получены',
     } as error.IServerError;
   };
 }

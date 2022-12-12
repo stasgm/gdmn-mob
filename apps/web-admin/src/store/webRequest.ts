@@ -10,7 +10,7 @@ export const webRequest =
       case 'OK': {
         //Если пришел ответ, что не пройдена авторизация
         if (res.response.data.status === 401) {
-          dispatch(actions.setErrorMessage(res.response.data.erlror || 'не пройдена авторизация'));
+          dispatch(actions.setErrorMessage('Не пройдена авторизация пользователя. Повторите вход в приложение'));
           dispatch(actions.logout());
         }
         return res.response.data as T;

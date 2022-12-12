@@ -43,7 +43,7 @@ class Auth extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'пользователь не создан',
+      message: res?.error || 'Пользователь не создан',
     } as error.IServerError;
   };
 
@@ -59,7 +59,7 @@ class Auth extends BaseRequest {
       }
       return {
         type: 'ERROR',
-        message: 'вход пользователя не выполнен',
+        message: 'Вход пользователя не выполнен',
       } as error.IServerError;
     }
 
@@ -84,7 +84,7 @@ class Auth extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'вход пользователя не выполнен',
+      message: res?.error || 'Вход пользователя не выполнен',
     } as error.IServerError;
   };
 
@@ -110,7 +110,7 @@ class Auth extends BaseRequest {
     }
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'выход из профиля не выполнен',
+      message: res?.error || 'Выход из профиля не выполнен',
     } as error.IServerError;
   };
 
@@ -124,7 +124,7 @@ class Auth extends BaseRequest {
     }
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'данные о пользователе не получены',
+      message: res?.error || 'Данные о пользователе не получены',
     } as error.IServerError;
   };
 
@@ -147,7 +147,7 @@ class Auth extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'невереный код активации',
+      message: res?.error || 'Невереный код активации',
     } as error.IServerError;
   };
 
@@ -176,7 +176,7 @@ class Auth extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'статус устройства не получен',
+      message: res?.error || 'Статус устройства не получен',
     } as error.IServerError;
   };
 }

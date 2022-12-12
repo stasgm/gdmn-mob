@@ -46,7 +46,7 @@ class DeviceLog extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'журнал ошибок устройства не отправлен',
+      message: res?.error || 'Журнал ошибок устройства не отправлен',
     } as error.IServerError;
   };
 
@@ -75,7 +75,7 @@ class DeviceLog extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'журнал ошибок не получен',
+      message: res?.error || 'Журнал ошибок не получен',
     } as error.IServerError;
   };
 
@@ -105,7 +105,7 @@ class DeviceLog extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'журналы ошибок не получены',
+      message: res?.error || 'Журналы ошибок не получены',
     } as error.IServerError;
   };
 
@@ -132,7 +132,7 @@ class DeviceLog extends BaseRequest {
 
     return {
       type: 'ERROR',
-      message: res?.error || 'журнал ошибок не удален',
+      message: res?.error || 'Журнал ошибок не удален',
     } as error.IServerError;
   };
 }

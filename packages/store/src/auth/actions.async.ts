@@ -26,9 +26,7 @@ const getDeviceByUid = (
 ): AppThunk<
   Promise<ActionType<typeof actions.getDeviceByUidAsync>>,
   AuthState,
-  | ActionType<typeof actions.getDeviceByUidAsync>
-  | ActionType<typeof actions.setAppSystem>
-  | ActionType<typeof appActions.loadSuperDataFromDisc>
+  ActionType<typeof actions.getDeviceByUidAsync> | ActionType<typeof actions.setAppSystem>
 > => {
   return async (dispatch) => {
     dispatch(actions.getDeviceByUidAsync.request(''));

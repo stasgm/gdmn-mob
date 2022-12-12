@@ -44,7 +44,7 @@ class AppSystem extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'подсистема не создана',
+      message: res?.error || 'Подсистема не создана',
     } as error.IServerError;
   };
 
@@ -74,7 +74,7 @@ class AppSystem extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'подсистема не обновлена',
+      message: res?.error || 'Подсистема не обновлена',
     } as error.IServerError;
   };
 
@@ -101,7 +101,7 @@ class AppSystem extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'подсистема не удалена',
+      message: res?.error || 'Подсистема не удалена',
     } as error.IServerError;
   };
 
@@ -120,7 +120,7 @@ class AppSystem extends BaseRequest {
 
       return {
         type: 'ERROR',
-        message: 'подсистема не найдена',
+        message: 'Подсистема не найдена',
       } as error.IServerError;
     }
 
@@ -139,7 +139,7 @@ class AppSystem extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'данные о подсистеме не получены',
+      message: res?.error || 'Данные о подсистеме не получены',
     } as error.IServerError;
   };
 
@@ -164,7 +164,7 @@ class AppSystem extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'данные о подсистемах не получены',
+      message: res?.error || 'Данные о подсистемах не получены',
     } as error.IServerError;
   };
 }

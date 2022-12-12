@@ -8,7 +8,7 @@ import { IUserCredentials } from '@lib/types';
 
 import { useEffect } from 'react';
 
-import { authActions, useSelector, useDispatch } from '@lib/store';
+import { authActions, useSelector, useDispatch, useAuthThunkDispatch } from '@lib/store';
 
 import Logo from '../components/Logo';
 
@@ -18,6 +18,7 @@ import { webRequest } from '../store/webRequest';
 
 const Login = () => {
   const dispatch = useDispatch();
+  const authDispatch = useAuthThunkDispatch();
 
   const { error, loading, status, errorMessage } = useSelector((state) => state.auth);
 
@@ -32,7 +33,7 @@ const Login = () => {
       password: yup.string().required('Заполните это поле'),
     }),
     onSubmit: (values: IUserCredentials) => {
-      dispatch(authActions.login(webRequest(dispatch, authActions), values));
+      authDispatch(authActions.login(webRequest(dispatch, authActions), values));
     },
   });
 

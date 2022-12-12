@@ -11,7 +11,7 @@ import TestServer from './test.router';
 import Process from './process.router';
 import AppSystem from './appSystem.router';
 import DeviceLog from './deviceLog.router';
-import File from './fille.router';
+import File from './file.router';
 
 const rootRouter = new Router();
 

@@ -42,7 +42,7 @@ class DeviceBinding extends BaseRequest {
     }
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'привязанное устройство не добавлено',
+      message: res?.error || 'Привязанное устройство не добавлено',
     } as error.IServerError;
   };
 
@@ -71,7 +71,7 @@ class DeviceBinding extends BaseRequest {
     }
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'привязанное устройство не обновлено',
+      message: res?.error || 'Привязанное устройство не обновлено',
     } as error.IServerError;
   };
 
@@ -97,7 +97,7 @@ class DeviceBinding extends BaseRequest {
     }
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'привязанное устройство не удалено',
+      message: res?.error || 'Привязанное устройство не удалено',
     } as error.IServerError;
   };
 
@@ -134,7 +134,7 @@ class DeviceBinding extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'связанное устройство не получено',
+      message: res?.error || 'Связанное устройство не получено',
     } as error.IServerError;
   };
 
@@ -173,7 +173,7 @@ class DeviceBinding extends BaseRequest {
     }
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'данныe об устройствах не получены',
+      message: res?.error || 'Данныe об устройствах не получены',
     };
   };
 }

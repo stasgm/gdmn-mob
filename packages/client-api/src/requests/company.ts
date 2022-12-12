@@ -44,7 +44,7 @@ class Company extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'компания не создана',
+      message: res?.error || 'Компания не создана',
     } as error.IServerError;
   };
 
@@ -83,7 +83,7 @@ class Company extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'компания не обновлена',
+      message: res?.error || 'Компания не обновлена',
     } as error.IServerError;
   };
 
@@ -110,7 +110,7 @@ class Company extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'компания не удалена',
+      message: res?.error || 'Компания не удалена',
     } as error.IServerError;
   };
 
@@ -129,7 +129,7 @@ class Company extends BaseRequest {
 
       return {
         type: 'ERROR',
-        message: 'данные о компании не получены',
+        message: 'Данные о компании не получены',
       } as error.IServerError;
     }
 
@@ -144,7 +144,7 @@ class Company extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'данные о компании не получены',
+      message: res?.error || 'Данные о компании не получены',
     } as error.IServerError;
   };
 
@@ -169,7 +169,7 @@ class Company extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'данные о компаниях не получены',
+      message: res?.error || 'Данные о компаниях не получены',
     } as error.IServerError;
   };
 }

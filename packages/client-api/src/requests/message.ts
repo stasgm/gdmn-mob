@@ -53,7 +53,7 @@ class Message extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'сообщение не отправлено',
+      message: res?.error || 'Сообщение не отправлено',
     } as error.IServerError;
   };
 
@@ -83,7 +83,7 @@ class Message extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'сообщения не получены',
+      message: res?.error || 'Сообщения не получены',
     } as error.IServerError;
   };
 
@@ -110,7 +110,7 @@ class Message extends BaseRequest {
     }
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'cooбщение не удалено',
+      message: res?.error || 'Сooбщение не удалено',
     } as error.IServerError;
   };
 
@@ -138,7 +138,7 @@ class Message extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'сообщения не удалены',
+      message: res?.error || 'Сообщения не удалены',
     } as error.IServerError;
   };
 }

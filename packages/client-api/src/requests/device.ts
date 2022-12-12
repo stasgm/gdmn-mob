@@ -42,7 +42,7 @@ class Device extends BaseRequest {
     }
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'устройство не создано',
+      message: res?.error || 'Устройство не создано',
     } as error.IServerError;
   };
 
@@ -71,7 +71,7 @@ class Device extends BaseRequest {
     }
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'устройство не обновлено',
+      message: res?.error || 'Устройство не обновлено',
     } as error.IServerError;
   };
 
@@ -97,7 +97,7 @@ class Device extends BaseRequest {
     }
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'устройство не удалено',
+      message: res?.error || 'Устройство не удалено',
     } as error.IServerError;
   };
 
@@ -134,7 +134,7 @@ class Device extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'устройство не получено',
+      message: res?.error || 'Устройство не получено',
     } as error.IServerError;
   };
 
@@ -168,7 +168,7 @@ class Device extends BaseRequest {
     }
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'данные об устройствах не получены',
+      message: res?.error || 'Данные об устройствах не получены',
     } as error.IServerError;
   };
 
@@ -187,7 +187,7 @@ class Device extends BaseRequest {
     }
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'данные о пользователях по устройству не получены',
+      message: res?.error || 'Данные о пользователях по устройству не получены',
     } as error.IServerError;
   };
 }

@@ -2,7 +2,7 @@ import { IProcess } from '@lib/types';
 import { processes as mockProcesses } from '@lib/mock';
 
 import { error, process as types } from '../types';
-import { getParams, sleep } from '../utils';
+import { sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
@@ -38,7 +38,7 @@ class Process extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'данные о процессах не получены',
+      message: res?.error || 'Данные о процессах не получены',
     } as error.IServerError;
   };
 
@@ -65,7 +65,7 @@ class Process extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'процесс не удален',
+      message: res?.error || 'Процесс не удален',
     } as error.IServerError;
   };
 }
