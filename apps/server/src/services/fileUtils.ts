@@ -97,16 +97,16 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
 };
 
 const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => {
-  /* const re = /[^\\|/]+$/gi;
-  const match = re.exec(root);*/
-  const pathArr = root.split(path.sep);
-  const name = pathArr.pop();
+  /* const pathArr = root.split(path.sep);
+  const name = pathArr.pop();*/
+  const name = path.basename(root);
+  const ext = path.extname(root);
   if (!name) {
     log.error(`Invalid filename ${root}`);
     return undefined;
   }
-  const nameWithoutExt = name.split('.')[0];
-  const subPath = pathArr.join(path.sep);
+  const nameWithoutExt = path.basename(root, ext);
+  const subPath = path.dirname(root);
   const fileStat = await stat(root);
   const fileSize = fileStat.size / BYTES_PER_KB;
   const fileDate = fileStat.birthtime.toString();
@@ -159,11 +159,10 @@ export const getFile = async (fid: string): Promise<any> => {
     return undefined;
   }
 
-  const fullNameArr = fullName.split('.');
-  const fileExt = fullNameArr.pop();
+  const fileExt = path.extname(fullName);
 
-  if (!fileExt || fileExt.toLowerCase() !== 'json') {
-    log.error(`Файл с некорректного формата '${fid} в запросе`);
+  if (!fileExt || fileExt.toLowerCase() !== '.json') {
+    log.error(`Файл некорректного формата '${fid} в запросе`);
     return undefined;
   }
   const fileJson: any | string = await readJsonFile(fullName);
@@ -196,10 +195,9 @@ export const updateById = async <T>(id: string, fileData: Partial<Awaited<T>>): 
     return;
   }
 
-  const fullNameArr = fullName.split('.');
-  const fileExt = fullNameArr.pop();
+  const fileExt = path.extname(fullName);
 
-  if (!fileExt || fileExt.toLowerCase() !== 'json') {
+  if (!fileExt || fileExt.toLowerCase() !== '.json') {
     log.error(`Файл с некорректного формата '${id} в запросе`);
     return undefined;
   }
