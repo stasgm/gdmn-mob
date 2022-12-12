@@ -73,15 +73,16 @@ const FileListTable = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFilterVisible]);
 
-  const filtered = useMemo(() => {
+  const filteredList = useMemo(() => {
     if (
       formik.values.fileName ||
       formik.values.path ||
       formik.values.appSystem ||
       formik.values.company ||
-      formik.values.contact ||
       formik.values.date ||
       formik.values.device ||
+      formik.values.producer ||
+      formik.values.consumer ||
       formik.values.uid
     ) {
       return files.filter(
@@ -117,7 +118,6 @@ const FileListTable = ({
     formik.values.appSystem,
     formik.values.company,
     formik.values.consumer,
-    formik.values.contact,
     formik.values.date,
     formik.values.device,
     formik.values.fileName,
@@ -185,7 +185,7 @@ const FileListTable = ({
   }, [limitRows, selectedFileIds.length, selectedFiles]);
 
   const TableRows = () => {
-    const fileList = filtered.slice(page * limit, page * limit + limit).map((file: IFileSystem) => {
+    const fileList = filteredList.slice(page * limit, page * limit + limit).map((file: IFileSystem) => {
       return (
         <TableRow
           hover
@@ -224,7 +224,7 @@ const FileListTable = ({
       );
     });
 
-    const emptyRows = limit - Math.min(limit, files.length - page * limit);
+    const emptyRows = limit - Math.min(limit, filteredList.length - page * limit);
 
     return (
       <>
@@ -247,9 +247,9 @@ const FileListTable = ({
               <TableRow>
                 <TableCell padding="checkbox">
                   <Checkbox
-                    checked={selectedFileIds.length === files.length}
+                    checked={selectedFileIds.length === filteredList.length}
                     color="primary"
-                    indeterminate={selectedFileIds.length > 0 && selectedFileIds.length < files.length}
+                    indeterminate={selectedFileIds.length > 0 && selectedFileIds.length < filteredList.length}
                     onChange={handleSelectAll}
                   />
                 </TableCell>
@@ -302,7 +302,7 @@ const FileListTable = ({
       </PerfectScrollbar>
       <TablePagination
         component="div"
-        count={files.length}
+        count={filteredList.length}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleLimitChange}
         page={page}
