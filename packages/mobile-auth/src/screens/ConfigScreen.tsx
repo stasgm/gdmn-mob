@@ -116,7 +116,7 @@ const ConfigScreen = (props: Props) => {
           <View style={localStyles.buttonsView}>
             <PrimeButton
               outlined
-              icon="delete-outline"
+              icon="broom"
               onPress={() => setVisibleDialog(!visibleDialog)}
               style={localStyles.button}
             >
@@ -158,7 +158,7 @@ const ConfigScreen = (props: Props) => {
               icon={initDeviceID ? 'checkbox-outline' : 'checkbox-blank-outline'}
               onPress={() => setInitDeviceID(!initDeviceID)}
             />
-            <MediumText style={configStyles.textWidth}>Очистить номер устройства</MediumText>
+            <MediumText style={configStyles.textWidth}>Удалить данные об устройстве</MediumText>
           </View>
         </Dialog.Content>
         <Dialog.Actions style={{ borderColor: colors.primary }}>
