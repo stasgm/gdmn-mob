@@ -58,7 +58,7 @@
     "@material-ui/styled-engine": "^5.0.0-alpha.27",
     "@material-ui/styles": "^5.0.0-alpha.27",
     "@types/material-ui": "^0.21.8",
-    "@types/node": "^18.11.9",
+    "@types/node": "^18.11.14",
     "@types/react": "~18.0.25",
     "@types/react-dom": "^18.0.8",
     "@types/react-helmet": "^6.1.1",
