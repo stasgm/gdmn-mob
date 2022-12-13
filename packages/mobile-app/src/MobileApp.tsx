@@ -37,7 +37,7 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
   const settings = useSelector((state) => state.settings?.data);
   const synchPeriod = (settings.synchPeriod?.data as number) || 10;
   const autoSync = (settings.autoSync?.data as boolean) || false;
-  const { config, user } = useSelector((state) => state.auth);
+  const { config, user, isDemo } = useSelector((state) => state.auth);
   const loading = useSelector((state) => state.app.loading);
 
   const appState = useRef(AppState.currentState);
@@ -68,7 +68,7 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
   //Если в параметрах указана Автосинхронизация,
   //устанавливаем запуск следующей синхронизации через synchPeriod минут
   useEffect(() => {
-    if (!autoSync || loading) {
+    if (!autoSync || loading || isDemo) {
       return;
     }
 
@@ -82,7 +82,7 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
         timeOutRef.current = null;
       }
     };
-  }, [synchPeriod, autoSync, loading, syncData]);
+  }, [synchPeriod, autoSync, loading, syncData, isDemo]);
 
   return <DrawerNavigator items={items} onSyncClick={syncData} />;
 };

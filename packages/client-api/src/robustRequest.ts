@@ -97,7 +97,6 @@ export const robustRequest: RobustRequest = async ({
 
   const rTimeout = setTimeout(() => {
     controller.abort();
-    console.log('Aborted');
   }, timeout);
 
   try {
@@ -154,7 +153,6 @@ export const robustRequest: RobustRequest = async ({
       },
     } as IServerResponseResult;
   } catch (err) {
-    console.log('rr catch', JSON.stringify(err));
     clearTimeout(rTimeout);
 
     if (controller.signal.aborted) {

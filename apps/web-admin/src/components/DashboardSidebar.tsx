@@ -39,7 +39,6 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
   const [isCompact, setCompact] = useState(false);
 
   const { user } = useSelector((state) => state.auth);
-  console.log('DashboardSidebar');
 
   const items =
     user?.role === 'SuperAdmin'

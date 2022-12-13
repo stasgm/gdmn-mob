@@ -220,7 +220,7 @@ const Root = () => {
             </TouchableOpacity>
           </View>
           <PrimeButton icon={'presentation-play'} onPress={handleSetInfoWindow_0}>
-            {'Начать работу'}
+            Начать работу
           </PrimeButton>
         </AppScreen>
       ) : authLoading || loading || invLoading || appDataLoading ? (

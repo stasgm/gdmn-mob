@@ -66,7 +66,6 @@ const createTodo = createAsyncThunk<Todo, NewItem, { rejectValue: IErrorMessage 
     try {
       const response = await todosApi.create(item);
 
-      // console.log('response', response);
       if (response.success) {
         return response.data;
       }

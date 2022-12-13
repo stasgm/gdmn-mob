@@ -7,7 +7,7 @@ export const mobileRequest =
   async <T>(params: IRequestParams) => {
     dispatch(actions.setErrorMessage(''));
     const res = await robustRequest(params);
-    console.log('mobileRequest res', JSON.stringify(res));
+
     switch (res.result) {
       case 'OK': {
         //Если пришел ответ, что не пройдена авторизация

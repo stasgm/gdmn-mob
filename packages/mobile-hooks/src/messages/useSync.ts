@@ -616,8 +616,6 @@ export const useSync = (onSync?: () => Promise<any>) => {
       addError('useSync', `Проблемы с передачей данных ${err}`, tempErrs);
     }
 
-    console.log('tempErrs', tempErrs, tempErrs.length);
-
     //Если не ошибка сети при проверке статуса устройства, то
     if (!connectError) {
       saveErrors(tempErrs);

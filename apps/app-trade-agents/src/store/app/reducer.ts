@@ -16,10 +16,8 @@ export const initialState: Readonly<AppTradeState> = {
 
 const reducer: Reducer<AppTradeState, AppTradeActionType> = (state = initialState, action): AppTradeState => {
   switch (action.type) {
-    case getType(actions.init): {
-      console.log('init app');
+    case getType(actions.init):
       return initialState;
-    }
 
     case getType(actions.setLoading):
       return { ...state, loading: action.payload };
