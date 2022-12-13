@@ -68,8 +68,8 @@ const DeviceLogView = () => {
   };
 
   const refreshData = useCallback(() => {
-    dispatch(deviceLogActions.fetchDeviceLogFiles());
-  }, [dispatch]);
+    dispatch(deviceLogActions.fetchDeviceLog(id));
+  }, [dispatch, id]);
 
   useEffect(() => {
     refreshData();
