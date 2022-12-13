@@ -25,7 +25,7 @@
     "@gorhom/bottom-sheet": "^4.4.5",
     "@types/node": "^18.11.9",
     "@types/react-native": "0.70.6",
-    "expo-camera": "^13.0.0",
+    "expo-camera": "^13.1.0",
     "react": "18.1.0",
     "react-native": "0.70.5",
     "react-native-gesture-handler": "~2.8.0",
