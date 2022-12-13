@@ -188,6 +188,15 @@ export const deleteFileById = async (fid: string): Promise<void> => {
   return unlink(fullName);
 };
 
+export const deleteManyFiles = async (ids: string[]): Promise<void> => {
+  await Promise.allSettled(
+    ids.map(async (id) => {
+      const fullName = alias2fullFileName(id);
+      return unlink(fullName);
+    }),
+  );
+};
+
 export const updateById = async <T>(id: string, fileData: Partial<Awaited<T>>): Promise<void> => {
   const fullName = alias2fullFileName(id);
   if (!fullName) {

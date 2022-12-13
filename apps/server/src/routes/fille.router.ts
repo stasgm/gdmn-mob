@@ -5,7 +5,7 @@ import { permissionMiddleware } from '../middleware/permissionRequired';
 import { roleBasedParamsMiddlware } from '../middleware/roleBasedParams';
 import { fileValidation } from '../validations';
 import { deviceMiddleware } from '../middleware/deviceRequired';
-import { getFiles, getFile, removeFile, updateFile } from '../controllers/file';
+import { getFiles, getFile, removeFile, updateFile, removeManyFiles } from '../controllers/file';
 
 const file = route();
 
@@ -21,5 +21,6 @@ file.patch(
   updateFile,
 );
 file.delete('/:id', fileValidation.removeFile, authMiddleware, removeFile);
+file.delete('/', fileValidation.deleteFiles, authMiddleware, removeManyFiles);
 
 export default file;
