@@ -4420,62 +4420,67 @@
     color "^4.2.3"
     warn-once "^0.1.0"
 
-"@react-navigation/core@^6.4.1":
-  version "6.4.1"
-  resolved "https://registry.yarnpkg.com/@react-navigation/core/-/core-6.4.1.tgz#2d290cadc23992e914c45b5712efa30e5f37587f"
-  integrity sha512-M1rTS+qaw84ZItvObwFTjuvXfrJRnXL2uJJeiDVwSvu7/30Wp6bkL3/MfLUEA6I4CzJhL74iRSfCKSVe7kVhlw==
+"@react-navigation/core@^6.4.5":
+  version "6.4.5"
+  resolved "https://registry.yarnpkg.com/@react-navigation/core/-/core-6.4.5.tgz#8254b25c476857d53a649af8e3fded0cbe6e1ded"
+  integrity sha512-wcde35HeOM5r2P25EwLQZyJ1yhXDGKuWpnKfsSI1xrgYIvWdYi3j/yGnwgNGDelCmtUt1Fyk2pmOv8sEku9KkA==
   dependencies:
-    "@react-navigation/routers" "^6.1.3"
+    "@react-navigation/routers" "^6.1.6"
     escape-string-regexp "^4.0.0"
     nanoid "^3.1.23"
-    query-string "^7.0.0"
+    query-string "^7.1.3"
     react-is "^16.13.0"
     use-latest-callback "^0.1.5"
 
-"@react-navigation/drawer@^6.5.1":
-  version "6.5.1"
-  resolved "https://registry.yarnpkg.com/@react-navigation/drawer/-/drawer-6.5.1.tgz#07c920f55cd95c1e6790324402c74e55dcb55308"
-  integrity sha512-gBXDhAPZ0e+gRhdeZg35sNorm9B0QVtzNx0wiTUNVPa7F/Ij/EUx7J5xb7hcm2h6Wr79yxtv//GwxlTfzeXOJw==
+"@react-navigation/drawer@^6.5.5":
+  version "6.5.5"
+  resolved "https://registry.yarnpkg.com/@react-navigation/drawer/-/drawer-6.5.5.tgz#7e65201435bd23d8418878210a670e8598337436"
+  integrity sha512-dkmbkv7nc7EWOqns6AlewTHIIAIa3RMwmzbucjqPBnJNJEv76YxUmYpiSQ8TBH9R3czA/Km6eGodyYmkP+3o5Q==
   dependencies:
-    "@react-navigation/elements" "^1.3.7"
+    "@react-navigation/elements" "^1.3.11"
     color "^4.2.3"
     warn-once "^0.1.0"
+
+"@react-navigation/elements@^1.3.11":
+  version "1.3.11"
+  resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-1.3.11.tgz#135c2cb3ae4a31bc835bb731110fd1ef9c38e237"
+  integrity sha512-o4J0g4ofJbbn68e4TpuGkuZLtq5mLll7Ndz9C4O4RvD2chchLuGQ5TycIPTKP428cz8JzuTCFqUe/ZhOPSsudw==
 
 "@react-navigation/elements@^1.3.7":
   version "1.3.7"
   resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-1.3.7.tgz#40d80a7f34d645b605289da10bc4b6c3a7667215"
   integrity sha512-OZg2N/dd2tl6qkfrWvmUjFsYsbEyHEv4NbZSBuT+CR+d1pzmexN2IeVmi4cEMoR7U7GwhFcHRevF36yBsjU/dw==
 
-"@react-navigation/material-bottom-tabs@^6.2.5":
-  version "6.2.5"
-  resolved "https://registry.yarnpkg.com/@react-navigation/material-bottom-tabs/-/material-bottom-tabs-6.2.5.tgz#f3806666995654f987bf3ef7d14d69c0a12a98d1"
-  integrity sha512-3uZ95zHd0H9vH6hsKdu+wr+OgjhluxE88hMgiGsUJ5kWoQ+KTJanbE45hSlhBYCPVMDN3wK3Fmb5TlxhvmHr8w==
+"@react-navigation/material-bottom-tabs@^6.2.9":
+  version "6.2.9"
+  resolved "https://registry.yarnpkg.com/@react-navigation/material-bottom-tabs/-/material-bottom-tabs-6.2.9.tgz#e08726107cd172e110b7eddcabe03747b6613625"
+  integrity sha512-g87MeXpgjJkKtSUcXKev9/C6AswpmD9AWH/hEoFk01T1w7pkXsxbaUbBkGupN/ncQ9cFkH6HgXTHiotS+aIYLA==
   dependencies:
-    "@react-navigation/elements" "^1.3.7"
+    "@react-navigation/elements" "^1.3.11"
 
-"@react-navigation/native@^6.0.14":
-  version "6.0.14"
-  resolved "https://registry.yarnpkg.com/@react-navigation/native/-/native-6.0.14.tgz#3ce3a4176ac7dc5495241d56a28db18449baf754"
-  integrity sha512-Z95bJrRkZerBJq6Qc/xjA/kibPpB+UvPeMWS1CBhRF8FaX1483UdHqPqSbW879tPwjP2R4XfoA4dtoEHswrOjA==
+"@react-navigation/native@^6.1.1":
+  version "6.1.1"
+  resolved "https://registry.yarnpkg.com/@react-navigation/native/-/native-6.1.1.tgz#79d91db04fbad277f355a10405516df4f67cd308"
+  integrity sha512-iIozx9c66EjSFyzKrZPixnk6vBuivYXp0jmbKCJXNIa7MY+8OLx9CXj/+1py/l/OGlXDhI6jiUWWetOfOtMaBQ==
   dependencies:
-    "@react-navigation/core" "^6.4.1"
+    "@react-navigation/core" "^6.4.5"
     escape-string-regexp "^4.0.0"
     fast-deep-equal "^3.1.3"
     nanoid "^3.1.23"
 
-"@react-navigation/routers@^6.1.3":
-  version "6.1.3"
-  resolved "https://registry.yarnpkg.com/@react-navigation/routers/-/routers-6.1.3.tgz#1df51959e9a67c44367462e8b929b7360a5d2555"
-  integrity sha512-idJotMEzHc3haWsCh7EvnnZMKxvaS4YF/x2UyFBkNFiEFUaEo/1ioQU6qqmVLspdEv4bI/dLm97hQo7qD8Yl7Q==
+"@react-navigation/routers@^6.1.6":
+  version "6.1.6"
+  resolved "https://registry.yarnpkg.com/@react-navigation/routers/-/routers-6.1.6.tgz#f57f2a73855d329255aa225fdad75ae8e7700c6d"
+  integrity sha512-Z5DeCW3pUvMafbU9Cjy1qJYC2Bvl8iy3+PfsB0DsAwQ6zZ3WAXW5FTMX4Gb9H+Jg6qHWGbMFFwlYpS3UJ3tlVQ==
   dependencies:
     nanoid "^3.1.23"
 
-"@react-navigation/stack@^6.3.5":
-  version "6.3.5"
-  resolved "https://registry.yarnpkg.com/@react-navigation/stack/-/stack-6.3.5.tgz#c616ef78cbaa55938da993d871d9fc41801d41f4"
-  integrity sha512-G706Ow+8fhiLT5Cf48566YsjboU5h5ll9nva90xX3br7V6x0JMoGMvXjvbORZyzLuUytQO3mf0T3nVUuO52vZQ==
+"@react-navigation/stack@^6.3.9":
+  version "6.3.9"
+  resolved "https://registry.yarnpkg.com/@react-navigation/stack/-/stack-6.3.9.tgz#e4e2b6aa25973b3bc59200b7e3bf980e93cb5b4f"
+  integrity sha512-mTT0ZM/Zvp46s8UnphAspg2MR5Ds0mqZa/bEjzFgaYo+cLfjIXttUZYgsMG2fhvoTHpU7QFcZ/0kVhi4jVlzKQ==
   dependencies:
-    "@react-navigation/elements" "^1.3.7"
+    "@react-navigation/elements" "^1.3.11"
     color "^4.2.3"
     warn-once "^0.1.0"
 
@@ -8723,6 +8728,11 @@ decode-uri-component@^0.2.0:
   resolved "https://registry.yarnpkg.com/decode-uri-component/-/decode-uri-component-0.2.0.tgz#eb3913333458775cb84cd1a1fae062106bb87545"
   integrity sha512-hjf+xovcEn31w/EUYdTXQh/8smFL/dzYjohQGEIgjyNavaJfBY2p5F527Bo1VPATxv0VYTUC2bOcXvqFwk78Og==
 
+decode-uri-component@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/decode-uri-component/-/decode-uri-component-0.2.2.tgz#e69dbe25d37941171dd540e024c444cd5188e1e9"
+  integrity sha512-FqUYQ+8o158GyGTrMFJms9qh3CqTKvAqgqsTnkLI8sKu0028orqBhxNMFkFen0zGyg6epACD32pjVk58ngIErQ==
+
 decompress-response@^3.2.0, decompress-response@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/decompress-response/-/decompress-response-3.3.0.tgz#80a4dd323748384bfa248083622aedec982adff3"
@@ -10135,17 +10145,17 @@ expo-asset@~8.6.2:
     path-browserify "^1.0.0"
     url-parse "^1.5.9"
 
-expo-barcode-scanner@~12.0.0:
-  version "12.0.0"
-  resolved "https://registry.yarnpkg.com/expo-barcode-scanner/-/expo-barcode-scanner-12.0.0.tgz#2642e92a82ffffecbd3ca6c5678906dba3d49010"
-  integrity sha512-llBYv4QSjvoGHvpLS9b0Y+FySFXt2KAZhw4yZ0kIrw/XIKE1pmObxPAxIBLdW/MAhPxbyhJvJqEoQA4e8U8Wyw==
+expo-barcode-scanner@~12.1.0:
+  version "12.1.0"
+  resolved "https://registry.yarnpkg.com/expo-barcode-scanner/-/expo-barcode-scanner-12.1.0.tgz#3758b20e82bf1e30ad420df4106c8e868ed7b139"
+  integrity sha512-R+SlrtS7zEomY48Vjc+XJVHp+qz/u4TKG3CQeFobtQlBXPJvK94055yUg9PxOAwIIrOp3093FSOZiu/OGuoxiA==
   dependencies:
     expo-image-loader "~4.0.0"
 
-expo-camera@^13.0.0, expo-camera@~13.0.0:
-  version "13.0.0"
-  resolved "https://registry.yarnpkg.com/expo-camera/-/expo-camera-13.0.0.tgz#eedde5b35f5948617068f09412d6d3dd26fe71c4"
-  integrity sha512-3OVETNVtvlQojQSfghto9nn/Y/90DA0xOyEeJqNz9N8CX8klnclyXbBSeXtDN6aFz1lQH8D/fKePbFKNxoPsyg==
+expo-camera@^13.1.0, expo-camera@~13.1.0:
+  version "13.1.0"
+  resolved "https://registry.yarnpkg.com/expo-camera/-/expo-camera-13.1.0.tgz#e706a8efc78d1891d848ff729730d9d75468d36d"
+  integrity sha512-YD1Gd5nyhk3ekXgVTsTLrhd0Nlug51NI7hjBKq2BOP+X5YyrcZLVarZAXXdc5vgeW73VBYIne1rpX9Q0qJdlrw==
   dependencies:
     "@koale/useworker" "^4.0.2"
     invariant "^2.2.4"
@@ -10317,10 +10327,10 @@ expo-updates@~0.15.6:
     resolve-from "^5.0.0"
     uuid "^3.4.0"
 
-expo@^47.0.7:
-  version "47.0.7"
-  resolved "https://registry.yarnpkg.com/expo/-/expo-47.0.7.tgz#4fe95529c6b1e6d8026a164847ce1048f6dc5ccd"
-  integrity sha512-uHTxvPdD4K7W277tXVAdFmgjSZ0Hg+0g5bnez0jXyXQINa+0CTtGmulgFehBOrbrUZBqwosN0K8TsrxADwcXZQ==
+expo@^47.0.8:
+  version "47.0.8"
+  resolved "https://registry.yarnpkg.com/expo/-/expo-47.0.8.tgz#80390fd63f8305103445069c647011915f7c32dd"
+  integrity sha512-PGNCIvrnYwHH4TDFsVocq/xhWZ5DW8N3bLkZJPZZgX6VgjtVLNsbZ+0lm1inLCZHP+6xSpSKRccjGHO/QQoMBQ==
   dependencies:
     "@babel/runtime" "^7.14.0"
     "@expo/cli" "0.4.10"
@@ -17949,12 +17959,12 @@ query-string@^5.0.1:
     object-assign "^4.1.0"
     strict-uri-encode "^1.0.0"
 
-query-string@^7.0.0:
-  version "7.1.1"
-  resolved "https://registry.yarnpkg.com/query-string/-/query-string-7.1.1.tgz#754620669db978625a90f635f12617c271a088e1"
-  integrity sha512-MplouLRDHBZSG9z7fpuAAcI7aAYjDLhtsiVZsevsfaHWDS2IDdORKbSd1kWUA+V4zyva/HZoSfpwnYMMQDhb0w==
+query-string@^7.1.3:
+  version "7.1.3"
+  resolved "https://registry.yarnpkg.com/query-string/-/query-string-7.1.3.tgz#a1cf90e994abb113a325804a972d98276fe02328"
+  integrity sha512-hh2WYhq4fi8+b+/2Kg9CEge4fDPvHS534aOOvOZeQ3+Vf2mCFsaFBYj0i+iXcAq6I9Vzp5fjMFBlONvayDC1qg==
   dependencies:
-    decode-uri-component "^0.2.0"
+    decode-uri-component "^0.2.2"
     filter-obj "^1.1.0"
     split-on-first "^1.0.0"
     strict-uri-encode "^2.0.0"

@@ -99,6 +99,15 @@ export const appSettings: Settings = {
     visible: true,
     group: baseSettingGroup,
   },
+  quantityInput: {
+    id: 'quantityInput',
+    sortOrder: 4,
+    description: 'Не заполнять количество',
+    data: true,
+    type: 'boolean',
+    visible: true,
+    group: baseSettingGroup,
+  },
   weightCode: {
     id: 'weightCode',
     sortOrder: 5,

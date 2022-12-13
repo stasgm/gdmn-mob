@@ -10,6 +10,7 @@ export type IRefSelectParams = {
   isMulti?: boolean;
   docType?: string;
   refFieldName?: string;
+  descrFieldName?: string;
 };
 
 export type RefParamList = {

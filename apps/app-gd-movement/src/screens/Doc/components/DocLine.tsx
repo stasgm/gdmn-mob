@@ -5,7 +5,7 @@ import { styles } from '@lib/mobile-navigation';
 import { ItemSeparator, PrimeButton, ScanBarcode, ScanBarcodeReader } from '@lib/mobile-ui';
 import { useSelector } from '@lib/store';
 
-import { IconButton } from 'react-native-paper';
+import { IconButton, TextInput as Input } from 'react-native-paper';
 
 import { useTheme } from '@react-navigation/native';
 
@@ -156,8 +156,8 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
           <View style={styles.item}>
             <View style={styles.details}>
               <Text style={styles.name}>Количество</Text>
-              <TextInput
-                style={[styles.number, styles.field]}
+              <Input
+                style={[localStyles.quantitySize, styles.field]}
                 editable={true}
                 keyboardType="numeric"
                 autoCapitalize="words"
@@ -165,6 +165,7 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
                 returnKeyType="done"
                 ref={currRef}
                 value={goodQty}
+                mode="outlined"
               />
             </View>
           </View>
@@ -195,4 +196,5 @@ const localStyles = StyleSheet.create({
     margin: 5,
     justifyContent: 'center',
   },
+  quantitySize: { fontSize: 20 },
 });
