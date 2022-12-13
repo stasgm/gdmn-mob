@@ -4,7 +4,7 @@ import { getType } from 'typesafe-actions';
 
 import { config } from '@lib/client-config';
 
-import { company as mockCompany, device as mockDevice, user as mockUser } from '@lib/mock';
+import { company as mockCompany, device as mockDevice, user as mockUser, appSystem as mockAppSystem } from '@lib/mock';
 
 import { actions, AuthActionType } from './actions';
 import { AuthState } from './types';
@@ -214,6 +214,7 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
         ...state,
         connectionStatus: 'connected',
         user: mockUser,
+        appSystem: mockAppSystem,
         device: mockDevice,
         company: mockCompany,
         loadingData: false,

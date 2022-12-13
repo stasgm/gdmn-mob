@@ -5,7 +5,6 @@ export const webRequest =
   async <T>(params: IRequestParams) => {
     dispatch(actions.setErrorMessage(''));
     const res = await robustRequest(params);
-    console.log('webRequest res', res);
     switch (res.result) {
       case 'OK': {
         //Если пришел ответ, что не пройдена авторизация
