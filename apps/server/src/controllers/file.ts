@@ -26,6 +26,14 @@ const removeFile = async (ctx: ParameterizedContext): Promise<void> => {
   ok(ctx as Context, undefined, 'removeFile: file is successfully  deleted');
 };
 
+const removeManyFiles = async (ctx: ParameterizedContext): Promise<void> => {
+  const ids = ctx.request.body as string[];
+
+  await fileService.deleteMany(ids);
+
+  ok(ctx as Context, undefined, 'removeManyFiles: files are successfully  deleted');
+};
+
 const updateFile = async (ctx: ParameterizedContext): Promise<void> => {
   const { id } = ctx.request.params;
 
@@ -36,4 +44,4 @@ const updateFile = async (ctx: ParameterizedContext): Promise<void> => {
   ok(ctx as Context, updatedFile, `updateFile: file '${id}' is successfully updated`);
 };
 
-export { getFiles, getFile, removeFile, updateFile };
+export { getFiles, getFile, removeFile, updateFile, removeManyFiles };

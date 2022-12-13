@@ -36,4 +36,17 @@ const updateFile: Config = {
   },
 };
 
-export { removeFile, getFile, updateFile };
+const deleteFiles: Config = {
+  validate: {
+    params: Joi.object({
+      ...urlValidation.checkURL,
+    }),
+    type: 'json',
+    body: Joi.array()
+      .items(Joi.string())
+      .required()
+      .error(new InvalidParameterException('Некорректный формат списка удаляемых файлов')),
+  },
+};
+
+export { removeFile, getFile, updateFile, deleteFiles };
