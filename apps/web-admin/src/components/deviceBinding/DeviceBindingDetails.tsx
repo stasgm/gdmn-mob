@@ -24,7 +24,7 @@ export interface IDeviceBindingFormik extends Omit<IDeviceBinding, 'state'> {
 
 const DeviceBindingDetails = ({ deviceBinding, loading, onSubmit, onCancel }: IProps) => {
   // const [devices, setDevices] = useState<INamedEntity[]>([]);
-  const { list: devices, loading: loadingDevices } = useSelector((state) => state.users);
+  const { list: devices, loading: loadingDevices } = useSelector((state) => state.devices);
   // const [loadingDevices, setLoadingDevices] = useState(true);
 
   // useEffect(() => {

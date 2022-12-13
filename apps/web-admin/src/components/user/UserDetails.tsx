@@ -1,6 +1,6 @@
 import { Box, Card, CardContent, Grid, TextField, Divider, Button, Checkbox } from '@material-ui/core';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { INamedEntity, IUser, NewUser } from '@lib/types';
 import { FormikTouched, useFormik, Field, FormikProvider } from 'formik';
@@ -34,6 +34,11 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
 
   const { list: appSystems, loading: loadingAppSystems } = useSelector((state) => state.appSystems);
   const { list: users, loading: loadingUsers } = useSelector((state) => state.users);
+
+  const erpUsers = useMemo(() => {
+    return users.filter((i) => i.appSystem).map((d) => ({ id: d.id, name: d.name }));
+  }, [users]);
+
   // useEffect(() => {
   //   let unmounted = false;
   //   const getCompanies = async () => {
@@ -236,7 +241,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                       name="erpUser"
                       label="Пользователь ERP"
                       type="erpUser"
-                      options={users?.map((d) => ({ id: d.id, name: d.name })) || []}
+                      options={erpUsers || []}
                       setFieldValue={formik.setFieldValue}
                       setTouched={formik.setTouched}
                       onBlur={formik.handleBlur}
