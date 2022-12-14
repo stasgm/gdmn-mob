@@ -31,6 +31,12 @@ const removeFileAsync = createAsyncAction('FILE/REMOVE_FILE', 'FILE/REMOVE_FILE_
   string
 >();
 
+const removeFilesAsync = createAsyncAction('FILE/REMOVE_MANY', 'FILE/REMOVE_MANY_SUCCESS', 'FILE/REMOVE_MANY_FAILURE')<
+  string | undefined,
+  string[],
+  string
+>();
+
 const setPageParam = createAction('FILE/SET_PARAM')<IPageParam | undefined>();
 const clearPageParams = createAction('FILE/CLEAR_PARAMS')();
 
@@ -39,6 +45,7 @@ export const fileSystemActions = {
   fetchFileAsync,
   updateFileAsync,
   removeFileAsync,
+  removeFilesAsync,
   clearPageParams,
   setPageParam,
   clearError,

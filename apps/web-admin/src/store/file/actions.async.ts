@@ -1,3 +1,5 @@
+import { isDataView } from 'util/types';
+
 import { ThunkAction } from 'redux-thunk';
 import api from '@lib/client-api';
 
@@ -85,4 +87,22 @@ const removeFile = (id: string): AppThunk => {
   };
 };
 
-export default { fetchFiles, fetchFile, updateFile, removeFile };
+const removeFiles = (fileIds: string[]): AppThunk => {
+  return async (dispatch) => {
+    dispatch(fileSystemActions.removeFilesAsync.request(''));
+
+    const response = await api.file.removeFiles(fileIds);
+
+    if (response.type === 'REMOVE_FILES') {
+      return dispatch(fileSystemActions.removeFilesAsync.success(fileIds));
+    }
+
+    if (response.type === 'ERROR') {
+      return dispatch(fileSystemActions.removeFilesAsync.failure(response.message));
+    }
+
+    return dispatch(fileSystemActions.removeFilesAsync.failure('Ошибка получения данных о файлах'));
+  };
+};
+
+export default { fetchFiles, fetchFile, updateFile, removeFile, removeFiles };

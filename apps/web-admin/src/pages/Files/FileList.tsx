@@ -1,10 +1,11 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import CachedIcon from '@material-ui/icons/Cached';
 import FilterIcon from '@material-ui/icons/FilterAltOutlined';
+import DeleteIcon from '@material-ui/icons/DeleteOutline';
 
-import { IDeviceLogFiles } from '@lib/types';
+import { IDeviceLogFiles, IFileSystem } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
@@ -64,6 +65,83 @@ const FileList = () => {
     dispatch(actions.fileSystemActions.clearError());
   };
 
+  const selectedFiles: IFileSystem[] = useMemo(() => {
+    return [];
+  }, []);
+
+  const [selectedFileIds, setSelectedFileIds] = useState<IFileSystem[]>(selectedFiles);
+  const [limit, setLimit] = useState(25);
+  // const handleDelete = async (ids?: string[]) => {
+  const handleDelete = useCallback(() => {
+    // setOpen(false);
+    const ids = selectedFileIds.map((i) => {
+      return i.id;
+    });
+    if (ids) {
+      dispatch(actions.removeFiles(ids));
+      setSelectedFileIds([]);
+    } // if (res.type === 'FILE/REMOVE_FILES_SUCCESS') {
+    //   navigate(-1);
+    // }
+    // const res = await dispatch(actions.removeFiles(fileIds));
+    // if (res.type === 'FILE/REMOVE_FILES_SUCCESS') {
+    //   navigate(-1);
+    // }
+  }, [dispatch, selectedFileIds]);
+  // сonst delete
+
+  const handleSelectAll = (event: any) => {
+    let newSelectedFileIds;
+
+    if (event.target.checked) {
+      newSelectedFileIds = list.map((file: any) => file);
+    } else {
+      newSelectedFileIds = [];
+    }
+
+    setSelectedFileIds(newSelectedFileIds);
+    // onChangeSelectedFiles && onChangeSelectedFiles(newSelectedFileIds);
+  };
+
+  const handleSelectOne = (_event: any, file: IFileSystem) => {
+    const selectedIndex = selectedFileIds.map((item: IFileSystem) => item.id).indexOf(file.id);
+
+    let newSelectedFileIds: IFileSystem[] = [];
+
+    if (selectedIndex === -1) {
+      newSelectedFileIds = newSelectedFileIds.concat(selectedFileIds, file);
+    } else if (selectedIndex === 0) {
+      newSelectedFileIds = newSelectedFileIds.concat(selectedFileIds.slice(1));
+    } else if (selectedIndex === selectedFileIds.length - 1) {
+      newSelectedFileIds = newSelectedFileIds.concat(selectedFileIds.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelectedFileIds = newSelectedFileIds.concat(
+        selectedFileIds.slice(0, selectedIndex),
+        selectedFileIds.slice(selectedIndex + 1),
+      );
+    }
+
+    setSelectedFileIds(newSelectedFileIds);
+
+    // onChangeSelectedFiles && onChangeSelectedFiles(newSelectedFileIds);
+  };
+
+  // useEffect(() => {
+  //   // if (limitRows > 0) {
+  //   //   setLimit(limitRows);
+  //   // }
+
+  //   if (selectedFileIds.length === 0) {
+  //     if (selectedFiles.length > 0) {
+  //       const newSelectedFileIds = selectedFiles.map((file: IFileSystem) => file);
+
+  //       setSelectedFileIds(newSelectedFileIds);
+  //     }
+  //   }
+  // }, [selectedFileIds.length, selectedFiles]);
+
+  console.log('selectedIds', selectedFileIds);
+
   const buttons: IToolBarButton[] = [
     {
       name: 'Обновить',
@@ -77,8 +155,13 @@ const FileList = () => {
       onClick: () => setFilterVisible(!filterVisible),
       icon: <FilterIcon />,
     },
+    {
+      name: 'Удалить',
+      sx: { mx: 1 },
+      onClick: handleDelete,
+      icon: <DeleteIcon />,
+    },
   ];
-
   const headCells: IHeadCells<IDeviceLogFiles>[] = [
     // { id: 'path', label: 'Название', sortEnable: true, filterEnable: true },
     { id: 'company', label: 'Компания', sortEnable: true, filterEnable: true },
@@ -115,7 +198,15 @@ const FileList = () => {
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <FileListTable files={sortedList} isFilterVisible={filterVisible} onSubmit={fetchFiles} />
+              <FileListTable
+                files={sortedList}
+                isFilterVisible={filterVisible}
+                onSubmit={fetchFiles}
+                onDelete={handleDelete}
+                onSelectMany={handleSelectAll}
+                onSelectOne={handleSelectOne}
+                selectedFileIds={selectedFileIds}
+              />
             </Box>
             // <Box sx={{ pt: 2 }}>
             //   <SortableFilterTable<IDeviceLogFiles>

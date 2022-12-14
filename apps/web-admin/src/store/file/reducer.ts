@@ -92,6 +92,19 @@ const reducer: Reducer<IFileSystemState, FileSystemActionType> = (state = initia
         errorMessage: action.payload || 'error',
       };
 
+    case getType(fileSystemActions.removeFilesAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
+
+    case getType(fileSystemActions.removeFilesAsync.success):
+      return {
+        ...state,
+        loading: false,
+        list: state.list.filter((i) => action.payload.indexOf(i.id) === -1),
+      };
+
+    case getType(fileSystemActions.removeFilesAsync.failure):
+      return { ...state, loading: false, errorMessage: action.payload || 'error' };
+
     case getType(fileSystemActions.setPageParam):
       return {
         ...state,

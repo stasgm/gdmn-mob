@@ -30,6 +30,10 @@ interface IProps {
   onChangeSelectedFiles?: (newSelectedDeviceIds: any[]) => void;
   isFilterVisible?: boolean;
   onSubmit: (values: any) => void;
+  onDelete?: (ids?: string[]) => void;
+  onSelectOne: (_event: any, file: IFileSystem) => void;
+  onSelectMany: (event: any) => void;
+  selectedFileIds: IFileSystem[];
 }
 
 const FileListTable = ({
@@ -39,8 +43,11 @@ const FileListTable = ({
   limitRows = 0,
   isFilterVisible = false,
   onSubmit,
+  onSelectOne,
+  onSelectMany,
+  selectedFileIds,
 }: IProps) => {
-  const [selectedFileIds, setSelectedFileIds] = useState<IFileSystem[]>(selectedFiles);
+  // const [selectedFileIds, setSelectedFileIds] = useState<IFileSystem[]>(selectedFiles);
   const [limit, setLimit] = useState(25);
   const [page, setPage] = useState(0);
 
@@ -126,41 +133,41 @@ const FileListTable = ({
     formik.values.uid,
   ]);
 
-  const handleSelectAll = (event: any) => {
-    let newSelectedFileIds;
+  // const handleSelectAll = (event: any) => {
+  //   let newSelectedFileIds;
 
-    if (event.target.checked) {
-      newSelectedFileIds = files.map((file: any) => file);
-    } else {
-      newSelectedFileIds = [];
-    }
+  //   if (event.target.checked) {
+  //     newSelectedFileIds = filteredList.map((file: any) => file);
+  //   } else {
+  //     newSelectedFileIds = [];
+  //   }
 
-    setSelectedFileIds(newSelectedFileIds);
-    onChangeSelectedFiles && onChangeSelectedFiles(newSelectedFileIds);
-  };
+  //   setSelectedFileIds(newSelectedFileIds);
+  //   onChangeSelectedFiles && onChangeSelectedFiles(newSelectedFileIds);
+  // };
 
-  const handleSelectOne = (_event: any, file: IFileSystem) => {
-    const selectedIndex = selectedFileIds.map((item: IFileSystem) => item.id).indexOf(file.id);
+  // const handleSelectOne = (_event: any, file: IFileSystem) => {
+  //   const selectedIndex = selectedFileIds.map((item: IFileSystem) => item.id).indexOf(file.id);
 
-    let newSelectedFileIds: IFileSystem[] = [];
+  //   let newSelectedFileIds: IFileSystem[] = [];
 
-    if (selectedIndex === -1) {
-      newSelectedFileIds = newSelectedFileIds.concat(selectedFileIds, file);
-    } else if (selectedIndex === 0) {
-      newSelectedFileIds = newSelectedFileIds.concat(selectedFileIds.slice(1));
-    } else if (selectedIndex === selectedFileIds.length - 1) {
-      newSelectedFileIds = newSelectedFileIds.concat(selectedFileIds.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelectedFileIds = newSelectedFileIds.concat(
-        selectedFileIds.slice(0, selectedIndex),
-        selectedFileIds.slice(selectedIndex + 1),
-      );
-    }
+  //   if (selectedIndex === -1) {
+  //     newSelectedFileIds = newSelectedFileIds.concat(selectedFileIds, file);
+  //   } else if (selectedIndex === 0) {
+  //     newSelectedFileIds = newSelectedFileIds.concat(selectedFileIds.slice(1));
+  //   } else if (selectedIndex === selectedFileIds.length - 1) {
+  //     newSelectedFileIds = newSelectedFileIds.concat(selectedFileIds.slice(0, -1));
+  //   } else if (selectedIndex > 0) {
+  //     newSelectedFileIds = newSelectedFileIds.concat(
+  //       selectedFileIds.slice(0, selectedIndex),
+  //       selectedFileIds.slice(selectedIndex + 1),
+  //     );
+  //   }
 
-    setSelectedFileIds(newSelectedFileIds);
+  //   setSelectedFileIds(newSelectedFileIds);
 
-    onChangeSelectedFiles && onChangeSelectedFiles(newSelectedFileIds);
-  };
+  //   onChangeSelectedFiles && onChangeSelectedFiles(newSelectedFileIds);
+  // };
 
   const handleLimitChange = (event: any) => {
     setLimit(event.target.value);
@@ -170,19 +177,19 @@ const FileListTable = ({
     setPage(newPage);
   };
 
-  useEffect(() => {
-    if (limitRows > 0) {
-      setLimit(limitRows);
-    }
+  // useEffect(() => {
+  //   if (limitRows > 0) {
+  //     setLimit(limitRows);
+  //   }
 
-    if (selectedFileIds.length === 0) {
-      if (selectedFiles.length > 0) {
-        const newSelectedFileIds = selectedFiles.map((file: IFileSystem) => file);
+  //   if (selectedFileIds.length === 0) {
+  //     if (selectedFiles.length > 0) {
+  //       const newSelectedFileIds = selectedFiles.map((file: IFileSystem) => file);
 
-        setSelectedFileIds(newSelectedFileIds);
-      }
-    }
-  }, [limitRows, selectedFileIds.length, selectedFiles]);
+  //       setSelectedFileIds(newSelectedFileIds);
+  //     }
+  //   }
+  // }, [limitRows, selectedFileIds.length, selectedFiles]);
 
   const TableRows = () => {
     const fileList = filteredList.slice(page * limit, page * limit + limit).map((file: IFileSystem) => {
@@ -191,8 +198,8 @@ const FileListTable = ({
           hover
           key={file.id}
           selected={selectedFileIds.findIndex((d) => d.id === file?.id) !== -1}
-          component={Link}
-          to={`${adminPath}/app/files/${file.id}`}
+          // component={Link}
+          // to={`${adminPath}/app/files/${file.id}`}
           sx={{ backgroundColor: file.appSystem && file.producer && !file.device ? '#ffcfd1' : 'white' }}
         >
           <TableCell padding="checkbox">
@@ -204,7 +211,7 @@ const FileListTable = ({
                   })
                   .indexOf(file.id) !== -1
               }
-              onChange={(event) => handleSelectOne(event, file)}
+              onChange={(event) => onSelectOne(event, file)}
               value="true"
             />
           </TableCell>
@@ -250,7 +257,7 @@ const FileListTable = ({
                     checked={selectedFileIds.length === filteredList.length}
                     color="primary"
                     indeterminate={selectedFileIds.length > 0 && selectedFileIds.length < filteredList.length}
-                    onChange={handleSelectAll}
+                    onChange={onSelectMany}
                   />
                 </TableCell>
                 <TableCell style={{ minWidth: 150 }}>Путь</TableCell>
