@@ -1,5 +1,5 @@
 import path from 'path';
-import { readdir, unlink, stat, writeFile } from 'fs/promises';
+import { readdir, unlink, stat } from 'fs/promises';
 
 import { IFileSystem, IExtraFileInfo } from '@lib/types';
 
@@ -177,12 +177,6 @@ export const deleteFileById = async (fid: string): Promise<void> => {
   const fullName = alias2fullFileName(fid);
   if (!fullName) {
     log.error(`Неправильный параметр ID '${fid} в запросе`);
-    return;
-  }
-
-  const check = await checkFileExists(fullName);
-  if (!check) {
-    log.error(`Файл ${fullName} не существует`);
     return;
   }
   return unlink(fullName);

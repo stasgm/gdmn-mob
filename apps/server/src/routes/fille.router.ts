@@ -21,6 +21,6 @@ file.patch(
   updateFile,
 );
 file.delete('/:id', fileValidation.removeFile, authMiddleware, removeFile);
-file.delete('/', fileValidation.deleteFiles, authMiddleware, removeManyFiles);
+file.post('/', fileValidation.deleteFiles, authMiddleware, removeManyFiles);
 
 export default file;
