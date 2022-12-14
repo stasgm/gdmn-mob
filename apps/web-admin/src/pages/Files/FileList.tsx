@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet';
-import { Box, Container } from '@material-ui/core';
+import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText } from '@material-ui/core';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import CachedIcon from '@material-ui/icons/Cached';
 import FilterIcon from '@material-ui/icons/FilterAltOutlined';
@@ -20,6 +20,7 @@ const FileList = () => {
 
   const { list, loading, errorMessage, pageParams } = useSelector((state) => state.files);
 
+  const sortedList = useMemo(() => list.sort((a, b) => (a.path < b.path ? -1 : 1)), [list]);
   const fetchFiles = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
       dispatch(actions.fetchFiles());
@@ -31,8 +32,6 @@ const FileList = () => {
     // Загружаем данные при загрузке компонента.
     fetchFiles(pageParams?.filterText as string);
   }, [fetchFiles, pageParams?.filterText]);
-
-  const sortedList = list.sort((a, b) => (a.path < b.path ? -1 : 1));
 
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
@@ -65,42 +64,18 @@ const FileList = () => {
     dispatch(actions.fileSystemActions.clearError());
   };
 
-  const selectedFiles: IFileSystem[] = useMemo(() => {
-    return [];
-  }, []);
-
-  const [selectedFileIds, setSelectedFileIds] = useState<IFileSystem[]>(selectedFiles);
-  const [limit, setLimit] = useState(25);
-  // const handleDelete = async (ids?: string[]) => {
-  const handleDelete = useCallback(() => {
-    // setOpen(false);
-    const ids = selectedFileIds.map((i) => {
-      return i.id;
-    });
-    if (ids) {
-      dispatch(actions.removeFiles(ids));
-      setSelectedFileIds([]);
-    } // if (res.type === 'FILE/REMOVE_FILES_SUCCESS') {
-    //   navigate(-1);
-    // }
-    // const res = await dispatch(actions.removeFiles(fileIds));
-    // if (res.type === 'FILE/REMOVE_FILES_SUCCESS') {
-    //   navigate(-1);
-    // }
-  }, [dispatch, selectedFileIds]);
-  // сonst delete
+  const [selectedFileIds, setSelectedFileIds] = useState<IFileSystem[]>([]);
 
   const handleSelectAll = (event: any) => {
     let newSelectedFileIds;
 
     if (event.target.checked) {
-      newSelectedFileIds = list.map((file: any) => file);
+      newSelectedFileIds = sortedList.map((file: any) => file);
     } else {
       newSelectedFileIds = [];
     }
 
     setSelectedFileIds(newSelectedFileIds);
-    // onChangeSelectedFiles && onChangeSelectedFiles(newSelectedFileIds);
   };
 
   const handleSelectOne = (_event: any, file: IFileSystem) => {
@@ -122,8 +97,6 @@ const FileList = () => {
     }
 
     setSelectedFileIds(newSelectedFileIds);
-
-    // onChangeSelectedFiles && onChangeSelectedFiles(newSelectedFileIds);
   };
 
   // useEffect(() => {
@@ -140,7 +113,26 @@ const FileList = () => {
   //   }
   // }, [selectedFileIds.length, selectedFiles]);
 
-  console.log('selectedIds', selectedFileIds);
+  const [open, setOpen] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleDelete = useCallback(() => {
+    setOpen(false);
+    const ids = selectedFileIds.map((i) => {
+      return i.id;
+    });
+    if (ids) {
+      dispatch(actions.removeFiles(ids));
+      setSelectedFileIds([]);
+    }
+  }, [dispatch, selectedFileIds]);
 
   const buttons: IToolBarButton[] = [
     {
@@ -158,7 +150,7 @@ const FileList = () => {
     {
       name: 'Удалить',
       sx: { mx: 1 },
-      onClick: handleDelete,
+      onClick: handleClickOpen,
       icon: <DeleteIcon />,
     },
   ];
@@ -177,6 +169,21 @@ const FileList = () => {
       <Helmet>
         <title>Журнал ошибок</title>
       </Helmet>
+      <Box>
+        <Dialog open={open} onClose={handleClose}>
+          <DialogContent>
+            <DialogContentText color="black">Вы действительно хотите удалить файлы?</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDelete} color="primary" variant="contained">
+              Удалить
+            </Button>
+            <Button onClick={handleClose} color="secondary" variant="contained">
+              Отмена
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
       <Box
         sx={{
           backgroundColor: 'background.default',
