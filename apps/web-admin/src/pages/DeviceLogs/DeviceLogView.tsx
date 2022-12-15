@@ -15,8 +15,10 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
+import { IDeviceLog } from '@lib/types';
+
 import { useSelector, useDispatch } from '../../store';
-import { IToolBarButton } from '../../types';
+import { IHeadCells, IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 
 import deviceLogSelectors from '../../store/deviceLog/selectors';
@@ -26,6 +28,7 @@ import DeviceLogsDetailsView from '../../components/deviceLogs/DeviceLogDetailsV
 import deviceLogActions from '../../store/deviceLog';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import DeviceLogTable from '../../components/deviceLogs/DeviceLogTable';
+import SortableTable from '../../components/SortableTable';
 
 export type Params = {
   id: string;
@@ -120,6 +123,13 @@ const DeviceLogView = () => {
     },
   ];
 
+  const headCells: IHeadCells<IDeviceLog>[] = [
+    // { id: 'path', label: 'Название', sortEnable: true, filterEnable: true },
+    { id: 'name', label: 'Функция', sortEnable: true, filterEnable: true },
+    { id: 'message', label: 'Сообщение', sortEnable: true, filterEnable: true },
+    { id: 'date', label: 'Дата', sortEnable: true, filterEnable: true },
+  ];
+
   return (
     <>
       <Box>
@@ -172,9 +182,8 @@ const DeviceLogView = () => {
         >
           <DeviceLogsDetailsView deviceLogs={process} />
         </Box>
-        <Box>
-          <CardHeader sx={{ mx: 2 }} />
-          <DeviceLogTable deviceLog={logList} />
+        <Box sx={{ pt: 2 }}>
+          <SortableTable<IDeviceLog> headCells={headCells} data={logList} path={'/app/deviceLogs/'} />
         </Box>
       </Box>
 

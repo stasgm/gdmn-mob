@@ -30,12 +30,12 @@ const FileList = () => {
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchFiles(pageParams?.filterText as string);
-  }, [fetchFiles, pageParams?.filterText]);
+    fetchFiles();
+  }, [fetchFiles]);
 
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
-  const [filterVisible, setFilterVisible] = useState(false);
+  const [filterVisible, setFilterVisible] = useState(pageParams?.filesFilters ? true : false);
 
   const handleUpdateInput = (value: string) => {
     const inputValue: string = value;
@@ -113,6 +113,13 @@ const FileList = () => {
   //   }
   // }, [selectedFileIds.length, selectedFiles]);
 
+  const handleSetPageParams = useCallback(
+    (filesPageParams: IPageParam) => {
+      dispatch(actions.fileSystemActions.setPageParam({ filesFilters: filesPageParams.filesFilters }));
+    },
+    [dispatch],
+  );
+
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
@@ -122,6 +129,15 @@ const FileList = () => {
   const handleClose = () => {
     setOpen(false);
   };
+
+  const handleFilter = useCallback(() => {
+    if (filterVisible) {
+      setFilterVisible(false);
+      dispatch(actions.fileSystemActions.setPageParam({ filesFilters: undefined }));
+    } else {
+      setFilterVisible(true);
+    }
+  }, [dispatch, filterVisible]);
 
   const handleDelete = useCallback(() => {
     setOpen(false);
@@ -144,7 +160,7 @@ const FileList = () => {
     {
       name: 'Фильтр',
       sx: { mx: 1 },
-      onClick: () => setFilterVisible(!filterVisible),
+      onClick: handleFilter,
       icon: <FilterIcon />,
     },
     {
@@ -213,6 +229,8 @@ const FileList = () => {
                 onSelectMany={handleSelectAll}
                 onSelectOne={handleSelectOne}
                 selectedFileIds={selectedFileIds}
+                onSetPageParams={handleSetPageParams}
+                pageParams={pageParams}
               />
             </Box>
             // <Box sx={{ pt: 2 }}>

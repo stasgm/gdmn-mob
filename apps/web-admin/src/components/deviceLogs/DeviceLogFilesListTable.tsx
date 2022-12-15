@@ -21,6 +21,7 @@ import { IDeviceLogFiles } from '@lib/types';
 import { useFormik } from 'formik';
 
 import { adminPath } from '../../utils/constants';
+import { IDeviceLogFileFormik, IPageParam } from '../../types';
 
 interface IProps {
   deviceLogFiles: IDeviceLogFiles[];
@@ -29,6 +30,8 @@ interface IProps {
   onChangeSelectedDeviceLogFiles?: (newSelectedDeviceIds: any[]) => void;
   isFilterVisible?: boolean;
   onSubmit: (values: any) => void;
+  onSetPageParams: (logFilters: IPageParam) => void;
+  pageParams?: IPageParam | undefined;
 }
 
 const DeviceLogFilesListTable = ({
@@ -38,23 +41,27 @@ const DeviceLogFilesListTable = ({
   limitRows = 0,
   isFilterVisible = false,
   onSubmit,
+  onSetPageParams,
+  pageParams,
 }: IProps) => {
   const [selectedDeviceLogFileIds, setSelectedDeviceLogFileIds] = useState<IDeviceLogFiles[]>(selectedDeviceLogFiles);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
 
-  const initialValues = {
-    company: '',
-    appSystem: '',
-    contact: '',
-    device: '',
-    uid: '',
-    date: '',
-  };
+  const initialValues = useMemo(() => {
+    return {
+      company: '',
+      appSystem: '',
+      contact: '',
+      device: '',
+      uid: '',
+      date: '',
+    };
+  }, []);
 
-  const formik = useFormik<any>({
+  const formik = useFormik<IDeviceLogFileFormik>({
     enableReinitialize: true,
-    initialValues: initialValues,
+    initialValues: pageParams?.logFilters ? (pageParams?.logFilters as IDeviceLogFileFormik) : initialValues,
     onSubmit: (values) => {
       onSubmit(values);
     },
@@ -149,6 +156,13 @@ const DeviceLogFilesListTable = ({
   const handlePageChange = (_event: any, newPage: any) => {
     setPage(newPage);
   };
+
+  useEffect(() => {
+    if (isFilterVisible && formik.values !== initialValues) {
+      onSetPageParams({ logFilters: formik.values });
+    }
+    // }, [onSetPageParams]);
+  }, [formik.values, initialValues, isFilterVisible, onSetPageParams]);
 
   useEffect(() => {
     if (limitRows > 0) {
