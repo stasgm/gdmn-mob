@@ -29,12 +29,12 @@ const DeviceLogFilesList = () => {
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchDeviceLogFiles(pageParams?.filterText as string);
-  }, [fetchDeviceLogFiles, pageParams?.filterText]);
+    fetchDeviceLogFiles();
+  }, [fetchDeviceLogFiles]);
 
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
-  const [filterVisible, setFilterVisible] = useState(false);
+  const [filterVisible, setFilterVisible] = useState(pageParams?.logFilters ? true : false);
 
   const handleUpdateInput = (value: string) => {
     const inputValue: string = value;
@@ -57,6 +57,22 @@ const DeviceLogFilesList = () => {
     // fetchDevices(inputValue);
   };
 
+  const handleSetPageParams = useCallback(
+    (logPageParams: IPageParam) => {
+      dispatch(deviceLogActions.deviceLogActions.setPageParam({ logFilters: logPageParams.logFilters }));
+    },
+    [dispatch],
+  );
+
+  const handleFilter = useCallback(() => {
+    if (filterVisible) {
+      setFilterVisible(false);
+      dispatch(deviceLogActions.deviceLogActions.setPageParam({ logFilters: undefined }));
+    } else {
+      setFilterVisible(true);
+    }
+  }, [dispatch, filterVisible]);
+
   const handleClearError = () => {
     dispatch(actions.deviceActions.clearError());
   };
@@ -71,7 +87,7 @@ const DeviceLogFilesList = () => {
     {
       name: 'Фильтр',
       sx: { mx: 1 },
-      onClick: () => setFilterVisible(!filterVisible),
+      onClick: handleFilter,
       icon: <FilterIcon />,
     },
   ];
@@ -116,6 +132,8 @@ const DeviceLogFilesList = () => {
                 deviceLogFiles={filesList}
                 isFilterVisible={filterVisible}
                 onSubmit={fetchDeviceLogFiles}
+                onSetPageParams={handleSetPageParams}
+                pageParams={pageParams}
               />
             </Box>
             // <Box sx={{ pt: 2 }}>

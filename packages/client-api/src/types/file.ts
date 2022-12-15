@@ -1,7 +1,7 @@
 import { IDeviceLog, IFileSystem } from '@lib/types';
 
 export interface IFileQueryResponse {
-  type: 'GET_FILES' | 'GET_FILE' | 'ADD_FILE' | 'UPDATE_FILE' | 'REMOVE_FILE';
+  type: 'GET_FILES' | 'GET_FILE' | 'ADD_FILE' | 'UPDATE_FILE' | 'REMOVE_FILE' | 'REMOVE_FILES';
 }
 
 export interface IGetFilesResponse extends IFileQueryResponse {
@@ -25,4 +25,9 @@ export interface IUpdateFileResponse extends IFileQueryResponse {
 
 export interface IRemoveFileResponse extends IFileQueryResponse {
   type: 'REMOVE_FILE';
+}
+
+export interface IRemoveFilesResponse extends IFileQueryResponse {
+  type: 'REMOVE_FILES';
+  fileIds: string[];
 }

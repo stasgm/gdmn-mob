@@ -117,5 +117,38 @@ class File extends BaseRequest {
       message: res?.error || 'Файл не удален',
     } as error.IServerError;
   };
+
+  removeFiles = async (fileIds: string[]) => {
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
+
+      return {
+        type: 'REMOVE_FILE',
+      } as types.IRemoveFileResponse;
+    }
+
+    try {
+      const res = await this.api.axios.post<IResponse<void>>('/files/?action=delete', fileIds);
+      // const res = await this.api.axios.delete<IResponse<void>>('/files/', fileIds);
+      const resData = res.data;
+
+      if (resData.result) {
+        return {
+          type: 'REMOVE_FILES',
+          fileIds,
+        } as types.IRemoveFilesResponse;
+      }
+
+      return {
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err instanceof TypeError ? err.message : 'ошибка удаления файлов',
+      } as error.INetworkError;
+    }
+  };
 }
 export default File;

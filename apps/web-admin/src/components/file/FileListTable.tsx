@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
@@ -21,7 +21,7 @@ import { IFileSystem } from '@lib/types';
 import { useFormik } from 'formik';
 
 import { adminPath } from '../../utils/constants';
-import { IFileFormik } from '../../types';
+import { IFileFormik, IPageParam } from '../../types';
 
 interface IProps {
   files: IFileSystem[];
@@ -30,6 +30,12 @@ interface IProps {
   onChangeSelectedFiles?: (newSelectedDeviceIds: any[]) => void;
   isFilterVisible?: boolean;
   onSubmit: (values: any) => void;
+  onDelete?: (ids?: string[]) => void;
+  onSelectOne: (_event: any, file: IFileSystem) => void;
+  onSelectMany: (event: any) => void;
+  selectedFileIds: IFileSystem[];
+  onSetPageParams: (filesFilters: IPageParam) => void;
+  pageParams?: IPageParam | undefined;
 }
 
 const FileListTable = ({
@@ -39,8 +45,12 @@ const FileListTable = ({
   limitRows = 0,
   isFilterVisible = false,
   onSubmit,
+  onSelectOne,
+  onSelectMany,
+  selectedFileIds,
+  onSetPageParams,
+  pageParams,
 }: IProps) => {
-  const [selectedFileIds, setSelectedFileIds] = useState<IFileSystem[]>(selectedFiles);
   const [limit, setLimit] = useState(25);
   const [page, setPage] = useState(0);
 
@@ -58,9 +68,12 @@ const FileListTable = ({
     };
   }, []);
 
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const formik = useFormik<IFileFormik>({
     enableReinitialize: true,
-    initialValues: initialValues,
+    initialValues: pageParams?.filesFilters ? (pageParams?.filesFilters as IFileFormik) : initialValues,
     onSubmit: (values) => {
       onSubmit(values);
     },
@@ -126,42 +139,6 @@ const FileListTable = ({
     formik.values.uid,
   ]);
 
-  const handleSelectAll = (event: any) => {
-    let newSelectedFileIds;
-
-    if (event.target.checked) {
-      newSelectedFileIds = files.map((file: any) => file);
-    } else {
-      newSelectedFileIds = [];
-    }
-
-    setSelectedFileIds(newSelectedFileIds);
-    onChangeSelectedFiles && onChangeSelectedFiles(newSelectedFileIds);
-  };
-
-  const handleSelectOne = (_event: any, file: IFileSystem) => {
-    const selectedIndex = selectedFileIds.map((item: IFileSystem) => item.id).indexOf(file.id);
-
-    let newSelectedFileIds: IFileSystem[] = [];
-
-    if (selectedIndex === -1) {
-      newSelectedFileIds = newSelectedFileIds.concat(selectedFileIds, file);
-    } else if (selectedIndex === 0) {
-      newSelectedFileIds = newSelectedFileIds.concat(selectedFileIds.slice(1));
-    } else if (selectedIndex === selectedFileIds.length - 1) {
-      newSelectedFileIds = newSelectedFileIds.concat(selectedFileIds.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelectedFileIds = newSelectedFileIds.concat(
-        selectedFileIds.slice(0, selectedIndex),
-        selectedFileIds.slice(selectedIndex + 1),
-      );
-    }
-
-    setSelectedFileIds(newSelectedFileIds);
-
-    onChangeSelectedFiles && onChangeSelectedFiles(newSelectedFileIds);
-  };
-
   const handleLimitChange = (event: any) => {
     setLimit(event.target.value);
   };
@@ -171,19 +148,26 @@ const FileListTable = ({
   };
 
   useEffect(() => {
-    if (limitRows > 0) {
-      setLimit(limitRows);
+    if (isFilterVisible && formik.values !== initialValues) {
+      onSetPageParams({ filesFilters: formik.values });
     }
+  }, [formik.values, initialValues, isFilterVisible, onSetPageParams]);
 
-    if (selectedFileIds.length === 0) {
-      if (selectedFiles.length > 0) {
-        const newSelectedFileIds = selectedFiles.map((file: IFileSystem) => file);
+  // useEffect(() => {
+  //   if (limitRows > 0) {
+  //     setLimit(limitRows);
+  //   }
 
-        setSelectedFileIds(newSelectedFileIds);
-      }
-    }
-  }, [limitRows, selectedFileIds.length, selectedFiles]);
+  //   if (selectedFileIds.length === 0) {
+  //     if (selectedFiles.length > 0) {
+  //       const newSelectedFileIds = selectedFiles.map((file: IFileSystem) => file);
 
+  //       setSelectedFileIds(newSelectedFileIds);
+  //     }
+  //   }
+  // }, [limitRows, selectedFileIds.length, selectedFiles]);
+
+  const hlink = <Link to={`${adminPath}/app/files/123546`} />;
   const TableRows = () => {
     const fileList = filteredList.slice(page * limit, page * limit + limit).map((file: IFileSystem) => {
       return (
@@ -191,11 +175,22 @@ const FileListTable = ({
           hover
           key={file.id}
           selected={selectedFileIds.findIndex((d) => d.id === file?.id) !== -1}
-          component={Link}
-          to={`${adminPath}/app/files/${file.id}`}
-          sx={{ backgroundColor: file.appSystem && file.producer && !file.device ? '#ffcfd1' : 'white' }}
+          onClick={(event) => {
+            event.preventDefault();
+            navigate(`${adminPath}/app/files/${file.id}`);
+          }}
+          sx={{
+            backgroundColor: file.appSystem && file.producer && !file.device ? '#ffcfd1' : 'white',
+            cursor: 'pointer',
+          }}
         >
-          <TableCell padding="checkbox">
+          <TableCell
+            padding="checkbox"
+            onClick={(event) => {
+              event.stopPropagation();
+              onSelectOne(event, file);
+            }}
+          >
             <Checkbox
               checked={
                 selectedFileIds
@@ -204,7 +199,6 @@ const FileListTable = ({
                   })
                   .indexOf(file.id) !== -1
               }
-              onChange={(event) => handleSelectOne(event, file)}
               value="true"
             />
           </TableCell>
@@ -250,7 +244,7 @@ const FileListTable = ({
                     checked={selectedFileIds.length === filteredList.length}
                     color="primary"
                     indeterminate={selectedFileIds.length > 0 && selectedFileIds.length < filteredList.length}
-                    onChange={handleSelectAll}
+                    onChange={onSelectMany}
                   />
                 </TableCell>
                 <TableCell style={{ minWidth: 150 }}>Путь</TableCell>

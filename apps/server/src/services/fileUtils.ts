@@ -1,5 +1,5 @@
 import path from 'path';
-import { readdir, unlink, stat, writeFile } from 'fs/promises';
+import { readdir, unlink, stat } from 'fs/promises';
 
 import { IFileSystem, IExtraFileInfo } from '@lib/types';
 
@@ -179,13 +179,16 @@ export const deleteFileById = async (fid: string): Promise<void> => {
     log.error(`Неправильный параметр ID '${fid} в запросе`);
     return;
   }
-
-  const check = await checkFileExists(fullName);
-  if (!check) {
-    log.error(`Файл ${fullName} не существует`);
-    return;
-  }
   return unlink(fullName);
+};
+
+export const deleteManyFiles = async (ids: string[]): Promise<void> => {
+  await Promise.allSettled(
+    ids.map(async (id) => {
+      const fullName = alias2fullFileName(id);
+      return unlink(fullName);
+    }),
+  );
 };
 
 export const updateById = async <T>(id: string, fileData: Partial<Awaited<T>>): Promise<void> => {

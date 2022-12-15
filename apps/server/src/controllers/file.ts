@@ -2,7 +2,7 @@ import { Context, ParameterizedContext } from 'koa';
 
 import { fileService } from '../services';
 
-import { ok } from '../utils/apiHelpers';
+import { ok, notOk } from '../utils/apiHelpers';
 
 const getFiles = async (ctx: ParameterizedContext): Promise<void> => {
   const filesList = await fileService.findMany();
@@ -26,6 +26,20 @@ const removeFile = async (ctx: ParameterizedContext): Promise<void> => {
   ok(ctx as Context, undefined, 'removeFile: file is successfully  deleted');
 };
 
+const removeManyFiles = async (ctx: ParameterizedContext): Promise<void> => {
+  const { action } = ctx.query;
+
+  if (!action || action !== 'delete') {
+    notOk(ctx as Context);
+    return;
+  }
+  const ids = ctx.request.body as string[];
+
+  await fileService.deleteMany(ids);
+
+  ok(ctx as Context, undefined, 'removeManyFiles: files are successfully  deleted');
+};
+
 const updateFile = async (ctx: ParameterizedContext): Promise<void> => {
   const { id } = ctx.request.params;
 
@@ -36,4 +50,4 @@ const updateFile = async (ctx: ParameterizedContext): Promise<void> => {
   ok(ctx as Context, updatedFile, `updateFile: file '${id}' is successfully updated`);
 };
 
-export { getFiles, getFile, removeFile, updateFile };
+export { getFiles, getFile, removeFile, updateFile, removeManyFiles };
