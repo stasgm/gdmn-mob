@@ -42,10 +42,9 @@ const deleteFiles: Config = {
       ...urlValidation.checkURL,
     }),
     type: 'json',
-    body: Joi.array()
-      .items(Joi.string())
-      .required()
-      .error(new InvalidParameterException('Некорректный формат списка удаляемых файлов')),
+    body: Joi.object({
+      ids: Joi.array().items(Joi.string()).required(),
+    }).error(new InvalidParameterException('Некорректный формат списка удаляемых файлов')),
   },
 };
 

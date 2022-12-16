@@ -1,4 +1,4 @@
-import { IFileSystem, IResponse } from '@lib/types';
+import { IFileIds, IFileSystem, IResponse } from '@lib/types';
 
 import { error, file as types } from '../types';
 import { getParams, sleep } from '../utils';
@@ -118,37 +118,35 @@ class File extends BaseRequest {
     } as error.IServerError;
   };
 
-  removeFiles = async (fileIds: string[]) => {
+  removeFiles = async (customRequest: CustomRequest, fileIds: string[]) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
-        type: 'REMOVE_FILE',
-      } as types.IRemoveFileResponse;
+        type: 'REMOVE_FILES',
+      } as types.IRemoveFilesResponse;
     }
 
-    try {
-      const res = await this.api.axios.post<IResponse<void>>('/files/?action=delete', fileIds);
-      // const res = await this.api.axios.delete<IResponse<void>>('/files/', fileIds);
-      const resData = res.data;
+    const body: Partial<IFileIds> = { ids: fileIds };
 
-      if (resData.result) {
-        return {
-          type: 'REMOVE_FILES',
-          fileIds,
-        } as types.IRemoveFilesResponse;
-      }
+    console.log('body', body);
+    const res = await customRequest<void>({
+      api: this.api.axios,
+      method: 'POST',
+      url: '/files/?action=delete',
+      data: body,
+    });
 
+    if (res?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка удаления файлов',
-      } as error.INetworkError;
+        type: 'REMOVE_FILES',
+      } as types.IRemoveFilesResponse;
     }
+
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'Файл не удален',
+    } as error.IServerError;
   };
 }
 export default File;

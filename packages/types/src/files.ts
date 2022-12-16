@@ -14,3 +14,7 @@ export interface IFileSystem extends IEntity, IExtraFileInfo {
   fileName: string;
   path: string;
 }
+
+export interface IFileIds {
+  ids: string[];
+}

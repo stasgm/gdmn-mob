@@ -10,18 +10,23 @@ const addDeviceLog: Config = {
       ...urlValidation.checkURL,
     }),
     type: 'json',
-    body: Joi.object({
-      companyId: Joi.string().required().error(new InvalidParameterException('Не указана организация')),
-      appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана подсистема')),
-      deviceLog: Joi.array().items(
-        Joi.object({
-          name: Joi.string().required().error(new InvalidParameterException('Не указан наименование метода')),
-          date: Joi.string().required().error(new InvalidParameterException('Не указана дата ошибки')),
-          id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор')),
-          message: Joi.string().required().error(new InvalidParameterException('Не указан текст ошибки')),
-        }),
-      ),
-    }),
+    body: Joi.alternatives().try(
+      Joi.object({
+        companyId: Joi.string().required().error(new InvalidParameterException('Не указана организация')),
+        appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана подсистема')),
+        deviceLog: Joi.array().items(
+          Joi.object({
+            name: Joi.string().required().error(new InvalidParameterException('Не указан наименование метода')),
+            date: Joi.string().required().error(new InvalidParameterException('Не указана дата ошибки')),
+            id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор')),
+            message: Joi.string().required().error(new InvalidParameterException('Не указан текст ошибки')),
+          }),
+        ),
+      }),
+      Joi.object({
+        ids: Joi.array().items(Joi.string()).required(),
+      }),
+    ),
   },
 };
 
