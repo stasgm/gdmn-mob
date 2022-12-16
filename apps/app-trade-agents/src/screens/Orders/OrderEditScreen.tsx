@@ -18,7 +18,7 @@ import {
 } from '@lib/mobile-ui';
 import { IDocumentType, IReference, ScreenState } from '@lib/types';
 
-import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks';
+import { generateId, getDateString, isNamedEntity, useFilteredDocList } from '@lib/mobile-hooks';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOutlet, IOrderFormParam } from '../../store/types';
@@ -52,7 +52,9 @@ const OrderEditScreen = () => {
   } = useSelector((state) => state.app.formParams as IOrderFormParam);
 
   // Подразделение по умолчанию
-  const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data);
+  const departSetting = useSelector((state) => state.auth.user?.settings?.depart?.data);
+
+  const defaultDepart = useMemo(() => (isNamedEntity(departSetting) ? departSetting : undefined), [departSetting]);
 
   useEffect(() => {
     return () => {

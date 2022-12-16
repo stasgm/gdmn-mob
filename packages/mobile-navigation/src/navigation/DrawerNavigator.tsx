@@ -85,7 +85,7 @@ const DrawerNavigator = ({ onSyncClick, items }: IProps) => {
     //Определяем, сколько минут с прошлой синхронизации
     //и если меньше, чем synchPeriod, то предупреждаем и выходим
     //иначе - выполняем синхронизацию
-    const timeUntilNextSynch = 0; //getTimeUntilNextSynch(syncDate, synchPeriod);
+    const timeUntilNextSynch = getTimeUntilNextSynch(syncDate, synchPeriod);
 
     if (timeUntilNextSynch > 0) {
       Alert.alert(
