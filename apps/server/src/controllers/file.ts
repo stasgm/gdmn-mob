@@ -1,5 +1,7 @@
 import { Context, ParameterizedContext } from 'koa';
 
+import { IFileIds } from '@lib/types';
+
 import { fileService } from '../services';
 
 import { ok, notOk } from '../utils/apiHelpers';
@@ -33,7 +35,7 @@ const removeManyFiles = async (ctx: ParameterizedContext): Promise<void> => {
     notOk(ctx as Context);
     return;
   }
-  const ids = ctx.request.body as string[];
+  const { ids } = ctx.request.body as IFileIds;
 
   await fileService.deleteMany(ids);
 
