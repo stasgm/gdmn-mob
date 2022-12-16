@@ -77,7 +77,7 @@ const removeFiles = (fileIds: string[]): AppThunk => {
   return async (dispatch) => {
     dispatch(fileSystemActions.removeFilesAsync.request(''));
 
-    const response = await api.file.removeFiles(fileIds);
+    const response = await api.file.removeFiles(webRequest(dispatch, authActions), fileIds);
 
     if (response.type === 'REMOVE_FILES') {
       return dispatch(fileSystemActions.removeFilesAsync.success(fileIds));
