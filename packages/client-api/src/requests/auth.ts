@@ -147,7 +147,7 @@ class Auth extends BaseRequest {
 
     return {
       type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Невереный код активации',
+      message: res?.error || 'Код активации не проверен',
     } as error.IServerError;
   };
 

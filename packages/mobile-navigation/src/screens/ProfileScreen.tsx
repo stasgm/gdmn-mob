@@ -83,6 +83,8 @@ const ProfileScreen = () => {
           text: 'Да',
           onPress: () => {
             dispatch(appActions.clearSuperDataFromDisc());
+            //Очищаем данные пользователя после всего
+            dispatch(authActions.init());
             dispatch(authActions.setInit(true));
           },
         },
