@@ -1,6 +1,6 @@
 import { IDeviceLog, IDeviceLogFiles } from '@lib/types';
 
-import { saveDeviceLogFile, getFilesObject, getFile, deleteFileById } from './errorLogUtils';
+import { saveDeviceLogFile, getFilesObject, getFile, deleteFileById, deleteManyFiles } from './errorLogUtils';
 
 import { getDb } from './dao/db';
 
@@ -68,4 +68,12 @@ const findMany = async (): Promise<IDeviceLogFiles[]> => {
   return await getFilesObject();
 };
 
-export { addOne, findMany, findOne, deleteOne };
+/**
+/* Удаляет множество файлов по массиву ИД
+/* @param id ИД файла
+*/
+const deleteMany = async (ids: string[]): Promise<void> => {
+  return await deleteManyFiles(ids);
+};
+
+export { addOne, findMany, findOne, deleteOne, deleteMany };
