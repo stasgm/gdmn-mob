@@ -6,7 +6,7 @@ import { deviceLogService } from '../services';
 
 import { InvalidParameterException } from '../exceptions';
 
-import { created, ok, notOk } from '../utils/apiHelpers';
+import { created, ok } from '../utils/apiHelpers';
 
 const addDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
   const { action } = ctx.query;
@@ -56,24 +56,10 @@ const removeDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
   ok(ctx as Context, undefined, `removeDeviceLog: DeviceLog '${id}' is successfully removed`);
 };
 
-const removeManyDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
-  const { action } = ctx.query;
-
-  if (!action || action !== 'delete') {
-    notOk(ctx as Context);
-    return;
-  }
-  const { ids } = ctx.request.body as IFileIds;
-
-  await deviceLogService.deleteMany(ids);
-
-  ok(ctx as Context, undefined, 'removeManyFiles: files are successfully  deleted');
-};
-
 const getDeviceLogs = async (ctx: ParameterizedContext): Promise<void> => {
   const deviceLogList = await deviceLogService.findMany();
 
   ok(ctx as Context, deviceLogList, 'getDeviceLogs: deviceLogs are successfully received');
 };
 
-export { addDeviceLog, getDeviceLogs, getDeviceLog, removeDeviceLog, removeManyDeviceLog };
+export { addDeviceLog, getDeviceLogs, getDeviceLog, removeDeviceLog };
