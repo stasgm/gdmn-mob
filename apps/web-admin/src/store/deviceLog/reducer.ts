@@ -57,22 +57,35 @@ const reducer: Reducer<IDeviceLogState, DeviceLogActionType> = (state = initialS
         errorMessage: action.payload || 'error',
       };
 
-    case getType(deviceLogActions.removeDeviceLogsAsync.request):
+    case getType(deviceLogActions.removeDeviceLogAsync.request):
       return { ...state, loading: true, logList: [], errorMessage: '' };
 
-    case getType(deviceLogActions.removeDeviceLogsAsync.success):
+    case getType(deviceLogActions.removeDeviceLogAsync.success):
       return {
         ...state,
         filesList: state.filesList.filter((i) => i.id !== action.payload),
         loading: false,
       };
 
-    case getType(deviceLogActions.removeDeviceLogsAsync.failure):
+    case getType(deviceLogActions.removeDeviceLogAsync.failure):
       return {
         ...state,
         loading: false,
         errorMessage: action.payload || 'error',
       };
+
+    case getType(deviceLogActions.removeDeviceLogsAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
+
+    case getType(deviceLogActions.removeDeviceLogsAsync.success):
+      return {
+        ...state,
+        loading: false,
+        filesList: state.filesList.filter((i) => action.payload.indexOf(i.id) === -1),
+      };
+
+    case getType(deviceLogActions.removeDeviceLogsAsync.failure):
+      return { ...state, loading: false, errorMessage: action.payload || 'error' };
 
     case getType(deviceLogActions.setPageParam):
       return {

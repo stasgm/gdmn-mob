@@ -19,11 +19,17 @@ const fetchDeviceLogAsync = createAsyncAction(
   'DEVICE_LOG/FETCH_DEVICE_LOG_FAILURE',
 )<string | undefined, IDeviceLog[], string>();
 
-const removeDeviceLogsAsync = createAsyncAction(
+const removeDeviceLogAsync = createAsyncAction(
   'DEVICE_LOG/REMOVE_DEVICE_LOG',
   'DEVICE_LOG/REMOVE_DEVICE_LOG_SUCCESS',
   'DEVICE_LOG/REMOVE_DEVICE_LOG_FAILURE',
 )<string | undefined, string, string>();
+
+const removeDeviceLogsAsync = createAsyncAction(
+  'DEVICE_LOG/REMOVE_MANY',
+  'DEVICE_LOG/REMOVE_MANY_SUCCESS',
+  'DEVICE_LOG/REMOVE_MANY_FAILURE',
+)<string | undefined, string[], string>();
 
 const setPageParam = createAction('DEVICE_LOG/SET_PARAM')<IPageParam | undefined>();
 const clearPageParams = createAction('DEVICE_LOG/CLEAR_PARAMS')();
@@ -31,6 +37,7 @@ const clearPageParams = createAction('DEVICE_LOG/CLEAR_PARAMS')();
 export const deviceLogActions = {
   fetchDeviceLogFilesAsync,
   fetchDeviceLogAsync,
+  removeDeviceLogAsync,
   removeDeviceLogsAsync,
   clearPageParams,
   setPageParam,

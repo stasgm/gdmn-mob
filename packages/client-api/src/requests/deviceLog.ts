@@ -1,4 +1,4 @@
-import { IDeviceLog, IDeviceLogFiles, IResponse } from '@lib/types';
+import { IDeviceLog, IDeviceLogFiles, IFileIds, IResponse } from '@lib/types';
 
 import { error, deviceLog as types } from '../types';
 import { getParams, sleep } from '../utils';
@@ -135,5 +135,36 @@ class DeviceLog extends BaseRequest {
       message: res?.error || 'Журнал ошибок не удален',
     } as error.IServerError;
   };
+
+  removeDeviceLogs = async (customRequest: CustomRequest, deviceLogIds: string[]) => {
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
+
+      return {
+        type: 'REMOVE_DEVICELOGS',
+      } as types.IRemoveDeviceLogsResponse;
+    }
+
+    const body: Partial<IFileIds> = { ids: deviceLogIds };
+
+    const res = await customRequest<void>({
+      api: this.api.axios,
+      method: 'POST',
+      url: '/deviceLogs/?action=delete',
+      data: body,
+    });
+
+    if (res?.result) {
+      return {
+        type: 'REMOVE_DEVICELOGS',
+      } as types.IRemoveDeviceLogsResponse;
+    }
+
+    return {
+      type: res ? 'ERROR' : 'CONNECT_ERROR',
+      message: res?.error || 'Журналы ошибок не удалены',
+    } as error.IServerError;
+  };
 }
+
 export default DeviceLog;

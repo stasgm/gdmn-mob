@@ -49,7 +49,7 @@ const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
       name: yup.string().required('Required'),
     }),
     onSubmit: (values) => {
-      onSubmit(values);
+      onSubmit({ ...values, name: values.name.trim() });
     },
   });
 

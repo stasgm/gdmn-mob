@@ -40,9 +40,9 @@ interface IProps {
 
 const FileListTable = ({
   files = [],
-  onChangeSelectedFiles,
-  selectedFiles = [],
-  limitRows = 0,
+  // onChangeSelectedFiles,
+  // selectedFiles = [],
+  // limitRows = 0,
   isFilterVisible = false,
   onSubmit,
   onSelectOne,
@@ -69,7 +69,6 @@ const FileListTable = ({
   }, []);
 
   const navigate = useNavigate();
-  const location = useLocation();
 
   const formik = useFormik<IFileFormik>({
     enableReinitialize: true,
@@ -167,7 +166,6 @@ const FileListTable = ({
   //   }
   // }, [limitRows, selectedFileIds.length, selectedFiles]);
 
-  const hlink = <Link to={`${adminPath}/app/files/123546`} />;
   const TableRows = () => {
     const fileList = filteredList.slice(page * limit, page * limit + limit).map((file: IFileSystem) => {
       return (
