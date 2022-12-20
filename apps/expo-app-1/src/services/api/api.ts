@@ -37,7 +37,7 @@ const handleError = (error: any): IApiErrorResponse => {
   }
 
   console.error('handleError', JSON.stringify(error));
-  const { statusCode } = error.response?.data;
+  const { statusCode } = error.data;
   if (statusCode === 401) {
     return { success: false, data: { error: 'No permissions' } };
   }

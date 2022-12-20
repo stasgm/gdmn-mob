@@ -2,7 +2,7 @@ import { DeviceState, IUser, IUserCredentials } from '@lib/types';
 import { user as mockUser } from '@lib/mock';
 
 import { error, auth as types } from '../types';
-import { sleep } from '../utils';
+import { response2Log, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
@@ -35,15 +35,15 @@ class Auth extends BaseRequest {
       data: body,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'SIGNUP',
       } as types.ISignUpResponse;
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Пользователь не создан',
+      type: res.type,
+      message: response2Log(res) || 'Пользователь не создан',
     } as error.IServerError;
   };
 
@@ -75,7 +75,7 @@ class Auth extends BaseRequest {
       data: body,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'LOGIN',
         user: res.data,
@@ -83,8 +83,8 @@ class Auth extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Вход пользователя не выполнен',
+      type: res.type,
+      message: response2Log(res) || 'Вход пользователя не выполнен',
     } as error.IServerError;
   };
 
@@ -103,28 +103,28 @@ class Auth extends BaseRequest {
       url: '/auth/logout',
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'LOGOUT',
       } as types.ILogOutResponse;
     }
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Выход из профиля не выполнен',
+      type: res.type,
+      message: response2Log(res) || 'Выход из профиля не выполнен',
     } as error.IServerError;
   };
 
   getCurrentUser = async (customRequest: CustomRequest) => {
     const res = await customRequest<IUser>({ api: this.api.axios, method: 'GET', url: '/auth/user' });
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'GET_CURRENT_USER',
         user: res.data,
       } as types.IUserResponse;
     }
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Данные о пользователе не получены',
+      type: res.type,
+      message: response2Log(res) || 'Данные о пользователе не получены',
     } as error.IServerError;
   };
 
@@ -138,7 +138,7 @@ class Auth extends BaseRequest {
       data: body,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'VERIFY_CODE',
         uid: res.data,
@@ -146,8 +146,8 @@ class Auth extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Код активации не проверен',
+      type: res.type,
+      message: response2Log(res) || 'Код активации не проверен',
     } as error.IServerError;
   };
 
@@ -167,7 +167,7 @@ class Auth extends BaseRequest {
       url: `/auth/deviceStatus/${uid}`,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'GET_DEVICE_STATUS',
         status: res.data,
@@ -175,8 +175,8 @@ class Auth extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Статус устройства не получен',
+      type: res.type,
+      message: response2Log(res) || 'Статус устройства не получен',
     } as error.IServerError;
   };
 }

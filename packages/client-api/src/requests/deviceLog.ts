@@ -1,7 +1,7 @@
-import { IDeviceLog, IDeviceLogFiles, IResponse } from '@lib/types';
+import { IDeviceLog, IDeviceLogFiles } from '@lib/types';
 
 import { error, deviceLog as types } from '../types';
-import { getParams, sleep } from '../utils';
+import { getParams, response2Log, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
@@ -38,15 +38,15 @@ class DeviceLog extends BaseRequest {
       data: body,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'ADD_DEVICELOG',
       } as types.IAddDeviceLogResponse;
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Журнал ошибок устройства не отправлен',
+      type: res.type,
+      message: response2Log(res) || 'Журнал ошибок устройства не отправлен',
     } as error.IServerError;
   };
 
@@ -60,22 +60,22 @@ class DeviceLog extends BaseRequest {
       } as error.IServerError;
     }
 
-    const res = await customRequest<IDeviceLogFiles>({
+    const res = await customRequest<IDeviceLog[]>({
       api: this.api.axios,
       method: 'GET',
       url: `/deviceLogs/${deviceLogId}`,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'GET_DEVICELOG',
-        deviceLog: res.data || [],
+        deviceLog: res.data,
       } as types.IGetDeviceLogResponse;
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Журнал ошибок не получен',
+      type: res.type,
+      message: response2Log(res) || 'Журнал ошибок не получен',
     } as error.IServerError;
   };
 
@@ -96,7 +96,7 @@ class DeviceLog extends BaseRequest {
       params,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'GET_DEVICELOGS',
         deviceLogs: res.data || [],
@@ -104,8 +104,8 @@ class DeviceLog extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Журналы ошибок не получены',
+      type: res.type,
+      message: response2Log(res) || 'Журналы ошибок не получены',
     } as error.IServerError;
   };
 
@@ -124,7 +124,7 @@ class DeviceLog extends BaseRequest {
       url: `/deviceLogs/${deviceLogId}`,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'REMOVE_DEVICELOG',
       } as types.IRemoveDeviceLogResponse;
@@ -132,7 +132,7 @@ class DeviceLog extends BaseRequest {
 
     return {
       type: 'ERROR',
-      message: res?.error || 'Журнал ошибок не удален',
+      message: response2Log(res) || 'Журнал ошибок не удален',
     } as error.IServerError;
   };
 }

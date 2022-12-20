@@ -3,7 +3,7 @@ import { IAppSystem, NewAppSystem } from '@lib/types';
 import { appSystems as mockAppSystems } from '@lib/mock';
 
 import { error, appSystem as types } from '../types';
-import { generateId, sleep } from '../utils';
+import { generateId, response2Log, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
@@ -35,7 +35,7 @@ class AppSystem extends BaseRequest {
       data: appSystem,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'ADD_APP_SYSTEM',
         appSystem: res.data,
@@ -43,8 +43,8 @@ class AppSystem extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Подсистема не создана',
+      type: res.type,
+      message: response2Log(res) || 'Подсистема не создана',
     } as error.IServerError;
   };
 
@@ -65,7 +65,7 @@ class AppSystem extends BaseRequest {
       data: appSystem,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'UPDATE_APP_SYSTEM',
         appSystem: res.data,
@@ -73,8 +73,8 @@ class AppSystem extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Подсистема не обновлена',
+      type: res.type,
+      message: response2Log(res) || 'Подсистема не обновлена',
     } as error.IServerError;
   };
 
@@ -93,15 +93,15 @@ class AppSystem extends BaseRequest {
       url: `/appSystems/${appSystemId}`,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'REMOVE_APP_SYSTEM',
       } as types.IRemoveAppSystemResponse;
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Подсистема не удалена',
+      type: res.type,
+      message: response2Log(res) || 'Подсистема не удалена',
     } as error.IServerError;
   };
 
@@ -130,7 +130,7 @@ class AppSystem extends BaseRequest {
       url: `/appSystems/${appSystemId}`,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'GET_APP_SYSTEM',
         appSystem: res.data,
@@ -138,8 +138,8 @@ class AppSystem extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Данные о подсистеме не получены',
+      type: res.type,
+      message: response2Log(res) || 'Данные о подсистеме не получены',
     } as error.IServerError;
   };
 
@@ -155,7 +155,7 @@ class AppSystem extends BaseRequest {
 
     const res = await customRequest<IAppSystem[]>({ api: this.api.axios, method: 'GET', url: '/appSystems', params });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'GET_APP_SYSTEMS',
         appSystems: res.data,
@@ -163,8 +163,8 @@ class AppSystem extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Данные о подсистемах не получены',
+      type: res.type,
+      message: response2Log(res) || 'Данные о подсистемах не получены',
     } as error.IServerError;
   };
 }

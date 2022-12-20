@@ -2,7 +2,7 @@ import { IActivationCode } from '@lib/types';
 import { activationCodes as mockActivationCodes } from '@lib/mock';
 
 import { error, activationCode as types } from '../types';
-import { sleep } from '../utils';
+import { response2Log, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
@@ -35,7 +35,7 @@ class ActivationCode extends BaseRequest {
 
     const res = await customRequest<IActivationCode[]>({ api: this.api.axios, method: 'GET', url: '/codes', params });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'GET_CODES',
         codes: res.data || [],
@@ -43,8 +43,8 @@ class ActivationCode extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Данные об активационных кодах не получены',
+      type: res.type,
+      message: response2Log(res) || 'Данные об активационных кодах не получены',
     } as error.IServerError;
   };
 
@@ -77,7 +77,7 @@ class ActivationCode extends BaseRequest {
       url: `/codes/device/${deviceId}/code`,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'CREATE_CODE',
         code: res.data,
@@ -85,8 +85,8 @@ class ActivationCode extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Код активации не создан',
+      type: res.type,
+      message: response2Log(res) || 'Код активации не создан',
     } as error.IServerError;
   };
 }

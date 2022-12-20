@@ -1,7 +1,7 @@
 import { IMessage, IMessageInfo, INamedEntity, NewMessage } from '@lib/types';
 
 import { error, message as types } from '../types';
-import { generateId, sleep } from '../utils';
+import { generateId, response2Log, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
@@ -43,17 +43,17 @@ class Message extends BaseRequest {
       data: body,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'SEND_MESSAGE',
-        uid: res.data?.uid,
-        date: res.data?.date,
+        uid: res.data.uid,
+        date: res.data.date,
       } as types.ISendMessageResponse;
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Сообщение не отправлено',
+      type: res.type,
+      message: response2Log(res) || 'Сообщение не отправлено',
     } as error.IServerError;
   };
 
@@ -74,7 +74,7 @@ class Message extends BaseRequest {
       params,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'GET_MESSAGES',
         messageList: res.data,
@@ -82,8 +82,8 @@ class Message extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Сообщения не получены',
+      type: res.type,
+      message: response2Log(res) || 'Сообщения не получены',
     } as error.IServerError;
   };
 
@@ -103,14 +103,14 @@ class Message extends BaseRequest {
       params,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'REMOVE_MESSAGE',
       } as types.IRemoveMessageResponse;
     }
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Сooбщение не удалено',
+      type: res.type,
+      message: response2Log(res) || 'Сooбщение не удалено',
     } as error.IServerError;
   };
 
@@ -130,15 +130,15 @@ class Message extends BaseRequest {
       params,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'CLEAR_MESSAGES',
       } as types.IClearMessagesResponse;
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Сообщения не удалены',
+      type: res.type,
+      message: response2Log(res) || 'Сообщения не удалены',
     } as error.IServerError;
   };
 }

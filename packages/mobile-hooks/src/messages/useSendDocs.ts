@@ -9,7 +9,7 @@ import {
 } from '@lib/store';
 
 import { IDeviceLog, IDocument, IMessage } from '@lib/types';
-import api from '@lib/client-api';
+import api, { isConnectError } from '@lib/client-api';
 
 import { useMemo } from 'react';
 
@@ -70,12 +70,8 @@ export const useSendDocs = (readyDocs: IDocument[]) => {
 
       const statusRespone = await api.auth.getDeviceStatus(appRequest, deviceId);
       if (statusRespone.type !== 'GET_DEVICE_STATUS') {
-        addError(
-          'useSendDocs: getDeviceStatus',
-          `Ошибка ${statusRespone.type === 'CONNECT_ERROR' ? ' подключения к серверу' : ''}: ${statusRespone.message}`,
-          tempErrs,
-        );
-        connectError = statusRespone.type === 'CONNECT_ERROR';
+        addError('useSendDocs: getDeviceStatus', `Статус устройства не получен. ${statusRespone.message}`, tempErrs);
+        connectError = isConnectError(statusRespone.type);
       } else {
         authDispatch(
           authActions.setConnectionStatus(statusRespone.status === 'ACTIVE' ? 'connected' : 'not-activated'),
