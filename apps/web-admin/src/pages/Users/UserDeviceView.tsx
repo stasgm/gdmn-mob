@@ -40,8 +40,10 @@ const UserDeviceView = () => {
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => state.devices);
   const deviceBinding = deviceBindingSelectors.bindingById(bindingid);
-  const device = deviceSelectors.deviceById(deviceBinding?.device.id || '-1');
+  const device = deviceSelectors.deviceById(deviceBinding?.device.id);
   const [open, setOpen] = useState(false);
+
+  const { user } = useSelector((state) => state.auth);
 
   const handleCancel = () => {
     navigate(-1);
@@ -171,6 +173,12 @@ const UserDeviceView = () => {
           <DeviceBindingDetailsView deviceBinding={deviceBinding} uid={device?.uid} />
         </Box>
       </Box>
+      {user?.role === 'SuperAdmin' ? (
+        <Box>
+          <CardHeader title={'Журнал ошибок устройства пользователя'} sx={{ mx: 2 }} />
+          <UserDeviceLog deviceId={device?.uid} userId={deviceBinding.user.id} />
+        </Box>
+      ) : null}
     </>
   );
 };
