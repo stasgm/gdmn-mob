@@ -1,30 +1,62 @@
 import { Box, Container } from '@material-ui/core';
 
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import { generateId } from '@lib/client-api/dist/src/utils';
+import { IDeviceLog } from '@lib/types';
 
-import { IPageParam } from '../../types';
+import { IHeadCells } from '../../types';
 
 import { useDispatch, useSelector } from '../../store';
 
-import DeviceBindingLogTable from '../../components/deviceBinding/DeviceBindingLogTable';
+import deviceLogSelectors from '../../store/deviceLog/selectors';
+import deviceLogActions from '../../store/deviceLog';
+import SortableTable from '../../components/SortableTable';
 
 interface IProps {
   userId?: string;
   deviceId?: string;
-  onAddDevice?: () => void;
 }
 
-const UserDeviceLog = ({ userId, deviceId, onAddDevice }: IProps) => {
+const UserDeviceLog = ({ userId, deviceId }: IProps) => {
   const dispatch = useDispatch();
 
   // const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
-  const { filesList, loading, errorMessage, pageParams } = useSelector((state) => state.deviceLogs);
+  const { logList } = useSelector((state) => state.deviceLogs);
 
-  const logFilesList = filesList.filter;
-  const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
+  const fetchDeviceLogFiles = useCallback(
+    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+      dispatch(deviceLogActions.fetchDeviceLogFiles());
+    },
+    [dispatch],
+  );
+
+  useEffect(() => {
+    // Загружаем данные при загрузке компонента.
+    fetchDeviceLogFiles();
+  }, [fetchDeviceLogFiles]);
+
+  const userLogFile = deviceLogSelectors.deviceLogByUserDeviceIds(userId, deviceId);
+
+  const fetchDeviceLogFile = useCallback(
+    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+      if (userLogFile) {
+        dispatch(deviceLogActions.fetchDeviceLog(userLogFile?.id));
+      }
+    },
+    [dispatch, userLogFile],
+  );
+
+  useEffect(() => {
+    // Загружаем данные при загрузке компонента.
+    fetchDeviceLogFile();
+  }, [fetchDeviceLogFile, userLogFile?.id]);
+
+  const headCells: IHeadCells<IDeviceLog>[] = [
+    { id: 'name', label: 'Функция', sortEnable: true, filterEnable: true },
+    { id: 'message', label: 'Сообщение', sortEnable: true, filterEnable: true },
+    { id: 'date', label: 'Дата', sortEnable: true, filterEnable: true },
+  ];
 
   return (
     <Box
@@ -34,17 +66,8 @@ const UserDeviceLog = ({ userId, deviceId, onAddDevice }: IProps) => {
       }}
     >
       <Container maxWidth={false}>
-        {/* <ToolbarActionsWithSearch
-          buttons={deviceButtons}
-          searchTitle={'Найти ошибку'}
-          // valueRef={valueRef}
-          updateInput={handleUpdateInput}
-          searchOnClick={handleSearchClick}
-          keyPress={handleKeyPress}
-          value={(pageParamLocal?.filterText as undefined) || ''}
-        /> */}
         <Box sx={{ pt: 2 }}>
-          <DeviceBindingLogTable errors={errorList} limitRows={5} />
+          <SortableTable<IDeviceLog> headCells={headCells} data={logList} path={'/app/deviceLogs/'} />
         </Box>
       </Container>
     </Box>

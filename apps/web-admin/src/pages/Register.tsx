@@ -46,7 +46,13 @@ const Register = () => {
       password: yup.string().required('Заполните это поле'),
       verifyPassword: yup.string().required('Заполните это поле'),
     }),
-    onSubmit: (values) => handleSubmit(values),
+    // onSubmit: (values) => handleSubmit(values),
+    onSubmit: (values) =>
+      handleSubmit({
+        ...values,
+        name: values.name.trim(),
+        password: values.password.trim(),
+      }),
   });
 
   return (

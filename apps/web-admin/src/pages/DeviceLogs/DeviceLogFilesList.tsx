@@ -1,19 +1,19 @@
 import { Helmet } from 'react-helmet';
-import { Box, Container } from '@material-ui/core';
+import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText } from '@material-ui/core';
 import { useCallback, useEffect, useState } from 'react';
 import CachedIcon from '@material-ui/icons/Cached';
 import FilterIcon from '@material-ui/icons/FilterAltOutlined';
+import DeleteIcon from '@material-ui/icons/DeleteOutline';
 
 import { IDeviceLogFiles } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import actions from '../../store/device';
 import { IHeadCells, IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
 import DeviceLogFilesListTable from '../../components/deviceLogs/DeviceLogFilesListTable';
-import deviceLogActions from '../../store/deviceLog';
+import actions from '../../store/deviceLog';
 
 const DeviceLogFilesList = () => {
   const dispatch = useDispatch();
@@ -22,7 +22,7 @@ const DeviceLogFilesList = () => {
 
   const fetchDeviceLogFiles = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(deviceLogActions.fetchDeviceLogFiles());
+      dispatch(actions.fetchDeviceLogFiles());
     },
     [dispatch],
   );
@@ -45,7 +45,7 @@ const DeviceLogFilesList = () => {
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.deviceActions.setPageParam({ filterText: pageParamLocal?.filterText }));
+    dispatch(actions.deviceLogActions.setPageParam({ filterText: pageParamLocal?.filterText }));
     fetchDeviceLogFiles(pageParamLocal?.filterText as string);
   };
 
@@ -59,7 +59,7 @@ const DeviceLogFilesList = () => {
 
   const handleSetPageParams = useCallback(
     (logPageParams: IPageParam) => {
-      dispatch(deviceLogActions.deviceLogActions.setPageParam({ logFilters: logPageParams.logFilters }));
+      dispatch(actions.deviceLogActions.setPageParam({ logFilters: logPageParams.logFilters }));
     },
     [dispatch],
   );
@@ -67,15 +67,70 @@ const DeviceLogFilesList = () => {
   const handleFilter = useCallback(() => {
     if (filterVisible) {
       setFilterVisible(false);
-      dispatch(deviceLogActions.deviceLogActions.setPageParam({ logFilters: undefined }));
+      dispatch(actions.deviceLogActions.setPageParam({ logFilters: undefined }));
     } else {
       setFilterVisible(true);
     }
   }, [dispatch, filterVisible]);
 
   const handleClearError = () => {
-    dispatch(actions.deviceActions.clearError());
+    dispatch(actions.deviceLogActions.clearError());
   };
+
+  const [selectedDeviceLogFileIds, setSelectedDeviceLogFileIds] = useState<IDeviceLogFiles[]>([]);
+
+  const handleSelectAll = (event: any) => {
+    let newSelectedDeviceLogFileIds;
+
+    if (event.target.checked) {
+      newSelectedDeviceLogFileIds = filesList.map((deviceLogFile: any) => deviceLogFile);
+    } else {
+      newSelectedDeviceLogFileIds = [];
+    }
+
+    setSelectedDeviceLogFileIds(newSelectedDeviceLogFileIds);
+  };
+
+  const handleSelectOne = (_event: any, deviceLogFile: IDeviceLogFiles) => {
+    const selectedIndex = selectedDeviceLogFileIds.map((item: IDeviceLogFiles) => item.id).indexOf(deviceLogFile.id);
+
+    let newSelectedDeviceLogFileIds: IDeviceLogFiles[] = [];
+
+    if (selectedIndex === -1) {
+      newSelectedDeviceLogFileIds = newSelectedDeviceLogFileIds.concat(selectedDeviceLogFileIds, deviceLogFile);
+    } else if (selectedIndex === 0) {
+      newSelectedDeviceLogFileIds = newSelectedDeviceLogFileIds.concat(selectedDeviceLogFileIds.slice(1));
+    } else if (selectedIndex === selectedDeviceLogFileIds.length - 1) {
+      newSelectedDeviceLogFileIds = newSelectedDeviceLogFileIds.concat(selectedDeviceLogFileIds.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelectedDeviceLogFileIds = newSelectedDeviceLogFileIds.concat(
+        selectedDeviceLogFileIds.slice(0, selectedIndex),
+        selectedDeviceLogFileIds.slice(selectedIndex + 1),
+      );
+    }
+
+    setSelectedDeviceLogFileIds(newSelectedDeviceLogFileIds);
+  };
+  const [open, setOpen] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleDelete = useCallback(() => {
+    setOpen(false);
+    const ids = selectedDeviceLogFileIds.map((i) => {
+      return i.id;
+    });
+    if (ids) {
+      dispatch(actions.removeDeviceLogs(ids));
+      setSelectedDeviceLogFileIds([]);
+    }
+  }, [dispatch, selectedDeviceLogFileIds]);
 
   const buttons: IToolBarButton[] = [
     {
@@ -89,6 +144,12 @@ const DeviceLogFilesList = () => {
       sx: { mx: 1 },
       onClick: handleFilter,
       icon: <FilterIcon />,
+    },
+    {
+      name: 'Удалить',
+      sx: { mx: 1 },
+      onClick: handleClickOpen,
+      icon: <DeleteIcon />,
     },
   ];
 
@@ -107,6 +168,21 @@ const DeviceLogFilesList = () => {
       <Helmet>
         <title>Журнал ошибок</title>
       </Helmet>
+      <Box>
+        <Dialog open={open} onClose={handleClose}>
+          <DialogContent>
+            <DialogContentText color="black">Вы действительно хотите удалить файлы?</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDelete} color="primary" variant="contained">
+              Удалить
+            </Button>
+            <Button onClick={handleClose} color="secondary" variant="contained">
+              Отмена
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
       <Box
         sx={{
           backgroundColor: 'background.default',
@@ -132,6 +208,10 @@ const DeviceLogFilesList = () => {
                 deviceLogFiles={filesList}
                 isFilterVisible={filterVisible}
                 onSubmit={fetchDeviceLogFiles}
+                onDelete={handleDelete}
+                onSelectMany={handleSelectAll}
+                onSelectOne={handleSelectOne}
+                selectedDeviceLogFiles={selectedDeviceLogFileIds}
                 onSetPageParams={handleSetPageParams}
                 pageParams={pageParams}
               />

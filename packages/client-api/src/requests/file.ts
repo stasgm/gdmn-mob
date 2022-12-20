@@ -129,7 +129,6 @@ class File extends BaseRequest {
 
     const body: Partial<IFileIds> = { ids: fileIds };
 
-    console.log('body', body);
     const res = await customRequest<void>({
       api: this.api.axios,
       method: 'POST',
@@ -145,8 +144,9 @@ class File extends BaseRequest {
 
     return {
       type: res.type,
-      message: response2Log(res) || 'Файл не удален',
+      message: response2Log(res) || 'Файлы не удален',
     } as error.IServerError;
   };
 }
+
 export default File;

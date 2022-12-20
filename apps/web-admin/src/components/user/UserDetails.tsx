@@ -103,7 +103,16 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
         Object.keys(user).length == 0 ? yup.string().required('Заполните это поле') : yup.string().notRequired(),
     }),
     onSubmit: (values) => {
-      onSubmit(values);
+      onSubmit({
+        ...values,
+        name: values.name.trim(),
+        firstName: values.firstName?.trim(),
+        lastName: values.lastName?.trim(),
+        middleName: values.middleName?.trim(),
+        phoneNumber: values.phoneNumber?.trim(),
+        email: values.email?.trim(),
+        externalId: values.externalId?.trim(),
+      });
     },
   });
 
@@ -303,7 +312,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     onChange={formik.handleChange}
                     type="password"
                     disabled={loading}
-                    value={(formik.values as NewUser).password}
+                    value={(formik.values as NewUser).password.trim()}
                   />
                 </Grid>
                 <Grid item md={6} xs={12} display={open ? 'block' : 'none'}>
@@ -321,7 +330,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     onChange={formik.handleChange}
                     type="password"
                     disabled={loading}
-                    value={(formik.values as NewUser).verifyPassword}
+                    value={(formik.values as NewUser).verifyPassword?.trim()}
                   />
                 </Grid>
                 {(formik.values as NewUser).password !== (formik.values as NewUser).verifyPassword &&
