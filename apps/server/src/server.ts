@@ -1,5 +1,7 @@
 import fs from 'fs';
 import path from 'path';
+import http from 'http';
+import https from 'https';
 
 import Koa from 'koa';
 import cors from '@koa/cors';
@@ -50,9 +52,6 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   checkProcessList(true);
 
   timerId = setInterval(checkProcessList, config.PROCESS_CHECK_PERIOD_IN_MIN * MSEС_IN_MIN);
-
-  app.context.port = server.port;
-  app.context.name = server.name;
 
   const sessions = app.context.db.sessionId.data;
   const sessionId = sessions.length ? sessions[0].id : '';
@@ -133,7 +132,31 @@ process.on('SIGINT', () => {
 });
 
 export const startServer = (app: KoaApp) => {
-  app.listen(app.context.port);
+  const koaCallback = app.callback();
 
-  log.info(`${app.context.name} is running on http://localhost:${app.context.port}`);
+  const httpServer = http.createServer(koaCallback);
+
+  httpServer.listen(config.PORT, () => log.info(`>>> HTTP server is running at http://localhost:${config.PORT}`));
+
+  /**
+   * HTTPS сервер с платным сертификатом
+   */
+
+  const cert = fs.readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.crt'));
+  const key = fs.readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.key'));
+
+  const ca = fs
+    .readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.ca-bundle'), { encoding: 'utf8' })
+    .split('-----END CERTIFICATE-----\r\n')
+    .map((cert) => cert + '-----END CERTIFICATE-----\r\n')
+    .pop();
+
+  if (!ca) {
+    throw new Error('No CA file or file is invalid');
+  }
+
+  https.createServer({ cert, ca, key }, koaCallback).listen(config.HTTPS_PORT, () =>
+    log.info(`>>> HTTPS server is running at
+  http://localhost:${config.HTTPS_PORT}`),
+  );
 };
