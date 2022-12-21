@@ -20,7 +20,6 @@ export default function Processes() {
   const routeComponent = useRoutes(routes);
   const dispatch = useDispatch();
   const processErrorMessage = useSelector((state) => state.processes.errorMessage);
-  const errorMessage = useSelector((state) => state.auth.errorMessage);
 
   const handleClearError = () => {
     dispatch(processActions.clearError());
@@ -30,8 +29,8 @@ export default function Processes() {
     <>
       {routeComponent}
       <SnackBar
-        visible={!!processErrorMessage && !errorMessage}
-        errorMessage={`Ошибка: ${processErrorMessage}`}
+        visible={!!processErrorMessage}
+        errorMessage={processErrorMessage}
         onClearError={handleClearError}
       />
     </>

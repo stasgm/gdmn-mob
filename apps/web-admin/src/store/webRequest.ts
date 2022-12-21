@@ -5,17 +5,16 @@ export const webRequest =
   async (params: IRequestParams) => {
     dispatch(actions.setErrorMessage(''));
     const res = await robustRequest(params);
+
     switch (res.type) {
-      case 'SUCCESS': {
-        //Если пришел ответ, что не пройдена авторизация
-        if (res.data.status === 401) {
-          dispatch(actions.setErrorMessage('Не пройдена авторизация пользователя. Повторите вход'));
-          dispatch(actions.logout());
-        }
-        return res.data;
-      }
       case 'FAILURE': {
-        return res.error;
+        //Если пришел ответ, что не пройдена авторизация
+        if (res.status === 401) {
+          dispatch(actions.setErrorMessage(res.error));
+          dispatch(actions.logout());
+         return { ...res, type: 'UNAUTHORIZED' };
+        }
+        return res;
       }
       case 'SERVER_TIMEOUT':
         dispatch(actions.setErrorMessage('Не удается получить ответ от сервера'));
@@ -28,7 +27,7 @@ export const webRequest =
           return { type: 'SERVER_TIMEOUT' };
         } else {
           dispatch(actions.setErrorMessage('Не удается получить ответ от сервера'));
-          return { type: 'NO_CONNECTION' };
+          return res;
         }
       }
     }

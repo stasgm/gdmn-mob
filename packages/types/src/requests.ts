@@ -22,8 +22,13 @@ export type ErrorResponse = {
   type: 'INVALID_DATA' | 'ERROR';
 };
 
+export type UnAuthorized = {
+  type: 'UNAUTHORIZED';
+  error: string;
+};
+
 export type ServerResponse<T = any> = SuccessResponse<T> | FailureResponse;
 
-export type TResponse<T = any> = ServerResponse<T> | NoConnection | ServerTimeout | ErrorResponse;
+export type TResponse<T = any> = ServerResponse<T> | NoConnection | ServerTimeout | ErrorResponse | UnAuthorized;
 
 export type AuthLogOut = () => Promise<any>;

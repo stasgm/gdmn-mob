@@ -32,7 +32,6 @@ export default function Users() {
   const routeComponent = useRoutes(routes);
   const dispatch = useDispatch();
   const usersErrorMessage = useSelector((state) => state.users.errorMessage);
-  const errorMessage = useSelector((state) => state.auth.errorMessage);
 
   const handleClearError = () => {
     dispatch(userActions.clearError());
@@ -42,8 +41,8 @@ export default function Users() {
     <>
       {routeComponent}
       <SnackBar
-        visible={!!usersErrorMessage && !errorMessage}
-        errorMessage={`Ошибка: ${usersErrorMessage}`}
+        visible={!!usersErrorMessage}
+        errorMessage={usersErrorMessage}
         onClearError={handleClearError}
       />
     </>

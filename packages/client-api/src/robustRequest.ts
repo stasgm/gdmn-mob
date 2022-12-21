@@ -1,5 +1,5 @@
 import { config } from '@lib/client-config';
-import { ErrorResponse, ServerResponse, TResponse } from '@lib/types';
+import { ServerResponse, TResponse } from '@lib/types';
 import { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 
 /** Функция, вызывается при неверной авторизации */
@@ -132,7 +132,7 @@ export const robustRequest: RobustRequest = async ({
       }
 
       //Десериализация данных deserializer
-      objData = { ...bodyData, data: deserializer ? deserializer(bodyData) : bodyData };
+      objData = { ...res.data, data: deserializer ? deserializer(bodyData) : bodyData };
     } else if (validator) {
       return {
         type: 'INVALID_DATA',

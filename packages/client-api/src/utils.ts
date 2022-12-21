@@ -29,6 +29,7 @@ export const response2Log = (r: TResponse) => {
       return 'Неверный формат данных';
 
     case 'FAILURE':
+    case 'UNAUTHORIZED':
       return r.error;
 
     default:
@@ -36,4 +37,5 @@ export const response2Log = (r: TResponse) => {
   }
 };
 
-export const isConnectError = (type: string) => type === 'NO_CONNECTION' || type === 'SERVER_TIMEOUT';
+export const isConnectError = (type: string) =>
+  type === 'NO_CONNECTION' || type === 'SERVER_TIMEOUT' || type === 'UNAUTHORIZED';

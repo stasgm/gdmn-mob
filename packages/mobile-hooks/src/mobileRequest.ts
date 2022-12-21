@@ -10,15 +10,13 @@ export const mobileRequest =
     console.log('res', res);
 
     switch (res.type) {
-      case 'SUCCESS': {
+      case 'FAILURE': {
         //Если пришел ответ, что не пройдена авторизация
         if (res.status === 401) {
           dispatch(actions.setErrorMessage('Не пройдена авторизация пользователя. Повторите вход в приложение'));
           dispatch(actions.logout());
+          return { ...res, type: 'UNAUTHORIZED' };
         }
-        return res;
-      }
-      case 'FAILURE': {
         return res;
       }
       case 'SERVER_TIMEOUT':
@@ -33,7 +31,7 @@ export const mobileRequest =
           return { type: 'SERVER_TIMEOUT' };
         } else {
           dispatch(actions.setErrorMessage('Отсутствует соединение с интернетом'));
-          return { type: 'NO_CONNECTION' };
+          return res;
         }
       }
     }

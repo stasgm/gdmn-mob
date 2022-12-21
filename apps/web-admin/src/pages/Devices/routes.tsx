@@ -24,7 +24,6 @@ export default function Devices() {
   const routeComponent = useRoutes(routes);
   const dispatch = useDispatch();
   const devicesErrorMessage = useSelector((state) => state.devices.errorMessage);
-  const errorMessage = useSelector((state) => state.auth.errorMessage);
 
   const handleClearError = () => {
     dispatch(deviceActions.clearError());
@@ -34,8 +33,8 @@ export default function Devices() {
     <>
       {routeComponent}
       <SnackBar
-        visible={!!devicesErrorMessage && !errorMessage}
-        errorMessage={`Ошибка: ${devicesErrorMessage}`}
+        visible={!!devicesErrorMessage}
+        errorMessage={devicesErrorMessage}
         onClearError={handleClearError}
       />
     </>

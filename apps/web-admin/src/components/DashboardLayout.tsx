@@ -2,11 +2,10 @@ import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { experimentalStyled } from '@material-ui/core';
 
-import { authActions, useDispatch, useSelector } from '@lib/store';
+import { useDispatch } from '@lib/store';
 
 import DashboardNavbar from './DashboardNavbar';
 import DashboardSidebar from './DashboardSidebar';
-import SnackBar from './SnackBar';
 
 const DashboardLayoutRoot = experimentalStyled('div')(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
@@ -40,12 +39,8 @@ const DashboardLayoutContent = experimentalStyled('div')({
 
 const DashboardLayout = () => {
   const [isMobileNavOpen, setMobileNavOpen] = useState(false);
-  const errorMessage = useSelector((state) => state.auth.errorMessage);
   const dispatch = useDispatch();
 
-  const closeErrBar = () => {
-    dispatch(authActions.setErrorMessage(''));
-  };
 
   return (
     <DashboardLayoutRoot>
@@ -55,7 +50,6 @@ const DashboardLayout = () => {
         <DashboardLayoutContainer>
           <DashboardLayoutContent>
             <Outlet />
-            <SnackBar visible={!!errorMessage} errorMessage={errorMessage} onClearError={closeErrBar} />
           </DashboardLayoutContent>
         </DashboardLayoutContainer>
       </DashboardLayoutWrapper>
