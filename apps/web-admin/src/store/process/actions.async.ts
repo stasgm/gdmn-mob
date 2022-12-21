@@ -34,7 +34,7 @@ const removeProcess = (id: string): AppThunk => {
   return async (dispatch) => {
     dispatch(processActions.removeProcessAsync.request('Удаление процесса'));
 
-    const response = await api.process.removeProcess(id);
+    const response = await api.process.removeProcess(webRequest(dispatch, authActions), id);
 
     if (response.type === 'REMOVE_PROCESS') {
       return dispatch(processActions.removeProcessAsync.success(id));
