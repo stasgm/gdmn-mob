@@ -2,7 +2,7 @@ import { IDevice, NewDevice } from '@lib/types';
 import { device as mockDevice } from '@lib/mock';
 
 import { error, device as types } from '../types';
-import { generateId, sleep } from '../utils';
+import { generateId, response2Log, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
@@ -34,15 +34,15 @@ class Device extends BaseRequest {
       data: newDevice,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'ADD_DEVICE',
         device: res.data,
       } as types.IAddDeviceResponse;
     }
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Устройство не создано',
+      type: res.type,
+      message: response2Log(res) || 'Устройство не создано',
     } as error.IServerError;
   };
 
@@ -63,15 +63,15 @@ class Device extends BaseRequest {
       data: device,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'UPDATE_DEVICE',
         device: res.data,
       } as types.IUpdateDeviceResponse;
     }
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Устройство не обновлено',
+      type: res.type,
+      message: response2Log(res) || 'Устройство не обновлено',
     } as error.IServerError;
   };
 
@@ -90,14 +90,14 @@ class Device extends BaseRequest {
       url: `/devices/${deviceId}`,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'REMOVE_DEVICE',
       } as types.IRemoveDeviceResponse;
     }
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Устройство не удалено',
+      type: res.type,
+      message: response2Log(res) || 'Устройство не удалено',
     } as error.IServerError;
   };
 
@@ -125,7 +125,7 @@ class Device extends BaseRequest {
       url: `/devices/${deviceId || this.api.config.deviceId}`,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'GET_DEVICE',
         device: res.data,
@@ -133,8 +133,8 @@ class Device extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Устройство не получено',
+      type: res.type,
+      message: response2Log(res) || 'Устройство не получено',
     } as error.IServerError;
   };
 
@@ -160,15 +160,16 @@ class Device extends BaseRequest {
 
     const res = await customRequest<IDevice[]>({ api: this.api.axios, method: 'GET', url: '/devices', params });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'GET_DEVICES',
         devices: res.data || [],
       } as types.IGetDevicesResponse;
     }
+
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Данные об устройствах не получены',
+      type: res.type,
+      message: response2Log(res) || 'Данные об устройствах не получены',
     } as error.IServerError;
   };
 
@@ -179,15 +180,16 @@ class Device extends BaseRequest {
       url: `/devices/${deviceId}/users`,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'GET_USERS_BY_DEVICE',
         userList: res.data,
       } as types.IGetUsersByDeviceResponse;
     }
+
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Данные о пользователях по устройству не получены',
+      type: res.type,
+      message: response2Log(res) || 'Данные о пользователях по устройству не получены',
     } as error.IServerError;
   };
 }

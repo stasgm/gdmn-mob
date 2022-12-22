@@ -2,7 +2,7 @@ import { AuthLogOut, IUser, NewUser } from '@lib/types';
 import { user as mockUser, users as mockUsers } from '@lib/mock';
 
 import { error, user as types } from '../types';
-import { generateId, sleep } from '../utils';
+import { generateId, response2Log, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 
 import { BaseRequest } from '../types/BaseRequest';
@@ -40,7 +40,7 @@ class User extends BaseRequest {
       data: user,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'ADD_USER',
         user: res.data,
@@ -48,9 +48,9 @@ class User extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'пользователь не создан',
-    };
+      type: res.type,
+      message: response2Log(res) || 'пользователь не создан',
+    } as error.IServerError;
   };
 
   updateUser = async (customRequest: CustomRequest, user: Partial<IUser>) => {
@@ -78,15 +78,15 @@ class User extends BaseRequest {
       data: user,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'UPDATE_USER',
         user: res.data,
       } as types.IUpdateUserResponse;
     }
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Пользователь не обновлен',
+      type: res.type,
+      message: response2Log(res) || 'Пользователь не обновлен',
     } as error.IServerError;
   };
 
@@ -105,15 +105,15 @@ class User extends BaseRequest {
       url: `/users/${userId}`,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'REMOVE_USER',
       } as types.IRemoveUserResponse;
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Пользователь не удален',
+      type: res.type,
+      message: response2Log(res) || 'Пользователь не удален',
     } as error.IServerError;
   };
 
@@ -137,7 +137,7 @@ class User extends BaseRequest {
 
     const res = await customRequest<IUser>({ api: this.api.axios, method: 'GET', url: `/users/${userId}` });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'GET_USER',
         user: res.data,
@@ -145,8 +145,8 @@ class User extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Данные о пользователе не получены',
+      type: res.type,
+      message: response2Log(res) || 'Данные о пользователе не получены',
     } as error.IServerError;
   };
 
@@ -169,7 +169,7 @@ class User extends BaseRequest {
 
     const res = await customRequest<IUser[]>({ api: this.api.axios, method: 'GET', url: '/users', params });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'GET_USERS',
         users: res.data,
@@ -177,8 +177,8 @@ class User extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Данные о пользователях не получены',
+      type: res.type,
+      message: response2Log(res) || 'Данные о пользователях не получены',
     } as error.IServerError;
   };
 }

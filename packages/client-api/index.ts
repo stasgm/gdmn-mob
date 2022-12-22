@@ -1,14 +1,8 @@
 import * as requests from './src/requests';
 import * as types from './src/types';
-import {
-  RobustRequest,
-  IRequestParams,
-  CustomRequestProps,
-  robustRequest,
-  CustomRequest,
-  IServerUnreacheableResult,
-} from './src/robustRequest';
+import { RobustRequest, IRequestParams, CustomRequestProps, robustRequest, CustomRequest } from './src/robustRequest';
 import { default as Api } from './src/api';
+import { isConnectError } from './src/utils';
 
 export default Api;
 export {
@@ -19,5 +13,5 @@ export {
   robustRequest,
   CustomRequest,
   CustomRequestProps,
-  IServerUnreacheableResult,
+  isConnectError,
 };

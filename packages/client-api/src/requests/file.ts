@@ -1,7 +1,7 @@
-import { IFileIds, IFileSystem, IResponse } from '@lib/types';
+import { IFileIds, IFileSystem } from '@lib/types';
 
 import { error, file as types } from '../types';
-import { getParams, sleep } from '../utils';
+import { response2Log, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
@@ -27,7 +27,7 @@ class File extends BaseRequest {
       url: `/files/${fileId}`,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'GET_FILE',
         file: res?.data,
@@ -35,8 +35,8 @@ class File extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Данные файла не получены',
+      type: res.type,
+      message: response2Log(res) || 'Данные файла не получены',
     } as error.IServerError;
   };
 
@@ -57,7 +57,7 @@ class File extends BaseRequest {
       params,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'GET_FILES',
         files: res?.data || [],
@@ -65,8 +65,8 @@ class File extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Данные о файле не получены',
+      type: res.type,
+      message: response2Log(res) || 'Данные о файле не получены',
     } as error.IServerError;
   };
 
@@ -78,7 +78,7 @@ class File extends BaseRequest {
       data: file,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'UPDATE_FILE',
         file: res.data,
@@ -86,8 +86,8 @@ class File extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Данные файла не обновлены',
+      type: res.type,
+      message: response2Log(res) || 'Данные файла не обновлены',
     } as error.IServerError;
   };
 
@@ -106,15 +106,15 @@ class File extends BaseRequest {
       url: `/files/${fileId}`,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'REMOVE_FILE',
       } as types.IRemoveFileResponse;
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Файл не удален',
+      type: res.type,
+      message: response2Log(res) || 'Файл не удален',
     } as error.IServerError;
   };
 
@@ -136,15 +136,15 @@ class File extends BaseRequest {
       data: body,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'REMOVE_FILES',
       } as types.IRemoveFilesResponse;
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Файлы не удалены',
+      type: res.type,
+      message: response2Log(res) || 'Файлы не удален',
     } as error.IServerError;
   };
 }

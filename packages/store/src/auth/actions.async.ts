@@ -1,4 +1,4 @@
-import api, { CustomRequest } from '@lib/client-api';
+import api, { CustomRequest, isConnectError } from '@lib/client-api';
 import { IUserCredentials, IUserSettings } from '@lib/types';
 
 import { ActionType } from 'typesafe-actions';
@@ -8,8 +8,6 @@ import { ThunkDispatch } from 'redux-thunk';
 import { useDispatch } from 'react-redux';
 
 import { AppThunk } from '../types';
-
-import { appActions } from '../app/actions';
 
 import { AuthState } from './types';
 import { actions, AuthActionType } from './actions';
@@ -209,7 +207,7 @@ const getDeviceStatus = (
         return dispatch(
           actions.getDeviceStatusAsync.success(response.status === 'ACTIVE' ? 'connected' : 'not-activated'),
         );
-      } else if (response.type === 'CONNECT_ERROR') {
+      } else if (isConnectError(response.type)) {
         return dispatch(actions.getDeviceStatusAsync.success('not-checked'));
       }
 

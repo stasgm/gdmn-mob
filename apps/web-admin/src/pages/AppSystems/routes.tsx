@@ -24,7 +24,6 @@ export default function AppSystems() {
   const routeComponent = useRoutes(routes);
   const dispatch = useDispatch();
   const appSystemErrorMessage = useSelector((state) => state.appSystems.errorMessage);
-  const errorMessage = useSelector((state) => state.auth.errorMessage);
 
   const handleClearError = () => {
     dispatch(appSystemActions.clearError());
@@ -34,8 +33,8 @@ export default function AppSystems() {
     <>
       {routeComponent}
       <SnackBar
-        visible={!!appSystemErrorMessage && !errorMessage}
-        errorMessage={`Ошибка: ${appSystemErrorMessage}`}
+        visible={!!appSystemErrorMessage}
+        errorMessage={appSystemErrorMessage}
         onClearError={handleClearError}
       />
     </>

@@ -2,7 +2,7 @@ import { IDeviceBinding, NewDeviceBinding } from '@lib/types';
 import { deviceBinding as mockDeviceBinding, deviceBindings as mockDeviceBindings } from '@lib/mock';
 
 import { error, deviceBinding as types } from '../types';
-import { generateId, sleep } from '../utils';
+import { generateId, response2Log, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
@@ -34,15 +34,16 @@ class DeviceBinding extends BaseRequest {
       data: newDeviceBinding,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'ADD_DEVICEBINDING',
         deviceBinding: res.data,
       } as types.IAddDeviceBindingResponse;
     }
+
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Привязанное устройство не добавлено',
+      type: res.type,
+      message: response2Log(res) || 'Привязанное устройство не добавлено',
     } as error.IServerError;
   };
 
@@ -63,15 +64,16 @@ class DeviceBinding extends BaseRequest {
       data: deviceBinding,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'UPDATE_DEVICEBINDING',
         deviceBinding: res.data,
       } as types.IUpdateDeviceBindingResponse;
     }
+
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Привязанное устройство не обновлено',
+      type: res.type,
+      message: response2Log(res) || 'Привязанное устройство не обновлено',
     } as error.IServerError;
   };
 
@@ -90,14 +92,14 @@ class DeviceBinding extends BaseRequest {
       url: `/binding/${deviceId}`,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'REMOVE_DEVICEBINDING',
       } as types.IRemoveDeviceBindingResponse;
     }
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Привязанное устройство не удалено',
+      type: res.type,
+      message: response2Log(res) || 'Привязанное устройство не удалено',
     } as error.IServerError;
   };
 
@@ -125,7 +127,7 @@ class DeviceBinding extends BaseRequest {
       url: `/binding/${deviceId || this.api.config.deviceId}`,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'GET_DEVICEBINDING',
         deviceBinding: res.data,
@@ -133,8 +135,8 @@ class DeviceBinding extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Связанное устройство не получено',
+      type: res.type,
+      message: response2Log(res) || 'Связанное устройство не получено',
     } as error.IServerError;
   };
 
@@ -155,7 +157,7 @@ class DeviceBinding extends BaseRequest {
       return {
         type: 'GET_DEVICEBINDINGS',
         deviceBindings: mockDeviceBindings,
-      };
+      } as types.IGetDeviceBindingsResponse;
     }
 
     const res = await customRequest<IDeviceBinding[]>({
@@ -165,16 +167,17 @@ class DeviceBinding extends BaseRequest {
       params,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'GET_DEVICEBINDINGS',
         deviceBindings: res.data || [],
-      };
+      } as types.IGetDeviceBindingsResponse;
     }
+
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Данныe об устройствах не получены',
-    };
+      type: res.type,
+      message: response2Log(res) || 'Данныe об устройствах не получены',
+    } as error.IServerError;
   };
 }
 
