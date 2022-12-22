@@ -7,7 +7,6 @@ export const mobileRequest =
   async (params: IRequestParams) => {
     dispatch(actions.setErrorMessage(''));
     const res = await robustRequest(params);
-    console.log('res', res);
 
     switch (res.type) {
       case 'FAILURE': {

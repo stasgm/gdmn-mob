@@ -12,7 +12,7 @@ export const webRequest =
         if (res.status === 401) {
           dispatch(actions.setErrorMessage(res.error));
           dispatch(actions.logout());
-         return { ...res, type: 'UNAUTHORIZED' };
+          return { ...res, type: 'UNAUTHORIZED' };
         }
         return res;
       }

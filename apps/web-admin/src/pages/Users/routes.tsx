@@ -40,11 +40,7 @@ export default function Users() {
   return (
     <>
       {routeComponent}
-      <SnackBar
-        visible={!!usersErrorMessage}
-        errorMessage={usersErrorMessage}
-        onClearError={handleClearError}
-      />
+      <SnackBar visible={!!usersErrorMessage} errorMessage={usersErrorMessage} onClearError={handleClearError} />
     </>
   );
 }
