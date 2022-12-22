@@ -52,19 +52,6 @@ const Account = () => {
     dispatch(actions.userActions.clearError());
   };
 
-  if (!user) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          p: 3,
-        }}
-      >
-        Пользователь не найден
-      </Box>
-    );
-  }
 
   return (
     <>
@@ -78,10 +65,19 @@ const Account = () => {
           py: 3,
         }}
       >
-        {/* {loading && <CircularProgress size={40} />} */}
-        <Container maxWidth="lg">
+        <Container
+          maxWidth="lg"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            m: 2,
+          }}
+        >
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
+          ) : !user ? (
+            <Box>Пользователь не найден</Box>
           ) : (
             <Grid container spacing={3}>
               <Grid item lg={4} md={6} xs={12}>

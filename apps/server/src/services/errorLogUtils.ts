@@ -1,5 +1,5 @@
 import path from 'path';
-import { writeFile, readdir, unlink, stat } from 'fs/promises';
+import { readdir, unlink, stat } from 'fs/promises';
 
 import { IPathParams, IFileDeviceLogInfo, IDeviceLog, IDeviceLogFiles } from '@lib/types';
 

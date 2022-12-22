@@ -37,7 +37,7 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
   const settings = useSelector((state) => state.settings?.data);
   const synchPeriod = (settings.synchPeriod?.data as number) || 10;
   const autoSync = (settings.autoSync?.data as boolean) || false;
-  const { config, user, isDemo } = useSelector((state) => state.auth);
+  const { config, user, isDemo, connectionStatus } = useSelector((state) => state.auth);
   const loading = useSelector((state) => state.app.loading);
 
   const appState = useRef(AppState.currentState);
@@ -68,9 +68,11 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
   //Если в параметрах указана Автосинхронизация,
   //устанавливаем запуск следующей синхронизации через synchPeriod минут
   useEffect(() => {
-    if (!autoSync || loading || isDemo) {
+    console.log('timeOutRef 11');
+    if (!autoSync || loading || isDemo || connectionStatus !== 'connected') {
       return;
     }
+    console.log('timeOutRef 22');
 
     timeOutRef.current = setTimeout(() => {
       syncData();
@@ -82,7 +84,7 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
         timeOutRef.current = null;
       }
     };
-  }, [synchPeriod, autoSync, loading, syncData, isDemo]);
+  }, [synchPeriod, autoSync, loading, syncData, isDemo, connectionStatus]);
 
   return <DrawerNavigator items={items} onSyncClick={syncData} />;
 };
@@ -130,7 +132,7 @@ const MobileApp = ({ loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
 
   const closeErrBar = () => {
     dispatch(authActions.setErrorMessage(''));
-    dispatch(authActions.clearError());
+    // dispatch(authActions.clearError());
   };
 
   return (

@@ -1,8 +1,12 @@
 import { Navigate, useRoutes } from 'react-router-dom';
 import { RouteObject } from 'react-router';
 
-import DeviceLogView from './DeviceLogView';
+import SnackBar from '../../components/SnackBar';
+import { useDispatch, useSelector } from '../../store';
+import { deviceLogActions } from '../../store/deviceLog/actions';
+
 import DeviceLogFilesList from './DeviceLogFilesList';
+import DeviceLogView from './DeviceLogView';
 
 const routes: RouteObject[] = [
   { path: '/', element: <DeviceLogFilesList /> },
@@ -11,5 +15,22 @@ const routes: RouteObject[] = [
 ];
 
 export default function DeviceLogs() {
-  return useRoutes(routes);
+  const routeComponent = useRoutes(routes);
+  const dispatch = useDispatch();
+  const logErrorMessage = useSelector((state) => state.deviceLogs.errorMessage);
+
+  const handleClearError = () => {
+    dispatch(deviceLogActions.clearError());
+  };
+
+  return (
+    <>
+      {routeComponent}
+      <SnackBar
+        visible={!!logErrorMessage}
+        errorMessage={logErrorMessage}
+        onClearError={handleClearError}
+      />
+    </>
+  );
 }

@@ -15,23 +15,13 @@ const fetchDeviceLogFiles = (): AppThunk => {
   return async (dispatch) => {
     dispatch(deviceLogActions.fetchDeviceLogFilesAsync.request(''));
 
-    const params: Record<string, string | number> = {};
-
-    // if (filterText) params.filterText = filterText;
-    // if (fromRecord) params.fromRecord = fromRecord;
-    // if (toRecord) params.toRecord = toRecord;
-
-    const response = await api.deviceLog.getDeviceLogFiles(webRequest(dispatch, authActions), params);
+    const response = await api.deviceLog.getDeviceLogFiles(webRequest(dispatch, authActions));
 
     if (response.type === 'GET_DEVICELOGS') {
       return dispatch(deviceLogActions.fetchDeviceLogFilesAsync.success(response.deviceLogs));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(deviceLogActions.fetchDeviceLogFilesAsync.failure(response.message));
-    }
-
-    return dispatch(deviceLogActions.fetchDeviceLogFilesAsync.failure('Ошибка получения данных о журнале ошибок'));
+    return dispatch(deviceLogActions.fetchDeviceLogFilesAsync.failure(response.message));
   };
 };
 
@@ -45,11 +35,7 @@ const fetchDeviceLog = (id: string): AppThunk => {
       return dispatch(deviceLogActions.fetchDeviceLogAsync.success(response.deviceLog));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(deviceLogActions.fetchDeviceLogAsync.failure(response.message));
-    }
-
-    return dispatch(deviceLogActions.fetchDeviceLogAsync.failure('Ошибка получения данных о журнале ошибок'));
+    return dispatch(deviceLogActions.fetchDeviceLogAsync.failure(response.message));
   };
 };
 
@@ -63,11 +49,7 @@ const removeDeviceLog = (id: string): AppThunk => {
       return dispatch(deviceLogActions.removeDeviceLogAsync.success(id));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(deviceLogActions.removeDeviceLogAsync.failure(response.message));
-    }
-
-    return dispatch(deviceLogActions.removeDeviceLogAsync.failure('Ошибка получения данных о журнале ошибок'));
+    return dispatch(deviceLogActions.removeDeviceLogAsync.failure(response.message));
   };
 };
 
@@ -81,11 +63,7 @@ const removeDeviceLogs = (deviceLogIds: string[]): AppThunk => {
       return dispatch(deviceLogActions.removeDeviceLogsAsync.success(deviceLogIds));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(deviceLogActions.removeDeviceLogsAsync.failure(response.message));
-    }
-
-    return dispatch(deviceLogActions.removeDeviceLogsAsync.failure('Ошибка получения данных о журналах ошибок'));
+    return dispatch(deviceLogActions.removeDeviceLogsAsync.failure(response.message));
   };
 };
 

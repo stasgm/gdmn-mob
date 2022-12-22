@@ -24,7 +24,6 @@ export default function Companies() {
   const routeComponent = useRoutes(routes);
   const dispatch = useDispatch();
   const companiesErrorMessage = useSelector((state) => state.companies.errorMessage);
-  const errorMessage = useSelector((state) => state.auth.errorMessage);
 
   const handleClearError = () => {
     dispatch(companyActions.clearError());
@@ -34,8 +33,8 @@ export default function Companies() {
     <>
       {routeComponent}
       <SnackBar
-        visible={!!companiesErrorMessage && !errorMessage}
-        errorMessage={`Ошибка: ${companiesErrorMessage}`}
+        visible={!!companiesErrorMessage}
+        errorMessage={companiesErrorMessage}
         onClearError={handleClearError}
       />
     </>

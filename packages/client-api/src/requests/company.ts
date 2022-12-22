@@ -2,7 +2,7 @@ import { NewCompany, ICompany } from '@lib/types';
 import { user as mockUser, companies as mockCompanies } from '@lib/mock';
 
 import { error, company as types } from '../types';
-import { generateId, sleep } from '../utils';
+import { generateId, response2Log, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
@@ -35,7 +35,7 @@ class Company extends BaseRequest {
       data: company,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'ADD_COMPANY',
         company: res?.data,
@@ -43,8 +43,8 @@ class Company extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Компания не создана',
+      type: res.type,
+      message: response2Log(res) || 'Компания не создана',
     } as error.IServerError;
   };
 
@@ -74,7 +74,7 @@ class Company extends BaseRequest {
       data: company,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'UPDATE_COMPANY',
         company: res.data,
@@ -82,8 +82,8 @@ class Company extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Компания не обновлена',
+      type: res.type,
+      message: response2Log(res) || 'Компания не обновлена',
     } as error.IServerError;
   };
 
@@ -102,15 +102,15 @@ class Company extends BaseRequest {
       url: `/companies/${companyId}`,
     });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'REMOVE_COMPANY',
       } as types.IRemoveCompanyResponse;
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Компания не удалена',
+      type: res.type,
+      message: response2Log(res) || 'Компания не удалена',
     } as error.IServerError;
   };
 
@@ -135,7 +135,7 @@ class Company extends BaseRequest {
 
     const res = await customRequest<ICompany>({ api: this.api.axios, method: 'GET', url: `/companies/${companyId}` });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'GET_COMPANY',
         company: res.data,
@@ -143,8 +143,8 @@ class Company extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Данные о компании не получены',
+      type: res.type,
+      message: response2Log(res) || 'Данные о компании не получены',
     } as error.IServerError;
   };
 
@@ -160,7 +160,7 @@ class Company extends BaseRequest {
 
     const res = await customRequest<ICompany[]>({ api: this.api.axios, method: 'GET', url: '/companies', params });
 
-    if (res?.result) {
+    if (res.type === 'SUCCESS') {
       return {
         type: 'GET_COMPANIES',
         companies: res.data,
@@ -168,8 +168,8 @@ class Company extends BaseRequest {
     }
 
     return {
-      type: res ? 'ERROR' : 'CONNECT_ERROR',
-      message: res?.error || 'Данные о компаниях не получены',
+      type: res.type,
+      message: response2Log(res) || 'Данные о компаниях не получены',
     } as error.IServerError;
   };
 }

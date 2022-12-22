@@ -1,15 +1,11 @@
-// import { URLSearchParams } from 'url';
-
 import { config } from '@lib/client-config';
-import { IResponse } from '@lib/types';
+import { ServerResponse, TResponse } from '@lib/types';
 import { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
-
-// import api from './api';
 
 /** Функция, вызывается при неверной авторизации */
 export type AuthLogOut = () => Promise<any>;
 
-export type CustomRequest = <T>(params: IRequestParams) => Promise<IResponse<T> | undefined>;
+export type CustomRequest = <T>(params: IRequestParams) => Promise<TResponse<T>>;
 
 export type CustomRequestProps = <T>(dispatch: any, actions: any) => CustomRequest;
 
@@ -43,7 +39,7 @@ export interface IRequestParams {
   timeout?: number;
 }
 
-export type RequestResult = IServerResponseResult | IServerUnreacheableResult | IErrorResult;
+// export type RequestResult = IServerResponseResult | IServerUnreacheableResult | IErrorResult;
 
 // export interface IResponse {
 //   /** HTTP response status */
@@ -51,32 +47,31 @@ export type RequestResult = IServerResponseResult | IServerUnreacheableResult | 
 //   data?: any;
 // }
 
-interface IServerResponseResult {
-  /** 2xx, 4xx, 5xx */
-  result: 'OK' | 'CLIENT_ERROR' | 'SERVER_ERROR';
-  response: {
-    /** HTTP response status */
-    status: number;
-    data?: any;
-  };
-}
+// interface IServerResponseResult {
+//   /** 2xx, 4xx, 5xx */
+//   result: 'OK' | 'CLIENT_ERROR' | 'SERVER_ERROR';
+//   response: {
+//     /** HTTP response status */
+//     status: number;
+//     data?: any;
+//   };
+// }
 
-export interface IServerUnreacheableResult {
-  result: 'NO_CONNECTION' | 'TIMEOUT';
-}
+// export interface IServerUnreacheableResult {
+//   result: 'NO_CONNECTION' | 'TIMEOUT';
+// }
 
-/** Возвращается, когда произошло исключение при проверки типа, десериализации или вообще в процессе работы */
-interface IErrorResult {
-  result: 'INVALID_DATA' | 'ERROR';
-  message?: string;
-}
+// /** Возвращается, когда произошло исключение при проверки типа, десериализации или вообще в процессе работы */
+// interface IErrorResult {
+//   result: 'INVALID_DATA' | 'ERROR';
+//   message?: string;
+// }
 
-export type RobustRequest = (params: IRequestParams) => Promise<RequestResult>;
+export type RobustRequest = (params: IRequestParams) => Promise<TResponse>;
 
 export const robustRequest: RobustRequest = async ({
   api,
   method,
-  baseUrl,
   url,
   params,
   data,
@@ -102,7 +97,7 @@ export const robustRequest: RobustRequest = async ({
   try {
     const config = { params: urlParams, signal: controller.signal };
 
-    let res: AxiosResponse<IResponse<any>, any>;
+    let res: AxiosResponse<ServerResponse, any>;
     switch (method) {
       case 'GET': {
         res = await api.get(url, config);
@@ -122,8 +117,7 @@ export const robustRequest: RobustRequest = async ({
       }
       default:
         return {
-          result: 'ERROR',
-          message: 'Неизвестный тип запроса',
+          type: 'ERROR',
         };
     }
     clearTimeout(rTimeout);
@@ -131,54 +125,53 @@ export const robustRequest: RobustRequest = async ({
     let objData = res.data;
 
     //Проверка данных validator
-    if (res.data?.data) {
+    if (res.data.type === 'SUCCESS') {
+      const bodyData = res.data.data;
       if (validator) {
-        validator(res.data.data);
+        validator(bodyData);
       }
 
       //Десериализация данных deserializer
-      objData = { ...res.data, data: deserializer ? deserializer(res.data.data) : res.data.data };
+      objData = { ...res.data, data: deserializer ? deserializer(bodyData) : bodyData };
     } else if (validator) {
       return {
-        result: 'INVALID_DATA',
-        message: 'Пустой ответ сервера',
+        type: 'INVALID_DATA',
       };
     }
 
-    return {
-      result: 'OK',
-      response: {
-        status: res.status,
-        data: objData,
-      },
-    } as IServerResponseResult;
+    return objData;
+    // return {
+    //   result: 'OK',
+    //   response: {
+    //     status: res.status,
+    //     data: objData,
+    //   },
+    // };
   } catch (err) {
     clearTimeout(rTimeout);
 
     if (controller.signal.aborted) {
       return {
-        result: 'TIMEOUT',
+        type: 'SERVER_TIMEOUT',
       };
     }
 
     if (err instanceof AxiosError) {
       if (err.response?.status) {
         return {
-          result: 'SERVER_ERROR',
-          response: {
-            status: err.response?.status || 500,
-            data: err.response?.data,
-          },
+          type: 'FAILURE',
+          status: err.response.status || 500,
+          error: err.response.data || '',
         };
       } else {
         return {
-          result: 'NO_CONNECTION',
+          type: 'NO_CONNECTION',
         };
       }
     }
 
     return {
-      result: 'ERROR',
+      type: 'ERROR',
     };
   }
 };

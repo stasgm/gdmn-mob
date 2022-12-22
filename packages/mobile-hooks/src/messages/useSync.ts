@@ -12,7 +12,7 @@ import {
   useSettingThunkDispatch,
 } from '@lib/store';
 
-import api from '@lib/client-api';
+import api, { isConnectError } from '@lib/client-api';
 import {
   BodyType,
   IAppSystemSettings,
@@ -126,7 +126,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
               if (removeMess.type !== 'REMOVE_MESSAGE') {
                 addError(
                   'useSync: api.message.removeMessage',
-                  `Справочники загружены, но сообщение справочников с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
+                  `Справочники загружены, но сообщение справочников с id=${msg.id} на сервере не удалено. ${removeMess.message}`,
                   tempErrs,
                 );
               }
@@ -143,7 +143,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
               if (removeMess.type !== 'REMOVE_MESSAGE') {
                 addError(
                   'useSync: removeMessage',
-                  `Справочники добавлены, но сообщение справочников с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
+                  `Справочники добавлены, но сообщение справочников с id=${msg.id} на сервере не удалено. ${removeMess.message}`,
                   tempErrs,
                 );
               }
@@ -181,7 +181,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
               if (removeMess.type !== 'REMOVE_MESSAGE') {
                 addError(
                   'useSync: removeMessage',
-                  `Справочник ${refName} загружен, но сообщение справочника с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
+                  `Справочник ${refName} загружен, но сообщение справочника с id=${msg.id} на сервере не удалено. ${removeMess.message}`,
                   tempErrs,
                 );
               }
@@ -210,7 +210,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
             if (removeMess.type !== 'REMOVE_MESSAGE') {
               addError(
                 'useSync: api.message.removeMessage',
-                `Документы загружены, но сообщение документов с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
+                `Документы загружены, но сообщение документов с id=${msg.id} на сервере не удалено. ${removeMess.message}`,
                 tempErrs,
               );
             }
@@ -259,7 +259,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
             if (removeMess.type !== 'REMOVE_MESSAGE') {
               addError(
                 'useSync: api.message.removeMessage',
-                `Настройки пользователя загружены, но сообщение настроек пользователя с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
+                `Настройки пользователя загружены, но сообщение настроек пользователя с id=${msg.id} на сервере не удалено. ${removeMess.message}`,
                 tempErrs,
               );
             }
@@ -303,7 +303,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
             if (removeMess.type !== 'REMOVE_MESSAGE') {
               addError(
                 'useSync: api.message.removeMessage',
-                `Настройки приложения загружены, но сообщение настроек подсистемы с id=${msg.id} на сервере не удалено: ${removeMess.message}`,
+                `Настройки приложения загружены, но сообщение настроек подсистемы с id=${msg.id} на сервере не удалено. ${removeMess.message}`,
                 tempErrs,
               );
             }
@@ -358,16 +358,11 @@ export const useSync = (onSync?: () => Promise<any>) => {
           //Если статус приложения не проверен (не было сети при подключении) connectionStatus === 'not-checked'
           //то проверим его, и если статус не будет получен, прервем синхронизацию
           addRequestNotice('Проверка статуса устройства');
+
           const statusRespone = await api.auth.getDeviceStatus(appRequest, deviceId);
           if (statusRespone.type !== 'GET_DEVICE_STATUS') {
-            addError(
-              'useSync: getDeviceStatus',
-              `Ошибка ${statusRespone.type === 'CONNECT_ERROR' ? ' подключения к серверу' : ''}: ${
-                statusRespone.message
-              }`,
-              tempErrs,
-            );
-            connectError = statusRespone.type === 'CONNECT_ERROR';
+            addError('useSync: getDeviceStatus', `Статус устройства не получен. ${statusRespone.message}`, tempErrs);
+            connectError = isConnectError(statusRespone.type);
           } else {
             authDispatch(
               authActions.setConnectionStatus(statusRespone.status === 'ACTIVE' ? 'connected' : 'not-activated'),
@@ -376,9 +371,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
 
           if (!tempErrs.length) {
             const messageCompany = { id: company.id, name: company.name };
-
             const consumer = user.erpUser;
-
             const readyDocs = documents.filter((doc) => doc.status === 'READY');
 
             // 1. Если есть документы, готовые для отправки (status = 'READY'),
@@ -419,192 +412,211 @@ export const useSync = (onSync?: () => Promise<any>) => {
               } else {
                 addError(
                   'useSync: api.message.sendMessages',
-                  `Документы ${readyDocs.map((doc) => doc.number).join(', ')} не отправлены, ${
+                  `Документы ${readyDocs.map((doc) => doc.number).join(', ')} не отправлены. ${
                     sendMessageResponse.message
                   }`,
                   tempErrs,
                 );
+                connectError = isConnectError(sendMessageResponse.type);
               }
             }
 
-            addRequestNotice('Получение данных');
-            //2. Получаем все сообщения для мобильного
-            const getMessagesResponse = await api.message.getMessages(appRequest, {
-              appSystemId: appSystem.id,
-              companyId: company.id,
-            });
+            //Если до сих пор не было ошибки сети, то продолжаем
+            if (!connectError) {
+              addRequestNotice('Получение данных');
+              //2. Получаем все сообщения для мобильного
+              const getMessagesResponse = await api.message.getMessages(appRequest, {
+                appSystemId: appSystem.id,
+                companyId: company.id,
+              });
 
-            //Если сообщения получены успешно, то
-            //  справочники: очищаем старые и записываем в хранилище новые данные
-            //  документы: добавляем новые, а старые заменеям только если был статус 'DRAFT'
-            if (getMessagesResponse.type === 'GET_MESSAGES') {
-              const sortedMessages = getMessagesResponse.messageList.sort((a, b) => a.head.order - b.head.order);
-              for (const message of sortedMessages) {
-                // eslint-disable-next-line no-await-in-loop
-                await processMessage(message, tempErrs);
-              }
-
-              // addError('useSync: api.message.sendMessages', new Date().toISOString(), tempErrs);
-              // withError = true;
-              // await Promise.all(
-              //   getMessagesResponse.messageList
-              //     .sort((a, b) => a.head.order - b.head.order)
-              //     ?.map((message) => processMessage(message, errList, okList, params)),
-              // );
-              //Формируем запрос на получение документов для следующего раза
-              const messageGetDoc: IMessage['body'] = {
-                type: 'CMD',
-                version: docVersion,
-                payload: {
-                  name: 'GET_DOCUMENTS',
-                },
-              };
-
-              //Формируем запрос на получение настроек для юзера
-              const messageGetUserSettings: IMessage['body'] = {
-                type: 'CMD',
-                version: docVersion,
-                payload: {
-                  name: 'GET_USER_SETTINGS',
-                },
-              };
-
-              //Формируем запрос на получение настроек подсистемы
-              const messageGetAppSettings: IMessage['body'] = {
-                type: 'CMD',
-                version: docVersion,
-                payload: {
-                  name: 'GET_APP_SYSTEM_SETTINGS',
-                },
-              };
-
-              if (isGetReferences) {
-                //Формируем запрос на получение справочников для следующего раза
-                const messageGetRef: IMessage['body'] = {
-                  type: 'CMD',
-                  version: refVersion,
-                  payload: {
-                    name: 'GET_REF',
-                  },
-                };
-
-                addRequestNotice('Запрос справочников');
-
-                //3. Отправляем запрос на получение справочников
-                const sendMesRefResponse = await api.message.sendMessages(
-                  appRequest,
-                  appSystem,
-                  messageCompany,
-                  consumer,
-                  messageGetRef,
-                  getNextOrder(),
-                  deviceId,
-                );
-
-                if (sendMesRefResponse?.type !== 'SEND_MESSAGE') {
-                  addError(
-                    'useSync: api.message.sendMessages',
-                    `Запрос на получение справочников не отправлен: ${sendMesRefResponse.message}`,
-                    tempErrs,
-                  );
+              //Если сообщения получены успешно, то
+              //  справочники: очищаем старые и записываем в хранилище новые данные
+              //  документы: добавляем новые, а старые заменеям только если был статус 'DRAFT'
+              //  отправляем запросы за остальными данными
+              if (getMessagesResponse.type === 'GET_MESSAGES') {
+                const sortedMessages = getMessagesResponse.messageList.sort((a, b) => a.head.order - b.head.order);
+                for (const message of sortedMessages) {
+                  // eslint-disable-next-line no-await-in-loop
+                  await processMessage(message, tempErrs);
                 }
-              }
 
-              addRequestNotice('Запрос документов');
+                // addError('useSync: api.message.sendMessages', new Date().toISOString(), tempErrs);
+                // withError = true;
+                // await Promise.all(
+                //   getMessagesResponse.messageList
+                //     .sort((a, b) => a.head.order - b.head.order)
+                //     ?.map((message) => processMessage(message, errList, okList, params)),
+                // );
 
-              //4. Отправляем запрос на получение документов
-              const sendMesDocRespone = await api.message.sendMessages(
-                appRequest,
-                appSystem,
-                messageCompany,
-                consumer,
-                messageGetDoc,
-                getNextOrder(),
-                deviceId,
-              );
+                if (isGetReferences) {
+                  //Формируем запрос на получение справочников для следующего раза
+                  const messageGetRef: IMessage['body'] = {
+                    type: 'CMD',
+                    version: refVersion,
+                    payload: {
+                      name: 'GET_REF',
+                    },
+                  };
 
-              if (sendMesDocRespone.type !== 'SEND_MESSAGE') {
-                addError(
-                  'useSync: api.message.sendMessages',
-                  `Запрос на получение документов не отправлен: ${sendMesDocRespone.message}`,
-                  tempErrs,
-                );
-              }
+                  addRequestNotice('Запрос справочников');
 
-              if (cleanDocTime > 0) {
-                //5. Удаляем обработанные документы, которые хранятся больше времени, которое указано в настройках
-                const maxDocDate = new Date();
-                maxDocDate.setDate(maxDocDate.getDate() - cleanDocTime);
+                  //3. Отправляем запрос на получение справочников
+                  const sendMesRefResponse = await api.message.sendMessages(
+                    appRequest,
+                    appSystem,
+                    messageCompany,
+                    consumer,
+                    messageGetRef,
+                    getNextOrder(),
+                    deviceId,
+                  );
 
-                const delDocs = documents
-                  .filter(
-                    (d) =>
-                      (d.status === 'PROCESSED' || d.status === 'ARCHIVE') &&
-                      new Date(d.documentDate).getTime() <= maxDocDate.getTime(),
-                  )
-                  .map((d) => d.id);
-
-                if (delDocs.length) {
-                  addRequestNotice(`Удаление обработанных документов, дата которых менее ${getDateString(maxDocDate)}`);
-
-                  const delDocResponse = await docDispatch(documentActions.removeDocuments(delDocs));
-                  if (delDocResponse.type === 'DOCUMENTS/REMOVE_MANY_FAILURE') {
+                  if (sendMesRefResponse.type !== 'SEND_MESSAGE') {
                     addError(
-                      'useSync: removeDocuments',
-                      `Обработанные документы, дата которых менее ${getDateString(maxDocDate)}, не удалены`,
+                      'useSync: api.message.sendMessages',
+                      `Запрос на получение справочников не отправлен. ${sendMesRefResponse.message}`,
                       tempErrs,
                     );
+                    connectError = isConnectError(sendMesRefResponse.type);
                   }
                 }
-              }
 
-              addRequestNotice('Запрос настроек пользователя');
+                if (!connectError) {
+                  addRequestNotice('Запрос документов');
 
-              //7. Отправляем запрос на получение настроек пользователя
-              const sendMesUserSettResponse = await api.message.sendMessages(
-                appRequest,
-                appSystem,
-                messageCompany,
-                consumer,
-                messageGetUserSettings,
-                getNextOrder(),
-                deviceId,
-              );
+                  //Формируем запрос на получение документов для следующего раза
+                  const messageGetDoc: IMessage['body'] = {
+                    type: 'CMD',
+                    version: docVersion,
+                    payload: {
+                      name: 'GET_DOCUMENTS',
+                    },
+                  };
 
-              if (sendMesUserSettResponse.type !== 'SEND_MESSAGE') {
+                  //4. Отправляем запрос на получение документов
+                  const sendMesDocRespone = await api.message.sendMessages(
+                    appRequest,
+                    appSystem,
+                    messageCompany,
+                    consumer,
+                    messageGetDoc,
+                    getNextOrder(),
+                    deviceId,
+                  );
+
+                  if (sendMesDocRespone.type !== 'SEND_MESSAGE') {
+                    addError(
+                      'useSync: api.message.sendMessages',
+                      `Запрос на получение документов не отправлен. ${sendMesDocRespone.message}`,
+                      tempErrs,
+                    );
+                    connectError = isConnectError(sendMesDocRespone.type);
+                  }
+                }
+
+                if (cleanDocTime > 0) {
+                  //5. Удаляем обработанные документы, которые хранятся больше времени, которое указано в настройках
+                  const maxDocDate = new Date();
+                  maxDocDate.setDate(maxDocDate.getDate() - cleanDocTime);
+
+                  const delDocs = documents
+                    .filter(
+                      (d) =>
+                        (d.status === 'PROCESSED' || d.status === 'ARCHIVE') &&
+                        new Date(d.documentDate).getTime() <= maxDocDate.getTime(),
+                    )
+                    .map((d) => d.id);
+
+                  if (delDocs.length) {
+                    addRequestNotice(
+                      `Удаление обработанных документов, дата которых менее ${getDateString(maxDocDate)}`,
+                    );
+
+                    const delDocResponse = await docDispatch(documentActions.removeDocuments(delDocs));
+                    if (delDocResponse.type === 'DOCUMENTS/REMOVE_MANY_FAILURE') {
+                      addError(
+                        'useSync: removeDocuments',
+                        `Обработанные документы, дата которых менее ${getDateString(maxDocDate)}, не удалены`,
+                        tempErrs,
+                      );
+                    }
+                  }
+                }
+
+                if (!connectError) {
+                  addRequestNotice('Запрос настроек пользователя');
+
+                  //Формируем запрос на получение настроек для юзера
+                  const messageGetUserSettings: IMessage['body'] = {
+                    type: 'CMD',
+                    version: docVersion,
+                    payload: {
+                      name: 'GET_USER_SETTINGS',
+                    },
+                  };
+
+                  //7. Отправляем запрос на получение настроек пользователя
+                  const sendMesUserSettResponse = await api.message.sendMessages(
+                    appRequest,
+                    appSystem,
+                    messageCompany,
+                    consumer,
+                    messageGetUserSettings,
+                    getNextOrder(),
+                    deviceId,
+                  );
+
+                  if (sendMesUserSettResponse.type !== 'SEND_MESSAGE') {
+                    addError(
+                      'useSync: api.message.sendMessages',
+                      `Запрос на получение настроек пользователя не отправлен. ${sendMesUserSettResponse.message}`,
+                      tempErrs,
+                    );
+                    connectError = isConnectError(sendMesUserSettResponse.type);
+                  }
+                }
+
+                if (!connectError) {
+                  addRequestNotice('Запрос настроек подсистемы');
+
+                  //Формируем запрос на получение настроек подсистемы
+                  const messageGetAppSettings: IMessage['body'] = {
+                    type: 'CMD',
+                    version: docVersion,
+                    payload: {
+                      name: 'GET_APP_SYSTEM_SETTINGS',
+                    },
+                  };
+
+                  //8. Отправляем запрос на получение настроек подсистемы
+                  const sendMesAppSettResponse = await api.message.sendMessages(
+                    appRequest,
+                    appSystem,
+                    messageCompany,
+                    consumer,
+                    messageGetAppSettings,
+                    getNextOrder(),
+                    deviceId,
+                  );
+
+                  if (sendMesAppSettResponse.type !== 'SEND_MESSAGE') {
+                    addError(
+                      'useSync: api.message.sendMessages',
+                      `Запрос на получение настроек подсистемы не отправлен. ${sendMesAppSettResponse.message}`,
+                      tempErrs,
+                    );
+                    connectError = isConnectError(sendMesAppSettResponse.type);
+                  }
+                }
+              } else {
                 addError(
-                  'useSync: api.message.sendMessages',
-                  `Запрос на получение настроек пользователя не отправлен: ${sendMesUserSettResponse.message}`,
+                  'useSync: api.message.getMessages',
+                  `Сообщения не получены. ${getMessagesResponse.message}`,
                   tempErrs,
                 );
+                connectError = isConnectError(getMessagesResponse.type);
               }
-
-              addRequestNotice('Запрос настроек подсистемы');
-
-              //8. Отправляем запрос на получение настроек подсистемы
-              const sendMesAppSettResponse = await api.message.sendMessages(
-                appRequest,
-                appSystem,
-                messageCompany,
-                consumer,
-                messageGetAppSettings,
-                getNextOrder(),
-                deviceId,
-              );
-
-              if (sendMesAppSettResponse.type !== 'SEND_MESSAGE') {
-                addError(
-                  'useSync: api.message.sendMessages',
-                  `Запрос на получение настроек подсистемы не отправлен: ${sendMesAppSettResponse.message}`,
-                  tempErrs,
-                );
-              }
-            } else {
-              addError(
-                'useSync: api.message.getMessages',
-                `Сообщения не получены: ${getMessagesResponse.message}`,
-                tempErrs,
-              );
             }
           }
         } else if (onSync) {
@@ -616,7 +628,9 @@ export const useSync = (onSync?: () => Promise<any>) => {
       addError('useSync', `Проблемы с передачей данных ${err}`, tempErrs);
     }
 
-    //Если не ошибка сети при проверке статуса устройства, то
+    //Если не ошибка сети,
+    //то сохраняем ошибки и передаем на сервер
+    //иначе, сохраним их и передадим в следующий раз
     if (!connectError) {
       saveErrors(tempErrs);
     } else if (tempErrs.length) {

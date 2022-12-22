@@ -1,7 +1,7 @@
 import { useDispatch, useSelector, appActions, authActions, useAuthThunkDispatch } from '@lib/store';
 
 import { ICmdParams, IDeviceLog, IMessage } from '@lib/types';
-import api from '@lib/client-api';
+import api, { isConnectError } from '@lib/client-api';
 
 import { useMemo } from 'react';
 
@@ -62,10 +62,10 @@ export const useSendOneRefRequest = (description: string, params: ICmdParams) =>
       if (statusRespone.type !== 'GET_DEVICE_STATUS') {
         addError(
           'useSendOneRefRequest: getDeviceStatus',
-          `Ошибка ${statusRespone.type === 'CONNECT_ERROR' ? ' подключения к серверу' : ''}: ${statusRespone.message}`,
+          `Статус устройства не получен. ${statusRespone.message}`,
           tempErrs,
         );
-        connectError = statusRespone.type === 'CONNECT_ERROR';
+        connectError = isConnectError(statusRespone.type);
       } else {
         authDispatch(
           authActions.setConnectionStatus(statusRespone.status === 'ACTIVE' ? 'connected' : 'not-activated'),

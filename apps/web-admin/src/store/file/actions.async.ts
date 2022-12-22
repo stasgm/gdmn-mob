@@ -23,11 +23,7 @@ const fetchFiles = (): AppThunk => {
       return dispatch(fileSystemActions.fetchFilesAsync.success(response.files));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(fileSystemActions.fetchFilesAsync.failure(response.message));
-    }
-
-    return dispatch(fileSystemActions.fetchFilesAsync.failure('Ошибка получения данных о файлах'));
+    return dispatch(fileSystemActions.fetchFilesAsync.failure(response.message));
   };
 };
 
@@ -83,11 +79,7 @@ const removeFiles = (fileIds: string[]): AppThunk => {
       return dispatch(fileSystemActions.removeFilesAsync.success(fileIds));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(fileSystemActions.removeFilesAsync.failure(response.message));
-    }
-
-    return dispatch(fileSystemActions.removeFilesAsync.failure('Ошибка получения данных о файлах'));
+    return dispatch(fileSystemActions.removeFilesAsync.failure(response.message));
   };
 };
 
