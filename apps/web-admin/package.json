@@ -65,6 +65,7 @@
     "@types/react-input-mask": "^3.0.2",
     "@types/react-text-mask": "^5.4.10",
     "@types/styled-components": "^5.1.26",
+    "@types/react-google-recaptcha": "~2.1.5",
     "babel-loader": "^9.1.0",
     "clsx": "^1.2.1",
     "cross-env": "^7.0.3",
@@ -93,7 +94,11 @@
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.10.0",
     "webpack-merge": "^5.8.0",
-    "yup": "^0.32.11"
+    "yup": "^0.32.11",
+    "reaptcha": "~1.12.1",
+    "dotenv": "~16.0.3",
+    "dotenv-webpack": "~8.0.1",
+    "react-google-recaptcha": "~2.1.0"
   },
   "devDependencies": {
     "@config/eslint-config": "*",
