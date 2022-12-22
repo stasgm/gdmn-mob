@@ -32,11 +32,7 @@ export default function Devices() {
   return (
     <>
       {routeComponent}
-      <SnackBar
-        visible={!!devicesErrorMessage}
-        errorMessage={devicesErrorMessage}
-        onClearError={handleClearError}
-      />
+      <SnackBar visible={!!devicesErrorMessage} errorMessage={devicesErrorMessage} onClearError={handleClearError} />
     </>
   );
 }

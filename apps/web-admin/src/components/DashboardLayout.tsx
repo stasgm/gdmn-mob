@@ -39,8 +39,6 @@ const DashboardLayoutContent = experimentalStyled('div')({
 
 const DashboardLayout = () => {
   const [isMobileNavOpen, setMobileNavOpen] = useState(false);
-  const dispatch = useDispatch();
-
 
   return (
     <DashboardLayoutRoot>

@@ -28,11 +28,7 @@ export default function Processes() {
   return (
     <>
       {routeComponent}
-      <SnackBar
-        visible={!!processErrorMessage}
-        errorMessage={processErrorMessage}
-        onClearError={handleClearError}
-      />
+      <SnackBar visible={!!processErrorMessage} errorMessage={processErrorMessage} onClearError={handleClearError} />
     </>
   );
 }

@@ -52,7 +52,6 @@ const Account = () => {
     dispatch(actions.userActions.clearError());
   };
 
-
   return (
     <>
       <Helmet>
