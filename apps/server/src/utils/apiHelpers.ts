@@ -11,6 +11,7 @@ export const ok = <T>(ctx: Context, data?: T, logMessage?: string, logData?: boo
   //   data,
   // };
   ctx.body = {
+    result: true,
     type: 'SUCCESS',
     status: 200,
     data,
@@ -31,6 +32,7 @@ export const created = (ctx: Context, data?: any, logMessage?: string, logData?:
   //   data,
   // };
   ctx.body = {
+    result: true,
     type: 'SUCCESS',
     status: 201,
     data,
@@ -48,10 +50,8 @@ export const notOk = (ctx: Context) => {
   ctx.status = 400;
   // ctx.body = { result: false };
   ctx.body = {
+    result: false,
     type: 'FAILURE',
-    body: {
-      result: false,
-      status: 400,
-    },
+    status: 400,
   };
 };

@@ -21,6 +21,7 @@ export const errorHandler = async (ctx: Context, next: Next) => {
       //   status: error.status || 500,
       // };
       const result: FailureResponse = {
+        result: false,
         type: 'FAILURE',
         status: error.status || 500,
         error: error.message || 'Неизвестная внутренняя ошибка',
@@ -39,6 +40,7 @@ export const errorHandler = async (ctx: Context, next: Next) => {
       //   data: 'InnerErrorException',
       // };
       ctx.body = {
+        result: false,
         type: 'FAILURE',
         status: 500,
         error: errorMsg,
