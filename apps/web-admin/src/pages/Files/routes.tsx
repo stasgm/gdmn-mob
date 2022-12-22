@@ -30,11 +30,7 @@ export default function Files() {
   return (
     <>
       {routeComponent}
-      <SnackBar
-        visible={!!filesErrorMessage}
-        errorMessage={filesErrorMessage}
-        onClearError={handleClearError}
-      />
+      <SnackBar visible={!!filesErrorMessage} errorMessage={filesErrorMessage} onClearError={handleClearError} />
     </>
   );
 }

@@ -26,11 +26,7 @@ export default function DeviceLogs() {
   return (
     <>
       {routeComponent}
-      <SnackBar
-        visible={!!logErrorMessage}
-        errorMessage={logErrorMessage}
-        onClearError={handleClearError}
-      />
+      <SnackBar visible={!!logErrorMessage} errorMessage={logErrorMessage} onClearError={handleClearError} />
     </>
   );
 }

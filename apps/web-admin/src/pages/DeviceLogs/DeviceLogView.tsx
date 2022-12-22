@@ -36,8 +36,6 @@ export type Params = {
 
 const DeviceLogView = () => {
   const { id } = useParams<keyof Params>() as Params;
-
-  console.log('id log', id);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
