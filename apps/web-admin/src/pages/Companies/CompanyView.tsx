@@ -14,19 +14,19 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/company';
 import userActions from '../../store/user';
 import CompanyUsers from '../../components/company/CompanyUsers';
-import { IToolBarButton } from '../../types';
+import { ILinkedEntity, IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
-import CompanyDetailsView from '../../components/company/CompanyDetailsView';
 import companySelectors from '../../store/company/selectors';
 import userSelectors from '../../store/user/selectors';
 
 import { adminPath } from '../../utils/constants';
+import DetailsView from '../../components/DetailsView';
 
 export type Params = {
   id: string;
@@ -40,6 +40,20 @@ const CompanyView = () => {
   const company = companySelectors.companyById(companyId);
   const users = userSelectors.usersByCompanyId(companyId);
   const [open, setOpen] = useState(false);
+
+  const companyDetails: ILinkedEntity[] = useMemo(
+    () =>
+      company
+        ? [
+            { id: 'Наименование', value: company },
+            { id: 'ID', value: company?.id },
+            { id: 'Город', value: company?.city },
+            { id: 'Администратор', value: company?.admin, link: `${adminPath}/app/users/${company.admin.id}/` },
+            { id: 'Подсистемы', value: company?.appSystems },
+          ]
+        : [],
+    [company],
+  );
 
   const handleCancel = () => {
     navigate(-1);
@@ -166,7 +180,7 @@ const CompanyView = () => {
             minHeight: '100%',
           }}
         >
-          <CompanyDetailsView company={company} />
+          <DetailsView details={companyDetails} />
         </Box>
       </Box>
       <Box>

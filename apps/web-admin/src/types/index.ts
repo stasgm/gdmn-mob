@@ -58,3 +58,8 @@ export interface IDeviceLogFileFormik {
   uid: string;
   date: string;
 }
+
+export interface ILinkedEntity extends IEntity {
+  value: string | number | INamedEntity | INamedEntity[] | undefined;
+  link?: string;
+}
