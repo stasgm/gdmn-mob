@@ -159,6 +159,7 @@ export const robustRequest: RobustRequest = async ({
     if (err instanceof AxiosError) {
       if (err.response?.status) {
         return {
+          result: false,
           type: 'FAILURE',
           status: err.response.status || 500,
           error: err.response.data || '',

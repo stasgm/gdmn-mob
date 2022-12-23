@@ -1,10 +1,12 @@
 export type SuccessResponse<T> = {
+  result: true;
   type: 'SUCCESS';
   status: number;
   data: T;
 };
 
 export type FailureResponse = {
+  result: false;
   type: 'FAILURE';
   status: number;
   error: string;
