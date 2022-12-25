@@ -3,7 +3,7 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { refSelectors } from '@lib/store';
 import { DataTable, IconButton } from 'react-native-paper';
 
-import { useTheme } from '@react-navigation/native';
+import { useIsFocused, useTheme } from '@react-navigation/native';
 
 import { formatValue, round, useFilteredDocList } from '@lib/mobile-hooks';
 
@@ -26,14 +26,16 @@ const RouteTotal = ({ routeId, onPress, isGroupVisible = false }: IItem) => {
 
   const orders = useFilteredDocList<IOrderDocument>('order');
 
-  const orderLines = useMemo(() => {
-    return orders?.reduce((prev: IOrderLine[], order) => {
-      if (order.head.route?.id === routeId) {
-        prev = [...prev, ...order.lines];
-      }
-      return prev;
-    }, []);
-  }, [orders, routeId]);
+  const orderLines = useMemo(
+    () =>
+      orders?.reduce((prev: IOrderLine[], order) => {
+        if (order.head.route?.id === routeId) {
+          prev = [...prev, ...order.lines];
+        }
+        return prev;
+      }, []),
+    [orders, routeId],
+  );
 
   const totalListByRoute = useMemo(
     () => totalListByGroup(firstLevelGroups, groups, orderLines),
@@ -47,16 +49,7 @@ const RouteTotal = ({ routeId, onPress, isGroupVisible = false }: IItem) => {
     borderRightColor: colors.border,
     borderTopColor: colors.border,
   };
-  const headerStyle = [
-    localStyles.borderColor,
-    localStyles.borderBottomColor,
-    localStyles.borderTopColor,
-    {
-      backgroundColor: globalColors.backgroundLight,
-      borderTopColor: globalColors.backgroundLight,
-      borderTopWidth: 0,
-    },
-  ];
+
   const textColor = { color: colors.text };
   const rowStyle = [
     { minHeight: 22, borderBottomWidth: 0, borderTopWidth: isGroupVisible ? StyleSheet.hairlineWidth * 2 : 0 },
@@ -69,6 +62,11 @@ const RouteTotal = ({ routeId, onPress, isGroupVisible = false }: IItem) => {
     backgroundColor:
       isGroupVisible && totalListByRoute?.length % 2 === 1 ? globalColors.backgroundLight : 'transparent',
   };
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <></>;
+  }
 
   return (
     <TouchableOpacity onPress={() => !!orderLines.length && onPress()}>
@@ -181,3 +179,13 @@ const localStyles = StyleSheet.create({
   borderTopColor: { borderTopColor: 'transparent' },
   borderBottomColor: { borderBottomColor: 'transparent' },
 });
+const headerStyle = [
+  localStyles.borderColor,
+  localStyles.borderBottomColor,
+  localStyles.borderTopColor,
+  {
+    backgroundColor: globalColors.backgroundLight,
+    borderTopColor: globalColors.backgroundLight,
+    borderTopWidth: 0,
+  },
+];
