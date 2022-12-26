@@ -222,9 +222,11 @@ const RouteViewScreen = () => {
           ItemSeparatorComponent={ItemSeparator}
           refreshControl={RC}
           ListEmptyComponent={EmptyList}
-          updateCellsBatchingPeriod={50}
-          maxToRenderPerBatch={15}
           keyboardShouldPersistTaps={'handled'}
+          maxToRenderPerBatch={50}
+          windowSize={60}
+          updateCellsBatchingPeriod={50}
+          initialNumToRender={50}
         />
         {!!routeLineList?.length && !filterVisible && route?.id && (
           <RouteTotal

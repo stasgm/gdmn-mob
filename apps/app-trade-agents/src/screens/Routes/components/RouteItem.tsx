@@ -1,11 +1,13 @@
 import React, { useMemo } from 'react';
-import { View, TouchableHighlight, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { globalStyles as styles, LargeText, MediumText } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 
 import { getDateString, useFilteredDocList } from '@lib/mobile-hooks';
+
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import { IOutlet, IRouteLine, IVisitDocument } from '../../../store/types';
 
@@ -28,7 +30,7 @@ const RouteItem = ({ item, onPressItem }: IItem) => {
   );
 
   return (
-    <TouchableHighlight activeOpacity={0.7} underlayColor="#DDDDDD" onPress={onPressItem}>
+    <TouchableOpacity onPress={onPressItem}>
       <View style={[styles.item, localStyles.item]}>
         <View style={styles.icon}>
           <MediumText style={styles.lightText}>{item.ordNumber}</MediumText>
@@ -48,7 +50,7 @@ const RouteItem = ({ item, onPressItem }: IItem) => {
           {dateEnd ? <MediumText>{dateEnd}</MediumText> : null}
         </View>
       </View>
-    </TouchableHighlight>
+    </TouchableOpacity>
   );
 };
 
