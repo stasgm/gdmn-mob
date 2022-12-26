@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 
-import { RouteProp, useRoute, useTheme, useNavigation, useIsFocused } from '@react-navigation/native';
+import { RouteProp, useRoute, useTheme, useNavigation } from '@react-navigation/native';
 import { View, Alert, RefreshControl, FlatList } from 'react-native';
 import { Divider, Searchbar } from 'react-native-paper';
 
@@ -14,28 +14,21 @@ import {
   EmptyList,
   SearchButton,
   navBackButton,
-  AppActivityIndicator,
 } from '@lib/mobile-ui';
-import { documentActions, docSelectors, useDocThunkDispatch, appActions, useSelector } from '@lib/store';
+import { documentActions, docSelectors, useDocThunkDispatch } from '@lib/store';
 
 import { getDateString, keyExtractor, useFilteredDocList } from '@lib/mobile-hooks';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument, IRouteDocument, IRouteFormParam, IRouteLine, IVisitDocument } from '../../store/types';
+import { IOrderDocument, IRouteDocument, IRouteLine, IVisitDocument } from '../../store/types';
 import actions from '../../store/geo';
 
 import { useDispatch, useSelector as useAppSelector } from '../../store';
 
-import { getItemLayout, viewabilityConfig } from '../../utils/helpers';
-
-import { ROUTE_ITEM_HEIGHT } from '../../utils/constants';
-
 import RouteItem from './components/RouteItem';
 import RouteTotal from './components/RouteTotal';
-
-const getItemLayoutRoute = (_: any, index: number) => getItemLayout(index, ROUTE_ITEM_HEIGHT);
 
 interface IFilteredList {
   searchQuery: string;
@@ -100,21 +93,6 @@ const RouteViewScreen = () => {
   const visits = useFilteredDocList<IVisitDocument>('visit');
 
   const geoList = useAppSelector((state) => state.geo?.list)?.filter((g) => g.routeId === id);
-
-  //Первый элемент записывается в параметры формы при прокрутке списка точек маршрута
-  //При возвращении с окна визита, переходит на этот эелемент (initialScrollIndex)
-  const onViewableItemsChanged = useCallback(
-    ({ viewableItems }: any) => {
-      if (viewableItems?.length) {
-        dispatch(
-          appActions.setFormParams({
-            routeItemId: viewableItems[0].index,
-          }),
-        );
-      }
-    },
-    [dispatch],
-  );
 
   const handleDelete = useCallback(() => {
     const deleteRoute = async () => {
@@ -209,21 +187,16 @@ const RouteViewScreen = () => {
     [handlePressRouteItem],
   );
 
-  const isFocused = useIsFocused();
-  if (!isFocused) {
-    return <AppActivityIndicator />;
-  }
+  const RouteView = useMemo(() => {
+    if (!route) {
+      return (
+        <View style={styles.container}>
+          <SubTitle style={styles.title}>Маршрут не найден</SubTitle>
+        </View>
+      );
+    }
 
-  if (!route) {
     return (
-      <View style={styles.container}>
-        <SubTitle style={styles.title}>Маршрут не найден</SubTitle>
-      </View>
-    );
-  }
-
-  return (
-    <>
       <AppScreen>
         <SubTitle style={styles.title}>{getDateString(route.documentDate)}</SubTitle>
         <Divider />
@@ -242,54 +215,39 @@ const RouteViewScreen = () => {
             <ItemSeparator />
           </>
         )}
-        <CalcTopRouteList
-          renderItem={renderItem}
-          onViewableItemsChanged={onViewableItemsChanged}
-          RC={RC}
+        <FlatList
           data={filteredList.routeLineList}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          ItemSeparatorComponent={ItemSeparator}
+          refreshControl={RC}
+          ListEmptyComponent={EmptyList}
+          updateCellsBatchingPeriod={50}
+          maxToRenderPerBatch={15}
+          keyboardShouldPersistTaps={'handled'}
         />
+        {!!routeLineList?.length && !filterVisible && route?.id && (
+          <RouteTotal
+            onPress={() => setIsGroupVisible(!isGroupVisible)}
+            isGroupVisible={isGroupVisible}
+            routeId={route.id}
+          />
+        )}
       </AppScreen>
-      {!!routeLineList?.length && !filterVisible && (
-        <RouteTotal
-          onPress={() => setIsGroupVisible(!isGroupVisible)}
-          isGroupVisible={isGroupVisible}
-          routeId={route.id}
-        />
-      )}
-    </>
-  );
-};
+    );
+  }, [
+    RC,
+    colors.primary,
+    filterVisible,
+    filteredList.routeLineList,
+    isGroupVisible,
+    renderItem,
+    route,
+    routeLineList?.length,
+    searchQuery,
+  ]);
 
-const CalcTopRouteList = ({
-  renderItem,
-  onViewableItemsChanged,
-  RC,
-  data,
-}: {
-  renderItem: any;
-  onViewableItemsChanged: ({ viewableItems }: any) => void;
-  RC: any;
-  data?: IRouteLine[];
-}) => {
-  const viewabilityConfigCallbackPairs = useRef([{ viewabilityConfig, onViewableItemsChanged }]);
-  const routeItemId = useSelector((state) => state.app.formParams as IRouteFormParam)?.routeItemId;
-
-  return (
-    <FlatList
-      data={data}
-      keyExtractor={keyExtractor}
-      renderItem={renderItem}
-      ItemSeparatorComponent={ItemSeparator}
-      refreshControl={RC}
-      ListEmptyComponent={EmptyList}
-      updateCellsBatchingPeriod={50}
-      viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
-      initialScrollIndex={routeItemId && data && data.length > routeItemId ? routeItemId : undefined}
-      getItemLayout={getItemLayoutRoute}
-      maxToRenderPerBatch={15}
-      keyboardShouldPersistTaps={'handled'}
-    />
-  );
+  return <>{RouteView}</>;
 };
 
 export default RouteViewScreen;
