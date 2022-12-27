@@ -152,7 +152,7 @@
 
 <img src="img/3.Docs/3.DocTypes.jpg" alt="drawing" height="400"/>  <img src="img/3.Docs/3.AddDocTypes.jpg" alt="drawing" height="400"/>  <img src="img/3.Docs/3.InventoryAdd.jpg" alt="drawing" height="400"/>
 
-Поля контактов могут быть 3 типов, которые при необходимости можно менять:
+**Поля контактов** (откуда и куда) могут быть 3 типов, которые при необходимости можно менять:
 - Подразделение
 - Организация
 - Сотрудник
