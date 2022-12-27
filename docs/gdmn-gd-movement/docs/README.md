@@ -8,7 +8,7 @@
 - Демо режим ( НАЧАТЬ РАБОТУ )
 - Подключение к серверу
 
-
+<img src="img/1.Connection/1.StartScreen2.jpg" alt="drawing" height="400"/>
 <img src="img/1.Connection/1.StartScreen.jpg" alt="drawing" height="400"/>
 
 
