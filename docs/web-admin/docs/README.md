@@ -14,19 +14,17 @@
 
 По нажатию переходим на страницу регистрации.
 
-![alt text](img/1.Register/1.SignUpWindow.png)​
-
 <img src="img/1.Register/1.SignUpWindow.jpg" alt="drawing" height="400"/>
 
 Для регистрации необходимо заполнить поля **Учетная запись** и **Пароль**, **Повторите Пароль** и нажать на кнопку **Зарегистрироваться**. Поле **Email** является необязательным, его можно будет заполнить при редактировании пользователя.
 
-![alt text](img/1.Register/1.SignUpSuperadmin.png)​
+![alt text](img/1.Register/1.SignUpSuperadmin.jpg)​
 
 Так как это первая регистрация, то пользователь автоматически становится суперадминистратором.
 
 Далее регистрируем администратора компании.
 
-![alt text](img/1.Register/1.SignUpAdmin.png)​
+![alt text](img/1.Register/1.SignUpAdmin.jpg)​
 
 ## 2. Вход в учетную запись
 
