@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -18,7 +18,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 import { useSelector, useDispatch } from '../../store';
-import { IToolBarButton } from '../../types';
+import { ILinkedEntity, IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 
 import appSystemSelectors from '../../store/appSystem/selectors';
@@ -27,6 +27,7 @@ import AppSystemDetailsView from '../../components/appSystem/AppSystemDetailsVie
 import actions from '../../store/appSystem';
 
 import { adminPath } from '../../utils/constants';
+import DetailsView from '../../components/DetailsView';
 
 export type Params = {
   id: string;
@@ -42,6 +43,17 @@ const AppSystemView = () => {
   const appSystem = appSystemSelectors.appSystemById(id);
 
   const [open, setOpen] = useState(false);
+
+  const appSystemDetails: ILinkedEntity[] = useMemo(
+    () =>
+      appSystem
+        ? [
+            { id: 'Наименование', value: appSystem },
+            { id: 'Описание', value: appSystem?.description },
+          ]
+        : [],
+    [appSystem],
+  );
 
   const handleCancel = () => {
     navigate(-1);
@@ -171,7 +183,7 @@ const AppSystemView = () => {
             minHeight: '100%',
           }}
         >
-          <AppSystemDetailsView appSystem={appSystem} />
+          <DetailsView details={appSystemDetails} />
         </Box>
       </Box>
     </>

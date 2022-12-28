@@ -28,7 +28,7 @@
     "@lib/store": "*",
     "@lib/types": "*",
     "@react-navigation/native": "^6.1.1",
-    "@react-navigation/stack": "^6.3.9",
+    "@react-navigation/stack": "^6.3.10",
     "@types/node": "^18.11.14",
     "@types/react": "~18.0.25",
     "@types/react-native": "0.70.8",

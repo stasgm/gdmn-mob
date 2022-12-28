@@ -75,4 +75,24 @@ export const lineTypes: IListItem[] = [
     value: 'предыдущие',
   },
 ];
+
 export const ROUTE_ITEM_HEIGHT = 80;
+
+export const statusTypes: IListItem[] = [
+  {
+    id: 'DRAFT',
+    value: 'Черновик',
+  },
+  {
+    id: 'READY',
+    value: 'Готово',
+  },
+  {
+    id: 'SENT',
+    value: 'Отправлено',
+  },
+  {
+    id: 'PROCESSED',
+    value: 'Обработано',
+  },
+];

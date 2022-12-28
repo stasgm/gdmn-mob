@@ -14,6 +14,8 @@ import {
 
 import { IFormParam } from '@lib/store';
 
+import { IListItem } from '@lib/mobile-types';
+
 import { ICoords } from './geo/types';
 import { IGood } from './app/types';
 
@@ -37,6 +39,7 @@ export interface IOrderListFormParam extends IFormParam {
   filterDateBegin?: string;
   filterDateEnd?: string;
   filterGood?: IReferenceData;
+  filterStatusList: IListItem[];
 }
 
 export interface IReportListFormParam extends IFormParam {
