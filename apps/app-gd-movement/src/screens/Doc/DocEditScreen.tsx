@@ -19,7 +19,7 @@ import {
 } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
-import { generateId, getDateString } from '@lib/mobile-hooks';
+import { generateId, getDateString, isNamedEntity } from '@lib/mobile-hooks';
 
 import { IDocumentType, ScreenState } from '@lib/types';
 
@@ -58,6 +58,13 @@ export const DocEditScreen = () => {
     fromContactType: docFromContactType,
     toContactType: docToContactType,
   } = useSelector((state) => state.app.formParams as IDocFormParam);
+
+  const departmentSetting = useSelector((state) => state.auth.user?.settings?.toDepartment?.data);
+
+  const defaultToDepartment = useMemo(
+    () => (isNamedEntity(departmentSetting) && docToContactType?.id === 'department' ? departmentSetting : undefined),
+    [departmentSetting, docToContactType?.id],
+  );
 
   const documentType = useMemo(
     () => documentTypes?.find((d) => d.id === docDocumentType?.id),
@@ -98,6 +105,7 @@ export const DocEditScreen = () => {
           documentType: dt,
           fromContactType: contactTypes.find((item) => item.id === dt?.fromType),
           toContactType: contactTypes.find((item) => item.id === dt?.toType),
+          toContact: defaultToDepartment,
         }),
       );
     }
@@ -296,7 +304,7 @@ export const DocEditScreen = () => {
         appActions.setFormParams({
           fromContact: undefined,
           fromContactType: contactTypes.find((item) => item.id === documentType?.fromType),
-          toContact: undefined,
+          toContact: defaultToDepartment ? defaultToDepartment : undefined,
           toContactType: contactTypes.find((item) => item.id === documentType?.toType),
         }),
       );
