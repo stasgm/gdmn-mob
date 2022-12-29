@@ -62,13 +62,23 @@ export const DocEditScreen = () => {
   const departmentSetting = useSelector((state) => state.auth.user?.settings?.toDepartment?.data);
 
   const defaultToDepartment = useMemo(
-    () => (isNamedEntity(departmentSetting) && docToContactType?.id === 'department' ? departmentSetting : undefined),
-    [departmentSetting, docToContactType?.id],
+    () =>
+      isNamedEntity(departmentSetting) && (docToContactType ? docToContactType?.id === 'department' : true)
+        ? departmentSetting
+        : undefined,
+    [departmentSetting, docToContactType],
   );
 
   const documentType = useMemo(
     () => documentTypes?.find((d) => d.id === docDocumentType?.id),
     [docDocumentType, documentTypes],
+  );
+
+  const dt = documentTypes?.[0];
+
+  const dtToContact = useMemo(
+    () => contactTypes.find((item) => (defaultToDepartment ? item.id === 'department' : item.id === dt?.toType)),
+    [defaultToDepartment, dt?.toType],
   );
 
   useEffect(() => {
@@ -95,7 +105,6 @@ export const DocEditScreen = () => {
         }),
       );
     } else {
-      const dt = documentTypes?.[0];
       const newNumber = getNextDocNumber(documents);
       dispatch(
         appActions.setFormParams({
@@ -104,7 +113,7 @@ export const DocEditScreen = () => {
           status: 'DRAFT',
           documentType: dt,
           fromContactType: contactTypes.find((item) => item.id === dt?.fromType),
-          toContactType: contactTypes.find((item) => item.id === dt?.toType),
+          toContactType: dtToContact,
           toContact: defaultToDepartment,
         }),
       );

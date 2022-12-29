@@ -339,11 +339,11 @@ export const SelectRemainsScreen = () => {
         refreshControl={RC}
         ListEmptyComponent={EmptyList}
         removeClippedSubviews={true} // Unmount compsonents when outside of window
-        initialNumToRender={6}
-        maxToRenderPerBatch={6} // Reduce number in each render batch
-        updateCellsBatchingPeriod={100} // Increase time between renders
-        windowSize={7} // Reduce the window size
         keyboardShouldPersistTaps="handled"
+        maxToRenderPerBatch={50}
+        windowSize={60}
+        updateCellsBatchingPeriod={50}
+        initialNumToRender={50}
       />
       {(selectedLine || selectedGood) && (
         <DocLineDialog
