@@ -1,8 +1,8 @@
 import { styles } from '@lib/mobile-navigation';
-import { ItemSeparator, QuantityInput } from '@lib/mobile-ui';
+import { ItemSeparator } from '@lib/mobile-ui';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { StyleSheet, View, Text, ScrollView, TextInput } from 'react-native';
+import { StyleSheet, View, Text, ScrollView } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { INamedEntity } from '@lib/types';
@@ -10,24 +10,16 @@ import { INamedEntity } from '@lib/types';
 import { IOrderLine, IPackageGood } from '../../../store/types';
 
 import Checkbox from './Checkbox';
+import { NumberKeypad } from './NumberKeypad';
 
 interface IProps {
-  visibleQuantityInput: boolean;
   item: IOrderLine;
   packages: IPackageGood[];
   onSetLine: (value: IOrderLine) => void;
 }
 
-const OrderLine = ({ item, packages, onSetLine, visibleQuantityInput }: IProps) => {
+const OrderLine = ({ item, packages, onSetLine }: IProps) => {
   const { colors } = useTheme();
-  const inputRef = React.useRef<TextInput>(null);
-
-  useEffect(() => {
-    // TODO временное решение
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 1000);
-  }, [inputRef]);
 
   // Если упаковка только одна, то ставим ее по умолчанию, иначе
   // если есть упаковка с признаком 'по умолчанию', то подставляем ее
@@ -48,63 +40,66 @@ const OrderLine = ({ item, packages, onSetLine, visibleQuantityInput }: IProps) 
   const textStyle = [styles.number, styles.field, { color: colors.text, blackgroundColor: 'transparent' }];
 
   return (
-    <ScrollView keyboardShouldPersistTaps={'handled'} style={{ backgroundColor: colors.background }}>
-      <View style={styles.content}>
-        <View style={styles.item}>
-          <View style={styles.details}>
-            <Text style={styles.name}>Наименование</Text>
-            <Text style={textStyle}>{item ? item.good.name || 'товар не найден' : ''}</Text>
+    <View style={localStyles.container}>
+      <View>
+        <ScrollView keyboardShouldPersistTaps={'handled'}>
+          <View style={styles.item}>
+            <View style={styles.details}>
+              <Text style={styles.name}>Наименование</Text>
+              <Text style={textStyle}>{item ? item.good.name || 'товар не найден' : ''}</Text>
+            </View>
           </View>
-        </View>
-        <ItemSeparator />
-        <View style={styles.item}>
-          <View style={styles.details}>
-            <Text style={styles.name}>Цена</Text>
-            <Text style={textStyle}>{item.good.priceFsn}</Text>
+          <ItemSeparator />
+          <View style={styles.item}>
+            <View style={styles.details}>
+              <Text style={styles.name}>Цена</Text>
+              <Text style={textStyle}>{item.good.priceFsn}</Text>
+            </View>
           </View>
-        </View>
-        <ItemSeparator />
-        <View style={styles.item}>
-          <View style={styles.details}>
-            <Text style={styles.name}>Количество, кг</Text>
-            {visibleQuantityInput ? (
-              <QuantityInput
-                inputRef={inputRef}
-                value={item.quantity.toString()}
-                onChangeText={(newValue) => onSetLine({ ...item, quantity: parseFloat(newValue) })}
-              />
-            ) : (
-              <View style={localStyles.quantityItem} />
-            )}
+          <ItemSeparator />
+          <View style={localStyles.item}>
+            <View style={styles.details}>
+              <Text style={styles.name}>Упаковка</Text>
+              {packages.length > 0 ? (
+                <View style={localStyles.packages}>
+                  {packages.map((elem) => (
+                    <Checkbox
+                      key={elem.package.id}
+                      title={elem.package.name}
+                      selected={elem.package.id === item.package?.id}
+                      onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
+                    />
+                  ))}
+                </View>
+              ) : (
+                <Text style={[textStyle, localStyles.pack]}>Без упаковки</Text>
+              )}
+            </View>
           </View>
-        </View>
-        <ItemSeparator />
-        <View style={localStyles.item}>
-          <View style={styles.details}>
-            <Text style={styles.name}>Упаковка</Text>
-            {packages.length > 0 ? (
-              <View style={localStyles.packages}>
-                {packages.map((elem) => (
-                  <Checkbox
-                    key={elem.package.id}
-                    title={elem.package.name}
-                    selected={elem.package.id === item.package?.id}
-                    onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
-                  />
-                ))}
-              </View>
-            ) : (
-              <Text style={[textStyle, localStyles.pack]}>Без упаковки</Text>
-            )}
+          <ItemSeparator />
+          <View style={styles.item}>
+            <View style={styles.details}>
+              <Text style={styles.name}>Количество, кг</Text>
+              <Text style={[textStyle, localStyles.quantityItem]}>{item.quantity.toString()}</Text>
+            </View>
           </View>
-        </View>
-        <ItemSeparator />
+        </ScrollView>
       </View>
-    </ScrollView>
+      <NumberKeypad
+        oldValue={item.quantity.toString()}
+        handelApply={(newValue) => onSetLine({ ...item, quantity: parseFloat(newValue) })}
+      />
+    </View>
   );
 };
 
 const localStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    margin: 5,
+  },
   packages: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -116,7 +111,7 @@ const localStyles = StyleSheet.create({
     marginTop: 3,
   },
   quantityItem: {
-    height: 28,
+    fontSize: 40,
   },
   pack: {
     marginVertical: 6,
