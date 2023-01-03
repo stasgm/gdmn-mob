@@ -87,7 +87,7 @@ const OrderLine = ({ item, packages, onSetLine }: IProps) => {
       </View>
       <NumberKeypad
         oldValue={item.quantity.toString()}
-        handelApply={(newValue) => onSetLine({ ...item, quantity: parseFloat(newValue) })}
+        onApply={(newValue) => onSetLine({ ...item, quantity: parseFloat(newValue) })}
       />
     </View>
   );

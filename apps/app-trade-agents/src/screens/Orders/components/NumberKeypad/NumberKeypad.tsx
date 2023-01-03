@@ -8,24 +8,25 @@ import { IKeyProps, Key } from './Key';
 
 interface IProps {
   oldValue?: string;
-  handelDismiss?: () => void;
-  handelApply: (newValue: string) => void;
+  onDismiss?: () => void;
+  onApply: (newValue: string) => void;
 }
 
-const NumberKeypad = ({ oldValue, handelDismiss, handelApply }: IProps) => {
+const NumberKeypad = ({ oldValue, onDismiss, onApply }: IProps) => {
   const [expression, setExpression] = useState('');
   const [number, setNumber] = useState(oldValue);
   const [firstOperation, setFirstOperation] = useState(true);
   const { colors } = useTheme();
 
   const handleNumberPress = ({ value }: { value: string }) => {
+    //Если деление на ноль, то не выводим ноль
     if (value === '0' && expression.slice(-1) === '/') {
       return;
     }
     //Если уже было число 0, без выражения, и не введена точка, то берем введеное число
     //иначе склеиваем к предыдущему числу введенное число
     let newValue = `${number === '0' && !expression && value !== '.' ? '' : number}${value}`;
-    // //Если получившееся
+    //Если получившееся
     newValue = Number.isNaN(parseFloat(newValue)) ? '0.' : newValue ?? '0';
 
     const validNumber = new RegExp(/^(\d{1,6}(.))?\d{0,4}$/);
@@ -34,30 +35,23 @@ const NumberKeypad = ({ oldValue, handelDismiss, handelApply }: IProps) => {
 
     setNumber(n);
 
-    //Если вводим после операции деления 0, то выводим 0
-    handelApply(parseFloat(evaluate(`${expression}${n || '0'}`).toFixed(3)).toString());
+    onApply(calc(`${expression}${n || '0'}`));
   };
 
   const handleOperationPress = ({ value }: { value: string }) => {
+    //если введен оператор не с начала и есть число, то добавляем оператор
     if (!firstOperation && number) {
-      const result = parseFloat(evaluate(`${expression}${number}`).toFixed(3)).toString();
-      setExpression(`${result}${value}`);
+      setExpression(`${calc(`${expression}${number}`)}${value}`);
       setNumber('');
     } else {
-      if (!expression && !!oldValue && !number) {
-        //если введен с самого начала оператор
-        setExpression((prev) => `${prev}${oldValue}${value}`);
-        setFirstOperation(false);
-      } else if (number) {
+      if (number) {
         //обычный случай
         setExpression((prev) => `${prev}${number}${value}`);
         setNumber('');
         setFirstOperation(false);
-        //Если ввели оператор после числа, то выводим 0
-        handelApply('0');
       } else {
         //замена математического оператора
-        setExpression((prev) => `${firstOperation ? '0' : ''}${prev.slice(0, -1)}${value}`);
+        setExpression((prev) => (firstOperation ? `0${value}` : `${prev.slice(0, -1)}${value}`));
         setFirstOperation(false);
       }
     }
@@ -66,7 +60,7 @@ const NumberKeypad = ({ oldValue, handelDismiss, handelApply }: IProps) => {
   const handleClear = () => {
     setExpression('');
     setNumber('');
-    handelApply('0');
+    onApply('0');
     setFirstOperation(true);
   };
 
@@ -77,19 +71,24 @@ const NumberKeypad = ({ oldValue, handelDismiss, handelApply }: IProps) => {
       if (newN === '-') {
         setNumber('');
         setExpression('-');
-        handelApply('0');
+        onApply('0');
         setFirstOperation(true);
       } else {
         setNumber(newN || '');
-        handelApply(newN ? parseFloat(evaluate(`${expression}${newN}`).toFixed(3)).toString() : '0');
-        setFirstOperation(!!newN);
+        if (newN) {
+          onApply(calc(`${expression}${newN}`));
+        } else {
+          const newExpr = `${expression.slice(0, -1)}`;
+          onApply(newExpr ? calc(`${newExpr}`) : '0');
+          setFirstOperation(true);
+        }
       }
     } else {
       const newExpr = `${expression.slice(0, -1)}`;
       setNumber(newExpr);
       setExpression('');
       setFirstOperation(true);
-      handelApply(number ? parseFloat(evaluate(`${newExpr}${number}`).toFixed(3)).toString() : newExpr || '0');
+      onApply(number ? calc(`${newExpr}${number}`) : newExpr || '0');
     }
   };
 
@@ -122,13 +121,9 @@ const NumberKeypad = ({ oldValue, handelDismiss, handelApply }: IProps) => {
       {
         title: '=',
         onPress: () => {
-          const newValue =
-            number === '0' && expression.slice(-1) === '/'
-              ? '0'
-              : parseFloat(evaluate(`${expression}${number || '0'}`).toFixed(3)).toString();
-          setNumber(newValue);
+          setNumber(oldValue);
           setExpression('');
-          handelDismiss && handelDismiss();
+          onDismiss && onDismiss();
         },
         grow: 2,
         operation: true,
@@ -149,7 +144,7 @@ const NumberKeypad = ({ oldValue, handelDismiss, handelApply }: IProps) => {
           <Feather name="delete" size={24} color={colors.primary} />
         </TouchableOpacity>
       </View>
-      <View style={[styles.keypad]}>
+      <View style={styles.keypad}>
         {keys.map((rowKeys, idx) => (
           <View key={idx} style={styles.keypadRow}>
             {rowKeys.map((keyProps) => (
@@ -163,6 +158,8 @@ const NumberKeypad = ({ oldValue, handelDismiss, handelApply }: IProps) => {
 };
 
 export { NumberKeypad };
+
+const calc = (value: string) => parseFloat(evaluate(value).toFixed(3)).toString();
 
 const styles = StyleSheet.create({
   container: {
