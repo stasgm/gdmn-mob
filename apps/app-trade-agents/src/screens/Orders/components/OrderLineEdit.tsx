@@ -2,11 +2,13 @@ import React, { useCallback, useState } from 'react';
 import { View, Alert, StyleSheet, Modal, SafeAreaView } from 'react-native';
 
 import { documentActions, refSelectors, useDispatch } from '@lib/store';
-import { globalStyles as styles, SaveButton } from '@lib/mobile-ui';
+import { SaveButton } from '@lib/mobile-ui';
 
 import { IconButton, Title } from 'react-native-paper';
 
 import { ScreenState } from '@lib/types';
+
+import { useTheme } from '@react-navigation/native';
 
 import { IOrderLine, IPackageGood } from '../../../store/types';
 
@@ -29,7 +31,7 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
 
   const [line, setLine] = useState<IOrderLine>(item);
   const [screenState, setScreenState] = useState<ScreenState>('idle');
-  const [visibleQuantityInput, setVisibleQuantityInput] = useState(false);
+  const { colors } = useTheme();
 
   const packages = refSelectors
     .selectByName<IPackageGood>('packageGood')
@@ -42,7 +44,11 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
       setScreenState('idle');
       return;
     }
-
+    if (line.quantity < 0) {
+      Alert.alert('Ошибка!', 'Вес товара не может быть меньше нуля!', [{ text: 'Ок' }]);
+      setScreenState('idle');
+      return;
+    }
     if (line.quantity) {
       dispatch(
         mode === 0
@@ -71,19 +77,9 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
   }, [dispatch, docId, line, mode, onDismiss, packages.length]);
 
   return (
-    <Modal
-      animationType="fade"
-      visible={true}
-      onShow={() => {
-        /*Для правильной отрисовки курсора после открытия клавиатуры в компоненте ввода количества*/
-        const timeout = setTimeout(() => {
-          setVisibleQuantityInput(true);
-        }, 100);
-        return () => clearTimeout(timeout);
-      }}
-    >
+    <Modal animationType="fade" visible={true}>
       <SafeAreaView style={localStyles.container}>
-        <View style={styles.container}>
+        <View style={localStyles.container1}>
           <View style={localStyles.navigation}>
             <IconButton icon="chevron-left" onPress={onDismiss} size={30} />
             <Title>Позиция заявки</Title>
@@ -91,7 +87,9 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
               <SaveButton onPress={handleSaveLine} disabled={screenState === 'saving'} />
             </View>
           </View>
-          <OrderLine item={line} packages={packages} onSetLine={setLine} visibleQuantityInput={visibleQuantityInput} />
+          <View style={[{ backgroundColor: colors.background }, localStyles.orderLineItem]}>
+            <OrderLine item={line} packages={packages} onSetLine={setLine} />
+          </View>
         </View>
       </SafeAreaView>
     </Modal>
@@ -101,11 +99,18 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
 export default OrderLineEdit;
 
 const localStyles = StyleSheet.create({
+  container1: {
+    display: 'flex',
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+  },
   navigation: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center',
     display: 'flex',
+    backgroundColor: 'transparent',
   },
   btnOk: {
     flex: 1,
@@ -113,7 +118,11 @@ const localStyles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
     justifyContent: 'flex-start',
+  },
+  orderLineItem: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
   },
 });
