@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect } from 'react';
 import { FlatList, View, Text, Alert } from 'react-native';
-import { appActions, IDeviceLog, useDispatch, useSelector } from '@lib/store';
+import { appActions, useDispatch, useSelector } from '@lib/store';
 import {
   AppScreen,
   globalStyles as styles,
@@ -17,6 +17,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useNavigation } from '@react-navigation/native';
+
+import { IDeviceLog } from '@lib/types';
 
 import { InformationStackParamList } from '../navigation/Root/types';
 
