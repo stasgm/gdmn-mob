@@ -41,3 +41,9 @@ yarn-error.log*
 /admin/**/react
 /admin/assets/**
 /admin/index.html
+
+/ssl/**/*.key
+/ssl/**/*.ca-bundle
+/ssl/**/*.crt
+
+

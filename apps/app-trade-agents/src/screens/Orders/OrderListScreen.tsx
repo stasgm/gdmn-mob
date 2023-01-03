@@ -30,14 +30,17 @@ import { deleteSelectedItems, formatValue, getDateString, getDelList, keyExtract
 
 import { appActions, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 
-import { IDelList } from '@lib/mobile-types';
+import { IDelList, IListItem } from '@lib/mobile-types';
 
 import { Searchbar } from 'react-native-paper';
 
 import { IDebt, IOrderDocument, IOrderListFormParam, IOutlet } from '../../store/types';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
+import { statusTypes } from '../../utils/constants';
+
 import OrderListTotal from './components/OrderListTotal';
+import Checkbox from './components/Checkbox';
 
 export interface OrderListSectionProps {
   title: string;
@@ -61,9 +64,13 @@ const OrderListScreen = () => {
 
   const outlets = refSelectors.selectByName<IOutlet>('outlet')?.data;
 
-  const { filterContact, filterOutlet, filterDateBegin, filterDateEnd } = useSelector(
-    (state) => state.app.formParams as IOrderListFormParam,
-  );
+  const {
+    filterContact,
+    filterOutlet,
+    filterDateBegin,
+    filterDateEnd,
+    filterStatusList = [],
+  } = useSelector((state) => state.app.formParams as IOrderListFormParam);
 
   useEffect(() => {
     return () => {
@@ -133,7 +140,7 @@ const OrderListScreen = () => {
   );
 
   const filteredOrderList = useMemo(() => {
-    if (filterContact?.id || filterOutlet?.id || filterDateBegin || filterDateEnd) {
+    if (filterContact?.id || filterOutlet?.id || filterDateBegin || filterDateEnd || filterStatusList) {
       let dateEnd: Date | undefined;
       if (filterDateEnd) {
         dateEnd = new Date(filterDateEnd);
@@ -145,12 +152,16 @@ const OrderListScreen = () => {
           (filterContact?.id ? i.head.contact.id === filterContact.id : true) &&
           (filterOutlet?.id ? i.head.outlet.id === filterOutlet.id : true) &&
           (filterDateBegin ? new Date(filterDateBegin).getTime() <= new Date(i.head?.onDate).getTime() : true) &&
-          (dateEnd ? new Date(dateEnd).getTime() >= new Date(i.head?.onDate).getTime() : true),
+          (dateEnd ? new Date(dateEnd).getTime() >= new Date(i.head?.onDate).getTime() : true) &&
+          (filterStatusList?.length
+            ? filterStatusList?.find((item) => item.id.toUpperCase() === i.status.toUpperCase())
+            : true),
       );
     } else {
       return orderList;
     }
-  }, [filterContact, filterDateBegin, filterDateEnd, filterOutlet, orderList]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterContact?.id, filterDateBegin, filterDateEnd, filterOutlet?.id, filterStatusList?.length, orderList]);
 
   const debets = refSelectors.selectByName<IDebt>('debt')?.data;
 
@@ -308,6 +319,31 @@ const OrderListScreen = () => {
     });
   }, [filterContact?.id, filterOutlet, navigation]);
 
+  const handleFilterStatus = useCallback(
+    (value: IListItem) => {
+      if (filterStatusList.length) {
+        const filteredStatus = filterStatusList?.find((item) => item.id === value.id);
+
+        const filterList = filterStatusList;
+
+        filterList?.push(value);
+
+        if (filteredStatus) {
+          dispatch(
+            appActions.setFormParams({ filterStatus: filterStatusList?.filter((i) => i.id !== filteredStatus.id) }),
+          );
+        } else {
+          dispatch(appActions.setFormParams({ filterStatus: filterList }));
+        }
+      } else {
+        const filterList: IListItem[] = [];
+        filterList.push(value);
+        dispatch(appActions.setFormParams({ filterStatus: filterList }));
+      }
+    },
+    [dispatch, filterStatusList],
+  );
+
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const debt = debets.find((d) => d.id === orderList.find((o) => o.id === item.id)?.head?.contact.id);
 
@@ -383,11 +419,27 @@ const OrderListScreen = () => {
                 />
               </View>
             </View>
+            <View style={[localStyles.marginTop, localStyles.status]}>
+              {statusTypes.map((elem) => (
+                <View key={elem.id}>
+                  <Checkbox
+                    key={elem.id}
+                    title={elem.value}
+                    selected={
+                      filterStatusList?.length && filterStatusList?.find((i) => i.id === elem.id) ? true : false
+                    }
+                    onSelect={() => handleFilterStatus(elem)}
+                  />
+                </View>
+              ))}
+            </View>
             <View style={localStyles.container}>
               <PrimeButton
                 icon={'delete-outline'}
                 onPress={handleCleanFormParams}
-                disabled={!(filterContact || filterOutlet || filterDateBegin || filterDateEnd)}
+                disabled={
+                  !(filterContact || filterOutlet || filterDateBegin || filterDateEnd || filterStatusList.length)
+                }
               >
                 {'Очистить'}
               </PrimeButton>
@@ -453,5 +505,10 @@ const localStyles = StyleSheet.create({
   container: {
     alignItems: 'center',
     marginTop: -10,
+  },
+  status: {
+    marginHorizontal: 5,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
 });

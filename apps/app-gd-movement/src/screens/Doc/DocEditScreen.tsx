@@ -19,7 +19,7 @@ import {
 } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
-import { generateId, getDateString } from '@lib/mobile-hooks';
+import { generateId, getDateString, isNamedEntity } from '@lib/mobile-hooks';
 
 import { IDocumentType, ScreenState } from '@lib/types';
 
@@ -59,9 +59,26 @@ export const DocEditScreen = () => {
     toContactType: docToContactType,
   } = useSelector((state) => state.app.formParams as IDocFormParam);
 
+  const departmentSetting = useSelector((state) => state.auth.user?.settings?.toDepartment?.data);
+
+  const defaultToDepartment = useMemo(
+    () =>
+      isNamedEntity(departmentSetting) && (docToContactType ? docToContactType?.id === 'department' : true)
+        ? departmentSetting
+        : undefined,
+    [departmentSetting, docToContactType],
+  );
+
   const documentType = useMemo(
     () => documentTypes?.find((d) => d.id === docDocumentType?.id),
     [docDocumentType, documentTypes],
+  );
+
+  const dt = documentTypes?.[0];
+
+  const dtToContact = useMemo(
+    () => contactTypes.find((item) => (defaultToDepartment ? item.id === 'department' : item.id === dt?.toType)),
+    [defaultToDepartment, dt?.toType],
   );
 
   useEffect(() => {
@@ -88,7 +105,6 @@ export const DocEditScreen = () => {
         }),
       );
     } else {
-      const dt = documentTypes?.[0];
       const newNumber = getNextDocNumber(documents);
       dispatch(
         appActions.setFormParams({
@@ -97,7 +113,8 @@ export const DocEditScreen = () => {
           status: 'DRAFT',
           documentType: dt,
           fromContactType: contactTypes.find((item) => item.id === dt?.fromType),
-          toContactType: contactTypes.find((item) => item.id === dt?.toType),
+          toContactType: dtToContact,
+          toContact: defaultToDepartment,
         }),
       );
     }
@@ -296,7 +313,7 @@ export const DocEditScreen = () => {
         appActions.setFormParams({
           fromContact: undefined,
           fromContactType: contactTypes.find((item) => item.id === documentType?.fromType),
-          toContact: undefined,
+          toContact: defaultToDepartment ? defaultToDepartment : undefined,
           toContactType: contactTypes.find((item) => item.id === documentType?.toType),
         }),
       );

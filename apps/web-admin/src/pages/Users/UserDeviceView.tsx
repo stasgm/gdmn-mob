@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -19,14 +19,15 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { useSelector, useDispatch } from '../../store';
 import bindingActions from '../../store/deviceBinding';
 import deviceActions from '../../store/device';
-import { IToolBarButton } from '../../types';
+import { ILinkedEntity, IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 
 import deviceBindingSelectors from '../../store/deviceBinding/selectors';
 import deviceSelectors from '../../store/device/selectors';
 
-import { adminPath } from '../../utils/constants';
-import DeviceBindingDetailsView from '../../components/deviceBinding/DeviceBindingDetailsView';
+import { adminPath, deviceStates } from '../../utils/constants';
+
+import DetailsView from '../../components/DetailsView';
 
 import UserDeviceLog from './UserDeviceLog';
 
@@ -44,6 +45,27 @@ const UserDeviceView = () => {
   const [open, setOpen] = useState(false);
 
   const { user } = useSelector((state) => state.auth);
+
+  const deviceBindingDetails: ILinkedEntity[] = useMemo(
+    () =>
+      deviceBinding
+        ? [
+            {
+              id: 'Наименование',
+              value: deviceBinding.device,
+              link: `${adminPath}/app/devices/${deviceBinding.device.id}`,
+            },
+            {
+              id: 'Пользователь',
+              value: deviceBinding?.user,
+              link: `${adminPath}/app/users/${deviceBinding.user.id}`,
+            },
+            { id: 'Состояние', value: deviceStates[deviceBinding.state] },
+            { id: 'Номер', value: device?.uid },
+          ]
+        : [],
+    [device?.uid, deviceBinding],
+  );
 
   const handleCancel = () => {
     navigate(-1);
@@ -170,7 +192,7 @@ const UserDeviceView = () => {
             minHeight: '100%',
           }}
         >
-          <DeviceBindingDetailsView deviceBinding={deviceBinding} uid={device?.uid} />
+          <DetailsView details={deviceBindingDetails} />
         </Box>
       </Box>
       {user?.role === 'SuperAdmin' ? (

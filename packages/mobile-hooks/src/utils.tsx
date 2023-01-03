@@ -52,6 +52,15 @@ const isNamedEntity = (obj: any): obj is INamedEntity => {
   return typeof obj === 'object' && 'name' in obj;
 };
 
+const isNumeric = (value: any) => {
+  if (typeof value !== 'number') {
+    return true;
+  } else if (typeof value !== 'string') {
+    return false;
+  }
+  return !isNaN(Number(value)) && !isNaN(parseFloat(value));
+};
+
 const isIReferences = (obj: any): obj is IReferences => {
   if (typeof obj === 'object') {
     const data = Object.values(obj);
@@ -181,6 +190,7 @@ export {
   shortenString,
   extraPredicate,
   isNamedEntity,
+  isNumeric,
   isIReferences,
   formatValue,
   round,

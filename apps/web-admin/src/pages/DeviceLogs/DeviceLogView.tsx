@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -18,17 +18,16 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { IDeviceLog } from '@lib/types';
 
 import { useSelector, useDispatch } from '../../store';
-import { IHeadCells, IToolBarButton } from '../../types';
+import { IHeadCells, ILinkedEntity, IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 
 import deviceLogSelectors from '../../store/deviceLog/selectors';
 import SnackBar from '../../components/SnackBar';
-
-import DeviceLogsDetailsView from '../../components/deviceLogs/DeviceLogDetailsView';
 import deviceLogActions from '../../store/deviceLog';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-import DeviceLogTable from '../../components/deviceLogs/DeviceLogTable';
 import SortableTable from '../../components/SortableTable';
+import DetailsView from '../../components/DetailsView';
+import { adminPath } from '../../utils/constants';
 
 export type Params = {
   id: string;
@@ -54,6 +53,24 @@ const DeviceLogView = () => {
   }, [fetchDeviceLogs, pageParams?.filterText]);
 
   const process = deviceLogSelectors.deviceLogById(id);
+
+  const deviceLogsDetails: ILinkedEntity[] = useMemo(
+    () =>
+      process
+        ? [
+            { id: 'Компания', value: process.company, link: `${adminPath}/app/companies/${process.company.id}/` },
+            {
+              id: 'Подсистема',
+              value: process?.appSystem,
+              link: `${adminPath}/app/appSystems/${process.appSystem.id}/`,
+            },
+            { id: 'Устройство', value: process.device, link: `${adminPath}/app/devices/${process.device.id}/` },
+            { id: 'Идентификатор устройства', value: process?.device.id },
+            { id: 'Пользователь', value: process?.contact, link: `${adminPath}/app/users/${process.contact.id}/` },
+          ]
+        : [],
+    [process],
+  );
 
   const [open, setOpen] = useState(false);
 
@@ -123,7 +140,6 @@ const DeviceLogView = () => {
   ];
 
   const headCells: IHeadCells<IDeviceLog>[] = [
-    // { id: 'path', label: 'Название', sortEnable: true, filterEnable: true },
     { id: 'name', label: 'Функция', sortEnable: true, filterEnable: true },
     { id: 'message', label: 'Сообщение', sortEnable: true, filterEnable: true },
     { id: 'date', label: 'Дата', sortEnable: true, filterEnable: true },
@@ -179,7 +195,7 @@ const DeviceLogView = () => {
             minHeight: '100%',
           }}
         >
-          <DeviceLogsDetailsView deviceLogs={process} />
+          <DetailsView details={deviceLogsDetails} />
         </Box>
         <Box sx={{ pt: 2 }}>
           <SortableTable<IDeviceLog> headCells={headCells} data={logList} path={'/app/deviceLogs/'} />

@@ -201,7 +201,7 @@ const VisitScreen = () => {
       try {
         if (!orderDocs.find((i) => i.head.route)) {
           coords = await getCurrentPosition();
-
+          console.log('image.png', coords);
           const date = new Date().toISOString();
 
           if (visit) {

@@ -22,13 +22,22 @@ const baseSettings: Settings<IBaseSettings> = {
   },
   synchPeriod: {
     id: 'synchPeriod',
-    description: 'Период синхронизации, мин.',
+    description: 'Синхронизация на сервере, мин.',
     data: 10,
     type: 'number',
     sortOrder: 2,
     visible: true,
     group: synchSettingGroup,
     readonly: true,
+  },
+  autoSynchPeriod: {
+    id: 'autoSynchPeriod',
+    description: 'Автосинхронизация, мин.',
+    data: 10,
+    type: 'number',
+    sortOrder: 3,
+    visible: true,
+    group: synchSettingGroup,
   },
   getReferences: {
     id: 'getReferences',
