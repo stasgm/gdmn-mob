@@ -26,7 +26,7 @@ import {
 
 import { useCallback, useMemo } from 'react';
 
-import { generateId, getDateString, isIReferences } from '../utils';
+import { generateId, getDateString, isIReferences, isNumeric } from '../utils';
 
 import { mobileRequest } from '../mobileRequest';
 
@@ -285,18 +285,51 @@ export const useSync = (onSync?: () => Promise<any>) => {
             addRequestNotice('Сохранение настроек подсистемы');
 
             const appSetts = Object.entries(msg.body.payload as IAppSystemSettings);
+
+            let syncPeriod;
+
             for (const [optionName, value] of appSetts) {
               if (value && settings[optionName]) {
-                settDispatch(
-                  settingsActions.updateOption({
-                    optionName,
-                    value: {
-                      ...settings[optionName],
-                      data: optionName === 'synchPeriod' ? ((value.data as number) || 600) / 60 : value.data,
-                    } as ISettingsOption,
-                  }),
-                );
+                if (optionName === 'synchPeriod') {
+                  syncPeriod = isNumeric(value.data) ? (Number(value.data) || 600) / 60 : undefined;
+
+                  if (syncPeriod) {
+                    settDispatch(
+                      settingsActions.updateOption({
+                        optionName,
+                        value: {
+                          ...settings[optionName],
+                          data: syncPeriod,
+                        } as ISettingsOption,
+                      }),
+                    );
+                  } else {
+                    addError('useSync: processMessage', 'Период синхронизации указан неверно', tempErrs);
+                  }
+                } else {
+                  settDispatch(
+                    settingsActions.updateOption({
+                      optionName,
+                      value: {
+                        ...settings[optionName],
+                        data: value.data,
+                      } as ISettingsOption,
+                    }),
+                  );
+                }
               }
+            }
+
+            if (settings.autoSynchPeriod?.data && syncPeriod && settings.autoSynchPeriod?.data < syncPeriod) {
+              settDispatch(
+                settingsActions.updateOption({
+                  optionName: 'autoSynchPeriod',
+                  value: {
+                    ...settings.autoSynchPeriod,
+                    data: syncPeriod,
+                  } as ISettingsOption,
+                }),
+              );
             }
 
             const removeMess = await api.message.removeMessage(appRequest, msg.id, params);

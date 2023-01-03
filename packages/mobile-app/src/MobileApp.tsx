@@ -35,7 +35,7 @@ export interface IApp {
 const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
   const { syncData } = useSync(onSync);
   const settings = useSelector((state) => state.settings?.data);
-  const synchPeriod = (settings.synchPeriod?.data as number) || 10;
+  const autoSynchPeriod = (settings.autoSynchPeriod?.data as number) || 10;
   const autoSync = (settings.autoSync?.data as boolean) || false;
   const { config, user, isDemo } = useSelector((state) => state.auth);
   const loading = useSelector((state) => state.app.loading);
@@ -74,7 +74,7 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
 
     timeOutRef.current = setTimeout(() => {
       syncData();
-    }, synchPeriod * 60 * 1000);
+    }, autoSynchPeriod * 60 * 1000);
 
     return () => {
       if (timeOutRef.current) {
@@ -83,7 +83,7 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [synchPeriod, autoSync, loading, isDemo]);
+  }, [autoSynchPeriod, autoSync, loading, isDemo]);
 
   return <DrawerNavigator items={items} onSyncClick={syncData} />;
 };

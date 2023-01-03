@@ -24,7 +24,10 @@ const SettingsDetailsScreen = () => {
   const groupDescription = list?.[0]?.[1]?.group?.description || '';
 
   const handleUpdate = (optionName: string, value: ISettingsOption) => {
-    dispatch(settingsActions.updateOption({ optionName, value }));
+    const synchPeriod = list.find(([item, _]) => item === 'synchPeriod')?.[1]?.data;
+    if (!(optionName === 'autoSynchPeriod' && synchPeriod && value.data < synchPeriod)) {
+      dispatch(settingsActions.updateOption({ optionName, value }));
+    }
   };
 
   useLayoutEffect(() => {
