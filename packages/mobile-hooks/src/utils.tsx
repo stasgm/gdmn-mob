@@ -53,7 +53,7 @@ const isNamedEntity = (obj: any): obj is INamedEntity => {
 };
 
 const isNumeric = (value: any) => {
-  if (typeof value !== 'number') {
+  if (typeof value === 'number') {
     return true;
   } else if (typeof value !== 'string') {
     return false;
