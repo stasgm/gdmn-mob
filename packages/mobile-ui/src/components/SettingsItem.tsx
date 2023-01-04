@@ -3,6 +3,10 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { SettingValue } from '@lib/types';
 
+import { HelperText } from 'react-native-paper';
+
+import { IListItem } from '@lib/mobile-types';
+
 import Input from './Input';
 import { MediumText } from './AppText';
 import Switch from './Switch';
@@ -12,9 +16,10 @@ type Props = {
   value: SettingValue;
   disabled?: boolean;
   onValueChange: (newValue: SettingValue) => void;
+  onEndEditing: () => void;
 };
 
-const SettingsItem = ({ label, value, disabled = false, onValueChange }: Props) => {
+const SettingsItem = ({ label, value, disabled = false, onValueChange, onEndEditing }: Props) => {
   return (
     <View>
       {typeof value === 'boolean' ? (
@@ -33,6 +38,7 @@ const SettingsItem = ({ label, value, disabled = false, onValueChange }: Props) 
               clearInput={true}
               autoCapitalize="none"
               disabled={disabled}
+              onEndEditing={onEndEditing}
             />
           ) : (
             <Input

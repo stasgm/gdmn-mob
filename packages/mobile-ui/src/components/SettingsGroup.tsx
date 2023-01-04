@@ -4,6 +4,8 @@ import { Divider } from 'react-native-paper';
 
 import { ISettingsOption } from '@lib/types';
 
+import { IListItem } from '@lib/mobile-types';
+
 import SettingsItem from './SettingsItem';
 import { LargeText } from './AppText';
 
@@ -11,9 +13,10 @@ type Props = {
   groupDescription?: string;
   list: any[];
   onValueChange: (optionName: string, value: ISettingsOption) => void;
+  onCheckSettings?: (optionName: string, value: ISettingsOption) => void;
 };
 
-const SettingsGroup = ({ groupDescription, list, onValueChange }: Props) => {
+const SettingsGroup = ({ groupDescription, list, onValueChange, onCheckSettings }: Props) => {
   return (
     <View>
       {groupDescription ? (
@@ -27,11 +30,11 @@ const SettingsGroup = ({ groupDescription, list, onValueChange }: Props) => {
             <View key={key}>
               <Divider />
               <SettingsItem
-                key={key}
                 label={item.description || key}
                 value={item.data}
                 disabled={item.readonly}
                 onValueChange={(newValue) => onValueChange(key, { ...item, data: newValue })}
+                onEndEditing={() => onCheckSettings && onCheckSettings(key, item)}
               />
             </View>
           );

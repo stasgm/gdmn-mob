@@ -304,7 +304,11 @@ export const useSync = (onSync?: () => Promise<any>) => {
                       }),
                     );
                   } else {
-                    addError('useSync: processMessage', 'Период синхронизации указан неверно', tempErrs);
+                    addError(
+                      'useSync: processMessage',
+                      'Неверный тип параметра "Период синхронизации на сервере" ',
+                      tempErrs,
+                    );
                   }
                 } else {
                   settDispatch(
