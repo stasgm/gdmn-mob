@@ -141,13 +141,24 @@
 Выберем подразделение.
 На экране отображены остатки товаров для данного подразделения. По нажатию на конкретный товар можно просмотреть его цены и остаток.
 
-<img src="img/7.Remains/7.Contacts.jpg" alt="drawing" height="400"/> <img src="img/7.Remains/7.Goods.jpg" alt="drawing" height="400"/> <img src="img/7.Remains/7.Position.jpg" alt="drawing" height="400"/>
+<img src="img/7.Remains/7.Contacts.jpg" alt="drawing" height="400"/> <img src="img/7.Remains/7.Goods.jpg" alt="drawing" height="400"/>
+<img src="img/7.Remains/7.Position.jpg" alt="drawing" height="400"/>
+
+Чтобы найти найти необходимую информацию по наименованию можно воспользоваться строкой поиска, нажав на иконку **Поиск** <img src="img/1.Connection/1.IconSearch.jpg" alt="drawing" height="22"/> в правом верхнем углу экрана.
+
+Так же можно воспользоваться фильтром <img src="img/7.Remains/7.IconFiltr.jpg" alt="drawing" height="20"/>, который сортирует товары по двум категриям "Все" и "Ненулевые".
+
+<img src="img/7.Remains/7.Goods.jpg" alt="drawing" height="400"/>
+<img src="img/7.Remains/7.GoodsFiltr.jpg" alt="drawing" height="300"/>
+
 
 ## 6. Документы
 
 ### Cоздание документа
 
 Выбрав пункт бокового меню **Документы**, переходим на экран просмотра списка документов.
+
+<img src="img/1.Connection/1.Docs.jpg" alt="drawing" height="400"/>
 
 По нажатию на иконку " ✚ ", в верхнем правом углу, переходим на экран добавления документа.
 
@@ -158,7 +169,7 @@
 
 - для документа **инвентаризации** - поле **Место**.
 
-<img src="img/3.Docs/3.DocTypes.jpg" alt="drawing" height="400"/>  <img src="img/3.Docs/3.AddDocTypes.jpg" alt="drawing" height="400"/>  <img src="img/3.Docs/3.InventoryAdd.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.DocTypes1.jpg" alt="drawing" height="400"/>  <img src="img/3.Docs/3.AddDocTypes.jpg" alt="drawing" height="400"/>  <img src="img/3.Docs/3.InventoryAdd.jpg" alt="drawing" height="400"/>
 
 **Поля контактов** (откуда и куда) могут быть 3 типов, которые при необходимости можно менять:
 - Подразделение
@@ -414,6 +425,7 @@
 | <img src="img/1.Connection/1.Sync.jpg" alt="drawing" height="27"/>           | синхронизация|
 | <img src="img/1.Connection/1.ConfigIcon.png" alt="drawing" height="22"/>           | переход на экран настроек|
 | <img src="img/1.Connection/1.IconTrash.jpg" alt="drawing" height="22"/>           | удаление документа|
+|<img src="img/7.Remains/7.IconFiltr.jpg" alt="drawing" height="20"/>| фильтр 
 | <img src="img/1.Connection/1.IconFlash.jpg" alt="drawing" height="22"/>           | вспышка выключена|
 | <img src="img/1.Connection/1.IconVibr.jpg" alt="drawing" height="22"/>           | вибрация выключена|
 | **✓**            | сохранить|
