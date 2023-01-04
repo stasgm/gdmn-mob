@@ -88,6 +88,7 @@ const OrderLine = ({ item, packages, onSetLine }: IProps) => {
       <NumberKeypad
         oldValue={item.quantity.toString()}
         onApply={(newValue) => onSetLine({ ...item, quantity: parseFloat(newValue) })}
+        decDigitsForTotal={3}
       />
     </View>
   );
