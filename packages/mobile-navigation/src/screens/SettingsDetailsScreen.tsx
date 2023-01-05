@@ -1,12 +1,10 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useLayoutEffect } from 'react';
 import { Alert, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { settingsActions, useDispatch, useSelector } from '@lib/store';
 import { AppScreen, SettingsGroup, navBackButton } from '@lib/mobile-ui';
 import { ISettingsOption } from '@lib/types';
-
-import { IListItem } from '@lib/mobile-types';
 
 import { SettingsStackParamList } from '../navigation/Root/types';
 
@@ -22,6 +20,7 @@ const SettingsDetailsScreen = () => {
     .filter(([_, item]) => item?.visible && item?.group?.id === id)
     .sort(([, itema], [, itemb]) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0));
 
+  console.log('456', list);
   const groupName = list?.[0]?.[1]?.group?.name || '';
   const groupDescription = list?.[0]?.[1]?.group?.description || '';
 
@@ -34,9 +33,22 @@ const SettingsDetailsScreen = () => {
     if (optionName === 'autoSynchPeriod' && synchPeriod && value.data < synchPeriod) {
       dispatch(settingsActions.updateOption({ optionName, value: { ...value, data: synchPeriod } }));
 
-      Alert.alert('Внимание!', 'Период автосинхронизации не может быть меньше периода синхронизации на сервере', [
+      Alert.alert('Внимание!', 'Период автосинхронизации не может быть меньше периода синхронизации на сервере.', [
         { text: 'OK' },
       ]);
+    }
+
+    if (optionName === 'autoSync') {
+      const autoSynchPeriod = list.find(([itema, _]) => itema === 'autoSynchPeriod')?.[1];
+
+      if (autoSynchPeriod) {
+        dispatch(
+          settingsActions.updateOption({
+            optionName: 'autoSynchPeriod',
+            value: { ...autoSynchPeriod, readonly: !value.data ? false : true },
+          }),
+        );
+      }
     }
   };
 

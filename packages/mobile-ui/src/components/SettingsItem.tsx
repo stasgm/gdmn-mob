@@ -25,7 +25,13 @@ const SettingsItem = ({ label, value, disabled = false, onValueChange, onEndEdit
       {typeof value === 'boolean' ? (
         <View style={localStyles.container}>
           <MediumText>{label}</MediumText>
-          <Switch value={value} onValueChange={() => onValueChange(!value)} />
+          <Switch
+            value={value}
+            onValueChange={() => {
+              onValueChange(!value);
+              onEndEditing();
+            }}
+          />
         </View>
       ) : (
         <View style={localStyles.settingsContainer}>
