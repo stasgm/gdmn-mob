@@ -504,7 +504,7 @@ const localStyles = StyleSheet.create({
   },
   container: {
     alignItems: 'center',
-    marginTop: -10,
+    marginTop: -4,
   },
   status: {
     marginHorizontal: 5,

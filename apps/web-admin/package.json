@@ -105,6 +105,6 @@
     "@config/eslint-config-react": "*",
     "@config/prettier-config": "*",
     "lint-staged": "^13.0.3",
-    "react-hot-loader": "^4.13.0"
+    "react-hot-loader": "^4.13.1"
   }
 }
