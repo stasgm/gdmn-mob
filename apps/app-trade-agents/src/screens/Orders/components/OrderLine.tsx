@@ -1,8 +1,8 @@
 import { styles } from '@lib/mobile-navigation';
 import { ItemSeparator } from '@lib/mobile-ui';
 
-import React, { useEffect, useMemo, useState } from 'react';
-import { StyleSheet, View, Text, ScrollView } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { StyleSheet, View, Text, ScrollView, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { INamedEntity } from '@lib/types';
@@ -20,6 +20,11 @@ interface IProps {
 
 const OrderLine = ({ item, packages, onSetLine }: IProps) => {
   const { colors } = useTheme();
+  const currRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    currRef?.current && currRef.current?.focus();
+  }, []);
 
   // Если упаковка только одна, то ставим ее по умолчанию, иначе
   // если есть упаковка с признаком 'по умолчанию', то подставляем ее
@@ -41,50 +46,54 @@ const OrderLine = ({ item, packages, onSetLine }: IProps) => {
 
   return (
     <View style={localStyles.container}>
-      <View>
-        <ScrollView keyboardShouldPersistTaps={'handled'}>
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Наименование</Text>
-              <Text style={textStyle}>{item ? item.good.name || 'товар не найден' : ''}</Text>
-            </View>
+      <ScrollView keyboardShouldPersistTaps={'handled'} contentContainerStyle={localStyles.containerScroll}>
+        <View style={styles.item}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Наименование</Text>
+            <Text style={textStyle}>{item ? item.good.name || 'товар не найден' : ''}</Text>
           </View>
-          <ItemSeparator />
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Цена</Text>
-              <Text style={textStyle}>{item.good.priceFsn}</Text>
-            </View>
+        </View>
+        <ItemSeparator />
+        <View style={styles.item}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Цена</Text>
+            <Text style={textStyle}>{item.good.priceFsn}</Text>
           </View>
-          <ItemSeparator />
-          <View style={localStyles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Упаковка</Text>
-              {packages.length > 0 ? (
-                <View style={localStyles.packages}>
-                  {packages.map((elem) => (
-                    <Checkbox
-                      key={elem.package.id}
-                      title={elem.package.name}
-                      selected={elem.package.id === item.package?.id}
-                      onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
-                    />
-                  ))}
-                </View>
-              ) : (
-                <Text style={[textStyle, localStyles.pack]}>Без упаковки</Text>
-              )}
-            </View>
+        </View>
+        <ItemSeparator />
+        <View style={localStyles.item}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Упаковка</Text>
+            {packages.length > 0 ? (
+              <View style={localStyles.packages}>
+                {packages.map((elem) => (
+                  <Checkbox
+                    key={elem.package.id}
+                    title={elem.package.name}
+                    selected={elem.package.id === item.package?.id}
+                    onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
+                  />
+                ))}
+              </View>
+            ) : (
+              <Text style={[textStyle, localStyles.pack]}>Без упаковки</Text>
+            )}
           </View>
-          <ItemSeparator />
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Количество, кг</Text>
-              <Text style={[textStyle, localStyles.quantityItem]}>{item.quantity.toString()}</Text>
-            </View>
+        </View>
+        <ItemSeparator />
+        <View style={styles.item}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Количество, кг</Text>
+            <TextInput
+              style={[textStyle, localStyles.quantityItem]}
+              showSoftInputOnFocus={false}
+              caretHidden={true}
+              ref={currRef}
+              value={item.quantity.toString()}
+            />
           </View>
-        </ScrollView>
-      </View>
+        </View>
+      </ScrollView>
       <NumberKeypad
         oldValue={item.quantity.toString()}
         onApply={(newValue) => onSetLine({ ...item, quantity: parseFloat(newValue) })}
@@ -100,6 +109,9 @@ const localStyles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'space-between',
     margin: 5,
+  },
+  containerScroll: {
+    flexGrow: 1,
   },
   packages: {
     flexDirection: 'row',

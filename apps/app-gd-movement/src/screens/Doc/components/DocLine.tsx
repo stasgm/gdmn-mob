@@ -2,10 +2,10 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ScrollView, TextInput, View, Text, Modal, TouchableOpacity, StyleSheet } from 'react-native';
 
 import { styles } from '@lib/mobile-navigation';
-import { ItemSeparator, PrimeButton, ScanBarcode, ScanBarcodeReader } from '@lib/mobile-ui';
+import { ItemSeparator, ScanBarcode, ScanBarcodeReader } from '@lib/mobile-ui';
 import { useSelector } from '@lib/store';
 
-import { IconButton, TextInput as Input } from 'react-native-paper';
+import { IconButton } from 'react-native-paper';
 
 import { useTheme } from '@react-navigation/native';
 
@@ -16,6 +16,7 @@ import { IScannedObject } from '@lib/client-types';
 import { IMovementLine } from '../../../store/types';
 
 import { ONE_SECOND_IN_MS } from '../../../utils/constants';
+import { NumberKeypad } from '../../../components/NumberKeypad';
 
 interface IProps {
   item: IMovementLine;
@@ -136,7 +137,6 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
             </View>
           </View>
           <ItemSeparator />
-
           <View style={styles.item}>
             <View style={localStyles.details}>
               <View style={localStyles.new}>
@@ -144,9 +144,13 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
                 <Text style={textStyle}>{item?.EID || 'Не указан'}</Text>
               </View>
               <View style={localStyles.button}>
-                {item?.EID && (
+                {item?.EID ? (
                   <TouchableOpacity>
                     <IconButton icon="close" size={20} onPress={() => setGoodEID(undefined)} />
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity>
+                    <IconButton icon="barcode-scan" size={30} onPress={handleDoScan} />
                   </TouchableOpacity>
                 )}
               </View>
@@ -156,26 +160,19 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
           <View style={styles.item}>
             <View style={styles.details}>
               <Text style={styles.name}>Количество</Text>
-              <Input
+              <TextInput
                 style={[localStyles.quantitySize, styles.field]}
                 editable={true}
-                keyboardType="numeric"
-                autoCapitalize="words"
-                onChangeText={handleQuantityChange}
-                returnKeyType="done"
+                showSoftInputOnFocus={false}
+                caretHidden={true}
                 ref={currRef}
                 value={goodQty}
-                mode="outlined"
               />
             </View>
           </View>
-          <View>
-            <PrimeButton icon="barcode-scan" onPress={handleDoScan}>
-              Сканировать EID
-            </PrimeButton>
-          </View>
         </View>
       </ScrollView>
+      <NumberKeypad oldValue={goodQty} onApply={handleQuantityChange} decDigitsForTotal={3} />
     </>
   );
 };
@@ -196,5 +193,5 @@ const localStyles = StyleSheet.create({
     margin: 5,
     justifyContent: 'center',
   },
-  quantitySize: { fontSize: 20 },
+  quantitySize: { fontSize: 40 },
 });
