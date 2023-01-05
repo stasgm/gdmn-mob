@@ -26,25 +26,6 @@ module.exports = merge(commonConfig, {
     open: true,
     static: './',
     historyApiFallback: true,
-    https: true,
-    server: {
-      options: {
-        ca: './ssl/gdmn.app.ca-bundle',
-        key: './ssl/gdmn.app.key',
-        cert: './ssl/gdmn.app.crt',
-        //passphrase: 'webpack-dev-server'
-      }
-    },
-    // https: {
-    //   ca: '../../../server/ssl/gdmn.app.ca-bundle',
-    //   key: '../../../server/ssl/gdmn.app.key',
-    //   cert: '../../../server/ssl/gdmn.app.crt',
-    //   // ca: fs.readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.ca-bundle')),
-    //   // key: fs.readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.key')),
-    //   // cert: fs.readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.crt')),
-    //   passphrase: 'webpack-dev-server',
-    //   requestCert: true,
-    // },
   },
   resolve: {
     modules: ['node_modules'],
@@ -60,10 +41,7 @@ module.exports = merge(commonConfig, {
     new webpack.DefinePlugin({
       'process.env': {
         MOCK: JSON.stringify(process.env.MOCK),
-        REACT_APP_SECRET_KEY: JSON.stringify(process.env.REACT_APP_SECRET_KEY),
-        REACT_APP_SITE_KEY: JSON.stringify(process.env.REACT_APP_SITE_KEY),
       },
-      // "process.env": JSON.stringify(process.env),
     }),
   ],
 });

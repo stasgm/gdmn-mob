@@ -1,22 +1,34 @@
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
 import { evaluate } from 'mathjs';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 
 import { IKeyProps, Key } from './Key';
 
 interface IProps {
   oldValue?: string;
+  decDigitsForTotal?: number;
   onDismiss?: () => void;
   onApply: (newValue: string) => void;
 }
 
-const NumberKeypad = ({ oldValue, onDismiss, onApply }: IProps) => {
+const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProps) => {
   const [expression, setExpression] = useState('');
   const [number, setNumber] = useState(oldValue);
   const [firstOperation, setFirstOperation] = useState(true);
   const { colors } = useTheme();
+
+  const calc = useCallback(
+    (value: string) => {
+      let roundValue = evaluate(value);
+      if (decDigitsForTotal) {
+        roundValue = roundValue.toFixed(decDigitsForTotal);
+      }
+      return parseFloat(roundValue).toString();
+    },
+    [decDigitsForTotal],
+  );
 
   const handleNumberPress = ({ value }: { value: string }) => {
     //Если деление на ноль, то не выводим ноль
@@ -158,8 +170,6 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply }: IProps) => {
 };
 
 export { NumberKeypad };
-
-const calc = (value: string) => parseFloat(evaluate(value).toFixed(3)).toString();
 
 const styles = StyleSheet.create({
   container: {

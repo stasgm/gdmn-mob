@@ -81,7 +81,6 @@ const OrderListScreen = () => {
 
   const handleCleanFormParams = useCallback(() => {
     dispatch(appActions.clearFormParams());
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -153,15 +152,14 @@ const OrderListScreen = () => {
           (filterOutlet?.id ? i.head.outlet.id === filterOutlet.id : true) &&
           (filterDateBegin ? new Date(filterDateBegin).getTime() <= new Date(i.head?.onDate).getTime() : true) &&
           (dateEnd ? new Date(dateEnd).getTime() >= new Date(i.head?.onDate).getTime() : true) &&
-          (filterStatusList?.length
-            ? filterStatusList?.find((item) => item.id.toUpperCase() === i.status.toUpperCase())
+          (filterStatusList.length
+            ? filterStatusList.find((item) => item.id.toUpperCase() === i.status.toUpperCase())
             : true),
       );
     } else {
       return orderList;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filterContact?.id, filterDateBegin, filterDateEnd, filterOutlet?.id, filterStatusList?.length, orderList]);
+  }, [filterContact?.id, filterDateBegin, filterDateEnd, filterOutlet?.id, filterStatusList, orderList]);
 
   const debets = refSelectors.selectByName<IDebt>('debt')?.data;
 
@@ -212,6 +210,18 @@ const OrderListScreen = () => {
         ];
       }, []),
     [filteredListByStatus],
+  );
+
+  const statusTypesSection = useMemo(
+    () =>
+      status === 'all'
+        ? statusTypes
+        : status === 'active'
+        ? statusTypes.filter((e) => e.id !== 'PROCESSED')
+        : status === 'archive'
+        ? statusTypes.filter((e) => e.id === 'PROCESSED')
+        : [],
+    [status],
   );
 
   const [delList, setDelList] = useState<IDelList>({});
@@ -321,25 +331,13 @@ const OrderListScreen = () => {
 
   const handleFilterStatus = useCallback(
     (value: IListItem) => {
-      if (filterStatusList.length) {
-        const filteredStatus = filterStatusList?.find((item) => item.id === value.id);
-
-        const filterList = filterStatusList;
-
-        filterList?.push(value);
-
-        if (filteredStatus) {
-          dispatch(
-            appActions.setFormParams({ filterStatus: filterStatusList?.filter((i) => i.id !== filteredStatus.id) }),
-          );
-        } else {
-          dispatch(appActions.setFormParams({ filterStatus: filterList }));
-        }
-      } else {
-        const filterList: IListItem[] = [];
-        filterList.push(value);
-        dispatch(appActions.setFormParams({ filterStatus: filterList }));
-      }
+      dispatch(
+        appActions.setFormParams({
+          filterStatusList: filterStatusList.find((item) => item.id === value.id)
+            ? filterStatusList.filter((i) => i.id !== value.id)
+            : [...filterStatusList, value],
+        }),
+      );
     },
     [dispatch, filterStatusList],
   );
@@ -420,14 +418,12 @@ const OrderListScreen = () => {
               </View>
             </View>
             <View style={[localStyles.marginTop, localStyles.status]}>
-              {statusTypes.map((elem) => (
+              {statusTypesSection.map((elem) => (
                 <View key={elem.id}>
                   <Checkbox
                     key={elem.id}
                     title={elem.value}
-                    selected={
-                      filterStatusList?.length && filterStatusList?.find((i) => i.id === elem.id) ? true : false
-                    }
+                    selected={!!filterStatusList.find((i) => i.id === elem.id)}
                     onSelect={() => handleFilterStatus(elem)}
                   />
                 </View>
