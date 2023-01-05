@@ -142,7 +142,7 @@ export const startServer = (app: KoaApp) => {
    * HTTPS сервер с платным сертификатом
    */
 
-  const cert = fs.readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.crt'));
+  /* const cert = fs.readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.crt'));
   const key = fs.readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.key'));
 
   const ca = fs
@@ -158,5 +158,5 @@ export const startServer = (app: KoaApp) => {
   https.createServer({ cert, ca, key }, koaCallback).listen(config.HTTPS_PORT, () =>
     log.info(`>>> HTTPS server is running at
   http://localhost:${config.HTTPS_PORT}`),
-  );
+  );*/
 };
