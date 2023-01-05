@@ -31,6 +31,7 @@ const SettingsItem = ({ label, value, disabled = false, onValueChange, onEndEdit
               onValueChange(!value);
               onEndEditing();
             }}
+            disabled={disabled}
           />
         </View>
       ) : (

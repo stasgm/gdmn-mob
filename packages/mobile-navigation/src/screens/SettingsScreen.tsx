@@ -80,6 +80,21 @@ const SettingsScreen = () => {
 
   const serverPath = `${config?.protocol}${config?.server}:${config?.port}/${config?.apiPath}`;
 
+  const handleUpdateOption = (optionName: string, value: ISettingsOption) => {
+    if (optionName === 'scannerUse') {
+      const screenKeyboard = Object.values(settsData).find((i) => i?.id === 'screenKeyboard');
+
+      if (screenKeyboard) {
+        dispatch(
+          settingsActions.updateOption({
+            optionName: 'screenKeyboard',
+            value: { ...screenKeyboard, readonly: value.data ? true : false, data: true },
+          }),
+        );
+      }
+    }
+  };
+
   return (
     <AppScreen>
       <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={[{ padding: 5, flexDirection: 'column' }]}>
@@ -91,7 +106,12 @@ const SettingsScreen = () => {
             return (
               <View key={groupKey}>
                 {group.id === 'base' ? (
-                  <SettingsGroup key={groupKey} list={list} onValueChange={handleUpdate} />
+                  <SettingsGroup
+                    key={groupKey}
+                    list={list}
+                    onValueChange={handleUpdate}
+                    onCheckSettings={handleUpdateOption}
+                  />
                 ) : (
                   <View key={groupKey} style={localStyles.group}>
                     <Divider />

@@ -99,9 +99,18 @@ export const appSettings: Settings = {
     visible: true,
     group: baseSettingGroup,
   },
+  screenKeyboard: {
+    id: 'screenKeyboard',
+    sortOrder: 4,
+    description: 'Экранная клавиатура',
+    data: true,
+    type: 'boolean',
+    visible: true,
+    group: baseSettingGroup,
+  },
   quantityInput: {
     id: 'quantityInput',
-    sortOrder: 4,
+    sortOrder: 5,
     description: 'Не заполнять количество',
     data: true,
     type: 'boolean',
@@ -110,7 +119,7 @@ export const appSettings: Settings = {
   },
   weightCode: {
     id: 'weightCode',
-    sortOrder: 5,
+    sortOrder: 6,
     description: 'Идентификатор весового товара',
     data: '22',
     type: 'string',
@@ -119,7 +128,7 @@ export const appSettings: Settings = {
   },
   countCode: {
     id: 'countCode',
-    sortOrder: 6,
+    sortOrder: 7,
     description: 'Кол-во символов кода товара',
     data: 5,
     type: 'number',
@@ -128,7 +137,7 @@ export const appSettings: Settings = {
   },
   countWeight: {
     id: 'countWeight',
-    sortOrder: 7,
+    sortOrder: 8,
     description: 'Кол-во символов веса (в гр.)',
     data: 5,
     type: 'number',

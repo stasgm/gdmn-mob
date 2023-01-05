@@ -37,6 +37,7 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
   const currRef = useRef<TextInput>(null);
 
   const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
+  const isScreenKeyboard = useSelector((state) => state.settings?.data?.screenKeyboard?.data);
 
   useEffect(() => {
     currRef?.current && setTimeout(() => currRef.current?.focus(), ONE_SECOND_IN_MS);
