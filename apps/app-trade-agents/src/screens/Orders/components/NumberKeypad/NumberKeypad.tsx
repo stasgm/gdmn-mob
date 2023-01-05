@@ -53,17 +53,17 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
   const handleOperationPress = ({ value }: { value: string }) => {
     //если введен оператор не с начала и есть число, то добавляем оператор
     if (!firstOperation && number) {
-      setExpression(`${calc(`${expression}${number}`)}${value}`);
+      setExpression(`${calc(`${expression}${number}`)} ${value} `);
       setNumber('');
     } else {
       if (number) {
         //обычный случай
-        setExpression((prev) => `${prev}${number}${value}`);
+        setExpression((prev) => `${prev}${number} ${value} `);
         setNumber('');
         setFirstOperation(false);
       } else {
         //замена математического оператора
-        setExpression((prev) => (firstOperation ? `0${value}` : `${prev.slice(0, -1)}${value}`));
+        setExpression((prev) => (firstOperation ? `0${value} ` : `${prev.slice(0, -1)} ${value} `));
         setFirstOperation(false);
       }
     }
@@ -78,7 +78,7 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
 
   const handleDelete = () => {
     if (number) {
-      const newN = `${number.slice(0, -1)}`;
+      const newN = `${number.trim().slice(0, -1)}`;
       //Если удаляем и остается минус от числа, то обнуляем число, в выражение подставляем минус, выводим 0
       if (newN === '-') {
         setNumber('');
@@ -90,13 +90,13 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
         if (newN) {
           onApply(calc(`${expression}${newN}`));
         } else {
-          const newExpr = `${expression.slice(0, -1)}`;
+          const newExpr = `${expression.trim().slice(0, -1)}`;
           onApply(newExpr ? calc(`${newExpr}`) : '0');
           setFirstOperation(true);
         }
       }
     } else {
-      const newExpr = `${expression.slice(0, -1)}`;
+      const newExpr = `${expression.trim().slice(0, -1)}`;
       setNumber(newExpr);
       setExpression('');
       setFirstOperation(true);
