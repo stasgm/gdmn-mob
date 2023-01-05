@@ -176,7 +176,7 @@
 - Организация
 - Сотрудник
 
-<img src="img/3.Docs/3.DocTypes.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.From.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.To.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.DocTypes.jpg" alt="drawing" height="400"/>  <img src="img/3.Docs/3.DocTypesOpen.jpg" alt="drawing" height="400"/>  <img src="img/3.Docs/3.To.jpg" alt="drawing" height="400"/>
 
 После заполнения данных документ сохраняем, нажав на иконку " **✓** " в правом верхнем углу.
 
