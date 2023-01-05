@@ -1,16 +1,17 @@
 import { styles } from '@lib/mobile-navigation';
-import { ItemSeparator } from '@lib/mobile-ui';
+import { ItemSeparator, NumberKeypad } from '@lib/mobile-ui';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { StyleSheet, View, Text, ScrollView, TextInput } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TextInput, Keyboard } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { INamedEntity } from '@lib/types';
 
 import { IOrderLine, IPackageGood } from '../../../store/types';
 
+import { ONE_SECOND_IN_MS } from '../../../utils/constants';
+
 import Checkbox from './Checkbox';
-import { NumberKeypad } from './NumberKeypad';
 
 interface IProps {
   item: IOrderLine;
@@ -23,7 +24,11 @@ const OrderLine = ({ item, packages, onSetLine }: IProps) => {
   const currRef = useRef<TextInput>(null);
 
   useEffect(() => {
-    currRef?.current && currRef.current?.focus();
+    currRef?.current &&
+      setTimeout(() => {
+        currRef.current?.focus();
+        Keyboard.dismiss();
+      }, ONE_SECOND_IN_MS);
   }, []);
 
   // Если упаковка только одна, то ставим ее по умолчанию, иначе

@@ -39,3 +39,4 @@ export { default as ScanBarcodeReader } from './ScanBarcodeReader';
 export { default as Switch } from './Switch';
 export { navBackButton, navBackDrawer } from './NavigationButtons';
 export { SimpleDialog } from './SimpleDialog';
+export { NumberKeypad } from './NumberKeypad';

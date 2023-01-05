@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ScrollView, TextInput, View, Text, Modal, TouchableOpacity, StyleSheet } from 'react-native';
+import { ScrollView, TextInput, View, Text, Modal, TouchableOpacity, StyleSheet, Keyboard } from 'react-native';
 
 import { styles } from '@lib/mobile-navigation';
-import { ItemSeparator, ScanBarcode, ScanBarcodeReader } from '@lib/mobile-ui';
+import { ItemSeparator, NumberKeypad, ScanBarcode, ScanBarcodeReader } from '@lib/mobile-ui';
 import { useSelector } from '@lib/store';
 
 import { IconButton } from 'react-native-paper';
@@ -16,7 +16,6 @@ import { IScannedObject } from '@lib/client-types';
 import { IMovementLine } from '../../../store/types';
 
 import { ONE_SECOND_IN_MS } from '../../../utils/constants';
-import { NumberKeypad } from '../../../components/NumberKeypad';
 
 interface IProps {
   item: IMovementLine;
@@ -40,7 +39,11 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
   const isScreenKeyboard = useSelector((state) => state.settings?.data?.screenKeyboard?.data);
 
   useEffect(() => {
-    currRef?.current && setTimeout(() => currRef.current?.focus(), ONE_SECOND_IN_MS);
+    currRef?.current &&
+      setTimeout(() => {
+        currRef.current?.focus();
+        Keyboard.dismiss();
+      }, ONE_SECOND_IN_MS);
   }, []);
 
   const handleGetScannedObject = useCallback((brc: string) => {
@@ -109,8 +112,8 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
         )}
       </Modal>
       <ScrollView keyboardShouldPersistTaps="handled">
-        <View style={[styles.content]}>
-          <View style={[styles.item]}>
+        <View style={styles.content}>
+          <View style={styles.item}>
             <View style={styles.details}>
               <Text style={styles.name}>Наименование</Text>
               <Text style={textStyle}>{item ? item.good.name || 'товар не найден' : ''}</Text>
@@ -162,7 +165,7 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
             <View style={styles.details}>
               <Text style={styles.name}>Количество</Text>
               <TextInput
-                style={[localStyles.quantitySize, styles.field]}
+                style={[textStyle, localStyles.quantitySize]}
                 editable={true}
                 showSoftInputOnFocus={false}
                 caretHidden={true}
@@ -173,7 +176,7 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
           </View>
         </View>
       </ScrollView>
-      <NumberKeypad oldValue={goodQty} onApply={handleQuantityChange} decDigitsForTotal={3} />
+      {isScreenKeyboard && <NumberKeypad oldValue={goodQty} onApply={handleQuantityChange} decDigitsForTotal={3} />}
     </>
   );
 };

@@ -1,8 +1,9 @@
 import { Feather } from '@expo/vector-icons';
-import { useTheme } from '@react-navigation/native';
 import { evaluate } from 'mathjs';
 import React, { useCallback, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Dimensions } from 'react-native';
+
+import globalColors from '../../styles/colors';
 
 import { IKeyProps, Key } from './Key';
 
@@ -17,7 +18,6 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
   const [expression, setExpression] = useState('');
   const [number, setNumber] = useState(oldValue);
   const [firstOperation, setFirstOperation] = useState(true);
-  const { colors } = useTheme();
 
   const calc = useCallback(
     (value: string) => {
@@ -146,7 +146,7 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
 
   return (
     <View style={styles.container}>
-      <View style={[styles.input, { borderColor: colors.border, backgroundColor: colors.card }]}>
+      <View style={[styles.input, { borderColor: globalColors.border, backgroundColor: globalColors.card }]}>
         <View>
           <Text style={styles.currentNumber}>
             {expression}
@@ -154,7 +154,7 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
           </Text>
         </View>
         <TouchableOpacity onPress={handleDelete}>
-          <Feather name="delete" size={24} color={colors.primary} />
+          <Feather name="delete" size={24} color={globalColors.primary} />
         </TouchableOpacity>
       </View>
       <View style={styles.keypad}>
