@@ -20,7 +20,6 @@ const SettingsDetailsScreen = () => {
     .filter(([_, item]) => item?.visible && item?.group?.id === id)
     .sort(([, itema], [, itemb]) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0));
 
-  console.log('456', list);
   const groupName = list?.[0]?.[1]?.group?.name || '';
   const groupDescription = list?.[0]?.[1]?.group?.description || '';
 
