@@ -63,7 +63,7 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
         setFirstOperation(false);
       } else {
         //замена математического оператора
-        setExpression((prev) => (firstOperation ? `0${value} ` : `${prev.slice(0, -1)} ${value} `));
+        setExpression((prev) => (firstOperation ? `0${value} ` : `${prev.slice(0, -2)}${value} `));
         setFirstOperation(false);
       }
     }
@@ -175,6 +175,7 @@ export { NumberKeypad };
 const styles = StyleSheet.create({
   container: {
     height: Dimensions.get('window').height / 2.6,
+    minHeight: 300,
   },
   currentNumber: {
     fontSize: 17,

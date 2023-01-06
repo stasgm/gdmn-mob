@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
-import { View, FlatList, TouchableOpacity, RefreshControl, StyleSheet, Alert } from 'react-native';
+import { View, FlatList, RefreshControl, StyleSheet, Alert } from 'react-native';
 import { Searchbar, Divider, Chip } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 
@@ -24,6 +24,8 @@ import { IDocumentType } from '@lib/types';
 import { formatValue, generateId } from '@lib/mobile-hooks';
 
 import { StackNavigationProp } from '@react-navigation/stack';
+
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import { getRemGoodListByContact } from '../../utils/helpers';
 import { DocStackParamList } from '../../navigation/Root/types';
@@ -52,7 +54,7 @@ export const SelectRemainsScreen = () => {
 
   const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
 
-  const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IMovementDocument;
+  const document = docSelectors.selectByDocId<IMovementDocument>(docId);
 
   const goods = refSelectors.selectByName<IGood>('good')?.data;
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
@@ -239,12 +241,22 @@ export const SelectRemainsScreen = () => {
     setSelectedGood(undefined);
   };
 
+  const handlePressItem = useCallback(
+    (isAdded: boolean, item: IRemGood) => {
+      if (isAdded) {
+        setSelectedGood(item);
+      } else {
+        handleAddLine(item);
+      }
+    },
+    [handleAddLine],
+  );
+
   const GoodRemains = useCallback(
     ({ item }: { item: IRemGood }) => {
-      const barcode = !!item.good.barcode;
+      // const barcode = !!item.good.barcode;
 
-      const doc = docSelectors.selectByDocId(docId) as IMovementDocument;
-      const lines = doc?.lines?.filter((i) => i.good.id === item.good.id);
+      const lines = document?.lines?.filter((i) => i.good.id === item.good.id);
       const isAdded = !!lines?.length;
 
       const iconStyle = [styles.icon, { backgroundColor: isAdded ? '#06567D' : '#E91E63' }];
@@ -253,15 +265,7 @@ export const SelectRemainsScreen = () => {
       };
 
       return (
-        <TouchableOpacity
-          onPress={() => {
-            if (isAdded) {
-              setSelectedGood(item);
-            } else {
-              handleAddLine(item);
-            }
-          }}
-        >
+        <TouchableOpacity onPress={() => handlePressItem(isAdded, item)}>
           <View style={[localStyles.goodItem, goodStyle]}>
             <View style={iconStyle}>
               <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
@@ -273,11 +277,10 @@ export const SelectRemainsScreen = () => {
                   {item.remains} {item.good.valueName} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)}{' '}
                   руб.
                 </MediumText>
-                {barcode && (
+                {!!item.good.barcode && (
                   <MediumText style={[styles.number, styles.flexDirectionRow]}>{item.good.barcode}</MediumText>
                 )}
               </View>
-
               {item.good.alias && item.good.weightCode ? (
                 <MediumText style={[styles.number, styles.flexDirectionRow]}>
                   арт. {item.good.alias}, вес. код {item.good.weightCode}
@@ -305,7 +308,7 @@ export const SelectRemainsScreen = () => {
         </TouchableOpacity>
       );
     },
-    [colors.primary, docId, handleAddLine],
+    [colors.primary, document?.lines, handlePressItem],
   );
 
   const renderItem = ({ item }: { item: IRemGood }) => <GoodRemains item={item} />;
