@@ -87,19 +87,19 @@ const DrawerNavigator = ({ onSyncClick, items }: IProps) => {
     //иначе - выполняем синхронизацию
     const timeUntilNextSynch = getTimeUntilNextSynch(syncDate, synchPeriod);
 
-    if (timeUntilNextSynch > 0) {
-      Alert.alert(
-        'Внимание!',
-        // eslint-disable-next-line max-len
-        `В настоящее время сервер обрабатывает запрос.\nПовторная синхронизация возможна через ${Math.ceil(
-          timeUntilNextSynch / 60000,
-        )} мин.`,
-        [{ text: 'OK' }],
-      );
-    } else {
-      dispatch(appActions.setShowSyncInfo(true));
-      onSyncClick();
-    }
+    // if (timeUntilNextSynch > 0) {
+    //   Alert.alert(
+    //     'Внимание!',
+    //     // eslint-disable-next-line max-len
+    //     `В настоящее время сервер обрабатывает запрос.\nПовторная синхронизация возможна через ${Math.ceil(
+    //       timeUntilNextSynch / 60000,
+    //     )} мин.`,
+    //     [{ text: 'OK' }],
+    //   );
+    // } else {
+    dispatch(appActions.setShowSyncInfo(true));
+    onSyncClick();
+    // }
   };
 
   const onDismissDialog = () => {
