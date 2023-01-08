@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, FlatList, TextInput, Alert, ListRenderItem } from 'react-native';
+import { View, TextInput, Alert } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -29,13 +29,14 @@ import {
   generateId,
   getDateString,
   getDelLineList,
-  keyExtractor,
   shortenString,
   useSendDocs,
   sleep,
 } from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
+
+import { FlashList } from '@shopify/flash-list';
 
 import { IScanDocument, IScanLine } from '../../store/types';
 import { ScanStackParamList } from '../../navigation/Root/types';
@@ -216,7 +217,7 @@ export const ScanViewScreen = () => {
     });
   }, [delList.length, isDelList, navigation, renderLeft, renderRight]);
 
-  const renderItem: ListRenderItem<IScanLine> = ({ item, index }) => (
+  const renderItem = ({ item, index }: { item: IScanLine; index: number }) => (
     <ListItemLine
       key={item.id}
       {...item}
@@ -325,15 +326,12 @@ export const ScanViewScreen = () => {
           showSoftInputOnFocus={false}
           onChangeText={(text) => !scanned && setScan(text)}
         />
-        <FlatList
+        <FlashList
           data={lines}
-          keyExtractor={keyExtractor}
           renderItem={renderItem}
-          initialNumToRender={6}
-          maxToRenderPerBatch={6} // Reduce number in each render batch
-          updateCellsBatchingPeriod={100} // Increase time between renders
-          windowSize={7} // Reduce the window size
+          estimatedItemSize={60}
           ItemSeparatorComponent={ItemSeparator}
+          keyboardShouldPersistTaps="handled"
         />
         <SimpleDialog
           visible={visibleSendDialog}
