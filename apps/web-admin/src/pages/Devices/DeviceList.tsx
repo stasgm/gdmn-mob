@@ -10,11 +10,10 @@ import { authActions, useAuthThunkDispatch } from '@lib/store';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import actions from '../../store/device';
+import deviceActions from '../../store/device';
 import codeActions from '../../store/activationCode';
 import { IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-import SnackBar from '../../components/SnackBar';
 import DeviceListTable from '../../components/device/DeviceListTable';
 
 const DeviceList = () => {
@@ -22,17 +21,13 @@ const DeviceList = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const authDispatch = useAuthThunkDispatch();
-
-  const { list, loading, errorMessage, pageParams } = useSelector((state) => state.devices);
+  const { list, loading, pageParams } = useSelector((state) => state.devices);
   const { list: activationCodes } = useSelector((state) => state.activationCodes);
-
-  // const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
-
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
   const fetchDevices = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(actions.fetchDevices(filterText, fromRecord, toRecord));
+      dispatch(deviceActions.fetchDevices(filterText, fromRecord, toRecord));
       dispatch(codeActions.fetchActivationCodes()); //TODO Добавить фильтрацию
     },
     [dispatch],
@@ -60,23 +55,14 @@ const DeviceList = () => {
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.deviceActions.setPageParam({ filterText: pageParamLocal?.filterText }));
+    dispatch(deviceActions.setPageParam({ filterText: pageParamLocal?.filterText }));
     fetchDevices(pageParamLocal?.filterText as string);
-
-    // const inputValue = valueRef?.current?.value;
-    // fetchDevices(inputValue);
   };
 
   const handleKeyPress = (key: string) => {
     if (key !== 'Enter') return;
 
     handleSearchClick();
-    // const inputValue = valueRef?.current?.value;
-    // fetchDevices(inputValue);
-  };
-
-  const handleClearError = () => {
-    dispatch(actions.deviceActions.clearError());
   };
 
   const handleCreateCode = (deviceId: string) => {
@@ -86,7 +72,7 @@ const DeviceList = () => {
 
   const handleCreateUid = async (code: string, deviceId: string) => {
     await authDispatch(authActions.activateDevice(code));
-    dispatch(actions.fetchDeviceById(deviceId));
+    dispatch(deviceActions.fetchDeviceById(deviceId));
     fetchActivationCodes(deviceId);
   };
 
@@ -97,20 +83,6 @@ const DeviceList = () => {
       onClick: () => fetchDevices(),
       icon: <CachedIcon />,
     },
-    // {
-    //   name: 'Загрузить',
-    //   onClick: () => {
-    //     return;
-    //   },
-    //   icon: <ImportExportIcon />,
-    // },
-    // {
-    //   name: 'Выгрузить',
-    //   sx: { mx: 1 },
-    //   onClick: () => {
-    //     return;
-    //   },
-    // },
     {
       name: 'Добавить',
       color: 'primary',
@@ -136,7 +108,6 @@ const DeviceList = () => {
           <ToolbarActionsWithSearch
             buttons={buttons}
             searchTitle={'Найти устройство'}
-            //valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
@@ -156,7 +127,6 @@ const DeviceList = () => {
           )}
         </Container>
       </Box>
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

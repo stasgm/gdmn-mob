@@ -4,22 +4,13 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { Divider } from 'react-native-paper';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { RouteProp, useNavigation, useRoute, StackActions, useTheme, useIsFocused } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, StackActions, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import {
-  SelectableInput,
-  Input,
-  SaveButton,
-  SubTitle,
-  AppScreen,
-  RadioGroup,
-  AppActivityIndicator,
-  navBackButton,
-} from '@lib/mobile-ui';
+import { SelectableInput, Input, SaveButton, SubTitle, AppScreen, RadioGroup, navBackButton } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
-import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-app';
+import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks';
 
 import { IDocumentType, IReference, ScreenState } from '@lib/types';
 
@@ -36,8 +27,6 @@ export const MoveEditScreen = () => {
   const { colors } = useTheme();
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
-
-  const formParams = useSelector((state) => state.app.formParams as IMoveFormParam);
 
   const movements = useFilteredDocList<IMoveDocument>('movement');
 
@@ -58,9 +47,7 @@ export const MoveEditScreen = () => {
     number: docNumber,
     comment: docComment,
     status: docStatus,
-  } = useMemo(() => {
-    return formParams;
-  }, [formParams]);
+  } = useSelector((state) => state.app.formParams as IMoveFormParam);
 
   useEffect(() => {
     return () => {
@@ -292,11 +279,6 @@ export const MoveEditScreen = () => {
     ],
     [colors.card, colors.primary],
   );
-
-  const isFocused = useIsFocused();
-  if (!isFocused) {
-    return <AppActivityIndicator />;
-  }
 
   return (
     <AppScreen>

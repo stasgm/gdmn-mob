@@ -37,7 +37,7 @@ const handleError = (error: any): IApiErrorResponse => {
   }
 
   console.error('handleError', JSON.stringify(error));
-  const { statusCode } = error.response?.data;
+  const { statusCode } = error.data;
   if (statusCode === 401) {
     return { success: false, data: { error: 'No permissions' } };
   }
@@ -76,8 +76,6 @@ export const apiProvider = <T>(endpoint: string) => {
     },
     (error) => {
       axiosLogger('response-err', error);
-      // const message = error.response?.data?.message || error.message;
-      // console.log('error message: ', message)
       return Promise.reject(error);
     },
   );
@@ -124,7 +122,6 @@ export const apiProvider = <T>(endpoint: string) => {
 
   const patch = async (id: string, data = {}, options = {}): Promise<IApiResponse<T> | IApiErrorResponse> => {
     try {
-      console.log('item', id, data);
       const res = await api.put<T>(`${endpoint}/${id}`, data, { ...options, ...getCommonOptions() });
       return handleResponse<T>(res.data);
     } catch (error) {

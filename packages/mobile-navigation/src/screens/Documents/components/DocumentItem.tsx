@@ -1,11 +1,11 @@
 import React from 'react';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { IDocument } from '@lib/types';
-import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity, View, Text } from 'react-native';
-import { useTheme } from 'react-native-paper';
-
+import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useTheme } from 'react-native-paper';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+import { IDocument } from '@lib/types';
 
 import { styles } from '../styles';
 import { DocumentsTabsStackParamsList } from '../../../navigation/Root/types';

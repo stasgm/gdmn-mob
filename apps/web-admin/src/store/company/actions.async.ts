@@ -3,7 +3,11 @@ import api from '@lib/client-api';
 
 import { NewCompany, ICompany } from '@lib/types';
 
+import { authActions } from '@lib/store';
+
 import { AppState } from '../';
+
+import { webRequest } from '../webRequest';
 
 import { companyActions, CompanyActionType } from './actions';
 
@@ -13,17 +17,13 @@ const fetchCompanyById = (id: string): AppThunk => {
   return async (dispatch) => {
     dispatch(companyActions.fetchCompanyAsync.request(''));
 
-    const response = await api.company.getCompany(id);
+    const response = await api.company.getCompany(webRequest(dispatch, authActions), id);
 
     if (response.type === 'GET_COMPANY') {
       return dispatch(companyActions.fetchCompanyAsync.success(response.company));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(companyActions.fetchCompanyAsync.failure(response.message));
-    }
-
-    return dispatch(companyActions.fetchCompaniesAsync.failure('Ошибка получения данных о компании'));
+    return dispatch(companyActions.fetchCompanyAsync.failure(response.message));
   };
 };
 
@@ -37,17 +37,13 @@ const fetchCompanies = (filterText?: string, fromRecord?: number, toRecord?: num
     if (fromRecord) params.fromRecord = fromRecord;
     if (toRecord) params.toRecord = toRecord;
 
-    const response = await api.company.getCompanies(params);
+    const response = await api.company.getCompanies(webRequest(dispatch, authActions), params);
 
     if (response.type === 'GET_COMPANIES') {
       return dispatch(companyActions.fetchCompaniesAsync.success(response.companies));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(companyActions.fetchCompaniesAsync.failure(response.message));
-    }
-
-    return dispatch(companyActions.fetchCompaniesAsync.failure('Ошибка получения данных о компаниях'));
+    return dispatch(companyActions.fetchCompaniesAsync.failure(response.message));
   };
 };
 
@@ -55,17 +51,13 @@ const addCompany = (company: NewCompany): AppThunk => {
   return async (dispatch) => {
     dispatch(companyActions.addCompanyAsync.request(''));
 
-    const response = await api.company.addCompany(company);
+    const response = await api.company.addCompany(webRequest(dispatch, authActions), company);
 
     if (response.type === 'ADD_COMPANY') {
       return dispatch(companyActions.addCompanyAsync.success(response.company));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(companyActions.addCompanyAsync.failure(response.message));
-    }
-
-    return dispatch(companyActions.addCompanyAsync.failure('Ошибка добавления компании'));
+    return dispatch(companyActions.addCompanyAsync.failure(response.message));
   };
 };
 
@@ -73,17 +65,13 @@ const updateCompany = (company: ICompany): AppThunk => {
   return async (dispatch) => {
     dispatch(companyActions.updateCompanyAsync.request('Обновление компании'));
 
-    const response = await api.company.updateCompany(company);
+    const response = await api.company.updateCompany(webRequest(dispatch, authActions), company);
 
     if (response.type === 'UPDATE_COMPANY') {
       return dispatch(companyActions.updateCompanyAsync.success(response.company));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(companyActions.updateCompanyAsync.failure(response.message));
-    }
-
-    return dispatch(companyActions.updateCompanyAsync.failure('Ошибка обновления компании'));
+    return dispatch(companyActions.updateCompanyAsync.failure(response.message));
   };
 };
 
@@ -91,17 +79,13 @@ const removeCompany = (id: string): AppThunk => {
   return async (dispatch) => {
     dispatch(companyActions.removeCompanyAsync.request('Удаление компании'));
 
-    const response = await api.company.removeCompany(id);
+    const response = await api.company.removeCompany(webRequest(dispatch, authActions), id);
 
     if (response.type === 'REMOVE_COMPANY') {
       return dispatch(companyActions.removeCompanyAsync.success(id));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(companyActions.removeCompanyAsync.failure(response.message));
-    }
-
-    return dispatch(companyActions.removeCompanyAsync.failure('Ошибка удаления компании'));
+    return dispatch(companyActions.removeCompanyAsync.failure(response.message));
   };
 };
 

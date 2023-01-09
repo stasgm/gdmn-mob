@@ -129,7 +129,7 @@ const verifyCode = (code: string): string | undefined => {
   const codeObj = codes.data.find((i) => i.code === code);
 
   if (!codeObj) {
-    throw new DataNotFoundException('Код не найден');
+    throw new DataNotFoundException('Код не найден.\nПожалуйста, обратитесь к администратору!');
   }
 
   const date: Date = new Date(codeObj.date);
@@ -140,13 +140,13 @@ const verifyCode = (code: string): string | undefined => {
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
   if (diffDays < 0) {
-    throw new UnauthorizedException('Срок действия кода истёк');
+    throw new UnauthorizedException('Срок действия кода истёк.\nПожалуйста, обратитесь к администратору!');
   }
 
   const device = devices.findById(codeObj.deviceId);
 
   if (!device) {
-    throw new DataNotFoundException('По данному коду устройство не найдено');
+    throw new DataNotFoundException('По данному коду устройство не найдено.\nПожалуйста, обратитесь к администратору!');
   }
 
   //Устанавливаем состояние данного устройства в 'ACTIVE' и обновляем uid у устройства
@@ -181,7 +181,7 @@ const getDeviceStatus = (uid: string): DeviceState => {
   const device = getDb().devices.data.find((i) => i.uid === uid);
 
   if (!device) {
-    throw new UnauthorizedException('Устройство не найдено');
+    throw new UnauthorizedException('Устройство не найдено.\nПожалуйста, обратитесь к администратору!');
   }
 
   return device.state;

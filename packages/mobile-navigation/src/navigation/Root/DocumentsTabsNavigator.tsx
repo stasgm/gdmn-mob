@@ -1,14 +1,14 @@
 import React, { useCallback, useLayoutEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { useNavigation } from '@react-navigation/native';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { documentActions, useDispatch, useSelector } from '@lib/store';
+import { documentActions, useDocThunkDispatch, useSelector } from '@lib/store';
 
 import { MenuButton, navBackDrawer } from '@lib/mobile-ui';
 import { useActionSheet } from '@lib/mobile-ui/src/hooks';
-import { useNavigation } from '@react-navigation/native';
 
 import { documentsMock } from '@lib/mock';
 
@@ -23,14 +23,14 @@ const TabsNavigator = () => {
 
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
-  const dispatch = useDispatch();
+  const docDispatch = useDocThunkDispatch();
 
   const handleAddDocument = () => {
     //
   };
 
   const handleLoad = () => {
-    dispatch(documentActions.addDocuments(documentsMock));
+    docDispatch(documentActions.addDocuments(documentsMock));
   };
 
   const actionsMenu = useCallback(() => {

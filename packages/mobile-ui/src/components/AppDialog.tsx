@@ -1,6 +1,6 @@
-import { useTheme } from '@react-navigation/native';
 import React from 'react';
 import { Text } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 import { Dialog, Button, TextInput } from 'react-native-paper';
 
 interface IProps {

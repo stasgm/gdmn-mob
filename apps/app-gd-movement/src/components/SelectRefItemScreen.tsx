@@ -12,9 +12,10 @@ import {
   SubTitle,
   globalStyles as styles,
   navBackButton,
+  LargeText,
 } from '@lib/mobile-ui';
 
-import { extraPredicate } from '@lib/mobile-app';
+import { extraPredicate } from '@lib/mobile-hooks';
 
 import { useDispatch } from '../store';
 import { RefParamList } from '../navigation/Root/types';
@@ -33,6 +34,7 @@ export const SelectRefItemScreen = () => {
     value,
     clause,
     refFieldName = 'name',
+    descrFieldName,
   } = useRoute<RouteProp<RefParamList, 'SelectRefItem'>>().params;
 
   const refObj = refSelectors.selectByName<IReferenceData>(refName);
@@ -69,13 +71,17 @@ export const SelectRefItemScreen = () => {
     }
     setFilteredList(
       list
-        .filter((i) => i[refFieldName]?.toUpperCase().includes(searchQuery.toUpperCase()))
+        .filter(
+          (i) =>
+            i[refFieldName]?.toUpperCase().includes(searchQuery.toUpperCase()) ||
+            (descrFieldName && i[descrFieldName]?.toUpperCase().includes(searchQuery.toUpperCase())),
+        )
         .sort((a) => {
           return checkedItem?.find((v) => v.id === a.id) ? -1 : 1;
         }),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMulti, list, refFieldName, searchQuery, value]);
+  }, [isMulti, list, descrFieldName, refFieldName, searchQuery, value]);
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
@@ -118,12 +124,13 @@ export const SelectRefItemScreen = () => {
           item={item}
           isChecked={isChecked}
           onCheck={handleSelectItem}
+          descrFieldName={descrFieldName}
           refFieldName={refFieldName}
           disabled={screenState === 'saving' ? true : false}
         />
       );
     },
-    [checkedItem, handleSelectItem, refFieldName, screenState],
+    [checkedItem, descrFieldName, handleSelectItem, refFieldName, screenState],
   );
 
   const renderRight = useCallback(
@@ -190,11 +197,15 @@ const LineItem = React.memo(
     isChecked,
     onCheck,
     refFieldName,
+    descrFieldName,
+
     disabled,
   }: {
     item: IReferenceData;
     isChecked: boolean;
     onCheck: (id: IReferenceData) => void;
+    descrFieldName?: string;
+
     refFieldName: string;
     disabled?: boolean;
   }) => {
@@ -210,6 +221,11 @@ const LineItem = React.memo(
             <View style={styles.rowCenter}>
               <Text style={textStyle}>{item[refFieldName] || item.id}</Text>
             </View>
+            {descrFieldName && item[descrFieldName] ? (
+              <View style={styles.rowCenter}>
+                <LargeText style={styles.textDescription}>УНП: {item[descrFieldName]}</LargeText>
+              </View>
+            ) : null}
           </View>
         </View>
       </TouchableOpacity>

@@ -1,13 +1,15 @@
-import { Linking, TouchableOpacity } from 'react-native';
+import { Linking, ScrollView, TouchableOpacity, View } from 'react-native';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Provider } from 'react-redux';
-import { dialCall, MobileApp } from '@lib/mobile-app';
+import { MobileApp } from '@lib/mobile-app';
+import { dialCall, sleep } from '@lib/mobile-hooks';
 import { INavItem, GDMN_PHONE, GDMN_EMAIL, GDMN_SITE_ADDRESS } from '@lib/mobile-navigation';
+
+import { StatusBar } from 'expo-status-bar';
 
 import {
   appActions,
   appSelectors,
-  authSelectors,
   referenceActions,
   documentActions,
   settingsActions,
@@ -15,6 +17,7 @@ import {
   useRefThunkDispatch,
   useDocThunkDispatch,
   useSelector,
+  authSelectors,
 } from '@lib/store';
 
 import {
@@ -28,8 +31,6 @@ import {
 import { ActivityIndicator, Caption, Text } from 'react-native-paper';
 
 import { IDocument, IReferences, ISettingsOption } from '@lib/types';
-
-import { sleep } from '@lib/client-api';
 
 import Constants from 'expo-constants';
 
@@ -94,7 +95,7 @@ const Root = () => {
 
   //Загружаем в стор дополнительные настройки приложения
   const isInit = useSelector((state) => state.settings.isInit);
-  const isGetReferences = useSelector((state) => state.settings?.data.getReferences);
+  const getReferences = useSelector((state) => state.settings?.data?.getReferences);
   const isDemo = useSelector((state) => state.auth.isDemo);
 
   const refDispatch = useRefThunkDispatch();
@@ -117,7 +118,7 @@ const Root = () => {
       dispatch(
         settingsActions.updateOption({
           optionName: 'getReferences',
-          value: { ...isGetReferences, data: false } as ISettingsOption,
+          value: { ...getReferences, data: false } as ISettingsOption,
         }),
       );
     }
@@ -127,17 +128,17 @@ const Root = () => {
   const appDataLoading = appSelectors.selectLoading();
   const authLoading = useSelector((state) => state.auth.loadingData);
   const tradeLoading = useAppTradeSelector((state) => state.appTrade.loadingData);
-  const isLogged = authSelectors.isLoggedWithCompany();
   const tradeLoadingError = useAppTradeSelector<string>((state) => state.appTrade.loadingError);
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
+  const isLogged = authSelectors.isLoggedWithCompany();
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (isLogged) {
       dispatch(appActions.loadSuperDataFromDisc());
     }
   }, [dispatch, isLogged]);
-
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     //Для отрисовки при первом подключении
@@ -175,23 +176,30 @@ const Root = () => {
     </AppScreen>
   ) : infoWindow === 1 ? (
     <AppScreen>
-      <Text style={styles.textInfo}>
-        {
-          'Добро пожаловать в GDMN Агент!\n\nНаше приложение облегчает труд торгового агента и позволяет выполнить следующие действия:\n\n1. Оформить заявку на поставку товаров\n\n2. Оформить возврат непроданных товаров\n\n3. Планировать посещение торговых объектов, составлять маршрут и просматривать его на карте\n\n4. Оперативно контролировать задолженность за поставленную продукцию\n\n5. Просматривать юридический адрес, адрес разгрузки и иные реквизиты покупателя\n\n6. Гибко настраивать цены и скидки для конкретного покупателя или группы покупателей'
-        }
-      </Text>
-      <TouchableOpacity
-        style={styles.buttonPrev}
-        onPress={() => {
-          setInfoWindow(0);
-          dispatch(appActions.loadGlobalDataFromDisc());
-        }}
+      <ScrollView
+        contentContainerStyle={styles.contentContainerStyle}
+        maintainVisibleContentPosition={{ autoscrollToTopThreshold: 1, minIndexForVisible: 0 }}
+        style={styles.scrollContainer}
       >
-        <Text style={styles.textInfo}>{'« Назад'}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.buttonNext} onPress={handleSetInfoWindow_2}>
-        <Text style={styles.textInfo}>{'Далее »'}</Text>
-      </TouchableOpacity>
+        <Text style={styles.textInfo}>
+          {
+            'Добро пожаловать в GDMN Агент!\n\nПриложение облегчает труд торгового агента и позволяет выполнить следующие действия:\n\n1. Оформить заявку на поставку товаров\n\n2. Оформить возврат непроданных товаров\n\n3. Планировать посещение торговых объектов, составлять маршрут и просматривать его на карте\n\n4. Оперативно контролировать задолженность за поставленную продукцию\n\n5. Просматривать юридический адрес, адрес разгрузки и иные реквизиты покупателя\n\n6. Гибко настраивать цены и скидки для конкретного покупателя или группы покупателей'
+          }
+        </Text>
+      </ScrollView>
+      <View style={styles.infoButtons}>
+        <TouchableOpacity
+          onPress={() => {
+            setInfoWindow(0);
+            dispatch(appActions.loadGlobalDataFromDisc());
+          }}
+        >
+          <Text style={styles.textInfo}>{'« Назад'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleSetInfoWindow_2}>
+          <Text style={styles.textInfo}>{'Далее »'}</Text>
+        </TouchableOpacity>
+      </View>
     </AppScreen>
   ) : infoWindow === 2 ? (
     <AppScreen>
@@ -209,12 +217,14 @@ const Root = () => {
       <TouchableOpacity onPress={() => Linking.openURL(GDMN_SITE_ADDRESS)}>
         <Text style={[styles.textInfo, styles.textReference]}>{GDMN_SITE_ADDRESS}</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.buttonPrev} onPress={handleSetInfoWindow_1}>
-        <Text style={styles.textInfo}>{'« Назад'}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.buttonNext} onPress={handleSetInfoWindow_3}>
-        <Text style={styles.textInfo}>{'Далее »'}</Text>
-      </TouchableOpacity>
+      <View style={styles.infoButtons}>
+        <TouchableOpacity onPress={handleSetInfoWindow_1}>
+          <Text style={styles.textInfo}>{'« Назад'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleSetInfoWindow_3}>
+          <Text style={styles.textInfo}>{'Далее »'}</Text>
+        </TouchableOpacity>
+      </View>
     </AppScreen>
   ) : infoWindow === 3 ? (
     <AppScreen>
@@ -227,11 +237,13 @@ const Root = () => {
           '\nВыявленные ошибки и пожелания оставляйте в системе регистрации.\n\nСпасибо за использование GDMN Агент!\n\n'
         }
       </Text>
-      <TouchableOpacity style={styles.buttonPrev} onPress={handleSetInfoWindow_2}>
-        <Text style={styles.textInfo}>{'« Назад'}</Text>
-      </TouchableOpacity>
+      <View style={styles.infoButtons}>
+        <TouchableOpacity onPress={handleSetInfoWindow_2}>
+          <Text style={styles.textInfo}>{'« Назад'}</Text>
+        </TouchableOpacity>
+      </View>
       <PrimeButton icon={'presentation-play'} onPress={handleSetInfoWindow_0}>
-        {'Начать работу'}
+        Начать работу
       </PrimeButton>
     </AppScreen>
   ) : (
@@ -243,6 +255,7 @@ const App = () => (
   <Provider store={store}>
     <UIProvider theme={defaultTheme}>
       <Root />
+      <StatusBar style="auto" />
     </UIProvider>
   </Provider>
 );

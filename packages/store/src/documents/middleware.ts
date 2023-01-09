@@ -38,6 +38,10 @@ export const documentMiddlewareFactory: PersistedMiddleware =
         });
     }
 
+    if (action.type === getType(appActions.clearSuperDataFromDisc)) {
+      store.dispatch(actions.init());
+    }
+
     if (store.getState().auth.user?.id) {
       switch (action.type) {
         case getType(actions.init):

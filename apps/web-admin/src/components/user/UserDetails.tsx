@@ -1,6 +1,6 @@
 import { Box, Card, CardContent, Grid, TextField, Divider, Button, Checkbox } from '@material-ui/core';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { INamedEntity, IUser, NewUser } from '@lib/types';
 import { FormikTouched, useFormik, Field, FormikProvider } from 'formik';
@@ -11,6 +11,9 @@ import api from '@lib/client-api';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 
 import ComboBox from '../ComboBox';
+import companyActions from '../../store/company';
+import userActions from '../../store/user';
+import { useDispatch, useSelector } from '../../store';
 
 interface IProps {
   loading: boolean;
@@ -23,42 +26,56 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
   const [open, setOpen] = useState(false);
   const [userERP, setUserERP] = useState(user.appSystem ? true : false);
 
-  const [appSystems, setAppSystems] = useState<INamedEntity[] | undefined>([]);
-  const [loadingAppSystems, setLoadingAppSystems] = useState(true);
+  // const [appSystems, setAppSystems] = useState<INamedEntity[] | undefined>([]);
+  // const [loadingAppSystems, setLoadingAppSystems] = useState(true);
 
-  const [users, setUsers] = useState<INamedEntity[]>([]);
-  const [loadingUsers, setLoadingUsers] = useState(true);
+  // const [users, setUsers] = useState<INamedEntity[]>([]);
+  // const [loadingUsers, setLoadingUsers] = useState(true);
 
-  useEffect(() => {
-    let unmounted = false;
-    const getCompanies = async () => {
-      const res = await api.company.getCompanies();
-      if (res.type === 'GET_COMPANIES' && !unmounted) {
-        const companyAppSystems = res.companies.map((d) => ({ appSystems: d.appSystems }));
-        setAppSystems(companyAppSystems[0].appSystems);
-        setLoadingAppSystems(false);
-      }
-    };
-    getCompanies();
-    return () => {
-      unmounted = true;
-    };
-  }, []);
+  const { list: appSystems, loading: loadingAppSystems } = useSelector((state) => state.appSystems);
+  const { list: users, loading: loadingUsers } = useSelector((state) => state.users);
 
-  useEffect(() => {
-    let unmounted = false;
-    const getUsers = async () => {
-      const res = await api.user.getUsers();
-      if (res.type === 'GET_USERS' && !unmounted) {
-        setUsers(res.users.filter((i) => i.appSystem).map((d) => ({ id: d.id, name: d.name })));
-        setLoadingUsers(false);
-      }
-    };
-    getUsers();
-    return () => {
-      unmounted = true;
-    };
-  }, []);
+  const erpUsers = useMemo(() => {
+    return users.filter((i) => i.appSystem).map((d) => ({ id: d.id, name: d.name }));
+  }, [users]);
+
+  // useEffect(() => {
+  //   let unmounted = false;
+  //   const getCompanies = async () => {
+  //     const res = await api.company.getCompanies();
+  //     if (res.type === 'GET_COMPANIES' && !unmounted) {
+  //       const companyAppSystems = res.companies.map((d) => ({ appSystems: d.appSystems }));
+  //       setAppSystems(companyAppSystems[0].appSystems);
+  //       setLoadingAppSystems(false);
+  //     }
+  //   };
+  //   getCompanies();
+  //   return () => {
+  //     unmounted = true;
+  //   };
+  // }, []);
+
+  // useEffect(() => {
+  //   let unmounted = false;
+  //   const getUsers = async () => {
+  //     const res = await api.user.getUsers();
+  //     if (res.type === 'GET_USERS' && !unmounted) {
+  //       setUsers(res.users.filter((i) => i.appSystem).map((d) => ({ id: d.id, name: d.name })));
+  //       setLoadingUsers(false);
+  //     }
+  //   };
+  //   getUsers();
+  //   return () => {
+  //     unmounted = true;
+  //   };
+  // }, []);
+
+  // const dispatch = useDispatch();
+
+  // useEffect(() => {
+  //   dispatch(companyActions.fetchCompanies());
+  //   dispatch(userActions.fetchUsers());
+  // }, []);
 
   const formik = useFormik<IUser | NewUser>({
     enableReinitialize: true,
@@ -86,7 +103,16 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
         Object.keys(user).length == 0 ? yup.string().required('Заполните это поле') : yup.string().notRequired(),
     }),
     onSubmit: (values) => {
-      onSubmit(values);
+      onSubmit({
+        ...values,
+        name: values.name.trim(),
+        firstName: values.firstName?.trim(),
+        lastName: values.lastName?.trim(),
+        middleName: values.middleName?.trim(),
+        phoneNumber: values.phoneNumber?.trim(),
+        email: values.email?.trim(),
+        externalId: values.externalId?.trim(),
+      });
     },
   });
 
@@ -224,7 +250,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                       name="erpUser"
                       label="Пользователь ERP"
                       type="erpUser"
-                      options={users?.map((d) => ({ id: d.id, name: d.name })) || []}
+                      options={erpUsers || []}
                       setFieldValue={formik.setFieldValue}
                       setTouched={formik.setTouched}
                       onBlur={formik.handleBlur}
@@ -240,8 +266,8 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                   <TextField
                     error={formik.touched.externalId && Boolean(formik.errors.externalId)}
                     fullWidth
-                    required={userERP || user.role !== 'User' ? false : true}
-                    label="ID"
+                    required={userERP || (user.role && user.role !== 'User') ? false : true}
+                    label="Идентификатор из ERP системы"
                     name="externalId"
                     variant="outlined"
                     onBlur={formik.handleBlur}
@@ -286,7 +312,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     onChange={formik.handleChange}
                     type="password"
                     disabled={loading}
-                    value={(formik.values as NewUser).password}
+                    value={(formik.values as NewUser).password.trim()}
                   />
                 </Grid>
                 <Grid item md={6} xs={12} display={open ? 'block' : 'none'}>
@@ -304,7 +330,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     onChange={formik.handleChange}
                     type="password"
                     disabled={loading}
-                    value={(formik.values as NewUser).verifyPassword}
+                    value={(formik.values as NewUser).verifyPassword?.trim()}
                   />
                 </Grid>
                 {(formik.values as NewUser).password !== (formik.values as NewUser).verifyPassword &&

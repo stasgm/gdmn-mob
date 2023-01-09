@@ -1,12 +1,12 @@
 import React, { useCallback, useLayoutEffect, useState } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 
 import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigation/native';
 
-import { AppActivityIndicator, globalStyles, MediumText, navBackButton, ScanBarcode } from '@lib/mobile-ui';
+import { AppActivityIndicator, globalStyles, LargeText, MediumText, navBackButton, ScanBarcode } from '@lib/mobile-ui';
 import { docSelectors, useDispatch, documentActions } from '@lib/store';
 
-import { generateId } from '@lib/mobile-app';
+import { generateId } from '@lib/mobile-hooks';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -43,10 +43,16 @@ const ScanGoodScreen = () => {
       return;
     }
 
-    dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
+    if (!doc) {
+      return;
+    }
+
+    const line: IScanLine = { ...scannedObject, sortOrder: doc?.lines?.length + 1 };
+
+    dispatch(documentActions.addDocumentLine({ docId, line }));
 
     setScaner({ state: 'init' });
-  }, [scannedObject, dispatch, docId]);
+  }, [scannedObject, doc, dispatch, docId]);
 
   const handleClearScaner = () => setScaner({ state: 'init' });
 
@@ -56,7 +62,11 @@ const ScanGoodScreen = () => {
   }
 
   if (!doc) {
-    return <Text style={globalStyles.title}>Документ не найден</Text>;
+    return (
+      <View style={[globalStyles.container, globalStyles.alignItemsCenter]}>
+        <LargeText>Документ не найден</LargeText>
+      </View>
+    );
   }
 
   return (

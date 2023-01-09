@@ -5,7 +5,6 @@ import { useEffect } from 'react';
 
 import DeviceBindingDetails from '../../components/deviceBinding/DeviceBindingDetails';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import SnackBar from '../../components/SnackBar';
 import actions from '../../store/deviceBinding';
 import selectors from '../../store/deviceBinding/selectors';
 
@@ -19,7 +18,7 @@ const UserDeviceEdit = () => {
 
   const dispatch: AppDispatch = useDispatch();
 
-  const { loading, errorMessage } = useSelector((state) => state.deviceBindings);
+  const { loading } = useSelector((state) => state.deviceBindings);
   const binding = selectors.bindingById(bindingid);
 
   useEffect(() => {
@@ -28,10 +27,6 @@ const UserDeviceEdit = () => {
 
   const goBack = () => {
     navigate(-1);
-  };
-
-  const handleClearError = () => {
-    dispatch(actions.deviceBindingActions.clearError());
   };
 
   const handleSubmit = async (values: NewDeviceBinding | IDeviceBinding) => {
@@ -76,7 +71,6 @@ const UserDeviceEdit = () => {
         onSubmit={handleSubmit}
         onCancel={goBack}
       />
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </Box>
   );
 };

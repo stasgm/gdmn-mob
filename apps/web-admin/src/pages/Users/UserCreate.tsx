@@ -2,29 +2,32 @@ import { Box, CardHeader, CircularProgress } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
 import { IUser, NewUser } from '@lib/types';
 
+import { useEffect } from 'react';
+
 import UserDetails from '../../components/user/UserDetails';
-import SnackBar from '../../components/SnackBar';
 
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import actions from '../../store/user';
+import appSystemActions from '../../store/appSystem';
+import userActions from '../../store/user';
 
 const UserCreate = () => {
   const navigate = useNavigate();
 
   const dispatch: AppDispatch = useDispatch();
 
-  const { errorMessage, loading } = useSelector((state) => state.users);
+  const { loading } = useSelector((state) => state.users);
+
+  useEffect(() => {
+    dispatch(appSystemActions.fetchAppSystems());
+    dispatch(userActions.fetchUsers());
+  }, [dispatch]);
 
   const goBack = () => {
     navigate(-1);
   };
 
-  const handleClearError = () => {
-    dispatch(actions.userActions.clearError());
-  };
-
   const handleSubmit = async (values: IUser | NewUser) => {
-    const res = await dispatch(actions.addUser(values as NewUser));
+    const res = await dispatch(userActions.addUser(values as NewUser));
     if (res.type === 'USER/ADD_SUCCESS') {
       goBack();
     }
@@ -51,7 +54,6 @@ const UserCreate = () => {
         </Box>
         <UserDetails user={{} as NewUser} loading={loading} onSubmit={handleSubmit} onCancel={goBack} />
       </Box>
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

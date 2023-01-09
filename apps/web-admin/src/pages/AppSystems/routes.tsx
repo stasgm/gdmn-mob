@@ -1,6 +1,12 @@
 import { Navigate, useRoutes } from 'react-router-dom';
 import { RouteObject } from 'react-router';
 
+import SnackBar from '../../components/SnackBar';
+
+import { useDispatch, useSelector } from '../../store';
+
+import { appSystemActions } from '../../store/appSystem/actions';
+
 import AppSystemView from './AppSystemView';
 import AppSystemList from './AppSystemList';
 import AppSystemCreate from './AppSystemCreate';
@@ -15,5 +21,22 @@ const routes: RouteObject[] = [
 ];
 
 export default function AppSystems() {
-  return useRoutes(routes);
+  const routeComponent = useRoutes(routes);
+  const dispatch = useDispatch();
+  const appSystemErrorMessage = useSelector((state) => state.appSystems.errorMessage);
+
+  const handleClearError = () => {
+    dispatch(appSystemActions.clearError());
+  };
+
+  return (
+    <>
+      {routeComponent}
+      <SnackBar
+        visible={!!appSystemErrorMessage}
+        errorMessage={appSystemErrorMessage}
+        onClearError={handleClearError}
+      />
+    </>
+  );
 }

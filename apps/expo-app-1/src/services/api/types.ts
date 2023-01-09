@@ -12,7 +12,7 @@ export interface IApiErrorResponse extends IApiResponse<IErrorMessage> {
   success: false;
 }
 
-export interface INetworkError {
+export interface IServerError {
   type: 'ERROR';
   message: string;
 }

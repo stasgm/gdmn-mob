@@ -6,7 +6,6 @@ import CompanyDetails from '../../components/company/CompanyDetails';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/company';
 import selectors from '../../store/company/selectors';
-import SnackBar from '../../components/SnackBar';
 
 export type Params = {
   id: string;
@@ -14,20 +13,13 @@ export type Params = {
 
 const CompanyEdit = () => {
   const { id: companyId } = useParams<keyof Params>() as Params;
-
   const navigate = useNavigate();
-
   const dispatch: AppDispatch = useDispatch();
-
-  const { errorMessage, loading } = useSelector((state) => state.companies);
+  const { loading } = useSelector((state) => state.companies);
   const company = selectors.companyById(companyId);
 
   const goBack = () => {
     navigate(-1);
-  };
-
-  const handleClearError = () => {
-    dispatch(actions.companyActions.clearError());
   };
 
   const handleSubmit = async (values: ICompany | NewCompany) => {
@@ -67,7 +59,6 @@ const CompanyEdit = () => {
         {loading && <CircularProgress size={40} />}
       </Box>
       <CompanyDetails company={company} loading={loading} onSubmit={handleSubmit} onCancel={goBack} />
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </Box>
   );
 };

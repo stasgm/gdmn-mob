@@ -6,6 +6,8 @@ import * as messageValidation from './message';
 import * as deviceBindingValidation from './deviceBinding';
 import * as processValidation from './process';
 import * as appSystemValidation from './appSystem';
+import * as deviceLogValidation from './deviceLog';
+import * as fileValidation from './file';
 
 export {
   authValidation,
@@ -16,4 +18,6 @@ export {
   deviceBindingValidation,
   processValidation,
   appSystemValidation,
+  deviceLogValidation,
+  fileValidation,
 };

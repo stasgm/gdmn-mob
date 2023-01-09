@@ -1,8 +1,10 @@
 import api from '@lib/client-api';
+import { authActions } from '@lib/store';
 
 import { ThunkAction } from 'redux-thunk';
 
 import { AppState } from '..';
+import { webRequest } from '../webRequest';
 
 import { processActions, ProcessActionType } from './actions';
 
@@ -18,17 +20,13 @@ const fetchProcesses = (filterText?: string, fromRecord?: number, toRecord?: num
     if (fromRecord) params.fromRecord = fromRecord;
     if (toRecord) params.toRecord = toRecord;
 
-    const response = await api.process.getProcesses(params);
+    const response = await api.process.getProcesses(webRequest(dispatch, authActions), params);
 
     if (response.type === 'GET_PROCESSES') {
       return dispatch(processActions.fetchProcessesAsync.success(response.processes));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(processActions.fetchProcessesAsync.failure(response.message));
-    }
-
-    return dispatch(processActions.fetchProcessesAsync.failure('Ошибка получения данных о процессах'));
+    return dispatch(processActions.fetchProcessesAsync.failure(response.message));
   };
 };
 
@@ -36,17 +34,13 @@ const removeProcess = (id: string): AppThunk => {
   return async (dispatch) => {
     dispatch(processActions.removeProcessAsync.request('Удаление процесса'));
 
-    const response = await api.process.removeProcess(id);
+    const response = await api.process.removeProcess(webRequest(dispatch, authActions), id);
 
     if (response.type === 'REMOVE_PROCESS') {
       return dispatch(processActions.removeProcessAsync.success(id));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(processActions.removeProcessAsync.failure(response.message));
-    }
-
-    return dispatch(processActions.removeProcessAsync.failure('Ошибка удаления процесса'));
+    return dispatch(processActions.removeProcessAsync.failure(response.message));
   };
 };
 

@@ -80,7 +80,7 @@ export type IOrderDocument = MandateProps<IDocument<IOrderHead, IOrderLine>, 'he
 export interface IShipmentHead extends IHead {
   contact: ICodeEntity; //организация-плательщик
   outlet: ICodeEntity; // магазин –подразделение организации плательщика
-  depart: ICodeEntity; // подразделеніе сотрудника (кладовщик, работающий с терминалом)
+  depart: ICodeEntity; // подразделение сотрудника (кладовщик, работающий с терминалом)
   onDate: string; // Дата отгрузки
   barcode: string; // штрих-код заявки, по которой создан
   // ovСode?: string; // штрих-код документа-отвеса

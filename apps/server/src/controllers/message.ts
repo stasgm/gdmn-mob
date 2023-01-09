@@ -56,7 +56,7 @@ const getMessages = async (ctx: ParameterizedContext): Promise<void> => {
 
 const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: messageId } = ctx.params;
-  const { companyId, appSystemName, deviceId } = ctx.query;
+  const { companyId, appSystemName } = ctx.query;
 
   await messageService.deleteOne({ messageId, companyId: companyId as string, appSystemName: appSystemName as string });
 

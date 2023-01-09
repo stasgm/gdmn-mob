@@ -1,6 +1,8 @@
+import { IDeviceBinding } from '@lib/types';
+
 import { useSelector } from '../';
 
-const bindingById = (id: string) => {
+const bindingById = (id?: string) => {
   return useSelector((state) => state.deviceBindings.list.find((d) => d.id === id));
 };
 

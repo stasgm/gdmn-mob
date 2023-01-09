@@ -9,6 +9,7 @@ import {
   getUsersWithDevice,
   getUserWithDevice,
 } from '../controllers/user';
+
 import { authMiddleware } from '../middleware/authRequired';
 import { deviceMiddleware } from '../middleware/deviceRequired';
 import { permissionMiddleware } from '../middleware/permissionRequired';

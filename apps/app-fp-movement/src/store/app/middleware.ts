@@ -40,6 +40,10 @@ export const appFpMiddlewareFactory: PersistedMiddleware =
         });
     }
 
+    if (action.type === getType(appActions.clearSuperDataFromDisc)) {
+      store.dispatch(appActions.init());
+    }
+
     if (store.getState().auth.user?.id) {
       switch (action.type) {
         case getType(actions.addTempOrder):

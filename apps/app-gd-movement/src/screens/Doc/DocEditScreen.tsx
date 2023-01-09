@@ -4,7 +4,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { Divider } from 'react-native-paper';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { RouteProp, useNavigation, useRoute, StackActions, useTheme, useIsFocused } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, StackActions, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import {
@@ -15,14 +15,13 @@ import {
   SubTitle,
   AppScreen,
   RadioGroup,
-  AppActivityIndicator,
   navBackButton,
 } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
-import { generateId, getDateString } from '@lib/mobile-app';
+import { generateId, getDateString, isNamedEntity } from '@lib/mobile-hooks';
 
-import { IDocumentType } from '@lib/types';
+import { IDocumentType, ScreenState } from '@lib/types';
 
 import { IListItem } from '@lib/mobile-types';
 
@@ -37,14 +36,15 @@ export const DocEditScreen = () => {
   const dispatch = useDispatch();
   const { colors } = useTheme();
 
-  const formParams = useSelector((state) => state.app.formParams as IDocFormParam);
+  const documents = useSelector((state) =>
+    state.documents.list.filter((i) => i.documentType.name === 'prihod' || i.documentType.name === 'inventory'),
+  ) as IMovementDocument[];
 
-  const documents = useSelector((state) => state.documents.list) as IMovementDocument[];
   const documentTypes = refSelectors
     .selectByName<IDocumentType>('documentType')
     ?.data?.sort((a, b) => ((a.sortOrder || 1) < (b.sortOrder || 1) ? -1 : 1));
 
-  const doc = useSelector((state) => state.documents.list)?.find((e) => e.id === id) as IMovementDocument | undefined;
+  const doc = useMemo(() => documents?.find((e) => e.id === id) as IMovementDocument | undefined, [documents, id]);
 
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {
@@ -57,13 +57,28 @@ export const DocEditScreen = () => {
     status: docStatus,
     fromContactType: docFromContactType,
     toContactType: docToContactType,
-  } = useMemo(() => {
-    return formParams;
-  }, [formParams]);
+  } = useSelector((state) => state.app.formParams as IDocFormParam);
+
+  const departmentSetting = useSelector((state) => state.auth.user?.settings?.toDepartment?.data);
+
+  const defaultToDepartment = useMemo(
+    () =>
+      isNamedEntity(departmentSetting) && (docToContactType ? docToContactType?.id === 'department' : true)
+        ? departmentSetting
+        : undefined,
+    [departmentSetting, docToContactType],
+  );
 
   const documentType = useMemo(
     () => documentTypes?.find((d) => d.id === docDocumentType?.id),
     [docDocumentType, documentTypes],
+  );
+
+  const dt = documentTypes?.[0];
+
+  const dtToContact = useMemo(
+    () => contactTypes.find((item) => (defaultToDepartment ? item.id === 'department' : item.id === dt?.toType)),
+    [defaultToDepartment, dt?.toType],
   );
 
   useEffect(() => {
@@ -90,7 +105,6 @@ export const DocEditScreen = () => {
         }),
       );
     } else {
-      const dt = documentTypes?.[0];
       const newNumber = getNextDocNumber(documents);
       dispatch(
         appActions.setFormParams({
@@ -99,84 +113,101 @@ export const DocEditScreen = () => {
           status: 'DRAFT',
           documentType: dt,
           fromContactType: contactTypes.find((item) => item.id === dt?.fromType),
-          toContactType: contactTypes.find((item) => item.id === dt?.toType),
+          toContactType: dtToContact,
+          toContact: defaultToDepartment,
         }),
       );
     }
-  }, [dispatch, doc, documents, documentTypes]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, doc, documentTypes]);
 
-  const handleSave = useCallback(() => {
-    if (
-      !documentType ||
-      !docDocumentType ||
-      !docNumber ||
-      !docDate ||
-      (documentType.fromRequired && !docFromContact) ||
-      (documentType.toRequired && !docToContact)
-    ) {
-      return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
-    }
+  const [screenState, setScreenState] = useState<ScreenState>('idle');
 
-    if (documentType.isRemains && docDate && new Date(docDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)) {
-      Alert.alert('Внимание!', 'Нельзя выбрать дату меньше текущей.', [{ text: 'OK' }]);
-      return;
-    }
+  useEffect(() => {
+    if (screenState === 'saving') {
+      if (
+        !documentType ||
+        !docDocumentType ||
+        !docNumber ||
+        !docDate ||
+        (documentType.fromRequired && !docFromContact) ||
+        (documentType.toRequired && !docToContact)
+      ) {
+        setScreenState('idle');
 
-    const docId = !id ? generateId() : id;
-    const createdDate = new Date().toISOString();
+        return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
+      }
 
-    if (!id) {
-      const newDoc: IMovementDocument = {
-        id: docId,
-        documentType: docDocumentType,
-        number: docNumber && docNumber.trim(),
-        documentDate: docDate,
-        status: 'DRAFT',
-        head: {
-          comment: docComment && docComment.trim(),
-          fromContact: docFromContact,
-          toContact: docToContact,
-          fromContactType: docFromContactType,
-          toContactType: docToContactType,
-        },
-        lines: [],
-        creationDate: createdDate,
-        editionDate: createdDate,
-      };
+      if (
+        documentType.isRemains &&
+        docDate &&
+        new Date(docDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)
+      ) {
+        Alert.alert('Внимание!', 'Нельзя выбрать дату меньше текущей.', [{ text: 'OK' }]);
+        setScreenState('idle');
 
-      dispatch(documentActions.addDocument(newDoc));
-
-      navigation.dispatch(StackActions.replace('DocView', { id: newDoc.id }));
-    } else {
-      if (!doc) {
         return;
       }
 
-      const updatedDate = new Date().toISOString();
+      const docId = !id ? generateId() : id;
+      const createdDate = new Date().toISOString();
 
-      const updatedDoc: IMovementDocument = {
-        ...doc,
-        id,
-        number: docNumber && docNumber.trim(),
-        status: docStatus || 'DRAFT',
-        documentDate: docDate,
-        documentType: docDocumentType,
-        errorMessage: undefined,
-        head: {
-          ...doc.head,
-          comment: docComment && docComment.trim(),
-          fromContact: docFromContact,
-          toContact: docToContact,
-          fromContactType: docFromContactType,
-          toContactType: docToContactType,
-        },
-        lines: doc.lines,
-        creationDate: doc.creationDate || updatedDate,
-        editionDate: updatedDate,
-      };
+      if (!id) {
+        const newDoc: IMovementDocument = {
+          id: docId,
+          documentType: docDocumentType,
+          number: docNumber && docNumber.trim(),
+          documentDate: docDate,
+          status: 'DRAFT',
+          head: {
+            comment: docComment && docComment.trim(),
+            fromContact: docFromContact,
+            toContact: docToContact,
+            fromContactType: docFromContactType,
+            toContactType: docToContactType,
+          },
+          lines: [],
+          creationDate: createdDate,
+          editionDate: createdDate,
+        };
 
-      dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
-      navigation.navigate('DocView', { id });
+        dispatch(documentActions.addDocument(newDoc));
+
+        navigation.dispatch(StackActions.replace('DocView', { id: newDoc.id }));
+      } else {
+        if (!doc) {
+          setScreenState('idle');
+
+          return;
+        }
+
+        const updatedDate = new Date().toISOString();
+
+        const updatedDoc: IMovementDocument = {
+          ...doc,
+          id,
+          number: docNumber && docNumber.trim(),
+          status: docStatus || 'DRAFT',
+          documentDate: docDate,
+          documentType: docDocumentType,
+          errorMessage: undefined,
+          head: {
+            ...doc.head,
+            comment: docComment && docComment.trim(),
+            fromContact: docFromContact,
+            toContact: docToContact,
+            fromContactType: docFromContactType,
+            toContactType: docToContactType,
+          },
+          lines: doc.lines,
+          creationDate: doc.creationDate || updatedDate,
+          editionDate: updatedDate,
+        };
+
+        dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
+        setScreenState('idle');
+        navigation.navigate('DocView', { id });
+      }
     }
   }, [
     documentType,
@@ -193,9 +224,13 @@ export const DocEditScreen = () => {
     navigation,
     doc,
     docStatus,
+    screenState,
   ]);
 
-  const renderRight = useCallback(() => <SaveButton onPress={handleSave} />, [handleSave]);
+  const renderRight = useCallback(
+    () => <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />,
+    [screenState],
+  );
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -244,6 +279,7 @@ export const DocEditScreen = () => {
       refName: docFromContactType.id,
       fieldName: 'fromContact',
       value: docFromContact && [docFromContact],
+      descrFieldName: 'taxId',
     });
   };
 
@@ -263,6 +299,7 @@ export const DocEditScreen = () => {
       refName: docToContactType.id,
       fieldName: 'toContact',
       value: docToContact && [docToContact],
+      descrFieldName: 'taxId',
     });
   };
 
@@ -276,7 +313,7 @@ export const DocEditScreen = () => {
         appActions.setFormParams({
           fromContact: undefined,
           fromContactType: contactTypes.find((item) => item.id === documentType?.fromType),
-          toContact: undefined,
+          toContact: defaultToDepartment ? defaultToDepartment : undefined,
           toContactType: contactTypes.find((item) => item.id === documentType?.toType),
         }),
       );
@@ -376,14 +413,9 @@ export const DocEditScreen = () => {
     [colors.card, colors.primary],
   );
 
-  const isFocused = useIsFocused();
-  if (!isFocused) {
-    return <AppActivityIndicator />;
-  }
-
   return (
     <AppScreen>
-      <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }}>
+      <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} keyboardShouldPersistTaps={'handled'}>
         <SubTitle>{statusName}</SubTitle>
         <Divider />
         <ScrollView>
@@ -401,6 +433,7 @@ export const DocEditScreen = () => {
             onChangeText={handleChangeNumber}
             disabled={isBlocked}
             clearInput={true}
+            keyboardType="url"
           />
           <SelectableInput
             label="Дата"

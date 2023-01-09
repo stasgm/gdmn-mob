@@ -1,8 +1,8 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { ListRenderItem, SectionList, SectionListData, View } from 'react-native';
-import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
-import { documentActions, useDispatch, useSelector } from '@lib/store';
+import { documentActions, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   AddButton,
@@ -15,14 +15,13 @@ import {
   IListItemProps,
   DeleteButton,
   CloseButton,
-  AppActivityIndicator,
   EmptyList,
   navBackDrawer,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@lib/mobile-app';
+import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@lib/mobile-hooks';
 
 import { IDelList } from '@lib/mobile-types';
 
@@ -37,7 +36,7 @@ export type SectionDataProps = SectionListData<IListItemProps, FreeShipmentListS
 
 export const FreeShipmentListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<FreeShipmentStackParamList, 'FreeShipmentList'>>();
-  const dispatch = useDispatch();
+  const docDispatch = useDocThunkDispatch();
 
   const list = (
     useSelector((state) => state.documents.list)?.filter(
@@ -100,12 +99,12 @@ export const FreeShipmentListScreen = () => {
     const docIds = Object.keys(delList);
 
     const deleteDocs = () => {
-      dispatch(documentActions.removeDocuments(docIds));
+      docDispatch(documentActions.removeDocuments(docIds));
       setDelList({});
     };
 
     deleteSelectedItems(delList, deleteDocs);
-  }, [delList, dispatch]);
+  }, [delList, docDispatch]);
 
   const renderRight = useCallback(
     () => (
@@ -150,11 +149,6 @@ export const FreeShipmentListScreen = () => {
   const renderSectionHeader = ({ section }: any) => (
     <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
-
-  const isFocused = useIsFocused();
-  if (!isFocused) {
-    return <AppActivityIndicator />;
-  }
 
   return (
     <AppScreen>

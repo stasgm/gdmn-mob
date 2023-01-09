@@ -1,11 +1,15 @@
-import React, { useCallback, useEffect } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
+import React, { useCallback, useEffect } from 'react';
 
-import { authActions, useSelector, useAuthThunkDispatch } from '@lib/store';
-import { AuthLogOut, IUserCredentials } from '@lib/types';
-import { IApiConfig } from '@lib/client-types';
 import api from '@lib/client-api';
+import { IApiConfig } from '@lib/client-types';
+import { authActions, useAuthThunkDispatch, useSelector } from '@lib/store';
+import { IUserCredentials } from '@lib/types';
+import { mobileRequest } from '@lib/mobile-hooks';
+
 import Constants from 'expo-constants';
+
+import { device } from '@lib/mock';
 
 import {
   SplashScreen,
@@ -20,13 +24,14 @@ import { AuthStackParamList } from './types';
 
 const AuthStack = createStackNavigator<AuthStackParamList>();
 
-const AuthNavigator: React.FC = () => {
+const AuthNavigator = () => {
   const { config, isDemo, isInit, user, isConfigFirst, connectionStatus, isLogout } = useSelector(
     (state) => state.auth,
   );
 
   const authDispatch = useAuthThunkDispatch();
-
+  // const appRequest = useMemo(() => mobileRequest(authDispatch, authActions), [authDispatch]);
+  // const appRequest: CustomRequest = () => {};
   /*
     При запуске приложения
     - устанавливаем isInit, чтобы открылось окно выбора режима (демо или подключение к серверу).
@@ -57,11 +62,9 @@ const AuthNavigator: React.FC = () => {
   );
 
   const logout = useCallback(async () => {
-    await authDispatch(authActions.logout());
+    await authDispatch(authActions.logout(mobileRequest(authDispatch, authActions)));
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
   }, [authDispatch]);
-
-  const authMiddleware: AuthLogOut = useCallback(() => authDispatch(authActions.logout()), [authDispatch]);
 
   const checkDevice = useCallback(async () => {
     //Если в настройках записан deviceId, то получаем от сервера устройство,
@@ -69,24 +72,38 @@ const AuthNavigator: React.FC = () => {
     if (isLogout && config?.deviceId && user) {
       logout();
     } else {
-      const objGetStatus = await authDispatch(authActions.getDeviceStatus(config?.deviceId));
+      const objGetStatus = await authDispatch(
+        authActions.getDeviceStatus(mobileRequest(authDispatch, authActions), config?.deviceId),
+      );
+      //TODO: надо обработать случай, если пришла ошибка, что не нашлось устройство по uid
+      // if (objGetStatus.type === 'AUTH/GET_DEVICE_STATUS_FAILURE') {
+      //   authDispatch(authActions.setConfig({ ...config, deviceId: undefined }));
+      //   api.config = { ...api.config, deviceId: undefined };
+      //   return;
+      // }
       //Получим устройство по uid
-      if (config?.deviceId && user && objGetStatus.type !== 'AUTH/GET_DEVICE_STATUS_FAILURE') {
+      if (
+        config?.deviceId &&
+        user &&
+        user.erpUser?.id &&
+        objGetStatus.type !== 'AUTH/GET_DEVICE_STATUS_FAILURE' &&
+        !device
+      ) {
         await authDispatch(
           authActions.getDeviceByUid(
+            mobileRequest(authDispatch, authActions),
             config.deviceId,
-            user.erpUser!.id,
+            user.erpUser.id,
             Constants.manifest?.extra?.slug,
-            authMiddleware,
           ),
         );
       }
     }
-  }, [authDispatch, authMiddleware, config.deviceId, isLogout, logout, user]);
+  }, [authDispatch, config.deviceId, isLogout, logout, user]);
 
   const activateDevice = useCallback(
     async (code: string) => {
-      const res = await authDispatch(authActions.activateDevice(code));
+      const res = await authDispatch(authActions.activateDevice(mobileRequest(authDispatch, authActions), code));
       if (res.type === 'AUTH/ACTIVATE_DEVICE_SUCCESS') {
         //Если устройство прошло активацию по коду,
         //то запишем uId в конфиг api и в настройки
@@ -99,29 +116,32 @@ const AuthNavigator: React.FC = () => {
 
   const login = useCallback(
     async (credentials: IUserCredentials) => {
-      const res = await authDispatch(authActions.login(credentials, Constants.manifest?.extra?.slug, authMiddleware));
+      const res = await authDispatch(
+        authActions.login(mobileRequest(authDispatch, authActions), credentials, Constants.manifest?.extra?.slug),
+      );
       if (config?.deviceId && res.type === 'AUTH/LOGIN_SUCCESS') {
         await authDispatch(
           authActions.getDeviceByUid(
+            mobileRequest(authDispatch, authActions),
             config.deviceId,
             res.payload?.erpUser?.id,
             Constants.manifest?.extra?.slug,
-            logout,
           ),
         );
       }
     },
-    [authDispatch, authMiddleware, config.deviceId, logout],
+    [authDispatch, config.deviceId],
   );
 
   const setCompany = useCallback(async () => {
     if (!user?.company) {
       return;
     }
-    const res = await authDispatch(authActions.getCompany(user.company.id));
-    if (res.type === 'AUTH/GET_COMPANY_SUCCESS') {
-      authDispatch(authActions.setCompany(res.payload));
-    }
+    // authDispatch(authActions.setCompany(user.company as ICompany));
+    await authDispatch(authActions.getCompany(mobileRequest(authDispatch, authActions), user.company.id));
+    // if (res.type === 'AUTH/GET_COMPANY_SUCCESS') {
+    //   authDispatch(authActions.setCompany(res.payload));
+    // }
   }, [authDispatch, user?.company]);
 
   const SplashWithParams = useCallback(
@@ -180,7 +200,7 @@ const AuthNavigator: React.FC = () => {
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
       {isInit ? (
         <AuthStack.Screen name="Mode" component={ModeSelection} />
-      ) : connectionStatus === 'connected' ? (
+      ) : connectionStatus === 'connected' || connectionStatus === 'not-checked' ? (
         !user ? (
           <AuthStack.Screen name="Login" component={SignInWithParams} options={{ animationTypeForReplace: 'pop' }} />
         ) : (

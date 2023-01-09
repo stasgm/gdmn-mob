@@ -1,14 +1,21 @@
+import { SuccessResponse } from '@lib/types';
 import { Context } from 'koa';
 
 import log from '../utils/logger';
 
-export const ok = (ctx: Context, data?: any, logMessage?: string, logData?: boolean) => {
+export const ok = <T>(ctx: Context, data?: T, logMessage?: string, logData?: boolean) => {
   ctx.statusMessage = 'success result';
   ctx.status = 200;
+  // ctx.body = {
+  //   result: true,
+  //   data,
+  // };
   ctx.body = {
     result: true,
+    type: 'SUCCESS',
+    status: 200,
     data,
-  };
+  } as SuccessResponse<T>;
   if (logMessage) {
     if (logData) {
       log.info(logMessage, data);
@@ -20,8 +27,14 @@ export const ok = (ctx: Context, data?: any, logMessage?: string, logData?: bool
 
 export const created = (ctx: Context, data?: any, logMessage?: string, logData?: boolean) => {
   ctx.status = 201;
+  // ctx.body = {
+  //   result: true,
+  //   data,
+  // };
   ctx.body = {
     result: true,
+    type: 'SUCCESS',
+    status: 201,
     data,
   };
   if (logMessage) {
@@ -34,6 +47,11 @@ export const created = (ctx: Context, data?: any, logMessage?: string, logData?:
 };
 
 export const notOk = (ctx: Context) => {
-  ctx.status = 201;
-  ctx.body = { result: false };
+  ctx.status = 400;
+  // ctx.body = { result: false };
+  ctx.body = {
+    result: false,
+    type: 'FAILURE',
+    status: 400,
+  };
 };

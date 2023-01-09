@@ -1,4 +1,4 @@
-import { getDateString, keyExtractor } from '@lib/mobile-app';
+import { getDateString, keyExtractor } from '@lib/mobile-hooks';
 import {
   AppActivityIndicator,
   AppScreen,
@@ -122,7 +122,6 @@ const ContactListScreen = () => {
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
               selectionColor={colors.primary}
-              keyboardType="url"
             />
           </View>
           <ItemSeparator />

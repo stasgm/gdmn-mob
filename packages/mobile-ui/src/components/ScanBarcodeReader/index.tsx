@@ -29,6 +29,8 @@ interface IProps {
   onClearScannedObject: () => void;
   children?: ReactNode;
   onSearch?: () => void;
+  isLeftButton?: boolean;
+  onCancel?: () => void;
 }
 
 const ScanBarcodeReader = ({
@@ -38,6 +40,8 @@ const ScanBarcodeReader = ({
   onClearScannedObject,
   children,
   onSearch,
+  isLeftButton,
+  onCancel,
 }: IProps) => {
   const ref = useRef<TextInput>(null);
 
@@ -106,6 +110,9 @@ const ScanBarcodeReader = ({
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={viewStyle}>
       <View style={styles.camera}>
         <View style={styles.header}>
+          {isLeftButton ? (
+            <IconButton icon="arrow-left" color={'#FFF'} size={30} style={styles.transparent} onPress={onCancel} />
+          ) : null}
           <IconButton
             icon={vibroMode ? 'vibrate' : 'vibrate-off'}
             size={30}
@@ -125,7 +132,8 @@ const ScanBarcodeReader = ({
           <View style={[styles.scannerContainer, styles.notScannedContainer]}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
               <TextInput
-                style={styles.scanFocus}
+                style={styles.scanFocusWithWidth}
+                selectionColor="transparent"
                 autoFocus={true}
                 ref={ref}
                 showSoftInputOnFocus={false}

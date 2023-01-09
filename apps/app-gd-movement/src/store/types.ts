@@ -43,6 +43,7 @@ export interface IContact extends INamedEntity, IReferenceData {
   contractDate: string; // Дата договора
   paycond: string; // Условие оплаты
   phoneNumber: string; // Номер телефона
+  taxId?: string; //УНП
 }
 
 export interface IMovementHead extends IHead {
@@ -62,6 +63,7 @@ export interface IMovementLine extends IEntity {
   barcode?: string;
   EID?: string;
   docType?: string;
+  weightCode?: string;
 }
 
 export type IMovementDocument = MandateProps<IDocument<IMovementHead, IMovementLine>, 'head' | 'lines'>;
@@ -73,6 +75,7 @@ export interface IScanHead extends IHead {
 
 export interface IScanLine extends IEntity {
   barcode: string;
+  sortOrder?: number;
 }
 
 export type IScanDocument = MandateProps<IDocument<IScanHead, IScanLine>, 'head' | 'lines'>;

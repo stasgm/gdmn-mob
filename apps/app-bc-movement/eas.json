@@ -1,0 +1,15 @@
+{
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "android": {
+        "distribution": "internal",
+        "buildType": "apk"
+      }
+    },
+    "production": {"node": "16.14.0"}
+  }
+}

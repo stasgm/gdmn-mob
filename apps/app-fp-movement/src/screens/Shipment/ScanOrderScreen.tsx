@@ -6,7 +6,7 @@ import { useSelector, refSelectors, docSelectors, documentActions, useDispatch }
 
 import { IDocumentType } from '@lib/types';
 
-import { generateId } from '@lib/mobile-app';
+import { generateId } from '@lib/mobile-hooks';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 

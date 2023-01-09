@@ -1,8 +1,8 @@
-import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
-
 import React from 'react';
 import { StyleProp, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { useTheme } from 'react-native-paper';
+
+import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 
 import styles from '../styles/global';
 

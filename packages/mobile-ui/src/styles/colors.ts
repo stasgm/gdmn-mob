@@ -6,4 +6,7 @@ export default {
   light: '#3e92cc',
   black: '#000000',
   backgroundLight: '#e4e4e4',
+  card: 'rgb(255, 255, 255)',
+  border: 'rgb(216, 216, 216)',
+  background: 'rgb(242, 242, 242)',
 };

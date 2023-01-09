@@ -1,6 +1,6 @@
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
-import { AppInventoryState, IMDGoodRemain, IModelData } from './types';
+import { AppInventoryState, IMDGoodRemains, IModelData } from './types';
 
 const init = createAction('APP_INVENTORY/INIT')();
 const loadData = createAction('APP_INVENTORY/LOAD_DATA')<AppInventoryState>();
@@ -12,7 +12,7 @@ const setModelAsync = createAsyncAction(
   'APP_INVENTORY/SET_MODEL',
   'APP_INVENTORY/SET_MODEL_SUCCESS',
   'APP_INVENTORY/SET_MODEL_FAILURE',
-)<string | undefined, IModelData<IMDGoodRemain>, string>();
+)<string | undefined, IModelData<IMDGoodRemains>, string>();
 
 export const actions = {
   init,

@@ -1,5 +1,5 @@
 import React, { useLayoutEffect } from 'react';
-import { View } from 'react-native';
+import { Alert, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { settingsActions, useDispatch, useSelector } from '@lib/store';
@@ -27,6 +27,30 @@ const SettingsDetailsScreen = () => {
     dispatch(settingsActions.updateOption({ optionName, value }));
   };
 
+  const handleUpdateAutoSynch = (optionName: string, value: ISettingsOption) => {
+    const synchPeriod = list.find(([item, _]) => item === 'synchPeriod')?.[1]?.data;
+    if (optionName === 'autoSynchPeriod' && synchPeriod && value.data < synchPeriod) {
+      dispatch(settingsActions.updateOption({ optionName, value: { ...value, data: synchPeriod } }));
+
+      Alert.alert('Внимание!', 'Период автосинхронизации не может быть меньше периода синхронизации на сервере.', [
+        { text: 'OK' },
+      ]);
+    }
+
+    if (optionName === 'autoSync') {
+      const autoSynchPeriod = list.find(([itema, _]) => itema === 'autoSynchPeriod')?.[1];
+
+      if (autoSynchPeriod) {
+        dispatch(
+          settingsActions.updateOption({
+            optionName: 'autoSynchPeriod',
+            value: { ...autoSynchPeriod, readonly: !value.data ? false : true },
+          }),
+        );
+      }
+    }
+  };
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackButton,
@@ -38,7 +62,12 @@ const SettingsDetailsScreen = () => {
     <AppScreen>
       <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={[{ padding: 5, flexDirection: 'column' }]}>
         <View>
-          <SettingsGroup list={list} groupDescription={groupDescription} onValueChange={handleUpdate} />
+          <SettingsGroup
+            list={list}
+            groupDescription={groupDescription}
+            onValueChange={handleUpdate}
+            onCheckSettings={handleUpdateAutoSynch}
+          />
         </View>
       </KeyboardAwareScrollView>
     </AppScreen>

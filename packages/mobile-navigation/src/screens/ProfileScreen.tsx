@@ -3,7 +3,18 @@ import { Alert, View, StyleSheet } from 'react-native';
 import { Avatar, Divider } from 'react-native-paper';
 import { useNavigation, useTheme } from '@react-navigation/native';
 
-import { authActions, useSelector, useDispatch, documentActions, referenceActions, appActions } from '@lib/store';
+import {
+  authActions,
+  useSelector,
+  useDispatch,
+  documentActions,
+  referenceActions,
+  appActions,
+  useAuthThunkDispatch,
+  useDocThunkDispatch,
+  useSettingThunkDispatch,
+  settingsActions,
+} from '@lib/store';
 
 import {
   MenuButton,
@@ -18,6 +29,7 @@ import {
   navBackDrawer,
 } from '@lib/mobile-ui';
 import api from '@lib/client-api';
+import { mobileRequest } from '@lib/mobile-hooks';
 
 const ProfileScreen = () => {
   const { colors } = useTheme();
@@ -27,6 +39,8 @@ const ProfileScreen = () => {
   const userSettings = user?.settings;
 
   const dispatch = useDispatch();
+  const authDispatch = useAuthThunkDispatch();
+  const settingsDispatch = useSettingThunkDispatch();
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
 
@@ -51,7 +65,7 @@ const ProfileScreen = () => {
       {
         text: 'Да',
         onPress: () => {
-          dispatch(authActions.setUserSettings({}));
+          authDispatch(authActions.setUserSettings({}));
         },
       },
       {
@@ -60,8 +74,34 @@ const ProfileScreen = () => {
     ]);
   };
 
+  const handleClearAll = () => {
+    Alert.alert(
+      'Вы уверены, что хотите выйти и удалить все данные?',
+      'После удаления данные не подлежат восстановлению.',
+      [
+        {
+          text: 'Да',
+          onPress: () => {
+            dispatch(appActions.clearSuperDataFromDisc());
+            //Очищаем данные пользователя после всего
+            dispatch(authActions.init());
+            dispatch(authActions.setInit(true));
+          },
+        },
+        {
+          text: 'Отмена',
+        },
+      ],
+    );
+  };
+
   const actionsMenu = useCallback(() => {
     showActionSheet([
+      {
+        title: 'Выйти и удалить все данные',
+        type: 'destructive',
+        onPress: handleClearAll,
+      },
       {
         title: 'Удалить все справочники и документы',
         type: 'destructive',
@@ -87,7 +127,7 @@ const ProfileScreen = () => {
   }, [navigation]);
 
   const handleLogout = () => {
-    dispatch(authActions.logout());
+    authDispatch(authActions.logout(mobileRequest(dispatch, authActions)));
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
   };
 
@@ -149,7 +189,7 @@ const ProfileScreen = () => {
           </View>
         )}
         <View>
-          <PrimeButton outlined onPress={handleLogout} disabled={loading}>
+          <PrimeButton outlined onPress={handleLogout} disabled={loading} loadIcon={loading}>
             {isDemo ? 'Выйти из демо режима' : 'Сменить пользователя'}
           </PrimeButton>
         </View>
@@ -166,6 +206,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 12,
     fontSize: 20,
+    paddingVertical: 3,
+    marginVertical: 6,
   },
   subHeading: {
     width: '85%',

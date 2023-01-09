@@ -1,33 +1,35 @@
 import { styles } from '@lib/mobile-navigation';
-import { ItemSeparator, QuantityInput } from '@lib/mobile-ui';
+import { ItemSeparator, NumberKeypad } from '@lib/mobile-ui';
 
-import React, { useEffect, useMemo, useState } from 'react';
-import { StyleSheet, View, Text, ScrollView, TextInput } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { StyleSheet, View, Text, ScrollView, TextInput, Keyboard } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { INamedEntity } from '@lib/types';
 
 import { IOrderLine, IPackageGood } from '../../../store/types';
 
+import { ONE_SECOND_IN_MS } from '../../../utils/constants';
+
 import Checkbox from './Checkbox';
 
 interface IProps {
-  visibleQuantityInput: boolean;
   item: IOrderLine;
   packages: IPackageGood[];
   onSetLine: (value: IOrderLine) => void;
 }
 
-const OrderLine = ({ item, packages, onSetLine, visibleQuantityInput }: IProps) => {
+const OrderLine = ({ item, packages, onSetLine }: IProps) => {
   const { colors } = useTheme();
-  const inputRef = React.useRef<TextInput>(null);
+  const currRef = useRef<TextInput>(null);
 
   useEffect(() => {
-    // TODO временное решение
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 1000);
-  }, [inputRef]);
+    currRef?.current &&
+      setTimeout(() => {
+        currRef.current?.focus();
+        Keyboard.dismiss();
+      }, ONE_SECOND_IN_MS);
+  }, []);
 
   // Если упаковка только одна, то ставим ее по умолчанию, иначе
   // если есть упаковка с признаком 'по умолчанию', то подставляем ее
@@ -46,11 +48,10 @@ const OrderLine = ({ item, packages, onSetLine, visibleQuantityInput }: IProps) 
   }, [pack]);
 
   const textStyle = [styles.number, styles.field, { color: colors.text, blackgroundColor: 'transparent' }];
-  const textPackStyle = [localStyles.text, { color: colors.text }, { marginTop: 4 }];
 
   return (
-    <ScrollView keyboardShouldPersistTaps={'handled'} style={{ backgroundColor: colors.background }}>
-      <View style={styles.content}>
+    <View style={localStyles.container}>
+      <ScrollView keyboardShouldPersistTaps={'handled'} contentContainerStyle={localStyles.containerScroll}>
         <View style={styles.item}>
           <View style={styles.details}>
             <Text style={styles.name}>Наименование</Text>
@@ -62,21 +63,6 @@ const OrderLine = ({ item, packages, onSetLine, visibleQuantityInput }: IProps) 
           <View style={styles.details}>
             <Text style={styles.name}>Цена</Text>
             <Text style={textStyle}>{item.good.priceFsn}</Text>
-          </View>
-        </View>
-        <ItemSeparator />
-        <View style={styles.item}>
-          <View style={styles.details}>
-            <Text style={styles.name}>Количество, кг</Text>
-            {visibleQuantityInput ? (
-              <QuantityInput
-                inputRef={inputRef}
-                value={item.quantity.toString()}
-                onChangeText={(newValue) => onSetLine({ ...item, quantity: parseFloat(newValue) })}
-              />
-            ) : (
-              <View style={localStyles.quantityItem} />
-            )}
           </View>
         </View>
         <ItemSeparator />
@@ -95,24 +81,46 @@ const OrderLine = ({ item, packages, onSetLine, visibleQuantityInput }: IProps) 
                 ))}
               </View>
             ) : (
-              <Text style={textPackStyle}>Без упаковки</Text>
+              <Text style={[textStyle, localStyles.pack]}>Без упаковки</Text>
             )}
           </View>
         </View>
         <ItemSeparator />
-      </View>
-    </ScrollView>
+        <View style={styles.item}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Количество, кг</Text>
+            <TextInput
+              style={[textStyle, localStyles.quantityItem]}
+              showSoftInputOnFocus={false}
+              caretHidden={true}
+              ref={currRef}
+              value={item.quantity.toString()}
+            />
+          </View>
+        </View>
+      </ScrollView>
+      <NumberKeypad
+        oldValue={item.quantity.toString()}
+        onApply={(newValue) => onSetLine({ ...item, quantity: parseFloat(newValue) })}
+        decDigitsForTotal={3}
+      />
+    </View>
   );
 };
 
 const localStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    margin: 5,
+  },
+  containerScroll: {
+    flexGrow: 1,
+  },
   packages: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-  },
-  text: {
-    paddingHorizontal: 10,
-    paddingBottom: 10,
   },
   item: {
     alignItems: 'center',
@@ -121,7 +129,10 @@ const localStyles = StyleSheet.create({
     marginTop: 3,
   },
   quantityItem: {
-    height: 28,
+    fontSize: 40,
+  },
+  pack: {
+    marginVertical: 6,
   },
 });
 

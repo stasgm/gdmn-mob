@@ -1,6 +1,6 @@
 import { customAlphabet } from 'nanoid';
 
-const extraPredicate = <T>(item: T, params: Record<string, string>) => {
+const extraPredicate = (item: any, params: Record<string, string>) => {
   let matched = 0;
 
   const paramsEntries = Object.entries(params);

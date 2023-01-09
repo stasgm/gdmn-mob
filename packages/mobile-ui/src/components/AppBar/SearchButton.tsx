@@ -1,8 +1,7 @@
 import React from 'react';
+import { View } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import { useTheme } from '@react-navigation/native';
-
-import { View } from 'react-native';
 
 import styles from '../../styles/buttonRippleStyle';
 

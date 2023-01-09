@@ -1,9 +1,9 @@
-import { IListItem } from '@lib/mobile-types';
 import React from 'react';
 import { StyleSheet, View, Text, StyleProp, ViewStyle, TouchableHighlight } from 'react-native';
 import { IconButton, Menu as PaperMenu, useTheme } from 'react-native-paper';
 import { IconSource } from 'react-native-paper/lib/typescript/components/Icon';
 
+import { IListItem } from '@lib/mobile-types';
 interface Props {
   options: IListItem[];
   activeOptionId?: string;

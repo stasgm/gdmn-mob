@@ -1,8 +1,8 @@
 import React from 'react';
 import { TouchableOpacity, View, Text } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { IReference } from '@lib/types';
 

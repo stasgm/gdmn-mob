@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
 import { SectionList, ListRenderItem, SectionListData, View } from 'react-native';
-import { useFocusEffect, useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
 import { Searchbar } from 'react-native-paper';
 
 import {
@@ -16,17 +16,16 @@ import {
   DeleteButton,
   CloseButton,
   EmptyList,
-  AppActivityIndicator,
   SearchButton,
   MediumText,
   navBackDrawer,
 } from '@lib/mobile-ui';
 
-import { documentActions, useDispatch, useSelector } from '@lib/store';
+import { documentActions, useDocThunkDispatch, useSelector } from '@lib/store';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@lib/mobile-app';
+import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@lib/mobile-hooks';
 
 import { IDelList } from '@lib/mobile-types';
 
@@ -49,7 +48,7 @@ export type SectionDataProps = SectionListData<IListItemProps, ScanListSectionPr
 
 export const ScanListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ScanStackParamList, 'ScanList'>>();
-  const dispatch = useDispatch();
+  const docDispatch = useDocThunkDispatch();
 
   const { colors } = useTheme();
 
@@ -65,12 +64,12 @@ export const ScanListScreen = () => {
     const docIds = Object.keys(delList);
 
     const deleteDocs = () => {
-      dispatch(documentActions.removeDocuments(docIds));
+      docDispatch(documentActions.removeDocuments(docIds));
       setDelList({});
     };
 
     deleteSelectedItems(delList, deleteDocs);
-  }, [delList, dispatch]);
+  }, [delList, docDispatch]);
 
   const handleAddDocument = useCallback(() => {
     navigation.navigate('ScanEdit');
@@ -116,7 +115,6 @@ export const ScanListScreen = () => {
   useFocusEffect(
     React.useCallback(() => {
       if (!searchQuery) {
-        // setFilteredList({ searchQuery, list: list.filter((i) => i.documentType.name !== 'scan') });
         setFilteredList({
           searchQuery,
           list: list
@@ -248,11 +246,6 @@ export const ScanListScreen = () => {
     [],
   );
 
-  const isFocused = useIsFocused();
-  if (!isFocused) {
-    return <AppActivityIndicator />;
-  }
-
   return (
     <AppScreen>
       <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} />
@@ -277,7 +270,6 @@ export const ScanListScreen = () => {
         keyExtractor={keyExtractor}
         ItemSeparatorComponent={ItemSeparator}
         renderSectionHeader={renderSectionHeader}
-        // refreshControl={<RefreshControl refreshing={loading} title="идет загрузка данных..." />}
         ListEmptyComponent={EmptyList}
       />
     </AppScreen>

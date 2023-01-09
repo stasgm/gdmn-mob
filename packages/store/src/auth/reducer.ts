@@ -4,10 +4,10 @@ import { getType } from 'typesafe-actions';
 
 import { config } from '@lib/client-config';
 
-import { device as mockDevice, user as mockUser, company as mockCompany } from '@lib/mock';
+import { company as mockCompany, device as mockDevice, user as mockUser, appSystem as mockAppSystem } from '@lib/mock';
 
+import { actions, AuthActionType } from './actions';
 import { AuthState } from './types';
-import { AuthActionType, actions } from './actions';
 
 const {
   server: { name, port, protocol },
@@ -21,6 +21,7 @@ export const initialState: Readonly<AuthState> = {
   user: undefined,
   device: undefined,
   company: undefined,
+  appSystem: undefined,
   connectionStatus: 'not-connected',
   config: {
     apiPath,
@@ -40,6 +41,7 @@ export const initialState: Readonly<AuthState> = {
   isInit: false,
   isConfigFirst: true,
   isLogout: false,
+  errorMessage: '',
 };
 
 const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, action): AuthState => {
@@ -142,6 +144,9 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
     case getType(actions.setCompany):
       return { ...state, company: action.payload };
 
+    case getType(actions.setAppSystem):
+      return { ...state, appSystem: action.payload };
+
     case getType(actions.disconnectAsync.request):
       return { ...state, error: false, status: '', loading: true };
 
@@ -170,7 +175,8 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
         loading: false,
         status: '',
         error: false,
-        connectionStatus: action.payload === 'ACTIVE' ? 'connected' : 'not-activated',
+        connectionStatus: action.payload,
+        // connectionStatus: action.payload === 'ACTIVE' ? 'connected' : 'not-activated',
       };
 
     case getType(actions.getDeviceStatusAsync.failure):
@@ -208,6 +214,7 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
         ...state,
         connectionStatus: 'connected',
         user: mockUser,
+        appSystem: mockAppSystem,
         device: mockDevice,
         company: mockCompany,
         loadingData: false,
@@ -216,6 +223,24 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
 
     case getType(actions.setDemoModeAsync.failure):
       return { ...state, loadingData: false, status: '', error: true };
+
+    case getType(actions.setErrorMessage):
+      return { ...state, errorMessage: action.payload };
+
+    case getType(actions.getCompanyAsync.request):
+      return { ...state, loading: true, company: undefined, status: '', error: false };
+
+    case getType(actions.getCompanyAsync.success):
+      return {
+        ...state,
+        loading: false,
+        status: '',
+        error: false,
+        company: action.payload,
+      };
+
+    case getType(actions.getCompanyAsync.failure):
+      return { ...state, loading: false, status: action.payload, error: true };
 
     default:
       return state;

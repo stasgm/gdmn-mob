@@ -1,4 +1,4 @@
-import { log } from '@lib/mobile-app';
+import { log } from '@lib/mobile-hooks';
 import { IDocument } from '@lib/types';
 
 import { IGood, IMGoodData, IMGoodRemain, IModelRem, IRemainsData, IRemGood } from '../store/app/types';
@@ -17,7 +17,7 @@ export const getNextDocNumber = (documents: IDocument[]) => {
     "111111111" : { good: { id: '3', name: 'Товар 3', value: 'шт.', ...}},
   }
 */
-const getRemGoodByContact = (goods: IGood[], remains: IRemainsData[], isRemains: boolean | undefined = false) => {
+const getRemGoodByContact = (goods: IGood[], remains: IRemainsData[] = [], isRemains: boolean | undefined = false) => {
   log('getRemGoodByContact', 'Начало построения модели товаров по подразделению в разрезе штрихкодов');
 
   const remGoods: IMGoodData<IMGoodRemain> = {};
@@ -29,8 +29,9 @@ const getRemGoodByContact = (goods: IGood[], remains: IRemainsData[], isRemains:
 
       //Заполняем объект товаров по штрихкоду, если есть шк и (выбор не из остатков или есть остатки по товару)
       for (const good of goods) {
-        if (good.barcode && (!isRemains || remainsByGoodId[good.id])) {
-          remGoods[good.barcode] = {
+        const code = good.barcode || good.weightCode || good.alias;
+        if (code && (!isRemains || remainsByGoodId[good.id])) {
+          remGoods[code] = {
             good,
             remains: remainsByGoodId ? remainsByGoodId[good.id] : [],
           };
@@ -39,8 +40,9 @@ const getRemGoodByContact = (goods: IGood[], remains: IRemainsData[], isRemains:
     } else if (!isRemains) {
       //Если по контакту нет остатков и  выбор не из остатков, добавляем объект товара без remains
       for (const good of goods) {
-        if (good.barcode) {
-          remGoods[good.barcode] = { good };
+        const code = good.barcode || good.weightCode || good.alias;
+        if (code) {
+          remGoods[code] = { good };
         }
       }
     }
@@ -57,7 +59,11 @@ const getRemGoodByContact = (goods: IGood[], remains: IRemainsData[], isRemains:
     { good: { id: '2', name: 'Товар 2', value: 'шт.', ...}, price: 0, remains: 0}
   ]
 */
-const getRemGoodListByContact = (goods: IGood[], remains: IRemainsData[], isRemains: boolean | undefined = false) => {
+const getRemGoodListByContact = (
+  goods: IGood[],
+  remains: IRemainsData[] = [],
+  isRemains: boolean | undefined = false,
+) => {
   log('getRemGoodListByContact', 'Начало построения массива товаров по подразделению');
 
   const remGoods: IRemGood[] = [];

@@ -5,9 +5,10 @@ import { useTheme, Switch as SwitchComponent } from 'react-native-paper';
 type Props = {
   value: boolean;
   onValueChange: (newValue: boolean) => void;
+  disabled?: boolean;
 };
 
-const Switch = ({ value, onValueChange }: Props) => {
+const Switch = ({ value, onValueChange, disabled }: Props) => {
   const { colors } = useTheme();
   return (
     <View>
@@ -16,6 +17,7 @@ const Switch = ({ value, onValueChange }: Props) => {
         trackColor={{ false: colors.disabled, true: colors.accent }}
         value={value}
         onValueChange={() => onValueChange(!value)}
+        disabled={disabled}
       />
     </View>
   );

@@ -1,8 +1,10 @@
 import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import { Provider } from 'react-redux';
-import { dialCall, MobileApp } from '@lib/mobile-app';
+import { MobileApp } from '@lib/mobile-app';
 import { GDMN_EMAIL, GDMN_PHONE, GDMN_SITE_ADDRESS, INavItem } from '@lib/mobile-navigation';
 import ErrorBoundary from 'react-native-error-boundary';
+
+import { StatusBar } from 'expo-status-bar';
 
 import {
   appActions,
@@ -31,9 +33,9 @@ import { ActivityIndicator, Caption, Text } from 'react-native-paper';
 
 import { IDocument, IReferences, IUserSettings } from '@lib/types';
 
-import { sleep } from '@lib/client-api';
+import { sleep, dialCall } from '@lib/mobile-hooks';
 
-import { TouchableOpacity, Linking } from 'react-native';
+import { TouchableOpacity, Linking, ScrollView, View } from 'react-native';
 
 import Constants from 'expo-constants';
 
@@ -159,23 +161,30 @@ const Root = () => {
     <ErrorBoundary FallbackComponent={AppFallback}>
       {infoWindow === 1 ? (
         <AppScreen>
-          <Text style={styles.textInfo}>
-            {
-              'Добро пожаловать в GDMN Отгрузка!\n\nНаше приложение облегчает рабочий процесс кладовщика при перемещении продукции между подразделениями предприятия и при отгрузке продукции покупателю. Приложение позволяет выполнить следующие действия: \n\n1. Оформить документы внутреннего перемещения товаров между складскими подразделениями и экспедициями путем сканирования технологического штрих-кода\n\n2. Создать отвес-накладные, а также отвес-накладные по заявкам c контролем заявленного количества'
-            }
-          </Text>
-          <TouchableOpacity
-            style={styles.buttonPrev}
-            onPress={() => {
-              setInfoWindow(0);
-              dispatch(appActions.loadGlobalDataFromDisc());
-            }}
+          <ScrollView
+            contentContainerStyle={styles.contentContainerStyle}
+            maintainVisibleContentPosition={{ autoscrollToTopThreshold: 1, minIndexForVisible: 0 }}
+            style={styles.scrollContainer}
           >
-            <Text style={styles.textInfo}>{'« Назад'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonNext} onPress={handleSetInfoWindow_2}>
-            <Text style={styles.textInfo}>{'Далее »'}</Text>
-          </TouchableOpacity>
+            <Text style={styles.textInfo}>
+              {
+                'Добро пожаловать в GDMN Отгрузка!\nПриложение облегчает рабочий процесс кладовщика при перемещении продукции между подразделениями предприятия и при отгрузке продукции покупателю. Приложение позволяет выполнить следующие действия: \n\n1. Оформить документы внутреннего перемещения товаров между складскими подразделениями и экспедициями путем сканирования технологического штрих-кода\n\n2. Создать отвес-накладные, а также отвес-накладные по заявкам c контролем заявленного количества'
+              }
+            </Text>
+          </ScrollView>
+          <View style={styles.infoButtons}>
+            <TouchableOpacity
+              onPress={() => {
+                setInfoWindow(0);
+                dispatch(appActions.loadGlobalDataFromDisc());
+              }}
+            >
+              <Text style={styles.textInfo}>{'« Назад'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleSetInfoWindow_2}>
+              <Text style={styles.textInfo}>{'Далее »'}</Text>
+            </TouchableOpacity>
+          </View>
         </AppScreen>
       ) : infoWindow === 2 ? (
         <AppScreen>
@@ -193,12 +202,14 @@ const Root = () => {
           <TouchableOpacity onPress={() => Linking.openURL(GDMN_SITE_ADDRESS)}>
             <Text style={[styles.textInfo, styles.textReference]}>{GDMN_SITE_ADDRESS}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonPrev} onPress={handleSetInfoWindow_1}>
-            <Text style={styles.textInfo}>{'« Назад'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonNext} onPress={handleSetInfoWindow_3}>
-            <Text style={styles.textInfo}>{'Далее »'}</Text>
-          </TouchableOpacity>
+          <View style={styles.infoButtons}>
+            <TouchableOpacity onPress={handleSetInfoWindow_1}>
+              <Text style={styles.textInfo}>{'« Назад'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleSetInfoWindow_3}>
+              <Text style={styles.textInfo}>{'Далее »'}</Text>
+            </TouchableOpacity>
+          </View>
         </AppScreen>
       ) : infoWindow === 3 ? (
         <AppScreen>
@@ -211,11 +222,13 @@ const Root = () => {
               '\nВыявленные ошибки и пожелания оставляйте в системе регистрации.\n\nСпасибо за использование GDMN Отгрузка!\n\n'
             }
           </Text>
-          <TouchableOpacity style={styles.buttonPrev} onPress={handleSetInfoWindow_2}>
-            <Text style={styles.textInfo}>{'« Назад'}</Text>
-          </TouchableOpacity>
+          <View style={styles.infoButtons}>
+            <TouchableOpacity onPress={handleSetInfoWindow_2}>
+              <Text style={styles.textInfo}>{'« Назад'}</Text>
+            </TouchableOpacity>
+          </View>
           <PrimeButton icon={'presentation-play'} onPress={handleSetInfoWindow_0}>
-            {'Начать работу'}
+            Начать работу
           </PrimeButton>
         </AppScreen>
       ) : authLoading || loading || fpLoading || appDataLoading ? (
@@ -226,12 +239,7 @@ const Root = () => {
           </Caption>
         </AppScreen>
       ) : (
-        <MobileApp
-          items={navItems}
-          loadingErrors={[fpLoadingError]}
-          onClearLoadingErrors={onClearLoadingErrors}
-          onGetMessages={isDemo ? getMessages : undefined}
-        />
+        <MobileApp items={navItems} loadingErrors={[fpLoadingError]} onClearLoadingErrors={onClearLoadingErrors} />
       )}
     </ErrorBoundary>
   );
@@ -241,6 +249,7 @@ const App = () => (
   <Provider store={store}>
     <UIProvider theme={defaultTheme}>
       <Root />
+      <StatusBar style="auto" />
     </UIProvider>
   </Provider>
 );

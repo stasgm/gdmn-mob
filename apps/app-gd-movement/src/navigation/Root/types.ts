@@ -10,6 +10,7 @@ export type IRefSelectParams = {
   isMulti?: boolean;
   docType?: string;
   refFieldName?: string;
+  descrFieldName?: string;
 };
 
 export type RefParamList = {
@@ -41,7 +42,6 @@ export type DocParamList = RefParamList & {
   DocView: { id: string; docType?: string };
   DocEdit: { id: string; docType?: string } | undefined;
   DocLine: { mode: number; docId: string; item: IMovementLine; docType?: string };
-  SelectGoodItem: { docId: string; docType?: string };
   SelectRemainsItem: { docId: string; docType?: string };
   ScanBarcode: { docId: string; docType?: string };
   DocLineEdit: {

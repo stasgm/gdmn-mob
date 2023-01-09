@@ -8,22 +8,20 @@ import { useNavigate } from 'react-router';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import actions from '../../store/device';
-import appSystemsActions from '../../store/appSystem';
+import actions from '../../store/appSystem';
 import { IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-import SnackBar from '../../components/SnackBar';
 import AppSystemListTable from '../../components/appSystem/AppSystemListTable';
 
 const AppSystemList = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const { list, loading, errorMessage, pageParams } = useSelector((state) => state.appSystems);
+  const { list, loading, pageParams } = useSelector((state) => state.appSystems);
+  const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
   const fetchAppSystems = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(appSystemsActions.fetchAppSystems(filterText, fromRecord, toRecord));
+      dispatch(actions.fetchAppSystems(filterText, fromRecord, toRecord));
     },
     [dispatch],
   );
@@ -33,21 +31,14 @@ const AppSystemList = () => {
     fetchAppSystems(pageParams?.filterText as string);
   }, [fetchAppSystems, pageParams?.filterText]);
 
-  // const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
-
-  const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
-
   const handleUpdateInput = (value: string) => {
     const inputValue: string = value;
-
     setPageParamLocal({ filterText: value });
-
     if (inputValue) return;
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.deviceActions.setPageParam({ filterText: pageParamLocal?.filterText }));
-
+    dispatch(actions.setPageParam({ filterText: pageParamLocal?.filterText }));
     fetchAppSystems(pageParamLocal?.filterText as string);
   };
 
@@ -55,10 +46,6 @@ const AppSystemList = () => {
     if (key !== 'Enter') return;
 
     handleSearchClick();
-  };
-
-  const handleClearError = () => {
-    dispatch(actions.deviceActions.clearError());
   };
 
   const buttons: IToolBarButton[] = [
@@ -107,7 +94,6 @@ const AppSystemList = () => {
           )}
         </Container>
       </Box>
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

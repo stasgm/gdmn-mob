@@ -20,7 +20,7 @@ const reducer: Reducer<IAppSystemState, AppSystemActionType> = (state = initialS
       return { ...state, errorMessage: '' };
 
     case getType(appSystemActions.setError):
-      return { ...state, errorMessage: 'Подсистема уже существует' };
+      return { ...state, errorMessage: action.payload }; //'Подсистема уже существует'
 
     case getType(appSystemActions.fetchAppSystemsAsync.request):
       return { ...state, loading: true, list: [], errorMessage: '' };
@@ -55,6 +55,7 @@ const reducer: Reducer<IAppSystemState, AppSystemActionType> = (state = initialS
         loading: false,
         errorMessage: action.payload || 'error',
       };
+
     case getType(appSystemActions.updateAppSystemAsync.request):
       return { ...state, loading: true, errorMessage: '' };
 

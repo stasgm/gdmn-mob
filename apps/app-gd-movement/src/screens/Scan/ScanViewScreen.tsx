@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { View, FlatList, TextInput, Alert, ListRenderItem } from 'react-native';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { View, TextInput, Alert } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -21,6 +21,7 @@ import {
   ListItemLine,
   navBackButton,
   SaveDocument,
+  SimpleDialog,
 } from '@lib/mobile-ui';
 
 import {
@@ -28,14 +29,14 @@ import {
   generateId,
   getDateString,
   getDelLineList,
-  keyExtractor,
   shortenString,
   useSendDocs,
-} from '@lib/mobile-app';
-
-import { sleep } from '@lib/client-api';
+  sleep,
+} from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
+
+import { FlashList } from '@shopify/flash-list';
 
 import { IScanDocument, IScanLine } from '../../store/types';
 import { ScanStackParamList } from '../../navigation/Root/types';
@@ -52,6 +53,8 @@ export const ScanViewScreen = () => {
 
   const id = useRoute<RouteProp<ScanStackParamList, 'ScanView'>>().params?.id;
   const doc = docSelectors.selectByDocId<IScanDocument>(id);
+  const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
+  const loading = useSelector((state) => state.app.loading);
 
   const isBlocked = doc?.status !== 'DRAFT';
 
@@ -116,26 +119,31 @@ export const ScanViewScreen = () => {
     navigation.goBack();
   }, [dispatch, id, doc, navigation]);
 
+  const hanldeCancelLastScan = useCallback(() => {
+    const lastId = doc?.lines?.[0]?.id;
+
+    if (lastId) {
+      dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
+    }
+  }, [dispatch, doc?.lines, id]);
+
   const sendDoc = useSendDocs(doc ? [doc] : []);
 
-  const handleSendDocument = useCallback(() => {
-    Alert.alert('Вы уверены, что хотите отправить документ?', '', [
-      {
-        text: 'Да',
-        onPress: async () => {
-          setScreenState('sending');
-          await sendDoc();
-          setScreenState('sent');
-        },
-      },
-      {
-        text: 'Отмена',
-      },
-    ]);
+  const [visibleSendDialog, setVisibleSendDialog] = useState(false);
+
+  const handleSendDocument = useCallback(async () => {
+    setVisibleSendDialog(false);
+    setScreenState('sending');
+    await sendDoc();
+    setScreenState('sent');
   }, [sendDoc]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
+      {
+        title: 'Отменить последнее сканирование',
+        onPress: hanldeCancelLastScan,
+      },
       {
         title: 'Редактировать данные',
         onPress: handleEditDocHead,
@@ -150,13 +158,13 @@ export const ScanViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleDelete, handleEditDocHead]);
+  }, [showActionSheet, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
 
   const renderRight = useCallback(
     () =>
       isBlocked ? (
         doc?.status === 'READY' ? (
-          <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+          <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
         ) : (
           doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
         )
@@ -169,7 +177,7 @@ export const ScanViewScreen = () => {
               {doc?.status === 'DRAFT' && (
                 <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
               )}
-              <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+              <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
               {!isScanerReader && (
                 <ScanButton
                   onPress={() => navigation.navigate('ScanGood', { docId: id })}
@@ -186,11 +194,11 @@ export const ScanViewScreen = () => {
       doc?.status,
       handleDeleteDocs,
       handleSaveDocument,
-      handleSendDocument,
       id,
       isBlocked,
       isDelList,
       isScanerReader,
+      loading,
       navigation,
       screenState,
     ],
@@ -209,7 +217,7 @@ export const ScanViewScreen = () => {
     });
   }, [delList.length, isDelList, navigation, renderLeft, renderRight]);
 
-  const renderItem: ListRenderItem<IScanLine> = ({ item, index }) => (
+  const renderItem = ({ item, index }: { item: IScanLine; index: number }) => (
     <ListItemLine
       key={item.id}
       {...item}
@@ -219,7 +227,9 @@ export const ScanViewScreen = () => {
       readonly={true}
     >
       <View style={styles.details}>
-        <LargeText style={styles.textBold}>Сканирование {(index + 1)?.toString()}</LargeText>
+        <LargeText style={styles.textBold}>
+          Сканирование {(lines?.length ? lines?.length - index : 1 + index)?.toString()}
+        </LargeText>
         <MediumText>{shortenString(item.barcode, 30)}</MediumText>
       </View>
     </ListItemLine>
@@ -233,13 +243,17 @@ export const ScanViewScreen = () => {
 
   const getScannedObject = useCallback(
     (brc: string) => {
-      const line: IScanLine = { id: generateId(), barcode: brc };
+      if (!doc) {
+        return;
+      }
+
+      const line: IScanLine = { id: generateId(), barcode: brc, sortOrder: doc?.lines?.length + 1 };
       dispatch(documentActions.addDocumentLine({ docId: id, line }));
 
       setScanned(false);
     },
 
-    [dispatch, id],
+    [dispatch, doc, id],
   );
 
   const setScan = (brc: string) => {
@@ -312,15 +326,20 @@ export const ScanViewScreen = () => {
           showSoftInputOnFocus={false}
           onChangeText={(text) => !scanned && setScan(text)}
         />
-        <FlatList
-          data={doc.lines}
-          keyExtractor={keyExtractor}
+        <FlashList
+          data={lines}
           renderItem={renderItem}
-          initialNumToRender={6}
-          maxToRenderPerBatch={6} // Reduce number in each render batch
-          updateCellsBatchingPeriod={100} // Increase time between renders
-          windowSize={7} // Reduce the window size
+          estimatedItemSize={60}
           ItemSeparatorComponent={ItemSeparator}
+          keyboardShouldPersistTaps="handled"
+        />
+        <SimpleDialog
+          visible={visibleSendDialog}
+          title={'Внимание!'}
+          text={'Вы уверены, что хотите отправить документ?'}
+          onCancel={() => setVisibleSendDialog(false)}
+          onOk={handleSendDocument}
+          okDisabled={loading}
         />
       </View>
     </>

@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet';
-import { Box, Container, Grid, CircularProgress } from '@material-ui/core';
+import { Box, Container, Grid } from '@material-ui/core';
 
 import { IUser } from '@lib/types';
 
@@ -14,14 +14,12 @@ import { useDispatch, useSelector as userSelector } from '../store/';
 import AccountProfile from '../components/account/AccountProfile';
 import AccountProfileDetails from '../components/account/AccountProfileDetails';
 import SnackBar from '../components/SnackBar';
+import CircularProgressWithContent from '../components/CircularProgressWidthContent';
 
 const Account = () => {
   const dispatch = useDispatch();
-
   const [user, setUser] = useState<IUser | undefined>();
-
   const { user: account } = useSelector((state) => state.auth);
-
   const { errorMessage, loading } = userSelector((state) => state.users);
 
   const fetchUser = useCallback(
@@ -54,10 +52,6 @@ const Account = () => {
     dispatch(actions.userActions.clearError());
   };
 
-  if (!user) {
-    return <Box>Пользователь не найден</Box>;
-  }
-
   return (
     <>
       <Helmet>
@@ -70,18 +64,31 @@ const Account = () => {
           py: 3,
         }}
       >
-        {loading && <CircularProgress size={40} />}
-        <Container maxWidth="lg">
-          <Grid container spacing={3}>
-            <Grid item lg={4} md={6} xs={12}>
-              <AccountProfile user={user} />
+        <Container
+          maxWidth="lg"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            m: 2,
+          }}
+        >
+          {loading ? (
+            <CircularProgressWithContent content={'Идет загрузка данных...'} />
+          ) : !user ? (
+            <Box>Пользователь не найден</Box>
+          ) : (
+            <Grid container spacing={3}>
+              <Grid item lg={4} md={6} xs={12}>
+                <AccountProfile user={user} />
+              </Grid>
+              <Grid item lg={8} md={6} xs={12}>
+                <AccountProfileDetails user={user} loading={loading} onSubmit={handleSaveUser} />
+              </Grid>
             </Grid>
-            <Grid item lg={8} md={6} xs={12}>
-              <AccountProfileDetails user={user} loading={loading} onSubmit={handleSaveUser} />
-            </Grid>
-          </Grid>
+          )}
         </Container>
-        <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
+        <SnackBar visible={!!errorMessage} errorMessage={errorMessage} onClearError={handleClearError} />
       </Box>
     </>
   );

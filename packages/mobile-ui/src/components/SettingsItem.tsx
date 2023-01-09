@@ -1,6 +1,11 @@
 import React from 'react';
-import { SettingValue } from '@lib/types';
+
 import { View, StyleSheet } from 'react-native';
+import { SettingValue } from '@lib/types';
+
+import { HelperText } from 'react-native-paper';
+
+import { IListItem } from '@lib/mobile-types';
 
 import Input from './Input';
 import { MediumText } from './AppText';
@@ -9,16 +14,25 @@ import Switch from './Switch';
 type Props = {
   label: string;
   value: SettingValue;
+  disabled?: boolean;
   onValueChange: (newValue: SettingValue) => void;
+  onEndEditing: () => void;
 };
 
-const SettingsItem = ({ label, value, onValueChange }: Props) => {
+const SettingsItem = ({ label, value, disabled = false, onValueChange, onEndEditing }: Props) => {
   return (
     <View>
       {typeof value === 'boolean' ? (
         <View style={localStyles.container}>
           <MediumText>{label}</MediumText>
-          <Switch value={value} onValueChange={() => onValueChange(!value)} />
+          <Switch
+            value={value}
+            onValueChange={() => {
+              onValueChange(!value);
+              onEndEditing();
+            }}
+            disabled={disabled}
+          />
         </View>
       ) : (
         <View style={localStyles.settingsContainer}>
@@ -30,6 +44,8 @@ const SettingsItem = ({ label, value, onValueChange }: Props) => {
               keyboardType={'numeric'}
               clearInput={true}
               autoCapitalize="none"
+              disabled={disabled}
+              onEndEditing={onEndEditing}
             />
           ) : (
             <Input
@@ -53,6 +69,8 @@ const localStyles = StyleSheet.create({
     paddingHorizontal: 12,
     fontSize: 20,
     justifyContent: 'space-between',
+    paddingVertical: 3,
+    marginVertical: 6,
   },
   settingsContainer: {
     flexDirection: 'column',

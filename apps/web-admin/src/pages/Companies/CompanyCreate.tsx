@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { ICompany, NewCompany } from '@lib/types';
 
 import CompanyDetails from '../../components/company/CompanyDetails';
-import SnackBar from '../../components/SnackBar';
 
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/company';
@@ -13,14 +12,10 @@ const CompanyCreate = () => {
 
   const dispatch: AppDispatch = useDispatch();
 
-  const { errorMessage, loading } = useSelector((state) => state.companies);
+  const { loading } = useSelector((state) => state.companies);
 
   const handleGoBack = () => {
     navigate(-1);
-  };
-
-  const handleClearError = () => {
-    dispatch(actions.companyActions.clearError());
   };
 
   const handleSubmit = async (values: ICompany | NewCompany) => {
@@ -56,7 +51,6 @@ const CompanyCreate = () => {
           onCancel={handleGoBack}
         />
       </Box>
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

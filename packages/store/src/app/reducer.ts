@@ -6,12 +6,18 @@ import { IAppState } from './types';
 
 export const initialState: Readonly<IAppState> = {
   loading: false,
-  errorMessage: '',
+  showSyncInfo: false,
+  autoSync: false,
   formParams: {},
-  errorList: [],
+  errorLog: [],
   loadingData: false,
   loadingError: '',
+  requestNotice: [],
+  errorNotice: [],
+  isConnected: false,
 };
+
+const LOG_MAX_LINES = 1000;
 
 const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action): IAppState => {
   switch (action.type) {
@@ -36,11 +42,45 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
         loading: action.payload,
       };
 
-    case getType(appActions.setErrorList):
+    case getType(appActions.setAutoSync):
       return {
         ...state,
-        errorList: action.payload,
+        autoSync: action.payload,
       };
+
+    case getType(appActions.setShowSyncInfo):
+      return {
+        ...state,
+        showSyncInfo: action.payload,
+      };
+
+    case getType(appActions.addErrors):
+      return {
+        ...state,
+        errorLog: [...state.errorLog, ...action.payload],
+      };
+
+    case getType(appActions.setSentErrors):
+      return {
+        ...state,
+        errorLog: state.errorLog.map((i) => (action.payload.indexOf(i.id) === -1 ? i : { ...i, isSent: true })),
+      };
+
+    case getType(appActions.clearErrors): {
+      if (action.payload === 'old') {
+        const sentLog = state.errorLog.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        const c = sentLog.length - LOG_MAX_LINES;
+        return {
+          ...state,
+          errorLog: c > 0 ? sentLog.slice(c) : sentLog,
+        };
+      } else {
+        return {
+          ...state,
+          errorLog: [],
+        };
+      }
+    }
 
     case getType(appActions.setSyncDate):
       return {
@@ -49,7 +89,7 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
       };
 
     case getType(appActions.loadData):
-      return { ...action.payload, loading: false, errorMessage: '' };
+      return { ...action.payload, loading: false };
 
     case getType(appActions.setLoadingData):
       return { ...state, loadingData: action.payload };
@@ -58,6 +98,24 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
       return {
         ...state,
         loadingError: action.payload,
+      };
+
+    case getType(appActions.addRequestNotice):
+      return { ...state, requestNotice: [...state.requestNotice, action.payload] };
+
+    case getType(appActions.clearRequestNotice):
+      return { ...state, requestNotice: [] };
+
+    case getType(appActions.addErrorNotice):
+      return { ...state, errorNotice: [...state.errorNotice, action.payload] };
+
+    case getType(appActions.clearErrorNotice):
+      return { ...state, errorNotice: [] };
+
+    case getType(appActions.setIsConnected):
+      return {
+        ...state,
+        isConnected: action.payload,
       };
 
     default:
