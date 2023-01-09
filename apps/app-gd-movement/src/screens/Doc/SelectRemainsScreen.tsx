@@ -246,10 +246,9 @@ export const SelectRemainsScreen = () => {
     [handleAddLine],
   );
 
-  const GoodRemains = useCallback(
+  const renderItem = useCallback(
     ({ item }: { item: IRemGood }) => {
-      const doc = docSelectors.selectByDocId(docId) as IMovementDocument;
-      const lines = doc?.lines?.filter((i) => i.good.id === item.good.id);
+      const lines = document?.lines?.filter((i) => i.good.id === item.good.id);
       const isAdded = !!lines?.length;
 
       const iconStyle = [styles.icon, { backgroundColor: isAdded ? '#06567D' : '#E91E63' }];
@@ -301,10 +300,8 @@ export const SelectRemainsScreen = () => {
         </TouchableOpacity>
       );
     },
-    [colors.primary, docId, handlePressItem],
+    [colors.primary, document?.lines, handlePressItem],
   );
-
-  const renderItem = ({ item }: { item: IRemGood }) => <GoodRemains item={item} />;
 
   const RC = useMemo(() => <RefreshControl refreshing={!goodRemains} title="загрузка данных..." />, [goodRemains]);
 
@@ -334,6 +331,7 @@ export const SelectRemainsScreen = () => {
         refreshControl={RC}
         ListEmptyComponent={EmptyList}
         keyboardShouldPersistTaps="handled"
+        extraData={document?.lines}
       />
       {(selectedLine || selectedGood) && (
         <DocLineDialog
