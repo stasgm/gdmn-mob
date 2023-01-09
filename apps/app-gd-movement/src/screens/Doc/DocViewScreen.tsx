@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { View, FlatList, Alert, ListRenderItem } from 'react-native';
+import { View, Alert } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -23,16 +23,11 @@ import {
   SimpleDialog,
 } from '@lib/mobile-ui';
 
-import {
-  deleteSelectedLineItems,
-  getDateString,
-  getDelLineList,
-  keyExtractor,
-  useSendDocs,
-  sleep,
-} from '@lib/mobile-hooks';
+import { deleteSelectedLineItems, getDateString, getDelLineList, useSendDocs, sleep } from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
+
+import { FlashList } from '@shopify/flash-list';
 
 import { IMovementDocument, IMovementLine } from '../../store/types';
 import { DocStackParamList } from '../../navigation/Root/types';
@@ -214,8 +209,8 @@ export const DocViewScreen = () => {
 
   const goods = refSelectors.selectByName<IGood>('good')?.data;
 
-  const renderItem: ListRenderItem<IMovementLine> = useCallback(
-    ({ item }) => {
+  const renderItem = useCallback(
+    ({ item }: { item: IMovementLine }) => {
       const good = goods?.find((e) => e.id === item?.good.id);
       return (
         <ListItemLine
@@ -279,15 +274,12 @@ export const DocViewScreen = () => {
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
         </>
       </InfoBlock>
-      <FlatList
+      <FlashList
         data={doc.lines}
-        keyExtractor={keyExtractor}
         renderItem={renderItem}
-        initialNumToRender={10}
-        maxToRenderPerBatch={10}
-        updateCellsBatchingPeriod={100}
-        windowSize={7}
+        estimatedItemSize={60}
         ItemSeparatorComponent={ItemSeparator}
+        keyboardShouldPersistTaps="handled"
       />
       {doc.lines.length ? (
         <DocTotal lineCount={doc.lines?.length || 0} sum={docLineSum} quantity={docLineQuantity} />

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { FlatList, View, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
 import { Searchbar } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
@@ -19,6 +19,8 @@ import { refSelectors, useSelector } from '@lib/store';
 import { IDepartment, IReferences } from '@lib/types';
 
 import { IListItem } from '@lib/mobile-types';
+
+import { FlashList } from '@shopify/flash-list';
 
 import { RemainsStackParamList } from '../../navigation/Root/types';
 
@@ -177,12 +179,12 @@ const GoodListScreen = () => {
           <ItemSeparator />
         </>
       )}
-      <FlatList
+      <FlashList
         data={filteredList.goodRemains}
-        keyExtractor={(_, i) => String(i)}
+        estimatedItemSize={60}
         renderItem={renderItem}
-        scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
+        keyboardShouldPersistTaps="handled"
         ListEmptyComponent={!goods || !goodRemains.length ? EmptyList : null}
       />
     </AppScreen>

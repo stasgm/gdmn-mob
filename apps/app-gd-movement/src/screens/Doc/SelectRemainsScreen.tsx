@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
-import { View, FlatList, RefreshControl, StyleSheet, Alert } from 'react-native';
+import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback } from 'react';
+import { View, StyleSheet, Alert, RefreshControl, TouchableOpacity } from 'react-native';
 import { Searchbar, Divider, Chip } from 'react-native-paper';
-import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import { FlashList } from '@shopify/flash-list';
 
 import {
   AppScreen,
@@ -9,11 +10,11 @@ import {
   ItemSeparator,
   globalStyles as styles,
   SearchButton,
-  EmptyList,
   MediumText,
   LargeText,
   navBackButton,
   globalColors,
+  EmptyList,
 } from '@lib/mobile-ui';
 import { docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 
@@ -24,8 +25,6 @@ import { IDocumentType } from '@lib/types';
 import { formatValue, generateId } from '@lib/mobile-hooks';
 
 import { StackNavigationProp } from '@react-navigation/stack';
-
-import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import { getRemGoodListByContact } from '../../utils/helpers';
 import { DocStackParamList } from '../../navigation/Root/types';
@@ -38,8 +37,6 @@ interface IFilteredList {
   searchQuery: string;
   goodRemains: IRemGood[];
 }
-
-const keyExtractor = (item: IRemGood) => String(item.good.id);
 
 export const SelectRemainsScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'SelectRemainsItem'>>();
@@ -142,9 +139,6 @@ export const SelectRemainsScreen = () => {
       headerRight: renderRight,
     });
   }, [navigation, renderRight]);
-
-  const refList = useRef<FlatList<IRemGood>>(null);
-  useScrollToTop(refList);
 
   const handleAddLine = useCallback(
     (item?: IRemGood) => {
@@ -252,10 +246,8 @@ export const SelectRemainsScreen = () => {
     [handleAddLine],
   );
 
-  const GoodRemains = useCallback(
+  const renderItem = useCallback(
     ({ item }: { item: IRemGood }) => {
-      // const barcode = !!item.good.barcode;
-
       const lines = document?.lines?.filter((i) => i.good.id === item.good.id);
       const isAdded = !!lines?.length;
 
@@ -311,8 +303,6 @@ export const SelectRemainsScreen = () => {
     [colors.primary, document?.lines, handlePressItem],
   );
 
-  const renderItem = ({ item }: { item: IRemGood }) => <GoodRemains item={item} />;
-
   const RC = useMemo(() => <RefreshControl refreshing={!goodRemains} title="загрузка данных..." />, [goodRemains]);
 
   return (
@@ -333,20 +323,15 @@ export const SelectRemainsScreen = () => {
           <ItemSeparator />
         </>
       )}
-      <FlatList
-        ref={refList}
+      <FlashList
         data={filteredList.goodRemains}
-        keyExtractor={keyExtractor}
+        estimatedItemSize={95}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
         refreshControl={RC}
         ListEmptyComponent={EmptyList}
-        removeClippedSubviews={true} // Unmount compsonents when outside of window
         keyboardShouldPersistTaps="handled"
-        maxToRenderPerBatch={50}
-        windowSize={60}
-        updateCellsBatchingPeriod={50}
-        initialNumToRender={50}
+        extraData={document?.lines}
       />
       {(selectedLine || selectedGood) && (
         <DocLineDialog
@@ -370,7 +355,7 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     padding: 3,
-    minHeight: 50,
+    minHeight: 70,
     fontWeight: 'bold',
     opacity: 0.9,
   },
