@@ -18,7 +18,7 @@ const ModeSelectionScreen = (props: Props) => {
       <AppScreen>
         <View style={localStyles.container}>
           <PrimeButton icon={'presentation-play'} onPress={onSetDemoMode}>
-            {'Начать работу'}
+            Начать работу
           </PrimeButton>
         </View>
         <TouchableOpacity onPress={onSetServerMode} style={localStyles.serverMode}>

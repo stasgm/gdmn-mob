@@ -1,17 +1,18 @@
-import { IProcess, IResponse } from '@lib/types';
+import { IProcess } from '@lib/types';
 import { processes as mockProcesses } from '@lib/mock';
 
 import { error, process as types } from '../types';
-import { getParams, sleep } from '../utils';
+import { response2Log, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
+import { CustomRequest } from '../robustRequest';
 
 class Process extends BaseRequest {
   constructor(api: BaseApi) {
     super(api);
   }
 
-  getProcesses = async (params?: Record<string, string | number>) => {
+  getProcesses = async (customRequest: CustomRequest, params?: Record<string, string | number>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -21,36 +22,27 @@ class Process extends BaseRequest {
       } as types.IGetProcessesResponse;
     }
 
-    let paramText = params ? getParams(params) : '';
+    const res = await customRequest<IProcess[]>({
+      api: this.api.axios,
+      method: 'GET',
+      url: '/processes',
+      params,
+    });
 
-    if (paramText > '') {
-      paramText = `?${paramText}`;
+    if (res.type === 'SUCCESS') {
+      return {
+        type: 'GET_PROCESSES',
+        processes: res.data,
+      } as types.IGetProcessesResponse;
     }
 
-    try {
-      const res = await this.api.axios.get<IResponse<IProcess[]>>(`/processes${paramText}`);
-      const resData = res.data;
-
-      if (resData.result) {
-        return {
-          type: 'GET_PROCESSES',
-          processes: resData.data,
-        } as types.IGetProcessesResponse;
-      }
-
-      return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка получения данных о процессах',
-      } as error.INetworkError;
-    }
+    return {
+      type: res.type,
+      message: response2Log(res) || 'Данные о процессах не получены',
+    } as error.IServerError;
   };
 
-  removeProcess = async (processId: string) => {
+  removeProcess = async (customRequest: CustomRequest, processId: string) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -59,26 +51,22 @@ class Process extends BaseRequest {
       } as types.IRemoveProcessResponse;
     }
 
-    try {
-      const res = await this.api.axios.delete<IResponse<void>>(`/processes/${processId}`);
-      const resData = res.data;
+    const res = await customRequest<void>({
+      api: this.api.axios,
+      method: 'DELETE',
+      url: `/processes/${processId}`,
+    });
 
-      if (resData.result) {
-        return {
-          type: 'REMOVE_PROCESS',
-        } as types.IRemoveProcessResponse;
-      }
-
+    if (res.type === 'SUCCESS') {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка удаления процесса',
-      } as error.INetworkError;
+        type: 'REMOVE_PROCESS',
+      } as types.IRemoveProcessResponse;
     }
+
+    return {
+      type: res.type,
+      message: response2Log(res) || 'Процесс не удален',
+    } as error.IServerError;
   };
 }
 

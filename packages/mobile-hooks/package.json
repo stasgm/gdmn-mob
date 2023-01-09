@@ -1,0 +1,42 @@
+{
+  "name": "@lib/mobile-hooks",
+  "version": "1.0.0",
+  "description": "common mobile navigation package",
+  "license": "MIT",
+  "main": "index.ts",
+  "scripts": {
+    "prettier:check": "prettier --check \"**/*.ts*\"",
+    "prettier:fix": "prettier --write \"**/*.ts*\"",
+    "lint": "eslint \"**/*.ts*\"",
+    "lint:fix": "eslint --fix \"**/*.ts*\"",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "yarn prettier:fix",
+      "yarn lint"
+    ]
+  },
+  "prettier": "@config/prettier-config",
+  "dependencies": {
+    "@lib/client-api": "*",
+    "@lib/store": "*",
+    "@lib/types": "*",
+    "@react-native-community/netinfo": "9.3.5",
+    "@types/node": "^18.11.14",
+    "@types/react": "~18.0.25",
+    "@types/react-native": "0.70.8",
+    "nanoid": "^3.3.4",
+    "react": "18.1.0",
+    "react-native": "0.70.5",
+    "react-native-get-random-values": "^1.8.0",
+    "typescript": "~4.8.4"
+  },
+  "devDependencies": {
+    "@config/eslint-config": "*",
+    "@config/eslint-config-react": "*",
+    "@config/eslint-config-react-native": "*",
+    "@config/prettier-config": "*",
+    "lint-staged": "^13.0.3"
+  }
+}

@@ -1,28 +1,19 @@
 import { Box, CardHeader, CircularProgress } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
-import { IAppSystem, ICompany, NewAppSystem, NewCompany } from '@lib/types';
-
-import { useCallback, useEffect } from 'react';
+import { IAppSystem, NewAppSystem } from '@lib/types';
 
 import AppSystemDetails from '../../components/appSystem/AppSystemDetails';
-import SnackBar from '../../components/SnackBar';
 
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/appSystem';
 
 const AppSystemCreate = () => {
   const navigate = useNavigate();
-
   const dispatch: AppDispatch = useDispatch();
-
-  const { errorMessage, loading } = useSelector((state) => state.appSystems);
+  const { loading } = useSelector((state) => state.appSystems);
 
   const handleGoBack = () => {
     navigate(-1);
-  };
-
-  const handleClearError = () => {
-    dispatch(actions.appSystemActions.clearError());
   };
 
   const handleSubmit = async (values: IAppSystem | NewAppSystem) => {
@@ -58,7 +49,6 @@ const AppSystemCreate = () => {
           onCancel={handleGoBack}
         />
       </Box>
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

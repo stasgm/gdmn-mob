@@ -3,10 +3,10 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Divider, IconButton } from 'react-native-paper';
 import { useNavigation, useTheme } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { baseSettingGroup, settingsActions, useDispatch, useSelector } from '@lib/store';
 import { MenuButton, useActionSheet, SettingsGroup, AppScreen, MediumText, navBackDrawer } from '@lib/mobile-ui';
 import { INamedEntity, ISettingsOption, Settings, SettingValue } from '@lib/types';
-import { StackNavigationProp } from '@react-navigation/stack';
 
 import { SettingsStackParamList } from '../navigation/Root/types';
 
@@ -80,6 +80,21 @@ const SettingsScreen = () => {
 
   const serverPath = `${config?.protocol}${config?.server}:${config?.port}/${config?.apiPath}`;
 
+  const handleUpdateOption = (optionName: string, value: ISettingsOption) => {
+    if (optionName === 'scannerUse') {
+      const screenKeyboard = Object.values(settsData).find((i) => i?.id === 'screenKeyboard');
+
+      if (screenKeyboard) {
+        dispatch(
+          settingsActions.updateOption({
+            optionName: 'screenKeyboard',
+            value: { ...screenKeyboard, readonly: value.data ? true : false, data: true },
+          }),
+        );
+      }
+    }
+  };
+
   return (
     <AppScreen>
       <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={[{ padding: 5, flexDirection: 'column' }]}>
@@ -90,8 +105,13 @@ const SettingsScreen = () => {
               .sort(([, itema], [, itemb]) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0));
             return (
               <View key={groupKey}>
-                {group.id === '1' ? (
-                  <SettingsGroup key={groupKey} list={list} onValueChange={handleUpdate} />
+                {group.id === 'base' ? (
+                  <SettingsGroup
+                    key={groupKey}
+                    list={list}
+                    onValueChange={handleUpdate}
+                    onCheckSettings={handleUpdateOption}
+                  />
                 ) : (
                   <View key={groupKey} style={localStyles.group}>
                     <Divider />

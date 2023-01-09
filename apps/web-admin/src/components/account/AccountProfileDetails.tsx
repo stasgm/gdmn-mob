@@ -7,7 +7,6 @@ interface IProps {
   user: IUser;
   loading: boolean;
   onSubmit: (user: IUser) => void;
-  // onCancel: () => void;
 }
 
 const AccountProfileDetails = ({ user, loading, onSubmit }: IProps) => {

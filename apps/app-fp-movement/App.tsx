@@ -1,8 +1,10 @@
 import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import { Provider } from 'react-redux';
-import { dialCall, MobileApp } from '@lib/mobile-app';
+import { MobileApp } from '@lib/mobile-app';
 import { GDMN_EMAIL, GDMN_PHONE, GDMN_SITE_ADDRESS, INavItem } from '@lib/mobile-navigation';
 import ErrorBoundary from 'react-native-error-boundary';
+
+import { StatusBar } from 'expo-status-bar';
 
 import {
   appActions,
@@ -31,7 +33,7 @@ import { ActivityIndicator, Caption, Text } from 'react-native-paper';
 
 import { IDocument, IReferences, IUserSettings } from '@lib/types';
 
-import { sleep } from '@lib/client-api';
+import { sleep, dialCall } from '@lib/mobile-hooks';
 
 import { TouchableOpacity, Linking, ScrollView, View } from 'react-native';
 
@@ -226,7 +228,7 @@ const Root = () => {
             </TouchableOpacity>
           </View>
           <PrimeButton icon={'presentation-play'} onPress={handleSetInfoWindow_0}>
-            {'Начать работу'}
+            Начать работу
           </PrimeButton>
         </AppScreen>
       ) : authLoading || loading || fpLoading || appDataLoading ? (
@@ -237,12 +239,7 @@ const Root = () => {
           </Caption>
         </AppScreen>
       ) : (
-        <MobileApp
-          items={navItems}
-          loadingErrors={[fpLoadingError]}
-          onClearLoadingErrors={onClearLoadingErrors}
-          onGetMessages={isDemo ? getMessages : undefined}
-        />
+        <MobileApp items={navItems} loadingErrors={[fpLoadingError]} onClearLoadingErrors={onClearLoadingErrors} />
       )}
     </ErrorBoundary>
   );
@@ -252,6 +249,7 @@ const App = () => (
   <Provider store={store}>
     <UIProvider theme={defaultTheme}>
       <Root />
+      <StatusBar style="auto" />
     </UIProvider>
   </Provider>
 );

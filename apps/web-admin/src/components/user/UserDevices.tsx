@@ -13,6 +13,7 @@ import actionsBinding from '../../store/deviceBinding';
 import deviceActions from '../../store/device';
 import codeActions from '../../store/activationCode';
 import DeviceBindingListTable from '../deviceBinding/DeviceBindingListTable';
+import { webRequest } from '../../store/webRequest';
 
 interface IProps {
   userId: string;
@@ -23,13 +24,8 @@ interface IProps {
 const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
   const dispatch = useDispatch();
   const authDispatch = useAuthThunkDispatch();
-
-  // const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
-
   const { pageParams } = useSelector((state) => state.deviceBindings);
-
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
-
   const { list: activationCodes } = useSelector((state) => state.activationCodes);
   const { list: devices } = useSelector((state) => state.devices);
 
@@ -62,7 +58,7 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
   }, [fetchActivationCodes, fetchDeviceBindings, fetchDevices, pageParams?.filterText]);
 
   const handleCreateUid = async (code: string, deviceId: string) => {
-    await authDispatch(authActions.activateDevice(code));
+    await authDispatch(authActions.activateDevice(webRequest(authDispatch, authActions), code));
     dispatch(deviceActions.fetchDeviceById(deviceId));
     fetchActivationCodes(deviceId);
   };

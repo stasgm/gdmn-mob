@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -18,16 +18,16 @@ import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 import { useSelector, useDispatch } from '../../store';
-import { IToolBarButton } from '../../types';
+import { ILinkedEntity, IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 
 import appSystemSelectors from '../../store/appSystem/selectors';
-import SnackBar from '../../components/SnackBar';
 
 import AppSystemDetailsView from '../../components/appSystem/AppSystemDetailsView';
-import appSystemActions from '../../store/appSystem';
+import actions from '../../store/appSystem';
 
 import { adminPath } from '../../utils/constants';
+import DetailsView from '../../components/DetailsView';
 
 export type Params = {
   id: string;
@@ -38,11 +38,22 @@ const AppSystemView = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading, errorMessage } = useSelector((state) => state.appSystems);
+  const { loading } = useSelector((state) => state.appSystems);
 
   const appSystem = appSystemSelectors.appSystemById(id);
 
   const [open, setOpen] = useState(false);
+
+  const appSystemDetails: ILinkedEntity[] = useMemo(
+    () =>
+      appSystem
+        ? [
+            { id: 'Наименование', value: appSystem },
+            { id: 'Описание', value: appSystem?.description },
+          ]
+        : [],
+    [appSystem],
+  );
 
   const handleCancel = () => {
     navigate(-1);
@@ -51,17 +62,18 @@ const AppSystemView = () => {
   const handleEdit = () => {
     navigate(`${adminPath}/app/appSystems/${id}/edit`);
   };
+
   const handleDelete = async () => {
     setOpen(false);
-    const res = await dispatch(appSystemActions.removeAppSystem(id));
+    const res = await dispatch(actions.removeAppSystem(id));
     if (res.type === 'APP_SYSTEM/REMOVE_SUCCESS') {
       navigate(-1);
     }
   };
 
   const refreshData = useCallback(() => {
-    dispatch(appSystemActions.fetchAppSystems());
-  }, [dispatch]);
+    dispatch(actions.fetchAppSystemById(id));
+  }, [dispatch, id]);
 
   useEffect(() => {
     refreshData();
@@ -76,7 +88,7 @@ const AppSystemView = () => {
   };
 
   const handleClearError = () => {
-    dispatch(appSystemActions.appSystemActions.clearError());
+    dispatch(actions.clearError());
   };
 
   if (!appSystem) {
@@ -116,7 +128,7 @@ const AppSystemView = () => {
       disabled: true,
       color: 'secondary',
       variant: 'contained',
-      onClick: handleClickOpen, //handleDelete,
+      onClick: handleClickOpen,
       icon: <DeleteIcon />,
     },
   ];
@@ -171,11 +183,9 @@ const AppSystemView = () => {
             minHeight: '100%',
           }}
         >
-          <AppSystemDetailsView appSystem={appSystem} />
+          <DetailsView details={appSystemDetails} />
         </Box>
       </Box>
-
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

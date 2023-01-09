@@ -26,11 +26,7 @@ const ScreenTitle = ({ children, style, loadIcon, errorText, line = true, infoRo
       {line && <ItemSeparator />}
       {infoRow && (
         <View style={localStyles.errorContaner}>
-          {errorText ? (
-            <Text style={localStyles.errorText}>Ошибка: {errorText}</Text>
-          ) : (
-            <View style={localStyles.blankError} />
-          )}
+          {errorText ? <Text style={localStyles.errorText}>{errorText}</Text> : <View style={localStyles.blankError} />}
         </View>
       )}
     </View>

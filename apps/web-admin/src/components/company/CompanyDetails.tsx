@@ -1,13 +1,14 @@
 import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@material-ui/core';
 
-import { ICompany, INamedEntity, NewCompany } from '@lib/types';
+import { ICompany, NewCompany } from '@lib/types';
 import { useFormik, Field, FormikProvider } from 'formik';
 import * as yup from 'yup';
-import api from '@lib/client-api';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import MultipleAutocomplete from '../MultipleAutocomplete';
+import { useDispatch, useSelector } from '../../store';
+import appSystemsActions from '../../store/appSystem';
 
 interface IProps {
   loading: boolean;
@@ -17,23 +18,29 @@ interface IProps {
 }
 
 const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
-  const [appSystems, setAppSystems] = useState<INamedEntity[]>([]);
-  const [loadingAppSystems, setLoadingAppSystems] = useState(true);
+  const { list, loading: loadingAppSystems } = useSelector((state) => state.appSystems);
+  // const [appSystems, setAppSystems] = useState<INamedEntity[]>([]);
+  // const [loadingAppSystems, setLoadingAppSystems] = useState(true);
+
+  // useEffect(() => {
+  //   let unmounted = false;
+  //   const getAppSystems = async () => {
+  //     const res = await api.appSystem.getAppSystems();
+  //     if (res.type === 'GET_APP_SYSTEMS' && !unmounted) {
+  //       setAppSystems(res.appSystems.map((d) => ({ id: d.id, name: d.name })));
+  //       setLoadingAppSystems(false);
+  //     }
+  //   };
+  //   getAppSystems();
+  //   return () => {
+  //     unmounted = true;
+  //   };
+  // }, []);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    let unmounted = false;
-    const getAppSystems = async () => {
-      const res = await api.appSystem.getAppSystems();
-      if (res.type === 'GET_APP_SYSTEMS' && !unmounted) {
-        setAppSystems(res.appSystems.map((d) => ({ id: d.id, name: d.name })));
-        setLoadingAppSystems(false);
-      }
-    };
-    getAppSystems();
-    return () => {
-      unmounted = true;
-    };
-  }, []);
+    dispatch(appSystemsActions.fetchAppSystems());
+  }, [dispatch]);
 
   const formik = useFormik<ICompany | NewCompany>({
     enableReinitialize: true,
@@ -42,7 +49,7 @@ const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
       name: yup.string().required('Required'),
     }),
     onSubmit: (values) => {
-      onSubmit(values);
+      onSubmit({ ...values, name: values.name.trim() });
     },
   });
 
@@ -93,7 +100,7 @@ const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
                     name="appSystems"
                     label="Подсистемы"
                     type="appSystems"
-                    options={appSystems || []} //+
+                    options={list || []}
                     setFieldValue={formik.setFieldValue}
                     setTouched={formik.setTouched}
                     error={Boolean(formik.touched.appSystems && formik.errors.appSystems)}

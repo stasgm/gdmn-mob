@@ -5,25 +5,26 @@ import { useFormik } from 'formik';
 import { Box, Button, Container, Link, TextField, Typography, CircularProgress } from '@material-ui/core';
 import { IUserCredentials } from '@lib/types';
 
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { authActions, useAuthThunkDispatch, useSelector } from '@lib/store';
 
-// import { useDispatch, useSelector } from '../store';
+import Reaptcha from 'reaptcha';
 
 import Logo from '../components/Logo';
 
 import { adminPath } from '../utils/constants';
+import { webRequest } from '../store/webRequest';
 
 const Register = () => {
   const navigate = useNavigate();
 
-  const { error, loading, status } = useSelector((state) => state.auth); //{ error: false, loading: false, status: '' };
+  const { error, loading, status } = useSelector((state) => state.auth);
 
   const dispatch = useAuthThunkDispatch();
 
   const handleSubmit = async (values: IUserCredentials) => {
-    const res = await dispatch(authActions.signup(values));
+    const res = await dispatch(authActions.signup(webRequest(dispatch, authActions), values));
 
     if (res.type === 'AUTH/SIGNUP_SUCCESS') {
       navigate(`${adminPath}/login`);
@@ -47,8 +48,17 @@ const Register = () => {
       password: yup.string().required('Заполните это поле'),
       verifyPassword: yup.string().required('Заполните это поле'),
     }),
-    onSubmit: (values) => handleSubmit(values),
+    // onSubmit: (values) => handleSubmit(values),
+    onSubmit: (values) =>
+      handleSubmit({
+        ...values,
+        name: values.name.trim(),
+        password: values.password.trim(),
+      }),
   });
+
+  const [captchaToken, setCaptchaToken] = useState('');
+  const captchaRef = useRef(null);
 
   return (
     <>
@@ -196,6 +206,21 @@ const Register = () => {
             {formik.values.password !== formik.values.verifyPassword && formik.values.verifyPassword && (
               <Box style={{ color: 'red' }}>Пароли не совпадают</Box>
             )}
+            <Box
+              sx={{
+                // mb: 2,
+                marginTop: 1,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Reaptcha
+                sitekey={process.env.REACT_APP_SITE_KEY}
+                ref={captchaRef}
+                onVerify={(token) => setCaptchaToken(token)}
+              />
+            </Box>
             <Box sx={{ py: 2 }}>
               <Button
                 color="primary"
@@ -204,7 +229,8 @@ const Register = () => {
                   !!formik.errors.password ||
                   !!formik.errors.name ||
                   !!formik.errors.verifyPassword ||
-                  formik.values.password !== formik.values.verifyPassword
+                  formik.values.password !== formik.values.verifyPassword ||
+                  (!captchaToken && Boolean(process.env.REACT_APP_SITE_KEY))
                 }
                 fullWidth
                 size="large"

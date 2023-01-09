@@ -21,11 +21,11 @@ import {
   navBackDrawer,
 } from '@lib/mobile-ui';
 
-import { documentActions, useDispatch, useSelector } from '@lib/store';
+import { documentActions, useDocThunkDispatch, useSelector } from '@lib/store';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@lib/mobile-app';
+import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@lib/mobile-hooks';
 
 import { IDelList } from '@lib/mobile-types';
 
@@ -48,7 +48,7 @@ export type SectionDataProps = SectionListData<IListItemProps, ScanListSectionPr
 
 export const ScanListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ScanStackParamList, 'ScanList'>>();
-  const dispatch = useDispatch();
+  const docDispatch = useDocThunkDispatch();
 
   const { colors } = useTheme();
 
@@ -64,12 +64,12 @@ export const ScanListScreen = () => {
     const docIds = Object.keys(delList);
 
     const deleteDocs = () => {
-      dispatch(documentActions.removeDocuments(docIds));
+      docDispatch(documentActions.removeDocuments(docIds));
       setDelList({});
     };
 
     deleteSelectedItems(delList, deleteDocs);
-  }, [delList, dispatch]);
+  }, [delList, docDispatch]);
 
   const handleAddDocument = useCallback(() => {
     navigation.navigate('ScanEdit');

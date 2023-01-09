@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback, useLayoutEffect, useMemo } from 'react';
-import { View, FlatList, Alert, TouchableOpacity } from 'react-native';
+import { View, FlatList, Alert } from 'react-native';
 import { Searchbar, Divider, Checkbox } from 'react-native-paper';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { IReferenceData, ScreenState } from '@lib/types';
 import { appActions, refSelectors } from '@lib/store';
@@ -15,7 +17,7 @@ import {
   navBackButton,
 } from '@lib/mobile-ui';
 
-import { extraPredicate, keyExtractor } from '@lib/mobile-app';
+import { extraPredicate, keyExtractor } from '@lib/mobile-hooks';
 
 import { useDispatch } from '../store';
 

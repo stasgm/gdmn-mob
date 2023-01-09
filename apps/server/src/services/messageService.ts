@@ -113,7 +113,7 @@ const deleteOne = async ({
   try {
     await getDb().messages.deleteById({ companyId, appSystemName }, messageId);
   } catch (err) {
-    throw new DataNotFoundException('Сообщение не найдено');
+    throw new DataNotFoundException(`Сообщение ${messageId} не найдено`);
   }
 };
 
@@ -140,6 +140,7 @@ export const makeMessage = async (message: IDBMessage): Promise<IMessage> => {
       deviceId: message.head.deviceId,
     },
     status: message.status,
+    errorMessage: message.errorMessage,
     body: message.body,
   };
 };
@@ -161,6 +162,7 @@ export const makeDBNewMessage = async (
       order: message.head.order,
     },
     status: message.status,
+    errorMessage: message.errorMessage,
     body: message.body,
   };
 };

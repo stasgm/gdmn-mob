@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Box,
   Button,
@@ -16,7 +16,6 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-
 import { IUser } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
@@ -26,19 +25,17 @@ import deviceActions from '../../store/device';
 import userActions from '../../store/user';
 import codeActions from '../../store/activationCode';
 import bindingActions from '../../store/deviceBinding';
-import { IToolBarButton, IHeadCells, IPageParam } from '../../types';
+import { IToolBarButton, IHeadCells, IPageParam, ILinkedEntity } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
-// eslint-disable-next-line import/namespace
-import DeviceDetailsView from '../../components/device/DeviceDetailsView';
-//import UserListTable from '../../components/user/UserListTable';
+
 import userSelectors from '../../store/user/selectors';
 import deviceSelectors from '../../store/device/selectors';
 import activationCodeSelectors from '../../store/activationCode/selectors';
-import SnackBar from '../../components/SnackBar';
 
 import SortableTable from '../../components/SortableTable';
 
-import { adminPath } from '../../utils/constants';
+import { adminPath, deviceStates } from '../../utils/constants';
+import DetailsView from '../../components/DetailsView';
 
 export type Params = {
   id: string;
@@ -50,11 +47,30 @@ const DeviceView = () => {
   const dispatch = useDispatch();
   const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
-  const { loading, errorMessage } = useSelector((state) => state.devices);
+  const { loading } = useSelector((state) => state.devices);
 
   const device = deviceSelectors.deviceById(deviceId);
   const users = userSelectors.usersByDeviceId(deviceId);
   const code = activationCodeSelectors.activationCodeByDeviceId(deviceId);
+
+  const deviceDetails: ILinkedEntity[] = useMemo(
+    () =>
+      device
+        ? [
+            {
+              id: 'Наименование',
+              value: device,
+            },
+            {
+              id: 'Номер',
+              value: device?.uid,
+            },
+            { id: 'Состояние', value: deviceStates[device?.state] },
+            { id: 'Код активации', value: code },
+          ]
+        : [],
+    [device, code],
+  );
 
   const [open, setOpen] = useState(false);
 
@@ -145,10 +161,6 @@ const DeviceView = () => {
     // },
   ];
 
-  const handleClearError = () => {
-    dispatch(deviceActions.deviceActions.clearError());
-  };
-
   if (!device) {
     return (
       <Box
@@ -186,12 +198,11 @@ const DeviceView = () => {
       disabled: true,
       color: 'secondary',
       variant: 'contained',
-      onClick: handleClickOpen, //handleDelete,
+      onClick: handleClickOpen,
       icon: <DeleteIcon />,
     },
   ];
 
-  // const headCells: IHeadCells<IUser>[] = [
   const headCells: IHeadCells<IUser>[] = [
     { id: 'name', label: 'Пользователь', sortEnable: true },
     { id: 'lastName', label: 'Фамилия', sortEnable: true },
@@ -251,15 +262,13 @@ const DeviceView = () => {
             minHeight: '100%',
           }}
         >
-          <DeviceDetailsView device={device} activationCode={code} />
+          <DetailsView details={deviceDetails} />
         </Box>
       </Box>
       <Box>
         <CardHeader title={'Пользователи устройства'} sx={{ mx: 2 }} />
-        {/* <UserListTable users={users} /> */}
 
         <Container maxWidth={false}>
-          {/* <ToolbarActions buttons={userButtons} /> */}
           <ToolbarActionsWithSearch
             buttons={userButtons}
             searchTitle={'Найти пользователя'}
@@ -270,12 +279,10 @@ const DeviceView = () => {
             value={(pageParamLocal?.filterText as undefined) || ''}
           />
           <Box /*sx={{ pt: 2 }}*/>
-            {/* <UserListTable users={users} /> */}
             <SortableTable<IUser> headCells={headCells} data={users} path={'/app/users/'} />
           </Box>
         </Container>
       </Box>
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

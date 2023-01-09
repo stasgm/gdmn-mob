@@ -84,6 +84,10 @@ const globalStyles = StyleSheet.create({
     color: '#333333',
     marginBottom: 5,
   },
+  text18: {
+    fontSize: 18,
+    lineHeight: 18,
+  },
   textLow: {
     fontSize: 15,
   },
@@ -277,6 +281,14 @@ const globalStyles = StyleSheet.create({
   },
   textDecorationLine: {
     textDecorationLine: 'underline',
+  },
+  rowAlignEnd: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+  columnAlignEnd: {
+    flexDirection: 'column',
+    alignItems: 'flex-end',
   },
 });
 

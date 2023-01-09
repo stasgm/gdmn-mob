@@ -1,4 +1,4 @@
 import asyncActions from './actions.async';
-import * as actions from './actions';
+import { processActions } from './actions';
 
-export default { ...asyncActions, ...actions };
+export default { ...asyncActions, ...processActions };

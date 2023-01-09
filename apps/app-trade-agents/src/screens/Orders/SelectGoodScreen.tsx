@@ -1,13 +1,13 @@
 import React, { useState, useLayoutEffect, useCallback, useMemo, useEffect } from 'react';
 import {
   View,
-  TouchableOpacity,
   Text,
   StyleSheet,
   ColorValue,
   Alert,
   FlatList,
   useWindowDimensions,
+  TouchableOpacity,
 } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 
@@ -23,7 +23,7 @@ import {
 } from '@lib/mobile-ui';
 import { appActions, docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 
-import { generateId, getDateString, keyExtractor, shortenString } from '@lib/mobile-app';
+import { generateId, getDateString, keyExtractor, shortenString } from '@lib/mobile-hooks';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 

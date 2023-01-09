@@ -26,18 +26,21 @@ import {
 import { StackNavigationProp } from '@react-navigation/stack';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-import { deleteSelectedItems, formatValue, getDateString, getDelList, keyExtractor } from '@lib/mobile-app';
+import { deleteSelectedItems, formatValue, getDateString, getDelList, keyExtractor } from '@lib/mobile-hooks';
 
-import { appActions, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
+import { appActions, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 
-import { IDelList } from '@lib/mobile-types';
+import { IDelList, IListItem } from '@lib/mobile-types';
 
 import { Searchbar } from 'react-native-paper';
 
 import { IDebt, IOrderDocument, IOrderListFormParam, IOutlet } from '../../store/types';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
+import { statusTypes } from '../../utils/constants';
+
 import OrderListTotal from './components/OrderListTotal';
+import Checkbox from './components/Checkbox';
 
 export interface OrderListSectionProps {
   title: string;
@@ -48,6 +51,7 @@ export type SectionDataProps = SectionListData<IListItemProps, OrderListSectionP
 const OrderListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
   const dispatch = useDispatch();
+  const docDispatch = useDocThunkDispatch();
 
   const { colors } = useTheme();
 
@@ -60,9 +64,13 @@ const OrderListScreen = () => {
 
   const outlets = refSelectors.selectByName<IOutlet>('outlet')?.data;
 
-  const { filterContact, filterOutlet, filterDateBegin, filterDateEnd } = useSelector(
-    (state) => state.app.formParams as IOrderListFormParam,
-  );
+  const {
+    filterContact,
+    filterOutlet,
+    filterDateBegin,
+    filterDateEnd,
+    filterStatusList = [],
+  } = useSelector((state) => state.app.formParams as IOrderListFormParam);
 
   useEffect(() => {
     return () => {
@@ -73,7 +81,6 @@ const OrderListScreen = () => {
 
   const handleCleanFormParams = useCallback(() => {
     dispatch(appActions.clearFormParams());
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -126,13 +133,13 @@ const OrderListScreen = () => {
         ?.sort(
           (a, b) =>
             new Date(b.documentDate.slice(0, 10)).getTime() - new Date(a.documentDate.slice(0, 10)).getTime() ||
-            new Date(b.head.onDate.slice(0, 10)).getTime() - new Date(a.head.onDate.slice(0, 10)).getTime(),
+            new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
         ),
     [orders, outlets, searchQuery],
   );
 
   const filteredOrderList = useMemo(() => {
-    if (filterContact?.id || filterOutlet?.id || filterDateBegin || filterDateEnd) {
+    if (filterContact?.id || filterOutlet?.id || filterDateBegin || filterDateEnd || filterStatusList) {
       let dateEnd: Date | undefined;
       if (filterDateEnd) {
         dateEnd = new Date(filterDateEnd);
@@ -144,12 +151,15 @@ const OrderListScreen = () => {
           (filterContact?.id ? i.head.contact.id === filterContact.id : true) &&
           (filterOutlet?.id ? i.head.outlet.id === filterOutlet.id : true) &&
           (filterDateBegin ? new Date(filterDateBegin).getTime() <= new Date(i.head?.onDate).getTime() : true) &&
-          (dateEnd ? new Date(dateEnd).getTime() >= new Date(i.head?.onDate).getTime() : true),
+          (dateEnd ? new Date(dateEnd).getTime() >= new Date(i.head?.onDate).getTime() : true) &&
+          (filterStatusList.length
+            ? filterStatusList.find((item) => item.id.toUpperCase() === i.status.toUpperCase())
+            : true),
       );
     } else {
       return orderList;
     }
-  }, [filterContact, filterDateBegin, filterDateEnd, filterOutlet, orderList]);
+  }, [filterContact?.id, filterDateBegin, filterDateEnd, filterOutlet?.id, filterStatusList, orderList]);
 
   const debets = refSelectors.selectByName<IDebt>('debt')?.data;
 
@@ -202,6 +212,18 @@ const OrderListScreen = () => {
     [filteredListByStatus],
   );
 
+  const statusTypesSection = useMemo(
+    () =>
+      status === 'all'
+        ? statusTypes
+        : status === 'active'
+        ? statusTypes.filter((e) => e.id !== 'PROCESSED')
+        : status === 'archive'
+        ? statusTypes.filter((e) => e.id === 'PROCESSED')
+        : [],
+    [status],
+  );
+
   const [delList, setDelList] = useState<IDelList>({});
   const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
 
@@ -209,12 +231,12 @@ const OrderListScreen = () => {
     const docIds = Object.keys(delList);
 
     const deleteDocs = () => {
-      dispatch(documentActions.removeDocuments(docIds));
+      docDispatch(documentActions.removeDocuments(docIds));
       setDelList({});
     };
 
     deleteSelectedItems(delList, deleteDocs);
-  }, [delList, dispatch]);
+  }, [delList, docDispatch]);
 
   const handleAddDocument = useCallback(() => {
     navigation.navigate('OrderEdit');
@@ -307,6 +329,19 @@ const OrderListScreen = () => {
     });
   }, [filterContact?.id, filterOutlet, navigation]);
 
+  const handleFilterStatus = useCallback(
+    (value: IListItem) => {
+      dispatch(
+        appActions.setFormParams({
+          filterStatusList: filterStatusList.find((item) => item.id === value.id)
+            ? filterStatusList.filter((i) => i.id !== value.id)
+            : [...filterStatusList, value],
+        }),
+      );
+    },
+    [dispatch, filterStatusList],
+  );
+
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const debt = debets.find((d) => d.id === orderList.find((o) => o.id === item.id)?.head?.contact.id);
 
@@ -382,11 +417,25 @@ const OrderListScreen = () => {
                 />
               </View>
             </View>
+            <View style={[localStyles.marginTop, localStyles.status]}>
+              {statusTypesSection.map((elem) => (
+                <View key={elem.id}>
+                  <Checkbox
+                    key={elem.id}
+                    title={elem.value}
+                    selected={!!filterStatusList.find((i) => i.id === elem.id)}
+                    onSelect={() => handleFilterStatus(elem)}
+                  />
+                </View>
+              ))}
+            </View>
             <View style={localStyles.container}>
               <PrimeButton
                 icon={'delete-outline'}
                 onPress={handleCleanFormParams}
-                disabled={!(filterContact || filterOutlet || filterDateBegin || filterDateEnd)}
+                disabled={
+                  !(filterContact || filterOutlet || filterDateBegin || filterDateEnd || filterStatusList.length)
+                }
               >
                 {'Очистить'}
               </PrimeButton>
@@ -451,6 +500,11 @@ const localStyles = StyleSheet.create({
   },
   container: {
     alignItems: 'center',
-    marginTop: -10,
+    marginTop: -4,
+  },
+  status: {
+    marginHorizontal: 5,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
 });

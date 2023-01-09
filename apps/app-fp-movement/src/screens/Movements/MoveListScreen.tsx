@@ -2,7 +2,7 @@ import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { ListRenderItem, SectionList, SectionListData, View, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import { documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
+import { documentActions, refSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   AddButton,
@@ -22,7 +22,7 @@ import {
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@lib/mobile-app';
+import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@lib/mobile-hooks';
 
 import { INamedEntity } from '@lib/types';
 
@@ -40,7 +40,7 @@ export type SectionDataProps = SectionListData<IListItemProps, MoveListSectionPr
 
 export const MoveListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'MoveList'>>();
-  const dispatch = useDispatch();
+  const docDispatch = useDocThunkDispatch();
 
   const list = (
     useSelector((state) => state.documents.list)?.filter((i) => i.documentType?.name === 'movement') as IMoveDocument[]
@@ -151,12 +151,12 @@ export const MoveListScreen = () => {
     const docIds = Object.keys(delList);
 
     const deleteDocs = () => {
-      dispatch(documentActions.removeDocuments(docIds));
+      docDispatch(documentActions.removeDocuments(docIds));
       setDelList({});
     };
 
     deleteSelectedItems(delList, deleteDocs);
-  }, [delList, dispatch]);
+  }, [delList, docDispatch]);
 
   const renderRight = useCallback(
     () => (

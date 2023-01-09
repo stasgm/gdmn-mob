@@ -20,11 +20,11 @@ import {
   navBackDrawer,
 } from '@lib/mobile-ui';
 
-import { documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
+import { documentActions, refSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@lib/mobile-app';
+import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@lib/mobile-hooks';
 
 import { IDelList, IListItem } from '@lib/mobile-types';
 
@@ -50,7 +50,7 @@ export type SectionDataProps = SectionListData<IListItemProps, DocListSectionPro
 
 export const DocListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'DocList'>>();
-  const dispatch = useDispatch();
+  const docDispatch = useDocThunkDispatch();
 
   const { colors } = useTheme();
 
@@ -70,12 +70,12 @@ export const DocListScreen = () => {
     const docIds = Object.keys(delList);
 
     const deleteDocs = () => {
-      dispatch(documentActions.removeDocuments(docIds));
+      docDispatch(documentActions.removeDocuments(docIds));
       setDelList({});
     };
 
     deleteSelectedItems(delList, deleteDocs);
-  }, [delList, dispatch]);
+  }, [delList, docDispatch]);
 
   const handleAddDocument = useCallback(() => {
     navigation.navigate('DocEdit');

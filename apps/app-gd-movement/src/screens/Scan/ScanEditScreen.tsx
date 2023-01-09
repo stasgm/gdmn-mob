@@ -19,7 +19,7 @@ import {
 } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors, docSelectors } from '@lib/store';
 
-import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-app';
+import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks';
 
 import { IDocumentType, IReference } from '@lib/types';
 
@@ -167,7 +167,7 @@ export const ScanEditScreen = () => {
     setShowDate(false);
 
     if (selectedDate) {
-      dispatch(appActions.setFormParams({ documentDate: selectedDate.toISOString().slice(0, 10) }));
+      dispatch(appActions.setFormParams({ documentDate: selectedDate.toISOString() }));
     }
   };
 
@@ -234,6 +234,7 @@ export const ScanEditScreen = () => {
             onChangeText={handleChangeNumber}
             disabled={isBlocked}
             clearInput={true}
+            keyboardType="url"
           />
           <SelectableInput
             label="Дата"

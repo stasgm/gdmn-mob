@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { IDeviceBinding, NewDeviceBinding } from '@lib/types';
 import { useEffect } from 'react';
 
-import SnackBar from '../../components/SnackBar';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import bindingActions from '../../store/deviceBinding';
 import actions from '../../store/user';
@@ -16,12 +15,9 @@ export type Params = {
 
 const UserDeviceCreate = () => {
   const { id: userId } = useParams<keyof Params>() as Params;
-
   const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch();
-
-  const { loading, errorMessage } = useSelector((state) => state.deviceBindings);
-
+  const { loading } = useSelector((state) => state.deviceBindings);
   const user = selectors.userById(userId);
 
   useEffect(() => {
@@ -30,10 +26,6 @@ const UserDeviceCreate = () => {
 
   const goBack = () => {
     navigate(-1);
-  };
-
-  const handleClearError = () => {
-    dispatch(bindingActions.deviceBindingActions.clearError());
   };
 
   const handleSubmit = async (values: IDeviceBinding | NewDeviceBinding) => {
@@ -69,7 +61,6 @@ const UserDeviceCreate = () => {
           onCancel={goBack}
         />
       </Box>
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

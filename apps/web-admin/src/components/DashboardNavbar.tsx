@@ -9,6 +9,8 @@ import { authActions, useAuthThunkDispatch } from '@lib/store';
 
 import { adminPath } from '../utils/constants';
 
+import { webRequest } from '../store/webRequest';
+
 import Logo from './Logo';
 
 interface IProps {
@@ -39,7 +41,10 @@ const DashboardNavbar = ({ onMobileNavOpen, ...rest }: IProps) => {
               <NotificationsIcon />
             </Badge>
           </IconButton>
-          <IconButton color="inherit" onClick={() => authDispatch(authActions.logout())}>
+          <IconButton
+            color="inherit"
+            onClick={() => authDispatch(authActions.logout(webRequest(authDispatch, authActions)))}
+          >
             <LogoutIcon />
           </IconButton>
         </Box>

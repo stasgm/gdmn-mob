@@ -2,11 +2,11 @@ import React from 'react';
 import { View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+import { StackNavigationProp } from '@react-navigation/stack';
+
 import { globalStyles as styles, PrimeButton, RoundButton, AppScreen, ScreenTitle } from '@lib/mobile-ui';
 import { IApiConfig } from '@lib/client-types';
 import { useSelector } from '@lib/store';
-
-import { StackNavigationProp } from '@react-navigation/stack';
 
 import { AuthStackParamList } from '../navigation/types';
 
@@ -36,7 +36,7 @@ const SplashScreen = (props: Props) => {
             onPress={!loading ? onCheckDevice : onBreakConnection}
             disabled={loading}
           >
-            {'Подключиться'}
+            Подключиться
           </PrimeButton>
         </View>
       </AppScreen>

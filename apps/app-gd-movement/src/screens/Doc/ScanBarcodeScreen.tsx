@@ -3,12 +3,19 @@ import { Text, View, StyleSheet } from 'react-native';
 
 import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigation/native';
 
-import { AppActivityIndicator, globalStyles, navBackButton, ScanBarcode, ScanBarcodeReader } from '@lib/mobile-ui';
+import {
+  AppActivityIndicator,
+  globalStyles,
+  LargeText,
+  navBackButton,
+  ScanBarcode,
+  ScanBarcodeReader,
+} from '@lib/mobile-ui';
 import { useSelector, refSelectors } from '@lib/store';
 
 import { IDocumentType, INamedEntity, ISettingsOption } from '@lib/types';
 
-import { generateId } from '@lib/mobile-app';
+import { generateId } from '@lib/mobile-hooks';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -31,6 +38,7 @@ const ScanBarcodeScreen = () => {
   const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>).data || 0;
   const weightSettingsCountWeight = (settings.countWeight as ISettingsOption<number>).data || 0;
   const isScanerReader = settings.scannerUse?.data;
+  const isInputQuantity = settings.quantityInput?.data;
 
   const [scaner, setScaner] = useState<IScannedObject>({ state: 'init' });
   const [scannedObject, setScannedObject] = useState<IMovementLine>();
@@ -72,6 +80,7 @@ const ScanBarcodeScreen = () => {
       if (!brc) {
         return;
       }
+
       let charFrom = 0;
       let charTo = weightSettingsWeightCode.data.length;
 
@@ -81,6 +90,7 @@ const ScanBarcodeScreen = () => {
         // Находим товар из модели остатков по баркоду, если баркод не найден, то
         //   если выбор из остатков, то undefined,
         //   иначе подставляем unknownGood cо сканированным шк и добавляем в позицию документа
+
         if (!remItem) {
           setScaner({ state: 'error', message: 'Товар не найден' });
           return;
@@ -89,7 +99,7 @@ const ScanBarcodeScreen = () => {
         setScannedObject({
           good: { id: remItem.good.id, name: remItem.good.name },
           id: generateId(),
-          quantity: 1,
+          quantity: isInputQuantity ? 0 : 1,
           price: remItem.remains?.length ? remItem.remains[0].price : 0,
           buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
@@ -132,6 +142,7 @@ const ScanBarcodeScreen = () => {
     [
       documentType?.isRemains,
       goodRemains,
+      isInputQuantity,
       weightSettingsCountCode,
       weightSettingsCountWeight,
       weightSettingsWeightCode.data,
@@ -156,7 +167,11 @@ const ScanBarcodeScreen = () => {
   }
 
   if (!document) {
-    return <Text style={globalStyles.title}>Документ не найден</Text>;
+    return (
+      <View style={[globalStyles.container, globalStyles.alignItemsCenter]}>
+        <LargeText>Документ не найден</LargeText>
+      </View>
+    );
   }
 
   return isScanerReader ? (

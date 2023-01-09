@@ -1,4 +1,4 @@
-import { log, round } from '@lib/mobile-app';
+import { log, round } from '@lib/mobile-hooks';
 
 import {
   IGood,
@@ -152,13 +152,14 @@ const totalListByGroup = (
 ): IOrderTotalLine[] =>
   firstLevelGroups
     ?.map((firstGr) => {
-      const linesByParentGroup = orderLines?.filter((l) =>
-        groups.find(
-          (group) => (group.parent?.id === firstGr.id || group.id === firstGr.id) && group.id === l.good.goodgroup.id,
-        ),
-      );
+      const linesByParentGroup =
+        orderLines?.filter((l) =>
+          groups.find(
+            (group) => (group.parent?.id === firstGr.id || group.id === firstGr.id) && group.id === l.good.goodgroup.id,
+          ),
+        ) || [];
 
-      const { quantity, sum, sumVat } = linesByParentGroup?.reduce(
+      const { quantity, sum, sumVat } = linesByParentGroup.reduce(
         (prev: any, line) => {
           const s1 = round((round(line.quantity, 3) / (line.good.invWeight || 1)) * line.good.priceFsn);
           return {

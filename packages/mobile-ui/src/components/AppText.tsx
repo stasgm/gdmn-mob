@@ -6,6 +6,7 @@ interface IProps {
   children?: any;
   style?: StyleProp<TextStyle>;
   selectable?: boolean;
+  onPress?: () => void;
 }
 
 export const LargeText = ({ children, style, selectable = false }: IProps) => {
@@ -17,10 +18,10 @@ export const LargeText = ({ children, style, selectable = false }: IProps) => {
   );
 };
 
-export const MediumText = ({ children, style, selectable = false }: IProps) => {
+export const MediumText = ({ children, style, selectable = false, onPress }: IProps) => {
   const { colors } = useTheme();
   return (
-    <Text style={[localStyles.mediumText, { color: colors.text }, style]} selectable={selectable}>
+    <Text style={[localStyles.mediumText, { color: colors.text }, style]} selectable={selectable} onPress={onPress}>
       {children}
     </Text>
   );

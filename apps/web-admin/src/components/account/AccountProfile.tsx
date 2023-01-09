@@ -27,17 +27,10 @@ const AccountProfile = ({ user }: IProps) => (
         <Typography color="textPrimary" gutterBottom variant="h3">
           {user.name}
         </Typography>
-        {/* <Typography color="textSecondary" variant="body1">
-          {`${user.city} ${user.country}`}
-        </Typography>
-        <Typography color="textSecondary" variant="body1">
-          {`${user.timezone}`}
-        </Typography>*/}
       </Box>
     </CardContent>
     <Divider />
     <CardActions>
-      {/* <Input type="file" id="file-input" name="ImageStyle" /> */}
       <Button color="primary" fullWidth variant="text">
         Загрузить картинку
       </Button>

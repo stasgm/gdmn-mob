@@ -1,5 +1,5 @@
 import { IListItem } from '@lib/mobile-types';
-import { baseSettingGroup } from '@lib/store/src/settings/reducer';
+import { baseSettingGroup } from '@lib/store';
 import { Settings, StatusType } from '@lib/types';
 
 import { IGood } from '../store/app/types';
@@ -87,11 +87,11 @@ export const getStatusColor = (status: StatusType) => {
   return statusColor;
 };
 
-const goodGroup = { id: '2', name: 'Весовой товар', sortOrder: 2 };
+const goodGroup = { id: 'goodScan', name: 'Весовой товар', sortOrder: 2 };
 
 export const appSettings: Settings = {
   scannerUse: {
-    id: '4',
+    id: 'scannerUse',
     sortOrder: 3,
     description: 'Использовать сканер',
     data: true,
@@ -99,9 +99,27 @@ export const appSettings: Settings = {
     visible: true,
     group: baseSettingGroup,
   },
-  weightCode: {
-    id: '5',
+  screenKeyboard: {
+    id: 'screenKeyboard',
+    sortOrder: 4,
+    description: 'Экранная клавиатура',
+    data: true,
+    type: 'boolean',
+    visible: true,
+    group: baseSettingGroup,
+  },
+  quantityInput: {
+    id: 'quantityInput',
     sortOrder: 5,
+    description: 'Не заполнять количество',
+    data: true,
+    type: 'boolean',
+    visible: true,
+    group: baseSettingGroup,
+  },
+  weightCode: {
+    id: 'weightCode',
+    sortOrder: 6,
     description: 'Идентификатор весового товара',
     data: '22',
     type: 'string',
@@ -109,8 +127,8 @@ export const appSettings: Settings = {
     group: goodGroup,
   },
   countCode: {
-    id: '6',
-    sortOrder: 6,
+    id: 'countCode',
+    sortOrder: 7,
     description: 'Кол-во символов кода товара',
     data: 5,
     type: 'number',
@@ -118,8 +136,8 @@ export const appSettings: Settings = {
     group: goodGroup,
   },
   countWeight: {
-    id: '7',
-    sortOrder: 7,
+    id: 'countWeight',
+    sortOrder: 8,
     description: 'Кол-во символов веса (в гр.)',
     data: 5,
     type: 'number',

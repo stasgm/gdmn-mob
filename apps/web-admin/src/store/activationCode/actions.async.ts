@@ -1,46 +1,29 @@
 import api from '@lib/client-api';
+import { authActions } from '@lib/store';
 
 import { ThunkAction } from 'redux-thunk';
 
 import { AppState } from '..';
+import { webRequest } from '../webRequest';
 
 import { activationCodeActions, ActivationCodeActionType } from './actions';
 
 export type AppThunk = ThunkAction<Promise<ActivationCodeActionType>, AppState, null, ActivationCodeActionType>;
 
-/*const fetchActivationCodeById = (id: string): AppThunk => {
-  return async (dispatch) => {
-    dispatch(activationCodeActions.fetchActivationCodeAsync.request(''));
-
-    const response = await api.activationCode.getDevice(id);
-
-    if (response.type === 'GET_DEVICE') {
-      return dispatch(activationCodeActions.fetchActivationCodeAsync.success(response.activationCode));
-    }
-
-    if (response.type === 'ERROR') {
-      return dispatch(activationCodeActions.fetchActivationCodeAsync.failure(response.message));
-    }
-
-    return dispatch(activationCodeActions.fetchActivationCodesAsync.failure('Ошибка получения данных об устройстве'));
-  };
-};*/
-
 const fetchActivationCodes = (deviceId?: string): AppThunk => {
   return async (dispatch) => {
     dispatch(activationCodeActions.fetchCodesAsync.request(''));
 
-    const response = await api.activationCode.getActivationCodes(deviceId ? { deviceId: deviceId } : undefined);
+    const response = await api.activationCode.getActivationCodes(
+      webRequest(dispatch, authActions),
+      deviceId ? { deviceId: deviceId } : undefined,
+    );
 
     if (response.type === 'GET_CODES') {
       return dispatch(activationCodeActions.fetchCodesAsync.success(response.codes));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(activationCodeActions.fetchCodesAsync.failure(response.message));
-    }
-
-    return dispatch(activationCodeActions.fetchCodesAsync.failure('Ошибка получения данных об активационных кодах'));
+    return dispatch(activationCodeActions.fetchCodesAsync.failure(response.message));
   };
 };
 
@@ -50,36 +33,14 @@ const createActivationCode = (deviceId: string): AppThunk => {
   return async (dispatch) => {
     dispatch(activationCodeActions.createCodeAsync.request(''));
 
-    const response = await api.activationCode.createActivationCode(deviceId);
+    const response = await api.activationCode.createActivationCode(webRequest(dispatch, authActions), deviceId);
 
     if (response.type === 'CREATE_CODE') {
       return dispatch(activationCodeActions.createCodeAsync.success(response.code));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(activationCodeActions.createCodeAsync.failure(response.message));
-    }
-
-    return dispatch(activationCodeActions.createCodeAsync.failure('Ошибка получения кода активации'));
+    return dispatch(activationCodeActions.createCodeAsync.failure(response.message));
   };
 };
-
-// const getActivationCode = (): AppThunk => {
-//   return async (dispatch) => {
-//     dispatch(activationCodeActions.getActivationCodeAsync.request(''));
-
-//     const response = await api.activationCode.getActivationCode();
-
-//     if (response.type === 'GET_ACTIVATION_CODE') {
-//       return dispatch(activationCodeActions.getActivationCodeAsync.success(response.activationCode));
-//     }
-
-//     if (response.type === 'ERROR') {
-//       return dispatch(activationCodeActions.getActivationCodeAsync.failure(response.message));
-//     }
-
-//     return dispatch(activationCodeActions.getActivationCodeAsync.failure('Ошибка получения данных об устройствах'));
-//   };
-// };
 
 export default { fetchActivationCodes, createActivationCode };

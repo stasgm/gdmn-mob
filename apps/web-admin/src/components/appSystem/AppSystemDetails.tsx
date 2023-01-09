@@ -19,7 +19,7 @@ const AppSystemDetails = ({ appSystem, loading, onSubmit, onCancel }: IProps) =>
       name: yup.string().required('Required'),
     }),
     onSubmit: (values) => {
-      onSubmit(values);
+      onSubmit({ ...values, name: values.name.trim(), description: values.description?.trim() || '' });
     },
   });
 

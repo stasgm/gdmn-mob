@@ -5,7 +5,7 @@ import { IPageParam } from '../../types';
 
 const init = createAction('COMPANY/INIT')();
 const clearError = createAction('COMPANY/CLEAR_ERROR')();
-const setError = createAction('COMPANY/SET_ERROR')();
+const setError = createAction('COMPANY/SET_ERROR')<string>();
 
 const fetchCompaniesAsync = createAsyncAction(
   'COMPANY/FETCH_COMPANIES',

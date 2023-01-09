@@ -23,3 +23,7 @@ yarn-debug.log*
 yarn-error.log*
 
 /configs/dev.json
+
+/ssl/**/*.key
+/ssl/**/*.ca-bundle
+/ssl/**/*.crt

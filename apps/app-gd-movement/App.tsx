@@ -1,8 +1,11 @@
 import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import { Provider } from 'react-redux';
-import { dialCall, MobileApp } from '@lib/mobile-app';
+import { MobileApp } from '@lib/mobile-app';
+import { dialCall, sleep } from '@lib/mobile-hooks';
 import { GDMN_EMAIL, GDMN_PHONE, GDMN_SITE_ADDRESS, INavItem } from '@lib/mobile-navigation';
 import ErrorBoundary from 'react-native-error-boundary';
+
+import { StatusBar } from 'expo-status-bar';
 
 import {
   appActions,
@@ -28,8 +31,6 @@ import {
 import { ActivityIndicator, Caption, Text } from 'react-native-paper';
 
 import { IDocument, IReferences } from '@lib/types';
-
-import { sleep } from '@lib/client-api';
 
 import { TouchableOpacity, Linking, View } from 'react-native';
 
@@ -219,7 +220,7 @@ const Root = () => {
             </TouchableOpacity>
           </View>
           <PrimeButton icon={'presentation-play'} onPress={handleSetInfoWindow_0}>
-            {'Начать работу'}
+            Начать работу
           </PrimeButton>
         </AppScreen>
       ) : authLoading || loading || invLoading || appDataLoading ? (
@@ -240,6 +241,7 @@ const App = () => (
   <Provider store={store}>
     <UIProvider theme={defaultTheme}>
       <Root />
+      <StatusBar style="auto" />
     </UIProvider>
   </Provider>
 );

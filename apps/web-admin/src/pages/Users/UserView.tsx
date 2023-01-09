@@ -14,7 +14,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/user';
@@ -22,13 +22,12 @@ import selectors from '../../store/user/selectors';
 import bindingSelectors from '../../store/deviceBinding/selectors';
 import bindingActions from '../../store/deviceBinding';
 import codeActions from '../../store/activationCode';
-import { IToolBarButton } from '../../types';
+import { ILinkedEntity, IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
-import UserDetailsView from '../../components/user/UserDetailsView';
 import UserDevices from '../../components/user/UserDevices';
-import SnackBar from '../../components/SnackBar';
 
 import { adminPath } from '../../utils/constants';
+import DetailsView from '../../components/DetailsView';
 
 export type Params = {
   id: string;
@@ -36,19 +35,32 @@ export type Params = {
 
 const UserView = () => {
   const { id: userId } = useParams<keyof Params>() as Params;
-
   const navigate = useNavigate();
-
   const dispatch = useDispatch();
-
-  const { loading, errorMessage } = useSelector((state) => state.users);
+  const { loading } = useSelector((state) => state.users);
   const user = selectors.userById(userId);
-
   const userBindingDevices = bindingSelectors.bindingsByUserId(userId);
-
-  // const { list } = useSelector((state) => state.devices);
-
   const [open, setOpen] = useState(false);
+
+  const userDetails: ILinkedEntity[] = useMemo(
+    () =>
+      user
+        ? [
+            { id: 'Пользователь', value: user },
+            { id: 'Фамилия', value: user.lastName },
+            { id: 'Имя', value: user.firstName },
+            { id: 'Отчество', value: user.middleName },
+            { id: 'Телефон', value: user.phoneNumber },
+            { id: 'Email', value: user.email },
+            { id: 'Идентификатор из ERP системы', value: user.externalId },
+            user.appSystem
+              ? { id: 'Подсистема', value: user.appSystem?.name }
+              : { id: 'Пользователь ERP', value: user.erpUser?.name },
+            { id: 'Компания', value: user.company, link: `${adminPath}/app/companies/${user.company?.id}/` },
+          ]
+        : [],
+    [user],
+  );
 
   const handleCancel = () => {
     navigate(-1);
@@ -62,16 +74,10 @@ const UserView = () => {
     navigate(`${adminPath}/app/users/${userId}/binding/new`);
   };
 
-  const handleClearError = () => {
-    dispatch(actions.userActions.clearError());
-  };
-
   const refreshData = useCallback(() => {
     dispatch(actions.fetchUserById(userId));
     dispatch(bindingActions.fetchDeviceBindings(userId));
     dispatch(codeActions.fetchActivationCodes());
-
-    // dispatch(deviceActions.fetchDevices());
   }, [dispatch, userId]);
 
   useEffect(() => {
@@ -94,23 +100,6 @@ const UserView = () => {
   const handleClose = () => {
     setOpen(false);
   };
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  // const userDevices: IDevice[] = [];
-
-  // const data = useMemo(
-  //   () =>
-  //     userBindingDevices.forEach((binding: IDeviceBinding) => {
-  //       const dev = list.find((a) => binding.device.id === a.id);
-  //       // /*return*/ list.find((a) => binding.device.id === a.id);
-  //       console.log('dev', dev);
-  //       if (dev) {
-  //         userDevices.push(dev);
-  //       }
-  //       return { dev };
-  //     }),
-  //   [userBindingDevices, userDevices, list],
-  // );
 
   if (!user) {
     return (
@@ -149,7 +138,7 @@ const UserView = () => {
       disabled: true,
       color: 'secondary',
       variant: 'contained',
-      onClick: () => handleClickOpen(), //handleDelete(),
+      onClick: () => handleClickOpen(),
       icon: <DeleteIcon />,
     },
   ];
@@ -208,14 +197,13 @@ const UserView = () => {
             minHeight: '100%',
           }}
         >
-          <UserDetailsView user={user} />
+          <DetailsView details={userDetails} />
         </Box>
       </Box>
       <Box>
         <CardHeader title={'Устройства пользователя'} sx={{ mx: 2 }} />
         <UserDevices userId={userId} userBindingDevices={userBindingDevices} onAddDevice={handleAddDevice} />
       </Box>
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

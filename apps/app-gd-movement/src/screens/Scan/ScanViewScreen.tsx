@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, FlatList, TextInput, Alert, ListRenderItem } from 'react-native';
+import { View, TextInput, Alert } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -21,6 +21,7 @@ import {
   ListItemLine,
   navBackButton,
   SaveDocument,
+  SimpleDialog,
 } from '@lib/mobile-ui';
 
 import {
@@ -28,14 +29,14 @@ import {
   generateId,
   getDateString,
   getDelLineList,
-  keyExtractor,
   shortenString,
   useSendDocs,
-} from '@lib/mobile-app';
-
-import { sleep } from '@lib/client-api';
+  sleep,
+} from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
+
+import { FlashList } from '@shopify/flash-list';
 
 import { IScanDocument, IScanLine } from '../../store/types';
 import { ScanStackParamList } from '../../navigation/Root/types';
@@ -53,6 +54,7 @@ export const ScanViewScreen = () => {
   const id = useRoute<RouteProp<ScanStackParamList, 'ScanView'>>().params?.id;
   const doc = docSelectors.selectByDocId<IScanDocument>(id);
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
+  const loading = useSelector((state) => state.app.loading);
 
   const isBlocked = doc?.status !== 'DRAFT';
 
@@ -127,20 +129,13 @@ export const ScanViewScreen = () => {
 
   const sendDoc = useSendDocs(doc ? [doc] : []);
 
-  const handleSendDocument = useCallback(() => {
-    Alert.alert('Вы уверены, что хотите отправить документ?', '', [
-      {
-        text: 'Да',
-        onPress: async () => {
-          setScreenState('sending');
-          await sendDoc();
-          setScreenState('sent');
-        },
-      },
-      {
-        text: 'Отмена',
-      },
-    ]);
+  const [visibleSendDialog, setVisibleSendDialog] = useState(false);
+
+  const handleSendDocument = useCallback(async () => {
+    setVisibleSendDialog(false);
+    setScreenState('sending');
+    await sendDoc();
+    setScreenState('sent');
   }, [sendDoc]);
 
   const actionsMenu = useCallback(() => {
@@ -169,7 +164,7 @@ export const ScanViewScreen = () => {
     () =>
       isBlocked ? (
         doc?.status === 'READY' ? (
-          <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+          <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
         ) : (
           doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
         )
@@ -182,7 +177,7 @@ export const ScanViewScreen = () => {
               {doc?.status === 'DRAFT' && (
                 <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
               )}
-              <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+              <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
               {!isScanerReader && (
                 <ScanButton
                   onPress={() => navigation.navigate('ScanGood', { docId: id })}
@@ -199,11 +194,11 @@ export const ScanViewScreen = () => {
       doc?.status,
       handleDeleteDocs,
       handleSaveDocument,
-      handleSendDocument,
       id,
       isBlocked,
       isDelList,
       isScanerReader,
+      loading,
       navigation,
       screenState,
     ],
@@ -222,7 +217,7 @@ export const ScanViewScreen = () => {
     });
   }, [delList.length, isDelList, navigation, renderLeft, renderRight]);
 
-  const renderItem: ListRenderItem<IScanLine> = ({ item, index }) => (
+  const renderItem = ({ item, index }: { item: IScanLine; index: number }) => (
     <ListItemLine
       key={item.id}
       {...item}
@@ -331,15 +326,20 @@ export const ScanViewScreen = () => {
           showSoftInputOnFocus={false}
           onChangeText={(text) => !scanned && setScan(text)}
         />
-        <FlatList
+        <FlashList
           data={lines}
-          keyExtractor={keyExtractor}
           renderItem={renderItem}
-          initialNumToRender={6}
-          maxToRenderPerBatch={6} // Reduce number in each render batch
-          updateCellsBatchingPeriod={100} // Increase time between renders
-          windowSize={7} // Reduce the window size
+          estimatedItemSize={60}
           ItemSeparatorComponent={ItemSeparator}
+          keyboardShouldPersistTaps="handled"
+        />
+        <SimpleDialog
+          visible={visibleSendDialog}
+          title={'Внимание!'}
+          text={'Вы уверены, что хотите отправить документ?'}
+          onCancel={() => setVisibleSendDialog(false)}
+          onOk={handleSendDocument}
+          okDisabled={loading}
         />
       </View>
     </>

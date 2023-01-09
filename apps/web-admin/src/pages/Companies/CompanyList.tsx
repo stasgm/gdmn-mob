@@ -6,30 +6,20 @@ import { useLocation } from 'react-router-dom';
 
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
-// import ImportExportIcon from '@material-ui/icons/ImportExport';
-
 import { ICompany } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
-
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/company';
-
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-
 import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
-
-import SnackBar from '../../components/SnackBar';
 import SortableTable from '../../components/SortableTable';
 
 const CompanyList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch: AppDispatch = useDispatch();
-  // const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
-
   const { list, loading, errorMessage, pageParams } = useSelector((state) => state.companies);
-
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
   const fetchCompanies = useCallback(
@@ -64,8 +54,6 @@ const CompanyList = () => {
     if (key !== 'Enter') return;
 
     handleSearchClick();
-    // const inputValue = valueRef?.current?.value;
-    // fetchCompanies(inputValue);
   };
 
   const handleClearError = () => {
@@ -74,7 +62,7 @@ const CompanyList = () => {
 
   const handleAddCompany = () => {
     if (list.length) {
-      dispatch(actions.companyActions.setError());
+      dispatch(actions.companyActions.setError('Компания уже существует'));
     } else {
       return navigate(`${location.pathname}/new`);
     }
@@ -87,20 +75,6 @@ const CompanyList = () => {
       onClick: () => fetchCompanies(),
       icon: <CachedIcon />,
     },
-    // {
-    //   name: 'Загрузить',
-    //   onClick: () => {
-    //     return;
-    //   },
-    //   icon: <ImportExportIcon />,
-    // },
-    // {
-    //   name: 'Выгрузить',
-    //   sx: { mx: 1 },
-    //   onClick: () => {
-    //     return;
-    //   },
-    // },
     {
       name: 'Добавить',
       color: 'primary',
@@ -149,7 +123,6 @@ const CompanyList = () => {
           )}
         </Container>
       </Box>
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

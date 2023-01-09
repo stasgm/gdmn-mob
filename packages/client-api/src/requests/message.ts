@@ -1,9 +1,10 @@
-import { AuthLogOut, IMessage, IMessageInfo, IMessageParams, INamedEntity, IResponse, NewMessage } from '@lib/types';
+import { IMessage, IMessageInfo, INamedEntity, NewMessage } from '@lib/types';
 
 import { error, message as types } from '../types';
-import { generateId, sleep } from '../utils';
+import { generateId, response2Log, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
+import { CustomRequest } from '../robustRequest';
 
 class Message extends BaseRequest {
   constructor(api: BaseApi) {
@@ -11,13 +12,13 @@ class Message extends BaseRequest {
   }
 
   sendMessages = async (
+    customRequest: CustomRequest,
     appSystem: INamedEntity,
     company: INamedEntity,
     consumer: INamedEntity,
     message: IMessage['body'],
     order: number,
     deviceId: string,
-    authFunc?: AuthLogOut,
   ) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
@@ -29,41 +30,34 @@ class Message extends BaseRequest {
       } as types.ISendMessageResponse;
     }
 
-    try {
-      const body: NewMessage = {
-        head: { company, consumer, appSystem, order, deviceId },
-        status: 'READY',
-        body: message,
-      };
+    const body: NewMessage = {
+      head: { company, consumer, appSystem, order, deviceId },
+      status: 'READY',
+      body: message,
+    };
 
-      const res = await this.api.axios.post<IResponse<IMessageInfo>>('/messages', body);
-      const resData = res.data;
+    const res = await customRequest<IMessageInfo>({
+      api: this.api.axios,
+      method: 'POST',
+      url: '/messages',
+      data: body,
+    });
 
-      if (authFunc && resData.status === 401) {
-        await authFunc();
-      }
-
-      if (resData.result) {
-        return {
-          type: 'SEND_MESSAGE',
-          uid: resData.data?.uid,
-          date: resData.data?.date,
-        } as types.ISendMessageResponse;
-      }
-
+    if (res.type === 'SUCCESS') {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка отправки сообщения',
-      } as error.INetworkError;
+        type: 'SEND_MESSAGE',
+        uid: res.data.uid,
+        date: res.data.date,
+      } as types.ISendMessageResponse;
     }
+
+    return {
+      type: res.type,
+      message: response2Log(res) || 'Сообщение не отправлено',
+    } as error.IServerError;
   };
 
-  getMessages = async (params: IMessageParams, authFunc?: AuthLogOut) => {
+  getMessages = async (customRequest: CustomRequest, params: Record<string, string>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -73,36 +67,27 @@ class Message extends BaseRequest {
       } as types.IGetMessagesResponse;
     }
 
-    try {
-      const res = await this.api.axios.get<IResponse<IMessage[]>>(
-        `/messages?companyId=${params.companyId}&appSystemId=${params.appSystemId}`,
-      );
-      const resData = res.data;
+    const res = await customRequest<IMessage[]>({
+      api: this.api.axios,
+      method: 'GET',
+      url: '/messages',
+      params,
+    });
 
-      if (authFunc && resData.status === 401) {
-        await authFunc();
-      }
-
-      if (resData.result) {
-        return {
-          type: 'GET_MESSAGES',
-          messageList: resData.data,
-        } as types.IGetMessagesResponse;
-      }
-
+    if (res.type === 'SUCCESS') {
       return {
-        type: 'ERROR',
-        message: resData.error || 'ошибка получения данных',
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка получения сообщения',
-      } as error.INetworkError;
+        type: 'GET_MESSAGES',
+        messageList: res.data,
+      } as types.IGetMessagesResponse;
     }
+
+    return {
+      type: res.type,
+      message: response2Log(res) || 'Сообщения не получены',
+    } as error.IServerError;
   };
 
-  removeMessage = async (messageId: string, params: IMessageParams, authFunc?: AuthLogOut) => {
+  removeMessage = async (customRequest: CustomRequest, messageId: string, params: Record<string, string>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -111,34 +96,25 @@ class Message extends BaseRequest {
       } as types.IRemoveMessageResponse;
     }
 
-    try {
-      const res = await this.api.axios.delete<IResponse<void>>(
-        `/messages/${messageId}?companyId=${params.companyId}&appSystemId=${params.appSystemId}`,
-      );
-      const resData = res.data;
+    const res = await customRequest<void>({
+      api: this.api.axios,
+      method: 'DELETE',
+      url: `/messages/${messageId}`,
+      params,
+    });
 
-      if (authFunc && resData.status === 401) {
-        await authFunc();
-      }
-
-      if (resData.result) {
-        return {
-          type: 'REMOVE_MESSAGE',
-        } as types.IRemoveMessageResponse;
-      }
+    if (res.type === 'SUCCESS') {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка удаления сообщения',
-      } as error.INetworkError;
+        type: 'REMOVE_MESSAGE',
+      } as types.IRemoveMessageResponse;
     }
+    return {
+      type: res.type,
+      message: response2Log(res) || 'Сooбщение не удалено',
+    } as error.IServerError;
   };
 
-  clear = async (params: IMessageParams, authFunc?: AuthLogOut) => {
+  clear = async (customRequest: CustomRequest, params: Record<string, string>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -147,32 +123,23 @@ class Message extends BaseRequest {
       } as types.IClearMessagesResponse;
     }
 
-    try {
-      const res = await this.api.axios.delete<IResponse<void>>(
-        `/messages?companyId=${params.companyId}&appSystemId=${params.appSystemId}`,
-      );
-      const resData = res.data;
+    const res = await customRequest<void>({
+      api: this.api.axios,
+      method: 'DELETE',
+      url: '/messages',
+      params,
+    });
 
-      if (authFunc && resData.status === 401) {
-        await authFunc();
-      }
-
-      if (resData.result) {
-        return {
-          type: 'CLEAR_MESSAGES',
-        } as types.IClearMessagesResponse;
-      }
-
+    if (res.type === 'SUCCESS') {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка удаления сообщений',
-      } as error.INetworkError;
+        type: 'CLEAR_MESSAGES',
+      } as types.IClearMessagesResponse;
     }
+
+    return {
+      type: res.type,
+      message: response2Log(res) || 'Сообщения не удалены',
+    } as error.IServerError;
   };
 }
 

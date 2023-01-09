@@ -10,7 +10,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { SelectableInput, Input, SaveButton, SubTitle, AppScreen, RadioGroup, navBackButton } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
-import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-app';
+import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks';
 
 import { IDocumentType, IReference, ScreenState } from '@lib/types';
 

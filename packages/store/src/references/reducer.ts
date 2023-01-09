@@ -49,13 +49,27 @@ const reducer: Reducer<ReferenceState, ReferenceActionType> = (state = initialSt
         errorMessage: action.payload || 'error',
       };
 
+    case getType(actions.setOneReferenceAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
+
+    case getType(actions.setOneReferenceAsync.success):
+      return {
+        ...state,
+        loading: false,
+        list: { ...state.list, [action.payload.refName]: action.payload.refData },
+      };
+
+    case getType(actions.setOneReferenceAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
+      };
+
     case getType(actions.deleteReference): {
       const { [action.payload]: _, ...rest } = state.list;
       return { ...state, list: rest };
     }
-
-    // case getType(actions.deleteAllReferences):
-    //   return { ...state, list: {} };
 
     case getType(actions.clearError):
       return { ...state, errorMessage: '' };

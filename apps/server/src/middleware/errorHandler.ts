@@ -1,6 +1,6 @@
 import { Context, Next } from 'koa';
 
-import { IResponse } from '@lib/types';
+import { FailureResponse } from '@lib/types';
 
 import log from '../utils/logger';
 import { ApplicationException } from '../exceptions';
@@ -14,11 +14,17 @@ export const errorHandler = async (ctx: Context, next: Next) => {
     await next();
   } catch (error: any) {
     if (error instanceof ApplicationException) {
-      const result: IResponse<string> = {
+      // const result: IResponse<string> = {
+      //   result: false,
+      //   error: error.message || 'Неизвестная внутренняя ошибка',
+      //   data: error.name || 'InnerErrorException',
+      //   status: error.status || 500,
+      // };
+      const result: FailureResponse = {
         result: false,
-        error: error.message || 'Неизвестная внутренняя ошибка',
-        data: error.name || 'InnerErrorException',
+        type: 'FAILURE',
         status: error.status || 500,
+        error: error.message || 'Неизвестная внутренняя ошибка',
       };
 
       ctx.status = 200;
@@ -27,12 +33,17 @@ export const errorHandler = async (ctx: Context, next: Next) => {
       log.error(error.toString());
     } else {
       const errorMsg = error instanceof Error && error.message ? error.message : `Неизвестная ошибка: ${error}`;
-
       ctx.status = 500;
+      // ctx.body = {
+      //   result: false,
+      //   error: errorMsg,
+      //   data: 'InnerErrorException',
+      // };
       ctx.body = {
         result: false,
+        type: 'FAILURE',
+        status: 500,
         error: errorMsg,
-        data: 'InnerErrorException',
       };
 
       log.error(errorMsg, JSON.stringify(error));

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -16,20 +16,20 @@ import EditIcon from '@material-ui/icons/Edit';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
-import { IDevice } from '@lib/types';
-
 import { useSelector, useDispatch } from '../../store';
 import bindingActions from '../../store/deviceBinding';
 import deviceActions from '../../store/device';
-import { IToolBarButton } from '../../types';
+import { ILinkedEntity, IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 
 import deviceBindingSelectors from '../../store/deviceBinding/selectors';
 import deviceSelectors from '../../store/device/selectors';
-import SnackBar from '../../components/SnackBar';
 
-import { adminPath } from '../../utils/constants';
-import DeviceBindingDetailsView from '../../components/deviceBinding/DeviceBindingDetailsView';
+import { adminPath, deviceStates } from '../../utils/constants';
+
+import DetailsView from '../../components/DetailsView';
+
+import UserDeviceLog from './UserDeviceLog';
 
 export type Params = {
   bindingid: string;
@@ -39,14 +39,33 @@ const UserDeviceView = () => {
   const { bindingid } = useParams<keyof Params>() as Params;
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const { loading, errorMessage } = useSelector((state) => state.devices);
-
+  const { loading } = useSelector((state) => state.devices);
   const deviceBinding = deviceBindingSelectors.bindingById(bindingid);
-
-  const device = deviceSelectors.deviceById(deviceBinding?.device.id || '-1');
-
+  const device = deviceSelectors.deviceById(deviceBinding?.device.id);
   const [open, setOpen] = useState(false);
+
+  const { user } = useSelector((state) => state.auth);
+
+  const deviceBindingDetails: ILinkedEntity[] = useMemo(
+    () =>
+      deviceBinding
+        ? [
+            {
+              id: 'Наименование',
+              value: deviceBinding.device,
+              link: `${adminPath}/app/devices/${deviceBinding.device.id}`,
+            },
+            {
+              id: 'Пользователь',
+              value: deviceBinding?.user,
+              link: `${adminPath}/app/users/${deviceBinding.user.id}`,
+            },
+            { id: 'Состояние', value: deviceStates[deviceBinding.state] },
+            { id: 'Номер', value: device?.uid },
+          ]
+        : [],
+    [device?.uid, deviceBinding],
+  );
 
   const handleCancel = () => {
     navigate(-1);
@@ -80,9 +99,6 @@ const UserDeviceView = () => {
   const handleClose = () => {
     setOpen(false);
   };
-  const handleClearError = () => {
-    dispatch(bindingActions.deviceBindingActions.clearError());
-  };
 
   const buttons: IToolBarButton[] = [
     {
@@ -107,7 +123,7 @@ const UserDeviceView = () => {
       disabled: true,
       color: 'secondary',
       variant: 'contained',
-      onClick: handleClickOpen, //handleDelete,
+      onClick: handleClickOpen,
       icon: <DeleteIcon />,
     },
   ];
@@ -176,10 +192,15 @@ const UserDeviceView = () => {
             minHeight: '100%',
           }}
         >
-          <DeviceBindingDetailsView deviceBinding={deviceBinding} uid={device?.uid} />
+          <DetailsView details={deviceBindingDetails} />
         </Box>
       </Box>
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
+      {user?.role === 'SuperAdmin' ? (
+        <Box>
+          <CardHeader title={'Журнал ошибок устройства пользователя'} sx={{ mx: 2 }} />
+          <UserDeviceLog deviceId={device?.uid} userId={deviceBinding.user.id} />
+        </Box>
+      ) : null}
     </>
   );
 };

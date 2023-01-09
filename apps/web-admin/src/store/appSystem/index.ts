@@ -1,5 +1,5 @@
 import asyncActions from './actions.async';
-import * as actions from './actions';
+import { appSystemActions } from './actions';
 import * as userSelectors from './selectors';
 
-export default { ...asyncActions, ...actions, userSelectors };
+export default { ...asyncActions, ...appSystemActions, userSelectors };

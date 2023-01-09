@@ -1,5 +1,7 @@
 import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { View } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles, LargeText, MediumText } from '@lib/mobile-ui';
 

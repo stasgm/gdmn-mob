@@ -1,8 +1,12 @@
 import { ThunkAction } from 'redux-thunk';
-import api from '@lib/client-api';
+import api, { CustomRequest } from '@lib/client-api';
 import { IUser, NewUser } from '@lib/types';
 
+import { authActions } from '@lib/store';
+
 import { AppState } from '../';
+
+import { webRequest } from '../webRequest';
 
 import { userActions, UserActionType } from './actions';
 
@@ -12,17 +16,13 @@ const fetchUserById = (id: string): AppThunk => {
   return async (dispatch) => {
     dispatch(userActions.fetchUserAsync.request(''));
 
-    const response = await api.user.getUser(id);
+    const response = await api.user.getUser(webRequest(dispatch, authActions), id);
 
     if (response.type === 'GET_USER') {
       return dispatch(userActions.fetchUserAsync.success(response.user));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(userActions.fetchUserAsync.failure(response.message));
-    }
-
-    return dispatch(userActions.fetchUsersAsync.failure('something wrong'));
+    return dispatch(userActions.fetchUserAsync.failure(response.message));
   };
 };
 
@@ -37,17 +37,13 @@ const fetchUsers = (companyId?: string, filterText?: string, fromRecord?: number
     if (fromRecord) params.fromRecord = fromRecord;
     if (toRecord) params.toRecord = toRecord;
 
-    const response = await api.user.getUsers(params);
+    const response = await api.user.getUsers(webRequest(dispatch, authActions), params);
 
     if (response.type === 'GET_USERS') {
       return dispatch(userActions.fetchUsersAsync.success(response.users));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(userActions.fetchUsersAsync.failure(response.message));
-    }
-
-    return dispatch(userActions.fetchUsersAsync.failure('something wrong'));
+    return dispatch(userActions.fetchUsersAsync.failure(response.message));
   };
 };
 
@@ -55,17 +51,13 @@ const addUser = (user: NewUser): AppThunk => {
   return async (dispatch) => {
     dispatch(userActions.addUserAsync.request(''));
 
-    const response = await api.user.addUser(user);
+    const response = await api.user.addUser(webRequest(dispatch, authActions), user);
 
     if (response.type === 'ADD_USER') {
       return dispatch(userActions.addUserAsync.success(response.user));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(userActions.addUserAsync.failure(response.message));
-    }
-
-    return dispatch(userActions.addUserAsync.failure('something wrong'));
+    return dispatch(userActions.addUserAsync.failure(response.message));
   };
 };
 
@@ -73,17 +65,13 @@ const updateUser = (user: IUser): AppThunk => {
   return async (dispatch) => {
     dispatch(userActions.updateUserAsync.request('обновление пользователя'));
 
-    const response = await api.user.updateUser(user);
+    const response = await api.user.updateUser(webRequest(dispatch, authActions), user);
 
     if (response.type === 'UPDATE_USER') {
       return dispatch(userActions.updateUserAsync.success(response.user));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(userActions.updateUserAsync.failure(response.message));
-    }
-
-    return dispatch(userActions.updateUserAsync.failure('something wrong'));
+    return dispatch(userActions.updateUserAsync.failure(response.message));
   };
 };
 
@@ -91,36 +79,14 @@ const removeUser = (id: string): AppThunk => {
   return async (dispatch) => {
     dispatch(userActions.removeUserAsync.request('Удаление пользователя'));
 
-    const response = await api.user.removeUser(id);
+    const response = await api.user.removeUser(webRequest(dispatch, authActions), id);
 
     if (response.type === 'REMOVE_USER') {
       return dispatch(userActions.removeUserAsync.success(id));
     }
 
-    if (response.type === 'ERROR') {
-      return dispatch(userActions.removeUserAsync.failure(response.message));
-    }
-
-    return dispatch(userActions.removeUserAsync.failure('Ошибка удаления компании'));
+    return dispatch(userActions.removeUserAsync.failure(response.message));
   };
 };
-
-// const addPageParams = (user: IUser): AppThunk => {
-//   return async (dispatch) => {
-//     dispatch(userActions.setPageParam.request(''));
-
-//     const response = await api.user.addUser(user);
-
-//     if (response.type === 'SET_PARAM') {
-//       return dispatch(userActions.addUserAsync.success(response.user));
-//     }
-
-//     if (response.type === 'ERROR') {
-//       return dispatch(userActions.addUserAsync.failure(response.message));
-//     }
-
-//     return dispatch(userActions.addUserAsync.failure('something wrong'));
-//   };
-// };
 
 export default { fetchUsers, fetchUserById, addUser, updateUser, removeUser };

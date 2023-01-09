@@ -1,9 +1,13 @@
 import { IProcess } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
+import { IPageParam } from '../../types';
+
 const init = createAction('PROCESSES/INIT')();
 const clearError = createAction('PROCESSES/CLEAR_ERROR')();
-const setError = createAction('APP_SYSTEM/SET_ERROR')();
+const setError = createAction('PROCESSES/SET_ERROR')<string>();
+const setPageParam = createAction('PROCESSES/SET_PARAM')<IPageParam | undefined>();
+const clearPageParams = createAction('PROCESSES/CLEAR_PARAMS')();
 
 const fetchProcessesAsync = createAsyncAction(
   'PROCESS/FETCH_PROCESSES',
@@ -30,6 +34,8 @@ export const processActions = {
   clearError,
   init,
   setError,
+  setPageParam,
+  clearPageParams,
 };
 
 export type ProcessActionType = ActionType<typeof processActions>;

@@ -15,14 +15,13 @@ import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/user';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import { IToolBarButton, IHeadCells, IPageParam } from '../../types';
-import SnackBar from '../../components/SnackBar';
 
 const UserList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
 
-  const { list, loading, errorMessage, pageParams } = useSelector((state) => state.users);
+  const { list, loading, pageParams } = useSelector((state) => state.users);
 
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
@@ -59,10 +58,6 @@ const UserList = () => {
     handleSearchClick();
   };
 
-  const handleClearError = () => {
-    dispatch(actions.userActions.clearError());
-  };
-
   const buttons: IToolBarButton[] = [
     {
       name: 'Обновить',
@@ -70,20 +65,6 @@ const UserList = () => {
       onClick: () => fetchUsers(),
       icon: <CachedIcon />,
     },
-    // {
-    //   name: 'Загрузить',
-    //   onClick: () => {
-    //     return;
-    //   },
-    //   icon: <ImportExportIcon />,
-    // },
-    // {
-    //   name: 'Выгрузить',
-    //   sx: { mx: 1 },
-    //   onClick: () => {
-    //     return;
-    //   },
-    // },
     {
       name: 'Добавить',
       color: 'primary',
@@ -97,7 +78,7 @@ const UserList = () => {
     { id: 'name', label: 'Пользователь', sortEnable: true },
     { id: 'lastName', label: 'Фамилия', sortEnable: true },
     { id: 'firstName', label: 'Имя', sortEnable: true },
-    { id: 'externalId', label: 'ID', sortEnable: false },
+    { id: 'externalId', label: 'Идентификатор из ERP системы', sortEnable: false },
     { id: 'erpUser', label: 'Пользователь ERP', sortEnable: true },
     { id: 'appSystem', label: 'Подсистема', sortEnable: true },
     { id: 'creationDate', label: 'Дата создания', sortEnable: true },
@@ -120,7 +101,6 @@ const UserList = () => {
           <ToolbarActionsWithSearch
             buttons={buttons}
             searchTitle={'Найти пользователя'}
-            // valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
@@ -135,7 +115,6 @@ const UserList = () => {
           )}
         </Container>
       </Box>
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

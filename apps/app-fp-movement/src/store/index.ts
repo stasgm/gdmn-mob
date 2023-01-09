@@ -9,7 +9,6 @@ import { FpMovementActionType } from './app/actions';
 import { appFpMiddlewareFactory } from './app/middleware';
 
 export { default as fpMovementActions } from './app';
-// export { useAppInventoryThunkDispatch } from './app/actions.async';
 
 type TActions = FpMovementActionType;
 
