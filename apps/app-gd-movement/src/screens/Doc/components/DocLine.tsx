@@ -35,8 +35,9 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
 
   const currRef = useRef<TextInput>(null);
 
-  const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
-  const isScreenKeyboard = useSelector((state) => state.settings?.data?.screenKeyboard?.data);
+  const settings = useSelector((state) => state.settings.data);
+  const isScanerReader = settings.scannerUse?.data as boolean;
+  const isScreenKeyboard = settings.screenKeyboard?.data as boolean;
 
   useEffect(() => {
     currRef?.current &&
@@ -167,8 +168,12 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
               <TextInput
                 style={[textStyle, localStyles.quantitySize]}
                 editable={true}
-                showSoftInputOnFocus={false}
+                showSoftInputOnFocus={!isScreenKeyboard}
                 caretHidden={true}
+                keyboardType="numeric"
+                autoCapitalize="words"
+                onChangeText={handleQuantityChange}
+                returnKeyType="done"
                 ref={currRef}
                 value={goodQty}
               />
