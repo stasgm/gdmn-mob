@@ -36,9 +36,8 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
     //Если уже было число 0, без выражения, и не введена точка, то берем введеное число
     //иначе склеиваем к предыдущему числу введенное число
     let newValue = `${number === '0' && ((!expression && value !== '.') || value === '0') ? '' : number}${value}`;
-    //Если получившееся
     newValue = Number.isNaN(parseFloat(newValue)) ? '0.' : newValue ?? '0';
-    const validNumber = new RegExp(/^(\d{1,6}(.))?\d{0,4}$/);
+    const validNumber = new RegExp(/^([-+]?\d{1,6}(.))?\d{0,4}$/);
     const n = validNumber.test(newValue) ? newValue : number;
     setNumber(n);
     if (!isDiv0(expression, n)) {
@@ -47,14 +46,7 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
   };
 
   const handleOperationPress = ({ value }: { value: string }) => {
-    // //Если деление на 0, то заменяем оператор, ноль не выводим
-    // if (!firstOperation && isDiv0(expression, number)) {
-    //   //замена математического оператора
-    //   setExpression((prev) => `${prev.trim().slice(0, -1)}${value} `);
-    //   setNumber('');
-    //   setFirstOperation(false);
-    // }
-    //если введен оператор не с начала и есть число
+    //Если введен оператор не с начала и есть число
     if (!firstOperation && number) {
       //Если деление на 0, то заменяем оператор, ноль не выводим
       //иначе добавляем оператор
@@ -67,7 +59,6 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
       setNumber('');
     } else {
       if (number) {
-        console.log(2, expression, number);
         //обычный случай
         setExpression((prev) => `${prev}${number} ${value} `);
         setNumber('');
@@ -109,11 +100,12 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
         }
       }
     } else {
-      const newExpr = `${expression.trim().slice(0, -1)}`;
+      const newExpr = `${expression.trim().slice(0, -1).trim()}`;
       setNumber(newExpr);
       setExpression('');
       setFirstOperation(true);
-      onApply(number ? calc(`${newExpr}${number}`) : newExpr || '0');
+      // onApply(number ? calc(`${newExpr}${number}`) : newExpr || '0');
+      onApply(newExpr || '0');
     }
   };
 
@@ -147,7 +139,6 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
       {
         title: '=',
         onPress: () => {
-          console.log('oldValue', oldValue);
           setNumber(oldValue);
           setExpression('');
           onDismiss && onDismiss();
