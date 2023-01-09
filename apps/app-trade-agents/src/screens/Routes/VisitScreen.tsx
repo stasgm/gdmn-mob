@@ -201,6 +201,7 @@ const VisitScreen = () => {
       try {
         if (!orderDocs.find((i) => i.head.route)) {
           coords = await getCurrentPosition();
+
           const date = new Date().toISOString();
 
           if (visit) {

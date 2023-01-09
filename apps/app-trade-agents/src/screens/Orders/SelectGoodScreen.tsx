@@ -1,7 +1,15 @@
 import React, { useState, useLayoutEffect, useCallback, useMemo, useEffect } from 'react';
-import { View, Text, StyleSheet, ColorValue, Alert, FlatList, useWindowDimensions } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ColorValue,
+  Alert,
+  FlatList,
+  useWindowDimensions,
+  TouchableOpacity,
+} from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import {
   globalStyles as styles,
