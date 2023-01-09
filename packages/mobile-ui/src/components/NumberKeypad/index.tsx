@@ -32,7 +32,7 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
 
   const handleNumberPress = ({ value }: { value: string }) => {
     //Если деление на ноль, то не выводим ноль
-    if (value === '0' && expression.slice(-1) === '/') {
+    if (value === '0' && expression.slice(-2, -1) === '/') {
       return;
     }
     //Если уже было число 0, без выражения, и не введена точка, то берем введеное число
