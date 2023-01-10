@@ -2,6 +2,8 @@ import { Platform, Linking } from 'react-native';
 import * as Location from 'expo-location';
 import { startActivityAsync, ActivityAction } from 'expo-intent-launcher';
 
+import { sleep } from '@lib/mobile-hooks';
+
 import { ICoords } from '../store/geo/types';
 
 const LocationStatus = {
@@ -73,12 +75,15 @@ export const getCurrentPosition = async (): Promise<ICoords | undefined> => {
   try {
     await getPermissionLocationStatus();
 
-    let result = await Location.getLastKnownPositionAsync();
-    result = result ? result : await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Low });
+    const lastKnownPos = await Location.getLastKnownPositionAsync();
 
-    return { latitude: result.coords.latitude, longitude: result.coords.longitude };
+    const result = lastKnownPos
+      ? lastKnownPos
+      : await Promise.race([Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Low }), sleep(15000)]);
+
+    return result ? { latitude: result.coords.latitude, longitude: result.coords.longitude } : undefined;
   } catch (error) {
-    if (error instanceof TypeError) {
+    if (error instanceof Error) {
       if (error.message.includes('Location services are disabled')) {
         throw new Error('Служба геолокации отключена');
       }

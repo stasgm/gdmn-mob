@@ -6,7 +6,7 @@ import { customAlphabet } from 'nanoid';
 
 import { IDelList } from '@lib/mobile-types';
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const sleep = (ms: number): Promise<undefined> => new Promise((resolve) => setTimeout(resolve, ms));
 
 const truncate = (str: string, l: number | undefined = 40) => (str.length > l ? `${str.substring(0, l)}...` : str);
 
