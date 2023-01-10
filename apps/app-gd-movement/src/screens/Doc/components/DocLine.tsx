@@ -27,7 +27,6 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
 
   const textStyle = useMemo(() => [styles.number, styles.field, { color: colors.text }], [colors.text]);
 
-  const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
   const [goodEID, setGoodEID] = useState<string | undefined>(item?.EID?.toString());
   const [doScanned, setDoScanned] = useState(false);
 
@@ -35,8 +34,9 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
 
   const currRef = useRef<TextInput>(null);
 
-  const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
-  const isScreenKeyboard = useSelector((state) => state.settings?.data?.screenKeyboard?.data);
+  const settings = useSelector((state) => state.settings.data);
+  const isScanerReader = settings.scannerUse?.data as boolean;
+  const isScreenKeyboard = settings.screenKeyboard?.data as boolean;
 
   useEffect(() => {
     currRef?.current &&
@@ -64,26 +64,14 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
     setScaner({ state: 'init' });
   };
 
-  const handleQuantityChange = useCallback((value: string) => {
-    setGoodQty((prev) => {
-      value = value.replace(',', '.');
-
-      value = !value.includes('.') ? parseFloat(value).toString() : value;
-      value = Number.isNaN(parseFloat(value)) ? '0' : value;
-
-      const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
-      return validNumber.test(value) ? value : prev;
-    });
-  }, []);
-
   const handleDoScan = () => {
     setDoScanned(true);
   };
 
   useEffect(() => {
-    onSetLine({ ...item, quantity: parseFloat(goodQty), EID: goodEID });
+    onSetLine({ ...item, EID: goodEID });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [goodQty, goodEID]);
+  }, [goodEID]);
 
   const price = item?.price || 0;
   const remains = item?.remains || 0;
@@ -167,16 +155,26 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
               <TextInput
                 style={[textStyle, localStyles.quantitySize]}
                 editable={true}
-                showSoftInputOnFocus={false}
+                showSoftInputOnFocus={!isScreenKeyboard}
                 caretHidden={true}
+                keyboardType="numeric"
+                autoCapitalize="words"
+                onChangeText={(value) => onSetLine({ ...item, quantity: parseFloat(value) })}
+                returnKeyType="done"
                 ref={currRef}
-                value={goodQty}
+                value={item.quantity.toString()}
               />
             </View>
           </View>
         </View>
       </ScrollView>
-      {isScreenKeyboard && <NumberKeypad oldValue={goodQty} onApply={handleQuantityChange} decDigitsForTotal={3} />}
+      {isScreenKeyboard && (
+        <NumberKeypad
+          oldValue={item.quantity.toString()}
+          onApply={(value) => onSetLine({ ...item, quantity: parseFloat(value) })}
+          decDigitsForTotal={3}
+        />
+      )}
     </>
   );
 };
