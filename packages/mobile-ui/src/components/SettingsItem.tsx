@@ -1,11 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { View, StyleSheet } from 'react-native';
 import { SettingValue } from '@lib/types';
-
-import { HelperText } from 'react-native-paper';
-
-import { IListItem } from '@lib/mobile-types';
 
 import Input from './Input';
 import { MediumText } from './AppText';
@@ -16,10 +12,16 @@ type Props = {
   value: SettingValue;
   disabled?: boolean;
   onValueChange: (newValue: SettingValue) => void;
-  onEndEditing: () => void;
+  onEndEditing: (newValue: SettingValue) => void;
 };
 
 const SettingsItem = ({ label, value, disabled = false, onValueChange, onEndEditing }: Props) => {
+  const [itemValue, setItemValue] = useState(value);
+
+  useEffect(() => {
+    setItemValue(value);
+  }, [value]);
+
   return (
     <View>
       {typeof value === 'boolean' ? (
@@ -29,7 +31,7 @@ const SettingsItem = ({ label, value, disabled = false, onValueChange, onEndEdit
             value={value}
             onValueChange={() => {
               onValueChange(!value);
-              onEndEditing();
+              onEndEditing(!value);
             }}
             disabled={disabled}
           />
@@ -39,13 +41,22 @@ const SettingsItem = ({ label, value, disabled = false, onValueChange, onEndEdit
           {typeof value === 'number' ? (
             <Input
               label={label}
-              value={value === 0 ? '' : value.toString()}
-              onChangeText={(text) => onValueChange(text !== '' ? Number(text) : 0)}
+              value={itemValue === 0 ? '' : itemValue.toString()}
+              onChangeText={(text) => {
+                let newValue = text.replace(',', '.');
+                newValue = !newValue.includes('.') ? parseFloat(newValue).toString() : newValue;
+                newValue = Number.isNaN(parseFloat(newValue)) ? '0' : newValue;
+                const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
+                setItemValue(validNumber.test(newValue) ? newValue : itemValue);
+              }}
               keyboardType={'numeric'}
               clearInput={true}
               autoCapitalize="none"
               disabled={disabled}
-              onEndEditing={onEndEditing}
+              onEndEditing={() => {
+                onValueChange(Number(itemValue));
+                onEndEditing(Number(itemValue));
+              }}
             />
           ) : (
             <Input
