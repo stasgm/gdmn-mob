@@ -8,8 +8,7 @@
 - Начать работу (Демо режим)
 - Подключение к серверу
 
-<img src="img/1.Connection/1.StartScreenTwo.jpg" alt="drawing" height="400"/> 
-<img src="img/1.Connection/1.StartScreenThree.jpg" alt="drawing" height="400"/>
+<img src="img/1.Connection/1.StartScreenTwo.jpg" alt="drawing" height="400"/> <img src="img/1.Connection/1.StartScreenThree.jpg" alt="drawing" height="400"/>
 
 ### Демо режим
 При нажатии на кнопку **Начать работу** выполняется автоматический вход в приложение под тестовым пользователем.
@@ -132,11 +131,11 @@
 Матрица представляет собой справочник, ежедневно на текущую дату выгружающийся с сервера и содержащий в себе информацию о списке товаров с ценами для конкретной организации. 
 
 
-<img src="img/7.Matrix/7.Contacts.jpg" alt="drawing" height="400"/> <img src="img/7.Matrix/7.Goods.jpg" alt="drawing" height="400"/> <img src="img/7.Matrix/7.Position.jpg" alt="drawing" height="400"/>
+<img src="img/7.Matrix/7.Matrixs.jpg" alt="drawing" height="400"/> <img src="img/7.Matrix/7.Goods.jpg" alt="drawing" height="400"/> <img src="img/7.Matrix/7.Position.jpg" alt="drawing" height="400"/>
 
 Если в настройках приложения установлен признак **Использовать матрицы**, то при добавлении товаров в документ заявки цены будут вытягиваться из матриц по конкретной организации.
 
-<img src="img/7.Matrix/7.SettingsContacts.jpg" alt="drawing" height="400"/>
+<img src="img/8.Settings/8.Settings.jpg" alt="drawing" height="400"/>
 
 Найти необходимую информацию по наименованию можно воспользовавшись строкой поиска, нажав на иконку <img src="img/1.Connection/1.IconSearch.jpg" alt="drawing" height="22"/>, в правом верхнем углу экрана.
 
@@ -163,6 +162,8 @@
 <img src="img/3.Orders/3.Contacts.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.Outlets.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.Departs.jpg" alt="drawing" height="400"/>
 
 После заполнения всех необходимых полей документ сохраняем, нажав на иконку " **✓** " в правом верхнем углу.
+
+<img src="img/3.Orders/3.OrderAddEnd.jpg" alt="drawing" height="400"/>
 
 После сохранения сразу попадаем на экран просмотра заявки **Заявка**. Отредактировать введенные данные можно, нажав на иконку <img src="img/1.Connection/1.IconEdit.jpg" alt="drawing" height="22"/> в шапке документа или используя пункт меню " **⁝** " **Редактировать данные**.
 
