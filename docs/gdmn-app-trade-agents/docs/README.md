@@ -224,7 +224,11 @@
 
 <img src="img/3.Orders/3.GoodsWithCont.jpg" alt="drawing" height="400"/>  <img src="img/3.Orders/3.GoodsSomeContDiff.jpg" alt="drawing" height="400"/>
 
-Для этого нужно из экрана **Заявка** нажать " **✚** ", перейдя к экрану **Выбор товара**, повторно выбрать из списка необходимую позицию нажатием, далее выбрать из дополнительного меню - пункт **Добавить**.
+Для этого нужно из экрана **Заявка** нажать " **✚** ",
+
+<img src="img/3.Orders/3.OrderView.jpg" alt="drawing" height="400"/>
+
+ перейдя к экрану **Выбор товара**, повторно выбрать из списка необходимую позицию нажатием, далее выбрать из дополнительного меню - пункт **Добавить**.
 
   <img src="img/3.Orders/3.ReferenceBookOfGoods.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.AddMenuAddGoods.jpg" alt="drawing" height="400"/>
 
