@@ -78,9 +78,9 @@ const SettingsScreen = () => {
     });
   }, [navigation, actionsMenu]);
 
-  const serverPath = `${config?.protocol}${config?.server}:${config?.port}/${config?.apiPath}`;
+  // const serverPath = `${config?.protocol}${config?.server}:${config?.port}/${config?.apiPath}`;
 
-  const handleUpdateOption = (optionName: string, value: ISettingsOption) => {
+  const handleCheckSettings = (optionName: string, value: ISettingsOption) => {
     if (optionName === 'scannerUse') {
       const screenKeyboard = Object.values(settsData).find((i) => i?.id === 'screenKeyboard');
 
@@ -88,7 +88,7 @@ const SettingsScreen = () => {
         dispatch(
           settingsActions.updateOption({
             optionName: 'screenKeyboard',
-            value: { ...screenKeyboard, readonly: value.data ? true : false, data: true },
+            value: { ...screenKeyboard, readonly: !value.data ? true : false, data: true },
           }),
         );
       }
@@ -110,7 +110,7 @@ const SettingsScreen = () => {
                     key={groupKey}
                     list={list}
                     onValueChange={handleUpdate}
-                    onCheckSettings={handleUpdateOption}
+                    onCheckSettings={handleCheckSettings}
                   />
                 ) : (
                   <View key={groupKey} style={localStyles.group}>

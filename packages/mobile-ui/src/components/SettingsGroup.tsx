@@ -4,8 +4,6 @@ import { Divider } from 'react-native-paper';
 
 import { ISettingsOption } from '@lib/types';
 
-import { IListItem } from '@lib/mobile-types';
-
 import SettingsItem from './SettingsItem';
 import { LargeText } from './AppText';
 
@@ -34,7 +32,7 @@ const SettingsGroup = ({ groupDescription, list, onValueChange, onCheckSettings 
                 value={item.data}
                 disabled={item.readonly}
                 onValueChange={(newValue) => onValueChange(key, { ...item, data: newValue })}
-                onEndEditing={() => onCheckSettings && onCheckSettings(key, item)}
+                onEndEditing={(newValue) => onCheckSettings && onCheckSettings(key, { ...item, data: newValue })}
               />
             </View>
           );
