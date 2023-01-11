@@ -54,7 +54,16 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
     log.error('Компания не найдена');
   }
 
-  const reMessage = arr[3].includes('_to_') ? /_from_(.+)_to_(.+)_dev_(.+)\.json/gi : /from_(.+)_dev_(.+)\.json/gi;
+  const getRx = (str: string): RegExp => {
+    if (str.includes('_to_')) return /_from_(.+)_to_(.+)_dev_(.+)\.json/gi;
+    return /from_(.+)_dev_(.+)\.json/gi;
+  };
+
+  //const reMessage = arr[3].includes('_to_') ?
+  //  /_from_(.+)_to_(.+)_dev_(.+)\.json/gi
+  //: /from_(.+)_dev_(.+)\.json/gi;
+
+  const reMessage = getRx(arr[3]);
   const matchMessage = reMessage.exec(arr[3]);
   if (!matchMessage) {
     log.error(`Invalid file name ${arr[3]}`);

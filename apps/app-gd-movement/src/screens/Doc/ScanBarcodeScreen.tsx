@@ -35,7 +35,7 @@ const ScanBarcodeScreen = () => {
   const settings = useSelector((state) => state.settings?.data);
 
   const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
-  const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>).data || 0;
+  const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>)?.data || 0;
   const weightSettingsCountWeight = (settings.countWeight as ISettingsOption<number>).data || 0;
   const isScanerReader = settings.scannerUse?.data;
   const isInputQuantity = settings.quantityInput?.data;

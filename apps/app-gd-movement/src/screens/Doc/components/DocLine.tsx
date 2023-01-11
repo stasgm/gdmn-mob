@@ -42,8 +42,18 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
     currRef?.current &&
       setTimeout(() => {
         currRef.current?.focus();
-        Keyboard.dismiss();
       }, ONE_SECOND_IN_MS);
+  }, []);
+
+  useEffect(() => {
+    Keyboard.addListener('keyboardDidShow', () => {
+      Keyboard.dismiss();
+      currRef.current?.focus();
+    });
+
+    return () => {
+      Keyboard.removeAllListeners('keyboardDidShow');
+    };
   }, []);
 
   const handleGetScannedObject = useCallback((brc: string) => {
@@ -99,7 +109,7 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
           />
         )}
       </Modal>
-      <ScrollView keyboardShouldPersistTaps="handled">
+      <ScrollView keyboardShouldPersistTaps="never">
         <View style={styles.content}>
           <View style={styles.item}>
             <View style={styles.details}>
@@ -153,9 +163,9 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
             <View style={styles.details}>
               <Text style={styles.name}>Количество</Text>
               <TextInput
+                autoFocus={true}
                 style={[textStyle, localStyles.quantitySize]}
-                editable={true}
-                showSoftInputOnFocus={!isScreenKeyboard}
+                showSoftInputOnFocus={false}
                 caretHidden={true}
                 keyboardType="numeric"
                 autoCapitalize="words"
