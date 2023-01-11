@@ -131,7 +131,6 @@ const MobileApp = ({ loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
 
   const closeErrBar = () => {
     dispatch(authActions.setErrorMessage(''));
-    // dispatch(authActions.clearError());
   };
 
   return (

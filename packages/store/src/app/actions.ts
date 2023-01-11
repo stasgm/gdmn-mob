@@ -24,7 +24,7 @@ const clearRequestNotice = createAction('APP/CLEAR_REQUEST_NOTICE')();
 const addErrorNotice = createAction('APP/ADD_ERROR_NOTICE')<IErrorNotice>();
 const clearErrorNotice = createAction('APP/CLEAR_ERROR_NOTICE')();
 
-const setIsConnected = createAction('APP/SET_CONNECTION')<boolean>();
+// const setIsConnected = createAction('APP/SET_CONNECTION')<boolean>();
 
 /**
  * Для ускорения работы программы мы кэшируем часть данных
@@ -73,7 +73,6 @@ export const appActions = {
   addErrorNotice,
   clearErrorNotice,
   setShowSyncInfo,
-  setIsConnected,
 };
 
 export type AppActionType = ActionType<typeof appActions>;

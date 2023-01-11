@@ -30,8 +30,6 @@ const AuthNavigator = () => {
   );
 
   const authDispatch = useAuthThunkDispatch();
-  // const appRequest = useMemo(() => mobileRequest(authDispatch, authActions), [authDispatch]);
-  // const appRequest: CustomRequest = () => {};
   /*
     При запуске приложения
     - устанавливаем isInit, чтобы открылось окно выбора режима (демо или подключение к серверу).
@@ -40,7 +38,6 @@ const AuthNavigator = () => {
   */
 
   useEffect(() => {
-    // setInit(connectionStatus === 'not-connected' && (!config.deviceId || isDemo));
     //При запуске приложения записываем настройки в апи
     api.config = { ...api.config, ...config, debug: { ...api.config.debug, isMock: isDemo } };
   }, [config, isDemo]);
@@ -75,12 +72,6 @@ const AuthNavigator = () => {
       const objGetStatus = await authDispatch(
         authActions.getDeviceStatus(mobileRequest(authDispatch, authActions), config?.deviceId),
       );
-      //TODO: надо обработать случай, если пришла ошибка, что не нашлось устройство по uid
-      // if (objGetStatus.type === 'AUTH/GET_DEVICE_STATUS_FAILURE') {
-      //   authDispatch(authActions.setConfig({ ...config, deviceId: undefined }));
-      //   api.config = { ...api.config, deviceId: undefined };
-      //   return;
-      // }
       //Получим устройство по uid
       if (
         config?.deviceId &&
@@ -137,11 +128,7 @@ const AuthNavigator = () => {
     if (!user?.company) {
       return;
     }
-    // authDispatch(authActions.setCompany(user.company as ICompany));
     await authDispatch(authActions.getCompany(mobileRequest(authDispatch, authActions), user.company.id));
-    // if (res.type === 'AUTH/GET_COMPANY_SUCCESS') {
-    //   authDispatch(authActions.setCompany(res.payload));
-    // }
   }, [authDispatch, user?.company]);
 
   const SplashWithParams = useCallback(
