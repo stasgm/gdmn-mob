@@ -63,7 +63,13 @@ const DrawerNavigator = ({ onSyncClick, items }: IProps) => {
   const { colors } = useTheme();
   const dispatch = useDispatch();
   const navList: INavItem[] = [...(items || []), ...baseNavList];
-  const { requestNotice, errorNotice, syncDate, showSyncInfo, loading } = useSelector((state) => state.app);
+  const {
+    requestNotice = [],
+    errorNotice = [],
+    syncDate,
+    showSyncInfo = false,
+    loading,
+  } = useSelector((state) => state.app);
   const settings = useSelector((state) => state.settings?.data);
   const synchPeriod = (settings.synchPeriod?.data as number) || 10;
   const [errorListVisible, setErrorListVisible] = useState(false);

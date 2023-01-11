@@ -39,34 +39,6 @@ export interface IRequestParams {
   timeout?: number;
 }
 
-// export type RequestResult = IServerResponseResult | IServerUnreacheableResult | IErrorResult;
-
-// export interface IResponse {
-//   /** HTTP response status */
-//   status: number;
-//   data?: any;
-// }
-
-// interface IServerResponseResult {
-//   /** 2xx, 4xx, 5xx */
-//   result: 'OK' | 'CLIENT_ERROR' | 'SERVER_ERROR';
-//   response: {
-//     /** HTTP response status */
-//     status: number;
-//     data?: any;
-//   };
-// }
-
-// export interface IServerUnreacheableResult {
-//   result: 'NO_CONNECTION' | 'TIMEOUT';
-// }
-
-// /** Возвращается, когда произошло исключение при проверки типа, десериализации или вообще в процессе работы */
-// interface IErrorResult {
-//   result: 'INVALID_DATA' | 'ERROR';
-//   message?: string;
-// }
-
 export type RobustRequest = (params: IRequestParams) => Promise<TResponse>;
 
 export const robustRequest: RobustRequest = async ({
@@ -140,13 +112,6 @@ export const robustRequest: RobustRequest = async ({
     }
 
     return objData;
-    // return {
-    //   result: 'OK',
-    //   response: {
-    //     status: res.status,
-    //     data: objData,
-    //   },
-    // };
   } catch (err) {
     clearTimeout(rTimeout);
 
