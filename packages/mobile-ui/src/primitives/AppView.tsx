@@ -153,7 +153,7 @@ export const AppScreen = (props: AppViewProps) => (
 
 export const AppInputScreen = (props: AppViewProps) => (
   <SafeAreaView style={[BaseStyle.container, props.style]}>
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[BaseStyle.container]}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={BaseStyle.container}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <AppScreen {...props} />
       </TouchableWithoutFeedback>
