@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { Alert, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
@@ -13,7 +13,6 @@ const SettingsDetailsScreen = () => {
   const dispatch = useDispatch();
 
   const id = useRoute<RouteProp<SettingsStackParamList, 'SettingsDetails'>>().params?.id;
-
   const data = useSelector((state) => state.settings.data);
 
   const list = Object.entries(data)
@@ -23,11 +22,14 @@ const SettingsDetailsScreen = () => {
   const groupName = list?.[0]?.[1]?.group?.name || '';
   const groupDescription = list?.[0]?.[1]?.group?.description || '';
 
+  //Для перерисовки
+  const [key, setKey] = useState(1);
+
   const handleUpdate = (optionName: string, value: ISettingsOption) => {
     dispatch(settingsActions.updateOption({ optionName, value }));
   };
 
-  const handleUpdateAutoSynch = (optionName: string, value: ISettingsOption) => {
+  const handleCheckSettings = (optionName: string, value: ISettingsOption) => {
     const synchPeriod = list.find(([item, _]) => item === 'synchPeriod')?.[1]?.data;
     if (optionName === 'autoSynchPeriod' && synchPeriod && value.data < synchPeriod) {
       dispatch(settingsActions.updateOption({ optionName, value: { ...value, data: synchPeriod } }));
@@ -35,6 +37,7 @@ const SettingsDetailsScreen = () => {
       Alert.alert('Внимание!', 'Период автосинхронизации не может быть меньше периода синхронизации на сервере.', [
         { text: 'OK' },
       ]);
+      setKey(key + 1);
     }
 
     if (optionName === 'autoSync') {
@@ -44,7 +47,7 @@ const SettingsDetailsScreen = () => {
         dispatch(
           settingsActions.updateOption({
             optionName: 'autoSynchPeriod',
-            value: { ...autoSynchPeriod, readonly: !value.data ? false : true },
+            value: { ...autoSynchPeriod, readonly: !value.data },
           }),
         );
       }
@@ -63,10 +66,11 @@ const SettingsDetailsScreen = () => {
       <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={[{ padding: 5, flexDirection: 'column' }]}>
         <View>
           <SettingsGroup
+            key={key}
             list={list}
             groupDescription={groupDescription}
             onValueChange={handleUpdate}
-            onCheckSettings={handleUpdateAutoSynch}
+            onCheckSettings={handleCheckSettings}
           />
         </View>
       </KeyboardAwareScrollView>

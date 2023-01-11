@@ -1,5 +1,5 @@
 import { Feather } from '@expo/vector-icons';
-import { evaluate } from 'mathjs';
+import { evaluate, exp } from 'mathjs';
 import React, { useCallback, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Dimensions } from 'react-native';
 
@@ -13,6 +13,8 @@ interface IProps {
   onDismiss?: () => void;
   onApply: (newValue: string) => void;
 }
+
+const isDiv0 = (expression: string, number?: string) => Number(number) === 0 && expression.indexOf('/') >= 0;
 
 const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProps) => {
   const [expression, setExpression] = useState('');
@@ -31,29 +33,29 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
   );
 
   const handleNumberPress = ({ value }: { value: string }) => {
-    //Если деление на ноль, то не выводим ноль
-    if (value === '0' && expression.slice(-2, -1) === '/') {
-      return;
-    }
     //Если уже было число 0, без выражения, и не введена точка, то берем введеное число
     //иначе склеиваем к предыдущему числу введенное число
-    let newValue = `${number === '0' && !expression && value !== '.' ? '' : number}${value}`;
-    //Если получившееся
+    let newValue = `${number === '0' && ((!expression && value !== '.') || value === '0') ? '' : number}${value}`;
     newValue = Number.isNaN(parseFloat(newValue)) ? '0.' : newValue ?? '0';
-
-    const validNumber = new RegExp(/^(\d{1,6}(.))?\d{0,4}$/);
-
+    const validNumber = new RegExp(/^([-+]?\d{1,6}(.))?\d{0,4}$/);
     const n = validNumber.test(newValue) ? newValue : number;
-
     setNumber(n);
-
-    onApply(calc(`${expression}${n || '0'}`));
+    if (!isDiv0(expression, n)) {
+      onApply(calc(`${expression}${n || '0'}`));
+    }
   };
 
   const handleOperationPress = ({ value }: { value: string }) => {
-    //если введен оператор не с начала и есть число, то добавляем оператор
+    //Если введен оператор не с начала и есть число
     if (!firstOperation && number) {
-      setExpression(`${calc(`${expression}${number}`)} ${value} `);
+      //Если деление на 0, то заменяем оператор, ноль не выводим
+      //иначе добавляем оператор
+      if (isDiv0(expression, number)) {
+        //замена математического оператора
+        setExpression((prev) => `${prev.trim().slice(0, -1)}${value} `);
+      } else {
+        setExpression(`${calc(`${expression}${number}`)} ${value} `);
+      }
       setNumber('');
     } else {
       if (number) {
@@ -63,7 +65,7 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
         setFirstOperation(false);
       } else {
         //замена математического оператора
-        setExpression((prev) => (firstOperation ? `0${value} ` : `${prev.slice(0, -2)}${value} `));
+        setExpression((prev) => (firstOperation ? `0 ${value} ` : `${prev.trim().slice(0, -1)}${value} `));
         setFirstOperation(false);
       }
     }
@@ -87,20 +89,23 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
         setFirstOperation(true);
       } else {
         setNumber(newN || '');
-        if (newN) {
+        if (newN && !isDiv0(expression, newN)) {
           onApply(calc(`${expression}${newN}`));
         } else {
           const newExpr = `${expression.trim().slice(0, -1)}`;
           onApply(newExpr ? calc(`${newExpr}`) : '0');
-          setFirstOperation(true);
+          if (!isDiv0(expression, newN)) {
+            setFirstOperation(true);
+          }
         }
       }
     } else {
-      const newExpr = `${expression.trim().slice(0, -1)}`;
+      const newExpr = `${expression.trim().slice(0, -1).trim()}`;
       setNumber(newExpr);
       setExpression('');
       setFirstOperation(true);
-      onApply(number ? calc(`${newExpr}${number}`) : newExpr || '0');
+      // onApply(number ? calc(`${newExpr}${number}`) : newExpr || '0');
+      onApply(newExpr || '0');
     }
   };
 

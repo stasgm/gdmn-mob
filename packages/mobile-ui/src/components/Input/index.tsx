@@ -1,5 +1,5 @@
-import React, { ReactNode } from 'react';
-import { ReturnKeyTypeOptions, Text, View } from 'react-native';
+import React from 'react';
+import { ReturnKeyTypeOptions, View } from 'react-native';
 import { TextInput, useTheme } from 'react-native-paper';
 
 import styles from './styles';

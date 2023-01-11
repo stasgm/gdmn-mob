@@ -13,8 +13,8 @@ const Switch = ({ value, onValueChange, disabled }: Props) => {
   return (
     <View>
       <SwitchComponent
-        thumbColor={value ? colors.placeholder : colors.background}
-        trackColor={{ false: colors.disabled, true: colors.accent }}
+        thumbColor={value ? (disabled ? colors.background : colors.placeholder) : colors.background}
+        trackColor={{ false: colors.disabled, true: disabled ? colors.disabled : colors.accent }}
         value={value}
         onValueChange={() => onValueChange(!value)}
         disabled={disabled}
