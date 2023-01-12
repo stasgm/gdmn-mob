@@ -8,7 +8,7 @@ import { generateId } from '../utils';
 
 export const useSaveErrors = () => {
   const dispatch = useDispatch();
-  const errorLog = useSelector((state) => state.app.errorLog);
+  const errorLog = useSelector((state) => state.app.errorLog || []);
   const { company, appSystem } = useSelector((state) => state.auth);
 
   const saveErrors = useCallback(

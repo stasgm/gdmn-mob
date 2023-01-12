@@ -53,19 +53,25 @@ export interface IProps {
   onSyncClick: () => void;
 }
 
-const getTimeUntilNextSynch = (lastSyncTime: Date, synchPeriod: number) => {
-  const nextTime = new Date(lastSyncTime);
-  nextTime.setMinutes(nextTime.getMinutes() + synchPeriod);
-  return nextTime.getTime() - new Date().getTime();
-};
+// const getTimeUntilNextSynch = (lastSyncTime: Date, synchPeriod: number) => {
+//   const nextTime = new Date(lastSyncTime);
+//   nextTime.setMinutes(nextTime.getMinutes() + synchPeriod);
+//   return nextTime.getTime() - new Date().getTime();
+// };
 
 const DrawerNavigator = ({ onSyncClick, items }: IProps) => {
   const { colors } = useTheme();
   const dispatch = useDispatch();
   const navList: INavItem[] = [...(items || []), ...baseNavList];
-  const { requestNotice, errorNotice, syncDate, showSyncInfo, loading } = useSelector((state) => state.app);
-  const settings = useSelector((state) => state.settings?.data);
-  const synchPeriod = (settings.synchPeriod?.data as number) || 10;
+  const {
+    requestNotice = [],
+    errorNotice = [],
+    syncDate,
+    showSyncInfo = false,
+    loading,
+  } = useSelector((state) => state.app);
+  // const settings = useSelector((state) => state.settings?.data);
+  // const synchPeriod = (settings.synchPeriod?.data as number) || 10;
   const [errorListVisible, setErrorListVisible] = useState(false);
   const { errorMessage } = useSelector((state) => state.auth);
 
@@ -85,7 +91,7 @@ const DrawerNavigator = ({ onSyncClick, items }: IProps) => {
     //Определяем, сколько минут с прошлой синхронизации
     //и если меньше, чем synchPeriod, то предупреждаем и выходим
     //иначе - выполняем синхронизацию
-    const timeUntilNextSynch = getTimeUntilNextSynch(syncDate, synchPeriod);
+    // const timeUntilNextSynch = getTimeUntilNextSynch(syncDate, synchPeriod);
 
     // if (timeUntilNextSynch > 0) {
     //   Alert.alert(
