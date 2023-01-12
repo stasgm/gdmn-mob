@@ -128,6 +128,8 @@ const dialCall = (number: string) => {
 
 const keyExtractor = (item: IEntity) => String(item.id);
 
+const keyExtractorByIndex = (item: any, i: number) => i.toString();
+
 const getDelList = (delList: IDelList, lineId: string, lineStatus: string) => {
   const newList = { ...delList };
   if (newList[lineId]) {
@@ -197,6 +199,7 @@ export {
   generateId,
   dialCall,
   keyExtractor,
+  keyExtractorByIndex,
   getDelList,
   deleteSelectedItems,
   getDelLineList,

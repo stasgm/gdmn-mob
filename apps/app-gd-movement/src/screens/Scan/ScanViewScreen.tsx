@@ -32,6 +32,7 @@ import {
   shortenString,
   useSendDocs,
   sleep,
+  keyExtractor,
 } from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
@@ -332,6 +333,7 @@ export const ScanViewScreen = () => {
           estimatedItemSize={60}
           ItemSeparatorComponent={ItemSeparator}
           keyboardShouldPersistTaps="handled"
+          keyExtractor={keyExtractor}
         />
         <SimpleDialog
           visible={visibleSendDialog}

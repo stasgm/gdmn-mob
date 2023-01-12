@@ -7,7 +7,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { docSelectors } from '@lib/store';
 import { globalStyles as styles, InfoBlock, ItemSeparator, SubTitle, ScanButton, navBackButton } from '@lib/mobile-ui';
 
-import { getDateString } from '@lib/mobile-hooks';
+import { getDateString, keyExtractorByIndex } from '@lib/mobile-hooks';
 
 import { IMovementDocument, IMovementLine } from '../../store/types';
 import { MovementStackParamList } from '../../navigation/Root/types';
@@ -74,7 +74,7 @@ export const MovementViewScreen = () => {
       </InfoBlock>
       <FlatList
         data={bcMovement.lines}
-        keyExtractor={(_, i) => String(i)}
+        keyExtractor={keyExtractorByIndex}
         renderItem={renderItem}
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}

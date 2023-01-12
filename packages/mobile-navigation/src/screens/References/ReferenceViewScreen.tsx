@@ -11,6 +11,7 @@ import { ReferenceStackParamList } from '../../navigation/Root/types';
 
 import { styles } from './styles';
 import ReferenceItem from './components/ReferenceItem';
+import { keyExtractorByIndex } from '@lib/mobile-hooks';
 
 const ReferenceViewScreen = () => {
   const navigation = useNavigation();
@@ -78,7 +79,7 @@ const ReferenceViewScreen = () => {
       <FlatList
         ref={ref}
         data={filteredList}
-        keyExtractor={(_, i) => String(i)}
+        keyExtractor={keyExtractorByIndex}
         renderItem={renderItem}
         scrollEventThrottle={400}
         ItemSeparatorComponent={Divider}

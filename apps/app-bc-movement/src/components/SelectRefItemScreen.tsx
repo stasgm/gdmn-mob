@@ -14,7 +14,7 @@ import {
   navBackButton,
 } from '@lib/mobile-ui';
 
-import { extraPredicate } from '@lib/mobile-hooks';
+import { extraPredicate, keyExtractorByIndex } from '@lib/mobile-hooks';
 
 import { useDispatch } from '../store';
 import { RefParamList } from '../navigation/Root/types';
@@ -147,7 +147,7 @@ export const SelectRefItemScreen = () => {
       <FlatList
         ref={refList}
         data={filteredList}
-        keyExtractor={(_, i) => String(i)}
+        keyExtractor={keyExtractorByIndex}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />

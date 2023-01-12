@@ -38,6 +38,8 @@ interface IFilteredList {
   goodRemains: IRemGood[];
 }
 
+const keyExtractor = (item: IRemGood) => String(item.good.id);
+
 export const SelectRemainsScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'SelectRemainsItem'>>();
   const { docId } = useRoute<RouteProp<DocStackParamList, 'SelectRemainsItem'>>().params;
@@ -332,6 +334,7 @@ export const SelectRemainsScreen = () => {
         ListEmptyComponent={EmptyList}
         keyboardShouldPersistTaps="handled"
         extraData={document?.lines}
+        keyExtractor={keyExtractor}
       />
       {(selectedLine || selectedGood) && (
         <DocLineDialog
