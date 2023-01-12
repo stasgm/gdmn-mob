@@ -246,62 +246,59 @@ export const SelectRemainsScreen = () => {
     [handleAddLine],
   );
 
-  const renderItem = useCallback(
-    ({ item }: { item: IRemGood }) => {
-      const lines = document?.lines?.filter((i) => i.good.id === item.good.id);
-      const isAdded = !!lines?.length;
+  const renderItem = ({ item }: { item: IRemGood }) => {
+    const lines = document?.lines?.filter((i) => i.good.id === item.good.id);
+    const isAdded = !!lines?.length;
 
-      const iconStyle = [styles.icon, { backgroundColor: isAdded ? '#06567D' : '#E91E63' }];
-      const goodStyle = {
-        backgroundColor: isAdded ? globalColors.backgroundLight : 'transparent',
-      };
+    const iconStyle = [styles.icon, { backgroundColor: isAdded ? '#06567D' : '#E91E63' }];
+    const goodStyle = {
+      backgroundColor: isAdded ? globalColors.backgroundLight : 'transparent',
+    };
 
-      return (
-        <TouchableOpacity onPress={() => handlePressItem(isAdded, item)}>
-          <View style={[localStyles.goodItem, goodStyle]}>
-            <View style={iconStyle}>
-              <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
-            </View>
-            <View style={styles.details}>
-              <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-              <View style={styles.directionRow}>
-                <MediumText>
-                  {item.remains} {item.good.valueName} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)}{' '}
-                  руб.
-                </MediumText>
-                {!!item.good.barcode && (
-                  <MediumText style={[styles.number, styles.flexDirectionRow]}>{item.good.barcode}</MediumText>
-                )}
-              </View>
-              {item.good.alias && item.good.weightCode ? (
-                <MediumText style={[styles.number, styles.flexDirectionRow]}>
-                  арт. {item.good.alias}, вес. код {item.good.weightCode}
-                </MediumText>
-              ) : item.good.alias ? (
-                <MediumText style={styles.number}>арт. {item.good.alias}</MediumText>
-              ) : item.good.weightCode ? (
-                <MediumText style={styles.number}>вес. код {item.good.weightCode}</MediumText>
-              ) : null}
-              {isAdded && (
-                <View style={localStyles.lineView}>
-                  {lines.map((line) => (
-                    <Chip
-                      key={line.id}
-                      style={[localStyles.lineChip, { borderColor: colors.primary }]}
-                      onPress={() => setSelectedLine(line)}
-                    >
-                      {line.quantity} {item.good.valueName}
-                    </Chip>
-                  ))}
-                </View>
+    return (
+      <TouchableOpacity onPress={() => handlePressItem(isAdded, item)}>
+        <View style={[localStyles.goodItem, goodStyle]}>
+          <View style={iconStyle}>
+            <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
+          </View>
+          <View style={styles.details}>
+            <LargeText style={styles.textBold}>{item.good.name}</LargeText>
+            <View style={styles.directionRow}>
+              <MediumText>
+                {item.remains} {item.good.valueName} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)}{' '}
+                руб.
+              </MediumText>
+              {!!item.good.barcode && (
+                <MediumText style={[styles.number, styles.flexDirectionRow]}>{item.good.barcode}</MediumText>
               )}
             </View>
+            {item.good.alias && item.good.weightCode ? (
+              <MediumText style={[styles.number, styles.flexDirectionRow]}>
+                арт. {item.good.alias}, вес. код {item.good.weightCode}
+              </MediumText>
+            ) : item.good.alias ? (
+              <MediumText style={styles.number}>арт. {item.good.alias}</MediumText>
+            ) : item.good.weightCode ? (
+              <MediumText style={styles.number}>вес. код {item.good.weightCode}</MediumText>
+            ) : null}
+            {isAdded && (
+              <View style={localStyles.lineView}>
+                {lines.map((line) => (
+                  <Chip
+                    key={line.id}
+                    style={[localStyles.lineChip, { borderColor: colors.primary }]}
+                    onPress={() => setSelectedLine(line)}
+                  >
+                    {line.quantity} {item.good.valueName}
+                  </Chip>
+                ))}
+              </View>
+            )}
           </View>
-        </TouchableOpacity>
-      );
-    },
-    [colors.primary, document?.lines, handlePressItem],
-  );
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   const RC = useMemo(() => <RefreshControl refreshing={!goodRemains} title="загрузка данных..." />, [goodRemains]);
 
