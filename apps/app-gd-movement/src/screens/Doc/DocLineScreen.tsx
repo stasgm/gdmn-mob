@@ -24,6 +24,11 @@ export const DocLineScreen = () => {
 
   useEffect(() => {
     if (screenState === 'saving') {
+      if (line.quantity < 0) {
+        Alert.alert('Ошибка!', 'Количество товара не может быть меньше нуля!', [{ text: 'Ок' }]);
+        setScreenState('idle');
+        return;
+      }
       if (line.quantity) {
         dispatch(
           mode === 0
