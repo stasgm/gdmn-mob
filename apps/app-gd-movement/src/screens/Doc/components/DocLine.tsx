@@ -38,12 +38,14 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
   const isScanerReader = settings.scannerUse?.data as boolean;
   const isScreenKeyboard = settings.screenKeyboard?.data as boolean;
 
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(isScreenKeyboard);
+
   useEffect(() => {
-    currRef?.current &&
+    (isKeyboardOpen || currRef?.current) &&
       setTimeout(() => {
         currRef.current?.focus();
       }, ONE_SECOND_IN_MS);
-  }, []);
+  }, [isKeyboardOpen]);
 
   useEffect(() => {
     Keyboard.addListener('keyboardDidShow', () => {
@@ -160,25 +162,37 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
           </View>
           <ItemSeparator />
           <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Количество</Text>
-              <TextInput
-                autoFocus={true}
-                style={[textStyle, localStyles.quantitySize]}
-                showSoftInputOnFocus={false}
-                caretHidden={true}
-                keyboardType="numeric"
-                autoCapitalize="words"
-                onChangeText={(value) => onSetLine({ ...item, quantity: parseFloat(value) })}
-                returnKeyType="done"
-                ref={currRef}
-                value={item.quantity.toString()}
-              />
+            <View style={localStyles.details}>
+              <View style={localStyles.new}>
+                <Text style={styles.name}>Количество</Text>
+                {/* <View style={{ width: '100%', justifyContent: 'space-between', flexDirection: 'row' }}> */}
+                <TextInput
+                  autoFocus={true}
+                  style={[textStyle, localStyles.quantitySize]}
+                  showSoftInputOnFocus={false}
+                  caretHidden={true}
+                  keyboardType="numeric"
+                  autoCapitalize="words"
+                  onChangeText={(value) => onSetLine({ ...item, quantity: parseFloat(value || '0') })}
+                  returnKeyType="done"
+                  ref={currRef}
+                  value={item.quantity.toString()}
+                />
+              </View>
+              {isScreenKeyboard && (
+                <View style={localStyles.button}>
+                  <IconButton
+                    icon={isKeyboardOpen ? 'pencil-remove-outline' : 'pencil-outline'}
+                    onPress={() => setIsKeyboardOpen(!isKeyboardOpen)}
+                    size={30}
+                  />
+                </View>
+              )}
             </View>
           </View>
         </View>
       </ScrollView>
-      {isScreenKeyboard && (
+      {isScreenKeyboard && isKeyboardOpen && (
         <NumberKeypad
           oldValue={item.quantity.toString()}
           onApply={(value) => onSetLine({ ...item, quantity: parseFloat(value) })}

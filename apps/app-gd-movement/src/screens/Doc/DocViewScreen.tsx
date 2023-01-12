@@ -216,33 +216,30 @@ export const DocViewScreen = () => {
 
   const goods = refSelectors.selectByName<IGood>('good')?.data;
 
-  const renderItem = useCallback(
-    ({ item }: { item: IMovementLine }) => {
-      const good = goods?.find((e) => e.id === item?.good.id);
-      return (
-        <ListItemLine
-          key={item.id}
-          onPress={() =>
-            isDelList
-              ? setDelList(getDelLineList(delList, item.id))
-              : !isBlocked && navigation.navigate('DocLine', { mode: 1, docId: id, item })
-          }
-          onLongPress={() => !isBlocked && setDelList(getDelLineList(delList, item.id))}
-          checked={delList.includes(item.id)}
-        >
-          <View style={styles.details}>
-            <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-            <View style={styles.directionRow}>
-              <MediumText>
-                {item.quantity} {good?.valueName} x {(item.price || 0).toString()} р.
-              </MediumText>
-            </View>
+  const renderItem = ({ item }: { item: IMovementLine }) => {
+    const good = goods?.find((e) => e.id === item?.good.id);
+    return (
+      <ListItemLine
+        key={item.id}
+        onPress={() =>
+          isDelList
+            ? setDelList(getDelLineList(delList, item.id))
+            : !isBlocked && navigation.navigate('DocLine', { mode: 1, docId: id, item })
+        }
+        onLongPress={() => !isBlocked && setDelList(getDelLineList(delList, item.id))}
+        checked={delList.includes(item.id)}
+      >
+        <View style={styles.details}>
+          <LargeText style={styles.textBold}>{item.good.name}</LargeText>
+          <View style={styles.directionRow}>
+            <MediumText>
+              {item.quantity} {good?.valueName} x {(item.price || 0).toString()} р.
+            </MediumText>
           </View>
-        </ListItemLine>
-      );
-    },
-    [goods, delList, isDelList, isBlocked, navigation, id],
-  );
+        </View>
+      </ListItemLine>
+    );
+  };
 
   if (screenState === 'deleting' || screenState === 'sending') {
     return (
@@ -288,6 +285,7 @@ export const DocViewScreen = () => {
         ItemSeparatorComponent={ItemSeparator}
         keyboardShouldPersistTaps="handled"
         keyExtractor={keyExtractor}
+        extraData={[goods, delList, isDelList, isBlocked, navigation, id]}
       />
       {doc.lines.length ? (
         <DocTotal lineCount={doc.lines?.length || 0} sum={docLineSum} quantity={docLineQuantity} />
