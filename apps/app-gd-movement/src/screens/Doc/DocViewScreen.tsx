@@ -23,7 +23,14 @@ import {
   SimpleDialog,
 } from '@lib/mobile-ui';
 
-import { deleteSelectedLineItems, getDateString, getDelLineList, useSendDocs, sleep } from '@lib/mobile-hooks';
+import {
+  deleteSelectedLineItems,
+  getDateString,
+  getDelLineList,
+  useSendDocs,
+  sleep,
+  keyExtractor,
+} from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
 
@@ -277,6 +284,7 @@ export const DocViewScreen = () => {
         estimatedItemSize={60}
         ItemSeparatorComponent={ItemSeparator}
         keyboardShouldPersistTaps="handled"
+        keyExtractor={keyExtractor}
         extraData={[goods, delList, isDelList, isBlocked, navigation, id]}
       />
       {doc.lines.length ? (

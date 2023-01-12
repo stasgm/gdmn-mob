@@ -7,7 +7,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useSelector } from '@lib/store';
 import { AppScreen, MenuButton, navBackDrawer, useActionSheet } from '@lib/mobile-ui';
 
-import { useSendRefsRequest } from '@lib/mobile-hooks';
+import { keyExtractorByIndex, useSendRefsRequest } from '@lib/mobile-hooks';
 
 import { ReferenceStackParamList } from '../../navigation/Root/types';
 
@@ -66,7 +66,7 @@ const ReferenceListScreen = () => {
     <AppScreen>
       <FlatList
         data={refData}
-        keyExtractor={(_, i) => String(i)}
+        keyExtractor={keyExtractorByIndex}
         renderItem={renderItem}
         ItemSeparatorComponent={Divider}
         scrollEventThrottle={400}

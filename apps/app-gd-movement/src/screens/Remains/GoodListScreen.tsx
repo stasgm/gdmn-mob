@@ -34,6 +34,8 @@ interface IFilteredList {
   goodRemains: IRemGood[];
 }
 
+const keyExtractor = (item: IRemGood) => String(item.good.id);
+
 const GoodListScreen = () => {
   const { id } = useRoute<RouteProp<RemainsStackParamList, 'GoodList'>>().params;
   const references = useSelector((state) => state.references.list) as IReferences;
@@ -186,6 +188,7 @@ const GoodListScreen = () => {
         ItemSeparatorComponent={ItemSeparator}
         keyboardShouldPersistTaps="handled"
         ListEmptyComponent={!goods || !goodRemains.length ? EmptyList : null}
+        keyExtractor={keyExtractor}
       />
     </AppScreen>
   );

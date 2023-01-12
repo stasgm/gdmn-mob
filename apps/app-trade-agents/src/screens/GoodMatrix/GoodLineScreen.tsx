@@ -10,6 +10,7 @@ import { IRefMetadata } from '@lib/types';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
 import { IGoodMatrix, IMatrixData } from '../../store/types';
+import { keyExtractorByIndex } from '@lib/mobile-hooks';
 
 interface IProperty {
   sortOrder: number;
@@ -77,7 +78,7 @@ const GoodLineScreen = () => {
       <View style={[styles.content]}>
         <FlatList
           data={refData}
-          keyExtractor={(_, i) => String(i)}
+          keyExtractor={keyExtractorByIndex}
           renderItem={renderItem}
           ItemSeparatorComponent={ItemSeparator}
         />

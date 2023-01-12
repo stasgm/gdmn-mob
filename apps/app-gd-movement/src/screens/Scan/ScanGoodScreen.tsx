@@ -6,11 +6,11 @@ import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigat
 import { AppActivityIndicator, globalStyles, LargeText, MediumText, navBackButton, ScanBarcode } from '@lib/mobile-ui';
 import { docSelectors, useDispatch, documentActions } from '@lib/store';
 
-import { generateId } from '@lib/mobile-hooks';
-
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { IScannedObject } from '@lib/client-types';
+
+import { generateId } from '@lib/mobile-hooks';
 
 import { ScanStackParamList } from '../../navigation/Root/types';
 import { IScanLine, IScanDocument } from '../../store/types';

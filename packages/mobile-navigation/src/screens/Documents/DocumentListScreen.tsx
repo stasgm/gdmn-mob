@@ -20,6 +20,7 @@ import { DocumentsTabsStackParamsList } from '../../navigation/Root/types'; */
 
 // import { styles } from './styles';
 import DocumentItem from './components/DocumentItem';
+import { keyExtractorByIndex } from '@lib/mobile-hooks';
 
 const DocumentListScreen = () => {
   const { list, loading } = useSelector((state) => state.documents);
@@ -82,7 +83,7 @@ const DocumentListScreen = () => {
       <FlatList
         ref={ref}
         data={list}
-        keyExtractor={(_, i) => String(i)}
+        keyExtractor={keyExtractorByIndex}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
         scrollEventThrottle={400}

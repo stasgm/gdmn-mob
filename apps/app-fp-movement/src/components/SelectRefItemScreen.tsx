@@ -15,7 +15,7 @@ import {
   navBackButton,
 } from '@lib/mobile-ui';
 
-import { extraPredicate } from '@lib/mobile-hooks';
+import { extraPredicate, keyExtractorByIndex } from '@lib/mobile-hooks';
 
 import { IReferenceData, ScreenState } from '@lib/types';
 
@@ -183,7 +183,7 @@ const SelectRefItemScreen = () => {
       <FlatList
         ref={refList}
         data={filteredList}
-        keyExtractor={(_, i) => String(i)}
+        keyExtractor={keyExtractorByIndex}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />
