@@ -220,7 +220,6 @@ export const ScanViewScreen = () => {
 
   const renderItem = ({ item, index }: { item: IScanLine; index: number }) => (
     <ListItemLine
-      key={item.id}
       {...item}
       onPress={() => (isDelList ? setDelList(getDelLineList(delList, item.id)) : undefined)}
       onLongPress={() => setDelList(getDelLineList(delList, item.id))}

@@ -7,11 +7,14 @@ import { SubTitle, ItemSeparator, SearchButton, AppScreen, navBackButton } from 
 import { refSelectors } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 
+import { keyExtractorByIndex } from '@lib/mobile-hooks';
+
+import { FlashList } from '@shopify/flash-list';
+
 import { ReferenceStackParamList } from '../../navigation/Root/types';
 
 import { styles } from './styles';
 import ReferenceItem from './components/ReferenceItem';
-import { keyExtractorByIndex } from '@lib/mobile-hooks';
 
 const ReferenceViewScreen = () => {
   const navigation = useNavigation();
@@ -76,13 +79,12 @@ const ReferenceViewScreen = () => {
           <ItemSeparator />
         </>
       )}
-      <FlatList
-        ref={ref}
+      <FlashList
         data={filteredList}
-        keyExtractor={keyExtractorByIndex}
         renderItem={renderItem}
-        scrollEventThrottle={400}
+        estimatedItemSize={60}
         ItemSeparatorComponent={Divider}
+        keyExtractor={keyExtractorByIndex}
       />
     </AppScreen>
   );
