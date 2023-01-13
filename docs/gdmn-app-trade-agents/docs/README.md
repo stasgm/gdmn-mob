@@ -237,7 +237,7 @@
 
  <img src="img/3.Orders/3.ReferenceBookOfGoods2.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.OrderViewGoodsTwo.jpg" alt="drawing" height="400"/>
 
-#### Редакция позиции
+#### Редакция позиции товара
 
 Необходимо подчеркнуть, что редакция позиции возможна только в том случае, когда сам документ находится в статусе **Черновик** (значок  <img src="img/1.Connection/1.IconDraft.JPG" alt="drawing" height="22"/> или боковая полоса шапки документа красного цвета).
 
@@ -250,7 +250,7 @@
 
 <img src="img/3.Orders/3.OrderViewGoods.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.GoodsWithoutCont2.jpg" alt="drawing" height="400"/> 
 
-#### Удаление позиции
+#### Удаление позиции товара
 
 Необходимо подчеркнуть, что редакция позиции возможна только в том случае, когда сам документ находится в статусе **Черновик** (значок  <img src="img/1.Connection/1.IconDraft.JPG" alt="drawing" height="22"/> или боковая полоса шапки документа красного цвета).
 
@@ -297,7 +297,7 @@
 - Из экрана **Заявка**
 
     - нажать на иконку дискетки  <img src="img/1.Connection/1.IconAutoTransl.jpg" alt="drawing" height="22"/> , чтобы перевести документ в статус **Готов к отправке**. Такой документ надо еще отправить, но можно позже. 
-    Этим способом можно воспользоваться при отсутствии интернета. Когда связь восстановится, документ автоматически будет отправлен на сервер, на обработку, при очередной синхронизации.
+    Этим способом можно воспользоваться при отсутствии интернета. Когда связь восстановится, документ автоматически будет отправлен на сервер, на обработку, при очередной автосинхронизации (или при ручной синхронизации).
 
     - нажать на иконку **Отправка документа** <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>. Этот шаг сразу отправит документ на сервер.
 
@@ -306,12 +306,14 @@
 - Из Маршрута, из экрана **Визит**
 
 
-    - нажав на иконку **Отправка документа** <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/> можно отправить сразу все заявки, в стадии **Черновик** или **Готов к отправке**.
+    - нажав на иконку **Отправка документа** <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/> можно отправить сразу все заявки, в стадии **Черновик** <img src="img/1.Connection/1.IconDraft.JPG" alt="drawing" height="22"/> или **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.JPG" alt="drawing" height="22"/>.
 
 
 <img src="img/3.Orders/3.VisitStartEnd.jpg" alt="drawing" height="400"/>
 <img src="img/3.Orders/3.VisitQuestion.jpg" alt="drawing" height="400"/>
-<img src="img/3.Orders/3.VisitEnd.jpg" alt="drawing" height="400"/>    
+<img src="img/3.Orders/3.VisitEnd.jpg" alt="drawing" height="400"/>  
+
+### Синхронизация
 
 ### Порядок работы
 
