@@ -316,9 +316,11 @@
 <img src="img/3.Orders/3.VisitEnd.jpg" alt="drawing" height="400"/>  
 
 ### Синхронизация
+
 Совмещение работы программы и работы сервера происходит с помощью синхронизации. Кнопка синхронизации находится в нижней части бокового меню. 
 
 Открыть боковое меню можно нажатием на иконку меню " ≡ ", находящуюся в верхнем углу приложения слева (или смахнув пальцем вправо с левого края устройства)
+
 #### Синхронизация при начале работы
 
 Ежедневно, в начале работы с приложением, необходимо производить ручную синхронизацию для получения  справочников с актуальными даннными, матриц, дебеторских задолженностей и для получения новых маршрутов. 
@@ -337,31 +339,22 @@
 
 Вернемся на экран просмотра заявки:
 
-<img src="img/3.Orders/3.OrderViewGoods.jpg" alt="drawing" height="400"/>
-
 При создании документ, по умолчании, имеет статус **Черновик** <img src="img/1.Connection/1.IconDraft.JPG" alt="drawing" height="22"/> (красный цвет).
 
 После ввода всех необходимых данных, чтобы отправить документ на сервер для обработки, необходимо снять признак **Черновик** на экране редактирования документа. Это можно сделать несколькими способами:
 
-   - или вручную, через нажатие на шапку документа <img src="img/1.Connection/1.IconEdit.JPG" alt="drawing" height="22"/>, 
-
-<img src="img/3.Orders/3.OrderEditDraft.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.OrderEditReady.jpg" alt="drawing" height="400"/> 
+   - или вручную, через нажатие на шапку документа <img src="img/1.Connection/1.IconEdit.JPG" alt="drawing" height="22"/>, документ переходит в статус **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.JPG" alt="drawing" height="22"/>
 
    - или через нажатие иконки <img src="img/1.Connection/1.IconAutoTransl.jpg" alt="drawing" height="22"/>, над шапкой документа, которая переведёт документ в статус **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.JPG" alt="drawing" height="22"/>.
-   - или отправить документ на сервер для обработки сразу, нажав на иконку <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>, над шапкой документа. 
 
-Когда документ перейдет в состояние **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.JPG" alt="drawing" height="22"/> (зеленый цвет) - редактировать данные нельзя, но можно вернуться к статусу **Черновик** и изменить данные.
+   - или отправить документ на сервер для обработки сразу, нажав на иконку <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>, над шапкой документа. Документ будет иметь статус **Отправлен** <img src="img/1.Connection/1.IconSent.JPG" alt="drawing" height="22"/>  
+ 
 
-<img src="img/3.Orders/3.OrdersReady.jpg" alt="drawing" height="400"/>
+После отправления на сервер заявка будет иметь статус **Отправлен** <img src="img/1.Connection/1.IconSent.JPG" alt="drawing" height="22"/>
 
+После того, как документ попадет на сервер и будет там обработан, программа вернет документ и цвет боковой полоски, значка или иконки станет синим <img src="img/1.Connection/1.IconProcesSucces.JPG" alt="drawing" height="22"/>.
 
-Итак, чтобы отправить документы на сервер, необходимо нажать на иконку <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>.
-
-После обработки на сервере программа вернет документ и цвет боковой полоски, значка или иконки станет синим <img src="img/1.Connection/1.IconProcesSucces.JPG" alt="drawing" height="22"/>.
-
-<img src="img/3.Orders/3.OrderViewGoods.jpg" alt="drawing" height="400"/>
- <img src="img/3.Orders/3.DocsProcessed.jpg" alt="drawing" height="400"/>
-
+### Редакция документa на разных стадиях
 
 На экране **Заявки** документы сгруппированы следующим образом:
 
