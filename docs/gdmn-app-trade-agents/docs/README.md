@@ -145,6 +145,9 @@
 
 По нажатию на иконку " **✚** " в верхнем правом углу экрана **Заявки** переходим на экран добавления документа **Заявка**.
 
+<img src="img/3.Orders/3.MenuOrders.jpg" alt="drawing" height="400"/>
+<img src="img/3.Orders/3.Orders.jpg" alt="drawing" height="400"/>
+
 Обязательные поля для заполнения: 
 - **Номер**
 - **Дата отгрузки**
@@ -314,6 +317,16 @@
 <img src="img/3.Orders/3.VisitEnd.jpg" alt="drawing" height="400"/>  
 
 ### Синхронизация
+Совмещение работы программы и работы сервера происходит с помощью синхронизации.
+#### Синхронизация при начале работы
+
+Ежедневно, в начале работы с приложением, необходимо производить ручную синхронизацию для получения  справочников с актуальными даннными, матриц, дебеторских задолженностей и для получения новых маршрутов. 
+
+<img src="img/1.Connection/1.NewSyncDate.jpg" alt="drawing" height="400"/>
+
+#### Автосинхронизация
+
+<img src="img/1.Connection/1.AutoSync.jpg" alt="drawing" height="400"/> <img src="img/1.Connection/1.AutoSyncOne.jpg" alt="drawing" height="400"/> <img src="img/8.Settings/8.SettingsSynchr.jpg" alt="drawing" height="400"/>
 
 ### Порядок работы
 
@@ -483,7 +496,7 @@
  <img src="img/5.Routes/5.AllOrders.jpg" alt="drawing" height="400"/>
 <img src="img/5.Routes/5.QuestionSendOrder.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.EndVisit.jpg" alt="drawing" height="400"/> 
 
-### Синхронизация
+### Синхронизация в маршруте
 
 После ввода всех заявок и отправления их на сервер далее следует синхронизировать данные через кнопку <img src="img/1.Connection/1.Sync.jpg" alt="drawing" height="27"/>, чтобы получить ответ от сервера - успешно ли созданы заявки в Гедымине или отклонены по разным причинам. 
 
