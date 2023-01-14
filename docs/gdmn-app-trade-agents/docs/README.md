@@ -241,7 +241,7 @@
 
 ### Редакция позиции товара
 
-Необходимо подчеркнуть, что редакция позиции возможна только в том случае, когда сам документ находится в статусе **Черновик** (значок  <img src="img/1.Connection/1.IconDraft.JPG" alt="drawing" height="22"/> или боковая полоса шапки документа красного цвета).
+Необходимо подчеркнуть, что редакция позиции возможна только в том случае, когда сам документ находится в статусе **Черновик** (значок  <img src="img/1.Connection/1.IconDraft.jpg" alt="drawing" height="22"/> или боковая полоса шапки документа красного цвета).
 
 При возникновении ситуации, когда во время заполнения заявки необходимо изменить уже заявленное количество товара или его тару, то можно сделать это повторным нажатием на необходимую позицию в списках товаров, далее выбрать из появившегося дополнительного меню пункт **Редактировать**.
 
@@ -254,7 +254,7 @@
 
 ### Удаление позиции товара
 
-Необходимо подчеркнуть, что редакция позиции возможна только в том случае, когда сам документ находится в статусе **Черновик** (значок  <img src="img/1.Connection/1.IconDraft.JPG" alt="drawing" height="22"/> или боковая полоса шапки документа красного цвета).
+Необходимо подчеркнуть, что редакция позиции возможна только в том случае, когда сам документ находится в статусе **Черновик** (значок  <img src="img/1.Connection/1.IconDraft.jpg" alt="drawing" height="22"/> или боковая полоса шапки документа красного цвета).
 
 Если в экране просмотра заявки нажать и удерживать позицию товара, то появится зеленая галочка. Далее необходимо нажать на иконку  <img src="img/1.Connection/1.IconTrash.jpg" alt="drawing" height="22"/> **Мусорная корзина**, и подтвердить желание удалить данную позицию в заявке. 
 
@@ -286,10 +286,10 @@
 
 | Статус | Цвет    | Значок |Описание                          |
 |------------| ------- | :---:|------------------------------------------ |
-|Черновик| Красный | <img src="img/1.Connection/1.IconDraft.JPG" alt="drawing" height="22"/> | Новый документ, который можно редактировать|
-|Готов к отправке| Зеленый | <img src="img/1.Connection/1.IconReadyToGo.JPG" alt="drawing" height="22"/> | Документ, который будет автоматически отправлен на сервер на обработку, при очередной синхронизации. Нельзя отредактировать, но можно вернуть статус Черновик |
-|Отправлен| Желтый  |<img src="img/1.Connection/1.IconSent.JPG" alt="drawing" height="22"/> | Документ отправлен, ожидается подтверждение (после синхронизации документы со статусом **Готов к отправке** меняют статус на **Отправлен**) |
-|Обработан успешно| Синий   | <img src="img/1.Connection/1.IconProcesSucces.JPG" alt="drawing" height="22"/> |Документ получил подтверждение об успешной обработке на сервере (в случае, если документ обработан с ошибкой, статус меняется на **Черновик** и описывается вид ошибки)  |
+|Черновик| Красный | <img src="img/1.Connection/1.IconDraft.jpg" alt="drawing" height="22"/> | Новый документ, который можно редактировать|
+|Готов к отправке| Зеленый | <img src="img/1.Connection/1.IconReadyToGo.jpg" alt="drawing" height="22"/> | Документ, который будет автоматически отправлен на сервер на обработку, при очередной синхронизации. Нельзя отредактировать, но можно вернуть статус Черновик |
+|Отправлен| Желтый  |<img src="img/1.Connection/1.IconSent.jpg" alt="drawing" height="22"/> | Документ отправлен, ожидается подтверждение (после синхронизации документы со статусом **Готов к отправке** меняют статус на **Отправлен**) |
+|Обработан успешно| Синий   | <img src="img/1.Connection/1.IconProcesSucces.jpg" alt="drawing" height="22"/> |Документ получил подтверждение об успешной обработке на сервере (в случае, если документ обработан с ошибкой, статус меняется на **Черновик** и описывается вид ошибки)  |
 
 ### Отправка документа
 
@@ -308,7 +308,7 @@
 - Из Маршрута, из экрана **Визит**
 
 
-    - нажав на иконку **Отправка документа** <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/> можно отправить сразу все заявки, в стадии **Черновик** <img src="img/1.Connection/1.IconDraft.JPG" alt="drawing" height="22"/> или **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.JPG" alt="drawing" height="22"/>.
+    - нажав на иконку **Отправка документа** <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/> можно отправить сразу все заявки, в стадии **Черновик** <img src="img/1.Connection/1.IconDraft.jpg" alt="drawing" height="22"/> или **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.jpg" alt="drawing" height="22"/>.
 
 
 <img src="img/3.Orders/3.VisitStartEnd.jpg" alt="drawing" height="400"/>
@@ -343,16 +343,16 @@
 
 После ввода всех необходимых данных, чтобы отправить документ на сервер для обработки, необходимо снять признак **Черновик** на экране редактирования документа. Это можно сделать несколькими способами:
 
-   - или вручную, через нажатие на шапку документа <img src="img/1.Connection/1.IconEdit.JPG" alt="drawing" height="22"/>, документ переходит в статус **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.JPG" alt="drawing" height="22"/>
+   - или вручную, через нажатие на шапку документа <img src="img/1.Connection/1.IconEdit.jpg" alt="drawing" height="22"/>, документ переходит в статус **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.jpg" alt="drawing" height="22"/>
 
-   - или через нажатие иконки <img src="img/1.Connection/1.IconAutoTransl.jpg" alt="drawing" height="22"/>, над шапкой документа, которая переведёт документ в статус **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.JPG" alt="drawing" height="22"/>.
+   - или через нажатие иконки <img src="img/1.Connection/1.IconAutoTransl.jpg" alt="drawing" height="22"/>, над шапкой документа, которая переведёт документ в статус **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.jpg" alt="drawing" height="22"/>.
 
-   - или отправить документ на сервер для обработки сразу, нажав на иконку <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>, над шапкой документа. Документ будет иметь статус **Отправлен** <img src="img/1.Connection/1.IconSent.JPG" alt="drawing" height="22"/>  
+   - или отправить документ на сервер для обработки сразу, нажав на иконку <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>, над шапкой документа. Документ будет иметь статус **Отправлен** <img src="img/1.Connection/1.IconSent.jpg" alt="drawing" height="22"/>  
  
 
-После отправления на сервер заявка будет иметь статус **Отправлен** <img src="img/1.Connection/1.IconSent.JPG" alt="drawing" height="22"/>
+После отправления на сервер заявка будет иметь статус **Отправлен** <img src="img/1.Connection/1.IconSent.jpg" alt="drawing" height="22"/>
 
-После того, как документ попадет на сервер и будет там обработан, программа вернет документ и цвет боковой полоски, значка или иконки станет синим <img src="img/1.Connection/1.IconProcesSucces.JPG" alt="drawing" height="22"/>.
+После того, как документ попадет на сервер и будет там обработан, программа вернет документ и цвет боковой полоски, значка или иконки станет синим <img src="img/1.Connection/1.IconProcesSucces.jpg" alt="drawing" height="22"/>.
 
 ### Редактирование документa на разных этапах
 
@@ -361,8 +361,8 @@
 | Группа | Описание                                                                                                                                                                    |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Все             | Все документы <img src="img/1.Connection/1.IconDraft.jpg" alt="drawing" height="22"/> <img src="img/1.Connection/1.IconReadyToGo.jpg" alt="drawing" height="22"/> <img src="img/1.Connection/1.IconSent.jpg" alt="drawing" height="22"/> <img src="img/1.Connection/1.IconProcesSucces.jpg" alt="drawing" height="22"/>                                                                                                                                 |
-| Активные        | Все документы, кроме тех, которые уже обработаны на сервере (со статусом Черновик, Готов к отправке, Отправлен <img src="img/1.Connection/1.IconDraft.JPG" alt="drawing" height="22"/> <img src="img/1.Connection/1.IconReadyToGo.JPG" alt="drawing" height="22"/> <img src="img/1.Connection/1.IconSent.JPG" alt="drawing" height="22"/>).                                                                |
-| Архив           | Документы, которые были отправлены и успешно обработаны на сервере (со статусом Обработан успешно <img src="img/1.Connection/1.IconProcesSucces.JPG" alt="drawing" height="22"/> )  |
+| Активные        | Все документы, кроме тех, которые уже обработаны на сервере (со статусом Черновик, Готов к отправке, Отправлен <img src="img/1.Connection/1.IconDraft.jpg" alt="drawing" height="22"/> <img src="img/1.Connection/1.IconReadyToGo.jpg" alt="drawing" height="22"/> <img src="img/1.Connection/1.IconSent.jpg" alt="drawing" height="22"/>).                                                                |
+| Архив           | Документы, которые были отправлены и успешно обработаны на сервере (со статусом Обработан успешно <img src="img/1.Connection/1.IconProcesSucces.jpg" alt="drawing" height="22"/> )  |
 
 
 
@@ -490,7 +490,7 @@
  
  <img src="img/5.Routes/5.DraftOrder.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.Order.jpg" alt="drawing" height="400"/>
 
- Когда у всех документов будет статус **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.JPG" alt="drawing" height="22"/>  из экрана **Визит** можно отправить все готовые заявки сразу с помощью иконки <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>.
+ Когда у всех документов будет статус **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.jpg" alt="drawing" height="22"/>  из экрана **Визит** можно отправить все готовые заявки сразу с помощью иконки <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>.
 
  <img src="img/5.Routes/5.AllOrders.jpg" alt="drawing" height="400"/>
 <img src="img/5.Routes/5.QuestionSendOrder.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.EndVisit.jpg" alt="drawing" height="400"/> 
@@ -607,14 +607,14 @@
 
 | Значок         | Значение         |
 |:----------------------:|----------------------------------|
-|<img src="img/1.Connection/1.IconDraft.JPG" alt="drawing" height="22"/>| _статус **Черновик**_, новый документ, который можно редактировать|
-|<img src="img/1.Connection/1.IconReadyToGo.JPG" alt="drawing" height="22"/>   | _статус **Готов к отправке**_, документ нельзя редактировать, но можно вернуть в статус **Черновик**   |
-|<img src="img/1.Connection/1.IconSent.JPG" alt="drawing" height="22"/>    | _статус **Отправлен**_, документ отправлен, ожидается подтверждение     |
-|<img src="img/1.Connection/1.IconProcesSucces.JPG" alt="drawing" height="22"/>    | _статус **Обработан успешно**_, документ получил подтверждение об успешной обработке на сервере   |
+|<img src="img/1.Connection/1.IconDraft.jpg" alt="drawing" height="22"/>| _статус **Черновик**_, новый документ, который можно редактировать|
+|<img src="img/1.Connection/1.IconReadyToGo.jpg" alt="drawing" height="22"/>   | _статус **Готов к отправке**_, документ нельзя редактировать, но можно вернуть в статус **Черновик**   |
+|<img src="img/1.Connection/1.IconSent.jpg" alt="drawing" height="22"/>    | _статус **Отправлен**_, документ отправлен, ожидается подтверждение     |
+|<img src="img/1.Connection/1.IconProcesSucces.jpg" alt="drawing" height="22"/>    | _статус **Обработан успешно**_, документ получил подтверждение об успешной обработке на сервере   |
 |<img src="img/1.Connection/1.IconTrash.jpg" alt="drawing" height="22"/>  | удаление документа |
 |<img src="img/1.Connection/1.ConfigIcon.png" alt="drawing" height="30"/>   | переход на экран настроек  |
 |<img src="img/1.Connection/1.IconSearch.jpg" alt="drawing" height="22"/>   | поиск  |
-|<img src="img/1.Connection/1.IconEdit.JPG" alt="drawing" height="22"/>   | редактирование документа  |
+|<img src="img/1.Connection/1.IconEdit.jpg" alt="drawing" height="22"/>   | редактирование документа  |
 |  <img src="img/1.Connection/1.Sync.jpg" alt="drawing" height="27"/>   | синхронизация  |
 | <img src="img/1.Connection/1.IconAutoTransl.jpg" alt="drawing" height="22"/> | перевод документа из статуса **Черновик** в статус **Готов к отправке** |
 |<img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>   | отправка документа |
