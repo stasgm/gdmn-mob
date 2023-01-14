@@ -145,8 +145,7 @@
 
 По нажатию на иконку " **✚** " в верхнем правом углу экрана **Заявки** переходим на экран добавления документа **Заявка**.
 
-<img src="img/3.Orders/3.MenuOrders.jpg" alt="drawing" height="400"/>
-<img src="img/3.Orders/3.Orders.jpg" alt="drawing" height="400"/>
+<img src="img/3.Orders/3.MenuOrders.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.Orders3.jpg" alt="drawing" height="400"/>
 
 Обязательные поля для заполнения: 
 - **Номер**
@@ -166,11 +165,11 @@
 
 После заполнения всех необходимых полей документ сохраняем, нажав на иконку " **✓** " в правом верхнем углу.
 
-<img src="img/3.Orders/3.OrderAddEnd.jpg" alt="drawing" height="400"/>
+<img src="img/3.Orders/3.OrderAddEndOne.jpg" alt="drawing" height="400"/>
 
 После сохранения сразу попадаем на экран просмотра заявки **Заявка**. Отредактировать введенные данные можно, нажав на иконку <img src="img/1.Connection/1.IconEdit.jpg" alt="drawing" height="22"/> в шапке документа или используя пункт меню " **⁝** " **Редактировать данные**.
 
-<img src="img/3.Orders/3.OrderView.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.EditData2.jpg" alt="drawing" height="400"/>
+<img src="img/3.Orders/3.OrderView3.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.EditData23.jpg" alt="drawing" height="400"/>
 
 ### Добавление товара
 
