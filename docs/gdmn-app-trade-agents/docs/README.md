@@ -339,7 +339,7 @@
 
 Вернемся на экран просмотра заявки:
 
-При создании документ, по умолчании, имеет статус **Черновик** <img src="img/1.Connection/1.IconDraft.JPG" alt="drawing" height="22"/> (красный цвет).
+По умолчанию, при создании, документ имеет статус **Черновик** <img src="img/1.Connection/1.IconDraft.jpg" alt="drawing" height="22"/> (красный цвет).
 
 После ввода всех необходимых данных, чтобы отправить документ на сервер для обработки, необходимо снять признак **Черновик** на экране редактирования документа. Это можно сделать несколькими способами:
 
@@ -360,7 +360,7 @@
 
 | Группа | Описание                                                                                                                                                                    |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Все             | Все документы <img src="img/1.Connection/1.IconDraft.JPG" alt="drawing" height="22"/> <img src="img/1.Connection/1.IconReadyToGo.JPG" alt="drawing" height="22"/> <img src="img/1.Connection/1.IconSent.JPG" alt="drawing" height="22"/> <img src="img/1.Connection/1.IconProcesSucces.JPG" alt="drawing" height="22"/>                                                                                                                                 |
+| Все             | Все документы <img src="img/1.Connection/1.IconDraft.jpg" alt="drawing" height="22"/> <img src="img/1.Connection/1.IconReadyToGo.jpg" alt="drawing" height="22"/> <img src="img/1.Connection/1.IconSent.jpg" alt="drawing" height="22"/> <img src="img/1.Connection/1.IconProcesSucces.jpg" alt="drawing" height="22"/>                                                                                                                                 |
 | Активные        | Все документы, кроме тех, которые уже обработаны на сервере (со статусом Черновик, Готов к отправке, Отправлен <img src="img/1.Connection/1.IconDraft.JPG" alt="drawing" height="22"/> <img src="img/1.Connection/1.IconReadyToGo.JPG" alt="drawing" height="22"/> <img src="img/1.Connection/1.IconSent.JPG" alt="drawing" height="22"/>).                                                                |
 | Архив           | Документы, которые были отправлены и успешно обработаны на сервере (со статусом Обработан успешно <img src="img/1.Connection/1.IconProcesSucces.JPG" alt="drawing" height="22"/> )  |
 
