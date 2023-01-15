@@ -19,14 +19,14 @@
 
 Выйти из демо режима можно, открыв боковую панель нажатием на иконку меню " **≡** ", находящуюся в верхнем углу приложения слева (или смахнув пальцем вправо с левого края устройства).
 
-Затем перейти на экран **Профиль** и нажать на кнопку **Выйти из демо режима**.
+Затем перейти на экран **Профиль** и нажать на кнопку **Выйти из демо режима**. Далее выбрать **Подключиться к серверу компании**.
 
-<img src="img/1.Connection/1.Рrofile.jpg" alt="drawing" height="400"/>
+<img src="img/1.Connection/1.Рrofile.jpg" alt="drawing" height="400"/> <img src="img/1.Connection/1.StartScreenThree.jpg" alt="drawing" height="400"/>
 
 ### Подключение к серверу
 Чтобы подключиться к рабочей базе данных необходимо выбрать **Подключиться к серверу** для перехода на экран настройки подключения (с помощью иконки <img src="img/1.Connection/1.ConfigIcon.png" alt="drawing" height="30"/> ):
 
-<img src="img/1.Connection/1.ConnectionSettings.jpg" alt="drawing" height="400"/>
+<img src="img/1.Connection/1.Login.jpg" alt="drawing" height="400"/> <img src="img/1.Connection/1.Connection.jpg" alt="drawing" height="400"/> <img src="img/1.Connection/1.ConnectionSettings.jpg" alt="drawing" height="400"/>
 
 В этом экране следует указать параметры подключения к серверу.
 
@@ -362,7 +362,7 @@
 | Группа | Описание                                                                                                                                                                    |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Все             | Все документы <img src="img/1.Connection/1.IconDraft.jpg" alt="drawing" height="22"/> <img src="img/1.Connection/1.IconReadyToGo.jpg" alt="drawing" height="22"/> <img src="img/1.Connection/1.IconSent.jpg" alt="drawing" height="22"/> <img src="img/1.Connection/1.IconProcesSucces.jpg" alt="drawing" height="22"/>                                                                                                                                 |
-| Активные        | Все документы, кроме тех, которые уже обработаны на сервере (со статусом Черновик, Готов к отправке, Отправлен <img src="img/1.Connection/1.IconDraft.jpg" alt="drawing" height="22"/> <img src="img/1.Connection/1.IconReadyToGo.jpg" alt="drawing" height="22"/> <img src="img/1.Connection/1.IconSent.jpg" alt="drawing" height="22"/>).                                                                |
+| Активные        | Все документы, кроме тех, которые уже обработаны на сервере (со статусом Черновик<img src="img/1.Connection/1.IconDraft.jpg" alt="drawing" height="22"/>, Готов к отправке<img src="img/1.Connection/1.IconReadyToGo.jpg" alt="drawing" height="22"/>, Отправлен   <img src="img/1.Connection/1.IconSent.jpg" alt="drawing" height="22">).                                                                |
 | Архив           | Документы, которые были отправлены и успешно обработаны на сервере (со статусом Обработан успешно <img src="img/1.Connection/1.IconProcesSucces.jpg" alt="drawing" height="22"/> )  |
 
 
@@ -595,7 +595,8 @@
 Поле **Склад магазин** необязательное для заполнения. Оно автоматически заполняется, если значение склада передается из ERP системы в настройки пользователя (можно просмотреть в окне **Профиль**).
 
 ## 12. О программе
-На данном экране можно узнать информацию о приложении и о контактных данных разработчика, перейдя по ссылке **Документация** ознакомиться с полным функционалом приложения. В журнале ошибок проверить ошибки.
+На данном экране можно узнать информацию о приложении и о контактных данных разработчика, перейдя по ссылке **Документация** ознакомиться с полным функционалом приложения. В **Журнале ошибок** проверить ошибки.
+
 <img src="img/10.About/10.About.jpg" alt="drawing" height="400"/>
 
 ## 13. Значение иконок
