@@ -321,9 +321,7 @@
     - нажав на иконку **Отправка документа** <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/> можно отправить сразу все заявки, в стадии **Черновик** <img src="img/1.Connection/1.IconDraft.jpg" alt="drawing" height="22"/> или **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.jpg" alt="drawing" height="22"/>.
 
 
-<img src="img/3.Orders/3.VisitStartEnd.jpg" alt="drawing" height="400"/>
-<img src="img/3.Orders/3.VisitQuestion.jpg" alt="drawing" height="400"/>
-<img src="img/3.Orders/3.VisitEnd.jpg" alt="drawing" height="400"/>  
+<img src="img/3.Orders/3.VisitStartEnd.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.VisitQuestion.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.VisitEnd.jpg" alt="drawing" height="400"/>  
 
 ### Синхронизация
 
@@ -453,7 +451,7 @@
 
 При выборе (нажатием на строку) необходимого маршрута откроется экран с торговыми точками, запланированными для посещения, то есть переходим на экран **Точки маршрута**.
 
-<img src="img/5.Routes/5.Route.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.Routes.jpg" alt="drawing" height="400"/>
+<img src="img/5.Routes/5.Route.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.Routes.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.VisitTwo.jpg" alt="drawing" height="400"/>
 
 После нажатия на торговую точку откроется экран с визитом выбранного объекта.
 
@@ -467,13 +465,14 @@
 
 Началом визита считается момент создания первой заявки, т.е. при создании первой заявки происходит определение местоположения, фиксирование даты и времени. 
 
+
 Из экрана **Визит** пользователь имеет возможность:
 - создать заявку
 - просмотреть текущие и предыдущие заявки, сделанные ранее
 - просмотреть условия оплаты, задолженности и сроки 
 - удалить заявки со статусом **Черновик** и **Готов к отправке**
 - отправить ВСЕ заявки со статусом **Готов к отправке** на сервер с помощью кнопки <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/> 
-- копировать заявку, сделанную ранее
+- скопировать заявку, сделанную ранее
 
 
  ### Создание заявки в маршруте
