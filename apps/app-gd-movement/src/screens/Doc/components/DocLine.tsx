@@ -111,7 +111,7 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
           />
         )}
       </Modal>
-      <ScrollView keyboardShouldPersistTaps="never">
+      <ScrollView keyboardShouldPersistTaps="handled">
         <View style={styles.content}>
           <View style={styles.item}>
             <View style={styles.details}>
