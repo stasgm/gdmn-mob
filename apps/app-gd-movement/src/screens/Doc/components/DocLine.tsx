@@ -165,7 +165,6 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
             <View style={localStyles.details}>
               <View style={localStyles.new}>
                 <Text style={styles.name}>Количество</Text>
-                {/* <View style={{ width: '100%', justifyContent: 'space-between', flexDirection: 'row' }}> */}
                 <TextInput
                   autoFocus={true}
                   style={[textStyle, localStyles.quantitySize]}

@@ -88,7 +88,17 @@ const SettingsScreen = () => {
         dispatch(
           settingsActions.updateOption({
             optionName: 'screenKeyboard',
-            value: { ...screenKeyboard, readonly: !value.data ? true : false, data: true },
+            value: { ...screenKeyboard, readonly: !value.data, data: true },
+          }),
+        );
+      }
+
+      const quantityInput = Object.values(settsData).find((i) => i?.id === 'quantityInput');
+      if (quantityInput) {
+        dispatch(
+          settingsActions.updateOption({
+            optionName: 'quantityInput',
+            value: { ...quantityInput, readonly: !value.data, data: false },
           }),
         );
       }
