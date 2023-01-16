@@ -8,8 +8,7 @@
 - Демо режим ( НАЧАТЬ РАБОТУ )
 - Подключение к серверу
 
-<img src="img/1.Connection/1.StartScreen2.jpg" alt="drawing" height="400"/>
-<img src="img/1.Connection/1.StartScreen.jpg" alt="drawing" height="400"/>
+<img src="img/1.Connection/1.StartScreen2.jpg" alt="drawing" height="400"/> <img src="img/1.Connection/1.StartScreen.jpg" alt="drawing" height="400"/>
 
 
 ### Демо режим
@@ -148,8 +147,7 @@
 
 Так же можно воспользоваться фильтром <img src="img/7.Remains/7.IconFiltr.jpg" alt="drawing" height="20"/>, который сортирует товары по двум категриям "Все" и "Ненулевые".
 
-<img src="img/7.Remains/7.Goods.jpg" alt="drawing" height="400"/>
-<img src="img/7.Remains/7.GoodsFiltr.jpg" alt="drawing" height="300"/>
+<img src="img/7.Remains/7.Goods.jpg" alt="drawing" height="400"/> <img src="img/7.Remains/7.GoodsFiltr.jpg" alt="drawing" height="300"/>
 
 
 ## 6. Документы
@@ -416,16 +414,20 @@
 
 | Иконка | Описание                                                                                                                                                                    |
 | :---------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>            | отправка документа                                                                                                                                    |
-| <img src="img/1.Connection/1.IconEdit.jpg" alt="drawing" height="22"/>        | редактирование документа                                                                |
-| <img src="img/1.Connection/1.IconSearch.jpg" alt="drawing" height="22"/>           | поиск|
-| <img src="img/10.Scanner/10.IconScanner.jpg" alt="drawing" height="22">           | сканирование штрихкода|
-| <img src="img/1.Connection/1.Sync.jpg" alt="drawing" height="27"/>           | синхронизация|
-| <img src="img/1.Connection/1.ConfigIcon.png" alt="drawing" height="22"/>           | переход на экран настроек|
-| <img src="img/1.Connection/1.IconTrash.jpg" alt="drawing" height="22"/>           | удаление документа|
-|<img src="img/7.Remains/7.IconFiltr.jpg" alt="drawing" height="20"/>| фильтр 
-| <img src="img/1.Connection/1.IconFlash.jpg" alt="drawing" height="22"/>           | вспышка выключена|
-| <img src="img/1.Connection/1.IconVibr.jpg" alt="drawing" height="22"/>           | вибрация выключена|
-| **✓**            | сохранить|
-| ✚           | добавление нового документа|
-| **⁝**           | меню документа|
+|<img src="img/1.Connection/1.IconDraft.jpg" alt="drawing" height="22"/>| _статус **Черновик**_, новый документ, который можно редактировать|
+|<img src="img/1.Connection/1.IconReadyToGo.jpg" alt="drawing" height="22"/>   | _статус **Готов к отправке**_, документ нельзя редактировать, но можно вернуть в статус **Черновик**   |
+|<img src="img/1.Connection/1.IconSent.jpg" alt="drawing" height="22"/>    | _статус **Отправлен**_, документ отправлен, ожидается подтверждение     |
+|<img src="img/1.Connection/1.IconProcesSucces.jpg" alt="drawing" height="22"/>    | _статус **Обработан успешно**_, документ получил подтверждение об успешной обработке на сервере   |
+| <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>            | отправка документа   |
+| <img src="img/1.Connection/1.IconEdit.jpg" alt="drawing" height="22"/>  | редактирование документа   |
+| <img src="img/1.Connection/1.IconSearch.jpg" alt="drawing" height="22"/> | поиск|
+| <img src="img/10.Scanner/10.IconScanner.jpg" alt="drawing" height="22">  | сканирование штрихкода|
+| <img src="img/1.Connection/1.Sync.jpg" alt="drawing" height="22"/>       | синхронизация|
+| <img src="img/1.Connection/1.ConfigIcon.png" alt="drawing" height="22"/> | переход на экран настроек|
+| <img src="img/1.Connection/1.IconTrash.jpg" alt="drawing" height="22"/>  | удаление документа|
+|<img src="img/7.Remains/7.IconFiltr.jpg" alt="drawing" height="20"/>      | фильтр 
+| <img src="img/1.Connection/1.IconFlash.jpg" alt="drawing" height="22">   | вспышка выключена|
+| <img src="img/1.Connection/1.IconVibr.jpg" alt="drawing" height="22"/>   | вибрация выключена|
+| **✓**     | сохранить|
+| ✚         | добавление нового документа|
+| **⁝**      | меню документа|
