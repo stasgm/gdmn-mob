@@ -248,7 +248,7 @@
 
 Кроме количества в позиции документа можно заполнить поле EID, которое используется для хранения DataMatrix кода прослеживаемого товара.
 
-Для этого необходимо нажать на кнопку **Сканировать EID** и просканировать ***DataMatrix код***.
+Для этого необходимо нажать на кнопку сканирования <img src="img/10.Scanner/10.IconScanner.jpg" alt="drawing" height="22"> напротив EID и просканировать ***DataMatrix код***.
 
 <img src="img/3.Docs/3.PrihodGoodLineFour.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.ScanEID.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.ScanDataMatrix.jpg" alt="drawing" height="400"/>
 
