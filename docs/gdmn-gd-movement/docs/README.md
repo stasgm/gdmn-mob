@@ -223,7 +223,7 @@
 Сканируем штрихкод, нажимаем на нужную кнопку (**Пересканировать** или **Товар**) и переходим на экран позиции документа для ввода количества товара:
 
 <img src="img/3.Docs/3.PrihodGoodLineFour.jpg" alt="drawing" height="400"/>
-<img src="img/3.Docs/3.PrihodGoodLineOne.jpg" alt="drawing" height="400"/>
+
 
 Кроме количества в позиции документа можно заполнить поле EID, которое используется для хранения DataMatrix кода прослеживаемого товара.
 
@@ -250,7 +250,7 @@
 
 Для этого необходимо нажать на кнопку **Сканировать EID** и просканировать ***DataMatrix код***.
 
-<img src="img/3.Docs/3.PrihodGoodLineOneNew.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.ScanEID.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.ScanDataMatrix.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.PrihodGoodLineFour.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.ScanEID.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.ScanDataMatrix.jpg" alt="drawing" height="400"/>
 
 #### Удаление позиции
 
