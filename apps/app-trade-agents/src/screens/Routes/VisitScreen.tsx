@@ -321,21 +321,25 @@ const VisitScreen = () => {
         {isDelList ? (
           <DeleteButton onPress={handleDeleteDocs} />
         ) : (
-          <>
-            <SendButton
-              onPress={() => setVisibleSendDialog(true)}
-              disabled={
-                screenState === 'sending' ||
-                screenState !== 'idle' ||
-                !orderDocs.find((doc) => doc.status === 'READY' || doc.status === 'DRAFT')
-              }
-            />
-            <AddButton onPress={() => setScreenState('adding')} disabled={screenState !== 'idle'} />
-          </>
+          !!orderType &&
+          !!contact &&
+          !!outlet && (
+            <>
+              <SendButton
+                onPress={() => setVisibleSendDialog(true)}
+                disabled={
+                  screenState === 'sending' ||
+                  screenState !== 'idle' ||
+                  !orderDocs.find((doc) => doc.status === 'READY' || doc.status === 'DRAFT')
+                }
+              />
+              <AddButton onPress={() => setScreenState('adding')} disabled={screenState !== 'idle'} />
+            </>
+          )
         )}
       </View>
     ),
-    [handleDeleteDocs, isDelList, orderDocs, screenState],
+    [contact, handleDeleteDocs, isDelList, orderDocs, orderType, outlet, screenState],
   );
 
   const renderLeft = useCallback(() => isDelList && <CloseButton onPress={() => setDelList({})} />, [isDelList]);

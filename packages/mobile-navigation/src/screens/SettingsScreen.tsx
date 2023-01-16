@@ -88,7 +88,7 @@ const SettingsScreen = () => {
         dispatch(
           settingsActions.updateOption({
             optionName: 'screenKeyboard',
-            value: { ...screenKeyboard, readonly: !value.data ? true : false, data: true },
+            value: { ...screenKeyboard, readonly: !value.data, data: true },
           }),
         );
       }

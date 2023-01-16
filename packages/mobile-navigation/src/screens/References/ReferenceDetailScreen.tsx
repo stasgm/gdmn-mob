@@ -11,6 +11,7 @@ import { IReferenceData } from '@lib/types';
 import { ReferenceStackParamList } from '../../navigation/Root/types';
 
 import { styles } from './styles';
+import { keyExtractorByIndex } from '@lib/mobile-hooks';
 
 interface IProperty {
   sortOrder: number;
@@ -83,7 +84,7 @@ const ReferenceDetailScreen = () => {
       <SubTitle style={styles.title}>{list.name}</SubTitle>
       <FlatList
         data={refData}
-        keyExtractor={(_, i) => String(i)}
+        keyExtractor={keyExtractorByIndex}
         renderItem={renderItem}
         ItemSeparatorComponent={Divider}
       />

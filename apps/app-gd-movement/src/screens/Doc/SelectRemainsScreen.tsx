@@ -38,6 +38,8 @@ interface IFilteredList {
   goodRemains: IRemGood[];
 }
 
+const keyExtractor = (item: IRemGood) => String(item.good.id);
+
 export const SelectRemainsScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'SelectRemainsItem'>>();
   const { docId } = useRoute<RouteProp<DocStackParamList, 'SelectRemainsItem'>>().params;
@@ -56,6 +58,7 @@ export const SelectRemainsScreen = () => {
   const goods = refSelectors.selectByName<IGood>('good')?.data;
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
   const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
+  const isInputQuantity = useSelector((state) => state.settings?.data?.quantityInput?.data);
 
   const documentType = useMemo(
     () => documentTypes?.find((d) => d.id === document?.documentType.id),
@@ -142,6 +145,7 @@ export const SelectRemainsScreen = () => {
 
   const handleAddLine = useCallback(
     (item?: IRemGood) => {
+      const quantity = isInputQuantity ? 1 : 0;
       if (selectedLine) {
         navigation.navigate('DocLine', {
           docId,
@@ -149,7 +153,7 @@ export const SelectRemainsScreen = () => {
           item: {
             id: generateId(),
             good: { id: selectedLine.good.id, name: selectedLine.good.name },
-            quantity: 0,
+            quantity,
             remains: selectedLine.remains,
             price: selectedLine.price,
             buyingPrice: selectedLine.buyingPrice,
@@ -163,7 +167,7 @@ export const SelectRemainsScreen = () => {
           item: {
             id: generateId(),
             good: selectedGood.good,
-            quantity: 0,
+            quantity,
             remains: selectedGood.remains,
             price: selectedGood.price,
             buyingPrice: selectedGood.buyingPrice,
@@ -177,7 +181,7 @@ export const SelectRemainsScreen = () => {
           item: {
             id: generateId(),
             good: { id: item.good.id, name: item.good.name },
-            quantity: 0,
+            quantity,
             remains: item.remains,
             price: item.price,
             buyingPrice: item.buyingPrice,
@@ -185,7 +189,7 @@ export const SelectRemainsScreen = () => {
         });
       }
     },
-    [docId, navigation, selectedGood, selectedLine],
+    [docId, isInputQuantity, navigation, selectedGood, selectedLine],
   );
 
   const handleEditLine = useCallback(() => {
@@ -246,62 +250,59 @@ export const SelectRemainsScreen = () => {
     [handleAddLine],
   );
 
-  const renderItem = useCallback(
-    ({ item }: { item: IRemGood }) => {
-      const lines = document?.lines?.filter((i) => i.good.id === item.good.id);
-      const isAdded = !!lines?.length;
+  const renderItem = ({ item }: { item: IRemGood }) => {
+    const lines = document?.lines?.filter((i) => i.good.id === item.good.id);
+    const isAdded = !!lines?.length;
 
-      const iconStyle = [styles.icon, { backgroundColor: isAdded ? '#06567D' : '#E91E63' }];
-      const goodStyle = {
-        backgroundColor: isAdded ? globalColors.backgroundLight : 'transparent',
-      };
+    const iconStyle = [styles.icon, { backgroundColor: isAdded ? '#06567D' : '#E91E63' }];
+    const goodStyle = {
+      backgroundColor: isAdded ? globalColors.backgroundLight : 'transparent',
+    };
 
-      return (
-        <TouchableOpacity onPress={() => handlePressItem(isAdded, item)}>
-          <View style={[localStyles.goodItem, goodStyle]}>
-            <View style={iconStyle}>
-              <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
-            </View>
-            <View style={styles.details}>
-              <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-              <View style={styles.directionRow}>
-                <MediumText>
-                  {item.remains} {item.good.valueName} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)}{' '}
-                  руб.
-                </MediumText>
-                {!!item.good.barcode && (
-                  <MediumText style={[styles.number, styles.flexDirectionRow]}>{item.good.barcode}</MediumText>
-                )}
-              </View>
-              {item.good.alias && item.good.weightCode ? (
-                <MediumText style={[styles.number, styles.flexDirectionRow]}>
-                  арт. {item.good.alias}, вес. код {item.good.weightCode}
-                </MediumText>
-              ) : item.good.alias ? (
-                <MediumText style={styles.number}>арт. {item.good.alias}</MediumText>
-              ) : item.good.weightCode ? (
-                <MediumText style={styles.number}>вес. код {item.good.weightCode}</MediumText>
-              ) : null}
-              {isAdded && (
-                <View style={localStyles.lineView}>
-                  {lines.map((line) => (
-                    <Chip
-                      key={line.id}
-                      style={[localStyles.lineChip, { borderColor: colors.primary }]}
-                      onPress={() => setSelectedLine(line)}
-                    >
-                      {line.quantity} {item.good.valueName}
-                    </Chip>
-                  ))}
-                </View>
+    return (
+      <TouchableOpacity onPress={() => handlePressItem(isAdded, item)}>
+        <View style={[localStyles.goodItem, goodStyle]}>
+          <View style={iconStyle}>
+            <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
+          </View>
+          <View style={styles.details}>
+            <LargeText style={styles.textBold}>{item.good.name}</LargeText>
+            <View style={styles.directionRow}>
+              <MediumText>
+                {item.remains} {item.good.valueName} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)}{' '}
+                руб.
+              </MediumText>
+              {!!item.good.barcode && (
+                <MediumText style={[styles.number, styles.flexDirectionRow]}>{item.good.barcode}</MediumText>
               )}
             </View>
+            {item.good.alias && item.good.weightCode ? (
+              <MediumText style={[styles.number, styles.flexDirectionRow]}>
+                арт. {item.good.alias}, вес. код {item.good.weightCode}
+              </MediumText>
+            ) : item.good.alias ? (
+              <MediumText style={styles.number}>арт. {item.good.alias}</MediumText>
+            ) : item.good.weightCode ? (
+              <MediumText style={styles.number}>вес. код {item.good.weightCode}</MediumText>
+            ) : null}
+            {isAdded && (
+              <View style={localStyles.lineView}>
+                {lines.map((line) => (
+                  <Chip
+                    key={line.id}
+                    style={[localStyles.lineChip, { borderColor: colors.primary }]}
+                    onPress={() => setSelectedLine(line)}
+                  >
+                    {line.quantity} {item.good.valueName}
+                  </Chip>
+                ))}
+              </View>
+            )}
           </View>
-        </TouchableOpacity>
-      );
-    },
-    [colors.primary, document?.lines, handlePressItem],
-  );
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   const RC = useMemo(() => <RefreshControl refreshing={!goodRemains} title="загрузка данных..." />, [goodRemains]);
 
@@ -331,7 +332,8 @@ export const SelectRemainsScreen = () => {
         refreshControl={RC}
         ListEmptyComponent={EmptyList}
         keyboardShouldPersistTaps="handled"
-        extraData={document?.lines}
+        extraData={[document?.lines, isInputQuantity]}
+        keyExtractor={keyExtractor}
       />
       {(selectedLine || selectedGood) && (
         <DocLineDialog

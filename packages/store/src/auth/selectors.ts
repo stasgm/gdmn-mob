@@ -8,8 +8,10 @@ const isLogged = (): boolean => {
 };
 
 const isLoggedWithCompany = (): boolean => {
-  const { connectionStatus, user, company, device } = useSelector((state: RootState) => state.auth);
-  return Boolean((connectionStatus === 'connected' || connectionStatus === 'not-checked') && user && company && device);
+  const { connectionStatus, user, company, device, appSystem } = useSelector((state: RootState) => state.auth);
+  return Boolean(
+    (connectionStatus === 'connected' || connectionStatus === 'not-checked') && user && company && device && appSystem,
+  );
 };
 
 export default { isLogged, isLoggedWithCompany };

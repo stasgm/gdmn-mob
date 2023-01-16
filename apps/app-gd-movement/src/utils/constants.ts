@@ -111,8 +111,8 @@ export const appSettings: Settings = {
   quantityInput: {
     id: 'quantityInput',
     sortOrder: 5,
-    description: 'Не заполнять количество',
-    data: true,
+    description: 'Заполнять количество',
+    data: false,
     type: 'boolean',
     visible: true,
     group: baseSettingGroup,

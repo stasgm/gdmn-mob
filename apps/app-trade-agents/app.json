@@ -29,7 +29,7 @@
     "android": {
       "package": "com.gsbelarus.salesrepresentative2",
       "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "FOREGROUND_SERVICE"],
-      "versionCode": 26
+      "versionCode": 28
     }
   }
 }

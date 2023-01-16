@@ -6,7 +6,7 @@ import { Divider } from 'react-native-paper';
 
 import { useTheme } from '@react-navigation/native';
 
-import { round, useFilteredDocList } from '@lib/mobile-hooks';
+import { keyExtractorByIndex, round, useFilteredDocList } from '@lib/mobile-hooks';
 
 import { IGoodGroup, IOrderDocument, IOrderLine, IOrderTotalLine } from '../../../store/types';
 import { totalList, totalListByGroup } from '../../../utils/helpers';
@@ -73,7 +73,7 @@ const OrderListTotal = ({ sectionOrders }: IItem) => {
           <Divider style={{ backgroundColor: colors.primary }} />
           <FlatList
             data={totalListByOrders}
-            keyExtractor={(_, i) => String(i)}
+            keyExtractor={keyExtractorByIndex}
             renderItem={renderTotalItem}
             style={localStyles.groupMargin}
           />

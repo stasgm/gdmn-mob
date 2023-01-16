@@ -25,7 +25,7 @@ import { AuthStackParamList } from './types';
 const AuthStack = createStackNavigator<AuthStackParamList>();
 
 const AuthNavigator = () => {
-  const { config, isDemo, isInit, user, isConfigFirst, connectionStatus, isLogout } = useSelector(
+  const { config, isDemo, isInit, user, isConfigFirst, connectionStatus, isLogout, appSystem } = useSelector(
     (state) => state.auth,
   );
 
@@ -78,7 +78,7 @@ const AuthNavigator = () => {
         user &&
         user.erpUser?.id &&
         objGetStatus.type !== 'AUTH/GET_DEVICE_STATUS_FAILURE' &&
-        !device
+        (!device || !appSystem)
       ) {
         await authDispatch(
           authActions.getDeviceByUid(
@@ -90,7 +90,7 @@ const AuthNavigator = () => {
         );
       }
     }
-  }, [authDispatch, config.deviceId, isLogout, logout, user]);
+  }, [appSystem, authDispatch, config.deviceId, isLogout, logout, user]);
 
   const activateDevice = useCallback(
     async (code: string) => {

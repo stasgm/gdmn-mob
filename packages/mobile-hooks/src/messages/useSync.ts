@@ -83,11 +83,15 @@ export const useSync = (onSync?: () => Promise<any>) => {
   const setVersion = 1;
 
   const { saveErrors } = useSaveErrors();
-  const params = useMemo(() => ({ appSystemId: appSystem!.id, companyId: company!.id }), [appSystem, company]);
+
+  const params = useMemo(
+    () => (appSystem && company ? { appSystemId: appSystem?.id, companyId: company?.id } : undefined),
+    [appSystem, company],
+  );
 
   const processMessage = useCallback(
     async (msg: IMessage, tempErrs: IDeviceLog[]) => {
-      if (!msg) {
+      if (!msg || !params) {
         return;
       }
 

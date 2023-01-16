@@ -32,6 +32,7 @@ import {
   shortenString,
   useSendDocs,
   sleep,
+  keyExtractor,
 } from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
@@ -219,7 +220,6 @@ export const ScanViewScreen = () => {
 
   const renderItem = ({ item, index }: { item: IScanLine; index: number }) => (
     <ListItemLine
-      key={item.id}
       {...item}
       onPress={() => (isDelList ? setDelList(getDelLineList(delList, item.id)) : undefined)}
       onLongPress={() => setDelList(getDelLineList(delList, item.id))}
@@ -332,6 +332,7 @@ export const ScanViewScreen = () => {
           estimatedItemSize={60}
           ItemSeparatorComponent={ItemSeparator}
           keyboardShouldPersistTaps="handled"
+          keyExtractor={keyExtractor}
         />
         <SimpleDialog
           visible={visibleSendDialog}
