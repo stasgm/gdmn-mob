@@ -227,13 +227,13 @@
 
 Кроме количества в позиции документа можно заполнить поле EID, которое используется для хранения DataMatrix кода прослеживаемого товара.
 
-Для этого необходимо нажать на кнопку **Сканировать EID** и просканировать сам ***DataMatrix код***. Поле заполнится автоматически.
+Для этого необходимо нажать на кнопку сканирования <img src="img/10.Scanner/10.IconScanner.jpg" alt="drawing" height="22"> напротив EID и просканировать сам ***DataMatrix код***. Поле заполнится автоматически.
 
 После ввода всех необходимых данных, сохраняем позицию, нажав на иконку " **✓** ".
 
 Если отсканированный штрихкод не найден в справочнике, и если документ работает не только с остатками товаров (например, документ прихода), то в позицию подставится неизвестный товар:
 
-<img src="img/3.Docs/3.ScanUnknown.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodGoodLineUnknown.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.ScanUnknown.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodGoodLineUnknownZero.jpg" alt="drawing" height="400"/>
 
 Но если документ работает только с остатками (например, документ инвентаризации), то товар с неизвестным штрихкодом добавить нельзя.
 
@@ -420,7 +420,7 @@
 | <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>            | отправка документа                                                                                                                                    |
 | <img src="img/1.Connection/1.IconEdit.jpg" alt="drawing" height="22"/>        | редактирование документа                                                                |
 | <img src="img/1.Connection/1.IconSearch.jpg" alt="drawing" height="22"/>           | поиск|
-| <img src="img/10.Scanner/10.IconScanner.jpg" alt="drawing" height="22"/>           | сканирование штрихкода|
+| <img src="img/10.Scanner/10.IconScanner.jpg" alt="drawing" height="22">           | сканирование штрихкода|
 | <img src="img/1.Connection/1.Sync.jpg" alt="drawing" height="27"/>           | синхронизация|
 | <img src="img/1.Connection/1.ConfigIcon.png" alt="drawing" height="22"/>           | переход на экран настроек|
 | <img src="img/1.Connection/1.IconTrash.jpg" alt="drawing" height="22"/>           | удаление документа|
