@@ -187,8 +187,7 @@
 
 - или используя пункт меню " **⁝** " **Редактировать данные**.
 
-<img src="img/3.Docs/3.MenuDelDoc.jpg" alt="drawing" height="400"/>
-<img src="img/3.Docs/3.PrihodNew.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.MenuDelDoc.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodNew.jpg" alt="drawing" height="400"/>
 
 Но есть исключения:
 - Нельзя выбрать дату меньше текущей, если выбранный тип документа работает только с остатками (например, документ инвентаризации)
@@ -207,7 +206,7 @@
 
 Уточнение: _если Вы производите сканирование штрихкодов исключительно с помощью камеры устройства, то в настройках приложения необходимо перевести параметр **Использовать сканер** в отрицательное положение._
 
-<img src="img/8.Settings/8.BaseSettings2.jpg" alt="drawing" height="400"/>
+<img src="img/8.Settings/8.BaseSettings.jpg" alt="drawing" height="400"/>
 
 Нажимаем на иконку штрихкода <img src="img/10.Scanner/10.IconScanner.jpg" alt="drawing" height="22"/>  в верхнем правом углу и переходим на экран сканирования товара. 
 
