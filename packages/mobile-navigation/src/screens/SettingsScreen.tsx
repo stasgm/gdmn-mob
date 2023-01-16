@@ -92,16 +92,6 @@ const SettingsScreen = () => {
           }),
         );
       }
-
-      const quantityInput = Object.values(settsData).find((i) => i?.id === 'quantityInput');
-      if (quantityInput) {
-        dispatch(
-          settingsActions.updateOption({
-            optionName: 'quantityInput',
-            value: { ...quantityInput, readonly: !value.data, data: false },
-          }),
-        );
-      }
     }
   };
 

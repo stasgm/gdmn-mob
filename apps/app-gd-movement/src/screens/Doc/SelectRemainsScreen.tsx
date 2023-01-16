@@ -58,6 +58,7 @@ export const SelectRemainsScreen = () => {
   const goods = refSelectors.selectByName<IGood>('good')?.data;
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
   const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
+  const isInputQuantity = useSelector((state) => state.settings?.data?.quantityInput?.data);
 
   const documentType = useMemo(
     () => documentTypes?.find((d) => d.id === document?.documentType.id),
@@ -144,6 +145,7 @@ export const SelectRemainsScreen = () => {
 
   const handleAddLine = useCallback(
     (item?: IRemGood) => {
+      const quantity = isInputQuantity ? 1 : 0;
       if (selectedLine) {
         navigation.navigate('DocLine', {
           docId,
@@ -151,7 +153,7 @@ export const SelectRemainsScreen = () => {
           item: {
             id: generateId(),
             good: { id: selectedLine.good.id, name: selectedLine.good.name },
-            quantity: 0,
+            quantity,
             remains: selectedLine.remains,
             price: selectedLine.price,
             buyingPrice: selectedLine.buyingPrice,
@@ -165,7 +167,7 @@ export const SelectRemainsScreen = () => {
           item: {
             id: generateId(),
             good: selectedGood.good,
-            quantity: 0,
+            quantity,
             remains: selectedGood.remains,
             price: selectedGood.price,
             buyingPrice: selectedGood.buyingPrice,
@@ -179,7 +181,7 @@ export const SelectRemainsScreen = () => {
           item: {
             id: generateId(),
             good: { id: item.good.id, name: item.good.name },
-            quantity: 0,
+            quantity,
             remains: item.remains,
             price: item.price,
             buyingPrice: item.buyingPrice,
@@ -187,7 +189,7 @@ export const SelectRemainsScreen = () => {
         });
       }
     },
-    [docId, navigation, selectedGood, selectedLine],
+    [docId, isInputQuantity, navigation, selectedGood, selectedLine],
   );
 
   const handleEditLine = useCallback(() => {
@@ -330,7 +332,7 @@ export const SelectRemainsScreen = () => {
         refreshControl={RC}
         ListEmptyComponent={EmptyList}
         keyboardShouldPersistTaps="handled"
-        extraData={document?.lines}
+        extraData={[document?.lines, isInputQuantity]}
         keyExtractor={keyExtractor}
       />
       {(selectedLine || selectedGood) && (
