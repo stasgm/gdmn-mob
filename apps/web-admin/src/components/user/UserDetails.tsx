@@ -32,8 +32,10 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
   // const [users, setUsers] = useState<INamedEntity[]>([]);
   // const [loadingUsers, setLoadingUsers] = useState(true);
 
-  const { list: appSystems, loading: loadingAppSystems } = useSelector((state) => state.appSystems);
+  const { list: companies, loading: loadingСompanies } = useSelector((state) => state.companies);
   const { list: users, loading: loadingUsers } = useSelector((state) => state.users);
+
+  const appSystems = companies.map((d) => ({ appSystems: d.appSystems }))?.[0].appSystems;
 
   const erpUsers = useMemo(() => {
     return users.filter((i) => i.appSystem).map((d) => ({ id: d.id, name: d.name }));
@@ -239,7 +241,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                       setFieldValue={formik.setFieldValue}
                       setTouched={formik.setTouched}
                       error={Boolean(formik.touched.appSystem && formik.errors.appSystem)}
-                      disabled={loading || loadingAppSystems}
+                      disabled={loading || loadingСompanies}
                       required={userERP ? true : false}
                     />
                   </Grid>

@@ -54,6 +54,7 @@
     "expo-font": "~11.0.1",
     "expo-status-bar": "~1.4.2",
     "expo-updates": "~0.15.6",
+    "mathjs": "^11.5.0",
     "nanoid": "^3.3.4",
     "react": "18.1.0",
     "react-dom": "18.1.0",

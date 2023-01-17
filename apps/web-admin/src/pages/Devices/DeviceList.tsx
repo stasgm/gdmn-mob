@@ -15,6 +15,7 @@ import codeActions from '../../store/activationCode';
 import { IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import DeviceListTable from '../../components/device/DeviceListTable';
+import { webRequest } from '../../store/webRequest';
 
 const DeviceList = () => {
   const navigate = useNavigate();
@@ -71,7 +72,7 @@ const DeviceList = () => {
   };
 
   const handleCreateUid = async (code: string, deviceId: string) => {
-    await authDispatch(authActions.activateDevice(code));
+    await authDispatch(authActions.activateDevice(webRequest(dispatch, authActions), code));
     dispatch(deviceActions.fetchDeviceById(deviceId));
     fetchActivationCodes(deviceId);
   };
