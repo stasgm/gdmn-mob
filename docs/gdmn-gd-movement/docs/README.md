@@ -305,8 +305,7 @@
 
 Но, пока документ не отправлен, его можно вернуть из статуса **Готов к отправке** в статус **Черновик** и отредактировать данные.
 
-
-<img src="img/3.Docs/3.PrihodEditDraft.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodEditReady.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.DocsReady.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.DocsReady.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.DocPrihod.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodEditReady.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodEditDraft.jpg" alt="drawing" height="400"/> 
 
 
 
