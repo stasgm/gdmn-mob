@@ -9,7 +9,7 @@ import { IDeviceLogFiles, IFileSystem } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import { IHeadCells, IPageParam, IToolBarButton } from '../../types';
+import { IFileFormik, IHeadCells, IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
 import actions from '../../store/file';
@@ -22,16 +22,16 @@ const FileList = () => {
 
   const sortedList = useMemo(() => list.sort((a, b) => (a.path < b.path ? -1 : 1)), [list]);
   const fetchFiles = useCallback(
-    (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(actions.fetchFiles());
+    (filesFilters: Record<string, string | number>) => {
+      dispatch(actions.fetchFiles(filesFilters));
     },
     [dispatch],
   );
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchFiles();
-  }, [fetchFiles]);
+    fetchFiles(pageParams?.filesFilters as IFileFormik);
+  }, [fetchFiles, pageParams?.filesFilters]);
 
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
@@ -47,9 +47,19 @@ const FileList = () => {
     // fetchDevices('');
   };
 
+  // useEffect(() => {
+  //   if (pageParams?.filesFilters) {
+  //     const fetchFiles = useCallback(
+  //       (filterText?: string, fromRecord?: number, toRecord?: number) => {
+  //         dispatch(actions.fetchFiles());
+  //       },
+  //       [dispatch],
+  //     );
+  //   }
+  // }, []);
   const handleSearchClick = () => {
     dispatch(actions.fileSystemActions.setPageParam({ filterText: pageParamLocal?.filterText }));
-    fetchFiles(pageParamLocal?.filterText as string);
+    fetchFiles(pageParamLocal?.filesFilters as IFileFormik);
   };
 
   const handleKeyPress = (key: string) => {
@@ -154,7 +164,7 @@ const FileList = () => {
     {
       name: 'Обновить',
       sx: { mx: 1 },
-      onClick: () => fetchFiles(),
+      onClick: () => fetchFiles(pageParams?.filesFilters as IFileFormik),
       icon: <CachedIcon />,
     },
     {
@@ -183,7 +193,7 @@ const FileList = () => {
   return (
     <>
       <Helmet>
-        <title>Журнал ошибок</title>
+        <title>Файловая система</title>
       </Helmet>
       <Box>
         <Dialog open={open} onClose={handleClose}>

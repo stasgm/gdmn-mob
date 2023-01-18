@@ -36,6 +36,7 @@ interface IProps {
   selectedFileIds: IFileSystem[];
   onSetPageParams: (filesFilters: IPageParam) => void;
   pageParams?: IPageParam | undefined;
+  iniValues?: IFileFormik;
 }
 
 const FileListTable = ({
@@ -50,6 +51,7 @@ const FileListTable = ({
   selectedFileIds,
   onSetPageParams,
   pageParams,
+  iniValues,
 }: IProps) => {
   const [limit, setLimit] = useState(25);
   const [page, setPage] = useState(0);

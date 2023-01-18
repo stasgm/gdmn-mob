@@ -13,11 +13,11 @@ import { fileSystemActions, FileSystemActionType } from './actions';
 
 export type AppThunk = ThunkAction<Promise<FileSystemActionType>, AppState, null, FileSystemActionType>;
 
-const fetchFiles = (): AppThunk => {
+const fetchFiles = (params?: Record<string, string | number>): AppThunk => {
   return async (dispatch) => {
     dispatch(fileSystemActions.fetchFilesAsync.request(''));
 
-    const response = await api.file.getFiles(webRequest(dispatch, authActions));
+    const response = await api.file.getFiles(webRequest(dispatch, authActions), params);
 
     if (response.type === 'GET_FILES') {
       return dispatch(fileSystemActions.fetchFilesAsync.success(response.files));

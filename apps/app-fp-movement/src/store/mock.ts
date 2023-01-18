@@ -276,7 +276,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
           data: [
             {
               id: 'internalMovement',
-              name: 'Внутренне перемещение',
+              name: 'Внутреннее перемещение',
             },
             {
               id: 'movement',
@@ -1574,7 +1574,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
             },
             subtype: {
               id: 'internalMovement',
-              name: 'Внутренне перемещение',
+              name: 'Внутреннее перемещение',
             },
           },
           editionDate: new Date().toISOString(),
@@ -1670,7 +1670,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
             },
             subtype: {
               id: 'internalMovement',
-              name: 'Внутренне перемещение',
+              name: 'Внутреннее перемещение',
             },
           },
           editionDate: new Date().toISOString(),

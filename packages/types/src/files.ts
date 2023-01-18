@@ -15,6 +15,14 @@ export interface IFileSystem extends IEntity, IExtraFileInfo {
   path: string;
 }
 
+export interface IFileFormik extends IExtraFileInfo {
+  [fieldName: string]: unknown;
+  path: string;
+  fileName: string;
+  uid: string;
+  date: string;
+}
+
 export interface IFileIds {
   ids: string[];
 }
