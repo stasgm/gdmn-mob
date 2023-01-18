@@ -192,11 +192,11 @@
 Отредактировать введенные данные можно двумя способами:
  - нажав на значок <img src="img/1.Connection/1.IconEdit.jpg" alt="drawing" height="22"/> **Редактирование документа** на шапке документа 
 
-<img src="img/3.Docs/3.PrihodView.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodNew.jpg" alt="drawing" height="400"/> 
+<img src="img/3.Docs/3.PrihodView.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodEditDraft.jpg" alt="drawing" height="400"/> 
 
 - или используя пункт меню " **⁝** " **Редактировать данные**.
 
-<img src="img/3.Docs/3.MenuDelDoc.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodNew.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.MenuDelDoc.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodEditDraft.jpg" alt="drawing" height="400"/>
 
 Но есть исключения:
 - Нельзя выбрать дату меньше текущей, если выбранный тип документа работает только с остатками (например, документ инвентаризации)
