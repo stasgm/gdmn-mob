@@ -21,11 +21,10 @@ export type Props = {
   onSetDemoMode: () => void;
 };
 
-const ConfigScreen = (props: Props) => {
+const ConfigScreen = ({ config, onSetConfig, onSetDemoMode }: Props) => {
   const navigation = useNavigation<StackNavigationProp<AuthStackParamList, 'Config'>>();
   const { colors } = useTheme();
 
-  const { config, onSetConfig, onSetDemoMode } = props;
   const [serverName, setServerName] = useState(`${config?.protocol}${config?.server}` || '');
   const [serverPort, setServerPort] = useState(config?.port?.toString() || '');
   const [timeout] = useState(config?.timeout?.toString() || '');
