@@ -9,18 +9,24 @@ export interface IExtraFileInfo {
 }
 
 export interface IFileSystem extends IEntity, IExtraFileInfo {
+  [key: string]: unknown;
   date: string;
   size: number;
   fileName: string;
   path: string;
 }
 
-export interface IFileFormik extends IExtraFileInfo {
+export interface IFileSearchOptions {
   [fieldName: string]: unknown;
   path: string;
   fileName: string;
   uid: string;
   date: string;
+  company: string;
+  appSystem: string;
+  consumer: string;
+  producer: string;
+  device: string;
 }
 
 export interface IFileIds {

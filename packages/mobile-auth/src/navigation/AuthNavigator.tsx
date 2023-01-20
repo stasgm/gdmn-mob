@@ -78,7 +78,7 @@ const AuthNavigator = () => {
         user &&
         user.erpUser?.id &&
         objGetStatus.type !== 'AUTH/GET_DEVICE_STATUS_FAILURE' &&
-      (!device || !appSystem)
+        (!device || !appSystem)
       ) {
         await authDispatch(
           authActions.getDeviceByUid(
@@ -90,7 +90,7 @@ const AuthNavigator = () => {
         );
       }
     }
-  }, [authDispatch, config.deviceId, isLogout, logout, user]);
+  }, [appSystem, authDispatch, config.deviceId, isLogout, logout, user]);
 
   const activateDevice = useCallback(
     async (code: string) => {
