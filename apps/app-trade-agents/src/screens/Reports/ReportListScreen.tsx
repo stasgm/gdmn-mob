@@ -20,9 +20,13 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } fro
 import { SectionListData, View, StyleSheet, SectionList, ListRenderItem, Platform, Keyboard } from 'react-native';
 
 import { ReportStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument, IReportListFormParam, IOutlet } from '../../store/types';
+import { IOrderDocument, IReportListFormParam, IOutlet, IReportTotalLine } from '../../store/types';
+
+import { noPackage } from '../../utils/constants';
 
 import ReportItem, { IReportItem } from './components/ReportItem';
+import { ReportTotal, ReportListTotal } from './components/ReportTotal';
+// import ReportListTotal from './components/ReportListTotal';
 
 export type RefListItem = IReference & { refName: string };
 
@@ -125,29 +129,77 @@ const ReportListScreen = () => {
       ? filteredOrderList
           .reduce((prev: IReportItem[], cur) => {
             const address = outlets.find((o) => cur?.head?.outlet.id === o.id)?.address;
-            const is = prev.find(
+            const line = prev.find(
               (e) =>
                 orders.find((a) => a.id === e.id)?.head.outlet.id === cur.head.outlet.id &&
                 new Date(e.onDate.slice(0, 10)).getTime() === new Date(cur.head.onDate.slice(0, 10)).getTime(),
             );
 
-            if (!is) {
-              prev.push({
-                id: cur.id,
-                name: cur.head.outlet?.name,
-                onDate: cur.head.onDate,
-                address: address,
-              } as IReportItem);
+            if (filterReportGood) {
+              const curOutletLines = cur.lines.reduce((lines: IReportTotalLine[], curLine) => {
+                if (curLine.good.id === filterReportGood.id) {
+                  const pack = lines.find((i) =>
+                    curLine.package ? i.package.id === curLine.package?.id : i.package.id === 'noPackage',
+                  );
+                  if (!pack) {
+                    const newRep: IReportTotalLine = {
+                      package: curLine.package || noPackage,
+                      quantity: curLine.quantity,
+                    };
+                    lines = [...lines, newRep];
+                  } else {
+                    const index = lines.indexOf(pack);
+                    lines[index] = { ...lines[index], quantity: lines[index].quantity + curLine.quantity };
+                  }
+                }
+                return lines;
+              }, []);
+
+              if (!line) {
+                prev.push({
+                  id: cur.id,
+                  outlet: cur.head.outlet,
+                  onDate: cur.head.onDate,
+                  address: address,
+                  goodGuantity: curOutletLines,
+                } as IReportItem);
+              } else {
+                const index = prev.indexOf(line);
+                const newQuantity = prev[index].goodGuantity?.reduce((reportLines: IReportTotalLine[], curr) => {
+                  const curOutlet = curOutletLines.find((item) => item.package.id === curr.package.id);
+                  if (curOutlet) {
+                    const newLine: IReportTotalLine = {
+                      package: curr.package,
+                      quantity: curr.quantity + curOutlet.quantity,
+                    };
+                    reportLines = [...reportLines, newLine];
+                  } else {
+                    reportLines = [...reportLines, curr];
+                  }
+                  return reportLines;
+                }, []);
+                prev[index] = { ...prev[index], goodGuantity: newQuantity };
+              }
+            } else {
+              if (!line) {
+                prev.push({
+                  id: cur.id,
+                  outlet: cur.head.outlet,
+                  onDate: cur.head.onDate,
+                  address: address,
+                } as IReportItem);
+              }
             }
+
             return prev;
           }, [])
           ?.sort(
             (a, b) =>
               new Date(b.onDate.slice(0, 10)).getTime() - new Date(a.onDate.slice(0, 10)).getTime() ||
-              (a.name < b.name ? -1 : 1),
+              (a.outlet.name < b.outlet.name ? -1 : 1),
           )
       : [];
-  }, [filteredOrderList, orders, outlets]);
+  }, [filterReportGood, filteredOrderList, orders, outlets]);
 
   const sections = useMemo(
     () =>
@@ -244,6 +296,12 @@ const ReportListScreen = () => {
     <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
 
+  const renderSectionFooter = useCallback(
+    (item: any) =>
+      filterReportGood && sections ? <ReportTotal sectionReports={item.section} reports={filteredOutletList} /> : null,
+    [filterReportGood, filteredOutletList, sections],
+  );
+
   const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
@@ -301,9 +359,11 @@ const ReportListScreen = () => {
         keyExtractor={keyExtractor}
         ItemSeparatorComponent={ItemSeparator}
         renderSectionHeader={renderSectionHeader}
+        renderSectionFooter={renderSectionFooter}
         ListEmptyComponent={EmptyList}
         keyboardShouldPersistTaps="never"
       />
+      {filterReportGood ? <ReportListTotal reports={filteredOutletList} /> : null}
       {showDateBegin && (
         <DateTimePicker
           testID="dateTimePicker"

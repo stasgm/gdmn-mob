@@ -59,7 +59,7 @@ const ScreenListItem = ({
             <LargeText style={styles.textBold}>{title}</LargeText>
           </View>
           <View style={styles.directionRow}>
-            {subtitle ? <MediumText>{subtitle}</MediumText> : null}
+            {subtitle ? <MediumText style={{ width: '90%' }}>{subtitle}</MediumText> : null}
             {addInfo ? <View style={{ width: '90%' }}>{addInfo}</View> : null}
             <View style={styles.rowCenter}>
               <MediumText>{lineCount}</MediumText>
