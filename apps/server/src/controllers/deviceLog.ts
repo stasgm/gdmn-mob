@@ -57,7 +57,47 @@ const removeDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getDeviceLogs = async (ctx: ParameterizedContext): Promise<void> => {
-  const deviceLogList = await deviceLogService.findMany();
+  const params: Record<string, string | number> = {};
+
+  const { uid, date, company, appSystem, contact, device, filterText, fromRecord, toRecord } = ctx.query;
+
+  if (typeof company === 'string') {
+    params.company = company;
+  }
+
+  if (typeof contact === 'string') {
+    params.contact = contact;
+  }
+
+  if (typeof uid === 'string') {
+    params.uid = uid;
+  }
+
+  if (typeof date === 'string') {
+    params.date = date;
+  }
+
+  if (typeof appSystem === 'string') {
+    params.appSystem = appSystem;
+  }
+
+  if (typeof device === 'string') {
+    params.device = device;
+  }
+
+  if (typeof filterText === 'string') {
+    params.filterText = filterText;
+  }
+
+  if (typeof fromRecord === 'string' && isFinite(Number(fromRecord))) {
+    params.fromRecord = Number(fromRecord);
+  }
+
+  if (typeof toRecord === 'string' && isFinite(Number(toRecord))) {
+    params.toRecord = Number(toRecord);
+  }
+
+  const deviceLogList = await deviceLogService.findMany(params);
 
   ok(ctx as Context, deviceLogList, 'getDeviceLogs: deviceLogs are successfully received');
 };
