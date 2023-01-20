@@ -437,7 +437,7 @@
 
 Если во время синхронизации программы и сервера произошли ошибки, то программа выдаст окно с надписью "Закончено с ошибками". Чтобы их просмотреть, необходимо нажать на кнопку "Просмотреть ошибки". Чтобы Вернуться обратно в список выполненных действий нажать на кнопку "Просмотреть операции". Все ошибки будут сохраняться в "Журнале ошибок" и переданы на сервер для анализа. 
 
-<img src="img/11.About/11.EddWithError.jpg" alt="drawing" height="400"/> <img src="img/10.About/10.EddWithErrorTwo.jpg" alt="drawing" height="400"/> <img src="img/10.About/10.LogError.jpg" alt="drawing" height="400"/> 
+<img src="img/11.About/11.EddWithError.jpg" alt="drawing" height="400"/> <img src="img/11.About/11.EddWithErrorTwo.jpg" alt="drawing" height="400"/> <img src="img/11.About/11.LogError.jpg" alt="drawing" height="400"/> 
 
 
 ## 10. Значение иконок
