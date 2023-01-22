@@ -70,17 +70,16 @@ const countSum = (reportLines: IReportTotalLine[]) => {
   return { lineSum, totalSum };
 };
 
-export const ReportTotal = ({ sectionReports, reports }: IItem) => {
+export const ReportTotalByDate = ({ sectionReports }: IItem) => {
   const { colors } = useTheme();
 
-  const reportLines = useMemo(() => {
-    return reports?.reduce((prev: IReportTotalLine[], report) => {
-      if (sectionReports?.data.find((i) => i.id === report.id) !== undefined && report.goodGuantity) {
-        prev = [...prev, ...report.goodGuantity];
-      }
-      return prev;
-    }, []);
-  }, [sectionReports?.data, reports]);
+  const sectionData = sectionReports ? (sectionReports?.data as IReportItem[]) : [];
+  const reportLines = sectionData.reduce((prev: IReportTotalLine[], report) => {
+    if (report.goodGuantity) {
+      prev = [...prev, ...report.goodGuantity];
+    }
+    return prev;
+  }, []);
 
   const sum = countSum(reportLines);
 
@@ -107,17 +106,15 @@ export const ReportTotal = ({ sectionReports, reports }: IItem) => {
   );
 };
 
-export const ReportListTotal = ({ reports }: IItem) => {
+export const ReportTotal = ({ reports }: IItem) => {
   const { colors } = useTheme();
 
-  const reportLines = useMemo(() => {
-    return reports?.reduce((prev: IReportTotalLine[], report) => {
-      if (report.goodGuantity) {
-        prev = [...prev, ...report.goodGuantity];
-      }
-      return prev;
-    }, []);
-  }, [reports]);
+  const reportLines = reports?.reduce((prev: IReportTotalLine[], report) => {
+    if (report.goodGuantity) {
+      prev = [...prev, ...report.goodGuantity];
+    }
+    return prev;
+  }, []);
 
   const sum = countSum(reportLines);
 

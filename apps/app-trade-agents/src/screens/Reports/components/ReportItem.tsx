@@ -10,8 +10,8 @@ import { useTheme } from '@react-navigation/native';
 
 import { IReportTotalLine } from '../../../store/types';
 
-export interface IReportItem extends IEntity {
-  [fieldName: string]: unknown;
+export interface IReportItem {
+  // export interface IReportItem extends IEntity {
   address: string;
   onDate: string;
   goodGuantity?: IReportTotalLine[];

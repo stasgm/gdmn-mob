@@ -6,6 +6,7 @@ import {
   globalStyles as styles,
   ItemSeparator,
   navBackDrawer,
+  SearchButton,
   PrimeButton,
   SelectableInput,
   SubTitle,
@@ -25,7 +26,7 @@ import { IOrderDocument, IReportListFormParam, IOutlet, IReportTotalLine } from 
 import { noPackage } from '../../utils/constants';
 
 import ReportItem, { IReportItem } from './components/ReportItem';
-import { ReportTotal, ReportListTotal } from './components/ReportTotal';
+import { ReportTotalByDate, ReportTotal } from './components/ReportTotal';
 // import ReportListTotal from './components/ReportListTotal';
 
 export type RefListItem = IReference & { refName: string };
@@ -131,16 +132,17 @@ const ReportListScreen = () => {
             const address = outlets.find((o) => cur?.head?.outlet.id === o.id)?.address;
             const line = prev.find(
               (e) =>
-                orders.find((a) => a.id === e.id)?.head.outlet.id === cur.head.outlet.id &&
+                e.outlet.id === cur.head.outlet.id &&
                 new Date(e.onDate.slice(0, 10)).getTime() === new Date(cur.head.onDate.slice(0, 10)).getTime(),
             );
 
             if (filterReportGood) {
               const curOutletLines = cur.lines.reduce((lines: IReportTotalLine[], curLine) => {
                 if (curLine.good.id === filterReportGood.id) {
-                  const pack = lines.find((i) =>
-                    curLine.package ? i.package.id === curLine.package?.id : i.package.id === 'noPackage',
-                  );
+                  ///////////////////////////////
+                  //////findIndex/////
+                  //////////////////////////////
+                  const pack = lines.find((i) => i.package.id === (curLine.package?.id || 'noPackage'));
                   if (!pack) {
                     const newRep: IReportTotalLine = {
                       package: curLine.package || noPackage,
@@ -157,7 +159,7 @@ const ReportListScreen = () => {
 
               if (!line) {
                 prev.push({
-                  id: cur.id,
+                  // id: cur.id,
                   outlet: cur.head.outlet,
                   onDate: cur.head.onDate,
                   address: address,
@@ -183,7 +185,7 @@ const ReportListScreen = () => {
             } else {
               if (!line) {
                 prev.push({
-                  id: cur.id,
+                  // id: cur.id,
                   outlet: cur.head.outlet,
                   onDate: cur.head.onDate,
                   address: address,
@@ -199,7 +201,7 @@ const ReportListScreen = () => {
               (a.outlet.name < b.outlet.name ? -1 : 1),
           )
       : [];
-  }, [filterReportGood, filteredOrderList, orders, outlets]);
+  }, [filterReportGood, filteredOrderList, outlets]);
 
   const sections = useMemo(
     () =>
@@ -223,11 +225,23 @@ const ReportListScreen = () => {
     [filteredOutletList],
   );
 
+  const [filterVisible, setFilterVisible] = useState(true);
+
+  const renderRight = useCallback(
+    () => (
+      <View style={styles.buttons}>
+        <SearchButton onPress={() => setFilterVisible(!filterVisible)} visible={filterVisible} />
+      </View>
+    ),
+    [filterVisible],
+  );
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackDrawer,
+      headerRight: renderRight,
     });
-  }, [navigation]);
+  }, [navigation, renderRight]);
 
   const [showDateBegin, setShowDateBegin] = useState(false);
   const handleApplyDateBegin = (_event: any, selectedDateBegin: Date | undefined) => {
@@ -298,7 +312,9 @@ const ReportListScreen = () => {
 
   const renderSectionFooter = useCallback(
     (item: any) =>
-      filterReportGood && sections ? <ReportTotal sectionReports={item.section} reports={filteredOutletList} /> : null,
+      filterReportGood && sections ? (
+        <ReportTotalByDate sectionReports={item.section} reports={filteredOutletList} />
+      ) : null,
     [filterReportGood, filteredOutletList, sections],
   );
 
@@ -309,50 +325,53 @@ const ReportListScreen = () => {
 
   return (
     <AppScreen>
-      <View style={[localStyles.filter, { borderColor: colors.primary }]}>
-        <SelectableInput label="Организация" value={filterReportContact?.name || ''} onPress={handleSearchContact} />
-        <View style={localStyles.marginTop}>
-          <SelectableInput label="Магазин" value={filterReportOutlet?.name || ''} onPress={handleSearchOutlet} />
-        </View>
-        <View style={localStyles.marginTop}>
-          <SelectableInput label="Товар" value={filterReportGood?.name || ''} onPress={handleSearchGood} />
-        </View>
-        <View style={[styles.flexDirectionRow, localStyles.marginTop]}>
-          <View style={localStyles.width}>
-            <SelectableInput
-              label="С даты отгрузки"
-              value={filterReportDateBegin ? getDateString(filterReportDateBegin) : ''}
-              onPress={handlePresentDateBegin}
-              style={!filterReportDateBegin && localStyles.fontSize}
-            />
+      {filterVisible && (
+        <View style={[localStyles.filter, { borderColor: colors.primary }]}>
+          <SelectableInput label="Организация" value={filterReportContact?.name || ''} onPress={handleSearchContact} />
+          <View style={localStyles.marginTop}>
+            <SelectableInput label="Магазин" value={filterReportOutlet?.name || ''} onPress={handleSearchOutlet} />
           </View>
-          <View style={localStyles.width}>
-            <SelectableInput
-              label="По дату отгрузки"
-              value={filterReportDateEnd ? getDateString(filterReportDateEnd || '') : ''}
-              onPress={handlePresentDateEnd}
-              style={[!filterReportDateEnd && localStyles.fontSize, localStyles.marginInput]}
-            />
+          <View style={localStyles.marginTop}>
+            <SelectableInput label="Товар" value={filterReportGood?.name || ''} onPress={handleSearchGood} />
+          </View>
+          <View style={[styles.flexDirectionRow, localStyles.marginTop]}>
+            <View style={localStyles.width}>
+              <SelectableInput
+                label="С даты отгрузки"
+                value={filterReportDateBegin ? getDateString(filterReportDateBegin) : ''}
+                onPress={handlePresentDateBegin}
+                style={!filterReportDateBegin && localStyles.fontSize}
+              />
+            </View>
+            <View style={localStyles.width}>
+              <SelectableInput
+                label="По дату отгрузки"
+                value={filterReportDateEnd ? getDateString(filterReportDateEnd || '') : ''}
+                onPress={handlePresentDateEnd}
+                style={[!filterReportDateEnd && localStyles.fontSize, localStyles.marginInput]}
+              />
+            </View>
+          </View>
+          <View style={localStyles.container}>
+            <PrimeButton
+              icon={'delete-outline'}
+              onPress={handleCleanFormParams}
+              disabled={
+                !(
+                  filterReportContact ||
+                  filterReportOutlet ||
+                  filterReportGood ||
+                  filterReportDateBegin ||
+                  filterReportDateEnd
+                )
+              }
+            >
+              {'Очистить'}
+            </PrimeButton>
           </View>
         </View>
-        <View style={localStyles.container}>
-          <PrimeButton
-            icon={'delete-outline'}
-            onPress={handleCleanFormParams}
-            disabled={
-              !(
-                filterReportContact ||
-                filterReportOutlet ||
-                filterReportGood ||
-                filterReportDateBegin ||
-                filterReportDateEnd
-              )
-            }
-          >
-            {'Очистить'}
-          </PrimeButton>
-        </View>
-      </View>
+      )}
+
       <SectionList
         sections={sections}
         renderItem={renderItem}
@@ -363,7 +382,7 @@ const ReportListScreen = () => {
         ListEmptyComponent={EmptyList}
         keyboardShouldPersistTaps="never"
       />
-      {filterReportGood ? <ReportListTotal reports={filteredOutletList} /> : null}
+      {filterReportGood ? <ReportTotal reports={filteredOutletList} /> : null}
       {showDateBegin && (
         <DateTimePicker
           testID="dateTimePicker"
