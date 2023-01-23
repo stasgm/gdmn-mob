@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ScrollView, TextInput, View, Text, Modal, TouchableOpacity, StyleSheet, Keyboard } from 'react-native';
 
 import { styles } from '@lib/mobile-navigation';
-import { ItemSeparator, NumberKeypad, ScanBarcode, ScanBarcodeReader } from '@lib/mobile-ui';
+import { AppDialog, ItemSeparator, NumberKeypad, ScanBarcode, ScanBarcodeReader } from '@lib/mobile-ui';
 import { useSelector } from '@lib/store';
 
 import { IconButton } from 'react-native-paper';
@@ -30,6 +30,9 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
   const [goodEID, setGoodEID] = useState<string | undefined>(item?.EID?.toString());
   const [doScanned, setDoScanned] = useState(false);
 
+  const [goodName, setGoodName] = useState<string>(item?.good.name || '');
+  const [visibleDialog, setVisibleDialog] = useState(false);
+
   const [scaner, setScaner] = useState<IScannedObject>({ state: 'init' });
 
   const currRef = useRef<TextInput>(null);
@@ -41,22 +44,24 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(isScreenKeyboard);
 
   useEffect(() => {
-    (isKeyboardOpen || currRef?.current) &&
+    !visibleDialog &&
+      (isKeyboardOpen || currRef?.current) &&
       setTimeout(() => {
         currRef.current?.focus();
       }, ONE_SECOND_IN_MS);
-  }, [isKeyboardOpen]);
+  }, [isKeyboardOpen, visibleDialog]);
 
   useEffect(() => {
-    Keyboard.addListener('keyboardDidShow', () => {
-      Keyboard.dismiss();
-      currRef.current?.focus();
-    });
-
+    if (!visibleDialog) {
+      Keyboard.addListener('keyboardDidShow', () => {
+        Keyboard.dismiss();
+        currRef.current?.focus();
+      });
+    }
     return () => {
       Keyboard.removeAllListeners('keyboardDidShow');
     };
-  }, []);
+  }, [visibleDialog]);
 
   const handleGetScannedObject = useCallback((brc: string) => {
     setScaner({ state: 'found' });
@@ -78,6 +83,11 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
 
   const handleDoScan = () => {
     setDoScanned(true);
+  };
+
+  const handleAddName = () => {
+    onSetLine({ ...item, good: { ...item.good, name: goodName } });
+    setVisibleDialog(false);
   };
 
   useEffect(() => {
@@ -114,9 +124,18 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
       <ScrollView keyboardShouldPersistTaps="handled">
         <View style={styles.content}>
           <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Наименование</Text>
-              <Text style={textStyle}>{item ? item.good.name || 'товар не найден' : ''}</Text>
+            <View style={localStyles.details}>
+              <View style={localStyles.new}>
+                <Text style={styles.name}>Наименование</Text>
+                <Text style={textStyle}>{item ? item.good.name || 'товар не найден' : ''}</Text>
+              </View>
+              {item.good.id === 'unknown' && (
+                <View style={localStyles.button}>
+                  <TouchableOpacity>
+                    <IconButton icon="pencil-outline" size={30} onPress={() => setVisibleDialog(true)} />
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
           </View>
           <ItemSeparator />
@@ -166,7 +185,6 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
               <View style={localStyles.new}>
                 <Text style={styles.name}>Количество</Text>
                 <TextInput
-                  autoFocus={true}
                   style={[textStyle, localStyles.quantitySize]}
                   showSoftInputOnFocus={false}
                   caretHidden={true}
@@ -191,6 +209,7 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
           </View>
         </View>
       </ScrollView>
+
       {isScreenKeyboard && isKeyboardOpen && (
         <NumberKeypad
           oldValue={item.quantity.toString()}
@@ -198,6 +217,15 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
           decDigitsForTotal={3}
         />
       )}
+      <AppDialog
+        title="Наименование"
+        visible={visibleDialog}
+        text={goodName || ''}
+        onChangeText={setGoodName}
+        onCancel={() => setVisibleDialog(false)}
+        onOk={handleAddName}
+        okLabel={'Сохранить'}
+      />
     </>
   );
 };
