@@ -12,10 +12,22 @@ interface IProps {
   okLabel?: string;
   errorMessage?: string;
   title: string;
+  okDisabled?: boolean;
 }
 
-const AppDialog = ({ visible, text, onChangeText, onOk, onCancel, errorMessage, okLabel = 'Ок', title }: IProps) => {
+const AppDialog = ({
+  visible,
+  text,
+  onChangeText,
+  onOk,
+  onCancel,
+  errorMessage,
+  okLabel = 'Ок',
+  title,
+  okDisabled = false,
+}: IProps) => {
   const { colors } = useTheme();
+
   return (
     <Dialog visible={visible} onDismiss={onCancel}>
       <Dialog.Title>{title}</Dialog.Title>
@@ -43,7 +55,7 @@ const AppDialog = ({ visible, text, onChangeText, onOk, onCancel, errorMessage, 
         <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={onCancel}>
           Отмена
         </Button>
-        <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={onOk}>
+        <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={onOk} disabled={okDisabled}>
           {okLabel}
         </Button>
       </Dialog.Actions>

@@ -225,6 +225,7 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
         onCancel={() => setVisibleDialog(false)}
         onOk={handleAddName}
         okLabel={'Сохранить'}
+        okDisabled={goodName ? false : true}
       />
     </>
   );
