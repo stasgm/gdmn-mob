@@ -69,7 +69,7 @@ const SelectGoodScreen = () => {
   const groups = useMemo(() => refGroup.data.concat(UNKNOWN_GROUP), [refGroup.data]);
   const doc = docSelectors.selectByDocId<IOrderDocument>(docId);
   const contactId = doc?.head.contact.id;
-  const { parentGroupId, groupId } = useSelector((state) => state.app.formParams as IGroupFormParam);
+  const { parentGroupId } = useSelector((state) => state.app.formParams as IGroupFormParam);
 
   const [filterVisible, setFilterVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -100,9 +100,7 @@ const SelectGoodScreen = () => {
     [selectedParentGroup, model],
   );
 
-  const [selectedGroup, setSelectedGroup] = useState<IGoodGroup | undefined>(
-    groupId ? groups.find((group) => group.id === groupId) || nextLevelGroups[0] : nextLevelGroups[0],
-  );
+  const [selectedGroup, setSelectedGroup] = useState<IGoodGroup | undefined>(undefined);
 
   const goodModel = useMemo(
     () =>
