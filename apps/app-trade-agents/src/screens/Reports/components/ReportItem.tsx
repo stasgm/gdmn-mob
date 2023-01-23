@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles, LargeText, MediumText } from '@lib/mobile-ui';
-import { IEntity, INamedEntity } from '@lib/types';
+import { INamedEntity } from '@lib/types';
 
 import { Chip } from 'react-native-paper';
 

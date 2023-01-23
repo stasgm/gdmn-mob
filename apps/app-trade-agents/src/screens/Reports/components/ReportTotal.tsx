@@ -26,7 +26,7 @@ export interface OrderListSectionProps {
 export type SectionDataProps = SectionListData<IListItemProps, OrderListSectionProps>[];
 
 export interface IItem {
-  sectionReports?: SectionListData<IListItemProps, ReportListSectionProps>;
+  sectionReports?: SectionListData<IReportItem, ReportListSectionProps>;
   reports: IReportItem[];
 }
 

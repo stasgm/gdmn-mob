@@ -1,4 +1,4 @@
-import { getDateString, keyExtractor } from '@lib/mobile-hooks';
+import { getDateString, keyExtractorByIndex, round } from '@lib/mobile-hooks';
 import {
   AppActivityIndicator,
   AppScreen,
@@ -126,81 +126,77 @@ const ReportListScreen = () => {
   ]);
 
   const filteredOutletList: IReportItem[] = useMemo(() => {
-    return filteredOrderList.length
-      ? filteredOrderList
-          .reduce((prev: IReportItem[], cur) => {
-            const address = outlets.find((o) => cur?.head?.outlet.id === o.id)?.address;
-            const line = prev.find(
-              (e) =>
-                e.outlet.id === cur.head.outlet.id &&
-                new Date(e.onDate.slice(0, 10)).getTime() === new Date(cur.head.onDate.slice(0, 10)).getTime(),
-            );
+    return filteredOrderList
+      .reduce((prev: IReportItem[], cur) => {
+        const line = prev.find(
+          (e) =>
+            e.outlet.id === cur.head.outlet.id &&
+            new Date(e.onDate.slice(0, 10)).getTime() === new Date(cur.head.onDate.slice(0, 10)).getTime(),
+        );
 
-            if (filterReportGood) {
-              const curOutletLines = cur.lines.reduce((lines: IReportTotalLine[], curLine) => {
-                if (curLine.good.id === filterReportGood.id) {
-                  ///////////////////////////////
-                  //////findIndex/////
-                  //////////////////////////////
-                  const pack = lines.find((i) => i.package.id === (curLine.package?.id || 'noPackage'));
-                  if (!pack) {
-                    const newRep: IReportTotalLine = {
-                      package: curLine.package || noPackage,
-                      quantity: curLine.quantity,
-                    };
-                    lines = [...lines, newRep];
-                  } else {
-                    const index = lines.indexOf(pack);
-                    lines[index] = { ...lines[index], quantity: lines[index].quantity + curLine.quantity };
-                  }
-                }
-                return lines;
-              }, []);
-
-              if (!line) {
-                prev.push({
-                  // id: cur.id,
-                  outlet: cur.head.outlet,
-                  onDate: cur.head.onDate,
-                  address: address,
-                  goodGuantity: curOutletLines,
-                } as IReportItem);
+        if (filterReportGood) {
+          const curOutletLines = cur.lines.reduce((lines: IReportTotalLine[], curLine) => {
+            if (curLine.good.id === filterReportGood.id) {
+              const index = lines.findIndex((i) => i.package.id === (curLine.package?.id || 'noPackage'));
+              if (index === -1) {
+                const newRep: IReportTotalLine = {
+                  package: curLine.package || noPackage,
+                  quantity: curLine.quantity,
+                };
+                lines = [...lines, newRep];
               } else {
-                const index = prev.indexOf(line);
-                const newQuantity = prev[index].goodGuantity?.reduce((reportLines: IReportTotalLine[], curr) => {
-                  const curOutlet = curOutletLines.find((item) => item.package.id === curr.package.id);
-                  if (curOutlet) {
-                    const newLine: IReportTotalLine = {
-                      package: curr.package,
-                      quantity: curr.quantity + curOutlet.quantity,
-                    };
-                    reportLines = [...reportLines, newLine];
-                  } else {
-                    reportLines = [...reportLines, curr];
-                  }
-                  return reportLines;
-                }, []);
-                prev[index] = { ...prev[index], goodGuantity: newQuantity };
-              }
-            } else {
-              if (!line) {
-                prev.push({
-                  // id: cur.id,
-                  outlet: cur.head.outlet,
-                  onDate: cur.head.onDate,
-                  address: address,
-                } as IReportItem);
+                lines[index] = { ...lines[index], quantity: round(lines[index].quantity + curLine.quantity, 3) };
               }
             }
+            return lines;
+          }, []);
 
-            return prev;
-          }, [])
-          ?.sort(
-            (a, b) =>
-              new Date(b.onDate.slice(0, 10)).getTime() - new Date(a.onDate.slice(0, 10)).getTime() ||
-              (a.outlet.name < b.outlet.name ? -1 : 1),
-          )
-      : [];
+          if (!line) {
+            const address = outlets.find((o) => cur?.head?.outlet.id === o.id)?.address;
+
+            prev.push({
+              outlet: cur.head.outlet,
+              onDate: cur.head.onDate,
+              address: address,
+              goodGuantity: curOutletLines,
+            } as IReportItem);
+          } else {
+            const index = prev.indexOf(line);
+            const newQuantity = prev[index].goodGuantity?.reduce((reportLines: IReportTotalLine[], curr) => {
+              const curOutlet = curOutletLines.find((item) => item.package.id === curr.package.id);
+              if (curOutlet) {
+                const newLine: IReportTotalLine = {
+                  package: curr.package,
+                  quantity: round(curr.quantity + curOutlet.quantity, 3),
+                };
+                reportLines = [...reportLines, newLine];
+              } else {
+                reportLines = [...reportLines, curr];
+              }
+              return reportLines;
+            }, []);
+            prev[index] = { ...prev[index], goodGuantity: newQuantity };
+          }
+        } else {
+          if (!line) {
+            const address = outlets.find((o) => cur?.head?.outlet.id === o.id)?.address;
+
+            prev.push({
+              outlet: cur.head.outlet,
+              onDate: cur.head.onDate,
+              address: address,
+            } as IReportItem);
+          }
+        }
+
+        return prev;
+      }, [])
+      ?.sort(
+        (a, b) =>
+          new Date(b.onDate.slice(0, 10)).getTime() - new Date(a.onDate.slice(0, 10)).getTime() ||
+          (a.outlet.name < b.outlet.name ? -1 : 1),
+      );
+    // : [];
   }, [filterReportGood, filteredOrderList, outlets]);
 
   const sections = useMemo(
@@ -303,7 +299,7 @@ const ReportListScreen = () => {
   }, [filterReportGood, navigation]);
 
   const renderItem: ListRenderItem<IReportItem> = ({ item }) => {
-    return <ReportItem key={item.id} {...item} />;
+    return <ReportItem {...item} />;
   };
 
   const renderSectionHeader = ({ section }: any) => (
@@ -375,7 +371,7 @@ const ReportListScreen = () => {
       <SectionList
         sections={sections}
         renderItem={renderItem}
-        keyExtractor={keyExtractor}
+        keyExtractor={keyExtractorByIndex}
         ItemSeparatorComponent={ItemSeparator}
         renderSectionHeader={renderSectionHeader}
         renderSectionFooter={renderSectionFooter}
