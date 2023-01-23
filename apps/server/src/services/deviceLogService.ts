@@ -64,8 +64,8 @@ const findOne = async (id: string): Promise<IDeviceLog[]> => {
  * Возвращает множество файлов ошибок по указанным параметрам
  * @returns Массив объектов файлов ошибок
  */
-const findMany = async (): Promise<IDeviceLogFiles[]> => {
-  return await getFilesObject();
+const findMany = async (params: Record<string, string | number>): Promise<IDeviceLogFiles[]> => {
+  return await getFilesObject(params);
 };
 
 /**

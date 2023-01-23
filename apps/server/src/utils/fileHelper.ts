@@ -8,7 +8,7 @@ import { finished } from 'stream';
 
 import { promisify } from 'util';
 
-import { IPathParams } from '@lib/types';
+import { IPathParams, IFileSystem, INamedEntity, IDeviceLogFiles } from '@lib/types';
 
 import { BYTES_PER_MB, defMaxFilesSize } from '../utils/constants';
 
@@ -98,4 +98,38 @@ export const writeIterableToFile = async (filename: string, iterable: string, op
 export const getAppSystemId = async (name: string): Promise<string> => {
   const { appSystems } = getDb();
   return appSystems.data.find((item) => item.name === name)?.id || '';
+};
+
+export const getFoundEntity = (
+  paramName: string,
+  newParams: Record<string, string | number>,
+  item: IFileSystem | IDeviceLogFiles,
+): boolean => {
+  let paramFound = true;
+  if (paramName in newParams) {
+    paramFound = false;
+    if (item[paramName] && Object.keys(item).indexOf(paramName) > 0) {
+      const prop = (item[paramName] as INamedEntity).name.toUpperCase();
+      paramFound = prop.includes((newParams[paramName] as string).toUpperCase());
+      delete newParams[paramName];
+    }
+  }
+  return paramFound;
+};
+
+export const getFoundString = (
+  paramName: string,
+  newParams: Record<string, string | number>,
+  item: IFileSystem | IDeviceLogFiles,
+): boolean => {
+  let paramFound = true;
+  if (paramName in newParams) {
+    paramFound = false;
+    if (item[paramName] && Object.keys(item).indexOf(paramName) > 0) {
+      const prop = (item[paramName] as string).toUpperCase();
+      paramFound = prop.includes((newParams[paramName] as string).toUpperCase());
+      delete newParams[paramName];
+    }
+  }
+  return paramFound;
 };

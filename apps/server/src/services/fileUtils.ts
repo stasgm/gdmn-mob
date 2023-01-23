@@ -1,21 +1,22 @@
 import path from 'path';
 import { readdir, unlink, stat } from 'fs/promises';
 
-import { IFileSystem, IExtraFileInfo, INamedEntity } from '@lib/types';
+import { IFileSystem, IExtraFileInfo } from '@lib/types';
 
 import { BYTES_PER_KB } from '../utils/constants';
 
 import log from '../utils/logger';
 
-import { extraPredicate, getListPart } from '../utils/helpers';
+import { getListPart } from '../utils/helpers';
 
 import {
   fullFileName2alias,
   getAppSystemId,
   alias2fullFileName,
   readJsonFile,
-  checkFileExists,
   writeIterableToFile,
+  getFoundEntity,
+  getFoundString,
 } from '../utils/fileHelper';
 
 import { getDb } from './dao/db';
@@ -147,40 +148,6 @@ const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => 
     fileName: name,
     path: subPath,
   };
-};
-
-export const getFoundEntity = (
-  paramName: string,
-  newParams: Record<string, string | number>,
-  item: IFileSystem,
-): boolean => {
-  let paramFound = true;
-  if (paramName in newParams) {
-    paramFound = false;
-    if (item[paramName] && Object.keys(item).indexOf(paramName) > 0) {
-      const prop = (item[paramName] as INamedEntity).name.toUpperCase();
-      paramFound = prop.includes((newParams[paramName] as string).toUpperCase());
-      delete newParams[paramName];
-    }
-  }
-  return paramFound;
-};
-
-export const getFoundString = (
-  paramName: string,
-  newParams: Record<string, string | number>,
-  item: IFileSystem,
-): boolean => {
-  let paramFound = true;
-  if (paramName in newParams) {
-    paramFound = false;
-    if (item[paramName] && Object.keys(item).indexOf(paramName) > 0) {
-      const prop = (item[paramName] as string).toUpperCase();
-      paramFound = prop.includes((newParams[paramName] as string).toUpperCase());
-      delete newParams[paramName];
-    }
-  }
-  return paramFound;
 };
 
 export const readListFiles = async (params: Record<string, string | number>): Promise<IFileSystem[]> => {
