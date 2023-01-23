@@ -2,23 +2,14 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles, LargeText, MediumText } from '@lib/mobile-ui';
-import { INamedEntity } from '@lib/types';
 
 import { Chip } from 'react-native-paper';
 
 import { useTheme } from '@react-navigation/native';
 
-import { IReportTotalLine } from '../../../store/types';
+import { IReportItem } from '../../../store/types';
 
-export interface IReportItem {
-  // export interface IReportItem extends IEntity {
-  address: string;
-  onDate: string;
-  goodGuantity?: IReportTotalLine[];
-  outlet: INamedEntity;
-}
-
-const ReportItem = ({ outlet, address, goodGuantity }: IReportItem) => {
+const ReportItem = ({ outlet, address, totalList: goodGuantity }: IReportItem) => {
   const { colors } = useTheme();
 
   return (

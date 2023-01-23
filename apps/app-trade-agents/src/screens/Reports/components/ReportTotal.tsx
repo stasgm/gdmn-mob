@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { View, SectionListData, StyleSheet, FlatList } from 'react-native';
 import {
   globalColors,
@@ -8,16 +8,10 @@ import {
   LargeText,
   MediumText,
 } from '@lib/mobile-ui';
-import { Divider } from 'react-native-paper';
-
-import { useTheme } from '@react-navigation/native';
 
 import { keyExtractorByIndex, round } from '@lib/mobile-hooks';
 
-import { IReportTotalLine } from '../../../store/types';
-import { ReportListSectionProps } from '../ReportListScreen';
-
-import { IReportItem } from './ReportItem';
+import { IReportItem, IReportTotalLine } from '../../../store/types';
 
 export interface OrderListSectionProps {
   title: string;
@@ -25,10 +19,24 @@ export interface OrderListSectionProps {
 
 export type SectionDataProps = SectionListData<IListItemProps, OrderListSectionProps>[];
 
-export interface IItem {
-  sectionReports?: SectionListData<IReportItem, ReportListSectionProps>;
-  reports: IReportItem[];
-}
+const getTotalData = (items: IReportItem[]) => {
+  let totalSum = 0;
+  const lines = items?.reduce((prev: IReportTotalLine[], cur) => {
+    cur.totalList?.forEach((totalByPackage) => {
+      const index = prev.findIndex((i) => totalByPackage.package.id === i.package.id);
+      totalSum = totalSum + totalByPackage.quantity;
+      if (index > -1) {
+        prev[index] = { ...prev[index], quantity: prev[index].quantity + totalByPackage.quantity };
+      } else {
+        prev = [...prev, totalByPackage];
+      }
+    });
+
+    return prev;
+  }, []);
+
+  return { lines, totalSum };
+};
 
 const renderTotalItem = ({ item }: { item: IReportTotalLine }) => (
   <View style={styles.itemNoMargin}>
@@ -45,88 +53,40 @@ const renderTotalItem = ({ item }: { item: IReportTotalLine }) => (
   </View>
 );
 
-const countSum = (reportLines: IReportTotalLine[]) => {
-  const lineSum = reportLines.reduce((prev: IReportTotalLine[], cur) => {
-    const line = prev.find((i) => cur.package.id === i.package.id);
-    if (line) {
-      const index = prev.indexOf(line);
-      prev[index] = { ...prev[index], quantity: prev[index].quantity + cur.quantity };
-    } else {
-      prev = [...prev, cur];
-    }
-
-    return prev;
-  }, []);
-
-  const totalSum = lineSum.reduce(
-    (prev, item) => ({
-      quantity: prev.quantity + (item.quantity || 0),
-    }),
-    {
-      quantity: 0,
-    },
-  );
-
-  return { lineSum, totalSum };
-};
-
-export const ReportTotalByDate = ({ sectionReports }: IItem) => {
-  const { colors } = useTheme();
-
-  const sectionData = sectionReports ? (sectionReports?.data as IReportItem[]) : [];
-  const reportLines = sectionData.reduce((prev: IReportTotalLine[], report) => {
-    if (report.goodGuantity) {
-      prev = [...prev, ...report.goodGuantity];
-    }
-    return prev;
-  }, []);
-
-  const sum = countSum(reportLines);
+export const ReportTotalByDate = ({ data, title }: { data: IReportItem[]; title: string }) => {
+  const total = getTotalData(data);
 
   return (
     <View>
-      <Divider style={{ backgroundColor: colors.primary }} />
-      {reportLines.length ? (
-        <>
-          <View style={[styles.directionRow, localStyles.margins]}>
-            <LargeText style={styles.textTotal}>{`Итого за ${sectionReports?.title}, кг: `}</LargeText>
-            <MediumText style={styles.textTotal}>{round(sum.totalSum?.quantity, 3)}</MediumText>
-          </View>
-          <Divider style={{ backgroundColor: colors.primary }} />
-          <FlatList
-            data={sum.lineSum}
-            keyExtractor={keyExtractorByIndex}
-            renderItem={renderTotalItem}
-            style={localStyles.groupMargin}
-            ItemSeparatorComponent={ItemSeparator}
-          />
-        </>
-      ) : null}
+      <ItemSeparator />
+      <View style={[styles.directionRow, localStyles.margins]}>
+        <LargeText style={styles.textTotal}>{`Итого за ${title}, кг: `}</LargeText>
+        <MediumText style={styles.textTotal}>{round(total.totalSum, 3)}</MediumText>
+      </View>
+      <ItemSeparator />
+      <FlatList
+        data={total.lines}
+        keyExtractor={keyExtractorByIndex}
+        renderItem={renderTotalItem}
+        style={localStyles.groupMargin}
+        ItemSeparatorComponent={ItemSeparator}
+      />
     </View>
   );
 };
 
-export const ReportTotal = ({ reports }: IItem) => {
-  const { colors } = useTheme();
-
-  const reportLines = reports?.reduce((prev: IReportTotalLine[], report) => {
-    if (report.goodGuantity) {
-      prev = [...prev, ...report.goodGuantity];
-    }
-    return prev;
-  }, []);
-
-  const sum = countSum(reportLines);
+export const ReportTotal = ({ data }: { data: IReportItem[] }) => {
+  const total = getTotalData(data);
 
   return (
     <View style={{ backgroundColor: globalColors.backgroundLight }}>
       <View style={[styles.directionRow, localStyles.margins, { backgroundColor: globalColors.backgroundLight }]}>
         <LargeText style={styles.textTotal}>Общий вес, кг: </LargeText>
-        <MediumText style={styles.textTotal}>{round(sum.totalSum?.quantity, 3)}</MediumText>
+        <MediumText style={styles.textTotal}>{round(total.totalSum, 3)}</MediumText>
       </View>
-      <Divider style={{ backgroundColor: colors.primary }} />
+      <ItemSeparator />
       <FlatList
-        data={sum.lineSum}
+        data={total.lines}
         keyExtractor={keyExtractorByIndex}
         renderItem={renderTotalItem}
         style={localStyles.groupMargin}

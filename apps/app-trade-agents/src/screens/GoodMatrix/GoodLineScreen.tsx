@@ -8,9 +8,10 @@ import { refSelectors } from '@lib/store';
 
 import { IRefMetadata } from '@lib/types';
 
+import { keyExtractorByIndex } from '@lib/mobile-hooks';
+
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
 import { IGoodMatrix, IMatrixData } from '../../store/types';
-import { keyExtractorByIndex } from '@lib/mobile-hooks';
 
 interface IProperty {
   sortOrder: number;

@@ -21,13 +21,12 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } fro
 import { SectionListData, View, StyleSheet, SectionList, ListRenderItem, Platform, Keyboard } from 'react-native';
 
 import { ReportStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument, IReportListFormParam, IOutlet, IReportTotalLine } from '../../store/types';
+import { IOrderDocument, IReportListFormParam, IOutlet, IReportItem } from '../../store/types';
 
 import { noPackage } from '../../utils/constants';
 
-import ReportItem, { IReportItem } from './components/ReportItem';
+import ReportItem from './components/ReportItem';
 import { ReportTotalByDate, ReportTotal } from './components/ReportTotal';
-// import ReportListTotal from './components/ReportListTotal';
 
 export type RefListItem = IReference & { refName: string };
 
@@ -128,65 +127,49 @@ const ReportListScreen = () => {
   const filteredOutletList: IReportItem[] = useMemo(() => {
     return filteredOrderList
       .reduce((prev: IReportItem[], cur) => {
-        const line = prev.find(
+        let itemIndex = prev.findIndex(
           (e) =>
             e.outlet.id === cur.head.outlet.id &&
             new Date(e.onDate.slice(0, 10)).getTime() === new Date(cur.head.onDate.slice(0, 10)).getTime(),
         );
 
         if (filterReportGood) {
-          const curOutletLines = cur.lines.reduce((lines: IReportTotalLine[], curLine) => {
+          cur.lines.forEach((curLine) => {
             if (curLine.good.id === filterReportGood.id) {
-              const index = lines.findIndex((i) => i.package.id === (curLine.package?.id || 'noPackage'));
-              if (index === -1) {
-                const newRep: IReportTotalLine = {
-                  package: curLine.package || noPackage,
-                  quantity: curLine.quantity,
-                };
-                lines = [...lines, newRep];
+              if (itemIndex > -1) {
+                const oldTotalList = prev[itemIndex].totalList || [];
+                const curTotalByPackage = oldTotalList.find((item) => item.package.id === curLine.package?.id);
+                if (curTotalByPackage) {
+                  const newTotalListByPackage = {
+                    ...curTotalByPackage,
+                    quantity: round(curTotalByPackage.quantity + curLine.quantity, 3),
+                  };
+                  const newTotalListByDate = oldTotalList
+                    .filter((i) => i.package.id !== curLine.package?.id)
+                    .concat(newTotalListByPackage);
+                  prev[itemIndex] = { ...prev[itemIndex], totalList: newTotalListByDate };
+                } else {
+                  prev[itemIndex] = {
+                    ...prev[itemIndex],
+                    totalList: [...oldTotalList, { package: curLine.package || noPackage, quantity: curLine.quantity }],
+                  };
+                }
               } else {
-                lines[index] = { ...lines[index], quantity: round(lines[index].quantity + curLine.quantity, 3) };
+                const newLine = {
+                  outlet: cur.head.outlet,
+                  onDate: cur.head.onDate,
+                  address: outlets.find((o) => cur?.head?.outlet.id === o.id)?.address,
+                  totalList: [{ package: curLine.package || noPackage, quantity: curLine.quantity }],
+                } as IReportItem;
+                prev = [...prev, newLine];
+                itemIndex = prev.findIndex(
+                  (e) =>
+                    e.outlet.id === cur.head.outlet.id &&
+                    new Date(e.onDate.slice(0, 10)).getTime() === new Date(cur.head.onDate.slice(0, 10)).getTime(),
+                );
               }
             }
-            return lines;
-          }, []);
-
-          if (!line) {
-            const address = outlets.find((o) => cur?.head?.outlet.id === o.id)?.address;
-
-            prev.push({
-              outlet: cur.head.outlet,
-              onDate: cur.head.onDate,
-              address: address,
-              goodGuantity: curOutletLines,
-            } as IReportItem);
-          } else {
-            const index = prev.indexOf(line);
-            const newQuantity = prev[index].goodGuantity?.reduce((reportLines: IReportTotalLine[], curr) => {
-              const curOutlet = curOutletLines.find((item) => item.package.id === curr.package.id);
-              if (curOutlet) {
-                const newLine: IReportTotalLine = {
-                  package: curr.package,
-                  quantity: round(curr.quantity + curOutlet.quantity, 3),
-                };
-                reportLines = [...reportLines, newLine];
-              } else {
-                reportLines = [...reportLines, curr];
-              }
-              return reportLines;
-            }, []);
-            prev[index] = { ...prev[index], goodGuantity: newQuantity };
-          }
-        } else {
-          if (!line) {
-            const address = outlets.find((o) => cur?.head?.outlet.id === o.id)?.address;
-
-            prev.push({
-              outlet: cur.head.outlet,
-              onDate: cur.head.onDate,
-              address: address,
-            } as IReportItem);
-          }
+          });
         }
 
         return prev;
@@ -196,7 +179,6 @@ const ReportListScreen = () => {
           new Date(b.onDate.slice(0, 10)).getTime() - new Date(a.onDate.slice(0, 10)).getTime() ||
           (a.outlet.name < b.outlet.name ? -1 : 1),
       );
-    // : [];
   }, [filterReportGood, filteredOrderList, outlets]);
 
   const sections = useMemo(
@@ -298,20 +280,16 @@ const ReportListScreen = () => {
     });
   }, [filterReportGood, navigation]);
 
-  const renderItem: ListRenderItem<IReportItem> = ({ item }) => {
-    return <ReportItem {...item} />;
-  };
+  const renderItem: ListRenderItem<IReportItem> = ({ item }) => <ReportItem {...item} />;
 
   const renderSectionHeader = ({ section }: any) => (
     <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
 
   const renderSectionFooter = useCallback(
-    (item: any) =>
-      filterReportGood && sections ? (
-        <ReportTotalByDate sectionReports={item.section} reports={filteredOutletList} />
-      ) : null,
-    [filterReportGood, filteredOutletList, sections],
+    ({ section }: any) =>
+      filterReportGood && sections ? <ReportTotalByDate data={section.data} title={section.title} /> : null,
+    [filterReportGood, sections],
   );
 
   const isFocused = useIsFocused();
@@ -367,7 +345,6 @@ const ReportListScreen = () => {
           </View>
         </View>
       )}
-
       <SectionList
         sections={sections}
         renderItem={renderItem}
@@ -378,7 +355,7 @@ const ReportListScreen = () => {
         ListEmptyComponent={EmptyList}
         keyboardShouldPersistTaps="never"
       />
-      {filterReportGood ? <ReportTotal reports={filteredOutletList} /> : null}
+      {filterReportGood ? <ReportTotal data={filteredOutletList} /> : null}
       {showDateBegin && (
         <DateTimePicker
           testID="dateTimePicker"

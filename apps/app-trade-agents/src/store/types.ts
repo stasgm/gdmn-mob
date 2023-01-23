@@ -50,12 +50,18 @@ export interface IReportListFormParam extends IFormParam {
   filterReportGood?: IReferenceData;
 }
 
+export interface IReportItem {
+  address: string;
+  onDate: string;
+  totalList?: IReportTotalLine[];
+  outlet: INamedEntity;
+}
+
 export interface IReportTotalLine {
-  [fieldName: string]: unknown;
   package: INamedEntity;
   quantity: number;
-  // good: IGood;
 }
+
 export interface IRouteFormParam extends IFormParam {
   routeItemId?: number;
 }
