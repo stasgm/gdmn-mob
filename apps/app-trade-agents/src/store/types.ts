@@ -48,6 +48,7 @@ export interface IReportListFormParam extends IFormParam {
   filterReportDateBegin?: string;
   filterReportDateEnd?: string;
   filterReportGood?: IReferenceData;
+  filterStatusList: IListItem[];
 }
 
 export interface IReportItem {

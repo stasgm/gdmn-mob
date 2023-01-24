@@ -6,10 +6,11 @@ import {
   globalStyles as styles,
   ItemSeparator,
   navBackDrawer,
-  SearchButton,
+  FilterButton,
   PrimeButton,
   SelectableInput,
   SubTitle,
+  Checkbox,
 } from '@lib/mobile-ui';
 import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
 import { IReference } from '@lib/types';
@@ -20,10 +21,12 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { SectionListData, View, StyleSheet, SectionList, ListRenderItem, Platform, Keyboard } from 'react-native';
 
+import { IListItem } from '@lib/mobile-types';
+
 import { ReportStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IReportListFormParam, IOutlet, IReportItem } from '../../store/types';
 
-import { noPackage } from '../../utils/constants';
+import { noPackage, statusTypes } from '../../utils/constants';
 
 import ReportItem from './components/ReportItem';
 import { ReportTotalByDate, ReportTotal } from './components/ReportTotal';
@@ -43,8 +46,14 @@ const ReportListScreen = () => {
 
   const dispatch = useDispatch();
 
-  const { filterReportContact, filterReportOutlet, filterReportDateBegin, filterReportDateEnd, filterReportGood } =
-    useSelector((state) => state.app.formParams as IReportListFormParam);
+  const {
+    filterReportContact,
+    filterReportOutlet,
+    filterReportDateBegin,
+    filterReportDateEnd,
+    filterReportGood,
+    filterStatusList = [],
+  } = useSelector((state) => state.app.formParams as IReportListFormParam);
 
   const outlets = refSelectors.selectByName<IOutlet>('outlet')?.data;
 
@@ -86,20 +95,16 @@ const ReportListScreen = () => {
     );
   }, [dispatch]);
 
-  const filteredOrderList = useMemo(() => {
-    if (
-      filterReportContact?.id ||
-      filterReportOutlet?.id ||
-      filterReportGood?.id ||
-      filterReportDateBegin ||
-      filterReportDateEnd
-    ) {
-      let dateEnd: Date | undefined;
-      if (filterReportDateEnd) {
-        dateEnd = new Date(filterReportDateEnd);
-        dateEnd.setDate(dateEnd.getDate() + 1);
-      }
+  const withParams =
+    !!filterReportContact ||
+    !!filterReportOutlet ||
+    !!filterReportGood ||
+    !!filterReportDateBegin ||
+    !!filterReportDateEnd ||
+    filterStatusList.length > 0;
 
+  const filteredOrderList = useMemo(() => {
+    if (withParams) {
       return orders.filter(
         (i) =>
           (filterReportContact?.id ? i.head.contact.id === filterReportContact.id : true) &&
@@ -110,7 +115,12 @@ const ReportListScreen = () => {
           (filterReportDateBegin
             ? new Date(filterReportDateBegin).getTime() <= new Date(i.head.onDate.slice(0, 10)).getTime()
             : true) &&
-          (dateEnd ? new Date(dateEnd).getTime() >= new Date(i.head.onDate.slice(0, 10)).getTime() : true),
+          (filterReportDateEnd
+            ? new Date(filterReportDateEnd).getTime() >= new Date(i.head.onDate.slice(0, 10)).getTime()
+            : true) &&
+          (filterStatusList.length > 0
+            ? filterStatusList.find((item) => item.id.toUpperCase() === i.status.toUpperCase())
+            : true),
       );
     } else {
       return [];
@@ -121,7 +131,9 @@ const ReportListScreen = () => {
     filterReportDateEnd,
     filterReportGood?.id,
     filterReportOutlet?.id,
+    filterStatusList,
     orders,
+    withParams,
   ]);
 
   const filteredOutletList: IReportItem[] = useMemo(() => {
@@ -170,6 +182,13 @@ const ReportListScreen = () => {
               }
             }
           });
+        } else if (itemIndex === -1) {
+          const newLine = {
+            outlet: cur.head.outlet,
+            onDate: cur.head.onDate,
+            address: outlets.find((o) => cur?.head?.outlet.id === o.id)?.address,
+          } as IReportItem;
+          prev = [...prev, newLine];
         }
 
         return prev;
@@ -208,10 +227,14 @@ const ReportListScreen = () => {
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        <SearchButton onPress={() => setFilterVisible(!filterVisible)} visible={filterVisible} />
+        <FilterButton
+          onPress={() => setFilterVisible(!filterVisible)}
+          visible={filterVisible}
+          withParams={withParams}
+        />
       </View>
     ),
-    [filterVisible],
+    [filterVisible, withParams],
   );
 
   useLayoutEffect(() => {
@@ -280,6 +303,19 @@ const ReportListScreen = () => {
     });
   }, [filterReportGood, navigation]);
 
+  const handleFilterStatus = useCallback(
+    (value: IListItem) => {
+      dispatch(
+        appActions.setFormParams({
+          filterStatusList: filterStatusList.find((item) => item.id === value.id)
+            ? filterStatusList.filter((i) => i.id !== value.id)
+            : [...filterStatusList, value],
+        }),
+      );
+    },
+    [dispatch, filterStatusList],
+  );
+
   const renderItem: ListRenderItem<IReportItem> = ({ item }) => <ReportItem {...item} />;
 
   const renderSectionHeader = ({ section }: any) => (
@@ -326,6 +362,18 @@ const ReportListScreen = () => {
               />
             </View>
           </View>
+          <View style={[localStyles.marginTop, localStyles.status]}>
+            {statusTypes.map((elem) => (
+              <View key={elem.id}>
+                <Checkbox
+                  key={elem.id}
+                  title={elem.value}
+                  selected={!!filterStatusList.find((i) => i.id === elem.id)}
+                  onSelect={() => handleFilterStatus(elem)}
+                />
+              </View>
+            ))}
+          </View>
           <View style={localStyles.container}>
             <PrimeButton
               icon={'delete-outline'}
@@ -336,7 +384,8 @@ const ReportListScreen = () => {
                   filterReportOutlet ||
                   filterReportGood ||
                   filterReportDateBegin ||
-                  filterReportDateEnd
+                  filterReportDateEnd ||
+                  filterStatusList.length
                 )
               }
             >
@@ -402,6 +451,11 @@ const localStyles = StyleSheet.create({
   },
   container: {
     alignItems: 'center',
-    marginTop: -10,
+    marginTop: -4,
+  },
+  status: {
+    marginHorizontal: 5,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
 });
