@@ -24,39 +24,40 @@ const getFiles = async (ctx: ParameterizedContext): Promise<void> => {
     toRecord,
   } = ctx.query;
 
-  if (typeof company === 'string') {
+  if (typeof company === 'string' && company) {
     params.company = company;
   }
 
-  if (typeof fileName === 'string') {
+  if (typeof fileName === 'string' && fileName) {
     params.fileName = fileName;
   }
 
-  if (typeof path === 'string') {
+  console.log('params.fileName', params.fileName);
+  if (typeof path === 'string' && path) {
     params.path = path;
   }
 
-  if (typeof uid === 'string') {
+  if (typeof uid === 'string' && uid) {
     params.uid = uid;
   }
 
-  if (typeof date === 'string') {
+  if (typeof date === 'string' && date) {
     params.date = date;
   }
 
-  if (typeof appSystem === 'string') {
+  if (typeof appSystem === 'string' && appSystem) {
     params.appSystem = appSystem;
   }
 
-  if (typeof consumer === 'string') {
+  if (typeof consumer === 'string' && consumer) {
     params.consumer = consumer;
   }
 
-  if (typeof producer === 'string') {
+  if (typeof producer === 'string' && producer) {
     params.producer = producer;
   }
 
-  if (typeof device === 'string') {
+  if (typeof device === 'string' && device) {
     params.device = device;
   }
 

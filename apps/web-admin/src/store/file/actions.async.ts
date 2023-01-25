@@ -9,11 +9,24 @@ import { AppState } from '..';
 
 import { webRequest } from '../webRequest';
 
+import { IFileFormik } from '../../types';
+
 import { fileSystemActions, FileSystemActionType } from './actions';
 
 export type AppThunk = ThunkAction<Promise<FileSystemActionType>, AppState, null, FileSystemActionType>;
 
-const fetchFiles = (params?: Record<string, string | number>): AppThunk => {
+const fetchFiles = (
+  filesFilters?: IFileFormik,
+  filterText?: string,
+  fromRecord?: number,
+  toRecord?: number,
+): AppThunk => {
+  const params: Record<string, string | number> = filesFilters ? filesFilters : {};
+
+  if (filterText) params.filterText = filterText;
+  if (fromRecord) params.fromRecord = fromRecord;
+  if (toRecord) params.toRecord = toRecord;
+
   return async (dispatch) => {
     dispatch(fileSystemActions.fetchFilesAsync.request(''));
 

@@ -37,7 +37,7 @@ export interface IMessageHead {
 }
 
 export interface IFileFormik {
-  [fieldName: string]: unknown;
+  [fieldName: string]: string;
   path: string;
   fileName: string;
   company: string;
@@ -50,7 +50,7 @@ export interface IFileFormik {
 }
 
 export interface IDeviceLogFileFormik {
-  [fieldName: string]: unknown;
+  [fieldName: string]: string;
   company: string;
   appSystem: string;
   contact: string;

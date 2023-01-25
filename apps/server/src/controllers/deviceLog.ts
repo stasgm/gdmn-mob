@@ -61,31 +61,31 @@ const getDeviceLogs = async (ctx: ParameterizedContext): Promise<void> => {
 
   const { uid, date, company, appSystem, contact, device, filterText, fromRecord, toRecord } = ctx.query;
 
-  if (typeof company === 'string') {
+  if (typeof company === 'string' && company) {
     params.company = company;
   }
 
-  if (typeof contact === 'string') {
+  if (typeof contact === 'string' && contact) {
     params.contact = contact;
   }
 
-  if (typeof uid === 'string') {
+  if (typeof uid === 'string' && uid) {
     params.uid = uid;
   }
 
-  if (typeof date === 'string') {
+  if (typeof date === 'string' && date) {
     params.date = date;
   }
 
-  if (typeof appSystem === 'string') {
+  if (typeof appSystem === 'string' && appSystem) {
     params.appSystem = appSystem;
   }
 
-  if (typeof device === 'string') {
+  if (typeof device === 'string' && device) {
     params.device = device;
   }
 
-  if (typeof filterText === 'string') {
+  if (typeof filterText === 'string' && filterText) {
     params.filterText = filterText;
   }
 

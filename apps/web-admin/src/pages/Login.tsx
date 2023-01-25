@@ -10,8 +10,8 @@ import { useEffect, useRef, useState } from 'react';
 
 import { authActions, useSelector, useDispatch, useAuthThunkDispatch } from '@lib/store';
 
-import Reaptcha from 'reaptcha';
-import { ReCAPTCHA } from 'react-google-recaptcha';
+// import Reaptcha from 'reaptcha';
+// import { ReCAPTCHA } from 'react-google-recaptcha';
 
 import Logo from '../components/Logo';
 
@@ -24,8 +24,8 @@ const Login = () => {
   const authDispatch = useAuthThunkDispatch();
 
   const { error, loading, status, errorMessage } = useSelector((state) => state.auth);
-  const [captchaToken, setCaptchaToken] = useState('');
-  const captchaRef = useRef(null);
+  // const [captchaToken, setCaptchaToken] = useState('');
+  // const captchaRef = useRef(null);
   const formik = useFormik<IUserCredentials>({
     enableReinitialize: true,
     initialValues: {
@@ -125,7 +125,7 @@ const Login = () => {
               variant="outlined"
               disabled={loading}
             />
-            <Box
+            {/* <Box
               sx={{
                 // mb: 2,
                 marginTop: 1,
@@ -139,8 +139,8 @@ const Login = () => {
                 ref={captchaRef}
                 onVerify={(token) => setCaptchaToken(token)}
               />
-            </Box>
-            <Box
+            </Box> */}
+            {/* <Box
               sx={{
                 // mb: 2,
                 marginTop: 1,
@@ -157,15 +157,14 @@ const Login = () => {
                 // onClick={(event) => setCaptchaToken(event.currentTarget.nodeValue)}
                 style={{ display: 'inline-block' }}
               />
-            </Box>
+            </Box> */}
             <Box sx={{ py: 2 }}>
               <Button
                 color="primary"
                 disabled={
-                  loading ||
-                  !!formik.errors.password ||
-                  !!formik.errors.name ||
-                  (!captchaToken && Boolean(process.env.REACT_APP_SITE_KEY))
+                  loading || !!formik.errors.password || !!formik.errors.name
+                  // ||
+                  // (!captchaToken && Boolean(process.env.REACT_APP_SITE_KEY))
                 }
                 fullWidth
                 size="large"
