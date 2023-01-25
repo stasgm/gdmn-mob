@@ -11,9 +11,7 @@ import {
   referenceActions,
   appActions,
   useAuthThunkDispatch,
-  useDocThunkDispatch,
   useSettingThunkDispatch,
-  settingsActions,
 } from '@lib/store';
 
 import {

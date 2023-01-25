@@ -466,21 +466,39 @@ export const useSync = (onSync?: () => Promise<any>) => {
             if (!connectError) {
               addRequestNotice('Получение данных');
               //2. Получаем все сообщения для мобильного
-              const getMessagesResponse = await api.message.getMessages(appRequest, {
+              let getMessagesResponse = await api.message.getMessages(appRequest, {
                 appSystemId: appSystem.id,
                 companyId: company.id,
+                // maxFiles: 1,
               });
+
+              // //2. Получаем все сообщения для мобильного
+              // const getMessagesResponse = await api.message.getMessages(appRequest, {
+              //   appSystemId: appSystem.id,
+              //   companyId: company.id,
+              // });
 
               //Если сообщения получены успешно, то
               //  справочники: очищаем старые и записываем в хранилище новые данные
               //  документы: добавляем новые, а старые заменеям только если был статус 'DRAFT'
               //  отправляем запросы за остальными данными
               if (getMessagesResponse.type === 'GET_MESSAGES') {
-                const sortedMessages = getMessagesResponse.messageList.sort((a, b) => a.head.order - b.head.order);
-                for (const message of sortedMessages) {
+                while (getMessagesResponse.type === 'GET_MESSAGES' && getMessagesResponse.messageList.length > 0) {
                   // eslint-disable-next-line no-await-in-loop
-                  await processMessage(message, tempErrs);
+                  await processMessage(getMessagesResponse.messageList[0], tempErrs);
+                  // eslint-disable-next-line no-await-in-loop
+                  getMessagesResponse = await api.message.getMessages(appRequest, {
+                    appSystemId: appSystem.id,
+                    companyId: company.id,
+                    // maxFiles: 1,
+                  });
                 }
+
+                // const sortedMessages = getMessagesResponse.messageList.sort((a, b) => a.head.order - b.head.order);
+                // for (const message of sortedMessages) {
+                //   // eslint-disable-next-line no-await-in-loop
+                //   await processMessage(message, tempErrs);
+                // }
 
                 // addError('useSync: api.message.sendMessages', new Date().toISOString(), tempErrs);
                 // withError = true;
