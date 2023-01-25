@@ -150,14 +150,16 @@ const ReportListScreen = () => {
             if (curLine.good.id === filterReportGood.id) {
               if (itemIndex > -1) {
                 const oldTotalList = prev[itemIndex].totalList || [];
-                const curTotalByPackage = oldTotalList.find((item) => item.package.id === curLine.package?.id);
+                const curTotalByPackage = oldTotalList.find(
+                  (item) => item.package.id === (curLine.package?.id || 'noPackage'),
+                );
                 if (curTotalByPackage) {
                   const newTotalListByPackage = {
                     ...curTotalByPackage,
                     quantity: round(curTotalByPackage.quantity + curLine.quantity, 3),
                   };
                   const newTotalListByDate = oldTotalList
-                    .filter((i) => i.package.id !== curLine.package?.id)
+                    .filter((i) => i.package.id !== (curLine.package?.id || 'noPackage'))
                     .concat(newTotalListByPackage);
                   prev[itemIndex] = { ...prev[itemIndex], totalList: newTotalListByDate };
                 } else {
