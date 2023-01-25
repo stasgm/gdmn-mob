@@ -52,10 +52,13 @@ export const alias2fullFileName = (alias: string): string => {
 const readableToString = async (readable: any): Promise<string | Error> => {
   const data = [];
   let size = 0;
+  let start = 0;
   for await (const chunk of readable) {
     data.push(chunk);
 
-    if (chunk.toString()[0] !== '{' && chunk.toString()[0] !== '[') throw new Error('Неправильный формат файла');
+    if (chunk.toString()[0] !== '{' && chunk.toString()[0] !== '[' && start === 0)
+      throw new Error('Неправильный формат файла');
+    start++;
 
     size += Buffer.byteLength(chunk.toString()) / BYTES_PER_MB;
 
