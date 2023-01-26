@@ -402,7 +402,7 @@
 
 Чтобы найти документ по наименованию можно воспользоваться строкой поиска, нажав на иконку <img src="img/1.Connection/1.IconSearch.jpg" alt="drawing" height="22"/>  **Поиск** в правом верхнем углу экрана.
 
-По нажатию иконки " ✚ ", в верхнем правом углу, переходим на экран добавления документа. При создании документ имеет статус Черновик. Заполняем необходимые поля - **Номер, Дата, Подразделение, Комментарий** и сохраняем документ, нажав на иконку 
+По нажатию иконки " ✚ ", в верхнем правом углу, переходим на экран добавления документа. При создании документ имеет статус Черновик. Заполняем необходимые поля - **Номер, Дата, Подразделение** (Комментарий - поле, не обязательное для заполнения) и сохраняем документ, нажав на иконку 
 **✓**.
 
 <img src="img/10.Scanner/10.ScanCreateDoc.jpg" alt="drawing" height="400"/>
@@ -411,14 +411,17 @@
 
 <img src="img/10.Scanner/10.ScanDoc.jpg" alt="drawing" height="400"/> <img src="img/10.Scanner/10.ScanEditDoc.jpg" alt="drawing" height="400"/>
 
-
 Нажимаем на иконку штрихкода <img src="img/10.Scanner/10.IconScanner.jpg" alt="drawing" height="22"/> в верхнем правом углу и переходим на экран сканирования товара.
 
 
 Для удобства работы во время сканирования можно использовать кнопки **Вспышка** <img src="img/1.Connection/1.IconFlash.jpg" alt="drawing" height="22"/>  или **Вибрация**  <img src="img/1.Connection/1.IconVibr.jpg" alt="drawing" height="22"/>.
 
 
-<img src="img/10.Scanner/10.ScanDoc.jpg" alt="drawing" height="400"/> <img src="img/10.Scanner/10.ScreenScan.jpg" alt="drawing" height="400"/> <img src="img/10.Scanner/10.DocWithScans.jpg" alt="drawing" height="400"/> 
+<img src="img/10.Scanner/10.ScanDoc.jpg" alt="drawing" height="400"/> <img src="img/10.Scanner/10.ScreenScan.jpg" alt="drawing" height="400"/>
+
+Возможно ввести вручную штрихкод, нажав на иконку <img src="img/1.Connection/1.IconScreenCod.jpg" alt="drawing" height="22"/> сверху справа.
+
+ <img src="img/10.Scanner/10.ScanCod.jpg" alt="drawing" height="400"/> <img src="img/10.Scanner/10.DocWithScans.jpg" alt="drawing" height="400"/> 
 
 После ввода необходимых данных, данный документ можно отправить  на обработку тремя способами:
 
@@ -452,6 +455,7 @@
 | <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>            | отправка документа   |
 | <img src="img/1.Connection/1.IconEdit.jpg" alt="drawing" height="22"/>  | редактирование документа   |
 | <img src="img/1.Connection/1.IconSearch.jpg" alt="drawing" height="22"/> | поиск|
+|<img src="img/1.Connection/1.IconScreenCod.jpg" alt="drawing" height="22"/>| ввод штрихкода вручную
 | <img src="img/10.Scanner/10.IconScanner.jpg" alt="drawing" height="22">  | сканирование штрихкода|
 | <img src="img/1.Connection/1.Sync.jpg" alt="drawing" height="22"/>       | синхронизация|
 | <img src="img/1.Connection/1.ConfigIcon.png" alt="drawing" height="22"/> | переход на экран настроек|
@@ -463,3 +467,5 @@
 | **≡**     | меню документа |
 | ✚         | добавление нового документа|
 | **⁝**      | меню документа|
+
+
