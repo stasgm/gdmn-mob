@@ -421,13 +421,21 @@
 
 Возможно ввести вручную штрихкод, нажав на иконку <img src="img/1.Connection/1.IconScreenCod.jpg" alt="drawing" height="22"/> сверху справа.
 
- <img src="img/10.Scanner/10.ScanCod.jpg" alt="drawing" height="400"/> <img src="img/10.Scanner/10.DocWithScans.jpg" alt="drawing" height="400"/> 
+ <img src="img/10.Scanner/10.ScanCod.jpg" alt="drawing" height="400"/>
+ 
+ Сканируем штрихкод, нажимаем на нужную кнопку (**Пересканировать** или **Штрихкод**) и продолжаем сканирование необходимое число раз. 
+
+<img src="img/10.Scanner/10.ScanBattons.jpg" alt="drawing" height="400"/> <img src="img/10.Scanner/10.DocWithScans.jpg" alt="drawing" height="400"/> 
+
+Для редактирования .... в меню документа " **⁝** ", расположенном в правом верхнем углу, нажимаем на пункт **Отменить последнее сканирование**. 
+
+<img src="img/10.Scanner/10.ScanEditDoc.jpg" alt="drawing" height="400"/>
 
 После ввода необходимых данных, данный документ можно отправить  на обработку тремя способами:
 
 * в документе необходимо вручную поменять признак **Черновик** на признак **Готов к отправке** с помощью значка <img src="img/1.Connection/1.IconEdit.jpg" alt="drawing" height="22"/> в шапке документа. Шапка документа изменит цвет с красного на зелёный. Далее нажать на значок <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/> и документ отправится на сервер. Шапка документа изменит цвет на жёлтый (статус **Отправлен**).
 
-* Нажать на значок <img src="img/1.Connection/1.IconAutoTransl.jpg" alt="drawing" height="22"/>
+* Нажать на значок <img src="img/1.Connection/1.IconAutoTransl.jpg" alt="drawing" height="22"/>. Иконка документа изменится с красной <img src="img/1.Connection/1.IconDraft.jpg" alt="drawing" height="22"/> на зелёную <img src="img/1.Connection/1.IconReadyToGo.jpg" alt="drawing" height="22"/>. Далее нажать на значок <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/> и документ отправится на сервер. Иконка документа изменит цвет на жёлтый <img src="img/1.Connection/1.IconSent.jpg" alt="drawing" height="22"/>.
 
 * нажать на значок <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>, находящийся над шапкой документа, который автоматически переведёт признак с **Черновик** на **Готов к отправке** и отправит документ на обработку.
 
@@ -438,7 +446,7 @@
 
 **Журнал ошибок**
 
-Если во время синхронизации программы и сервера произошли ошибки, то программа выдаст окно с надписью "Закончено с ошибками". Чтобы их просмотреть, необходимо нажать на кнопку "Просмотреть ошибки". Чтобы Вернуться обратно в список выполненных действий нажать на кнопку "Просмотреть операции". Все ошибки будут сохраняться в "Журнале ошибок" и переданы на сервер для анализа. 
+Если во время синхронизации программы и сервера произошли ошибки, то программа выдаст окно с надписью **"Закончено с ошибками"**. Чтобы их просмотреть, необходимо нажать на кнопку **Просмотреть ошибки**, а чтобы вернуться обратно в список выполненных действий, необходимо нажать на кнопку **Просмотреть операции**. Все ошибки будут сохраняться в **Журнале ошибок**, который можно просмотреть, и будут передаваться на сервер для анализа. 
 
 <img src="img/11.About/11.EddWithError.jpg" alt="drawing" height="400"/> <img src="img/11.About/11.EddWithErrorTwo.jpg" alt="drawing" height="400"/> <img src="img/11.About/11.LogError.jpg" alt="drawing" height="400"/> 
 
@@ -455,7 +463,7 @@
 | <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>            | отправка документа   |
 | <img src="img/1.Connection/1.IconEdit.jpg" alt="drawing" height="22"/>  | редактирование документа   |
 | <img src="img/1.Connection/1.IconSearch.jpg" alt="drawing" height="22"/> | поиск|
-|<img src="img/1.Connection/1.IconScreenCod.jpg" alt="drawing" height="22"/>| ввод штрихкода вручную
+|<img src="img/1.Connection/1.IconScreenCod.jpg" alt="drawing" height="22"/>| поиск товара в остатках|
 | <img src="img/10.Scanner/10.IconScanner.jpg" alt="drawing" height="22">  | сканирование штрихкода|
 | <img src="img/1.Connection/1.Sync.jpg" alt="drawing" height="22"/>       | синхронизация|
 | <img src="img/1.Connection/1.ConfigIcon.png" alt="drawing" height="22"/> | переход на экран настроек|
