@@ -626,9 +626,7 @@
 
 <img src="img/10.About/10.EddWithError.jpg" alt="drawing" height="400"/> <img src="img/10.About/10.EddWithErrorTwo.jpg" alt="drawing" height="400"/> <img src="img/10.About/10.LogError.jpg" alt="drawing" height="400"/> 
 
-
 ## 13. Значение иконок
-
 
 | Значок         | Значение         |
 |:----------------------:|----------------------------------|

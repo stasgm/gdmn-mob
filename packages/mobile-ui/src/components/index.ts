@@ -11,6 +11,7 @@ export {
   ScanButton,
   SendButton,
   SaveDocument,
+  FilterButton,
 } from './AppBar';
 export { BottomSheet } from './BottomSheet';
 export { ItemSeparator } from './ItemSeparator';
@@ -40,3 +41,4 @@ export { default as Switch } from './Switch';
 export { navBackButton, navBackDrawer } from './NavigationButtons';
 export { SimpleDialog } from './SimpleDialog';
 export { NumberKeypad } from './NumberKeypad';
+export { default as Checkbox } from './Checkbox';

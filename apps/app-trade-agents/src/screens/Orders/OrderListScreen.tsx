@@ -19,8 +19,9 @@ import {
   navBackDrawer,
   MediumText,
   SelectableInput,
-  SearchButton,
+  FilterButton,
   PrimeButton,
+  Checkbox,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -40,7 +41,6 @@ import { OrdersStackParamList } from '../../navigation/Root/types';
 import { statusTypes } from '../../utils/constants';
 
 import OrderListTotal from './components/OrderListTotal';
-import Checkbox from './components/Checkbox';
 
 export interface OrderListSectionProps {
   title: string;
@@ -81,6 +81,7 @@ const OrderListScreen = () => {
 
   const handleCleanFormParams = useCallback(() => {
     dispatch(appActions.clearFormParams());
+    setSearchQuery('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -138,20 +139,21 @@ const OrderListScreen = () => {
     [orders, outlets, searchQuery],
   );
 
-  const filteredOrderList = useMemo(() => {
-    if (filterContact?.id || filterOutlet?.id || filterDateBegin || filterDateEnd || filterStatusList) {
-      let dateEnd: Date | undefined;
-      if (filterDateEnd) {
-        dateEnd = new Date(filterDateEnd);
-        dateEnd.setDate(dateEnd.getDate() + 1);
-      }
+  const withParams =
+    !!filterContact || !!filterOutlet || !!filterDateBegin || !!filterDateEnd || filterStatusList.length > 0;
 
+  const filteredOrderList = useMemo(() => {
+    if (filterContact || filterOutlet || filterDateBegin || filterDateEnd || filterStatusList.length) {
       return orderList.filter(
         (i) =>
           (filterContact?.id ? i.head.contact.id === filterContact.id : true) &&
           (filterOutlet?.id ? i.head.outlet.id === filterOutlet.id : true) &&
-          (filterDateBegin ? new Date(filterDateBegin).getTime() <= new Date(i.head?.onDate).getTime() : true) &&
-          (dateEnd ? new Date(dateEnd).getTime() >= new Date(i.head?.onDate).getTime() : true) &&
+          (filterDateBegin
+            ? new Date(filterDateBegin).getTime() <= new Date(i.head.onDate.slice(0, 10)).getTime()
+            : true) &&
+          (filterDateEnd
+            ? new Date(filterDateEnd).getTime() >= new Date(i.head.onDate.slice(0, 10)).getTime()
+            : true) &&
           (filterStatusList.length
             ? filterStatusList.find((item) => item.id.toUpperCase() === i.status.toUpperCase())
             : true),
@@ -159,7 +161,7 @@ const OrderListScreen = () => {
     } else {
       return orderList;
     }
-  }, [filterContact?.id, filterDateBegin, filterDateEnd, filterOutlet?.id, filterStatusList, orderList]);
+  }, [filterContact, filterDateBegin, filterDateEnd, filterOutlet, filterStatusList, orderList]);
 
   const debets = refSelectors.selectByName<IDebt>('debt')?.data;
 
@@ -242,17 +244,6 @@ const OrderListScreen = () => {
     navigation.navigate('OrderEdit');
   }, [navigation]);
 
-  useEffect(() => {
-    if (!filterVisible && searchQuery) {
-      setSearchQuery('');
-    }
-  }, [filterVisible, searchQuery]);
-
-  const handleSearch = useCallback(() => {
-    setFilterVisible((prev) => !prev);
-    dispatch(appActions.clearFormParams());
-  }, [dispatch]);
-
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
@@ -261,12 +252,16 @@ const OrderListScreen = () => {
         ) : (
           <>
             <AddButton onPress={handleAddDocument} />
-            <SearchButton onPress={handleSearch} visible={filterVisible} />
+            <FilterButton
+              onPress={() => setFilterVisible((prev) => !prev)}
+              visible={filterVisible}
+              withParams={withParams || !!searchQuery}
+            />
           </>
         )}
       </View>
     ),
-    [filterVisible, handleAddDocument, handleDeleteDocs, handleSearch, isDelList],
+    [filterVisible, handleAddDocument, handleDeleteDocs, isDelList, searchQuery, withParams],
   );
 
   const renderLeft = useCallback(() => isDelList && <CloseButton onPress={() => setDelList({})} />, [isDelList]);
@@ -434,7 +429,14 @@ const OrderListScreen = () => {
                 icon={'delete-outline'}
                 onPress={handleCleanFormParams}
                 disabled={
-                  !(filterContact || filterOutlet || filterDateBegin || filterDateEnd || filterStatusList.length)
+                  !(
+                    filterContact ||
+                    filterOutlet ||
+                    filterDateBegin ||
+                    filterDateEnd ||
+                    filterStatusList.length ||
+                    searchQuery
+                  )
                 }
               >
                 {'Очистить'}

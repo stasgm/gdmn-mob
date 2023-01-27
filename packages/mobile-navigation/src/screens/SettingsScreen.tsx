@@ -15,7 +15,6 @@ const SettingsScreen = () => {
   const dispatch = useDispatch();
   const showActionSheet = useActionSheet();
   const data = useSelector((state) => state.settings.data);
-  const config = useSelector((state) => state.auth.config);
 
   const { colors } = useTheme();
 
@@ -77,8 +76,6 @@ const SettingsScreen = () => {
       headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
     });
   }, [navigation, actionsMenu]);
-
-  // const serverPath = `${config?.protocol}${config?.server}:${config?.port}/${config?.apiPath}`;
 
   const handleCheckSettings = (optionName: string, value: ISettingsOption) => {
     if (optionName === 'scannerUse') {

@@ -1,6 +1,6 @@
 import { IListItem } from '@lib/mobile-types';
 import { baseSettingGroup } from '@lib/store';
-import { Settings, StatusType } from '@lib/types';
+import { INamedEntity, Settings, StatusType } from '@lib/types';
 
 export const ONE_SECOND_IN_MS = 1000;
 
@@ -96,3 +96,5 @@ export const statusTypes: IListItem[] = [
     value: 'Обработано',
   },
 ];
+
+export const noPackage: INamedEntity = { id: 'noPackage', name: 'Без упаковки' };

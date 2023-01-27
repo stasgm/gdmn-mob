@@ -48,6 +48,19 @@ export interface IReportListFormParam extends IFormParam {
   filterReportDateBegin?: string;
   filterReportDateEnd?: string;
   filterReportGood?: IReferenceData;
+  filterStatusList: IListItem[];
+}
+
+export interface IReportItem {
+  address: string;
+  onDate: string;
+  totalList?: IReportTotalLine[];
+  outlet: INamedEntity;
+}
+
+export interface IReportTotalLine {
+  package: INamedEntity;
+  quantity: number;
 }
 
 export interface IRouteFormParam extends IFormParam {

@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
+import { FlashList } from '@shopify/flash-list';
 
 import {
   globalStyles as styles,
@@ -30,6 +31,8 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { Chip, Searchbar, useTheme } from 'react-native-paper';
+
+import { TouchableOpacity as TouchableOpacityGesture } from 'react-native-gesture-handler';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import {
@@ -69,7 +72,7 @@ const SelectGoodScreen = () => {
   const groups = useMemo(() => refGroup.data.concat(UNKNOWN_GROUP), [refGroup.data]);
   const doc = docSelectors.selectByDocId<IOrderDocument>(docId);
   const contactId = doc?.head.contact.id;
-  const { parentGroupId, groupId } = useSelector((state) => state.app.formParams as IGroupFormParam);
+  const { parentGroupId } = useSelector((state) => state.app.formParams as IGroupFormParam);
 
   const [filterVisible, setFilterVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -100,9 +103,7 @@ const SelectGoodScreen = () => {
     [selectedParentGroup, model],
   );
 
-  const [selectedGroup, setSelectedGroup] = useState<IGoodGroup | undefined>(
-    groupId ? groups.find((group) => group.id === groupId) || nextLevelGroups[0] : nextLevelGroups[0],
-  );
+  const [selectedGroup, setSelectedGroup] = useState<IGoodGroup | undefined>(undefined);
 
   const goodModel = useMemo(
     () =>
@@ -191,7 +192,7 @@ const SelectGoodScreen = () => {
           text: 'Отмена',
         },
       ]);
-      setSelectedLine(undefined);
+      hadndleDismissDialog();
     } else if (selectedGood && doc) {
       const lineIds: string[] = doc.lines?.filter((i) => i.good.id === selectedGood?.id)?.map((i) => i.id);
       Alert.alert(`Вы уверены, что хотите удалить ${lineIds.length > 1 ? 'все позиции' : 'позицию'} ?`, '', [
@@ -205,7 +206,7 @@ const SelectGoodScreen = () => {
           text: 'Отмена',
         },
       ]);
-      setSelectedGood(undefined);
+      hadndleDismissDialog();
     }
   }, [dispatch, doc, docId, selectedGood, selectedLine]);
 
@@ -264,8 +265,8 @@ const SelectGoodScreen = () => {
       };
 
       return (
-        <View key={item.id} style={localStyles.goodView}>
-          <TouchableOpacity
+        <View key={item.id}>
+          <TouchableOpacityGesture
             onPress={() => {
               if (isAdded) {
                 setSelectedGood(item);
@@ -296,7 +297,7 @@ const SelectGoodScreen = () => {
                 )}
               </View>
             </View>
-          </TouchableOpacity>
+          </TouchableOpacityGesture>
         </View>
       );
     },
@@ -377,15 +378,14 @@ const SelectGoodScreen = () => {
           <ItemSeparator />
         </View>
       )}
-      <FlatList
-        ref={refListGood}
+      <FlashList
         data={filterVisible ? goodsByContact : goodModel}
-        keyExtractor={keyExtractor}
-        ListHeaderComponent={filterVisible ? undefined : renderGroupHeader}
         renderItem={renderGood}
+        ListHeaderComponent={filterVisible ? undefined : renderGroupHeader}
+        estimatedItemSize={60}
         ItemSeparatorComponent={ItemSeparator}
-        keyboardShouldPersistTaps={'handled'}
-        maxToRenderPerBatch={20}
+        keyExtractor={keyExtractor}
+        extraData={[doc?.lines, docId]}
       />
       {(selectedLine || selectedGood) && (
         <OrderLineDialog
@@ -422,9 +422,6 @@ const localStyles = StyleSheet.create({
   flexRowWrap: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-  },
-  goodView: {
-    // width: '100%',
   },
   lineView: { display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginTop: 6 },
   lineChip: {
