@@ -13,14 +13,10 @@ import {
   ItemSeparator,
   navBackDrawer,
 } from '@lib/mobile-ui';
-/*
-import { useRoute, RouteProp } from '@react-navigation/native';
 
-import { DocumentsTabsStackParamsList } from '../../navigation/Root/types'; */
-
-// import { styles } from './styles';
-import DocumentItem from './components/DocumentItem';
 import { keyExtractorByIndex } from '@lib/mobile-hooks';
+
+import DocumentItem from './components/DocumentItem';
 
 const DocumentListScreen = () => {
   const { list, loading } = useSelector((state) => state.documents);
@@ -88,7 +84,6 @@ const DocumentListScreen = () => {
         ItemSeparatorComponent={ItemSeparator}
         scrollEventThrottle={400}
         onEndReached={() => ({})}
-        // refreshing={loading}
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
