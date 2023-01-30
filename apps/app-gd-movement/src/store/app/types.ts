@@ -2,6 +2,7 @@ import { INamedEntity } from '@lib/types';
 
 export type AppInventoryState = {
   readonly model: IModelData<IMDGoodRemains>;
+  readonly unknownGoods: IGood[];
   readonly loading: boolean;
   readonly loadingData: boolean;
   readonly errorMessage: string;
@@ -58,6 +59,7 @@ export interface IGood extends INamedEntity {
   price?: number; //Цена
   buyingPrice?: number;
   scale?: number; //количество единиц в месте
+  unknown_id?: string;
 }
 
 export interface IRemGood {

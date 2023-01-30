@@ -20,7 +20,7 @@ import {
   navBackDrawer,
 } from '@lib/mobile-ui';
 
-import { documentActions, refSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
+import { documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -33,6 +33,8 @@ import { IDocumentType } from '@lib/types';
 import { IMovementDocument } from '../../store/types';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { statusTypes, dataTypes, docContactTypes } from '../../utils/constants';
+import { IGood } from '../../store/app/types';
+import { appInventoryActions, useSelector as useInvSelector } from '../../store';
 
 export interface DocListProps {
   orders: IListItemProps[];
@@ -62,6 +64,23 @@ export const DocListScreen = () => {
   const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
 
   const list = useSelector((state) => state.documents.list) as IMovementDocument[];
+
+  const goods = refSelectors.selectByName<IGood>('good')?.data;
+  const unknownGoods = useInvSelector((state) => state.appInventory.unknownGoods);
+  const dispatch = useDispatch();
+  const [removingUnknownGoods, setRemovingUnknownGoods] = useState(false);
+
+  useEffect(() => {
+    if (unknownGoods.length > 0 && !removingUnknownGoods) {
+      setRemovingUnknownGoods(true);
+      goods.forEach((g) => {
+        if (unknownGoods.find((ug) => g.unknown_id === ug.id)) {
+          dispatch(appInventoryActions.removeUnknownGood(g.unknown_id!));
+        }
+      });
+      setRemovingUnknownGoods(false);
+    }
+  }, [dispatch, goods, removingUnknownGoods, unknownGoods]);
 
   const [delList, setDelList] = useState<IDelList>({});
   const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);

@@ -8,9 +8,14 @@ import { SaveButton, globalStyles as styles, AppActivityIndicator, AppScreen, na
 
 import { ScreenState } from '@lib/types';
 
+import { generateId } from '@lib/mobile-hooks';
+
 import { DocStackParamList } from '../../navigation/Root/types';
 
 import { IMovementLine } from '../../store/types';
+import { appInventoryActions } from '../../store';
+
+import { unknownGood } from '../../utils/constants';
 
 import { DocLine } from './components/DocLine';
 
@@ -29,10 +34,23 @@ export const DocLineScreen = () => {
         setScreenState('idle');
         return;
       }
+      let newLine = line;
+      if (line.good.id === 'unknown' && mode === 0) {
+        const id = `unknown_${generateId()}`;
+        dispatch(
+          appInventoryActions.addUnknownGood({
+            ...unknownGood,
+            ...line.good,
+            barcode: line.barcode,
+            id,
+          }),
+        );
+        newLine = { ...newLine, good: { ...newLine.good, id } };
+      }
       if (line.quantity) {
         dispatch(
           mode === 0
-            ? documentActions.addDocumentLine({ docId, line })
+            ? documentActions.addDocumentLine({ docId, line: newLine })
             : documentActions.updateDocumentLine({ docId, line }),
         );
         navigation.goBack();
@@ -43,7 +61,7 @@ export const DocLineScreen = () => {
             onPress: () => {
               dispatch(
                 mode === 0
-                  ? documentActions.addDocumentLine({ docId, line })
+                  ? documentActions.addDocumentLine({ docId, line: newLine })
                   : documentActions.updateDocumentLine({ docId, line }),
               );
               navigation.goBack();
