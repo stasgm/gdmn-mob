@@ -125,14 +125,10 @@ const FileList = () => {
       dispatch(
         actions.fileSystemActions.setPageParam({
           filesFilters: pageParams.filesFilters,
+          page: pageParams.page,
+          limit: pageParams.limit,
         }),
       );
-      // dispatch(
-      //   actions.fileSystemActions.setPageParam({
-      //     page: pageParams.page,
-      //     limit: pageParams.limit,
-      //   }),
-      // );
     },
     [dispatch],
   );

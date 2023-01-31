@@ -58,6 +58,18 @@ const UserList = () => {
     handleSearchClick();
   };
 
+  const handleSetPageParams = useCallback(
+    (pageParams: IPageParam) => {
+      dispatch(
+        actions.userActions.setPageParam({
+          page: pageParams.page,
+          limit: pageParams.limit,
+        }),
+      );
+    },
+    [dispatch],
+  );
+
   const buttons: IToolBarButton[] = [
     {
       name: 'Обновить',
@@ -110,7 +122,13 @@ const UserList = () => {
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <SortableTable<IUser> headCells={headCells} data={list} path={'/app/users/'} />
+              <SortableTable<IUser>
+                headCells={headCells}
+                data={list}
+                path={'/app/users/'}
+                onSetPageParams={handleSetPageParams}
+                pageParams={pageParams}
+              />
             </Box>
           )}
         </Container>
