@@ -59,7 +59,13 @@ const DeviceLogFilesList = () => {
 
   const handleSetPageParams = useCallback(
     (logPageParams: IPageParam) => {
-      dispatch(actions.deviceLogActions.setPageParam({ logFilters: logPageParams.logFilters }));
+      dispatch(
+        actions.deviceLogActions.setPageParam({
+          logFilters: logPageParams.logFilters,
+          page: logPageParams.page,
+          limit: logPageParams.limit,
+        }),
+      );
     },
     [dispatch],
   );

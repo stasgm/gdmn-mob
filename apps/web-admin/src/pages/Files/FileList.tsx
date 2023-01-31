@@ -114,8 +114,18 @@ const FileList = () => {
   // }, [selectedFileIds.length, selectedFiles]);
 
   const handleSetPageParams = useCallback(
-    (filesPageParams: IPageParam) => {
-      dispatch(actions.fileSystemActions.setPageParam({ filesFilters: filesPageParams.filesFilters }));
+    (pageParams: IPageParam) => {
+      dispatch(
+        actions.fileSystemActions.setPageParam({
+          filesFilters: pageParams.filesFilters,
+        }),
+      );
+      // dispatch(
+      //   actions.fileSystemActions.setPageParam({
+      //     page: pageParams.page,
+      //     limit: pageParams.limit,
+      //   }),
+      // );
     },
     [dispatch],
   );

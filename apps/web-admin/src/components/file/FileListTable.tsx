@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -51,8 +51,10 @@ const FileListTable = ({
   onSetPageParams,
   pageParams,
 }: IProps) => {
-  const [limit, setLimit] = useState(25);
-  const [page, setPage] = useState(0);
+  const [limit, setLimit] = useState(
+    pageParams?.limit && !isNaN(Number(pageParams?.limit)) ? Number(pageParams?.limit) : 10,
+  );
+  const [page, setPage] = useState(pageParams?.page && !isNaN(Number(pageParams?.page)) ? Number(pageParams.page) : 0);
 
   const initialValues = useMemo(() => {
     return {
@@ -138,19 +140,27 @@ const FileListTable = ({
     formik.values.uid,
   ]);
 
-  const handleLimitChange = (event: any) => {
-    setLimit(event.target.value);
-  };
+  const handleLimitChange = useCallback(
+    (event: any) => {
+      setLimit(event.target.value);
+      onSetPageParams({ ...pageParams, limit: event.target.value });
+    },
+    [onSetPageParams, pageParams],
+  );
 
-  const handlePageChange = (_event: any, newPage: any) => {
-    setPage(newPage);
-  };
+  const handlePageChange = useCallback(
+    (_event: any, newPage: any) => {
+      setPage(newPage);
+      onSetPageParams({ ...pageParams, page: newPage });
+    },
+    [onSetPageParams, pageParams],
+  );
 
   useEffect(() => {
     if (isFilterVisible && formik.values !== initialValues) {
-      onSetPageParams({ filesFilters: formik.values });
+      onSetPageParams({ ...pageParams, filesFilters: formik.values });
     }
-  }, [formik.values, initialValues, isFilterVisible, onSetPageParams]);
+  }, [formik.values, initialValues, isFilterVisible, onSetPageParams, pageParams]);
 
   // useEffect(() => {
   //   if (limitRows > 0) {
