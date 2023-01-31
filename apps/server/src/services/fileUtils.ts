@@ -3,9 +3,11 @@ import { readdir, unlink, stat } from 'fs/promises';
 
 import { IFileSystem, IExtraFileInfo } from '@lib/types';
 
-import { BYTES_PER_KB } from '../utils/constants';
+import { BYTES_PER_KB, MSEС_IN_DAY, collectionNames } from '../utils/constants';
 
 import log from '../utils/logger';
+
+import config from '../../config';
 
 import { getListPart } from '../utils/helpers';
 
@@ -21,19 +23,37 @@ import {
 
 import { getDb } from './dao/db';
 
-export const _readDir = async (root: string): Promise<string[]> => {
+export const _readDir = async (root: string, excludeFolders: string[] | undefined): Promise<string[]> => {
   try {
-    const subDirs = await readdir(root);
+    const dirs = await readdir(root);
+    const exclude: string[] = (excludeFolders ?? []).map((i) => i.toLocaleLowerCase());
+    const subDirs = dirs.filter((item) => !exclude.includes(item.toLocaleLowerCase()));
+
     const files = await Promise.all(
       subDirs.map(async (subDir) => {
         const res = path.join(root, subDir);
-        return (await stat(res)).isDirectory() ? _readDir(res) : res;
+        return (await stat(res)).isDirectory() ? _readDir(res, excludeFolders) : res;
       }),
     );
     return files.flat();
   } catch (err) {
     log.error(`Robust-protocol.errorDirectory: Ошибка чтения директории - ${err}`);
     return [];
+  }
+};
+
+export const checkFiles = async (): Promise<void> => {
+  const defaultExclude = Object.values(collectionNames).map((i) => `${i}.json`);
+
+  const root = getDb().dbPath;
+  const files = await _readDir(root, [...defaultExclude, 'deviceLogs']);
+  for (const file of files) {
+    // eslint-disable-next-line no-await-in-loop
+    const fileStat = await stat(file);
+    const fileDate = fileStat.birthtimeMs;
+    if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > config.FILES_CHECK_PERIOD_IN_DAYS) {
+      unlink(file);
+    }
   }
 };
 
@@ -153,7 +173,7 @@ const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => 
 export const readListFiles = async (params: Record<string, string | number>): Promise<IFileSystem[]> => {
   const root = getDb().dbPath;
   let files: IFileSystem[] = [];
-  const fileStrings = await _readDir(root);
+  const fileStrings = await _readDir(root, undefined);
   for (const file of fileStrings) {
     // eslint-disable-next-line no-await-in-loop
     const fileObj = await splitFilePath(file);

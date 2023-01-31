@@ -13,7 +13,7 @@ import {
 
 import { Collection, Database, CollectionMessage } from '../../utils/json-db';
 
-import { messageFolders } from '../../utils/constants';
+import { messageFolders, collectionNames } from '../../utils/constants';
 
 import { generateId } from '../../utils/helpers';
 
@@ -38,13 +38,13 @@ let database: DBType;
 export const createDb = async (dir: string, name: string): Promise<DBType> => {
   const db = new Database(dir, name);
   const collections = {
-    users: db.collection<IDBUser>('users'),
-    devices: db.collection<IDBDevice>('devices'),
-    companies: db.collection<IDBCompany>('companies'),
-    codes: db.collection<IDBActivationCode>('activation-codes'),
-    deviceBindings: db.collection<IDBDeviceBinding>('device-bindings'),
-    appSystems: db.collection<DBAppSystem>('app-systems'),
-    sessionId: db.collection<SessionId>('session-id'),
+    users: db.collection<IDBUser>(collectionNames.users),
+    devices: db.collection<IDBDevice>(collectionNames.devices),
+    companies: db.collection<IDBCompany>(collectionNames.companies),
+    codes: db.collection<IDBActivationCode>(collectionNames.codes),
+    deviceBindings: db.collection<IDBDeviceBinding>(collectionNames.deviceBindings),
+    appSystems: db.collection<DBAppSystem>(collectionNames.appSystems),
+    sessionId: db.collection<SessionId>(collectionNames.sessionId),
   };
 
   await Promise.all(Object.values(collections).map((c) => c.readDataFromDisk()));

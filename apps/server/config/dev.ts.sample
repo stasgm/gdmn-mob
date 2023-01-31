@@ -25,4 +25,6 @@ export default {
   ACTIVE_CODE_DAYS: 7,
    /**максимальное количество записей в журнале ошибок устройства*/
   DEVICE_LOG_MAX_LINES: 1000,
+  /** Период проверки файлов, в днях */
+  FILES_CHECK_PERIOD_IN_DAYS: 7,
 };
