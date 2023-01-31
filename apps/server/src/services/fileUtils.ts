@@ -7,13 +7,16 @@ import { BYTES_PER_KB } from '../utils/constants';
 
 import log from '../utils/logger';
 
+import { getListPart } from '../utils/helpers';
+
 import {
   fullFileName2alias,
   getAppSystemId,
   alias2fullFileName,
   readJsonFile,
-  checkFileExists,
   writeIterableToFile,
+  getFoundEntity,
+  getFoundString,
 } from '../utils/fileHelper';
 
 import { getDb } from './dao/db';
@@ -147,7 +150,7 @@ const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => 
   };
 };
 
-export const readListFiles = async (): Promise<IFileSystem[]> => {
+export const readListFiles = async (params: Record<string, string | number>): Promise<IFileSystem[]> => {
   const root = getDb().dbPath;
   let files: IFileSystem[] = [];
   const fileStrings = await _readDir(root);
@@ -158,7 +161,64 @@ export const readListFiles = async (): Promise<IFileSystem[]> => {
       files = [...files, fileObj];
     }
   }
-  return files;
+  files = files.filter((item: IFileSystem) => {
+    const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
+
+    const companyFound = getFoundEntity('company', newParams, item);
+    const appSystemFound = getFoundEntity('appSystem', newParams, item);
+    const consumerFound = getFoundEntity('consumer', newParams, item);
+    const producerFound = getFoundEntity('producer', newParams, item);
+    const deviceFound = getFoundEntity('device', newParams, item);
+    const pathFound = getFoundString('path', newParams, item);
+    const fileNameFound = getFoundString('fileName', newParams, item);
+
+    let dateFound = true;
+    if ('date' in newParams) {
+      dateFound = false;
+      if (item.date) {
+        const date = new Date(item.date || '').toLocaleString('ru', { hour12: false }).toUpperCase();
+        dateFound = date.includes((newParams.date as string).toUpperCase());
+        delete newParams['date'];
+      }
+    }
+
+    let uidFound = true;
+    if ('uid' in newParams) {
+      uidFound = false;
+      if (item.device) {
+        const uid = item.device.id.toUpperCase();
+        uidFound = uid.includes((newParams.uid as string).toUpperCase());
+        delete newParams['uid'];
+      }
+    }
+
+    /** filtering data */
+    let filteredFiles = true;
+    if ('filterText' in newParams) {
+      const filterText: string = (newParams.filterText as string).toUpperCase();
+
+      if (filterText) {
+        const fileName = item.fileName.toUpperCase();
+
+        filteredFiles = fileName.includes(filterText);
+      }
+      delete newParams['filterText'];
+    }
+
+    return (
+      companyFound &&
+      appSystemFound &&
+      consumerFound &&
+      producerFound &&
+      deviceFound &&
+      pathFound &&
+      fileNameFound &&
+      dateFound &&
+      uidFound &&
+      filteredFiles
+    );
+  });
+  return getListPart(files, params);
 };
 
 export const getFile = async (fid: string): Promise<any> => {

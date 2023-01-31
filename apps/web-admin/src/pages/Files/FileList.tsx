@@ -5,11 +5,11 @@ import CachedIcon from '@material-ui/icons/Cached';
 import FilterIcon from '@material-ui/icons/FilterAltOutlined';
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
 
-import { IDeviceLogFiles, IFileSystem } from '@lib/types';
+import { IFileSystem } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import { IHeadCells, IPageParam, IToolBarButton } from '../../types';
+import { IFileFormik, IHeadCells, IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
 import actions from '../../store/file';
@@ -22,16 +22,16 @@ const FileList = () => {
 
   const sortedList = useMemo(() => list.sort((a, b) => (a.path < b.path ? -1 : 1)), [list]);
   const fetchFiles = useCallback(
-    (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(actions.fetchFiles());
+    (filesFilters?: IFileFormik, filterText?: string, fromRecord?: number, toRecord?: number) => {
+      dispatch(actions.fetchFiles(filesFilters, filterText, fromRecord, toRecord));
     },
     [dispatch],
   );
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchFiles();
-  }, [fetchFiles]);
+    fetchFiles(pageParams?.filesFilters as IFileFormik);
+  }, [fetchFiles, pageParams?.filesFilters]);
 
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
@@ -47,17 +47,24 @@ const FileList = () => {
     // fetchDevices('');
   };
 
+  useEffect(() => {
+    if (pageParams?.filesFilters) {
+      fetchFiles(pageParams?.filesFilters as IFileFormik);
+    }
+  }, [fetchFiles, pageParams?.filesFilters]);
+
   const handleSearchClick = () => {
     dispatch(actions.fileSystemActions.setPageParam({ filterText: pageParamLocal?.filterText }));
-    fetchFiles(pageParamLocal?.filterText as string);
+    fetchFiles(
+      pageParamLocal?.filesFilters ? (pageParamLocal?.filesFilters as IFileFormik) : undefined,
+      pageParamLocal?.filterText as string,
+    );
   };
 
   const handleKeyPress = (key: string) => {
     if (key !== 'Enter') return;
 
     handleSearchClick();
-    // const inputValue = valueRef?.current?.value;
-    // fetchDevices(inputValue);
   };
 
   const handleClearError = () => {
@@ -164,7 +171,7 @@ const FileList = () => {
     {
       name: 'Обновить',
       sx: { mx: 1 },
-      onClick: () => fetchFiles(),
+      onClick: () => fetchFiles(pageParams?.filesFilters as IFileFormik),
       icon: <CachedIcon />,
     },
     {
@@ -180,20 +187,11 @@ const FileList = () => {
       icon: <DeleteIcon />,
     },
   ];
-  const headCells: IHeadCells<IDeviceLogFiles>[] = [
-    // { id: 'path', label: 'Название', sortEnable: true, filterEnable: true },
-    { id: 'company', label: 'Компания', sortEnable: true, filterEnable: true },
-    { id: 'appSystem', label: 'Подсистема', sortEnable: true, filterEnable: true },
-    { id: 'contact', label: 'Пользователь', sortEnable: true, filterEnable: true },
-    { id: 'device', label: 'Утсройство', sortEnable: false, filterEnable: true },
-    { id: 'date', label: 'Дата', sortEnable: true, filterEnable: true },
-    { id: 'size', label: 'Размер', sortEnable: true, filterEnable: false },
-  ];
 
   return (
     <>
       <Helmet>
-        <title>Журнал ошибок</title>
+        <title>Файловая система</title>
       </Helmet>
       <Box>
         <Dialog open={open} onClose={handleClose}>

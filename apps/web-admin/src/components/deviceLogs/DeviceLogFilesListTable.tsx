@@ -83,44 +83,15 @@ const DeviceLogFilesListTable = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFilterVisible]);
 
-  const filteredList = useMemo(() => {
-    if (
-      formik.values.appSystem ||
-      formik.values.company ||
-      formik.values.contact ||
-      formik.values.date ||
-      formik.values.device ||
-      formik.values.uid
-    ) {
-      return deviceLogFiles.filter(
-        (i) =>
-          (formik.values.appSystem
-            ? i.appSystem.name.toUpperCase().includes(formik.values.appSystem.toUpperCase())
-            : true) &&
-          (formik.values.company ? i.company.name.toUpperCase().includes(formik.values.company.toUpperCase()) : true) &&
-          (formik.values.contact ? i.contact.name.toUpperCase().includes(formik.values.contact.toUpperCase()) : true) &&
-          (formik.values.date
-            ? new Date(i.date || '')
-                .toLocaleString('ru', { hour12: false })
-                .toUpperCase()
-                .includes(formik.values.date.toUpperCase())
-            : true) &&
-          (formik.values.device ? i.device.name.toUpperCase().includes(formik.values.device.toUpperCase()) : true) &&
-          (formik.values.uid ? i.device.id.toUpperCase().includes(formik.values.uid.toUpperCase()) : true),
-      );
-    } else {
-      return deviceLogFiles;
-    }
-  }, [
-    deviceLogFiles,
-    formik.values.appSystem,
-    formik.values.company,
-    formik.values.contact,
-    formik.values.date,
-    formik.values.device,
+  const handleSearchClick = () => {
+    onSetPageParams({ logFilters: formik.values });
+  };
 
-    formik.values.uid,
-  ]);
+  const handleKeyPress = (key: string) => {
+    if (key !== 'Enter') return;
+
+    handleSearchClick();
+  };
 
   const handleLimitChange = useCallback(
     (event: any) => {
@@ -137,13 +108,6 @@ const DeviceLogFilesListTable = ({
     },
     [onSetPageParams, pageParams],
   );
-
-  useEffect(() => {
-    if (isFilterVisible && formik.values !== initialValues) {
-      onSetPageParams({ ...pageParams, logFilters: formik.values });
-    }
-    // }, [onSetPageParams]);
-  }, [formik.values, initialValues, isFilterVisible, onSetPageParams, pageParams]);
 
   // useEffect(() => {
   //   if (limitRows > 0) {
@@ -162,7 +126,7 @@ const DeviceLogFilesListTable = ({
   // }, [limitRows, selectedDeviceLogFileIds.length, selectedDeviceLogFiles]);
 
   const TableRows = () => {
-    const deviceLogFileList = filteredList
+    const deviceLogFileList = deviceLogFiles
       .slice(page * limit, page * limit + limit)
       .map((deviceLogFile: IDeviceLogFiles) => {
         return (
@@ -206,7 +170,7 @@ const DeviceLogFilesListTable = ({
         );
       });
 
-    const emptyRows = limit - Math.min(limit, filteredList.length - page * limit);
+    const emptyRows = limit - Math.min(limit, deviceLogFiles.length - page * limit);
 
     return (
       <>
@@ -229,10 +193,10 @@ const DeviceLogFilesListTable = ({
               <TableRow>
                 <TableCell padding="checkbox">
                   <Checkbox
-                    checked={selectedDeviceLogFiles?.length === filteredList.length}
+                    checked={selectedDeviceLogFiles?.length === deviceLogFiles.length}
                     color="primary"
                     indeterminate={
-                      selectedDeviceLogFiles.length > 0 && selectedDeviceLogFiles.length < filteredList.length
+                      selectedDeviceLogFiles.length > 0 && selectedDeviceLogFiles.length < deviceLogFiles.length
                     }
                     onChange={onSelectMany}
                   />
@@ -268,6 +232,7 @@ const DeviceLogFilesListTable = ({
                         type="search"
                         value={formik.values[item]}
                         onChange={formik.handleChange}
+                        onKeyPress={(event) => handleKeyPress(event.key)}
                       />
                     </TableCell>
                   ))}
@@ -283,7 +248,7 @@ const DeviceLogFilesListTable = ({
       </PerfectScrollbar>
       <TablePagination
         component="div"
-        count={filteredList.length}
+        count={deviceLogFiles.length}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleLimitChange}
         page={page}
