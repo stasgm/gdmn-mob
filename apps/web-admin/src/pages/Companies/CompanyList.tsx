@@ -20,6 +20,7 @@ const CompanyList = () => {
   const location = useLocation();
   const dispatch: AppDispatch = useDispatch();
   const { list, loading, errorMessage, pageParams } = useSelector((state) => state.companies);
+  const { user: authUser } = useSelector((state) => state.auth);
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
   const fetchCompanies = useCallback(
@@ -61,12 +62,24 @@ const CompanyList = () => {
   };
 
   const handleAddCompany = () => {
-    if (list.length) {
+    if (list.length && !(authUser?.role === 'SuperAdmin')) {
       dispatch(actions.companyActions.setError('Компания уже существует'));
     } else {
       return navigate(`${location.pathname}/new`);
     }
   };
+
+  const handleSetPageParams = useCallback(
+    (pageParams: IPageParam) => {
+      dispatch(
+        actions.companyActions.setPageParam({
+          page: pageParams.page,
+          limit: pageParams.limit,
+        }),
+      );
+    },
+    [dispatch],
+  );
 
   const buttons: IToolBarButton[] = [
     {
@@ -118,7 +131,13 @@ const CompanyList = () => {
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <SortableTable<ICompany> headCells={headCells} data={list} path={'/app/companies/'} />
+              <SortableTable<ICompany>
+                headCells={headCells}
+                data={list}
+                path={'/app/companies/'}
+                onSetPageParams={handleSetPageParams}
+                pageParams={pageParams}
+              />
             </Box>
           )}
         </Container>

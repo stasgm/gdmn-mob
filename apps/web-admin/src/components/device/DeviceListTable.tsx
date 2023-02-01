@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { NavLink } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -24,6 +24,7 @@ import {
 import { IDevice, IActivationCode } from '@lib/types';
 
 import { deviceStates, adminPath } from '../../utils/constants';
+import { IPageParam } from '../../types';
 
 interface IProps {
   devices: IDevice[];
@@ -33,6 +34,8 @@ interface IProps {
   onCreateCode?: (deviceId: string) => void;
   onChangeSelectedDevices?: (newSelectedDeviceIds: any[]) => void;
   onCreateUid?: (code: string, deviceId: string) => void;
+  onSetPageParams: (pageParams: IPageParam) => void;
+  pageParams?: IPageParam | undefined;
 }
 
 const DeviceListTable = ({
@@ -43,10 +46,15 @@ const DeviceListTable = ({
   limitRows = 0,
   onCreateCode,
   onCreateUid,
+  onSetPageParams,
+  pageParams,
 }: IProps) => {
   const [selectedDeviceIds, setSelectedDeviceIds] = useState<IDevice[]>(selectedDevices);
-  const [limit, setLimit] = useState(10);
-  const [page, setPage] = useState(0);
+
+  const [limit, setLimit] = useState(
+    pageParams?.limit && !isNaN(Number(pageParams?.limit)) ? Number(pageParams?.limit) : 10,
+  );
+  const [page, setPage] = useState(pageParams?.page && !isNaN(Number(pageParams?.page)) ? Number(pageParams.page) : 0);
 
   const handleSelectAll = (event: any) => {
     let newSelectedDeviceIds;
@@ -84,13 +92,21 @@ const DeviceListTable = ({
     onChangeSelectedDevices && onChangeSelectedDevices(newSelectedDeviceIds);
   };
 
-  const handleLimitChange = (event: any) => {
-    setLimit(event.target.value);
-  };
+  const handleLimitChange = useCallback(
+    (event: any) => {
+      setLimit(event.target.value);
+      onSetPageParams({ ...pageParams, limit: event.target.value });
+    },
+    [onSetPageParams, pageParams],
+  );
 
-  const handlePageChange = (_event: any, newPage: any) => {
-    setPage(newPage);
-  };
+  const handlePageChange = useCallback(
+    (_event: any, newPage: any) => {
+      setPage(newPage);
+      onSetPageParams({ ...pageParams, page: newPage });
+    },
+    [onSetPageParams, pageParams],
+  );
 
   useEffect(() => {
     if (limitRows > 0) {

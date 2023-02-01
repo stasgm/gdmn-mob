@@ -60,6 +60,8 @@ const Register = () => {
   const [captchaToken, setCaptchaToken] = useState('');
   const captchaRef = useRef(null);
 
+  const validPassword = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/);
+
   return (
     <>
       <Helmet>
@@ -203,6 +205,10 @@ const Register = () => {
             {Boolean(formik.touched.policy && formik.errors.policy) && (
               <FormHelperText error>{formik.errors.policy}</FormHelperText>
             )} */}
+            <Box style={{ color: 'GrayText' }}>
+              Пароль должен содержать не менее восьми знаков, включать буквы (заглавные и строчные), цифры и специальные
+              символы
+            </Box>
             {formik.values.password !== formik.values.verifyPassword && formik.values.verifyPassword && (
               <Box style={{ color: 'red' }}>Пароли не совпадают</Box>
             )}
@@ -230,7 +236,8 @@ const Register = () => {
                   !!formik.errors.name ||
                   !!formik.errors.verifyPassword ||
                   formik.values.password !== formik.values.verifyPassword ||
-                  (!captchaToken && Boolean(process.env.REACT_APP_SITE_KEY))
+                  (!captchaToken && Boolean(process.env.REACT_APP_SITE_KEY)) ||
+                  !validPassword.test(formik.values.password)
                 }
                 fullWidth
                 size="large"

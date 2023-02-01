@@ -77,6 +77,18 @@ const DeviceList = () => {
     fetchActivationCodes(deviceId);
   };
 
+  const handleSetPageParams = useCallback(
+    (pageParams: IPageParam) => {
+      dispatch(
+        deviceActions.setPageParam({
+          page: pageParams.page,
+          limit: pageParams.limit,
+        }),
+      );
+    },
+    [dispatch],
+  );
+
   const buttons: IToolBarButton[] = [
     {
       name: 'Обновить',
@@ -123,6 +135,8 @@ const DeviceList = () => {
                 activationCodes={activationCodes}
                 onCreateCode={handleCreateCode}
                 onCreateUid={handleCreateUid}
+                onSetPageParams={handleSetPageParams}
+                pageParams={pageParams}
               />
             </Box>
           )}

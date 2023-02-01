@@ -7,6 +7,7 @@ import * as yup from 'yup';
 import ComboBox from '../ComboBox';
 
 import { deviceStates } from '../../utils/constants';
+import { useSelector } from '../../store';
 
 interface IProps {
   loading: boolean;
@@ -27,6 +28,14 @@ export interface IDeviceFormik extends Omit<IDevice, 'state'> {
 // }
 
 const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel /*, onCreateUid*/ }: IProps) => {
+  const { list: companies, loading: loadingCompanies } = useSelector((state) => state.companies);
+
+  const { user: authUser } = useSelector((state) => state.auth);
+
+  const companyList = companies.map((d) => ({ id: d.id, name: d.name }));
+
+  const isCompanyAddRequired = authUser?.role === 'SuperAdmin';
+
   const initialValues: IDeviceFormik = {
     ...device,
     // user: deviceBinding.user || null,
@@ -44,7 +53,13 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel /*,
       // code: yup.string().required('Required'),
     }),
     onSubmit: (values) => {
-      onSubmit({ id: values.id, name: values.name, state: values.state.id, uid: values.uid } as IDevice); /*(values);*/
+      onSubmit({
+        id: values.id,
+        name: values.name,
+        state: values.state.id,
+        uid: values.uid,
+        company: values.company,
+      } as IDevice); /*(values);*/
     },
   });
 
@@ -122,6 +137,22 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel /*,
                     />
                   </Grid>
                 </Grid>
+                {isCompanyAddRequired && (
+                  <Grid item md={12} xs={12}>
+                    <Field
+                      component={ComboBox}
+                      name="company"
+                      label="Компания"
+                      type="company"
+                      options={companyList || []}
+                      setFieldValue={formik.setFieldValue}
+                      setTouched={formik.setTouched}
+                      error={Boolean(formik.touched.company && formik.errors.company)}
+                      disabled={loading || loadingCompanies}
+                      required={isCompanyAddRequired}
+                    />
+                  </Grid>
+                )}
               </Grid>
             </CardContent>
             <Divider />

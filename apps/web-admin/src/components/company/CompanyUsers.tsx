@@ -17,7 +17,6 @@ interface IProps {
 
 const CompanyUsers = ({ users }: IProps) => {
   const dispatch = useDispatch();
-  const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
   const { pageParams } = useSelector((state) => state.users);
 
@@ -34,10 +33,6 @@ const CompanyUsers = ({ users }: IProps) => {
     /* Загружаем данные при загрузке компонента */
     fetchUsers(pageParams?.filterText as string);
   }, [fetchUsers, pageParams?.filterText]);
-
-  // useEffect(() => {
-  //   fetchUsers();
-  // }, [fetchUsers]);
 
   const handleUpdateInput = (value: string) => {
     const inputValue: string = value;
@@ -60,20 +55,23 @@ const CompanyUsers = ({ users }: IProps) => {
   const handleKeyPress = (key: string) => {
     if (key !== 'Enter') return;
     handleSearchClick();
-    // const inputValue = valueRef?.current?.value;
-
-    // fetchUsers(inputValue);
   };
 
-  const userButtons: IToolBarButton[] = [
-    // {
-    //   name: 'Добавить',
-    //   color: 'primary',
-    //   variant: 'contained',
-    //   onClick: () => navigate('app/users/new'),
-    //   icon: <AddCircleOutlineIcon />,
-    // },
-  ];
+  const handleSetPageParams = useCallback(
+    (pageParams: IPageParam) => {
+      dispatch(
+        actions.userActions.setPageParam({
+          companyPage: pageParams.page,
+          companyLimit: pageParams.limit,
+        }),
+      );
+    },
+    [dispatch],
+  );
+
+  const newPageParams: IPageParam = { limit: pageParams?.companyLimit, page: pageParams?.companyPage };
+
+  const userButtons: IToolBarButton[] = [];
 
   const headCells: IHeadCells<IUser>[] = [
     { id: 'name', label: 'Пользователь', sortEnable: true },
@@ -103,7 +101,13 @@ const CompanyUsers = ({ users }: IProps) => {
         />
         <Box /*sx={{ pt: 2 }}*/>
           {/* <UserListTable users={users} /> */}
-          <SortableTable<IUser> headCells={headCells} data={users} path={'/app/users/'} />
+          <SortableTable<IUser>
+            headCells={headCells}
+            data={users}
+            path={'/app/users/'}
+            onSetPageParams={handleSetPageParams}
+            pageParams={newPageParams}
+          />
         </Box>
       </Container>
     </Box>

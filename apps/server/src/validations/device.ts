@@ -11,6 +11,9 @@ const addDevice: Config = {
       name: Joi.string().required().error(new InvalidParameterException('Не указано наименование устройства')),
       state: Joi.string().required().error(new InvalidParameterException('Не указано статус устройства')),
     }),
+    validateOptions: {
+      allowUnknown: true,
+    },
   },
 };
 

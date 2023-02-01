@@ -12,6 +12,9 @@ const addCompany: Config = {
       city: Joi.string().allow('', null),
       appSystems: Joi.array().optional(),
     }),
+    validateOptions: {
+      allowUnknown: true,
+    },
   },
 };
 
