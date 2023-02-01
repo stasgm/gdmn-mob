@@ -9,7 +9,7 @@ import { IDeviceLogFiles } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import { IDeviceLogFileFormik, IFileFormik, IHeadCells, IPageParam, IToolBarButton } from '../../types';
+import { IDeviceLogFileFormik, IHeadCells, IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
 import DeviceLogFilesListTable from '../../components/deviceLogs/DeviceLogFilesListTable';
@@ -141,6 +141,14 @@ const DeviceLogFilesList = () => {
     }
   }, [dispatch, selectedDeviceLogFileIds]);
 
+  const handleClearSearch = () => {
+    dispatch(actions.deviceLogActions.setPageParam({ filterText: undefined }));
+    setPageParamLocal({ filterText: undefined });
+    fetchDeviceLogFiles(
+      pageParamLocal?.logFilters ? (pageParamLocal?.filesFilters as IDeviceLogFileFormik) : undefined,
+    );
+  };
+
   const buttons: IToolBarButton[] = [
     {
       name: 'Обновить',
@@ -208,6 +216,7 @@ const DeviceLogFilesList = () => {
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
             value={(pageParamLocal?.filterText as undefined) || ''}
+            clearOnClick={handleClearSearch}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />

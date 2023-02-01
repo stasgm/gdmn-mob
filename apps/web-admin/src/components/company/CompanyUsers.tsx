@@ -57,6 +57,12 @@ const CompanyUsers = ({ users }: IProps) => {
     handleSearchClick();
   };
 
+  const handleClearSearch = () => {
+    dispatch(actions.userActions.setPageParam({ filterText: undefined }));
+    setPageParamLocal({ filterText: undefined });
+    fetchUsers();
+  };
+
   const handleSetPageParams = useCallback(
     (pageParams: IPageParam) => {
       dispatch(
@@ -98,6 +104,7 @@ const CompanyUsers = ({ users }: IProps) => {
           searchOnClick={handleSearchClick}
           keyPress={handleKeyPress}
           value={(pageParamLocal?.filterText as undefined) || ''}
+          clearOnClick={handleClearSearch}
         />
         <Box /*sx={{ pt: 2 }}*/>
           {/* <UserListTable users={users} /> */}

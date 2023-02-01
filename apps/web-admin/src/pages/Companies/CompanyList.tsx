@@ -57,6 +57,12 @@ const CompanyList = () => {
     handleSearchClick();
   };
 
+  const handleClearSearch = () => {
+    dispatch(actions.companyActions.setPageParam({ filterText: undefined }));
+    setPageParamLocal({ filterText: undefined });
+    fetchCompanies();
+  };
+
   const handleClearError = () => {
     dispatch(actions.companyActions.clearError());
   };
@@ -126,6 +132,7 @@ const CompanyList = () => {
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
             value={(pageParamLocal?.filterText as undefined) || ''}
+            clearOnClick={handleClearSearch}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />

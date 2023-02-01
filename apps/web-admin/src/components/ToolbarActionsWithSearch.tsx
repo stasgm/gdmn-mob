@@ -1,6 +1,6 @@
 import { Box, Card, TextField, InputAdornment, IconButton } from '@material-ui/core';
 
-import { Search as SearchIcon } from 'react-feather';
+import { Search as SearchIcon, X as ClearIcon } from 'react-feather';
 
 import { IToolBarButton } from '../types';
 
@@ -12,6 +12,7 @@ interface IProps {
   //valueRef: any;
   updateInput: (value: string) => void;
   searchOnClick: () => void;
+  clearOnClick?: () => void;
   keyPress: (key: string) => void;
   value?: string;
 }
@@ -21,6 +22,7 @@ const ToolbarActionsWithSearch = ({
   searchTitle,
   updateInput,
   searchOnClick,
+  clearOnClick,
   keyPress,
   //valueRef,
   value,
@@ -47,12 +49,19 @@ const ToolbarActionsWithSearch = ({
                   </IconButton>
                 </InputAdornment>
               ),
+              endAdornment: value ? (
+                <InputAdornment position="end" onClick={clearOnClick}>
+                  <IconButton>
+                    <ClearIcon fontSize="small" />
+                  </IconButton>
+                </InputAdornment>
+              ) : null,
             }}
             placeholder={searchTitle}
             variant="outlined"
             onChange={(event) => updateInput(event.target.value)}
             onKeyPress={(event) => keyPress(event.key)}
-            type="search"
+            type="text"
             //inputRef={valueRef}
             value={value || ''}
           />

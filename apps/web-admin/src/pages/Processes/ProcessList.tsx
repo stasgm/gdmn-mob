@@ -58,6 +58,12 @@ const ProcessList = () => {
     handleSearchClick();
   };
 
+  const handleClearSearch = () => {
+    dispatch(actions.setPageParam({ filterText: undefined }));
+    setPageParamLocal({ filterText: undefined });
+    fetchProcesses();
+  };
+
   const buttons: IToolBarButton[] = [
     {
       name: 'Обновить',
@@ -87,6 +93,7 @@ const ProcessList = () => {
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
             value={(pageParamLocal?.filterText as undefined) || ''}
+            clearOnClick={handleClearSearch}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />

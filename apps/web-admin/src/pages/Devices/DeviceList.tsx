@@ -66,6 +66,12 @@ const DeviceList = () => {
     handleSearchClick();
   };
 
+  const handleClearSearch = () => {
+    dispatch(deviceActions.setPageParam({ filterText: undefined }));
+    setPageParamLocal({ filterText: undefined });
+    fetchDevices();
+  };
+
   const handleCreateCode = (deviceId: string) => {
     dispatch(codeActions.createActivationCode(deviceId));
     fetchActivationCodes(deviceId);
@@ -125,6 +131,7 @@ const DeviceList = () => {
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
             value={(pageParamLocal?.filterText as undefined) || ''}
+            clearOnClick={handleClearSearch}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />

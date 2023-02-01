@@ -146,9 +146,12 @@ const DeviceView = () => {
     if (key !== 'Enter') return;
 
     handleSearchClick();
-    // const inputValue = valueRef?.current?.value;
+  };
 
-    // fetchUsers(inputValue);
+  const handleClearSearch = () => {
+    dispatch(userActions.userActions.setPageParam({ filterText: undefined }));
+    setPageParamLocal({ filterText: undefined });
+    fetchUsers();
   };
 
   const userButtons: IToolBarButton[] = [
@@ -277,6 +280,7 @@ const DeviceView = () => {
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
             value={(pageParamLocal?.filterText as undefined) || ''}
+            clearOnClick={handleClearSearch}
           />
           <Box /*sx={{ pt: 2 }}*/>
             <SortableTable<IUser> headCells={headCells} data={users} path={'/app/users/'} />

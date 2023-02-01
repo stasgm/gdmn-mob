@@ -163,6 +163,12 @@ const FileList = () => {
     }
   }, [dispatch, selectedFileIds]);
 
+  const handleClearSearch = () => {
+    dispatch(actions.fileSystemActions.setPageParam({ filterText: undefined }));
+    setPageParamLocal({ filterText: undefined });
+    fetchFiles(pageParamLocal?.filesFilters ? (pageParamLocal?.filesFilters as IFileFormik) : undefined);
+  };
+
   const buttons: IToolBarButton[] = [
     {
       name: 'Обновить',
@@ -220,6 +226,7 @@ const FileList = () => {
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
             value={(pageParamLocal?.filterText as undefined) || ''}
+            clearOnClick={handleClearSearch}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
