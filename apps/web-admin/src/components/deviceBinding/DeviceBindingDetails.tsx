@@ -6,10 +6,13 @@ import * as yup from 'yup';
 
 import { useEffect } from 'react';
 
+import { useNavigate } from 'react-router';
+
 import ComboBox from '../ComboBox';
-import { deviceStates } from '../../utils/constants';
+import { adminPath, deviceStates } from '../../utils/constants';
 import { useDispatch, useSelector } from '../../store';
 import deviceActions from '../../store/device';
+import FieldWithIcon from '../FiledWithIcon';
 
 interface IProps {
   loading: boolean;
@@ -41,6 +44,7 @@ const DeviceBindingDetails = ({ deviceBinding, loading, onSubmit, onCancel }: IP
   //     unmounted = true;
   //   };
   // }, []);
+  const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
@@ -96,16 +100,17 @@ const DeviceBindingDetails = ({ deviceBinding, loading, onSubmit, onCancel }: IP
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <Field
-                    component={ComboBox}
-                    name="device"
+                  <FieldWithIcon
                     label="Устройство"
+                    name="deivce"
                     type="device"
                     options={devices?.map((d) => ({ id: d.id, name: d.name })) || []}
                     setFieldValue={formik.setFieldValue}
                     setTouched={formik.setTouched}
                     error={Boolean(formik.touched.device && formik.errors.device)}
+                    onButtonClick={() => navigate(`${adminPath}/app/devices/new`)}
                     disabled={loading || loadingDevices}
+                    toolipTitle="Создать устройство"
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>

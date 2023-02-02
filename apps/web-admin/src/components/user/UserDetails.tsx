@@ -27,7 +27,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
   const [open, setOpen] = useState(false);
   const [userERP, setUserERP] = useState(user.appSystem ? true : false);
 
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(user.role === 'Admin');
 
   // const [appSystems, setAppSystems] = useState<INamedEntity[] | undefined>([]);
   // const [loadingAppSystems, setLoadingAppSystems] = useState(true);
@@ -166,7 +166,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
           <Card sx={{ p: 1 }}>
             <CardContent>
               <Grid container spacing={3}>
-                {authUser?.role === 'SuperAdmin' && (
+                {authUser?.role === 'SuperAdmin' && user.role !== 'User' && (
                   <>
                     <Grid item md={isAdmin ? 12 : 6} xs={12}>
                       <Checkbox
@@ -350,7 +350,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                         }
                         fullWidth
                         required={userERP || (user.role && user.role !== 'User') || isAdmin ? false : true}
-                        label="Идентификатор из ERP системы"
+                        label="ID из ERP системы"
                         name="externalId"
                         variant="outlined"
                         onBlur={formik.handleBlur}
