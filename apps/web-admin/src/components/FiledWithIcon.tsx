@@ -1,4 +1,4 @@
-import { Grid, Button, Tooltip } from '@material-ui/core';
+import { Grid, Button, Tooltip, Box } from '@material-ui/core';
 import { PlusSquare as AddIcon } from 'react-feather';
 
 import { Field } from 'formik';
@@ -39,7 +39,7 @@ const FieldWithIcon = ({
 }: IProps) => {
   return (
     <Grid container>
-      <Grid item xs={10} sm={10}>
+      <Box style={{ flexGrow: 1 }}>
         <Field
           {...field}
           component={ComboBox}
@@ -51,22 +51,14 @@ const FieldWithIcon = ({
           setTouched={setTouched}
           error={error}
           disabled={disabled}
+          fullWidth
         />
-      </Grid>
-      <Grid item xs={2} sm={2}>
-        <Tooltip title={toolipTitle}>
-          <Button
-            color="primary"
-            disabled={disabled}
-            onClick={onButtonClick}
-            variant="outlined"
-            sx={{ height: 55 }}
-            fullWidth
-          >
-            <AddIcon />
-          </Button>
-        </Tooltip>
-      </Grid>
+      </Box>
+      <Tooltip title={toolipTitle}>
+        <Button color="primary" disabled={disabled} onClick={onButtonClick} variant="outlined" sx={{ height: 55 }}>
+          <AddIcon />
+        </Button>
+      </Tooltip>
     </Grid>
   );
 };
