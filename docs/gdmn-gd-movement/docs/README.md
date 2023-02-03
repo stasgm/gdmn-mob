@@ -158,7 +158,6 @@
 
 <img src="img/7.Remains/7.Goods.jpg" alt="drawing" height="400"/> <img src="img/7.Remains/7.GoodsFiltr.jpg" alt="drawing" height="300"/>
 
-
 ## 6. Документы
 
 ### Cоздание документа
