@@ -7,11 +7,11 @@ import { useTheme } from '@react-navigation/native';
 
 import { INamedEntity } from '@lib/types';
 
+import Checkbox from '@lib/mobile-ui/src/components/Checkbox';
+
 import { IOrderLine, IPackageGood } from '../../../store/types';
 
 import { ONE_SECOND_IN_MS } from '../../../utils/constants';
-
-import Checkbox from '@lib/mobile-ui/src/components/Checkbox';
 
 interface IProps {
   item: IOrderLine;

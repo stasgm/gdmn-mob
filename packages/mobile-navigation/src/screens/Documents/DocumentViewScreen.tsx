@@ -10,12 +10,13 @@ import { useSelector } from '@lib/store';
 
 import { MenuButton, useActionSheet, ItemSeparator, navBackButton } from '@lib/mobile-ui';
 
+import { keyExtractorByIndex } from '@lib/mobile-hooks';
+
 import { DocumentsTabsStackParamsList } from '../../navigation/Root/types';
 
 import { styles } from './styles';
 import Header from './components/Header';
 import DocumentLine from './components/DocumentLine';
-import { keyExtractorByIndex } from '@lib/mobile-hooks';
 
 type typeValue = 'number' | 'date' | 'INamedEntity' | 'string';
 

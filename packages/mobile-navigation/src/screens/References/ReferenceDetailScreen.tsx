@@ -8,10 +8,11 @@ import { refSelectors } from '@lib/store';
 
 import { IReferenceData } from '@lib/types';
 
+import { keyExtractorByIndex } from '@lib/mobile-hooks';
+
 import { ReferenceStackParamList } from '../../navigation/Root/types';
 
 import { styles } from './styles';
-import { keyExtractorByIndex } from '@lib/mobile-hooks';
 
 interface IProperty {
   sortOrder: number;
