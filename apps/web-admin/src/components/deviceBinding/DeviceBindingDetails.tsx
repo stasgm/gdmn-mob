@@ -26,24 +26,8 @@ export interface IDeviceBindingFormik extends Omit<IDeviceBinding, 'state'> {
 }
 
 const DeviceBindingDetails = ({ deviceBinding, loading, onSubmit, onCancel }: IProps) => {
-  // const [devices, setDevices] = useState<INamedEntity[]>([]);
   const { list: devices, loading: loadingDevices } = useSelector((state) => state.devices);
-  // const [loadingDevices, setLoadingDevices] = useState(true);
 
-  // useEffect(() => {
-  //   let unmounted = false;
-  //   const getDevices = async () => {
-  //     const res = await api.device.getDevices();
-  //     if (res.type === 'GET_DEVICES' && !unmounted) {
-  //       setDevices(res.devices.map((d) => ({ id: d.id, name: d.name })));
-  //       setLoadingDevices(false);
-  //     }
-  //   };
-  //   getDevices();
-  //   return () => {
-  //     unmounted = true;
-  //   };
-  // }, []);
   const navigate = useNavigate();
 
   const dispatch = useDispatch();

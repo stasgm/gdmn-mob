@@ -15,7 +15,6 @@ interface IProps {
   activationCode?: string;
   onSubmit: (values: IDevice) => void;
   onCancel: () => void;
-  //onCreateUid?: (code: string) => void;
 }
 
 export interface IDeviceFormik extends Omit<IDevice, 'state'> {
@@ -23,11 +22,7 @@ export interface IDeviceFormik extends Omit<IDevice, 'state'> {
   code: string;
 }
 
-// export interface IActivationCodeFormik extends Omit<IActivationCode, 'code'> {
-//   code: INamedEntity;
-// }
-
-const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel /*, onCreateUid*/ }: IProps) => {
+const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel }: IProps) => {
   const { list: companies, loading: loadingCompanies } = useSelector((state) => state.companies);
 
   const { user: authUser } = useSelector((state) => state.auth);
@@ -38,8 +33,6 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel /*,
 
   const initialValues: IDeviceFormik = {
     ...device,
-    // user: deviceBinding.user || null,
-    // device: deviceBinding.device || null,
     state: { id: device.state, name: deviceStates[device.state] },
     code: activationCode || '',
   };
@@ -50,7 +43,6 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel /*,
     validationSchema: yup.object().shape({
       name: yup.string().required('Required'),
       state: yup.object().required('Required'),
-      // code: yup.string().required('Required'),
     }),
     onSubmit: (values) => {
       onSubmit({
@@ -59,7 +51,7 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel /*,
         state: values.state.id,
         uid: values.uid,
         company: values.company,
-      } as IDevice); /*(values);*/
+      } as IDevice);
     },
   });
 
@@ -110,7 +102,6 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel /*,
                     fullWidth
                     label="Код активации"
                     name="code"
-                    // required
                     variant="outlined"
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
@@ -119,15 +110,13 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel /*,
                     value={formik.values.code}
                   />
                 </Grid>
-                {/* <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}> */}
-                <Grid container direction="row" item /*md={6}*/ xs={12}>
+                <Grid container direction="row" item xs={12}>
                   <Grid item md={12} xs={12}>
                     <TextField
                       error={formik.touched.uid && Boolean(formik.errors.uid)}
                       fullWidth
                       label="Номер"
                       name="uid"
-                      // required
                       variant="outlined"
                       onBlur={formik.handleBlur}
                       onChange={formik.handleChange}

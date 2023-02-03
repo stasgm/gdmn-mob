@@ -1,15 +1,12 @@
 import { Box, Container } from '@material-ui/core';
 import { useCallback, useEffect, useRef, useState } from 'react';
-// import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import { IUser } from '@lib/types';
 
 import SortableTable from '../../components/SortableTable';
-// import UserListTable from '../../components/user/UserListTable';
 import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
 import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
 import { useDispatch, useSelector } from '../../store';
 import actions from '../../store/user';
-import companyActions from '../../store/company';
 
 interface IProps {
   users: IUser[];
@@ -47,9 +44,6 @@ const CompanyUsers = ({ users }: IProps) => {
   const handleSearchClick = () => {
     dispatch(actions.userActions.setPageParam({ filterText: pageParamLocal?.filterText }));
     fetchUsers(pageParamLocal?.filterText as string);
-    // const inputValue = valueRef?.current?.value;
-
-    // fetchUsers(inputValue);
   };
 
   const handleKeyPress = (key: string) => {
@@ -99,15 +93,13 @@ const CompanyUsers = ({ users }: IProps) => {
         <ToolbarActionsWithSearch
           buttons={userButtons}
           searchTitle={'Найти пользователя'}
-          // valueRef={valueRef}
           updateInput={handleUpdateInput}
           searchOnClick={handleSearchClick}
           keyPress={handleKeyPress}
           value={(pageParamLocal?.filterText as undefined) || ''}
           clearOnClick={handleClearSearch}
         />
-        <Box /*sx={{ pt: 2 }}*/>
-          {/* <UserListTable users={users} /> */}
+        <Box>
           <SortableTable<IUser>
             headCells={headCells}
             data={users}

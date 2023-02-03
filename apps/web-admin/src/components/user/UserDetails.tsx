@@ -6,20 +6,16 @@ import { INamedEntity, IUser, IUserCredentials, NewUser } from '@lib/types';
 import { FormikTouched, useFormik, Field, FormikProvider } from 'formik';
 import * as yup from 'yup';
 
-import api from '@lib/client-api';
-
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 
 import ComboBox from '../ComboBox';
-import companyActions from '../../store/company';
-import userActions from '../../store/user';
-import { useDispatch, useSelector } from '../../store';
+import { useSelector } from '../../store';
 
 interface IProps {
   loading: boolean;
   user: IUser | NewUser;
   onSubmit: (values: IUser | NewUser) => void;
-  onSubmitAdmin: (values: IUserCredentials) => void;
+  onSubmitAdmin?: (values: IUserCredentials) => void;
   onCancel: () => void;
 }
 
@@ -28,12 +24,6 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
   const [userERP, setUserERP] = useState(user.appSystem ? true : false);
 
   const [isAdmin, setIsAdmin] = useState(user.role === 'Admin');
-
-  // const [appSystems, setAppSystems] = useState<INamedEntity[] | undefined>([]);
-  // const [loadingAppSystems, setLoadingAppSystems] = useState(true);
-
-  // const [users, setUsers] = useState<INamedEntity[]>([]);
-  // const [loadingUsers, setLoadingUsers] = useState(true);
 
   const { list: companies, loading: loadingСompanies } = useSelector((state) => state.companies);
   const { list: users, loading: loadingUsers } = useSelector((state) => state.users);
@@ -47,43 +37,6 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
   }, [users]);
 
   const companyList = companies.map((d) => ({ id: d.id, name: d.name }));
-  // useEffect(() => {
-  //   let unmounted = false;
-  //   const getCompanies = async () => {
-  //     const res = await api.company.getCompanies();
-  //     if (res.type === 'GET_COMPANIES' && !unmounted) {
-  //       const companyAppSystems = res.companies.map((d) => ({ appSystems: d.appSystems }));
-  //       setAppSystems(companyAppSystems[0].appSystems);
-  //       setLoadingAppSystems(false);
-  //     }
-  //   };
-  //   getCompanies();
-  //   return () => {
-  //     unmounted = true;
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   let unmounted = false;
-  //   const getUsers = async () => {
-  //     const res = await api.user.getUsers();
-  //     if (res.type === 'GET_USERS' && !unmounted) {
-  //       setUsers(res.users.filter((i) => i.appSystem).map((d) => ({ id: d.id, name: d.name })));
-  //       setLoadingUsers(false);
-  //     }
-  //   };
-  //   getUsers();
-  //   return () => {
-  //     unmounted = true;
-  //   };
-  // }, []);
-
-  // const dispatch = useDispatch();
-
-  // useEffect(() => {
-  //   dispatch(companyActions.fetchCompanies());
-  //   dispatch(userActions.fetchUsers());
-  // }, []);
 
   const formik = useFormik<IUser | NewUser | IUserCredentials>({
     enableReinitialize: true,
@@ -119,7 +72,8 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
     }),
     onSubmit: (values) => {
       isAdmin
-        ? onSubmitAdmin({ ...values, name: values.name.trim(), password: (values as IUserCredentials).password.trim() })
+        ? onSubmitAdmin &&
+          onSubmitAdmin({ ...values, name: values.name.trim(), password: (values as IUserCredentials).password.trim() })
         : onSubmit({
             ...values,
             name: values.name.trim(),
@@ -461,13 +415,6 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                     </Button>
                   )}
                 </Grid>
-                {/* <Grid display={open ? 'block' : 'none'}>
-                  {Object.keys(user).length != 0 && (
-                    <Button color="primary" disabled={loading} onClick={handleClickClose} sx={{ m: 1 }}>
-                      <NoEncryptionOutlinedIcon style={{ height: 18 }} /> Отменить смену пароля
-                    </Button>
-                  )}
-                </Grid> */}
               </Grid>
             </>
           </Card>

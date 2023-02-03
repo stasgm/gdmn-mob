@@ -154,10 +154,7 @@ const DeviceBindingListTable = ({
               <Box>
                 {onCreateUid && (
                   <Tooltip title="Создать номер">
-                    <Button
-                      // component={RouterLink}
-                      onClick={() => onCreateUid && code && device && onCreateUid(code, device?.id)}
-                    >
+                    <Button onClick={() => onCreateUid && code && device && onCreateUid(code, device?.id)}>
                       <RefreshIcon />
                     </Button>
                   </Tooltip>
@@ -173,10 +170,7 @@ const DeviceBindingListTable = ({
               <Box>
                 {onCreateCode && (
                   <Tooltip title="Создать код">
-                    <Button
-                      // component={RouterLink}
-                      onClick={() => onCreateCode(binding.device.id)}
-                    >
+                    <Button onClick={() => onCreateCode(binding.device.id)}>
                       <RefreshIcon />
                     </Button>
                   </Tooltip>

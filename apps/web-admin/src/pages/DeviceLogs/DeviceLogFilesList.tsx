@@ -56,8 +56,6 @@ const DeviceLogFilesList = () => {
     if (key !== 'Enter') return;
 
     handleSearchClick();
-    // const inputValue = valueRef?.current?.value;
-    // fetchDevices(inputValue);
   };
 
   const handleSetPageParams = useCallback(
@@ -171,7 +169,6 @@ const DeviceLogFilesList = () => {
   ];
 
   const headCells: IHeadCells<IDeviceLogFiles>[] = [
-    // { id: 'path', label: 'Название', sortEnable: true, filterEnable: true },
     { id: 'company', label: 'Компания', sortEnable: true, filterEnable: true },
     { id: 'appSystem', label: 'Подсистема', sortEnable: true, filterEnable: true },
     { id: 'contact', label: 'Пользователь', sortEnable: true, filterEnable: true },
@@ -211,7 +208,6 @@ const DeviceLogFilesList = () => {
           <ToolbarActionsWithSearch
             buttons={buttons}
             searchTitle={'Найти файл'}
-            //valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}

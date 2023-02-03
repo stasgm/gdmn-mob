@@ -155,35 +155,28 @@ const DeviceListTable = ({
               </NavLink>
             </Box>
           </TableCell>
-          {/* <TableCell>{device.uid}</TableCell> */}
           <TableCell>
             <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
               <Box>
                 {onCreateUid && (
                   <Tooltip title="Создать номер">
-                    <Button
-                      // component={RouterLink}
-                      onClick={() => onCreateUid && code && onCreateUid(code, device.id)} //formik.values.code
-                    >
+                    <Button onClick={() => onCreateUid && code && onCreateUid(code, device.id)}>
                       <RefreshIcon />
                     </Button>
                   </Tooltip>
                 )}
               </Box>
-              <Box /*style={{ width: '275px' }}*/>{device.uid}</Box>
+              <Box>{device.uid}</Box>
             </Box>
           </TableCell>
           <TableCell>{deviceStates[device.state]}</TableCell>
           <TableCell>
             <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-              <Box style={{ width: '40px' }}>{/*activationCodes.find((a) => a.device.id === device.id)?.*/ code}</Box>
+              <Box style={{ width: '40px' }}>{code}</Box>
               <Box>
                 {onCreateCode && (
                   <Tooltip title="Создать код">
-                    <Button
-                      // component={RouterLink}
-                      onClick={() => onCreateCode(device.id)}
-                    >
+                    <Button onClick={() => onCreateCode(device.id)}>
                       <RefreshIcon />
                     </Button>
                   </Tooltip>

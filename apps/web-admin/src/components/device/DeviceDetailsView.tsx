@@ -4,10 +4,6 @@ import { IDevice } from '@lib/types';
 
 import { deviceStates } from '../../utils/constants';
 
-/* import activationCode from '../../store/activationCode';*/
-
-/*import { activationCodes } from '@lib/mock';*/
-
 interface IProps {
   device: IDevice;
   activationCode?: string;
@@ -60,7 +56,6 @@ const DeviceDetailsView = ({ device, activationCode }: IProps) => {
               <Grid item md={10} xs={6}>
                 <Typography variant="h4" gutterBottom>
                   {activationCode}
-                  {/*activationCode.code*/}
                 </Typography>
               </Grid>
             </Grid>

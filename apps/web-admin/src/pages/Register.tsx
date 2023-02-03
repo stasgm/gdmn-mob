@@ -121,34 +121,9 @@ const Register = () => {
               value={formik.values.name}
               variant="outlined"
             />
-            {/* <TextField
-              error={Boolean(formik.touched.firstName && formik.errors.firstName)}
-              fullWidth
-              helperText={formik.touched.firstName && formik.errors.firstName}
-              label="Имя"
-              margin="normal"
-              name="firstName"
-              onBlur={formik.handleBlur}
-              onChange={formik.handleChange}
-              value={formik.values.firstName}
-              variant="outlined"
-            />
-            <TextField
-              error={Boolean(formik.touched.lastName && formik.errors.lastName)}
-              fullWidth
-              helperText={formik.touched.lastName && formik.errors.lastName}
-              label="Фамилия"
-              margin="normal"
-              name="lastName"
-              onBlur={formik.handleBlur}
-              onChange={formik.handleChange}
-              value={formik.values.lastName}
-              variant="outlined"
-            />*/}
             <TextField
               error={Boolean(formik.touched.email && formik.errors.email)}
               fullWidth
-              // helperText={formik.touched.email && formik.errors.email}
               label="Email"
               margin="normal"
               name="email"

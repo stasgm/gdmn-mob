@@ -24,7 +24,6 @@ const ToolbarActionsWithSearch = ({
   searchOnClick,
   clearOnClick,
   keyPress,
-  //valueRef,
   value,
 }: IProps) => {
   return (
@@ -39,7 +38,6 @@ const ToolbarActionsWithSearch = ({
         <Box sx={{ maxWidth: 500, minWidth: 200, flexGrow: 1, alignSelf: 'center' }}>
           <TextField
             fullWidth
-            // size='small'
             sx={{ p: 2 }}
             InputProps={{
               startAdornment: (
@@ -62,7 +60,6 @@ const ToolbarActionsWithSearch = ({
             onChange={(event) => updateInput(event.target.value)}
             onKeyPress={(event) => keyPress(event.key)}
             type="text"
-            //inputRef={valueRef}
             value={value || ''}
           />
         </Box>

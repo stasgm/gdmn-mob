@@ -27,23 +27,6 @@ const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
   const adminList = users.filter((i) => i.role === 'Admin' && !i.company).map((d) => ({ id: d.id, name: d.name }));
 
   const isAdminRequired = authUser?.role === 'SuperAdmin' && !company.admin;
-  // const [appSystems, setAppSystems] = useState<INamedEntity[]>([]);
-  // const [loadingAppSystems, setLoadingAppSystems] = useState(true);
-
-  // useEffect(() => {
-  //   let unmounted = false;
-  //   const getAppSystems = async () => {
-  //     const res = await api.appSystem.getAppSystems();
-  //     if (res.type === 'GET_APP_SYSTEMS' && !unmounted) {
-  //       setAppSystems(res.appSystems.map((d) => ({ id: d.id, name: d.name })));
-  //       setLoadingAppSystems(false);
-  //     }
-  //   };
-  //   getAppSystems();
-  //   return () => {
-  //     unmounted = true;
-  //   };
-  // }, []);
 
   const dispatch = useDispatch();
 
