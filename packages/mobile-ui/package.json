@@ -23,7 +23,7 @@
     "@expo/vector-icons": "^13.0.0",
     "@expo/webpack-config": "^0.17.3",
     "@gorhom/bottom-sheet": "^4.4.5",
-    "@types/node": "^18.11.14",
+    "@types/node": "^18.11.19",
     "@types/react-native": "0.70.8",
     "expo-camera": "^13.1.0",
     "mathjs": "^11.5.1",

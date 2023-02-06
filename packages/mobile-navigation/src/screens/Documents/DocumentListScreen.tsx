@@ -19,8 +19,9 @@ import { useRoute, RouteProp } from '@react-navigation/native';
 import { DocumentsTabsStackParamsList } from '../../navigation/Root/types'; */
 
 // import { styles } from './styles';
-import DocumentItem from './components/DocumentItem';
 import { keyExtractorByIndex } from '@lib/mobile-hooks';
+
+import DocumentItem from './components/DocumentItem';
 
 const DocumentListScreen = () => {
   const { list, loading } = useSelector((state) => state.documents);

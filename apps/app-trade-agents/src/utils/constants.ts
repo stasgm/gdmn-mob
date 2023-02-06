@@ -7,7 +7,7 @@ export const ONE_SECOND_IN_MS = 1000;
 const statusColors = ['#E91E63', '#06567D', '#80B12C', '#FFA700'] as const;
 
 export const getStatusColor = (status: StatusType) => {
-  let statusColor: typeof statusColors[number];
+  let statusColor: (typeof statusColors)[number];
 
   switch (status) {
     case 'DRAFT':
