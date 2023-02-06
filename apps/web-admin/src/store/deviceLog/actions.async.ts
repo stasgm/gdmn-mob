@@ -7,14 +7,14 @@ import { AppState } from '..';
 
 import { webRequest } from '../webRequest';
 
-import { IDeviceLogFileFormik } from '../../types';
+import { IDeviceLogFileFilter } from '../../types';
 
 import { deviceLogActions, DeviceLogActionType } from './actions';
 
 export type AppThunk = ThunkAction<Promise<DeviceLogActionType>, AppState, null, DeviceLogActionType>;
 
 const fetchDeviceLogFiles = (
-  logFilters?: IDeviceLogFileFormik,
+  logFilters?: IDeviceLogFileFilter,
   filterText?: string,
   fromRecord?: number,
   toRecord?: number,

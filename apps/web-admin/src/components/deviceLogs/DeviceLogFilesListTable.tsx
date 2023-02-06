@@ -21,7 +21,7 @@ import { IDeviceLogFiles } from '@lib/types';
 import { useFormik } from 'formik';
 
 import { adminPath } from '../../utils/constants';
-import { IDeviceLogFileFormik, IPageParam } from '../../types';
+import { IDeviceLogFileFilter, IDeviceLogPageParam, IPageParam } from '../../types';
 
 interface IProps {
   deviceLogFiles: IDeviceLogFiles[];
@@ -34,7 +34,7 @@ interface IProps {
   onSelectOne: (_event: any, file: IDeviceLogFiles) => void;
   onSelectMany: (event: any) => void;
   onSetPageParams: (logFilters: IPageParam) => void;
-  pageParams?: IPageParam | undefined;
+  pageParams?: IDeviceLogPageParam | undefined;
 }
 
 const DeviceLogFilesListTable = ({
@@ -68,9 +68,9 @@ const DeviceLogFilesListTable = ({
 
   const navigate = useNavigate();
 
-  const formik = useFormik<IDeviceLogFileFormik>({
+  const formik = useFormik<IDeviceLogFileFilter>({
     enableReinitialize: true,
-    initialValues: pageParams?.logFilters ? (pageParams?.logFilters as IDeviceLogFileFormik) : initialValues,
+    initialValues: pageParams?.logFilters || initialValues,
     onSubmit: (values) => {
       onSubmit(values);
     },

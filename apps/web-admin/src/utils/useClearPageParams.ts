@@ -15,28 +15,51 @@ import userActions from '../store/user';
 
 import { adminPath } from './constants';
 
+const cutPathName = (str: string) => {
+  const strWithoutAdminPath = str.replace(adminPath + '/app/', '');
+  return strWithoutAdminPath.substring(0, strWithoutAdminPath.indexOf('/')) || strWithoutAdminPath;
+};
+
 const useClearPageParams = () => {
   const browserHistory = createBrowserHistory();
   const [history, setHistory] = useState(browserHistory.location.pathname);
 
   const dispatch = useDispatch();
 
-  const cutPathName = (str: string) => {
-    const strWithoutAdminPath = str.replace(adminPath + '/app/', '');
-    const newStr = strWithoutAdminPath.substring(0, strWithoutAdminPath.indexOf('/')) || strWithoutAdminPath;
-    return newStr;
-  };
-
   useEffect(() => {
     if (cutPathName(history) !== cutPathName(browserHistory.location.pathname)) {
-      dispatch(appSystemActions.clearPageParams());
-      dispatch(companyActions.companyActions.clearPageParams());
-      dispatch(deviceActions.clearPageParams());
-      dispatch(deviceBindingActions.deviceBindingActions.clearPageParams());
-      dispatch(deviceLogActions.deviceLogActions.clearPageParams());
-      dispatch(fileActions.fileSystemActions.clearPageParams());
-      dispatch(processActions.clearPageParams());
-      dispatch(userActions.userActions.clearPageParams());
+      switch (cutPathName(history)) {
+        case 'appSystems': {
+          dispatch(appSystemActions.clearPageParams());
+          break;
+        }
+        case 'companies': {
+          dispatch(companyActions.companyActions.clearPageParams());
+          break;
+        }
+        case 'devices': {
+          dispatch(deviceActions.clearPageParams());
+          dispatch(deviceBindingActions.deviceBindingActions.clearPageParams());
+          break;
+        }
+        case 'deviceLogs': {
+          dispatch(deviceLogActions.deviceLogActions.clearPageParams());
+          break;
+        }
+        case 'files': {
+          dispatch(fileActions.fileSystemActions.clearPageParams());
+          break;
+        }
+        case 'processes': {
+          dispatch(processActions.clearPageParams());
+          break;
+        }
+        case 'users': {
+          dispatch(userActions.userActions.clearPageParams());
+          dispatch(deviceBindingActions.deviceBindingActions.clearPageParams());
+          break;
+        }
+      }
       setHistory(browserHistory.location.pathname);
     }
   }, [dispatch, browserHistory.location.pathname, history]);

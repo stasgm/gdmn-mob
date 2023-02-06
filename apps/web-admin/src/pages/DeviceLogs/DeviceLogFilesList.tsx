@@ -9,7 +9,7 @@ import { IDeviceLogFiles } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import { IDeviceLogFileFormik, IHeadCells, IPageParam, IToolBarButton } from '../../types';
+import { IDeviceLogFileFilter, IDeviceLogPageParam, IHeadCells, IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
 import DeviceLogFilesListTable from '../../components/deviceLogs/DeviceLogFilesListTable';
@@ -21,7 +21,7 @@ const DeviceLogFilesList = () => {
   const { filesList, loading, errorMessage, pageParams } = useSelector((state) => state.deviceLogs);
 
   const fetchDeviceLogFiles = useCallback(
-    (logFilters?: IDeviceLogFileFormik, filterText?: string, fromRecord?: number, toRecord?: number) => {
+    (logFilters?: IDeviceLogFileFilter, filterText?: string, fromRecord?: number, toRecord?: number) => {
       dispatch(actions.fetchDeviceLogFiles(logFilters, filterText, fromRecord, toRecord));
     },
     [dispatch],
@@ -29,10 +29,10 @@ const DeviceLogFilesList = () => {
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchDeviceLogFiles(pageParams?.logFilters as IDeviceLogFileFormik);
+    fetchDeviceLogFiles(pageParams?.logFilters);
   }, [fetchDeviceLogFiles, pageParams?.logFilters]);
 
-  const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
+  const [pageParamLocal, setPageParamLocal] = useState<IDeviceLogPageParam | undefined>(pageParams);
 
   const [filterVisible, setFilterVisible] = useState(pageParams?.logFilters ? true : false);
 
@@ -46,10 +46,7 @@ const DeviceLogFilesList = () => {
 
   const handleSearchClick = () => {
     dispatch(actions.deviceLogActions.setPageParam({ filterText: pageParamLocal?.filterText }));
-    fetchDeviceLogFiles(
-      pageParams?.logFilters ? (pageParams?.logFilters as IDeviceLogFileFormik) : undefined,
-      pageParamLocal?.filterText as string,
-    );
+    fetchDeviceLogFiles(pageParams?.logFilters ? pageParams?.logFilters : undefined, pageParamLocal?.filterText);
   };
 
   const handleKeyPress = (key: string) => {
@@ -59,7 +56,7 @@ const DeviceLogFilesList = () => {
   };
 
   const handleSetPageParams = useCallback(
-    (logPageParams: IPageParam) => {
+    (logPageParams: IDeviceLogPageParam) => {
       dispatch(
         actions.deviceLogActions.setPageParam({
           logFilters: logPageParams.logFilters,
@@ -142,9 +139,7 @@ const DeviceLogFilesList = () => {
   const handleClearSearch = () => {
     dispatch(actions.deviceLogActions.setPageParam({ filterText: undefined }));
     setPageParamLocal({ filterText: undefined });
-    fetchDeviceLogFiles(
-      pageParamLocal?.logFilters ? (pageParamLocal?.filesFilters as IDeviceLogFileFormik) : undefined,
-    );
+    fetchDeviceLogFiles(pageParamLocal?.logFilters || undefined);
   };
 
   const buttons: IToolBarButton[] = [

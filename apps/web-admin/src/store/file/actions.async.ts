@@ -1,5 +1,3 @@
-import { isDataView } from 'util/types';
-
 import { ThunkAction } from 'redux-thunk';
 import api from '@lib/client-api';
 
@@ -9,14 +7,14 @@ import { AppState } from '..';
 
 import { webRequest } from '../webRequest';
 
-import { IFileFormik } from '../../types';
+import { IFileFilter } from '../../types';
 
 import { fileSystemActions, FileSystemActionType } from './actions';
 
 export type AppThunk = ThunkAction<Promise<FileSystemActionType>, AppState, null, FileSystemActionType>;
 
 const fetchFiles = (
-  filesFilters?: IFileFormik,
+  filesFilters?: IFileFilter,
   filterText?: string,
   fromRecord?: number,
   toRecord?: number,

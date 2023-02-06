@@ -23,7 +23,7 @@ import { useFormik } from 'formik';
 import actions from '../../store/file';
 
 import { adminPath } from '../../utils/constants';
-import { IFileFormik, IPageParam } from '../../types';
+import { IFileFilter, IFilePageParam, IPageParam } from '../../types';
 import { useDispatch } from '../../store';
 
 interface IProps {
@@ -38,7 +38,7 @@ interface IProps {
   onSelectMany: (event: any) => void;
   selectedFileIds: IFileSystem[];
   onSetPageParams: (filesFilters: IPageParam) => void;
-  pageParams?: IPageParam | undefined;
+  pageParams?: IFilePageParam | undefined;
 }
 
 const FileListTable = ({
@@ -75,9 +75,9 @@ const FileListTable = ({
 
   const navigate = useNavigate();
 
-  const formik = useFormik<IFileFormik>({
+  const formik = useFormik<IFileFilter>({
     enableReinitialize: true,
-    initialValues: pageParams?.filesFilters ? (pageParams?.filesFilters as IFileFormik) : initialValues,
+    initialValues: pageParams?.filesFilters || initialValues,
     onSubmit: (values) => {
       onSubmit(values);
     },

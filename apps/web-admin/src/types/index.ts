@@ -36,7 +36,7 @@ export interface IMessageHead {
   message: string;
 }
 
-export interface IFileFormik {
+export interface IFileFilter {
   [fieldName: string]: string;
   path: string;
   fileName: string;
@@ -49,7 +49,14 @@ export interface IFileFormik {
   date: string;
 }
 
-export interface IDeviceLogFileFormik {
+export interface IFilePageParam extends IPageParam {
+  filesFilters?: IFileFilter;
+  filterText?: string;
+  fromRecord?: number;
+  toRecord?: number;
+}
+
+export interface IDeviceLogFileFilter {
   [fieldName: string]: string;
   company: string;
   appSystem: string;
@@ -57,6 +64,13 @@ export interface IDeviceLogFileFormik {
   device: string;
   uid: string;
   date: string;
+}
+
+export interface IDeviceLogPageParam extends IPageParam {
+  logFilters?: IDeviceLogFileFilter;
+  filterText?: string;
+  fromRecord?: number;
+  toRecord?: number;
 }
 
 export interface ILinkedEntity extends IEntity {

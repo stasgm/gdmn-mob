@@ -9,7 +9,7 @@ import { IFileSystem } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import { IFileFormik, IHeadCells, IPageParam, IToolBarButton } from '../../types';
+import { IFileFilter, IHeadCells, IFilePageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
 import actions from '../../store/file';
@@ -22,7 +22,7 @@ const FileList = () => {
 
   const sortedList = useMemo(() => list.sort((a, b) => (a.path < b.path ? -1 : 1)), [list]);
   const fetchFiles = useCallback(
-    (filesFilters?: IFileFormik, filterText?: string, fromRecord?: number, toRecord?: number) => {
+    (filesFilters?: IFileFilter, filterText?: string, fromRecord?: number, toRecord?: number) => {
       dispatch(actions.fetchFiles(filesFilters, filterText, fromRecord, toRecord));
     },
     [dispatch],
@@ -30,10 +30,10 @@ const FileList = () => {
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchFiles(pageParams?.filesFilters as IFileFormik);
+    fetchFiles(pageParams?.filesFilters);
   }, [fetchFiles, pageParams?.filesFilters]);
 
-  const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
+  const [pageParamLocal, setPageParamLocal] = useState<IFilePageParam | undefined>(pageParams);
 
   const [filterVisible, setFilterVisible] = useState(pageParams?.filesFilters ? true : false);
 
@@ -49,16 +49,13 @@ const FileList = () => {
 
   useEffect(() => {
     if (pageParams?.filesFilters) {
-      fetchFiles(pageParams?.filesFilters as IFileFormik);
+      fetchFiles(pageParams?.filesFilters);
     }
   }, [fetchFiles, pageParams?.filesFilters]);
 
   const handleSearchClick = () => {
     dispatch(actions.fileSystemActions.setPageParam({ filterText: pageParamLocal?.filterText }));
-    fetchFiles(
-      pageParamLocal?.filesFilters ? (pageParamLocal?.filesFilters as IFileFormik) : undefined,
-      pageParamLocal?.filterText as string,
-    );
+    fetchFiles(pageParamLocal?.filesFilters ? pageParamLocal?.filesFilters : undefined, pageParamLocal?.filterText);
   };
 
   const handleKeyPress = (key: string) => {
@@ -121,7 +118,7 @@ const FileList = () => {
   // }, [selectedFileIds.length, selectedFiles]);
 
   const handleSetPageParams = useCallback(
-    (pageParams: IPageParam) => {
+    (pageParams: IFilePageParam) => {
       dispatch(
         actions.fileSystemActions.setPageParam({
           filesFilters: pageParams.filesFilters,
@@ -166,14 +163,14 @@ const FileList = () => {
   const handleClearSearch = () => {
     dispatch(actions.fileSystemActions.setPageParam({ filterText: undefined }));
     setPageParamLocal({ filterText: undefined });
-    fetchFiles(pageParamLocal?.filesFilters ? (pageParamLocal?.filesFilters as IFileFormik) : undefined);
+    fetchFiles(pageParamLocal?.filesFilters || undefined);
   };
 
   const buttons: IToolBarButton[] = [
     {
       name: 'Обновить',
       sx: { mx: 1 },
-      onClick: () => fetchFiles(pageParams?.filesFilters as IFileFormik),
+      onClick: () => fetchFiles(pageParams?.filesFilters),
       icon: <CachedIcon />,
     },
     {
