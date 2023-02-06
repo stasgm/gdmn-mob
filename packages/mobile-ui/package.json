@@ -26,7 +26,7 @@
     "@types/node": "^18.11.14",
     "@types/react-native": "0.70.8",
     "expo-camera": "^13.1.0",
-    "mathjs": "^11.5.0",
+    "mathjs": "^11.5.1",
     "react": "18.1.0",
     "react-native": "0.70.5",
     "react-native-gesture-handler": "~2.8.0",
