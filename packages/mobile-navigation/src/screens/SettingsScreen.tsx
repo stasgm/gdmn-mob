@@ -20,31 +20,29 @@ const SettingsScreen = () => {
 
   const settsData = useMemo(
     () =>
-      Object.entries(data).reduce((prev: Settings, cur: [string, ISettingsOption<SettingValue> | undefined]) => {
-        if (cur[1]) {
-          const newCur = cur[1]?.group ? cur[1] : { ...cur[1], group: baseSettingGroup };
-          prev[cur[0]] = newCur;
-        }
-        return prev;
-      }, {}),
+      Object.entries(data).reduce(
+        (prev: Settings, [idx, value]: [string, ISettingsOption<SettingValue> | undefined]) => {
+          if (value) {
+            const newCur = value?.group ? value : { ...value, group: baseSettingGroup };
+            prev[idx] = newCur;
+          }
+          return prev;
+        },
+        {},
+      ),
     [data],
   );
 
   //Массив уникальных групп настроек
   const parents = useMemo(
     () =>
-      Object.entries(settsData).reduce(
-        (prev: INamedEntity[], cur: [string, ISettingsOption<SettingValue> | undefined]) => {
-          const obj = cur[1];
+      Object.values(settsData).reduce((prev: INamedEntity[], value: ISettingsOption<SettingValue> | undefined) => {
+        if (value?.group === undefined || prev.find((gr) => gr.id === value?.group?.id)) {
+          return prev;
+        }
 
-          if (obj?.group === undefined || prev.find((gr) => gr.id === obj?.group?.id)) {
-            return prev;
-          }
-
-          return [...prev, obj.group];
-        },
-        [],
-      ),
+        return [...prev, value.group];
+      }, []),
     [settsData],
   );
 
@@ -97,9 +95,9 @@ const SettingsScreen = () => {
       <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={[{ padding: 5, flexDirection: 'column' }]}>
         <View>
           {parents.map((group, groupKey) => {
-            const list = Object.entries(settsData)
-              .filter(([_, item]) => item?.visible && item.group?.id === group.id)
-              .sort(([, itema], [, itemb]) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0));
+            const list = Object.values(settsData)
+              .filter((item) => item?.visible && item.group?.id === group.id)
+              .sort((itema, itemb) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0));
             return (
               <View key={groupKey}>
                 {group.id === 'base' ? (

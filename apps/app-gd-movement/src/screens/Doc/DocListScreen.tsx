@@ -71,7 +71,7 @@ export const DocListScreen = () => {
   const [removingUnknownGoods, setRemovingUnknownGoods] = useState(false);
 
   useEffect(() => {
-    if (unknownGoods.length > 0 && !removingUnknownGoods) {
+    if (unknownGoods.length > 0 && !removingUnknownGoods && goods) {
       setRemovingUnknownGoods(true);
       goods.forEach((g) => {
         if (unknownGoods.find((ug) => g.unknown_id === ug.id)) {

@@ -1,6 +1,7 @@
 import { IListItem } from '@lib/mobile-types';
 import { baseSettingGroup } from '@lib/store';
 import { Settings, StatusType } from '@lib/types';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 
 import { IGood } from '../store/app/types';
 
@@ -12,6 +13,18 @@ export const contactTypes: IListItem[] = [
   { id: 'department', value: 'Подразделение' },
   { id: 'contact', value: 'Организация' },
   { id: 'employee', value: 'Сотрудник' },
+];
+
+export const barcodeList: IListItem[] = [
+  { id: 'code128', value: 'code128' },
+  { id: 'ean13', value: 'ean13' },
+  { id: 'ean8', value: ' ean8' },
+];
+
+export const barCodeTypes = [
+  BarCodeScanner.Constants.BarCodeType.code128,
+  BarCodeScanner.Constants.BarCodeType.ean13,
+  BarCodeScanner.Constants.BarCodeType.ean8,
 ];
 
 export const docContactTypes: IListItem[] = [{ id: 'all', value: 'Все' }];
@@ -88,6 +101,7 @@ export const getStatusColor = (status: StatusType) => {
 };
 
 const goodGroup = { id: 'goodScan', name: 'Весовой товар', sortOrder: 2 };
+const scanSettings = { id: 'scanSettings', name: 'Настройки сканера', sortOrder: 2 };
 
 export const appSettings: Settings = {
   scannerUse: {
@@ -124,7 +138,8 @@ export const appSettings: Settings = {
     data: '22',
     type: 'string',
     visible: true,
-    group: goodGroup,
+    group: scanSettings,
+    groupInGroup: goodGroup,
   },
   countCode: {
     id: 'countCode',
@@ -133,7 +148,8 @@ export const appSettings: Settings = {
     data: 5,
     type: 'number',
     visible: true,
-    group: goodGroup,
+    group: scanSettings,
+    groupInGroup: goodGroup,
   },
   countWeight: {
     id: 'countWeight',
@@ -142,7 +158,17 @@ export const appSettings: Settings = {
     data: 5,
     type: 'number',
     visible: true,
-    group: goodGroup,
+    group: scanSettings,
+    groupInGroup: goodGroup,
+  },
+  barcodeType: {
+    id: 'barcodeType',
+    sortOrder: 9,
+    description: 'Типы штрихкодов',
+    data: barcodeList,
+    type: 'number',
+    visible: true,
+    group: scanSettings,
   },
 };
 
