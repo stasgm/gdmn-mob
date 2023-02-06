@@ -1,5 +1,5 @@
 import { styles } from '@lib/mobile-navigation';
-import { ItemSeparator, NumberKeypad } from '@lib/mobile-ui';
+import { ItemSeparator, NumberKeypad, Checkbox } from '@lib/mobile-ui';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View, Text, ScrollView, TextInput, Keyboard } from 'react-native';
@@ -10,8 +10,6 @@ import { INamedEntity } from '@lib/types';
 import { IOrderLine, IPackageGood } from '../../../store/types';
 
 import { ONE_SECOND_IN_MS } from '../../../utils/constants';
-
-import Checkbox from '@lib/mobile-ui/src/components/Checkbox';
 
 interface IProps {
   item: IOrderLine;

@@ -1,9 +1,4 @@
-import { IMessage } from '@lib/types';
-
-export interface IMultipartMessage {
-  multipartSeq: number;
-  data: any;
-}
+import { IMultipartMessage } from '@lib/types';
 
 export interface IMultipartItem {
   lastLoadDate: Date;
@@ -15,8 +10,9 @@ export interface IMultipartData {
 }
 
 export type MessagesState = {
-  readonly data: IMessage[];
-  multipartData: IMultipartData;
+  readonly multipartData: IMultipartData;
   readonly loading: boolean;
+  readonly loadingData: boolean;
+  readonly loadingError: string;
   readonly errorMessage: string;
 };

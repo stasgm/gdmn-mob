@@ -31,7 +31,9 @@ export interface IRefCmd {
 
 export type MessageType = ICmd | IDocument[] | IReferences | IUserSettings | IAppSystemSettings;
 
-export interface IMessage<T = MessageType> {
+export type IMessage<T = MessageType> = ISimpleMessage<T> | IMultipartMessage;
+
+export interface ISimpleMessage<T = MessageType> {
   id: string;
   status: StatusType;
   errorMessage?: string;
@@ -42,6 +44,12 @@ export interface IMessage<T = MessageType> {
     version: number;
     payload: T;
   };
+}
+
+export interface IMultipartMessage extends ISimpleMessage {
+  multipartId: string;
+  multipartSeq: number;
+  multipartEOF?: boolean;
 }
 
 export function isIHeadMessage(obj: any): obj is IHeadMessage {
@@ -80,8 +88,16 @@ export interface IDBHeadMessage extends Omit<IHeadMessage, 'company' | 'producer
   consumerId: string;
 }
 
-export interface IDBMessage<T = MessageType> extends Omit<IMessage<T>, 'head'> {
+export type IDBMessage<T = MessageType> = IDBSimpleMessage<T> | IDBMultipartMessage;
+
+export interface IDBSimpleMessage<T = MessageType> extends Omit<ISimpleMessage<T>, 'head'> {
   head: IDBHeadMessage;
+}
+
+export interface IDBMultipartMessage extends IDBSimpleMessage {
+  multipartId: string;
+  multipartSeq: number;
+  multipartEOF?: boolean;
 }
 
 //TODO: добавить более специфические условия проверки

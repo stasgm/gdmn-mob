@@ -1,6 +1,11 @@
 /* eslint-disable prettier/prettier */
 import thunkMiddleware, { ThunkDispatch } from 'redux-thunk';
-import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as useReduxDispatch } from 'react-redux';
+import {
+  TypedUseSelectorHook,
+  useSelector as useReduxSelector,
+  useDispatch as useReduxDispatch,
+  useStore,
+} from 'react-redux';
 import { Reducer, createStore, combineReducers, applyMiddleware, AnyAction } from 'redux';
 import { composeWithDevTools } from '@redux-devtools/extension';
 import { StateType } from 'typesafe-actions';
@@ -17,6 +22,7 @@ import { documentMiddlewareFactory } from './documents/middleware';
 import { referenceMiddlewareFactory } from './references/middleware';
 import { appMiddlewareFactory } from './app/middleware';
 import { settingMiddlewareFactory } from './settings/middleware';
+import { mesMiddlewareFactory } from './messages/middleware';
 
 export const rootReducer = {
   auth: authReducer,
@@ -46,6 +52,7 @@ export const configureStore = (
     referenceMiddlewareFactory,
     settingMiddlewareFactory,
     appMiddlewareFactory,
+    mesMiddlewareFactory
   ];
 
   const middleware = [
@@ -67,3 +74,4 @@ export type AppDispatch = ThunkDispatch<RootState, any, TActions>;
 export const useSelector: TypedUseSelectorHook<RootState> = useReduxSelector;
 export const useDispatch = useReduxDispatch;
 export const useThunkDispatch = () => useReduxDispatch<AppDispatch>();
+export const useAppStore = useStore;

@@ -128,7 +128,7 @@ const clear = async ({ companyId, appSystemName }: { companyId: string; appSyste
 export const makeMessage = async (message: IDBMessage): Promise<IMessage> => {
   const { users, companies, appSystems } = getDb();
 
-  return {
+  const newMessage = {
     id: message.id,
     head: {
       appSystem: appSystems.getNamedItem(message.head.appSystemId),
@@ -143,6 +143,15 @@ export const makeMessage = async (message: IDBMessage): Promise<IMessage> => {
     errorMessage: message.errorMessage,
     body: message.body,
   };
+
+  return 'multipartId' in message
+    ? {
+        ...newMessage,
+        multipartId: message.multipartId,
+        multipartSeq: message.multipartSeq,
+        multipartEOF: message.multipartEOF,
+      }
+    : newMessage;
 };
 
 export const makeDBNewMessage = async (

@@ -1,5 +1,7 @@
 import { getType } from 'typesafe-actions';
 
+import { appActions } from '../app/actions';
+
 import { PersistedMiddleware } from '../types';
 
 import { actions } from './actions';
@@ -16,7 +18,7 @@ export const mesMiddlewareFactory: PersistedMiddleware =
      *  Данные в файлы кэша записываются только когда меняются.
      */
 
-    if (action.type === getType(actions.loadSuperDataFromDisc) && store.getState().auth.user?.id) {
+    if (action.type === getType(appActions.loadSuperDataFromDisc) && store.getState().auth.user?.id) {
       // а здесь мы грузим данные для залогиненого пользователя
       store.dispatch(actions.setLoadingData(true));
       load('messages', store.getState().auth.user?.id)
@@ -44,7 +46,7 @@ export const mesMiddlewareFactory: PersistedMiddleware =
       switch (action.type) {
         case getType(actions.init):
         case getType(actions.addMultipartMessage):
-        case getType(actions.removeMultipartData): {
+        case getType(actions.removeMultipartItem): {
           const result = next(action);
 
           save('messages', store.getState().messages, store.getState().auth.user?.id).catch((err) => {
