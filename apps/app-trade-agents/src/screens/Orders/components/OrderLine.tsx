@@ -1,13 +1,11 @@
 import { styles } from '@lib/mobile-navigation';
-import { ItemSeparator, NumberKeypad } from '@lib/mobile-ui';
+import { Checkbox, ItemSeparator, NumberKeypad } from '@lib/mobile-ui';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View, Text, ScrollView, TextInput, Keyboard } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { INamedEntity } from '@lib/types';
-
-import Checkbox from '@lib/mobile-ui/src/components/Checkbox';
 
 import { IOrderLine, IPackageGood } from '../../../store/types';
 
