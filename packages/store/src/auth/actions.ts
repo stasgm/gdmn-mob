@@ -38,7 +38,7 @@ const loginUserAsync = createAsyncAction('AUTH/LOGIN', 'AUTH/LOGIN_SUCCESS', 'AU
 >();
 
 const signupAsync = createAsyncAction('AUTH/SIGNUP', 'AUTH/SIGNUP_SUCCESS', 'AUTH/SIGNUP_FAILURE')<
-  string | undefined,
+  undefined,
   undefined,
   string
 >();

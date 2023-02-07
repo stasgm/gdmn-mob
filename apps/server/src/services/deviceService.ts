@@ -42,7 +42,7 @@ const addOne = (deviceData: NewDevice): IDevice => {
  * @return обновленное устройство
  * */
 const updateOne = (id: string, deviceData: Partial<IDevice>, params?: Record<string, string>): IDevice => {
-  const { companies, devices } = getDb();
+  const { companies, devices, users } = getDb();
 
   const oldDevice = devices.findById(id);
 
@@ -62,9 +62,12 @@ const updateOne = (id: string, deviceData: Partial<IDevice>, params?: Record<str
 
   if (params) {
     if ('adminId' in params) {
-      const company = companies.data.find((c) => c.id === companyId && c.adminId === params.adminId);
-      if (!company) {
-        throw new DataNotFoundException('Устройство не может быть отредактировано');
+      const admin = users.findById(params.adminId);
+      if (admin?.role !== 'SuperAdmin') {
+        const company = companies.data.find((c) => c.id === companyId && c.adminId === params.adminId);
+        if (!company) {
+          throw new DataNotFoundException('Устройство не может быть отредактировано');
+        }
       }
     }
   }

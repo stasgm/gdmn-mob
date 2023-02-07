@@ -2,9 +2,12 @@ import { Box, CardHeader, CircularProgress } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
 import { IDevice, NewDevice } from '@lib/types';
 
+import { useEffect } from 'react';
+
 import DeviceDetails from '../../components/device/DeviceDetails';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/device';
+import companyActions from '../../store/company';
 
 const DeviceCreate = () => {
   const navigate = useNavigate();
@@ -12,6 +15,10 @@ const DeviceCreate = () => {
   const dispatch: AppDispatch = useDispatch();
 
   const { loading } = useSelector((state) => state.devices);
+
+  useEffect(() => {
+    dispatch(companyActions.fetchCompanies());
+  }, [dispatch]);
 
   const goBack = () => {
     dispatch(actions.clearError());

@@ -7,13 +7,13 @@ import { created, ok } from '../utils/apiHelpers';
 import { DataNotFoundException } from '../exceptions';
 
 const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
-  const { name, city, appSystems, externalId } = ctx.request.body as NewCompany;
+  const { name, city, appSystems, externalId, admin } = ctx.request.body as NewCompany;
 
   const user = ctx.state.user as IUser;
 
   const newCompany = companyService.addOne({
     name,
-    admin: { id: user.id, name: user.name },
+    admin: admin ? admin : { id: user.id, name: user.name },
     externalId,
     city,
     appSystems,

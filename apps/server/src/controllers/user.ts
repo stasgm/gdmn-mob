@@ -22,6 +22,7 @@ const addUser = async (ctx: ParameterizedContext) => {
     erpUser,
     appSystem,
     disabled,
+    company,
   } = ctx.request.body as NewUser;
 
   const creator = ctx.state.user as IUser;
@@ -41,6 +42,7 @@ const addUser = async (ctx: ParameterizedContext) => {
     appSystem,
     disabled,
     creator: { id: creator.id, name: creator.name },
+    company,
   } as NewUser;
 
   const newUser = userService.addOne(user);

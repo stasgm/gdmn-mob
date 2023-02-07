@@ -42,7 +42,7 @@ const DeviceList = () => {
   );
 
   useEffect(() => {
-    fetchDevices(pageParams?.filterText as string);
+    fetchDevices(pageParams?.filterText);
   }, [fetchDevices, pageParams?.filterText]);
 
   const handleUpdateInput = (value: string) => {
@@ -57,13 +57,19 @@ const DeviceList = () => {
 
   const handleSearchClick = () => {
     dispatch(deviceActions.setPageParam({ filterText: pageParamLocal?.filterText }));
-    fetchDevices(pageParamLocal?.filterText as string);
+    fetchDevices(pageParamLocal?.filterText);
   };
 
   const handleKeyPress = (key: string) => {
     if (key !== 'Enter') return;
 
     handleSearchClick();
+  };
+
+  const handleClearSearch = () => {
+    dispatch(deviceActions.setPageParam({ filterText: undefined }));
+    setPageParamLocal({ filterText: undefined });
+    fetchDevices();
   };
 
   const handleCreateCode = (deviceId: string) => {
@@ -76,6 +82,18 @@ const DeviceList = () => {
     dispatch(deviceActions.fetchDeviceById(deviceId));
     fetchActivationCodes(deviceId);
   };
+
+  const handleSetPageParams = useCallback(
+    (pageParams: IPageParam) => {
+      dispatch(
+        deviceActions.setPageParam({
+          page: pageParams.page,
+          limit: pageParams.limit,
+        }),
+      );
+    },
+    [dispatch],
+  );
 
   const buttons: IToolBarButton[] = [
     {
@@ -113,6 +131,7 @@ const DeviceList = () => {
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
             value={(pageParamLocal?.filterText as undefined) || ''}
+            clearOnClick={handleClearSearch}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
@@ -123,6 +142,8 @@ const DeviceList = () => {
                 activationCodes={activationCodes}
                 onCreateCode={handleCreateCode}
                 onCreateUid={handleCreateUid}
+                onSetPageParams={handleSetPageParams}
+                pageParams={pageParams}
               />
             </Box>
           )}

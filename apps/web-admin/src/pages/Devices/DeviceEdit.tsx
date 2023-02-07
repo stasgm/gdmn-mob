@@ -71,7 +71,6 @@ const DeviceEdit = () => {
         loading={loading}
         onSubmit={handleSubmit}
         onCancel={goBack}
-        //onCreateUid={handleCreateUid}
       />
     </Box>
   );

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -20,8 +20,11 @@ import { IFileSystem } from '@lib/types';
 
 import { useFormik } from 'formik';
 
+import actions from '../../store/file';
+
 import { adminPath } from '../../utils/constants';
-import { IFileFormik, IPageParam } from '../../types';
+import { IFileFilter, IFilePageParam, IPageParam } from '../../types';
+import { useDispatch } from '../../store';
 
 interface IProps {
   files: IFileSystem[];
@@ -35,7 +38,7 @@ interface IProps {
   onSelectMany: (event: any) => void;
   selectedFileIds: IFileSystem[];
   onSetPageParams: (filesFilters: IPageParam) => void;
-  pageParams?: IPageParam | undefined;
+  pageParams?: IFilePageParam | undefined;
 }
 
 const FileListTable = ({
@@ -51,8 +54,10 @@ const FileListTable = ({
   onSetPageParams,
   pageParams,
 }: IProps) => {
-  const [limit, setLimit] = useState(25);
-  const [page, setPage] = useState(0);
+  const [limit, setLimit] = useState(
+    pageParams?.limit && !isNaN(Number(pageParams?.limit)) ? Number(pageParams?.limit) : 10,
+  );
+  const [page, setPage] = useState(pageParams?.page && !isNaN(Number(pageParams?.page)) ? Number(pageParams.page) : 0);
 
   const initialValues = useMemo(() => {
     return {
@@ -70,9 +75,9 @@ const FileListTable = ({
 
   const navigate = useNavigate();
 
-  const formik = useFormik<IFileFormik>({
+  const formik = useFormik<IFileFilter>({
     enableReinitialize: true,
-    initialValues: pageParams?.filesFilters ? (pageParams?.filesFilters as IFileFormik) : initialValues,
+    initialValues: pageParams?.filesFilters || initialValues,
     onSubmit: (values) => {
       onSubmit(values);
     },
@@ -85,72 +90,37 @@ const FileListTable = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFilterVisible]);
 
-  const filteredList = useMemo(() => {
-    if (
-      formik.values.fileName ||
-      formik.values.path ||
-      formik.values.appSystem ||
-      formik.values.company ||
-      formik.values.date ||
-      formik.values.device ||
-      formik.values.producer ||
-      formik.values.consumer ||
-      formik.values.uid
-    ) {
-      return files.filter(
-        (i) =>
-          (formik.values.appSystem
-            ? i.appSystem?.name.toUpperCase().includes(formik.values.appSystem.toUpperCase())
-            : true) &&
-          (formik.values.fileName ? i.fileName.toUpperCase().includes(formik.values.fileName.toUpperCase()) : true) &&
-          (formik.values.path ? i.path?.toUpperCase().includes(formik.values.path.toUpperCase()) : true) &&
-          (formik.values.company
-            ? i.company?.name.toUpperCase().includes(formik.values.company.toUpperCase())
-            : true) &&
-          (formik.values.producer
-            ? i.producer?.name.toUpperCase().includes(formik.values.producer.toUpperCase())
-            : true) &&
-          (formik.values.consumer
-            ? i.consumer?.name.toUpperCase().includes(formik.values.consumer.toUpperCase())
-            : true) &&
-          (formik.values.date
-            ? new Date(i.date || '')
-                .toLocaleString('ru', { hour12: false })
-                .toUpperCase()
-                .includes(formik.values.date.toUpperCase())
-            : true) &&
-          (formik.values.device ? i.device?.name.toUpperCase().includes(formik.values.device.toUpperCase()) : true) &&
-          (formik.values.uid ? i.device?.id.toUpperCase().includes(formik.values.uid.toUpperCase()) : true),
-      );
-    } else {
-      return files;
-    }
-  }, [
-    files,
-    formik.values.appSystem,
-    formik.values.company,
-    formik.values.consumer,
-    formik.values.date,
-    formik.values.device,
-    formik.values.fileName,
-    formik.values.path,
-    formik.values.producer,
-    formik.values.uid,
-  ]);
-
-  const handleLimitChange = (event: any) => {
-    setLimit(event.target.value);
+  const handleSearchClick = () => {
+    onSetPageParams({ ...pageParams, filesFilters: formik.values });
   };
 
-  const handlePageChange = (_event: any, newPage: any) => {
-    setPage(newPage);
+  const handleKeyPress = (key: string) => {
+    if (key !== 'Enter') return;
+
+    handleSearchClick();
   };
 
-  useEffect(() => {
-    if (isFilterVisible && formik.values !== initialValues) {
-      onSetPageParams({ filesFilters: formik.values });
-    }
-  }, [formik.values, initialValues, isFilterVisible, onSetPageParams]);
+  const handleLimitChange = useCallback(
+    (event: any) => {
+      setLimit(event.target.value);
+      onSetPageParams({ ...pageParams, limit: event.target.value });
+    },
+    [onSetPageParams, pageParams],
+  );
+
+  const handlePageChange = useCallback(
+    (_event: any, newPage: any) => {
+      setPage(newPage);
+      onSetPageParams({ ...pageParams, page: newPage });
+    },
+    [onSetPageParams, pageParams],
+  );
+
+  // useEffect(() => {
+  //   if (isFilterVisible && formik.values !== initialValues) {
+  //     setPageParamLocal({ filesFilters: formik.values });
+  //   }
+  // }, [formik.values, initialValues, isFilterVisible, setPageParamLocal]);
 
   // useEffect(() => {
   //   if (limitRows > 0) {
@@ -167,7 +137,7 @@ const FileListTable = ({
   // }, [limitRows, selectedFileIds.length, selectedFiles]);
 
   const TableRows = () => {
-    const fileList = filteredList.slice(page * limit, page * limit + limit).map((file: IFileSystem) => {
+    const fileList = files.slice(page * limit, page * limit + limit).map((file: IFileSystem) => {
       return (
         <TableRow
           hover
@@ -216,7 +186,7 @@ const FileListTable = ({
       );
     });
 
-    const emptyRows = limit - Math.min(limit, filteredList.length - page * limit);
+    const emptyRows = limit - Math.min(limit, files.length - page * limit);
 
     return (
       <>
@@ -239,9 +209,9 @@ const FileListTable = ({
               <TableRow>
                 <TableCell padding="checkbox">
                   <Checkbox
-                    checked={selectedFileIds.length === filteredList.length}
+                    checked={selectedFileIds.length === files.length}
                     color="primary"
-                    indeterminate={selectedFileIds.length > 0 && selectedFileIds.length < filteredList.length}
+                    indeterminate={selectedFileIds.length > 0 && selectedFileIds.length < files.length}
                     onChange={onSelectMany}
                   />
                 </TableCell>
@@ -279,6 +249,7 @@ const FileListTable = ({
                         type="search"
                         value={formik.values[item]}
                         onChange={formik.handleChange}
+                        onKeyPress={(event) => handleKeyPress(event.key)}
                       />
                     </TableCell>
                   ))}
@@ -294,7 +265,7 @@ const FileListTable = ({
       </PerfectScrollbar>
       <TablePagination
         component="div"
-        count={filteredList.length}
+        count={files.length}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleLimitChange}
         page={page}

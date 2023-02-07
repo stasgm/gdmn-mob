@@ -30,7 +30,6 @@ interface IProps {
 
 const ProcessListTable = ({
   processes = [],
-  companies = [],
   onChangeSelectedDevices,
   selectedProcesses = [],
   limitRows = 0,

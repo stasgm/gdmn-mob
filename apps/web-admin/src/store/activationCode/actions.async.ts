@@ -27,8 +27,6 @@ const fetchActivationCodes = (deviceId?: string): AppThunk => {
   };
 };
 
-/*CREATE*/
-
 const createActivationCode = (deviceId: string): AppThunk => {
   return async (dispatch) => {
     dispatch(activationCodeActions.createCodeAsync.request(''));
