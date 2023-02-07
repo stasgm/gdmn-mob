@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import MultipleAutocomplete from '../MultipleAutocomplete';
 import { useDispatch, useSelector } from '../../store';
 import appSystemsActions from '../../store/appSystem';
+import ComboBox from '../ComboBox';
 
 interface IProps {
   loading: boolean;
@@ -19,23 +20,14 @@ interface IProps {
 
 const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
   const { list, loading: loadingAppSystems } = useSelector((state) => state.appSystems);
-  // const [appSystems, setAppSystems] = useState<INamedEntity[]>([]);
-  // const [loadingAppSystems, setLoadingAppSystems] = useState(true);
+  const { list: users, loading: loadingUsers } = useSelector((state) => state.users);
 
-  // useEffect(() => {
-  //   let unmounted = false;
-  //   const getAppSystems = async () => {
-  //     const res = await api.appSystem.getAppSystems();
-  //     if (res.type === 'GET_APP_SYSTEMS' && !unmounted) {
-  //       setAppSystems(res.appSystems.map((d) => ({ id: d.id, name: d.name })));
-  //       setLoadingAppSystems(false);
-  //     }
-  //   };
-  //   getAppSystems();
-  //   return () => {
-  //     unmounted = true;
-  //   };
-  // }, []);
+  const { user: authUser } = useSelector((state) => state.auth);
+
+  const adminList = users.filter((i) => i.role === 'Admin' && !i.company).map((d) => ({ id: d.id, name: d.name }));
+
+  const isAdminRequired = authUser?.role === 'SuperAdmin' && !company.admin;
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -107,6 +99,23 @@ const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
                     disabled={loading || loadingAppSystems}
                   />
                 </Grid>
+
+                {isAdminRequired ? (
+                  <Grid item md={6} xs={12}>
+                    <Field
+                      component={ComboBox}
+                      name="admin"
+                      label="Админ"
+                      type="admin"
+                      options={adminList || []}
+                      setFieldValue={formik.setFieldValue}
+                      setTouched={formik.setTouched}
+                      error={Boolean(formik.touched.admin && formik.errors.admin)}
+                      disabled={loading || loadingUsers}
+                      required={isAdminRequired}
+                    />
+                  </Grid>
+                ) : null}
               </Grid>
             </CardContent>
             <Divider />

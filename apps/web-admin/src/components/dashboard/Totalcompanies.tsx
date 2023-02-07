@@ -36,27 +36,6 @@ const TotalCompanies = (props: IProps) => {
             </Avatar>
           </Grid>
         </Grid>
-        {/* <Box
-          sx={{
-            alignItems: 'center',
-            display: 'flex',
-            pt: 2,
-          }}
-        >
-          <ArrowUpwardIcon sx={{ color: palette.primary.dark }} />
-          <Typography
-            variant="body2"
-            sx={{
-              color: palette.primary.dark,
-              mr: 1,
-            }}
-          >
-            3%
-          </Typography>
-          <Typography color="textSecondary" variant="caption">
-            За последний месяц
-          </Typography>
-        </Box> */}
       </CardContent>
     </Card>
   );

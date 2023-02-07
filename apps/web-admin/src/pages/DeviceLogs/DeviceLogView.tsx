@@ -198,7 +198,7 @@ const DeviceLogView = () => {
           <DetailsView details={deviceLogsDetails} />
         </Box>
         <Box sx={{ pt: 2 }}>
-          <SortableTable<IDeviceLog> headCells={headCells} data={logList} path={'/app/deviceLogs/'} />
+          <SortableTable<IDeviceLog> headCells={headCells} data={logList} />
         </Box>
       </Box>
 

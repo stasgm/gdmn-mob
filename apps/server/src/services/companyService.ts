@@ -24,7 +24,7 @@ const addOne = (companyData: NewCompanyData): ICompany => {
   */
   const { companies, createFoldersForCompany } = getDb();
 
-  if (companies.data.find((el) => el.name === companyData.name)) {
+  if (companies.data.find((el) => el.name.toUpperCase() === companyData.name.toUpperCase())) {
     throw new ConflictException(`Компания с названием ${companyData.name} уже существует`);
   }
 

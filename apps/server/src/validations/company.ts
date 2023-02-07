@@ -11,6 +11,7 @@ const addCompany: Config = {
       name: Joi.string().required().error(new InvalidParameterException('Не указано название компании')),
       city: Joi.string().allow('', null),
       appSystems: Joi.array().optional(),
+      admin: Joi.object().optional(),
     }),
   },
 };

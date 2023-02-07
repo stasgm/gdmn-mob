@@ -53,8 +53,8 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
   useEffect(() => {
     /* Загружаем данные при загрузке компонента */
     fetchActivationCodes();
-    fetchDevices(pageParams?.filterText as string);
-    fetchDeviceBindings(pageParams?.filterText as string);
+    fetchDevices(pageParams?.filterText);
+    fetchDeviceBindings(pageParams?.filterText);
   }, [fetchActivationCodes, fetchDeviceBindings, fetchDevices, pageParams?.filterText]);
 
   const handleCreateUid = async (code: string, deviceId: string) => {
@@ -85,6 +85,14 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
     handleSearchClick();
   };
 
+  const handleClearSearch = () => {
+    dispatch(deviceActions.setPageParam({ filterText: undefined }));
+    dispatch(actionsBinding.deviceBindingActions.setPageParam({ filterText: undefined }));
+    setPageParamLocal({ filterText: undefined });
+    fetchDevices();
+    fetchDeviceBindings();
+  };
+
   const handleCreateCode = (deviceId: string) => {
     dispatch(codeActions.createActivationCode(deviceId));
     fetchActivationCodes(deviceId);
@@ -111,11 +119,11 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
         <ToolbarActionsWithSearch
           buttons={deviceButtons}
           searchTitle={'Найти устройство'}
-          // valueRef={valueRef}
           updateInput={handleUpdateInput}
           searchOnClick={handleSearchClick}
           keyPress={handleKeyPress}
           value={(pageParamLocal?.filterText as undefined) || ''}
+          clearOnClick={handleClearSearch}
         />
         <Box sx={{ pt: 2 }}>
           <DeviceBindingListTable

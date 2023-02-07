@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
 import { Box, Card, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@material-ui/core';
-import { IDeviceLog, IDeviceLogFiles } from '@lib/types';
+import { IDeviceLog } from '@lib/types';
 
 interface IProps {
   deviceLog: IDeviceLog[];

@@ -86,7 +86,7 @@ const signup = (
   userCredentials: IUserCredentials,
 ): AppThunk<Promise<ActionType<typeof actions.signupAsync>>, AuthState, ActionType<typeof actions.signupAsync>> => {
   return async (dispatch) => {
-    dispatch(actions.signupAsync.request(''));
+    dispatch(actions.signupAsync.request());
 
     const response = await api.auth.signup(customRequest, userCredentials);
 

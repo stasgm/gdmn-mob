@@ -20,6 +20,7 @@ const CompanyList = () => {
   const location = useLocation();
   const dispatch: AppDispatch = useDispatch();
   const { list, loading, errorMessage, pageParams } = useSelector((state) => state.companies);
+  const { user: authUser } = useSelector((state) => state.auth);
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
   const fetchCompanies = useCallback(
@@ -31,7 +32,7 @@ const CompanyList = () => {
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchCompanies(pageParams?.filterText as string);
+    fetchCompanies(pageParams?.filterText);
   }, [fetchCompanies, pageParams?.filterText]);
 
   const handleUpdateInput = (value: string) => {
@@ -47,7 +48,7 @@ const CompanyList = () => {
   const handleSearchClick = () => {
     dispatch(actions.companyActions.setPageParam({ filterText: pageParamLocal?.filterText }));
 
-    fetchCompanies(pageParamLocal?.filterText as string);
+    fetchCompanies(pageParamLocal?.filterText);
   };
 
   const handleKeyPress = (key: string) => {
@@ -56,17 +57,35 @@ const CompanyList = () => {
     handleSearchClick();
   };
 
+  const handleClearSearch = () => {
+    dispatch(actions.companyActions.setPageParam({ filterText: undefined }));
+    setPageParamLocal({ filterText: undefined });
+    fetchCompanies();
+  };
+
   const handleClearError = () => {
     dispatch(actions.companyActions.clearError());
   };
 
   const handleAddCompany = () => {
-    if (list.length) {
+    if (list.length && !(authUser?.role === 'SuperAdmin')) {
       dispatch(actions.companyActions.setError('Компания уже существует'));
     } else {
       return navigate(`${location.pathname}/new`);
     }
   };
+
+  const handleSetPageParams = useCallback(
+    (pageParams: IPageParam) => {
+      dispatch(
+        actions.companyActions.setPageParam({
+          page: pageParams.page,
+          limit: pageParams.limit,
+        }),
+      );
+    },
+    [dispatch],
+  );
 
   const buttons: IToolBarButton[] = [
     {
@@ -113,12 +132,19 @@ const CompanyList = () => {
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
             value={(pageParamLocal?.filterText as undefined) || ''}
+            clearOnClick={handleClearSearch}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <SortableTable<ICompany> headCells={headCells} data={list} path={'/app/companies/'} />
+              <SortableTable<ICompany>
+                headCells={headCells}
+                data={list}
+                path={'/app/companies/'}
+                onSetPageParams={handleSetPageParams}
+                pageParams={pageParams}
+              />
             </Box>
           )}
         </Container>

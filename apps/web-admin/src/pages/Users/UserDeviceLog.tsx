@@ -20,8 +20,6 @@ interface IProps {
 const UserDeviceLog = ({ userId, deviceId }: IProps) => {
   const dispatch = useDispatch();
 
-  // const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
-
   const { logList } = useSelector((state) => state.deviceLogs);
 
   const fetchDeviceLogFiles = useCallback(

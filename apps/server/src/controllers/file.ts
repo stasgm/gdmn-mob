@@ -7,7 +7,73 @@ import { fileService } from '../services';
 import { ok, notOk } from '../utils/apiHelpers';
 
 const getFiles = async (ctx: ParameterizedContext): Promise<void> => {
-  const filesList = await fileService.findMany();
+  const params: Record<string, string | number> = {};
+
+  const {
+    path,
+    fileName,
+    uid,
+    date,
+    company,
+    appSystem,
+    consumer,
+    producer,
+    device,
+    filterText,
+    fromRecord,
+    toRecord,
+  } = ctx.query;
+
+  if (typeof company === 'string' && company) {
+    params.company = company;
+  }
+
+  if (typeof fileName === 'string' && fileName) {
+    params.fileName = fileName;
+  }
+
+  console.log('params.fileName', params.fileName);
+  if (typeof path === 'string' && path) {
+    params.path = path;
+  }
+
+  if (typeof uid === 'string' && uid) {
+    params.uid = uid;
+  }
+
+  if (typeof date === 'string' && date) {
+    params.date = date;
+  }
+
+  if (typeof appSystem === 'string' && appSystem) {
+    params.appSystem = appSystem;
+  }
+
+  if (typeof consumer === 'string' && consumer) {
+    params.consumer = consumer;
+  }
+
+  if (typeof producer === 'string' && producer) {
+    params.producer = producer;
+  }
+
+  if (typeof device === 'string' && device) {
+    params.device = device;
+  }
+
+  if (typeof filterText === 'string') {
+    params.filterText = filterText;
+  }
+
+  if (typeof fromRecord === 'string' && isFinite(Number(fromRecord))) {
+    params.fromRecord = Number(fromRecord);
+  }
+
+  if (typeof toRecord === 'string' && isFinite(Number(toRecord))) {
+    params.toRecord = Number(toRecord);
+  }
+
+  const filesList = await fileService.findMany(params);
 
   ok(ctx as Context, filesList, 'getFiles: deviceLogs are successfully received');
 };

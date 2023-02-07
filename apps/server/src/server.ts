@@ -30,7 +30,8 @@ import { userService } from './services';
 import router from './routes';
 import { createDb } from './services/dao/db';
 import { checkProcessList, loadProcessListFromDisk } from './services/processList';
-import { MSEС_IN_MIN } from './utils/constants';
+import { checkFiles } from './services/fileUtils';
+import { MSEС_IN_MIN, MSEС_IN_DAY } from './utils/constants';
 
 interface IServer {
   name: string;
@@ -41,6 +42,7 @@ interface IServer {
 
 export type KoaApp = Koa<Koa.DefaultState, Koa.DefaultContext>;
 let timerId: NodeJS.Timer;
+let timerFileId: NodeJS.Timer;
 
 export async function createServer(server: IServer): Promise<KoaApp> {
   const app: KoaApp = new Koa();
@@ -50,8 +52,10 @@ export async function createServer(server: IServer): Promise<KoaApp> {
 
   loadProcessListFromDisk();
   checkProcessList(true);
+  checkFiles();
 
   timerId = setInterval(checkProcessList, config.PROCESS_CHECK_PERIOD_IN_MIN * MSEС_IN_MIN);
+  timerFileId = setInterval(checkFiles, config.FILES_CHECK_PERIOD_IN_DAYS * MSEС_IN_DAY);
 
   const sessions = app.context.db.sessionId.data;
   const sessionId = sessions.length ? sessions[0].id : '';
@@ -128,6 +132,7 @@ process.on('SIGINT', () => {
   console.log('Ctrl-C...');
   console.log('Finished all requests');
   clearInterval(timerId);
+  clearInterval(timerFileId);
   process.exit(2);
 });
 
