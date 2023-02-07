@@ -42,7 +42,7 @@ const DeviceList = () => {
   );
 
   useEffect(() => {
-    fetchDevices(pageParams?.filterText as string);
+    fetchDevices(pageParams?.filterText);
   }, [fetchDevices, pageParams?.filterText]);
 
   const handleUpdateInput = (value: string) => {
@@ -57,7 +57,7 @@ const DeviceList = () => {
 
   const handleSearchClick = () => {
     dispatch(deviceActions.setPageParam({ filterText: pageParamLocal?.filterText }));
-    fetchDevices(pageParamLocal?.filterText as string);
+    fetchDevices(pageParamLocal?.filterText);
   };
 
   const handleKeyPress = (key: string) => {

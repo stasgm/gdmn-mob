@@ -25,7 +25,7 @@ const ProcessList = () => {
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchProcesses(pageParams?.filterText as string);
+    fetchProcesses(pageParams?.filterText);
   }, [fetchProcesses, pageParams?.filterText]);
 
   const fetchCompanies = useCallback(async () => {
@@ -50,7 +50,7 @@ const ProcessList = () => {
 
   const handleSearchClick = () => {
     dispatch(actions.setPageParam({ filterText: pageParamLocal?.filterText }));
-    fetchProcesses(pageParamLocal?.filterText as string);
+    fetchProcesses(pageParamLocal?.filterText);
   };
 
   const handleKeyPress = (key: string) => {

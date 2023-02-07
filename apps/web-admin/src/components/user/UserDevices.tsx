@@ -53,8 +53,8 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
   useEffect(() => {
     /* Загружаем данные при загрузке компонента */
     fetchActivationCodes();
-    fetchDevices(pageParams?.filterText as string);
-    fetchDeviceBindings(pageParams?.filterText as string);
+    fetchDevices(pageParams?.filterText);
+    fetchDeviceBindings(pageParams?.filterText);
   }, [fetchActivationCodes, fetchDeviceBindings, fetchDevices, pageParams?.filterText]);
 
   const handleCreateUid = async (code: string, deviceId: string) => {

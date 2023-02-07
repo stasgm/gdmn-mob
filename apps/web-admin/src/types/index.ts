@@ -16,6 +16,11 @@ export interface IToolBarButton {
 
 export interface IPageParam {
   [name: string]: unknown;
+  filterText?: string;
+  fromRecord?: number;
+  toRecord?: number;
+  page?: number;
+  limit?: number;
 }
 
 export interface IHeadCells<T> {
@@ -51,9 +56,6 @@ export interface IFileFilter {
 
 export interface IFilePageParam extends IPageParam {
   filesFilters?: IFileFilter;
-  filterText?: string;
-  fromRecord?: number;
-  toRecord?: number;
 }
 
 export interface IDeviceLogFileFilter {
@@ -68,9 +70,6 @@ export interface IDeviceLogFileFilter {
 
 export interface IDeviceLogPageParam extends IPageParam {
   logFilters?: IDeviceLogFileFilter;
-  filterText?: string;
-  fromRecord?: number;
-  toRecord?: number;
 }
 
 export interface ILinkedEntity extends IEntity {

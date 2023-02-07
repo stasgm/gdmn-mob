@@ -34,7 +34,7 @@ const UserList = () => {
 
   useEffect(() => {
     /* Загружаем данные при загрузке компонента */
-    fetchUsers(pageParams?.filterText as string);
+    fetchUsers(pageParams?.filterText);
   }, [fetchUsers, pageParams?.filterText]);
 
   const handleUpdateInput = (value: string) => {
@@ -49,7 +49,7 @@ const UserList = () => {
 
   const handleSearchClick = () => {
     dispatch(actions.userActions.setPageParam({ filterText: pageParamLocal?.filterText }));
-    fetchUsers(pageParamLocal?.filterText as string);
+    fetchUsers(pageParamLocal?.filterText);
   };
 
   const handleKeyPress = (key: string) => {

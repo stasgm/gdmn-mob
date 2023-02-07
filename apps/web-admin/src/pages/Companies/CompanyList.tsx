@@ -32,7 +32,7 @@ const CompanyList = () => {
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchCompanies(pageParams?.filterText as string);
+    fetchCompanies(pageParams?.filterText);
   }, [fetchCompanies, pageParams?.filterText]);
 
   const handleUpdateInput = (value: string) => {
@@ -48,7 +48,7 @@ const CompanyList = () => {
   const handleSearchClick = () => {
     dispatch(actions.companyActions.setPageParam({ filterText: pageParamLocal?.filterText }));
 
-    fetchCompanies(pageParamLocal?.filterText as string);
+    fetchCompanies(pageParamLocal?.filterText);
   };
 
   const handleKeyPress = (key: string) => {

@@ -28,7 +28,7 @@ const AppSystemList = () => {
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchAppSystems(pageParams?.filterText as string);
+    fetchAppSystems(pageParams?.filterText);
   }, [fetchAppSystems, pageParams?.filterText]);
 
   const handleUpdateInput = (value: string) => {
@@ -39,7 +39,7 @@ const AppSystemList = () => {
 
   const handleSearchClick = () => {
     dispatch(actions.setPageParam({ filterText: pageParamLocal?.filterText }));
-    fetchAppSystems(pageParamLocal?.filterText as string);
+    fetchAppSystems(pageParamLocal?.filterText);
   };
 
   const handleKeyPress = (key: string) => {

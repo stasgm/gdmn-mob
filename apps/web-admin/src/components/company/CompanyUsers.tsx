@@ -28,7 +28,7 @@ const CompanyUsers = ({ users }: IProps) => {
 
   useEffect(() => {
     /* Загружаем данные при загрузке компонента */
-    fetchUsers(pageParams?.filterText as string);
+    fetchUsers(pageParams?.filterText);
   }, [fetchUsers, pageParams?.filterText]);
 
   const handleUpdateInput = (value: string) => {
@@ -69,7 +69,10 @@ const CompanyUsers = ({ users }: IProps) => {
     [dispatch],
   );
 
-  const newPageParams: IPageParam = { limit: pageParams?.companyLimit, page: pageParams?.companyPage };
+  const newPageParams: IPageParam = {
+    limit: pageParams?.companyLimit && !isNaN(Number(pageParams?.limit)) ? Number(pageParams?.limit) : 10,
+    page: pageParams?.companyPage && !isNaN(Number(pageParams?.page)) ? Number(pageParams.companyPage) : 0,
+  };
 
   const userButtons: IToolBarButton[] = [];
 
