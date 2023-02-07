@@ -4,7 +4,7 @@ const statusColors = ['#ab033c', '#06567D', '#47690e', '#ab7e29'] as const;
 // const statusColors = ['#E91E63', '#06567D', '#80B12C', '#FFA700'] as const;
 
 const getStatusColor = (status: StatusType) => {
-  let statusColor: typeof statusColors[number];
+  let statusColor: (typeof statusColors)[number];
 
   switch (status) {
     case 'DRAFT':
@@ -39,7 +39,7 @@ const statusIcons = [
 ] as const;
 
 const getStatusIcon = (status: StatusType) => {
-  let statusIcon: typeof statusIcons[number];
+  let statusIcon: (typeof statusIcons)[number];
 
   switch (status) {
     case 'DRAFT':
