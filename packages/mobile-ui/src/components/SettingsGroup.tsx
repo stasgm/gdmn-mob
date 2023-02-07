@@ -35,28 +35,6 @@ const SettingsGroup = ({ groupDescription, list, onValueChange, onCheckSettings 
         </View>
       ) : null}
       <View>
-        {parents.map((group) => {
-          return (
-            <View>
-              <MediumText style={localStyles.title}>{group.name}</MediumText>
-              {Object.values(list)
-                .filter((item) => item?.visible && item.groupInGroup?.id === group.id)
-                .sort((itema, itemb) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0))
-                .map((s, xid) => (
-                  <View key={s.id}>
-                    {xid !== 0 && <Divider />}
-                    <SettingsItem
-                      label={s.description || s.id}
-                      value={s.data}
-                      disabled={s.readonly}
-                      onValueChange={(newValue) => onValueChange(s.id, { ...s, data: newValue })}
-                      onEndEditing={(newValue) => onCheckSettings && onCheckSettings(s.id, { ...s, data: newValue })}
-                    />
-                  </View>
-                ))}
-            </View>
-          );
-        })}
         {list
           .filter((l) => !l.groupInGroup)
           .map((item) => {
@@ -73,6 +51,29 @@ const SettingsGroup = ({ groupDescription, list, onValueChange, onCheckSettings 
               </View>
             );
           })}
+        {parents.length > 0 && <Divider />}
+        {parents.map((group) => {
+          return (
+            <View key={group.id}>
+              <MediumText style={localStyles.title}>{group.name}</MediumText>
+              {Object.values(list)
+                .filter((item) => item?.visible && item.groupInGroup?.id === group.id)
+                .sort((itema, itemb) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0))
+                .map((s, xid) => (
+                  <View key={s.id}>
+                    {xid > 0 && <Divider />}
+                    <SettingsItem
+                      label={s.description || s.id}
+                      value={s.data}
+                      disabled={s.readonly}
+                      onValueChange={(newValue) => onValueChange(s.id, { ...s, data: newValue })}
+                      onEndEditing={(newValue) => onCheckSettings && onCheckSettings(s.id, { ...s, data: newValue })}
+                    />
+                  </View>
+                ))}
+            </View>
+          );
+        })}
       </View>
     </View>
   );

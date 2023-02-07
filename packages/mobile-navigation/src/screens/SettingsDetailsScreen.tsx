@@ -52,6 +52,19 @@ const SettingsDetailsScreen = () => {
         );
       }
     }
+
+    if (optionName === 'scannerUse') {
+      const screenKeyboard = Object.values(data).find((i) => i?.id === 'screenKeyboard');
+
+      if (screenKeyboard) {
+        dispatch(
+          settingsActions.updateOption({
+            optionName: 'screenKeyboard',
+            value: { ...screenKeyboard, readonly: !value.data, data: true },
+          }),
+        );
+      }
+    }
   };
 
   useLayoutEffect(() => {

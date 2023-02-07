@@ -3,8 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { SettingValue } from '@lib/types';
 
-import { useTheme } from 'react-native-paper';
-
 import Input from './Input';
 import { MediumText } from './AppText';
 import Switch from './Switch';

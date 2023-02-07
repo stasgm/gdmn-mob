@@ -18,6 +18,7 @@ const SettingsScreen = () => {
 
   const { colors } = useTheme();
 
+  //Если группа не указана, подставляем базовую группу
   const settsData = useMemo(
     () =>
       Object.entries(data).reduce(
@@ -36,13 +37,15 @@ const SettingsScreen = () => {
   //Массив уникальных групп настроек
   const parents = useMemo(
     () =>
-      Object.values(settsData).reduce((prev: INamedEntity[], value: ISettingsOption<SettingValue> | undefined) => {
-        if (value?.group === undefined || prev.find((gr) => gr.id === value?.group?.id)) {
-          return prev;
-        }
+      Object.values(settsData)
+        .sort((itema, itemb) => (itema?.group?.sortOrder || 0) - (itemb?.group?.sortOrder || 0))
+        .reduce((prev: INamedEntity[], value: ISettingsOption<SettingValue>) => {
+          if (value?.group === undefined || prev.find((gr) => gr.id === value?.group?.id)) {
+            return prev;
+          }
 
-        return [...prev, value.group];
-      }, []),
+          return [...prev, value.group];
+        }, []),
     [settsData],
   );
 
@@ -75,21 +78,6 @@ const SettingsScreen = () => {
     });
   }, [navigation, actionsMenu]);
 
-  const handleCheckSettings = (optionName: string, value: ISettingsOption) => {
-    if (optionName === 'scannerUse') {
-      const screenKeyboard = Object.values(settsData).find((i) => i?.id === 'screenKeyboard');
-
-      if (screenKeyboard) {
-        dispatch(
-          settingsActions.updateOption({
-            optionName: 'screenKeyboard',
-            value: { ...screenKeyboard, readonly: !value.data, data: true },
-          }),
-        );
-      }
-    }
-  };
-
   return (
     <AppScreen>
       <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={[{ padding: 5, flexDirection: 'column' }]}>
@@ -101,14 +89,9 @@ const SettingsScreen = () => {
             return (
               <View key={groupKey}>
                 {group.id === 'base' ? (
-                  <SettingsGroup
-                    key={groupKey}
-                    list={list}
-                    onValueChange={handleUpdate}
-                    onCheckSettings={handleCheckSettings}
-                  />
+                  <SettingsGroup key={groupKey} list={list} onValueChange={handleUpdate} />
                 ) : (
-                  <View key={groupKey} style={localStyles.group}>
+                  <View key={groupKey}>
                     <Divider />
                     <TouchableOpacity
                       onPress={() => {
@@ -146,8 +129,5 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  group: {
-    paddingTop: 6,
   },
 });

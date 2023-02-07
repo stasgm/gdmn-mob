@@ -21,13 +21,11 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { IScannedObject } from '@lib/client-types';
 
-import { BarCodeScanner } from 'expo-barcode-scanner';
-
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IMovementLine, IMovementDocument } from '../../store/types';
 import { IGood, IMGoodData, IMGoodRemain, IRemains } from '../../store/app/types';
 import { getRemGoodByContact } from '../../utils/helpers';
-import { unknownGood } from '../../utils/constants';
+import { IBarcodeTypes, unknownGood } from '../../utils/constants';
 import { useSelector as useInvSelector } from '../../store';
 
 const ScanBarcodeScreen = () => {
@@ -38,6 +36,11 @@ const ScanBarcodeScreen = () => {
   const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
   const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>)?.data || 0;
   const weightSettingsCountWeight = (settings.countWeight as ISettingsOption<number>)?.data || 0;
+  const barcodeTypes =
+    (settings.barcodeTypes as ISettingsOption<Array<IBarcodeTypes>>)?.data
+      ?.filter((t) => t.selected)
+      .map((t) => t.type) || [];
+
   const isScanerReader = settings.scannerUse?.data;
   const isInputQuantity = settings.quantityInput?.data;
   const unknownGoods = useInvSelector((state) => state.appInventory.unknownGoods);
@@ -80,8 +83,16 @@ const ScanBarcodeScreen = () => {
   );
 
   const getScannedObject = useCallback(
-    (brc: string) => {
+    (brc: string, typeOk = true) => {
       if (!brc) {
+        return;
+      }
+
+      if (!typeOk) {
+        setScaner({
+          state: 'error',
+          message: 'Неверный тип штрихкода',
+        });
         return;
       }
 
@@ -208,11 +219,7 @@ const ScanBarcodeScreen = () => {
       onGetScannedObject={getScannedObject}
       onClearScannedObject={handleClearScaner}
       scaner={scaner}
-      barCodeTypes={[
-        BarCodeScanner.Constants.BarCodeType.code128,
-        BarCodeScanner.Constants.BarCodeType.ean13,
-        BarCodeScanner.Constants.BarCodeType.ean8,
-      ]}
+      barCodeTypes={barcodeTypes}
       onSearch={handleShowRemains}
     >
       {scannedObject ? (
