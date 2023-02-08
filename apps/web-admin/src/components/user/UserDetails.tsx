@@ -30,13 +30,13 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
 
   const { user: authUser } = useSelector((state) => state.auth);
 
-  const appSystems = companies.map((d) => ({ appSystems: d.appSystems }))?.[0].appSystems;
+  const appSystems = companies?.map((d) => ({ appSystems: d.appSystems }))?.[0]?.appSystems;
 
   const erpUsers = useMemo(() => {
-    return users.filter((i) => i.appSystem).map((d) => ({ id: d.id, name: d.name }));
+    return users?.filter((i) => i.appSystem).map((d) => ({ id: d.id, name: d.name }));
   }, [users]);
 
-  const companyList = companies.map((d) => ({ id: d.id, name: d.name }));
+  const companyList = companies?.map((d) => ({ id: d.id, name: d.name }));
 
   const formik = useFormik<IUser | NewUser | IUserCredentials>({
     enableReinitialize: true,
