@@ -13,19 +13,9 @@ import {
   existsSync,
 } from 'fs';
 
-import {
-  IFiles,
-  IDBProcess,
-  AddProcess,
-  IMessage,
-  IDBMessage,
-  isIDBMessage,
-  NewMessage,
-  IMessageParams,
-  IProcess,
-} from '@lib/types';
+import { IFiles, IDBProcess, AddProcess, IMessage, IDBMessage, NewMessage, IMessageParams, IProcess } from '@lib/types';
 
-import { extraPredicate, generateId, getListPart } from '../utils/helpers';
+import { extraPredicate, generateId, getListPart, isIDBMessage } from '../utils/helpers';
 
 import log from '../utils/logger';
 
