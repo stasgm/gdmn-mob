@@ -84,16 +84,6 @@ export interface IDBMessage<T = MessageType> extends Omit<IMessage<T>, 'head'> {
   head: IDBHeadMessage;
 }
 
-//TODO: добавить более специфические условия проверки
-export function isIDBHeadMessage(obj: any): obj is IDBHeadMessage {
-  return typeof obj === 'object';
-}
-
-//TODO: добавить более специфические условия проверки
-export function isIDBMessage(obj: any): obj is IDBMessage {
-  return obj['body']['version'] === 1 && isIDBHeadMessage(obj['head']);
-}
-
 export interface IFileMessageInfo {
   id: string;
   producerId: string;

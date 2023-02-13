@@ -1,3 +1,4 @@
+import { IDBHeadMessage, IDBMessage } from '@lib/types';
 import { customAlphabet } from 'nanoid';
 
 const extraPredicate = (item: any, params: Record<string, string>) => {
@@ -37,4 +38,14 @@ const generateId = () => {
   return customAlphabet('1234567890abcdef', 10)();
 };
 
-export { extraPredicate, getListPart, generateId };
+//TODO: добавить более специфические условия проверки
+function isIDBHeadMessage(obj: any): obj is IDBHeadMessage {
+  return typeof obj === 'object';
+}
+
+//TODO: добавить более специфические условия проверки
+function isIDBMessage(obj: any): obj is IDBMessage {
+  return obj['body']['version'] === 1 && isIDBHeadMessage(obj['head']);
+}
+
+export { extraPredicate, getListPart, generateId, isIDBMessage };
