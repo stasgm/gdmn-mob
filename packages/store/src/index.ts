@@ -52,7 +52,7 @@ export const configureStore = (
     referenceMiddlewareFactory,
     settingMiddlewareFactory,
     appMiddlewareFactory,
-    mesMiddlewareFactory
+    mesMiddlewareFactory,
   ];
 
   const middleware = [
