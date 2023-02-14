@@ -42,9 +42,9 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
     enableReinitialize: true,
     initialValues: isAdmin
       ? {
-          name: '',
-          email: '',
-          password: '',
+          name: user.name || '',
+          email: user.email || '',
+          password: (user as NewUser).password || '',
           verifyPassword: '',
         }
       : {
