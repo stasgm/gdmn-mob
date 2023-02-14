@@ -86,7 +86,7 @@ const DeviceBindingDetails = ({ deviceBinding, loading, onSubmit, onCancel }: IP
                 <Grid item md={6} xs={12}>
                   <FieldWithIcon
                     label="Устройство"
-                    name="deivce"
+                    name="device"
                     type="device"
                     options={devices?.map((d) => ({ id: d.id, name: d.name })) || []}
                     setFieldValue={formik.setFieldValue}
