@@ -63,7 +63,7 @@ class CollectionMessage<T extends CollectionItem> {
   }
 
   public async getPathSystem({ companyId, appSystemName }: IAppSystemParams) {
-    return `DB_${companyId}/${appSystemName}`;
+    return `db_${companyId}/${appSystemName}`;
   }
 
   public async getPathMessages(params: IAppSystemParams, fn = ''): Promise<string> {

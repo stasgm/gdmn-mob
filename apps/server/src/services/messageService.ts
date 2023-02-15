@@ -76,11 +76,13 @@ const FindMany = async ({
   companyId,
   consumerId,
   deviceId,
+  limitFiles,
 }: {
   appSystemName: string;
   companyId: string;
   consumerId: string;
   deviceId: string;
+  limitFiles: string;
 }) => {
   const { messages, users, devices } = getDb();
 
@@ -94,7 +96,9 @@ const FindMany = async ({
 
   try {
     const messageList = await messages.readByConsumerId({ companyId, appSystemName }, consumerId, deviceId);
-    const pr = messageList.map(async (i) => await makeMessage(i));
+    const limit = Number(limitFiles) || messageList.length;
+    const limitedList = messageList.sort((a, b) => a.head.order - b.head.order).slice(0, limit);
+    const pr = limitedList.map(async (i) => await makeMessage(i));
     return Promise.all(pr);
   } catch (err) {
     throw new InnerErrorException(`Поиск сообщений завершился с ошибкой ${err}`);
