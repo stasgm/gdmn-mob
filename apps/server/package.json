@@ -8,6 +8,7 @@
     "start": "cross-env NODE_ENV=prod ts-node ./src/index.ts",
     "start:mock": "cross-env MOCK=true nodemon src/index.ts",
     "build": "yarn clean-dist && tsc",
+    "prepare": "yarn build && powershell Compress-Archive dist -Update -DestinationPath ../../server.zip && powershell Compress-Archive admin -Update -DestinationPath ../../server.zip",
     "clean-dist": "rimraf ./dist",
     "nodemon:start": "yarn build && nodemon ./dist/src/index.js --watch",
     "dev": "nodemon src/index.ts",

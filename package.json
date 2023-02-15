@@ -7,6 +7,8 @@
     "configs/*"
   ],
   "scripts": {
+    "server:prepare": "yarn build:lib && yarn build:web-admin && yarn build:server && powershell Compress-Archive apps/server/dist -Update -DestinationPath server.zip && powershell Compress-Archive apps/server/admin -Update -DestinationPath server.zip",
+    "server:prepare-ubuntu": "yarn build:lib && yarn build:web-admin && yarn build:server && zip -r -u server.zip apps/server/dist apps/server/admin",
     "app:server": "lerna run --scope=@apps/server start --stream",
     "app:test": "lerna run --scope=@apps/expo-app-1 start --stream",
     "app:web": "lerna run --scope=@apps/web-admin start --stream",
