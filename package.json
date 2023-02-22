@@ -22,6 +22,7 @@
     "lint:fix": "lerna run --scope=@lib/* --scope=@apps/* lint:fix --stream",
     "prettier:fix": "lerna run --scope=@lib/* --scope=@apps/* prettier:fix --stream",
     "lerna": "lerna bootstrap",
+    "build": "yarn build:lib && yarn build:web-admin && yarn build:server",
     "build:lib": "lerna run --scope=@lib/* build --stream",
     "build:server": "lerna run --scope=@apps/server build --stream",
     "build:web-admin": "lerna run --scope=@apps/web-admin build --stream",
