@@ -53,7 +53,7 @@ export const configureStore = (
     ...[...corePersistedMiddlewares, ...persistedMiddlewares].map((m) => m(load, save)),
     ...appMiddlewares,
   ];
-  const middleWareEnhancer = applyMiddleware(...middleware); //logMiddleware
+  const middleWareEnhancer = applyMiddleware(...middleware);
   const combinedReducer = createReducer(appReducers);
 
   const store = createStore(combinedReducer, composeWithDevTools(middleWareEnhancer));
