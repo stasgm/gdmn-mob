@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "app:server": "lerna run --scope=@apps/server start --stream",
+    "app:server-js": "lerna run --scope=@apps/server start:js --stream",
     "app:test": "lerna run --scope=@apps/expo-app-1 start --stream",
     "app:web": "lerna run --scope=@apps/web-admin start --stream",
     "expo:app": "lerna run --scope=@apps/app start --stream",
@@ -23,6 +24,7 @@
     "build:lib": "lerna run --scope=@lib/* build --stream",
     "build:server": "lerna run --scope=@apps/server build --stream",
     "build:web-admin": "lerna run --scope=@apps/web-admin build --stream",
+    "build": "yarn build:lib && yarn build:web-admin && yarn build:server",
     "clean": "lerna clean",
     "clean:all": "yarn clean:node-modules && yarn clean:expo-cache && yarn clean:dist",
     "clean:dist": "rimraf packages/*/dist && rimraf apps/*/dist && rimraf configs/*/dist",

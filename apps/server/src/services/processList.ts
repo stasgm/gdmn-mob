@@ -156,7 +156,7 @@ const getPath = (folders: string[], fn = '') => {
 };
 
 const getPathSystem = ({ companyId, appSystemId }: IMessageParams) =>
-  `DB_${companyId}/${getDb().appSystems.findById(appSystemId)?.name}`;
+  `db_${companyId}/${getDb().appSystems.findById(appSystemId)?.name}`;
 
 export const getPathPrepared = (params: IMessageParams, fn = '') => getPath([getPathSystem(params), 'prepared'], fn);
 export const getPathMessages = (params: IMessageParams, fn = '') => getPath([getPathSystem(params), 'messages'], fn);

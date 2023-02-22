@@ -44,18 +44,6 @@ export interface IMessage<T = MessageType> {
   };
 }
 
-export function isIHeadMessage(obj: any): obj is IHeadMessage {
-  return typeof obj === 'object';
-}
-
-export function isIMessage(obj: any): obj is IMessage {
-  return obj['body']['version'] === 1 && isIHeadMessage(obj['head']);
-}
-
-export function isIResponseMessage(obj: any): obj is IMessage {
-  return obj['body']['version'] === 1 && isIHeadMessage(obj['head']) && !!obj['head']['replyTo'];
-}
-
 export type NewMessage = Omit<IMessage, 'head' | 'id'> & {
   head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
 };
