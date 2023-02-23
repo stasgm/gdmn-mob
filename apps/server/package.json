@@ -3,11 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "description": "Microservice for web & molb application",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
   "scripts": {
     "start": "cross-env NODE_ENV=production ts-node ./src/index.ts",
-    "start:js": "cross-env NODE_ENV=production yarn build && node ./dist/src/index.js",
+    "start:js": "node ./dist/src/index.js",
     "start:mock": "cross-env MOCK=true nodemon src/index.ts",
     "build": "yarn clean-dist && tsc",
     "clean-dist": "rimraf ./dist",

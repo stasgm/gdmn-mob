@@ -18,8 +18,6 @@ const rootRouter = new Router();
 rootRouter.prefix('/api/:version');
 
 rootRouter.param('version', (version, ctx, next) => {
-  console.log('router_version', version);
-
   ctx.query.version = version;
 
   return next();

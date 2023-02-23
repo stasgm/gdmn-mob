@@ -27,6 +27,6 @@ RUN yarn install --immutable --immutable-cache --check-cache && yarn cache clean
 RUN yarn lerna
 
 RUN yarn build:lib
-RUN yarn build:web-admin
+RUN yarn build:web-admin-linux
 
 ENTRYPOINT yarn app:server-js

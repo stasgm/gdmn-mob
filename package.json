@@ -25,6 +25,7 @@
     "build:lib": "lerna run --scope=@lib/* build --stream",
     "build:server": "lerna run --scope=@apps/server build --stream",
     "build:web-admin": "lerna run --scope=@apps/web-admin build --stream",
+    "build:web-admin-linux": "lerna run --scope=@apps/web-admin build-linux --stream",
     "clean": "lerna clean",
     "clean:all": "yarn clean:node-modules && yarn clean:expo-cache && yarn clean:dist",
     "clean:dist": "rimraf packages/*/dist && rimraf apps/*/dist && rimraf configs/*/dist",
