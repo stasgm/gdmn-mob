@@ -5,11 +5,11 @@
   "description": "Microservice for web & molb application",
   "scripts": {
     "start": "cross-env NODE_ENV=production ts-node ./src/index.ts",
-    "start:js": "cross-env NODE_ENV=production nodemon ./dist/src/index.js --watch",
+    "start:js": "cross-env NODE_ENV=production yarn build && node ./dist/src/index.js",
     "start:mock": "cross-env MOCK=true nodemon src/index.ts",
     "build": "yarn clean-dist && tsc",
     "clean-dist": "rimraf ./dist",
-    "nodemon:start": "cross-env NODE_ENV=production yarn build && nodemon ./dist/src/index.js --watch",
+    "nodemon:start": "yarn build && nodemon ./dist/src/index.js --watch",
     "dev": "nodemon src/index.ts",
     "prettier:check": "prettier --check \"src/**/*.ts\"",
     "prettier:fix": "prettier --write \"src/**/*.ts\"",

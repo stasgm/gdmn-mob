@@ -28,6 +28,5 @@ RUN yarn lerna
 
 RUN yarn build:lib
 RUN yarn build:web-admin
-RUN yarn build:server
 
 ENTRYPOINT yarn app:server-js
