@@ -46,4 +46,6 @@ yarn-error.log*
 /ssl/**/*.ca-bundle
 /ssl/**/*.crt
 
+.env.development
+.env.production
 
