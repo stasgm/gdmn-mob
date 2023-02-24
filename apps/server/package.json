@@ -5,7 +5,7 @@
   "description": "Microservice for web & molb application",
   "scripts": {
     "start": "cross-env NODE_ENV=production ts-node ./src/index.ts",
-    "start:js": "node ./dist/src/index.js",
+    "start:js": "yarn build && node ./dist/src/index.js",
     "start:mock": "cross-env MOCK=true nodemon src/index.ts",
     "build": "yarn clean-dist && tsc",
     "clean-dist": "rimraf ./dist",
@@ -43,7 +43,8 @@
     "koa2-connect-history-api-fallback": "^0.1.3",
     "nanoid": "^3.3.4",
     "passport-local": "^1.0",
-    "ramda": "^0.28.0"
+    "ramda": "^0.28.0",
+    "dotenv": "~16.0.3"
   },
   "devDependencies": {
     "@config/eslint-config": "*",

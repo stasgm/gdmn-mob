@@ -4,7 +4,7 @@ export default {
     name: 'localhost',
     port: 3651,
   },
-  timeout: 10000,
+  timeout: 60000,
   apiPath: 'api',
   version: 'v1',
   debug: {
