@@ -35,12 +35,6 @@ import { checkProcessList, loadProcessListFromDisk } from './services/processLis
 import { checkFiles } from './services/fileUtils';
 import { MSEС_IN_MIN, MSEС_IN_DAY } from './utils/constants';
 
-if (process.env.NODE_ENV === 'production') {
-  dotenv.config({ path: '.env.production' });
-} else {
-  dotenv.config({ path: '.env.development' });
-}
-
 interface IServer {
   name: string;
   dbName: string;
@@ -148,9 +142,7 @@ export const startServer = (app: KoaApp) => {
 
   const httpServer = http.createServer(koaCallback);
 
-  httpServer.listen(process.env.PORT, () =>
-    log.info(`>>> HTTP server is running at http://localhost:${process.env.PORT}`),
-  );
+  httpServer.listen(config.PORT, () => log.info(`>>> HTTP server is running at http://localhost:${config.PORT}`));
 
   /**
    * HTTPS сервер с платным сертификатом
@@ -169,8 +161,8 @@ export const startServer = (app: KoaApp) => {
     throw new Error('No CA file or file is invalid');
   }
 
-  https.createServer({ cert, ca, key }, koaCallback).listen(process.env.HTTPS_PORT, () =>
+  https.createServer({ cert, ca, key }, koaCallback).listen(config.HTTPS_PORT, () =>
     log.info(`>>> HTTPS server is running at
-  https://localhost:${process.env.HTTPS_PORT}`),
+  http://localhost:${config.HTTPS_PORT}`),
   );
 };

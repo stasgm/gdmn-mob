@@ -9,12 +9,10 @@ services:
       dockerfile: Dockerfile
       target: server
     ports:
-      - "${PORT}:${PORT}"
-      - "${HTTPS_PORT}:${HTTPS_PORT}"
+      - "3654:3654"
+      - "3655:3655"
     volumes:
-      - db:${FILES_PATH}
+      - db:/var/lib/gdmn-mob_db
       - ./apps/server/ssl:/usr/src/gdmn-mob/apps/server/ssl:ro
-    environment:
-      - NODE_ENV=development
 volumes:
   db:
