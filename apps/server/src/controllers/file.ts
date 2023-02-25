@@ -32,7 +32,6 @@ const getFiles = async (ctx: ParameterizedContext): Promise<void> => {
     params.fileName = fileName;
   }
 
-  console.log('params.fileName', params.fileName);
   if (typeof path === 'string' && path) {
     params.path = path;
   }
