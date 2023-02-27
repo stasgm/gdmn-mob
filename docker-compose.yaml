@@ -9,7 +9,7 @@ services:
       dockerfile: Dockerfile
       target: server
     env_file:
-      - .env
+      - ./apps/server/.env
     ports:
       - "${PORT}:${PORT}"
       - "${HTTPS_PORT}:${HTTPS_PORT}"

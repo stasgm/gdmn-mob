@@ -1,5 +1,8 @@
+const dotenv = require('dotenv');
+dotenv.config();
+
 const getNumber = (value: any, defaultValue: number) =>
-  value !== undefined && !isNaN(Number(value)) ? Number(process.env.HTTPS_PORT) : defaultValue;
+  value !== undefined && !isNaN(Number(value)) ? Number(value) : defaultValue;
 
 export default {
   /** Порт для сервера */
