@@ -1,5 +1,6 @@
 const dotenv = require('dotenv');
-dotenv.config();
+
+dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
 const getNumber = (value: any, defaultValue: number) =>
   value !== undefined && !isNaN(Number(value)) ? Number(value) : defaultValue;

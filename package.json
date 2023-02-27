@@ -8,7 +8,6 @@
   ],
   "scripts": {
     "app:server": "lerna run --scope=@apps/server start --stream",
-    "app:server-js": "lerna run --scope=@apps/server start:js --stream",
     "app:test": "lerna run --scope=@apps/expo-app-1 start --stream",
     "app:web": "lerna run --scope=@apps/web-admin start --stream",
     "expo:app": "lerna run --scope=@apps/app start --stream",

@@ -24,5 +24,6 @@ RUN yarn lerna
 
 RUN yarn build:lib
 RUN yarn build:web-admin-linux
+RUN yarn build:server
 
-ENTRYPOINT yarn app:server-js
+ENTRYPOINT yarn app:server
