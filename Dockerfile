@@ -2,11 +2,7 @@ FROM node:16.13.2-alpine3.15 as server
 
 WORKDIR /usr/src/gdmn-mob
 
-COPY ./package.json ./
-COPY ./lerna.json ./
-COPY ./yarn.lock ./
-COPY ./tsconfig.base.json ./
-COPY ./tsconfig.json ./
+COPY package.json lerna.json yarn.lock tsconfig.base.json tsconfig.json ./
 
 COPY ./configs/eslint-config-react ./configs/eslint-config-react
 COPY ./configs/eslint-config ./configs/eslint-config
