@@ -235,6 +235,7 @@ export const DocViewScreen = () => {
             <MediumText>
               {item.quantity} {good?.valueName} x {(item.price || 0).toString()} р.
             </MediumText>
+            {!!item.barcode && <MediumText style={[styles.number, styles.flexDirectionRow]}>{item.barcode}</MediumText>}
           </View>
         </View>
       </ListItemLine>

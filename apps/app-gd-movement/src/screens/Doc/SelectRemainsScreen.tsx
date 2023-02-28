@@ -29,6 +29,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { getRemGoodListByContact } from '../../utils/helpers';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IMovementDocument, IMovementLine } from '../../store/types';
+import { useSelector as useInvSelector } from '../../store';
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import { DocLineDialog } from './components/DocLineDialog';
@@ -59,6 +60,7 @@ export const SelectRemainsScreen = () => {
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
   const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
   const isInputQuantity = useSelector((state) => state.settings?.data?.quantityInput?.data);
+  const unknownGoods = useInvSelector((state) => state.appInventory.unknownGoods);
 
   const documentType = useMemo(
     () => documentTypes?.find((d) => d.id === document?.documentType.id),
@@ -71,8 +73,16 @@ export const SelectRemainsScreen = () => {
     [document?.head?.fromContact?.id, document?.head?.toContact?.id, documentType?.remainsField],
   );
 
-  const [goodRemains] = useState<IRemGood[]>(() =>
-    contactId ? getRemGoodListByContact(goods, remains[contactId], documentType?.isRemains) : [],
+  const goodRemains = useMemo<IRemGood[]>(
+    () =>
+      contactId
+        ? getRemGoodListByContact(
+            goods.concat(unknownGoods).sort((a, b) => (a.name < b.name ? -1 : 1)),
+            remains[contactId],
+            documentType?.isRemains,
+          )
+        : [],
+    [contactId, documentType?.isRemains, goods, remains, unknownGoods],
   );
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -92,7 +102,8 @@ export const SelectRemainsScreen = () => {
         const lower = searchQuery.toLowerCase();
 
         const fn = isNaN(Number(lower))
-          ? ({ good }: IRemGood) => good.name?.toLowerCase().includes(lower)
+          ? ({ good }: IRemGood) =>
+              good.name?.toLowerCase().includes(lower) || good.alias?.toLowerCase().includes(lower)
           : ({ good }: IRemGood) =>
               good.barcode?.includes(searchQuery) ||
               good.name?.toLowerCase().includes(lower) ||
