@@ -11,7 +11,7 @@ export default {
   /** Https порт для сервера */
   HTTPS_PORT: getNumber(process.env.HTTPS_PORT, 3654),
   /** Полный путь к папке для базы данных с json файлами */
-  FILES_PATH: process.env.FILES_PATH || 'C:\\db',
+  FILES_PATH: process.env.FILES_PATH || '/var/lib/gdmn-mob_db',
   /** Путь к папке для логов */
   LOG_PATH: process.env.LOG_PATH || './logs',
   /** Путь файла логирования ошибок относительно пути сервера*/
