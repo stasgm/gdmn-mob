@@ -9,11 +9,10 @@ let app: KoaApp | null = null;
 const testDb: IItemDatabase = {
   name: 'TEST_BASE',
   path: 'C:\\DB\\',
-  port: 3649,
 };
 
 export async function initEnvironment(): Promise<void> {
-  app = await createServer({ name: 'testServer', dbName: testDb.name, dbPath: testDb.path, port: testDb.port });
+  app = await createServer({ name: 'testServer', dbName: testDb.name, dbPath: testDb.path });
 }
 
 export async function cleanUp(): Promise<void> {

@@ -9,9 +9,9 @@ import { created, ok } from '../utils/apiHelpers';
 import { DataNotFoundException } from '../exceptions';
 
 const addDevice = async (ctx: ParameterizedContext): Promise<void> => {
-  const { name, state } = ctx.request.body as NewDevice;
+  const { name, state, company: newCompany } = ctx.request.body as NewDevice;
 
-  const company = ctx.state.user.company as INamedEntity;
+  const company = newCompany ? newCompany : (ctx.state.user.company as INamedEntity);
 
   const newDevice = deviceService.addOne({ name, company, state });
 

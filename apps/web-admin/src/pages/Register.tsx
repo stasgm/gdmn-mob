@@ -60,6 +60,8 @@ const Register = () => {
   const [captchaToken, setCaptchaToken] = useState('');
   const captchaRef = useRef(null);
 
+  const validPassword = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/);
+
   return (
     <>
       <Helmet>
@@ -119,34 +121,9 @@ const Register = () => {
               value={formik.values.name}
               variant="outlined"
             />
-            {/* <TextField
-              error={Boolean(formik.touched.firstName && formik.errors.firstName)}
-              fullWidth
-              helperText={formik.touched.firstName && formik.errors.firstName}
-              label="Имя"
-              margin="normal"
-              name="firstName"
-              onBlur={formik.handleBlur}
-              onChange={formik.handleChange}
-              value={formik.values.firstName}
-              variant="outlined"
-            />
-            <TextField
-              error={Boolean(formik.touched.lastName && formik.errors.lastName)}
-              fullWidth
-              helperText={formik.touched.lastName && formik.errors.lastName}
-              label="Фамилия"
-              margin="normal"
-              name="lastName"
-              onBlur={formik.handleBlur}
-              onChange={formik.handleChange}
-              value={formik.values.lastName}
-              variant="outlined"
-            />*/}
             <TextField
               error={Boolean(formik.touched.email && formik.errors.email)}
               fullWidth
-              // helperText={formik.touched.email && formik.errors.email}
               label="Email"
               margin="normal"
               name="email"
@@ -203,6 +180,10 @@ const Register = () => {
             {Boolean(formik.touched.policy && formik.errors.policy) && (
               <FormHelperText error>{formik.errors.policy}</FormHelperText>
             )} */}
+            <Box style={{ color: 'GrayText' }}>
+              Пароль должен содержать не менее восьми знаков, включать буквы (заглавные и строчные), цифры и специальные
+              символы
+            </Box>
             {formik.values.password !== formik.values.verifyPassword && formik.values.verifyPassword && (
               <Box style={{ color: 'red' }}>Пароли не совпадают</Box>
             )}
@@ -230,7 +211,8 @@ const Register = () => {
                   !!formik.errors.name ||
                   !!formik.errors.verifyPassword ||
                   formik.values.password !== formik.values.verifyPassword ||
-                  (!captchaToken && Boolean(process.env.REACT_APP_SITE_KEY))
+                  (!captchaToken && Boolean(process.env.REACT_APP_SITE_KEY)) ||
+                  !validPassword.test(formik.values.password)
                 }
                 fullWidth
                 size="large"

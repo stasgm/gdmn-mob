@@ -28,7 +28,7 @@ const AppSystemList = () => {
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchAppSystems(pageParams?.filterText as string);
+    fetchAppSystems(pageParams?.filterText);
   }, [fetchAppSystems, pageParams?.filterText]);
 
   const handleUpdateInput = (value: string) => {
@@ -39,13 +39,19 @@ const AppSystemList = () => {
 
   const handleSearchClick = () => {
     dispatch(actions.setPageParam({ filterText: pageParamLocal?.filterText }));
-    fetchAppSystems(pageParamLocal?.filterText as string);
+    fetchAppSystems(pageParamLocal?.filterText);
   };
 
   const handleKeyPress = (key: string) => {
     if (key !== 'Enter') return;
 
     handleSearchClick();
+  };
+
+  const handleClearSearch = () => {
+    dispatch(actions.setPageParam({ filterText: undefined }));
+    setPageParamLocal({ filterText: undefined });
+    fetchAppSystems();
   };
 
   const buttons: IToolBarButton[] = [
@@ -84,6 +90,7 @@ const AppSystemList = () => {
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
             value={(pageParamLocal?.filterText as undefined) || ''}
+            clearOnClick={handleClearSearch}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />

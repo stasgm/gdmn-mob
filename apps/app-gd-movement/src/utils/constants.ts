@@ -74,7 +74,7 @@ export const STATUS_LIST: IListItem[] = [
 ];
 
 export const getStatusColor = (status: StatusType) => {
-  let statusColor: typeof statusColors[number];
+  let statusColor: (typeof statusColors)[number];
 
   switch (status) {
     case 'DRAFT':

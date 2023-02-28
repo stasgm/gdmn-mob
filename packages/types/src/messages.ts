@@ -52,18 +52,6 @@ export interface IMultipartMessage extends ISimpleMessage {
   multipartEOF?: boolean;
 }
 
-export function isIHeadMessage(obj: any): obj is IHeadMessage {
-  return typeof obj === 'object';
-}
-
-export function isIMessage(obj: any): obj is IMessage {
-  return obj['body']['version'] === 1 && isIHeadMessage(obj['head']);
-}
-
-export function isIResponseMessage(obj: any): obj is IMessage {
-  return obj['body']['version'] === 1 && isIHeadMessage(obj['head']) && !!obj['head']['replyTo'];
-}
-
 export type SimpleNewMessage = Omit<ISimpleMessage, 'head' | 'id'> & {
   head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
 };
@@ -104,16 +92,6 @@ export interface IDBMultipartMessage extends IDBSimpleMessage {
   multipartId: string;
   multipartSeq: number;
   multipartEOF?: boolean;
-}
-
-//TODO: добавить более специфические условия проверки
-export function isIDBHeadMessage(obj: any): obj is IDBHeadMessage {
-  return typeof obj === 'object';
-}
-
-//TODO: добавить более специфические условия проверки
-export function isIDBMessage(obj: any): obj is IDBMessage {
-  return obj['body']['version'] === 1 && isIDBHeadMessage(obj['head']);
 }
 
 export interface IFileMessageInfo {

@@ -42,27 +42,25 @@ const DetailsView = ({ details }: IProps) => {
                     {item.id}
                   </Typography>
                 </Grid>
-                {Array.isArray(item.value) ? (
-                  item.value.map((i) => (
-                    <Typography variant="h4" gutterBottom key={item.id}>
-                      {getFieldValue(i)}
-                    </Typography>
-                  ))
-                ) : item.link ? (
-                  <Grid item md={10} xs={6}>
+                <Grid item md={10} xs={6}>
+                  {Array.isArray(item.value) ? (
+                    item.value.map((i) => (
+                      <Typography variant="h4" gutterBottom key={item.id}>
+                        {getFieldValue(i)}
+                      </Typography>
+                    ))
+                  ) : item.link ? (
                     <NavLink to={item.link}>
                       <Typography variant="h4" color="textPrimary" gutterBottom>
                         {getFieldValue(item.value)}
                       </Typography>
                     </NavLink>
-                  </Grid>
-                ) : (
-                  <Grid item md={10} xs={6}>
+                  ) : (
                     <Typography variant="h4" gutterBottom>
                       {getFieldValue(item.value)}
                     </Typography>
-                  </Grid>
-                )}
+                  )}
+                </Grid>
               </Grid>
             ))}
           </Grid>

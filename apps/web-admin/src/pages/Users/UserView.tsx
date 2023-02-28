@@ -52,7 +52,7 @@ const UserView = () => {
             { id: 'Отчество', value: user.middleName },
             { id: 'Телефон', value: user.phoneNumber },
             { id: 'Email', value: user.email },
-            { id: 'Идентификатор из ERP системы', value: user.externalId },
+            { id: 'ID из ERP системы', value: user.externalId },
             user.appSystem
               ? { id: 'Подсистема', value: user.appSystem?.name }
               : { id: 'Пользователь ERP', value: user.erpUser?.name },

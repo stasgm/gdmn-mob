@@ -1,5 +1,3 @@
-import { isDataView } from 'util/types';
-
 import { ThunkAction } from 'redux-thunk';
 import api from '@lib/client-api';
 
@@ -9,15 +7,28 @@ import { AppState } from '..';
 
 import { webRequest } from '../webRequest';
 
+import { IFileFilter } from '../../types';
+
 import { fileSystemActions, FileSystemActionType } from './actions';
 
 export type AppThunk = ThunkAction<Promise<FileSystemActionType>, AppState, null, FileSystemActionType>;
 
-const fetchFiles = (): AppThunk => {
+const fetchFiles = (
+  filesFilters?: IFileFilter,
+  filterText?: string,
+  fromRecord?: number,
+  toRecord?: number,
+): AppThunk => {
+  const params: Record<string, string | number> = filesFilters ? filesFilters : {};
+
+  if (filterText) params.filterText = filterText;
+  if (fromRecord) params.fromRecord = fromRecord;
+  if (toRecord) params.toRecord = toRecord;
+
   return async (dispatch) => {
     dispatch(fileSystemActions.fetchFilesAsync.request(''));
 
-    const response = await api.file.getFiles(webRequest(dispatch, authActions));
+    const response = await api.file.getFiles(webRequest(dispatch, authActions), params);
 
     if (response.type === 'GET_FILES') {
       return dispatch(fileSystemActions.fetchFilesAsync.success(response.files));

@@ -14,21 +14,22 @@ import { users as mockUsers } from './data/user';
  * @return {IUser} объект пользователя
  * */
 const addOne = (userData: NewUser): IUser => {
-  const { users } = getDb();
+  const { users, companies } = getDb();
 
   let creatorId;
   let company: string | null = null;
 
   if (userData.creator) {
     const creator = users.findById(userData.creator.id);
+    const adminId = userData.company ? companies.findById(userData.company?.id)?.adminId : '';
 
-    if (!creator?.company) {
+    if (!creator?.company && creator?.role !== 'SuperAdmin') {
       // Нельзя создавать пользователей пока не создана администратором организация
       throw new InvalidParameterException('Не создана организация');
     }
 
-    creatorId = creator.id;
-    company = creator.company;
+    creatorId = creator?.role === 'SuperAdmin' ? adminId : creator.id;
+    company = creator?.role === 'SuperAdmin' ? userData.company?.id || '' : creator.company;
   }
 
   if (users.data.find((i) => i.name.toUpperCase() === userData.name.toUpperCase())) {

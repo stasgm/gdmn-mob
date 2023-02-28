@@ -13,19 +13,9 @@ import {
   existsSync,
 } from 'fs';
 
-import {
-  IFiles,
-  IDBProcess,
-  AddProcess,
-  IMessage,
-  IDBMessage,
-  isIDBMessage,
-  NewMessage,
-  IMessageParams,
-  IProcess,
-} from '@lib/types';
+import { IFiles, IDBProcess, AddProcess, IMessage, IDBMessage, NewMessage, IMessageParams, IProcess } from '@lib/types';
 
-import { extraPredicate, generateId, getListPart } from '../utils/helpers';
+import { extraPredicate, generateId, getListPart, isIDBMessage } from '../utils/helpers';
 
 import log from '../utils/logger';
 
@@ -166,7 +156,7 @@ const getPath = (folders: string[], fn = '') => {
 };
 
 const getPathSystem = ({ companyId, appSystemId }: IMessageParams) =>
-  `DB_${companyId}/${getDb().appSystems.findById(appSystemId)?.name}`;
+  `db_${companyId}/${getDb().appSystems.findById(appSystemId)?.name}`;
 
 export const getPathPrepared = (params: IMessageParams, fn = '') => getPath([getPathSystem(params), 'prepared'], fn);
 export const getPathMessages = (params: IMessageParams, fn = '') => getPath([getPathSystem(params), 'messages'], fn);

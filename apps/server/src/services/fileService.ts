@@ -6,8 +6,8 @@ import { readListFiles, getFile, deleteFileById, updateById, deleteManyFiles } f
  * Возвращает множество файлов
  * @returns Массив объектов файлов
  */
-const findMany = async (): Promise<IFileSystem[]> => {
-  return await readListFiles();
+const findMany = async (params: Record<string, string | number>): Promise<IFileSystem[]> => {
+  return await readListFiles(params);
 };
 
 //**

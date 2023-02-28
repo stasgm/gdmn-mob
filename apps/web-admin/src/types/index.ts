@@ -16,6 +16,11 @@ export interface IToolBarButton {
 
 export interface IPageParam {
   [name: string]: unknown;
+  filterText?: string;
+  fromRecord?: number;
+  toRecord?: number;
+  page?: number;
+  limit?: number;
 }
 
 export interface IHeadCells<T> {
@@ -36,8 +41,8 @@ export interface IMessageHead {
   message: string;
 }
 
-export interface IFileFormik {
-  [fieldName: string]: unknown;
+export interface IFileFilter {
+  [fieldName: string]: string;
   path: string;
   fileName: string;
   company: string;
@@ -49,14 +54,22 @@ export interface IFileFormik {
   date: string;
 }
 
-export interface IDeviceLogFileFormik {
-  [fieldName: string]: unknown;
+export interface IFilePageParam extends IPageParam {
+  filesFilters?: IFileFilter;
+}
+
+export interface IDeviceLogFileFilter {
+  [fieldName: string]: string;
   company: string;
   appSystem: string;
   contact: string;
   device: string;
   uid: string;
   date: string;
+}
+
+export interface IDeviceLogPageParam extends IPageParam {
+  logFilters?: IDeviceLogFileFilter;
 }
 
 export interface ILinkedEntity extends IEntity {

@@ -81,7 +81,7 @@ const UserDetailsView = ({ user }: IProps) => {
               </Grid>
               <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>
-                  Идентификатор из ERP системы
+                  ID из ERP системы
                 </Typography>
               </Grid>
               <Grid item md={10} xs={6}>
@@ -95,11 +95,9 @@ const UserDetailsView = ({ user }: IProps) => {
                 </Typography>
               </Grid>
               <Grid item md={10} xs={6}>
-                {/* <NavLink to={`${adminPath}/app/users/${user.erpUser?.id}`} key={user.erpUser?.id}> */}
                 <Typography variant="h4" gutterBottom>
                   {user.appSystem ? user.appSystem.name : user.erpUser?.name}
                 </Typography>
-                {/* </NavLink> */}
               </Grid>
               <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>

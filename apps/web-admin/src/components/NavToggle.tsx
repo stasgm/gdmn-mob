@@ -10,7 +10,6 @@ const NavToggle = ({ compact, setCompact }: IProps) => {
   return (
     <Box sx={{ background: 'transparent', border: 'none', display: { xs: 'none', lg: 'block' } }}>
       <Button
-        // component={RouterLink}
         sx={{
           color: 'text.secondary',
           fontWeight: 'medium',

@@ -1,5 +1,5 @@
 import { styles } from '@lib/mobile-navigation';
-import { ItemSeparator, NumberKeypad, Checkbox } from '@lib/mobile-ui';
+import { Checkbox, ItemSeparator, NumberKeypad } from '@lib/mobile-ui';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View, Text, ScrollView, TextInput, Keyboard } from 'react-native';

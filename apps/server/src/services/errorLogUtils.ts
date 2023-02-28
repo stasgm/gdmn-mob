@@ -1,7 +1,7 @@
 import path from 'path';
 import { readdir, unlink, stat } from 'fs/promises';
 
-import { IPathParams, IFileDeviceLogInfo, IDeviceLog, IDeviceLogFiles } from '@lib/types';
+import { IPathParams, IFileDeviceLogInfo, IDeviceLog, IDeviceLogFiles, IDeviceLogOptions } from '@lib/types';
 
 import {
   checkFileExists,
@@ -12,11 +12,15 @@ import {
   readJsonFile,
   getAppSystemId,
   writeIterableToFile,
+  getFoundEntity,
+  getFoundString,
 } from '../utils/fileHelper';
 
 import config from '../../config';
 
 import log from '../utils/logger';
+
+import { getListPart } from '../utils/helpers';
 
 import { BYTES_PER_KB } from '../utils/constants';
 
@@ -197,7 +201,7 @@ const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined
   }
 };
 
-export const getFilesObject = async (): Promise<IDeviceLogFiles[]> => {
+export const getFilesObject = async (params: Record<string, string | number>): Promise<IDeviceLogFiles[]> => {
   const filesFull = await getDeviceLogsFiles();
   let fileObjs: IDeviceLogFiles[] = [];
   for (const item of filesFull) {
@@ -207,7 +211,52 @@ export const getFilesObject = async (): Promise<IDeviceLogFiles[]> => {
     const fileObj = await fileInfoToObj((match ? match[1] : item).split(path.sep));
     if (fileObj) fileObjs = [...fileObjs, fileObj];
   }
-  return fileObjs;
+
+  fileObjs = fileObjs.filter((item: IDeviceLogFiles) => {
+    const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
+
+    const companyFound = getFoundEntity('company', newParams, item);
+    const appSystemFound = getFoundEntity('appSystem', newParams, item);
+    const contactFound = getFoundEntity('contact', newParams, item);
+    const deviceFound = getFoundEntity('device', newParams, item);
+
+    let dateFound = true;
+    if ('date' in newParams) {
+      dateFound = false;
+      if (item.date) {
+        const date = new Date(item.date || '').toLocaleString('ru', { hour12: false }).toUpperCase();
+        dateFound = date.includes((newParams.date as string).toUpperCase());
+        delete newParams['date'];
+      }
+    }
+
+    let uidFound = true;
+    if ('uid' in newParams) {
+      uidFound = false;
+      if (item.device) {
+        const uid = item.device.id.toUpperCase();
+        uidFound = uid.includes((newParams.uid as string).toUpperCase());
+        delete newParams['uid'];
+      }
+    }
+
+    /** filtering data */
+    /* let filteredFiles = true;
+    if ('filterText' in newParams) {
+      const filterText: string = (newParams.filterText as string).toUpperCase();
+
+      if (filterText) {
+        const fileName = item.fileName.toUpperCase();
+
+        filteredFiles = fileName.includes(filterText);
+      }
+      delete newParams['filterText'];
+    }
+ */
+    return companyFound && appSystemFound && contactFound && deviceFound && dateFound && uidFound;
+  });
+
+  return getListPart(fileObjs, params);
 };
 
 export const getFile = async <IDeviceLog>(fid: string): Promise<IDeviceLog[]> => {

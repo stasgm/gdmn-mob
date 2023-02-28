@@ -19,7 +19,7 @@ import {
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 
-import { IHeadCells } from '../types';
+import { IHeadCells, IPageParam } from '../types';
 import { deviceStates, adminPath } from '../utils/constants';
 
 type Order = 'asc' | 'desc';
@@ -31,13 +31,24 @@ const useStyles = makeStyles(() => ({
 interface IProps<T extends { id: string }> {
   headCells: IHeadCells<T>[];
   data: T[];
-  path: string;
+  path?: string;
+  onSetPageParams?: (pageParams: IPageParam) => void;
+  pageParams?: IPageParam | undefined;
 }
 
-function SortableTable<T extends { id: string }>({ data = [], headCells = [], path, ...rest }: IProps<T>) {
+function SortableTable<T extends { id: string }>({
+  data = [],
+  headCells = [],
+  path,
+  onSetPageParams,
+  pageParams,
+  ...rest
+}: IProps<T>) {
   const [selectedItemIds, setSelectedItemIds] = useState<any>([]);
-  const [limit, setLimit] = useState(10);
-  const [page, setPage] = useState(0);
+  const [limit, setLimit] = useState(
+    pageParams?.limit && !isNaN(Number(pageParams?.limit)) ? Number(pageParams?.limit) : 10,
+  );
+  const [page, setPage] = useState(pageParams?.page && !isNaN(Number(pageParams?.page)) ? Number(pageParams.page) : 0);
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof T>(); //headCells[0].id
   const classes = useStyles();
@@ -76,10 +87,12 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], pa
 
   const handleLimitChange = (event: any) => {
     setLimit(event.target.value);
+    onSetPageParams && onSetPageParams({ ...pageParams, limit: event.target.value });
   };
 
   const handlePageChange = (_event: any, newPage: any) => {
     setPage(newPage);
+    onSetPageParams && onSetPageParams({ ...pageParams, page: newPage });
   };
 
   const handleSortRequest = (cellId: keyof T) => {
@@ -155,11 +168,17 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], pa
                     display: 'flex',
                   }}
                 >
-                  <NavLink to={`${adminPath}${path}${item.id}`}>
+                  {path ? (
+                    <NavLink to={`${adminPath}${path}${item.id}`}>
+                      <Typography color="textPrimary" variant="body1" key={item.id}>
+                        {DeserializeProp<T>(headCell.id, item[headCell.id])}
+                      </Typography>
+                    </NavLink>
+                  ) : (
                     <Typography color="textPrimary" variant="body1" key={item.id}>
                       {DeserializeProp<T>(headCell.id, item[headCell.id])}
                     </Typography>
-                  </NavLink>
+                  )}
                 </Box>
               </TableCell>
             );
