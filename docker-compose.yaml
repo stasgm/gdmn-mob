@@ -8,8 +8,8 @@ services:
       context: .
       dockerfile: Dockerfile
       target: server
-    environment:
-      - NODE_ENV=production
+    env_file:
+      - .env.production
     ports:
       - "3655:3655"
       - "3654:3654"

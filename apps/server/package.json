@@ -6,7 +6,7 @@
   "scripts": {
     "build": "yarn clean-dist && tsc",
     "dev": "nodemon src/index.ts",
-    "dev:start-js": "cross-env NODE_ENV=development yarn build && node ./dist/src/index.js",
+    "dev:start-js": "yarn build && cross-env NODE_ENV=development node ./dist/src/index.js",
     "start": "node ./dist/src/index.js",
     "clean-dist": "rimraf ./dist",
     "nodemon:start": "yarn build && nodemon ./dist/src/index.js --watch",
