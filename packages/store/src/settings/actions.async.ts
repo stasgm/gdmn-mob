@@ -22,7 +22,7 @@ const addSettings = (
   ActionType<typeof actions.addSettingsAsync>
 > => {
   return async (dispatch) => {
-    dispatch(actions.addSettingsAsync.request(''));
+    dispatch(actions.addSettingsAsync.request());
 
     //TODO: проверка
     if (settings) {

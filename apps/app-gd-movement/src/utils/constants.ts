@@ -1,6 +1,7 @@
 import { IListItem } from '@lib/mobile-types';
-import { baseSettingGroup } from '@lib/store';
+import { mainSettingGroup } from '@lib/store';
 import { Settings, StatusType } from '@lib/types';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 
 import { IGood } from '../store/app/types';
 
@@ -12,6 +13,19 @@ export const contactTypes: IListItem[] = [
   { id: 'department', value: 'Подразделение' },
   { id: 'contact', value: 'Организация' },
   { id: 'employee', value: 'Сотрудник' },
+];
+
+export interface IBarcodeTypes extends IListItem {
+  selected?: boolean;
+  type: string;
+}
+
+export const barcodeList: IBarcodeTypes[] = [
+  { id: 'ean8', value: 'EAN-8', type: BarCodeScanner.Constants.BarCodeType.ean8 },
+  { id: 'ean13', value: 'EAN-13', type: BarCodeScanner.Constants.BarCodeType.ean13, selected: true },
+  { id: 'code128', value: 'Code 128', type: BarCodeScanner.Constants.BarCodeType.code128, selected: true },
+  { id: 'datamatrix', value: 'Data Matrix', type: BarCodeScanner.Constants.BarCodeType.datamatrix },
+  { id: 'qr', value: 'QR code', type: BarCodeScanner.Constants.BarCodeType.qr },
 ];
 
 export const docContactTypes: IListItem[] = [{ id: 'all', value: 'Все' }];
@@ -87,62 +101,75 @@ export const getStatusColor = (status: StatusType) => {
   return statusColor;
 };
 
-const goodGroup = { id: 'goodScan', name: 'Весовой товар', sortOrder: 2 };
+const goodGroup = { id: 'goodScan', name: 'Весовой товар', sortOrder: 1 };
+const scanSettings = { id: 'scanSettings', name: 'Настройки сканера', sortOrder: 3 };
 
 export const appSettings: Settings = {
   scannerUse: {
     id: 'scannerUse',
-    sortOrder: 3,
+    sortOrder: 30,
     description: 'Использовать сканер',
     data: true,
     type: 'boolean',
     visible: true,
-    group: baseSettingGroup,
+    group: scanSettings,
   },
-  screenKeyboard: {
-    id: 'screenKeyboard',
-    sortOrder: 4,
-    description: 'Экранная клавиатура',
-    data: true,
-    type: 'boolean',
+  barcodeTypes: {
+    id: 'barcodeTypes',
+    sortOrder: 31,
+    description: 'Типы штрихкодов',
+    data: barcodeList,
+    type: 'number',
     visible: true,
-    group: baseSettingGroup,
-  },
-  quantityInput: {
-    id: 'quantityInput',
-    sortOrder: 5,
-    description: 'Заполнять количество',
-    data: false,
-    type: 'boolean',
-    visible: true,
-    group: baseSettingGroup,
+    group: scanSettings,
   },
   weightCode: {
     id: 'weightCode',
-    sortOrder: 6,
-    description: 'Идентификатор весового товара',
+    sortOrder: 32,
+    description: 'ID весового товара',
     data: '22',
     type: 'string',
     visible: true,
-    group: goodGroup,
+    group: scanSettings,
+    groupInGroup: goodGroup,
   },
   countCode: {
     id: 'countCode',
-    sortOrder: 7,
+    sortOrder: 33,
     description: 'Кол-во символов кода товара',
     data: 5,
     type: 'number',
     visible: true,
-    group: goodGroup,
+    group: scanSettings,
+    groupInGroup: goodGroup,
   },
   countWeight: {
     id: 'countWeight',
-    sortOrder: 8,
+    sortOrder: 34,
     description: 'Кол-во символов веса (в гр.)',
     data: 5,
     type: 'number',
     visible: true,
-    group: goodGroup,
+    group: scanSettings,
+    groupInGroup: goodGroup,
+  },
+  screenKeyboard: {
+    id: 'screenKeyboard',
+    sortOrder: 8,
+    description: 'Экранная клавиатура',
+    data: true,
+    type: 'boolean',
+    visible: true,
+    group: mainSettingGroup,
+  },
+  quantityInput: {
+    id: 'quantityInput',
+    sortOrder: 9,
+    description: 'Заполнять количество',
+    data: false,
+    type: 'boolean',
+    visible: true,
+    group: mainSettingGroup,
   },
 };
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, ReactNode } from 'react';
-import { View, TouchableOpacity, Vibration, Text } from 'react-native';
+import { View, TouchableOpacity, Vibration, Text, Alert } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import { Camera, FlashMode, AutoFocus, WhiteBalance } from 'expo-camera';
 
@@ -24,7 +24,7 @@ const ONE_SECOND_IN_MS = 1000;
 interface IProps {
   scaner: IScannedObject;
   onSave?: () => void;
-  onGetScannedObject: (brc: string) => void;
+  onGetScannedObject: (brc: string, typeOk?: boolean) => void;
   onClearScannedObject: () => void;
   barCodeTypes: string[];
   children?: ReactNode;
@@ -72,10 +72,10 @@ const ScanBarcode = ({
     }
   }, [scaner, visibleDialog]);
 
-  const handleBarCodeScanned = (data: string) => {
+  const handleBarCodeScanned = (data: string, typeOk?: boolean) => {
     const brc = data.replace(']C1', '');
     setBarcode(brc);
-    onGetScannedObject(brc);
+    onGetScannedObject(brc, typeOk);
   };
 
   const handleHideDialog = () => {
@@ -132,7 +132,9 @@ const ScanBarcode = ({
         barCodeScannerSettings={barCodeTypes ? { barCodeTypes } : undefined}
         autoFocus={AutoFocus.on}
         whiteBalance={WhiteBalance.auto}
-        onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
+        onBarCodeScanned={({ data, type }: { data: string; type: string }) =>
+          !scanned && handleBarCodeScanned(data, barCodeTypes ? barCodeTypes.indexOf(type) >= 0 : true)
+        }
         style={cameraStyle}
       >
         <View style={styles.header}>
