@@ -64,9 +64,15 @@ export function isIResponseMessage(obj: any): obj is IMessage {
   return obj['body']['version'] === 1 && isIHeadMessage(obj['head']) && !!obj['head']['replyTo'];
 }
 
-export type NewMessage = Omit<IMessage, 'head' | 'id'> & {
+export type SimpleNewMessage = Omit<ISimpleMessage, 'head' | 'id'> & {
   head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
 };
+
+export type MultipartNewMessage = Omit<IMultipartMessage, 'head' | 'id'> & {
+  head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
+};
+
+export type NewMessage = SimpleNewMessage | MultipartNewMessage;
 
 export interface IDataMessage<T = any> {
   id: string;

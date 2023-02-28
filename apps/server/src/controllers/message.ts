@@ -51,7 +51,9 @@ const getMessages = async (ctx: ParameterizedContext): Promise<void> => {
     deviceId: deviceId,
   });
 
-  ok(ctx as Context, messageList, `getMessages: message deviceId=${deviceId} is successfully received`);
+  const limitedList = messageList.sort((a, b) => a.head.order - b.head.order);
+
+  ok(ctx as Context, limitedList, `getMessages: message deviceId=${deviceId} is successfully received`);
 };
 
 const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
