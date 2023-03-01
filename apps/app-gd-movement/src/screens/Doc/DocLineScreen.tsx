@@ -83,11 +83,8 @@ export const DocLineScreen = () => {
             }
             //Предупреждение, если количество по товару больше остатков
             if (
-              (!!documentType?.isControlRemains && line.quantity > (line.remains || 0)) ||
               (!!documentType?.isControlRemains &&
-                showZeroRemains &&
-                !!documentType?.isRemains &&
-                (line.remains || 0) === 0) ||
+                (line.quantity > (line.remains || 0) || (line.remains || 0) === 0)) ||
               !line.quantity
             ) {
               const response = await AsyncAlert(
@@ -106,14 +103,7 @@ export const DocLineScreen = () => {
         />
       </View>
     ),
-    [
-      documentType?.isControlRemains,
-      documentType?.isRemains,
-      line.quantity,
-      line.remains,
-      screenState,
-      showZeroRemains,
-    ],
+    [documentType?.isControlRemains, line.quantity, line.remains, screenState],
   );
 
   useLayoutEffect(() => {
