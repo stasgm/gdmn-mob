@@ -33,6 +33,10 @@ const ScanBarcodeScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'ScanBarcode'>>();
   const settings = useSelector((state) => state.settings?.data);
 
+  const isScanerReader = settings?.scannerUse?.data;
+  const showZeroRemains = settings?.showZeroRemains?.data;
+  const isInputQuantity = settings?.quantityInput?.data;
+
   const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
   const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>)?.data || 0;
   const weightSettingsCountWeight = (settings.countWeight as ISettingsOption<number>)?.data || 0;
@@ -41,8 +45,6 @@ const ScanBarcodeScreen = () => {
       ?.filter((t) => t.selected)
       .map((t) => t.type) || [];
 
-  const isScanerReader = settings.scannerUse?.data;
-  const isInputQuantity = settings.quantityInput?.data;
   const unknownGoods = useInvSelector((state) => state.appInventory.unknownGoods);
 
   const [scaner, setScaner] = useState<IScannedObject>({ state: 'init' });
@@ -76,10 +78,17 @@ const ScanBarcodeScreen = () => {
     [document?.head?.fromContact?.id, document?.head?.toContact?.id, documentType?.remainsField],
   );
 
+  const noZeroRemains = useMemo(
+    () => !!documentType?.isControlRemains && !showZeroRemains && !!documentType?.isRemains,
+    [documentType?.isControlRemains, documentType?.isRemains, showZeroRemains],
+  );
+
   const goodRemains = useMemo<IMGoodData<IMGoodRemain>>(
     () =>
-      contactId ? getRemGoodByContact(goods.concat(unknownGoods), remains[contactId], documentType?.isRemains) : {},
-    [contactId, documentType?.isRemains, goods, remains, unknownGoods],
+      contactId
+        ? getRemGoodByContact(goods.concat(unknownGoods), remains[contactId], documentType?.isRemains, noZeroRemains)
+        : {},
+    [contactId, documentType?.isRemains, goods, noZeroRemains, remains, unknownGoods],
   );
 
   const getScannedObject = useCallback(
