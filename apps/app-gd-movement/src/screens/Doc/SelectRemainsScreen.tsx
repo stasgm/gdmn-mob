@@ -52,14 +52,16 @@ export const SelectRemainsScreen = () => {
 
   const [filterVisible, setFilterVisible] = useState(false);
 
-  const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
+  const settings = useSelector((state) => state.settings?.data);
+  const isScanerReader = settings?.scannerUse?.data;
+  const showZeroRemains = settings?.showZeroRemains?.data;
+  const isInputQuantity = settings?.quantityInput?.data;
 
   const document = docSelectors.selectByDocId<IMovementDocument>(docId);
 
   const goods = refSelectors.selectByName<IGood>('good')?.data;
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
   const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
-  const isInputQuantity = useSelector((state) => state.settings?.data?.quantityInput?.data);
   const unknownGoods = useInvSelector((state) => state.appInventory.unknownGoods);
 
   const documentType = useMemo(
@@ -73,23 +75,36 @@ export const SelectRemainsScreen = () => {
     [document?.head?.fromContact?.id, document?.head?.toContact?.id, documentType?.remainsField],
   );
 
-  const goodRemains = useMemo<IRemGood[]>(
-    () =>
-      contactId
-        ? getRemGoodListByContact(
-            goods.concat(unknownGoods).sort((a, b) => (a.name < b.name ? -1 : 1)),
-            remains[contactId],
-            documentType?.isRemains,
-          )
-        : [],
-    [contactId, documentType?.isRemains, goods, remains, unknownGoods],
+  const noZeroRemains = useMemo(
+    () => !!documentType?.isControlRemains && !showZeroRemains && !!documentType?.isRemains,
+    [documentType?.isControlRemains, documentType?.isRemains, showZeroRemains],
   );
+
+  const goodRemains = useMemo<IRemGood[]>(() => {
+    return contactId
+      ? getRemGoodListByContact(
+          goods.concat(unknownGoods).sort((a, b) => (a.name < b.name ? -1 : 1)),
+          remains[contactId],
+          documentType?.isRemains,
+          noZeroRemains,
+        )
+      : [];
+  }, [contactId, documentType?.isRemains, goods, noZeroRemains, remains, unknownGoods]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredList, setFilteredList] = useState<IFilteredList>({
     searchQuery: '',
     goodRemains,
   });
+
+  useEffect(
+    () =>
+      setFilteredList({
+        searchQuery: '',
+        goodRemains,
+      }),
+    [goodRemains],
+  );
 
   useEffect(() => {
     if (searchQuery !== filteredList.searchQuery) {

@@ -171,6 +171,15 @@ export const appSettings: Settings = {
     visible: true,
     group: mainSettingGroup,
   },
+  showZeroRemains: {
+    id: 'showZeroRemains',
+    sortOrder: 10,
+    description: 'Нулевые остатки в склад. документах',
+    data: true,
+    type: 'boolean',
+    visible: true,
+    group: mainSettingGroup,
+  },
 };
 
 export const unknownGood: IGood = {
