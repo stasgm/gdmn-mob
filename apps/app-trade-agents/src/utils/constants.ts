@@ -1,5 +1,5 @@
 import { IListItem } from '@lib/mobile-types';
-import { baseSettingGroup } from '@lib/store';
+import { mainSettingGroup } from '@lib/store';
 import { INamedEntity, Settings, StatusType } from '@lib/types';
 
 export const ONE_SECOND_IN_MS = 1000;
@@ -49,7 +49,7 @@ export const appSettings: Settings = {
     type: 'boolean',
     sortOrder: 3,
     visible: true,
-    group: baseSettingGroup,
+    group: mainSettingGroup,
   },
 };
 
