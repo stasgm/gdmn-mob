@@ -48,6 +48,7 @@ import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
 import { messageFpMovement, tempOrders } from './src/store/mock';
 import { FreeShipmentNavigator } from './src/navigation/FreeShipmentNavigator';
 import { ShipmentNavigator } from './src/navigation/ShipmentNavigator';
+import { CellsNavigator } from './src/navigation/CellsNavigator';
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -69,6 +70,12 @@ const Root = () => {
         title: 'Отвес',
         icon: 'playlist-plus',
         component: FreeShipmentNavigator,
+      },
+      {
+        name: 'CellShipment',
+        title: 'Ячейки',
+        icon: 'table-split-cell',
+        component: CellsNavigator,
       },
     ],
     [],

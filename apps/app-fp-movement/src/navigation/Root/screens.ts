@@ -1,4 +1,4 @@
-import { MoveListScreen, MoveEditScreen, MoveViewScreen } from '../../screens/Movements';
+import { MoveListScreen, MoveEditScreen, MoveViewScreen, SelectCellScreen } from '../../screens/Movements';
 
 import {
   ShipmentListScreen,
@@ -9,6 +9,7 @@ import {
 } from '../../screens/Shipment';
 
 import { FreeShipmentListScreen, FreeShipmentEditScreen, FreeShipmentViewScreen } from '../../screens/FreeShipment';
+import { CellsViewScreen, ContactListScreen, GoodLineScreen } from '../../screens/Cells';
 import { SelectRefItemScreen } from '../../components';
 
 export const moveScreens = {
@@ -16,6 +17,7 @@ export const moveScreens = {
   MoveView: { title: '', component: MoveViewScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
   ScanGood: { title: 'Сканер', component: ScanGoodScreen },
+  SelectCell: { title: 'Выбор ячейки', component: SelectCellScreen },
 };
 
 export const moveListScreens = {
@@ -27,6 +29,7 @@ export const shipmentScreens = {
   ShipmentView: { title: '', component: ShipmentViewScreen },
   ScanOrder: { title: 'Сканер заявки', component: ScanOrderScreen },
   ScanGood: { title: 'Сканер', component: ScanGoodScreen },
+  SelectCell: { title: 'Выбор ячейки', component: SelectCellScreen },
 };
 
 export const shipmentListScreens = {
@@ -42,4 +45,13 @@ export const freeShipmentScreens = {
 
 export const freeShipmentListScreens = {
   FreeShipmentList: { title: 'Отвесы', component: FreeShipmentListScreen },
+};
+
+export const cellsScreens = {
+  CellsView: { title: 'Ячейки', component: CellsViewScreen },
+  GoodLine: { title: 'Позиция ячейки', component: GoodLineScreen },
+};
+
+export const cellsListScreens = {
+  ContactList: { title: 'Ячейки', component: ContactListScreen },
 };

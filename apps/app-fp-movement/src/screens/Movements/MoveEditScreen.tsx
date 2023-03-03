@@ -78,7 +78,8 @@ export const MoveEditScreen = () => {
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
           fromDepart: docDocumentSubtype?.id === 'internalMovement' ? defaultDepart : undefined,
-          toDepart: docDocumentSubtype?.id === 'movement' ? defaultDepart : undefined,
+          toDepart:
+            docDocumentSubtype?.id === 'movement' || docDocumentSubtype?.id === 'prihod' ? defaultDepart : undefined,
         }),
       );
     }
@@ -100,17 +101,22 @@ export const MoveEditScreen = () => {
       }
 
       if (
-        !(
-          (docDocumentSubtype?.id === 'internalMovement' && docFromDepart) ||
-          (docDocumentSubtype?.id === 'movement' && docToDepart)
-        )
+        (docDocumentSubtype?.id === 'internalMovement' && !docFromDepart) ||
+        (docDocumentSubtype?.id === 'movement' && !docToDepart)
       ) {
         Alert.alert('Ошибка!', 'Нет подразделения пользователя. Обратитесь к администратору.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
       }
 
-      if (!(docNumber && docDate && docFromDepart && docToDepart)) {
+      if (
+        !(
+          docNumber &&
+          docDate &&
+          docFromDepart &&
+          (docDocumentSubtype.id === 'cellMovement' ? !docToDepart : docToDepart)
+        )
+      ) {
         Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
@@ -129,7 +135,7 @@ export const MoveEditScreen = () => {
           head: {
             comment: docComment && docComment.trim(),
             fromDepart: docFromDepart,
-            toDepart: docToDepart,
+            toDepart: docDocumentSubtype.id === 'cellMovement' ? docFromDepart : docToDepart,
             subtype: docDocumentSubtype,
           },
           lines: [],
@@ -160,7 +166,9 @@ export const MoveEditScreen = () => {
             ...doc.head,
             comment: docComment && docComment.trim(),
             fromDepart: docFromDepart,
-            toDepart: docToDepart,
+            // toDepart: docToDepart,
+            toDepart: docDocumentSubtype.id === 'cellMovement' ? docFromDepart : docToDepart,
+
             subtype: docDocumentSubtype,
           },
           lines: doc.lines,
@@ -254,11 +262,18 @@ export const MoveEditScreen = () => {
       return;
     }
 
+    const params: Record<string, string> = {};
+
+    if (docDocumentSubtype?.id === 'cellMovement') {
+      params.isAddressedStore = 'true';
+    }
+
     navigation.navigate('SelectRefItem', {
       refName: 'depart',
       fieldName: 'toDepart',
       value: docToDepart && [docToDepart],
       descrFieldName: 'shcode',
+      clause: params,
     });
   };
 
@@ -318,14 +333,19 @@ export const MoveEditScreen = () => {
             label={'Откуда'}
             value={docFromDepart?.name}
             onPress={handleFromDepart}
-            disabled={docDocumentSubtype?.id === 'internalMovement' || !docDocumentSubtype ? true : isBlocked}
+            disabled={!docDocumentSubtype ? true : isBlocked}
+            // disabled={docDocumentSubtype?.id === 'internalMovement' || !docDocumentSubtype ? true : isBlocked}
           />
 
           <SelectableInput
             label={'Куда'}
-            value={docToDepart?.name}
+            value={docDocumentSubtype?.id === 'cellMovement' ? docFromDepart?.name : docToDepart?.name}
             onPress={handleToDepart}
-            disabled={docDocumentSubtype?.id === 'movement' || !docDocumentSubtype ? true : isBlocked}
+            disabled={
+              docDocumentSubtype?.id === 'movement' || docDocumentSubtype?.id === 'cellMovement' || !docDocumentSubtype
+                ? true
+                : isBlocked
+            }
           />
           <Input
             label="Комментарий"

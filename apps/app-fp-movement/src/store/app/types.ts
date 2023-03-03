@@ -1,7 +1,13 @@
 import { IEntity, INamedEntity } from '@lib/types';
 
+import { ICellRef } from '../types';
+
 export interface ICodeEntity extends INamedEntity {
   shcode: string;
+}
+
+export interface IAddressStoreEntity extends INamedEntity {
+  isAddressStore?: boolean;
 }
 
 export type FpMovementState = {
@@ -44,4 +50,24 @@ export interface ITempLine extends IEntity {
   good: IGood; // товар
   weight: number; //вес
   packagekey?: INamedEntity; // Вид упаковки
+}
+
+export interface IModelData {
+  [id: string]: IChamberData;
+}
+
+export interface IChamberData {
+  [id: string]: IRowData;
+}
+
+export interface IRowData {
+  [id: string]: ICellsData[];
+}
+
+export interface ICellRefList {
+  [id: string]: ICellRef[];
+}
+
+export interface ICellsData extends ICellRef {
+  cell: string;
 }

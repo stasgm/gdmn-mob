@@ -118,7 +118,14 @@ export const MoveViewScreen = () => {
           sortOrder: (doc?.lines?.length || 0) + 1,
         };
         setErrorMessage('');
-        dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
+        if (
+          (doc?.head.subtype.id === 'prihod' && doc?.head.toDepart.isAddressStore) ||
+          (doc.head.subtype.id !== 'prihod' && doc.head.fromDepart.isAddressStore)
+        ) {
+          navigation.navigate('SelectCell', { docId: id, item: barcodeItem, mode: 0 });
+        } else {
+          dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
+        }
 
         setVisibleDialog(false);
         setBarcode('');
@@ -127,7 +134,7 @@ export const MoveViewScreen = () => {
       }
     },
 
-    [doc, minBarcodeLength, goodBarcodeSettings, goods, dispatch, id],
+    [doc, minBarcodeLength, goodBarcodeSettings, goods, navigation, id, dispatch],
   );
 
   const handleShowDialog = () => {
@@ -280,7 +287,11 @@ export const MoveViewScreen = () => {
   // }, []);
 
   const renderItem: ListRenderItem<IMoveLine> = ({ item }) => (
-    <ListItemLine key={item.id} readonly={true}>
+    <ListItemLine
+      key={item.id}
+      readonly={!(doc?.head.fromDepart.isAddressStore || doc?.head.toDepart.isAddressStore) || isBlocked}
+      onPress={() => navigation.navigate('SelectCell', { docId: id, item, mode: 1 })}
+    >
       <View style={styles.details}>
         <LargeText style={styles.textBold}>{item.good.name}</LargeText>
         <View style={styles.flexDirectionRow}>
@@ -292,6 +303,18 @@ export const MoveViewScreen = () => {
             Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
           </MediumText>
         </View>
+        {doc?.head.fromDepart.isAddressStore && (
+          <View style={styles.flexDirectionRow}>
+            <MediumText>Откуда: {item.fromCell || ''}</MediumText>
+          </View>
+        )}
+        {doc?.head.toDepart.isAddressStore && (
+          <View style={styles.flexDirectionRow}>
+            <MediumText>
+              {doc?.head.fromDepart.isAddressStore ? 'Куда:' : 'Ячейка №'} {item.toCell || ''}
+            </MediumText>
+          </View>
+        )}
       </View>
     </ListItemLine>
   );
@@ -350,12 +373,19 @@ export const MoveViewScreen = () => {
         sortOrder: doc.lines?.length + 1,
       };
 
-      dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+      if (
+        (doc.head.subtype.id === 'prihod' && doc.head.toDepart.isAddressStore) ||
+        (doc.head.subtype.id !== 'prihod' && doc.head.fromDepart.isAddressStore)
+      ) {
+        navigation.navigate('SelectCell', { docId: id, item: newLine, mode: 0 });
+      } else {
+        dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+      }
 
       setScanned(false);
     },
 
-    [doc, minBarcodeLength, goodBarcodeSettings, goods, dispatch, id],
+    [doc, minBarcodeLength, goodBarcodeSettings, goods, dispatch, id, navigation],
   );
 
   const [key, setKey] = useState(1);

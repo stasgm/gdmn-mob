@@ -166,10 +166,17 @@ const ScanGoodScreen = () => {
         },
       ]);
     } else {
-      dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
+      if (
+        (shipment?.head.subtype.id === 'prihod' && shipment?.head.toDepart.isAddressStore) ||
+        (shipment?.head.subtype.id !== 'prihod' && shipment?.head.fromDepart.isAddressStore)
+      ) {
+        navigation.navigate('SelectCell', { docId, item: scannedObject, mode: 0 });
+      } else {
+        dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
+      }
       setScaner({ state: 'init' });
     }
-  }, [scannedObject, tempOrder, shipment?.documentType.name, fpDispatch, dispatch, docId]);
+  }, [scannedObject, tempOrder, shipment, fpDispatch, dispatch, docId, navigation]);
 
   const handleClearScaner = () => setScaner({ state: 'init' });
 

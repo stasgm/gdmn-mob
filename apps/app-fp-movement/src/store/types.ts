@@ -4,7 +4,7 @@ import { ThunkAction } from 'redux-thunk';
 import { INamedEntity, IEntity, IDocument, MandateProps, IHead, StatusType, IReferenceData } from '@lib/types';
 import { IFormParam } from '@lib/store';
 
-import { ICodeEntity, IGood } from './app/types';
+import { IAddressStoreEntity, ICodeEntity, IGood } from './app/types';
 
 export { ITempLine, ITempDocument } from './app/types';
 
@@ -33,6 +33,14 @@ export interface IFreeShipmentFormParam extends IFormParam {
   comment?: string;
 }
 
+export interface ICellMovementFormParam extends IFormParam {
+  number?: string;
+  documentDate?: string;
+  status?: StatusType;
+  depart?: IAddressStoreEntity;
+  comment?: string;
+}
+
 //Подразделения-склады
 export type Department = INamedEntity;
 export type DepartmentType = INamedEntity;
@@ -44,9 +52,21 @@ export interface IContact extends INamedEntity, IReferenceData {
   phoneNumber: string; // Номер телефона
 }
 
+export interface ICell {
+  chamber: string;
+  row: string;
+  tier: string;
+  cell: string;
+}
+
+export interface ICellRef {
+  name: string;
+  barcode?: string;
+  disabled?: boolean;
+}
 export interface IMoveHead extends IHead {
-  fromDepart: ICodeEntity;
-  toDepart: ICodeEntity; //Подразделение
+  fromDepart: IAddressStoreEntity;
+  toDepart: IAddressStoreEntity; //Подразделение
   subtype: INamedEntity; //Подтип документа
   comment?: string; // Комvентарий
 }
@@ -58,6 +78,8 @@ export interface IMoveLine extends IEntity {
   numReceived: string; // Номер партии
   barcode?: string; // технологический код
   sortOrder?: number; // порядок сортировки
+  fromCell?: string; // номер ячейки
+  toCell?: string; // номер ячейки
 }
 
 export type IMoveDocument = MandateProps<IDocument<IMoveHead, IMoveLine>, 'head' | 'lines'>;
@@ -80,7 +102,7 @@ export type IOrderDocument = MandateProps<IDocument<IOrderHead, IOrderLine>, 'he
 export interface IShipmentHead extends IHead {
   contact: ICodeEntity; //организация-плательщик
   outlet: ICodeEntity; // магазин –подразделение организации плательщика
-  depart: ICodeEntity; // подразделение сотрудника (кладовщик, работающий с терминалом)
+  depart: IAddressStoreEntity; // подразделение сотрудника (кладовщик, работающий с терминалом)
   onDate: string; // Дата отгрузки
   barcode: string; // штрих-код заявки, по которой создан
   // ovСode?: string; // штрих-код документа-отвеса
@@ -101,7 +123,7 @@ export type IShipmentDocument = MandateProps<IDocument<IShipmentHead, IShipmentL
 
 export interface IFreeShipmentHead extends IHead {
   depart: ICodeEntity;
-  comment?: string; // Комvентарий
+  comment?: string; // Коментарий
 }
 export interface IFreeShipmentLine extends IEntity {
   good: IGood;
@@ -112,6 +134,18 @@ export interface IFreeShipmentLine extends IEntity {
   sortOrder?: number; // порядок сортировки
 }
 export type IFreeShipmentDocument = MandateProps<IDocument<IFreeShipmentHead, IFreeShipmentLine>, 'head' | 'lines'>;
+
+export interface ICellMovementHead extends IHead {
+  depart: IAddressStoreEntity;
+  comment?: string; // Коментарий
+}
+export interface CellMovementLine extends IEntity {
+  barcode: string; // технологический код
+  fromCell: string;
+  toCell: string;
+}
+
+export type ICellMovementDocument = MandateProps<IDocument<ICellMovementHead, CellMovementLine>, 'head' | 'lines'>;
 
 export type barcodeSettings = {
   [name: string]: number;
