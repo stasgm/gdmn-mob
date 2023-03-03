@@ -70,6 +70,12 @@ const reducer: Reducer<AppInventoryState, AppInventoryActionType> = (
         ),
       };
 
+    case getType(actions.removeUnknownGood):
+      return {
+        ...state,
+        unknownGoods: state.unknownGoods.filter((item) => item.good.id !== action.payload),
+      };
+
     default:
       return state;
   }

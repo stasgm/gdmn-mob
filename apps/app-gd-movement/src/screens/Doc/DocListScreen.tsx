@@ -34,6 +34,7 @@ import { IMovementDocument } from '../../store/types';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { statusTypes, dataTypes, docContactTypes } from '../../utils/constants';
 import { appInventoryActions, useSelector as useInvSelector } from '../../store';
+import { IGood } from '../../store/app/types';
 
 export interface DocListProps {
   orders: IListItemProps[];
@@ -68,13 +69,30 @@ export const DocListScreen = () => {
   const settings = useSelector((state) => state.settings.data);
   const cleanDocTime = (settings.cleanDocTime as ISettingsOption<number>).data || 0;
 
+  console.log('unknownGoods', unknownGoods);
+
+  const [removingUnknownGoods, setRemovingUnknownGoods] = useState(false);
+  const goods = refSelectors.selectByName<IGood>('good')?.data;
+
   useEffect(() => {
     const maxDocDate = new Date();
     maxDocDate.setDate(maxDocDate.getDate() - cleanDocTime);
-    if (unknownGoods.find((item) => item.createdDate.getTime() <= maxDocDate.getTime())) {
+    if (unknownGoods.find((item) => new Date(item.createdDate).getTime() <= maxDocDate.getTime())) {
       dispatch(appInventoryActions.removeOldGood(maxDocDate));
     }
   }, [cleanDocTime, dispatch, unknownGoods]);
+
+  useEffect(() => {
+    if (unknownGoods.length > 0 && !removingUnknownGoods && goods) {
+      setRemovingUnknownGoods(true);
+      unknownGoods.forEach((item) => {
+        if (goods.find((g) => g.barcode === item.good.barcode)) {
+          dispatch(appInventoryActions.removeUnknownGood(item.good.id));
+        }
+      });
+      setRemovingUnknownGoods(false);
+    }
+  }, [dispatch, goods, removingUnknownGoods, unknownGoods]);
 
   const [delList, setDelList] = useState<IDelList>({});
   const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
