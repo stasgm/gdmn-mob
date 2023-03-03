@@ -18,6 +18,7 @@ import {
   EmptyList,
   SearchButton,
   navBackDrawer,
+  MediumText,
 } from '@lib/mobile-ui';
 
 import { documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
@@ -68,8 +69,6 @@ export const DocListScreen = () => {
   const unknownGoods = useInvSelector((state) => state.appInventory.unknownGoods);
   const settings = useSelector((state) => state.settings.data);
   const cleanDocTime = (settings.cleanDocTime as ISettingsOption<number>).data || 0;
-
-  console.log('unknownGoods', unknownGoods);
 
   const [removingUnknownGoods, setRemovingUnknownGoods] = useState(false);
   const goods = refSelectors.selectByName<IGood>('good')?.data;
@@ -333,11 +332,16 @@ export const DocListScreen = () => {
         checked={!!delList[item.id]}
         addInfo={
           <View>
-            <Text style={textStyle}>
-              {(doc.documentType.remainsField === 'fromContact'
-                ? doc.head.fromContact?.name
-                : doc.head.toContact?.name) || ''}
-            </Text>
+            {doc.head.fromContact && (
+              <MediumText
+                style={styles.rowCenter}
+              >{`${doc.documentType.fromDescription}: ${doc.head.fromContact?.name}`}</MediumText>
+            )}
+            {doc.head.toContact && (
+              <MediumText
+                style={styles.rowCenter}
+              >{`${doc.documentType.toDescription}: ${doc.head.toContact?.name}`}</MediumText>
+            )}
             <Text style={textStyle}>
               № {doc.number} на {getDateString(doc.documentDate)}
             </Text>

@@ -529,7 +529,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
                 for (const [key, value] of Object.entries(state.messages.multipartData as IMultipartData)) {
                   //Если присутствуют идентификаторы последовательностей, с момента последнего сообщения в которых прошло более заданного промежутка (например, 1 час),
                   //то вся недопринятая последовательность удаляется, в лог помещается ошибка.
-                  if (new Date().getTime() - value.lastLoadDate.getTime() > MULTIPART_ITEM_LIVE_IN_MS) {
+                  if (new Date().getTime() - new Date(value.lastLoadDate).getTime() > MULTIPART_ITEM_LIVE_IN_MS) {
                     dispatch(messageActions.removeMultipartItem(key));
                     addError(
                       'useSync: removeMultipartItem',

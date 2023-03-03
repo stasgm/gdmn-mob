@@ -271,11 +271,16 @@ export const DocViewScreen = () => {
         isBlocked={isBlocked}
       >
         <>
-          <MediumText style={styles.rowCenter}>
-            {(doc.documentType.remainsField === 'fromContact'
-              ? doc.head.fromContact?.name
-              : doc.head.toContact?.name) || ''}
-          </MediumText>
+          {doc.head.fromContact && (
+            <MediumText
+              style={styles.rowCenter}
+            >{`${doc.documentType.fromDescription}: ${doc.head.fromContact?.name}`}</MediumText>
+          )}
+          {doc.head.toContact && (
+            <MediumText
+              style={styles.rowCenter}
+            >{`${doc.documentType.toDescription}: ${doc.head.toContact?.name}`}</MediumText>
+          )}
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
         </>
       </InfoBlock>
