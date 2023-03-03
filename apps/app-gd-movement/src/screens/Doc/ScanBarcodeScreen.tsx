@@ -86,7 +86,12 @@ const ScanBarcodeScreen = () => {
   const goodRemains = useMemo<IMGoodData<IMGoodRemain>>(
     () =>
       contactId
-        ? getRemGoodByContact(goods.concat(unknownGoods), remains[contactId], documentType?.isRemains, noZeroRemains)
+        ? getRemGoodByContact(
+            goods.concat(unknownGoods.map((item) => item.good)),
+            remains[contactId],
+            documentType?.isRemains,
+            noZeroRemains,
+          )
         : {},
     [contactId, documentType?.isRemains, goods, noZeroRemains, remains, unknownGoods],
   );

@@ -7,7 +7,7 @@ export interface IItemDatabase {
 }
 
 const defaultDatabase: IItemDatabase = {
-  name: 'DB',
+  name: 'db',
   path: process.env.FILES_PATH || '',
 };
 

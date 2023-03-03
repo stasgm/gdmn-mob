@@ -2,7 +2,7 @@ import { INamedEntity } from '@lib/types';
 
 export type AppInventoryState = {
   readonly model: IModelData<IMDGoodRemains>;
-  readonly unknownGoods: IGood[];
+  readonly unknownGoods: IUnknownGoods[];
   readonly loading: boolean;
   readonly loadingData: boolean;
   readonly errorMessage: string;
@@ -59,7 +59,6 @@ export interface IGood extends INamedEntity {
   price?: number; //Цена
   buyingPrice?: number;
   scale?: number; //количество единиц в месте
-  unknown_id?: string;
 }
 
 export interface IRemGood {
@@ -74,4 +73,9 @@ export interface IEmployee extends INamedEntity {
   lastName?: string;
   middleName?: string;
   position: INamedEntity;
+}
+
+export interface IUnknownGoods {
+  good: IGood;
+  createdDate: Date;
 }

@@ -8,8 +8,7 @@ const setLoading = createAction('APP_INVENTORY/SET_LOADING')<boolean>();
 const setLoadingData = createAction('APP_INVENTORY/SET_LOADING_DATA')<boolean>();
 const setLoadingError = createAction('APP_INVENTORY/SET_LOADING_ERROR')<string>();
 const addUnknownGood = createAction('APP_INVENTORY/ADD_UNKNOWN_GOOD')<IGood>();
-const removeUnknownGood = createAction('APP_INVENTORY/REMOVE_UNKNOWN_GOOD_ONE')<string>();
-const clearUnknownGoods = createAction('APP_INVENTORY/CLEAR_UNKNOWN_GOODS')();
+const removeOldGood = createAction('APP_INVENTORY/REMOVE_OLD_GOODS')<Date>();
 
 const setModelAsync = createAsyncAction(
   'APP_INVENTORY/SET_MODEL',
@@ -25,8 +24,7 @@ export const actions = {
   setLoadingData,
   setLoadingError,
   addUnknownGood,
-  removeUnknownGood,
-  clearUnknownGoods,
+  removeOldGood,
 };
 
 export type AppInventoryActionType = ActionType<typeof actions>;

@@ -83,7 +83,7 @@ export const SelectRemainsScreen = () => {
   const goodRemains = useMemo<IRemGood[]>(() => {
     return contactId
       ? getRemGoodListByContact(
-          goods.concat(unknownGoods).sort((a, b) => (a.name < b.name ? -1 : 1)),
+          goods.concat(unknownGoods.map((item) => item.good)).sort((a, b) => (a.name < b.name ? -1 : 1)),
           remains[contactId],
           documentType?.isRemains,
           noZeroRemains,

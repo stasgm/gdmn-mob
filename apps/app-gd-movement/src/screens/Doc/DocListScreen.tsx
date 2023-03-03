@@ -28,12 +28,11 @@ import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@l
 
 import { IDelList, IListItem } from '@lib/mobile-types';
 
-import { IDocumentType } from '@lib/types';
+import { IDocumentType, ISettingsOption } from '@lib/types';
 
 import { IMovementDocument } from '../../store/types';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { statusTypes, dataTypes, docContactTypes } from '../../utils/constants';
-import { IGood } from '../../store/app/types';
 import { appInventoryActions, useSelector as useInvSelector } from '../../store';
 
 export interface DocListProps {
@@ -53,6 +52,7 @@ export type SectionDataProps = SectionListData<IListItemProps, DocListSectionPro
 export const DocListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'DocList'>>();
   const docDispatch = useDocThunkDispatch();
+  const dispatch = useDispatch();
 
   const { colors } = useTheme();
 
@@ -64,23 +64,17 @@ export const DocListScreen = () => {
   const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
 
   const list = useSelector((state) => state.documents.list) as IMovementDocument[];
-
-  const goods = refSelectors.selectByName<IGood>('good')?.data;
   const unknownGoods = useInvSelector((state) => state.appInventory.unknownGoods);
-  const dispatch = useDispatch();
-  const [removingUnknownGoods, setRemovingUnknownGoods] = useState(false);
+  const settings = useSelector((state) => state.settings.data);
+  const cleanDocTime = (settings.cleanDocTime as ISettingsOption<number>).data || 0;
 
   useEffect(() => {
-    if (unknownGoods.length > 0 && !removingUnknownGoods && goods) {
-      setRemovingUnknownGoods(true);
-      goods.forEach((g) => {
-        if (unknownGoods.find((ug) => g.unknown_id === ug.id)) {
-          dispatch(appInventoryActions.removeUnknownGood(g.unknown_id!));
-        }
-      });
-      setRemovingUnknownGoods(false);
+    const maxDocDate = new Date();
+    maxDocDate.setDate(maxDocDate.getDate() - cleanDocTime);
+    if (unknownGoods.find((item) => item.createdDate.getTime() <= maxDocDate.getTime())) {
+      dispatch(appInventoryActions.removeOldGood(maxDocDate));
     }
-  }, [dispatch, goods, removingUnknownGoods, unknownGoods]);
+  }, [cleanDocTime, dispatch, unknownGoods]);
 
   const [delList, setDelList] = useState<IDelList>({});
   const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);

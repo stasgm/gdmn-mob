@@ -57,19 +57,17 @@ const reducer: Reducer<AppInventoryState, AppInventoryActionType> = (
     case getType(actions.addUnknownGood):
       return {
         ...state,
-        unknownGoods: state.unknownGoods.filter((g) => g.id !== action.payload.id).concat(action.payload),
+        unknownGoods: state.unknownGoods
+          .filter((item) => item.good.id !== action.payload.id)
+          .concat({ good: action.payload, createdDate: new Date() }),
       };
 
-    case getType(actions.removeUnknownGood):
+    case getType(actions.removeOldGood):
       return {
         ...state,
-        unknownGoods: state.unknownGoods.filter((g) => g.id !== action.payload),
-      };
-
-    case getType(actions.clearUnknownGoods):
-      return {
-        ...state,
-        unknownGoods: [],
+        unknownGoods: state.unknownGoods.filter(
+          (item) => new Date(item.createdDate).getTime() > action.payload.getTime(),
+        ),
       };
 
     default:
