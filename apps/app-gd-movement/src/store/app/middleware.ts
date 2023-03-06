@@ -46,6 +46,7 @@ export const appInvMiddlewareFactory: PersistedMiddleware =
 
     if (store.getState().auth.user?.id) {
       switch (action.type) {
+        case getType(actions.init):
         case getType(actions.setModelAsync.success):
         case getType(actions.addUnknownGood):
         case getType(actions.removeUnknownGood):
