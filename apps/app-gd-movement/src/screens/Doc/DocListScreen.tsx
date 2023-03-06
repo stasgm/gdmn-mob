@@ -74,10 +74,12 @@ export const DocListScreen = () => {
   const goods = refSelectors.selectByName<IGood>('good')?.data;
 
   useEffect(() => {
-    const maxDocDate = new Date();
-    maxDocDate.setDate(maxDocDate.getDate() - cleanDocTime);
-    if (unknownGoods.find((item) => new Date(item.createdDate).getTime() <= maxDocDate.getTime())) {
-      dispatch(appInventoryActions.removeOldGood(maxDocDate));
+    if (cleanDocTime > 0) {
+      const maxDocDate = new Date();
+      maxDocDate.setDate(maxDocDate.getDate() - cleanDocTime);
+      if (unknownGoods.find((item) => new Date(item.createdDate).getTime() <= maxDocDate.getTime())) {
+        dispatch(appInventoryActions.removeOldGood(maxDocDate));
+      }
     }
   }, [cleanDocTime, dispatch, unknownGoods]);
 
