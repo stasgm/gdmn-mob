@@ -30,7 +30,7 @@ import {
 
 import { ActivityIndicator, Caption, Text } from 'react-native-paper';
 
-import { IDocument, IReferences } from '@lib/types';
+import { IDocument, IReferences, ISettingsOption } from '@lib/types';
 
 import { TouchableOpacity, Linking, View } from 'react-native';
 
@@ -78,6 +78,7 @@ const Root = () => {
 
   //Загружаем в стор дополнительные настройки приложения
   const isInit = useSelector((state) => state.settings.isInit);
+  const getReferences = useSelector((state) => state.settings?.data?.getReferences);
   const authLoading = useSelector((state) => state.auth.loadingData);
   const appDataLoading = appSelectors.selectLoading();
   const isLogged = authSelectors.isLoggedWithCompany();
@@ -103,6 +104,12 @@ const Root = () => {
   useEffect(() => {
     if (appSettings && isInit) {
       dispatch(settingsActions.addSettings(appSettings));
+      dispatch(
+        settingsActions.updateOption({
+          optionName: 'getReferences',
+          value: { ...getReferences, data: false } as ISettingsOption,
+        }),
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInit]);
