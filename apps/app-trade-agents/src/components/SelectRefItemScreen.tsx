@@ -42,23 +42,35 @@ const SelectRefItemScreen = () => {
 
   const list = useMemo(() => {
     if (clause && refObj?.data) {
-      return refObj?.data.filter((item) => {
-        const newParams = Object.assign({}, clause);
+      return refObj?.data
+        .filter((item) => {
+          const newParams = Object.assign({}, clause);
 
-        let companyFound = true;
+          let companyFound = true;
+          let parentFound = true;
 
-        Object.keys(clause).forEach((i) => {
-          if (i in item) {
-            if (typeof clause[i] !== 'object' && typeof item[i] !== 'object' && item[i] === clause[i]) {
+          Object.keys(clause).forEach((i) => {
+            if (i in item) {
+              if (typeof clause[i] !== 'object' && typeof item[i] !== 'object' && item[i] === clause[i]) {
+              }
             }
-          }
-        });
-        companyFound = (item as IOutlet).company.id.includes(newParams.companyId);
-        delete newParams.companyId;
+          });
+          companyFound = newParams.companyId ? (item as IOutlet).company.id.includes(newParams.companyId) : true;
+          delete newParams.companyId;
 
-        return companyFound && extraPredicate(item, newParams);
-      });
+          parentFound =
+            newParams.groupParent === 'notNull'
+              ? !!item.parent?.id
+              : newParams.groupParent && item.parent?.id
+              ? item.parent.id.includes(newParams.groupParent)
+              : true;
+          delete newParams.groupParent;
+
+          return companyFound && parentFound && extraPredicate(item, newParams);
+        })
+        .sort((a, b) => (a[refFieldName] < b[refFieldName] ? -1 : 1));
     }
+
     return refObj?.data?.sort((a, b) => (a[refFieldName] < b[refFieldName] ? -1 : 1));
   }, [clause, refFieldName, refObj?.data]);
 
@@ -98,7 +110,9 @@ const SelectRefItemScreen = () => {
   const handleSelectItem = useCallback(
     (item: IReferenceData) => {
       if (isMulti) {
-        setCheckedItem((prev) => [...(prev as IReferenceData[]), item]);
+        setCheckedItem((prev) =>
+          prev.find((i) => i.id === item.id) ? prev.filter((i) => i.id !== item.id) : [...prev, item],
+        );
       } else if (checkedItem.find((i) => i.id === item.id)) {
         setCheckedItem([]);
         dispatch(

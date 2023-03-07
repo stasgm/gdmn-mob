@@ -27,14 +27,14 @@ const getDateString = (_date: string | Date) => {
   )}.${date.getFullYear()}`;
 };
 
-const extraPredicate = (item: any, params: Record<string, string>) => {
+const extraPredicate = (item: any, params: Record<string, string | undefined>) => {
   let matched = 0;
 
   const paramsEntries = Object.entries(params);
 
   for (const [param, value] of paramsEntries) {
     if (param in item) {
-      if (((item as any)[param] as string).toUpperCase() === value.toUpperCase()) {
+      if (((item as any)[param] as string).toUpperCase() === value?.toUpperCase()) {
         matched++;
       } else {
         break;

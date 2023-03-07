@@ -11,6 +11,7 @@ import {
   SelectableInput,
   SubTitle,
   Checkbox,
+  Menu,
 } from '@lib/mobile-ui';
 import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
 import { IReference } from '@lib/types';
@@ -26,7 +27,7 @@ import { IListItem } from '@lib/mobile-types';
 import { ReportStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IReportListFormParam, IOutlet, IReportItem } from '../../store/types';
 
-import { noPackage, statusTypes } from '../../utils/constants';
+import { noPackage, reports, statusTypes } from '../../utils/constants';
 
 import ReportItem from './components/ReportItem';
 import { ReportTotalByDate, ReportTotal } from './components/ReportTotal';
@@ -41,6 +42,7 @@ export type SectionDataProps = SectionListData<IReportItem, ReportListSectionPro
 
 const ReportListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ReportStackParamList, 'ReportList'>>();
+  const [visibleReport, setVisibleReport] = useState(false);
 
   const { colors } = useTheme();
 
@@ -51,9 +53,12 @@ const ReportListScreen = () => {
     filterReportOutlet,
     filterReportDateBegin,
     filterReportDateEnd,
+    filterReportGroup,
     filterReportGood,
     filterStatusList = [],
   } = useSelector((state) => state.app.formParams as IReportListFormParam);
+
+  const report = useSelector((state) => state.app.formParams as IReportListFormParam).report || reports[0];
 
   const outlets = refSelectors.selectByName<IOutlet>('outlet')?.data;
 
@@ -98,6 +103,7 @@ const ReportListScreen = () => {
   const withParams =
     !!filterReportContact ||
     !!filterReportOutlet ||
+    !!filterReportGroup ||
     !!filterReportGood ||
     !!filterReportDateBegin ||
     !!filterReportDateEnd ||
@@ -111,6 +117,9 @@ const ReportListScreen = () => {
           (filterReportOutlet?.id ? i.head.outlet.id === filterReportOutlet.id : true) &&
           (filterReportGood?.id
             ? i.lines.find((item) => item.good.id === filterReportGood?.id)?.good.id === filterReportGood.id
+            : true) &&
+          (filterReportGroup?.length
+            ? filterReportGroup.find((gr) => i.lines.find((item) => item.good.goodgroup.id === gr.id))
             : true) &&
           (filterReportDateBegin
             ? new Date(filterReportDateBegin).getTime() <= new Date(i.head.onDate.slice(0, 10)).getTime()
@@ -126,81 +135,87 @@ const ReportListScreen = () => {
       return [];
     }
   }, [
-    filterReportContact?.id,
+    filterReportContact,
     filterReportDateBegin,
     filterReportDateEnd,
-    filterReportGood?.id,
-    filterReportOutlet?.id,
+    filterReportGood,
+    filterReportGroup,
+    filterReportOutlet,
     filterStatusList,
     orders,
     withParams,
   ]);
 
   const filteredOutletList: IReportItem[] = useMemo(() => {
-    return filteredOrderList
-      .reduce((prev: IReportItem[], cur) => {
-        let itemIndex = prev.findIndex(
-          (e) =>
-            e.outlet.id === cur.head.outlet.id &&
-            new Date(e.onDate.slice(0, 10)).getTime() === new Date(cur.head.onDate.slice(0, 10)).getTime(),
-        );
+    return report.id !== 'byContact'
+      ? []
+      : filteredOrderList
+          .reduce((prev: IReportItem[], cur) => {
+            let itemIndex = prev.findIndex(
+              (e) =>
+                e.outlet.id === cur.head.outlet.id &&
+                new Date(e.onDate.slice(0, 10)).getTime() === new Date(cur.head.onDate.slice(0, 10)).getTime(),
+            );
 
-        if (filterReportGood) {
-          cur.lines.forEach((curLine) => {
-            if (curLine.good.id === filterReportGood.id) {
-              if (itemIndex > -1) {
-                const oldTotalList = prev[itemIndex].totalList || [];
-                const curTotalByPackage = oldTotalList.find(
-                  (item) => item.package.id === (curLine.package?.id || 'noPackage'),
-                );
-                if (curTotalByPackage) {
-                  const newTotalListByPackage = {
-                    ...curTotalByPackage,
-                    quantity: round(curTotalByPackage.quantity + curLine.quantity, 3),
-                  };
-                  const newTotalListByDate = oldTotalList
-                    .filter((i) => i.package.id !== (curLine.package?.id || 'noPackage'))
-                    .concat(newTotalListByPackage);
-                  prev[itemIndex] = { ...prev[itemIndex], totalList: newTotalListByDate };
-                } else {
-                  prev[itemIndex] = {
-                    ...prev[itemIndex],
-                    totalList: [...oldTotalList, { package: curLine.package || noPackage, quantity: curLine.quantity }],
-                  };
+            if (filterReportGood) {
+              cur.lines.forEach((curLine) => {
+                if (curLine.good.id === filterReportGood.id) {
+                  if (itemIndex > -1) {
+                    const oldTotalList = prev[itemIndex].totalList || [];
+                    const curTotalByPackage = oldTotalList.find(
+                      (item) => item.package.id === (curLine.package?.id || 'noPackage'),
+                    );
+                    if (curTotalByPackage) {
+                      const newTotalListByPackage = {
+                        ...curTotalByPackage,
+                        quantity: round(curTotalByPackage.quantity + curLine.quantity, 3),
+                      };
+                      const newTotalListByDate = oldTotalList
+                        .filter((i) => i.package.id !== (curLine.package?.id || 'noPackage'))
+                        .concat(newTotalListByPackage);
+                      prev[itemIndex] = { ...prev[itemIndex], totalList: newTotalListByDate };
+                    } else {
+                      prev[itemIndex] = {
+                        ...prev[itemIndex],
+                        totalList: [
+                          ...oldTotalList,
+                          { package: curLine.package || noPackage, quantity: curLine.quantity },
+                        ],
+                      };
+                    }
+                  } else {
+                    const newLine = {
+                      outlet: cur.head.outlet,
+                      onDate: cur.head.onDate,
+                      address: outlets.find((o) => cur?.head?.outlet.id === o.id)?.address,
+                      totalList: [{ package: curLine.package || noPackage, quantity: curLine.quantity }],
+                    } as IReportItem;
+                    prev = [...prev, newLine];
+                    itemIndex = prev.findIndex(
+                      (e) =>
+                        e.outlet.id === cur.head.outlet.id &&
+                        new Date(e.onDate.slice(0, 10)).getTime() === new Date(cur.head.onDate.slice(0, 10)).getTime(),
+                    );
+                  }
                 }
-              } else {
-                const newLine = {
-                  outlet: cur.head.outlet,
-                  onDate: cur.head.onDate,
-                  address: outlets.find((o) => cur?.head?.outlet.id === o.id)?.address,
-                  totalList: [{ package: curLine.package || noPackage, quantity: curLine.quantity }],
-                } as IReportItem;
-                prev = [...prev, newLine];
-                itemIndex = prev.findIndex(
-                  (e) =>
-                    e.outlet.id === cur.head.outlet.id &&
-                    new Date(e.onDate.slice(0, 10)).getTime() === new Date(cur.head.onDate.slice(0, 10)).getTime(),
-                );
-              }
+              });
+            } else if (itemIndex === -1) {
+              const newLine = {
+                outlet: cur.head.outlet,
+                onDate: cur.head.onDate,
+                address: outlets.find((o) => cur?.head?.outlet.id === o.id)?.address,
+              } as IReportItem;
+              prev = [...prev, newLine];
             }
-          });
-        } else if (itemIndex === -1) {
-          const newLine = {
-            outlet: cur.head.outlet,
-            onDate: cur.head.onDate,
-            address: outlets.find((o) => cur?.head?.outlet.id === o.id)?.address,
-          } as IReportItem;
-          prev = [...prev, newLine];
-        }
 
-        return prev;
-      }, [])
-      ?.sort(
-        (a, b) =>
-          new Date(b.onDate.slice(0, 10)).getTime() - new Date(a.onDate.slice(0, 10)).getTime() ||
-          (a.outlet.name < b.outlet.name ? -1 : 1),
-      );
-  }, [filterReportGood, filteredOrderList, outlets]);
+            return prev;
+          }, [])
+          ?.sort(
+            (a, b) =>
+              new Date(b.onDate.slice(0, 10)).getTime() - new Date(a.onDate.slice(0, 10)).getTime() ||
+              (a.outlet.name < b.outlet.name ? -1 : 1),
+          );
+  }, [filterReportGood, filteredOrderList, outlets, report.id]);
 
   const sections = useMemo(
     () =>
@@ -305,6 +320,18 @@ const ReportListScreen = () => {
     });
   }, [filterReportGood, navigation]);
 
+  const handleSearchGroup = useCallback(() => {
+    navigation.navigate('SelectRefItem', {
+      refName: 'goodGroup',
+      fieldName: 'filterReportGroup',
+      isMulti: true,
+      clause: {
+        groupParent: 'notNull',
+      },
+      value: filterReportGroup,
+    });
+  }, [filterReportGroup, navigation]);
+
   const handleFilterStatus = useCallback(
     (value: IListItem) => {
       dispatch(
@@ -330,6 +357,20 @@ const ReportListScreen = () => {
     [filterReportGood, sections],
   );
 
+  const handleReport = useCallback(
+    (option: IListItem) => {
+      if (!(option.id === report?.id)) {
+        dispatch(appActions.setFormParams({ report: option }));
+      }
+      setVisibleReport(false);
+    },
+    [report?.id, dispatch],
+  );
+
+  const handlePressReport = () => {
+    setVisibleReport(true);
+  };
+
   const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
@@ -339,13 +380,38 @@ const ReportListScreen = () => {
     <AppScreen>
       {filterVisible && (
         <View style={[localStyles.filter, { borderColor: colors.primary }]}>
+          <View style={localStyles.report}>
+            <Menu
+              key={'report'}
+              options={reports}
+              onChange={handleReport}
+              onPress={handlePressReport}
+              onDismiss={() => setVisibleReport(false)}
+              title={report?.value || ''}
+              visible={visibleReport}
+              activeOptionId={report?.id}
+              style={localStyles.btnTab}
+              iconName={'chevron-down'}
+            />
+          </View>
           <SelectableInput label="Организация" value={filterReportContact?.name || ''} onPress={handleSearchContact} />
           <View style={localStyles.marginTop}>
             <SelectableInput label="Магазин" value={filterReportOutlet?.name || ''} onPress={handleSearchOutlet} />
           </View>
-          <View style={localStyles.marginTop}>
-            <SelectableInput label="Товар" value={filterReportGood?.name || ''} onPress={handleSearchGood} />
-          </View>
+          {(report.id === 'byGroup' || report.id === 'byGroup&Good') && (
+            <View style={localStyles.marginTop}>
+              <SelectableInput
+                label="Группа"
+                value={filterReportGroup?.map((gr) => gr.name).join(',')}
+                onPress={handleSearchGroup}
+              />
+            </View>
+          )}
+          {report.id === 'byContact' && (
+            <View style={localStyles.marginTop}>
+              <SelectableInput label="Товар" value={filterReportGood?.name || ''} onPress={handleSearchGood} />
+            </View>
+          )}
           <View style={[styles.flexDirectionRow, localStyles.marginTop]}>
             <View style={localStyles.width}>
               <SelectableInput
@@ -384,6 +450,7 @@ const ReportListScreen = () => {
                 !(
                   filterReportContact ||
                   filterReportOutlet ||
+                  filterReportGroup ||
                   filterReportGood ||
                   filterReportDateBegin ||
                   filterReportDateEnd ||
@@ -459,5 +526,11 @@ const localStyles = StyleSheet.create({
     marginHorizontal: 5,
     flexDirection: 'row',
     flexWrap: 'wrap',
+  },
+  report: {
+    marginRight: 12,
+  },
+  btnTab: {
+    alignItems: 'flex-end',
   },
 });
