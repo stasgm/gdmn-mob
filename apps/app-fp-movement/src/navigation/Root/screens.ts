@@ -9,6 +9,7 @@ import {
 } from '../../screens/Shipment';
 
 import { FreeShipmentListScreen, FreeShipmentEditScreen, FreeShipmentViewScreen } from '../../screens/FreeShipment';
+import { ReturnListScreen, ReturnEditScreen, ReturnViewScreen } from '../../screens/Return';
 import { CellsViewScreen, ContactListScreen, GoodLineScreen } from '../../screens/Cells';
 import { SelectRefItemScreen } from '../../components';
 
@@ -45,6 +46,17 @@ export const freeShipmentScreens = {
 
 export const freeShipmentListScreens = {
   FreeShipmentList: { title: 'Отвесы', component: FreeShipmentListScreen },
+};
+
+export const returnScreens = {
+  ReturnEdit: { title: 'Возврат', component: ReturnEditScreen },
+  ReturnView: { title: '', component: ReturnViewScreen },
+  SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
+  ScanGood: { title: 'Сканер', component: ScanGoodScreen },
+};
+
+export const returnListScreens = {
+  ReturnList: { title: 'Возвраты', component: ReturnListScreen },
 };
 
 export const cellsScreens = {

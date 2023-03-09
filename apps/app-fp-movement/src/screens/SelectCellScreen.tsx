@@ -49,7 +49,7 @@ export const SelectCellScreen = () => {
     return prev;
   }, []);
 
-  const cellList = getCellList(cells['176424776'], lines || []);
+  const cellList = getCellList(cells[doc?.head.toDepart.id || ''] || [], lines || []);
 
   const { colors } = useTheme();
 

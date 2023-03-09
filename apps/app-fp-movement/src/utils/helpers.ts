@@ -63,7 +63,7 @@ export const getCellItem = (str: string) => {
 };
 
 export const getCellList = (list: ICellRef[], lines: IMoveLine[]) => {
-  const model = list.reduce((prev: IModelData, cur) => {
+  const model = list?.reduce((prev: IModelData, cur) => {
     const cellItem = getCellItem(cur.name);
 
     const chamber = prev?.[cellItem?.chamber];

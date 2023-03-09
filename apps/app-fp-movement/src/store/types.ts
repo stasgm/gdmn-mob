@@ -33,6 +33,16 @@ export interface IFreeShipmentFormParam extends IFormParam {
   comment?: string;
 }
 
+export interface IReturnFormParam extends IFormParam {
+  number?: string;
+  documentDate?: string;
+  status?: StatusType;
+  contact?: ICodeEntity;
+  outlet?: ICodeEntity;
+  depart?: ICodeEntity;
+  comment?: string;
+}
+
 export interface ICellMovementFormParam extends IFormParam {
   number?: string;
   documentDate?: string;
@@ -135,6 +145,25 @@ export interface IFreeShipmentLine extends IEntity {
 }
 export type IFreeShipmentDocument = MandateProps<IDocument<IFreeShipmentHead, IFreeShipmentLine>, 'head' | 'lines'>;
 
+export interface IReturnHead extends IHead {
+  contact: ICodeEntity; //организация-плательщик
+  outlet: ICodeEntity; // магазин –подразделение организации плательщика
+  depart: ICodeEntity;
+  comment?: string; // Комvентарий
+}
+
+export interface IReturnLine extends IEntity {
+  good: IGood;
+  weight: number;
+  workDate: string; // Дата производства
+  numReceived: string; // Номер партии
+  barcode?: string; // технологический код
+  sortOrder?: number; // порядок сортировки
+  // fromCell?: string; // номер ячейки
+  // toCell?: string; // номер ячейки
+}
+
+export type IReturnDocument = MandateProps<IDocument<IReturnHead, IReturnLine>, 'head' | 'lines'>;
 export interface ICellMovementHead extends IHead {
   depart: IAddressStoreEntity;
   comment?: string; // Коментарий
@@ -150,6 +179,14 @@ export type ICellMovementDocument = MandateProps<IDocument<ICellMovementHead, Ce
 export type barcodeSettings = {
   [name: string]: number;
 };
+
+export interface IOutlet extends INamedEntity, IReferenceData {
+  company: INamedEntity; //организация-плательщик
+  address: string; //Адрес разгрузки
+  phoneNumber: string; // Номер телефона
+  lat: number; // широта
+  lon: number; // долгота
+}
 
 export type TakeOrderType = 'ON_PLACE' | 'BY_PHONE' | 'BY_EMAIL';
 

@@ -266,6 +266,11 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               description: 'Реализация ГП',
               subtype: 'shipment',
             },
+            {
+              id: '187033859',
+              name: 'return',
+              description: 'Возврат',
+            },
           ],
         },
         documentSubtype: {
@@ -915,7 +920,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
           description: 'Ячейки',
           data: [
             {
-              '176424776': [
+              '147030695': [
                 { name: 'А-01-1-1', barcode: '00600028072213101142005256984' },
                 { name: 'А-01-1-2', barcode: false },
                 { name: 'А-01-1-3', barcode: '26600028072213101142005256984' },

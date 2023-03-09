@@ -45,6 +45,14 @@ export type FreeShipmentParamList = RefParamList & {
 
 export type FreeShipmentStackParamList = { FreeShipmentList: undefined } & FreeShipmentParamList;
 
+export type ReturnParamList = RefParamList & {
+  ReturnView: { id: string; docType?: string };
+  ReturnEdit: { id: string; docType?: string } | undefined; //itemId: string;
+  ScanGood: { docId: string; docType?: string };
+};
+
+export type ReturnStackParamList = { ReturnList: undefined } & ReturnParamList;
+
 export type CellsParamList = RefParamList & {
   CellsView: { id: string };
   GoodLine: { item: any };
