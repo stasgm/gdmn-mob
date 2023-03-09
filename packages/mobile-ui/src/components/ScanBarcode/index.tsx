@@ -26,7 +26,7 @@ interface IProps {
   onSave?: () => void;
   onGetScannedObject: (brc: string, typeOk?: boolean) => void;
   onClearScannedObject: () => void;
-  barCodeTypes: string[];
+  barCodeTypes?: string[];
   children?: ReactNode;
   onSearch?: () => void;
   isLeftButton?: boolean;
@@ -38,7 +38,7 @@ const ScanBarcode = ({
   onSave,
   onGetScannedObject,
   onClearScannedObject,
-  barCodeTypes,
+  barCodeTypes = [],
   children,
   onSearch,
   isLeftButton,
@@ -129,11 +129,11 @@ const ScanBarcode = ({
       <Camera
         key={`${scaner.state}`}
         flashMode={flashMode ? FlashMode.torch : FlashMode.off}
-        barCodeScannerSettings={barCodeTypes ? { barCodeTypes } : undefined}
+        barCodeScannerSettings={barCodeTypes.length ? { barCodeTypes } : undefined}
         autoFocus={AutoFocus.on}
         whiteBalance={WhiteBalance.auto}
         onBarCodeScanned={({ data, type }: { data: string; type: string }) =>
-          !scanned && handleBarCodeScanned(data, barCodeTypes ? barCodeTypes.indexOf(type) >= 0 : true)
+          !scanned && handleBarCodeScanned(data, barCodeTypes.length ? barCodeTypes.indexOf(type) >= 0 : true)
         }
         style={cameraStyle}
       >
