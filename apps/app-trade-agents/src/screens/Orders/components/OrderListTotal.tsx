@@ -111,6 +111,5 @@ const localStyles = StyleSheet.create({
   },
   quantity: {
     alignItems: 'flex-end',
-    // width: '25%',
   },
 });

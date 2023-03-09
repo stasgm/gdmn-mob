@@ -46,8 +46,10 @@ export interface IReportListFormParam extends IFormParam {
   report: IListItem;
   filterReportContact?: IReferenceData;
   filterReportOutlet?: IReferenceData;
-  filterReportDateBegin?: string;
-  filterReportDateEnd?: string;
+  filterReportDB?: string;
+  filterReportDE?: string;
+  filterReportOnDB?: string;
+  filterReportOnDE?: string;
   filterReportGroup?: IReferenceData[];
   filterReportGood?: IReferenceData;
   filterStatusList: IListItem[];
@@ -58,6 +60,11 @@ export interface IReportItem {
   onDate: string;
   totalList?: IReportTotalLine[];
   outlet: INamedEntity;
+}
+
+export interface IReportItemByGroup {
+  group: INamedEntity;
+  quantity: number;
 }
 
 export interface IReportTotalLine {
