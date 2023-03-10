@@ -28,6 +28,7 @@ import { reports, statusTypes } from '../../utils/constants';
 
 import { ReportListByContact } from './components/ReportListByContact';
 import { ReportListByGroup } from './components/ReportIListByGroup';
+import { ReportListByGood } from './components/ReportIListByGood';
 
 export type RefListItem = IReference & { refName: string };
 
@@ -286,14 +287,15 @@ const ReportListScreen = () => {
           <View style={localStyles.marginTop}>
             <SelectableInput label="Магазин" value={filterReportOutlet?.name || ''} onPress={handleSearchOutlet} />
           </View>
-
-          <View style={localStyles.marginTop}>
-            <SelectableInput
-              label="Группы"
-              value={filterReportGroup?.map((gr) => gr.name).join(',')}
-              onPress={handleSearchGroup}
-            />
-          </View>
+          {report?.id === 'byGroup' && (
+            <View style={localStyles.marginTop}>
+              <SelectableInput
+                label="Группы"
+                value={filterReportGroup?.map((gr) => gr.name).join(',')}
+                onPress={handleSearchGroup}
+              />
+            </View>
+          )}
           {report?.id === 'byContact' && (
             <View style={localStyles.marginTop}>
               <SelectableInput label="Товар" value={filterReportGood?.name || ''} onPress={handleSearchGood} />
@@ -359,6 +361,8 @@ const ReportListScreen = () => {
           <ReportListByContact />
         ) : report?.id === 'byGroup' ? (
           <ReportListByGroup />
+        ) : report?.id === 'byGood' ? (
+          <ReportListByGood />
         ) : null)}
       {showDateBegin && (
         <DateTimePicker

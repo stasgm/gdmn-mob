@@ -29,7 +29,6 @@ export const ReportListByContact = () => {
     filterReportDE,
     filterReportOnDB,
     filterReportOnDE,
-    filterReportGroup,
     filterReportGood,
     filterStatusList = [],
   } = useSelector((state) => state.app.formParams as IReportListFormParam);
@@ -45,9 +44,6 @@ export const ReportListByContact = () => {
           (filterReportOutlet?.id ? i.head.outlet.id === filterReportOutlet.id : true) &&
           (filterReportGood?.id
             ? i.lines.find((item) => item.good.id === filterReportGood?.id)?.good.id === filterReportGood.id
-            : true) &&
-          (filterReportGroup?.length
-            ? filterReportGroup.find((gr) => i.lines.find((item) => item.good.goodgroup.id === gr.id))
             : true) &&
           (filterReportDB
             ? new Date(filterReportDB).getTime() <= new Date(i.documentDate.slice(0, 10)).getTime()
@@ -70,7 +66,6 @@ export const ReportListByContact = () => {
       filterReportDB,
       filterReportDE,
       filterReportGood,
-      filterReportGroup,
       filterReportOnDB,
       filterReportOnDE,
       filterReportOutlet,

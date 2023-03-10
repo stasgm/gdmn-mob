@@ -67,6 +67,19 @@ export interface IReportItemByGroup {
   quantity: number;
 }
 
+export interface IReportItemByGood {
+  n: number;
+  good: INamedEntity;
+  quantity: number;
+}
+
+export interface IReportItemByGoods {
+  type: 'parent' | 'group' | 'good';
+  name: string;
+  n?: string;
+  quantity?: number;
+}
+
 export interface IReportTotalLine {
   package: INamedEntity;
   quantity: number;

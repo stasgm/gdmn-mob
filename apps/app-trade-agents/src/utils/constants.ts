@@ -102,6 +102,6 @@ export const noPackage: INamedEntity = { id: 'noPackage', name: 'Без упак
 export const reports: IListItem[] = [
   { id: 'byContact', value: 'В разрезе даты отгрузки и ТО' },
   { id: 'byGroup', value: 'В разрезе групп' },
-  { id: 'byGroup&Good', value: 'В разрезе товаров' },
+  { id: 'byGood', value: 'В разрезе товаров' },
   { id: 'sellBill', value: 'Накладные' },
 ];
