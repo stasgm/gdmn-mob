@@ -68,7 +68,6 @@ export interface IReportItemByGroup {
 }
 
 export interface IReportItemByGood {
-  n: number;
   good: INamedEntity;
   quantity: number;
 }

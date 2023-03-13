@@ -93,6 +93,8 @@ const ReportListScreen = () => {
         filterReportDE: '',
         filterReportOnDB: '',
         filterReportOnDE: '',
+        filterReportGood: undefined,
+        filterReportGroup: undefined,
       }),
     );
   }, [dispatch]);

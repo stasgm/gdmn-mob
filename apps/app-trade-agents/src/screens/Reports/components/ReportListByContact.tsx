@@ -1,12 +1,20 @@
 import React, { useCallback, useMemo } from 'react';
 import { View, SectionListData, SectionList, ListRenderItem, StyleSheet } from 'react-native';
-import { EmptyList, globalStyles as styles, ItemSeparator, LargeText, MediumText, SubTitle } from '@lib/mobile-ui';
+import {
+  EmptyList,
+  globalColors,
+  globalStyles as styles,
+  ItemSeparator,
+  LargeText,
+  MediumText,
+  SubTitle,
+} from '@lib/mobile-ui';
 
-import { getDateString, keyExtractorByIndex, round } from '@lib/mobile-hooks';
+import { formatValue, getDateString, keyExtractorByIndex, round } from '@lib/mobile-hooks';
 
 import { docSelectors, refSelectors, useSelector } from '@lib/store';
 
-import { Chip, useTheme } from 'react-native-paper';
+import { Chip } from 'react-native-paper';
 
 import { IOrderDocument, IOutlet, IReportItem, IReportListFormParam } from '../../../store/types';
 import { noPackage } from '../../../utils/constants';
@@ -19,9 +27,31 @@ export interface ReportListSectionProps {
 
 export type SectionDataProps = SectionListData<IReportItem, ReportListSectionProps>[];
 
-export const ReportListByContact = () => {
-  const { colors } = useTheme();
+const renderItem: ListRenderItem<IReportItem> = ({ item }) => (
+  <View style={styles.item}>
+    <View style={styles.details}>
+      <View style={styles.directionRow}>
+        <LargeText style={styles.textBold}>{item.outlet.name}</LargeText>
+      </View>
+      <MediumText>{item.address}</MediumText>
+      {item.totalList?.length ? (
+        <View style={localStyles.quantity}>
+          {item.totalList.map((line, key) => (
+            <Chip key={key} style={localStyles.margin}>
+              {line.package.name}: {formatValue({ type: 'number' }, line.quantity)} кг
+            </Chip>
+          ))}
+        </View>
+      ) : null}
+    </View>
+  </View>
+);
 
+const renderSectionHeader = ({ section }: any) => (
+  <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
+);
+
+export const ReportListByContact = () => {
   const {
     filterReportContact,
     filterReportOutlet,
@@ -162,30 +192,6 @@ export const ReportListByContact = () => {
     [filteredOutletList],
   );
 
-  const renderItem: ListRenderItem<IReportItem> = ({ item }) => (
-    <View style={styles.item}>
-      <View style={styles.details}>
-        <View style={styles.directionRow}>
-          <LargeText>{item.outlet.name}</LargeText>
-        </View>
-        <MediumText>{item.address}</MediumText>
-        {item.totalList?.length ? (
-          <View style={localStyles.quantity}>
-            {item.totalList.map((line, key) => (
-              <Chip key={key} style={[localStyles.margin, { borderColor: colors.primary }]}>
-                {line.package.name}: {line.quantity} кг
-              </Chip>
-            ))}
-          </View>
-        ) : null}
-      </View>
-    </View>
-  );
-
-  const renderSectionHeader = ({ section }: any) => (
-    <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
-  );
-
   const renderSectionFooter = useCallback(
     ({ section }: any) =>
       filterReportGood && sections.length > 0 ? <ReportTotalByDate data={section.data} title={section.title} /> : null,
@@ -204,7 +210,7 @@ export const ReportListByContact = () => {
         ListEmptyComponent={EmptyList}
         keyboardShouldPersistTaps="never"
       />
-      {filterReportGood && <ReportTotal data={filteredOutletList} />}
+      {filterReportGood && filteredOutletList.length > 0 && <ReportTotal data={filteredOutletList} />}
     </View>
   );
 };
@@ -218,5 +224,6 @@ const localStyles = StyleSheet.create({
   },
   margin: {
     margin: 2,
+    borderColor: globalColors.primary,
   },
 });

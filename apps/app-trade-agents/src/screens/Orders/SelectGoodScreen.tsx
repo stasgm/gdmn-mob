@@ -1,14 +1,5 @@
 import React, { useState, useLayoutEffect, useCallback, useMemo, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ColorValue,
-  Alert,
-  FlatList,
-  useWindowDimensions,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, ColorValue, Alert, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 
@@ -304,7 +295,7 @@ const SelectGoodScreen = () => {
     [colors.primary, doc?.lines, docId],
   );
 
-  const refListGood = React.useRef<FlatList<IGood>>(null);
+  const refListGood = React.useRef<FlashList<IGood>>(null);
 
   const handlePressGroup = useCallback(
     (paramName: string, item: IGoodGroup, setFunc: any) => {
@@ -386,6 +377,7 @@ const SelectGoodScreen = () => {
         ItemSeparatorComponent={ItemSeparator}
         keyExtractor={keyExtractor}
         extraData={[doc?.lines, docId]}
+        ref={refListGood}
       />
       {(selectedLine || selectedGood) && (
         <OrderLineDialog

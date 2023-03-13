@@ -1,20 +1,35 @@
 import React, { useMemo } from 'react';
-import { View, SectionListData, ListRenderItem, FlatList, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { EmptyList, globalColors, globalStyles as styles, ItemSeparator, LargeText, MediumText } from '@lib/mobile-ui';
 
-import { keyExtractorByIndex, round } from '@lib/mobile-hooks';
+import { formatValue, keyExtractorByIndex, round } from '@lib/mobile-hooks';
 
 import { docSelectors, useSelector } from '@lib/store';
 
 import { INamedEntity } from '@lib/types';
 
-import { IOrderDocument, IReportItem, IReportItemByGroup, IReportListFormParam } from '../../../store/types';
+import { FlashList } from '@shopify/flash-list';
+
+import { IOrderDocument, IReportItemByGroup, IReportListFormParam } from '../../../store/types';
 
 export interface ReportListSectionProps {
   title: string;
 }
 
-export type SectionDataProps = SectionListData<IReportItem, ReportListSectionProps>[];
+const renderItem = ({ item }: { item: IReportItemByGroup }) => (
+  <View style={styles.itemNoMargin}>
+    <View style={styles.details}>
+      <View style={styles.directionRow}>
+        <View style={localStyles.name}>
+          <MediumText>{item.group.name}</MediumText>
+        </View>
+        <View style={localStyles.quantity}>
+          <MediumText>{formatValue({ type: 'number' }, round(item.quantity, 3))}</MediumText>
+        </View>
+      </View>
+    </View>
+  </View>
+);
 
 export const ReportListByGroup = () => {
   const {
@@ -109,21 +124,6 @@ export const ReportListByGroup = () => {
     }
   }, [filterReportGroup, filteredOrderList]);
 
-  const renderItem: ListRenderItem<IReportItemByGroup> = ({ item }) => (
-    <View style={styles.itemNoMargin}>
-      <View style={styles.details}>
-        <View style={styles.directionRow}>
-          <View style={styles.groupWidth}>
-            <MediumText>{item.group.name}</MediumText>
-          </View>
-          <View style={localStyles.quantity}>
-            <MediumText>{round(item.quantity, 3)}</MediumText>
-          </View>
-        </View>
-      </View>
-    </View>
-  );
-
   const sAll = useMemo(
     () => round(filteredGroupList?.reduce((prev, cur) => prev + cur.quantity, 0) || 0, 3),
     [filteredGroupList],
@@ -131,20 +131,24 @@ export const ReportListByGroup = () => {
 
   return (
     <View style={styles.flex}>
-      <FlatList
+      <FlashList
         data={filteredGroupList}
         renderItem={renderItem}
         keyExtractor={keyExtractorByIndex}
         ItemSeparatorComponent={ItemSeparator}
         ListEmptyComponent={EmptyList}
         keyboardShouldPersistTaps="never"
+        estimatedItemSize={40}
+        extraData={[filterReportGroup, filteredOrderList]}
       />
-      <View style={{ backgroundColor: globalColors.backgroundLight }}>
-        <View style={[styles.directionRow, localStyles.margins, { backgroundColor: globalColors.backgroundLight }]}>
-          <LargeText style={styles.textTotal}>Общий вес, кг: </LargeText>
-          <MediumText style={styles.textTotal}>{sAll}</MediumText>
+      {sAll > 0 && (
+        <View style={{ backgroundColor: globalColors.backgroundLight }}>
+          <View style={[styles.directionRow, localStyles.margins, { backgroundColor: globalColors.backgroundLight }]}>
+            <LargeText style={styles.textTotal}>Общий вес, кг: </LargeText>
+            <MediumText style={styles.textTotal}>{formatValue({ type: 'number' }, sAll)}</MediumText>
+          </View>
         </View>
-      </View>
+      )}
     </View>
   );
 };
@@ -154,7 +158,11 @@ const localStyles = StyleSheet.create({
     marginHorizontal: 8,
     marginVertical: 5,
   },
+  name: {
+    flex: 1,
+    maxWidth: '80%',
+  },
   quantity: {
-    alignItems: 'flex-end',
+    flex: undefined,
   },
 });

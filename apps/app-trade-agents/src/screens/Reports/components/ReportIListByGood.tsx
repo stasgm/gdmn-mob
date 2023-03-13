@@ -1,16 +1,17 @@
 import React, { useMemo } from 'react';
-import { View, SectionListData, ListRenderItem, StyleSheet, FlatList } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { EmptyList, globalColors, globalStyles as styles, ItemSeparator, LargeText, MediumText } from '@lib/mobile-ui';
 
-import { keyExtractorByIndex, round } from '@lib/mobile-hooks';
+import { formatValue, keyExtractorByIndex, round } from '@lib/mobile-hooks';
 
 import { docSelectors, refSelectors, useSelector } from '@lib/store';
+
+import { FlashList } from '@shopify/flash-list';
 
 import {
   IGoodGroup,
   IOrderDocument,
   IOrderLine,
-  IReportItem,
   IReportItemByGood,
   IReportItemByGoods,
   IReportListFormParam,
@@ -20,7 +21,29 @@ export interface ReportListSectionProps {
   title: string;
 }
 
-export type SectionDataProps = SectionListData<IReportItem, ReportListSectionProps>[];
+const renderItem = ({ item }: { item: IReportItemByGoods }) => (
+  <View style={styles.flex}>
+    {item.type === 'good' ? (
+      <View style={[styles.directionRow, localStyles.good]}>
+        <View style={localStyles.name}>
+          <MediumText style={localStyles.n}>{item.n}</MediumText>
+          <MediumText style={localStyles.goodName}>{item.name}</MediumText>
+        </View>
+        <View style={localStyles.quantity}>
+          <MediumText>{formatValue({ type: 'number' }, round(item.quantity || 0, 3))}</MediumText>
+        </View>
+      </View>
+    ) : (
+      <View style={localStyles.group}>
+        <MediumText
+          style={[item.type === 'parent' && localStyles.itemParent, item.type === 'group' && localStyles.itemGroup]}
+        >
+          {item.name}
+        </MediumText>
+      </View>
+    )}
+  </View>
+);
 
 export const ReportListByGood = () => {
   const {
@@ -76,75 +99,54 @@ export const ReportListByGood = () => {
 
   const filteredGroupList = useMemo(() => {
     const list: IReportItemByGoods[] = [];
-    let i = 1;
     firstLevelGroups.forEach((parent) => {
       const secondLevelGroups = groups.filter((gr) => gr.parent?.id === parent.id);
       list.push({ type: 'parent', name: parent.name });
       secondLevelGroups.forEach((gr) => {
-        i = 1;
         const goods = lines.reduce((prev: IReportItemByGood[], line: IOrderLine) => {
           if (line.good.goodgroup.id === gr.id) {
             const idx = prev.findIndex((l) => l.good.id === line.good.id);
             if (idx >= 0) {
               prev[idx] = { ...prev[idx], quantity: prev[idx].quantity + line.quantity };
             } else {
-              prev = [...prev, { n: i, good: line.good, quantity: line.quantity }];
-              i++;
+              prev = [...prev, { good: line.good, quantity: line.quantity }];
             }
           }
           return prev;
         }, []);
         if (goods.length > 0) {
           list.push({ type: 'group', name: gr.name });
+          goods
+            .sort((a, b) => (a.good.name < b.good.name ? -1 : 1))
+            .forEach((item, id) =>
+              list.push({ type: 'good', n: `00${id + 1}.`.slice(-4), name: item.good.name, quantity: item.quantity }),
+            );
         }
-        goods.forEach((item) =>
-          list.push({ type: 'good', n: `00${item.n}.`.slice(-4), name: item.good.name, quantity: item.quantity }),
-        );
       });
     });
     return list;
   }, [firstLevelGroups, groups, lines]);
 
-  const renderItem: ListRenderItem<IReportItemByGoods> = ({ item }) => (
-    <View style={styles.itemNoMargin}>
-      <View style={styles.details}>
-        <View style={styles.directionRow}>
-          <View style={localStyles.item}>
-            {item.n && <MediumText style={localStyles.n}>{item.n}</MediumText>}
-            <MediumText
-              style={[
-                item.type === 'parent' && localStyles.itemParent,
-                item.type === 'group' && localStyles.itemGroup,
-                item.type === 'good' && localStyles.itemGood,
-              ]}
-            >
-              {item.name}
-            </MediumText>
-          </View>
-          {item.type === 'good' && (
-            <View style={localStyles.quantity}>
-              <MediumText>{round(item.quantity || 0, 3)}</MediumText>
-            </View>
-          )}
-        </View>
-      </View>
-    </View>
-  );
-
   const sAll = useMemo(
-    () => round(filteredGroupList?.reduce((prev, cur) => prev + (cur.quantity || 0), 0) || 0, 3),
+    () =>
+      formatValue(
+        { type: 'number' },
+        round(filteredGroupList?.reduce((prev, cur) => prev + (cur.quantity || 0), 0) || 0, 3),
+      ),
     [filteredGroupList],
   );
 
   return (
     <View style={styles.flex}>
-      <FlatList
+      <FlashList
         data={filteredGroupList}
         renderItem={renderItem}
         keyExtractor={keyExtractorByIndex}
         ItemSeparatorComponent={ItemSeparator}
         ListEmptyComponent={EmptyList}
         keyboardShouldPersistTaps="never"
+        estimatedItemSize={40}
+        extraData={[firstLevelGroups, groups, lines]}
       />
       <View style={{ backgroundColor: globalColors.backgroundLight }}>
         <View style={[styles.directionRow, localStyles.margins, { backgroundColor: globalColors.backgroundLight }]}>
@@ -162,22 +164,36 @@ const localStyles = StyleSheet.create({
     marginVertical: 5,
   },
   quantity: {
-    alignItems: 'flex-end',
+    flex: undefined,
+    paddingRight: 5,
   },
-  item: {
+  name: {
+    flex: 1,
+    maxWidth: '80%',
     flexDirection: 'row',
-    width: '80%',
+  },
+  group: {
+    width: '100%',
   },
   itemParent: {
     fontWeight: 'bold',
+    textAlignVertical: 'center',
+    paddingHorizontal: 5,
+    paddingVertical: 10,
+    backgroundColor: globalColors.backgroundLight,
   },
   itemGroup: {
     paddingLeft: 15,
     fontWeight: 'bold',
+    paddingVertical: 10,
+    textAlignVertical: 'center',
   },
-  itemGood: {
+  goodName: {
     paddingLeft: 6,
     width: '80%',
+  },
+  good: {
+    paddingVertical: 5,
   },
   n: {
     paddingLeft: 30,
