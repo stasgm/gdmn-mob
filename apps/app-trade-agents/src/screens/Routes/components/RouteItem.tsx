@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { globalStyles as styles, LargeText, MediumText } from '@lib/mobile-ui';
@@ -7,7 +7,7 @@ import { refSelectors } from '@lib/store';
 
 import { getDateString, useFilteredDocList } from '@lib/mobile-hooks';
 
-import { TouchableOpacity } from 'react-native-gesture-handler';
+// import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import { IOutlet, IRouteLine, IVisitDocument } from '../../../store/types';
 

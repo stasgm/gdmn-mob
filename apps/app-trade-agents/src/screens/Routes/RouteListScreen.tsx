@@ -1,5 +1,5 @@
-import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { useFocusEffect, useIsFocused, useNavigation, useScrollToTop } from '@react-navigation/native';
+import React, { useLayoutEffect, useMemo, useState } from 'react';
+import { useFocusEffect, useIsFocused, useNavigation } from '@react-navigation/native';
 
 import {
   ItemSeparator,
@@ -17,7 +17,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { appActions, useDispatch, useSelector } from '@lib/store';
 
-import { FlatList } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 
 import { IRouteDocument, IRouteFormParam } from '../../store/types';
 
@@ -35,9 +35,6 @@ const RouteListScreen = () => {
       ? new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime()
       : new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime(),
   );
-
-  const ref = useRef<FlatList<IRouteDocument>>(null);
-  useScrollToTop(ref);
 
   const routeItemId = useSelector((state) => state.app.formParams as IRouteFormParam)?.routeItemId;
 
@@ -85,7 +82,7 @@ const RouteListScreen = () => {
   return (
     <AppScreen>
       <FilterButtons status={status} onPress={setStatus} />
-      <FlatList
+      {/* <FlatList
         ref={ref}
         data={filteredList}
         keyExtractor={keyExtractor}
@@ -94,6 +91,17 @@ const RouteListScreen = () => {
         scrollEventThrottle={400}
         ListEmptyComponent={EmptyList}
         maxToRenderPerBatch={20}
+      /> */}
+      <FlashList
+        data={filteredList}
+        renderItem={renderItem}
+        // ListHeaderComponent={filterVisible ? undefined : renderGroupHeader}
+        estimatedItemSize={60}
+        ItemSeparatorComponent={ItemSeparator}
+        keyExtractor={keyExtractor}
+        extraData={[list, routeItemId]}
+        keyboardShouldPersistTaps={'handled'}
+        ListEmptyComponent={EmptyList}
       />
     </AppScreen>
   );

@@ -1,14 +1,5 @@
 import React, { useState, useLayoutEffect, useCallback, useMemo, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ColorValue,
-  Alert,
-  FlatList,
-  useWindowDimensions,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, ColorValue, Alert, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 
@@ -32,7 +23,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { Chip, Searchbar, useTheme } from 'react-native-paper';
 
-import { TouchableOpacity as TouchableOpacityGesture } from 'react-native-gesture-handler';
+// import { TouchableOpacity as TouchableOpacityGesture } from 'react-native-gesture-handler';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import {
@@ -266,7 +257,7 @@ const SelectGoodScreen = () => {
 
       return (
         <View key={item.id}>
-          <TouchableOpacityGesture
+          <TouchableOpacity
             onPress={() => {
               if (isAdded) {
                 setSelectedGood(item);
@@ -297,14 +288,14 @@ const SelectGoodScreen = () => {
                 )}
               </View>
             </View>
-          </TouchableOpacityGesture>
+          </TouchableOpacity>
         </View>
       );
     },
     [colors.primary, doc?.lines, docId],
   );
 
-  const refListGood = React.useRef<FlatList<IGood>>(null);
+  const refListGood = React.useRef<FlashList<IGood>>(null);
 
   const handlePressGroup = useCallback(
     (paramName: string, item: IGoodGroup, setFunc: any) => {
@@ -379,6 +370,7 @@ const SelectGoodScreen = () => {
         </View>
       )}
       <FlashList
+        ref={refListGood}
         data={filterVisible ? goodsByContact : goodModel}
         renderItem={renderGood}
         ListHeaderComponent={filterVisible ? undefined : renderGroupHeader}

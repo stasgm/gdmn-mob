@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { Alert, View, FlatList } from 'react-native';
+import { Alert, View } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -27,6 +27,8 @@ import { formatValue, generateId, getDateString, useSendDocs, keyExtractor, slee
 import { INamedEntity, ScreenState } from '@lib/types';
 
 import { useTheme } from 'react-native-paper';
+
+import { FlashList } from '@shopify/flash-list';
 
 import {
   IDebt,
@@ -475,7 +477,7 @@ const OrderViewScreen = () => {
             ) : null}
           </View>
         </InfoBlock>
-        <FlatList
+        {/* <FlatList
           data={order.lines}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
@@ -483,6 +485,15 @@ const OrderViewScreen = () => {
           maxToRenderPerBatch={20}
           updateCellsBatchingPeriod={100}
           ItemSeparatorComponent={ItemSeparator}
+        /> */}
+        <FlashList
+          data={order.lines}
+          renderItem={renderItem}
+          estimatedItemSize={60}
+          ItemSeparatorComponent={ItemSeparator}
+          keyExtractor={keyExtractor}
+          extraData={[order, id, delList, handleAddDeletelList, handlePressOrderLine, isBlocked, isDelList]}
+          keyboardShouldPersistTaps={'handled'}
         />
       </View>
       {!!order.lines.length && (
