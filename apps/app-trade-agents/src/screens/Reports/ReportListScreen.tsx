@@ -43,7 +43,6 @@ const ReportListScreen = () => {
   const [visibleReport, setVisibleReport] = useState(false);
 
   const { colors } = useTheme();
-
   const dispatch = useDispatch();
 
   const {
@@ -55,22 +54,26 @@ const ReportListScreen = () => {
     filterReportOnDE,
     filterReportGroup,
     filterReportGood,
-    filterStatusList = [],
+    filterReportStatusList = [],
   } = useSelector((state) => state.app.formParams as IReportListFormParam);
 
   const [report, setReport] = useState(reports[0]);
 
-  useEffect(() => {
-    return () => {
-      dispatch(appActions.clearFormParams());
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const handleCleanFormParams = useCallback(() => {
-    dispatch(appActions.clearFormParams());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    dispatch(
+      appActions.setFormParams({
+        filterReportContact: undefined,
+        filterReportOutlet: undefined,
+        filterReportDB: '',
+        filterReportDE: '',
+        filterReportOnDB: '',
+        filterReportOnDE: '',
+        filterReportGroup: undefined,
+        filterReportGood: undefined,
+        filterReportStatusList: undefined,
+      }),
+    );
+  }, [dispatch]);
 
   const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === filterReportOutlet?.id);
 
@@ -78,7 +81,7 @@ const ReportListScreen = () => {
     if (!!filterReportContact && !!filterReportOutlet && filterReportContact.id !== outlet?.company.id) {
       dispatch(
         appActions.setFormParams({
-          filterOutlet: undefined,
+          filterReportOutlet: undefined,
         }),
       );
     }
@@ -87,17 +90,8 @@ const ReportListScreen = () => {
 
   useEffect(() => {
     // Инициализируем параметры
-    dispatch(
-      appActions.setFormParams({
-        filterReportDB: '',
-        filterReportDE: '',
-        filterReportOnDB: '',
-        filterReportOnDE: '',
-        filterReportGood: undefined,
-        filterReportGroup: undefined,
-      }),
-    );
-  }, [dispatch]);
+    handleCleanFormParams();
+  }, [handleCleanFormParams]);
 
   const withParams =
     !!filterReportContact ||
@@ -108,7 +102,7 @@ const ReportListScreen = () => {
     !!filterReportDE ||
     !!filterReportOnDB ||
     !!filterReportOnDE ||
-    filterStatusList.length > 0;
+    filterReportStatusList.length > 0;
 
   const [filterVisible, setFilterVisible] = useState(true);
 
@@ -239,13 +233,13 @@ const ReportListScreen = () => {
     (value: IListItem) => {
       dispatch(
         appActions.setFormParams({
-          filterStatusList: filterStatusList.find((item) => item.id === value.id)
-            ? filterStatusList.filter((i) => i.id !== value.id)
-            : [...filterStatusList, value],
+          filterReportStatusList: filterReportStatusList.find((item) => item.id === value.id)
+            ? filterReportStatusList.filter((i) => i.id !== value.id)
+            : [...filterReportStatusList, value],
         }),
       );
     },
-    [dispatch, filterStatusList],
+    [dispatch, filterReportStatusList],
   );
 
   const handleReport = useCallback(
@@ -345,7 +339,7 @@ const ReportListScreen = () => {
                 <Checkbox
                   key={elem.id}
                   title={elem.value}
-                  selected={!!filterStatusList.find((i) => i.id === elem.id)}
+                  selected={!!filterReportStatusList.find((i) => i.id === elem.id)}
                   onSelect={() => handleFilterStatus(elem)}
                 />
               </View>

@@ -121,12 +121,6 @@ const SelectGoodScreen = () => {
     }
   }, [filterVisible, searchQuery]);
 
-  useEffect(() => {
-    if ((filterVisible ? goodsByContact : goodModel).length) {
-      refListGood.current?.scrollToIndex({ index: 0, animated: true });
-    }
-  }, [filterVisible, goodModel, goodsByContact]);
-
   const [selectedLine, setSelectedLine] = useState<IOrderLine | undefined>(undefined);
   const [selectedGood, setSelectedGood] = useState<IGood | undefined>(undefined);
 
@@ -245,6 +239,18 @@ const SelectGoodScreen = () => {
     [colors.text, groupButtonStyle],
   );
 
+  const handlePressGood = useCallback(
+    (isAdded: boolean, item: IGood) => {
+      if (isAdded) {
+        setSelectedGood(item);
+      } else {
+        const newLine = { mode: 0, docId, item: { id: generateId(), good: item, quantity: 0 } };
+        setOrderLine(newLine);
+      }
+    },
+    [docId],
+  );
+
   const renderGood = useCallback(
     ({ item }: { item: IGood }) => {
       const lines = doc?.lines?.filter((i) => i.good.id === item.id);
@@ -257,16 +263,7 @@ const SelectGoodScreen = () => {
 
       return (
         <View key={item.id}>
-          <TouchableOpacityGesture
-            onPress={() => {
-              if (isAdded) {
-                setSelectedGood(item);
-              } else {
-                const newLine = { mode: 0, docId, item: { id: generateId(), good: item, quantity: 0 } };
-                setOrderLine(newLine);
-              }
-            }}
-          >
+          <TouchableOpacityGesture onPress={() => handlePressGood(isAdded, item)}>
             <View style={[localStyles.goodItem, goodStyle]}>
               <View style={iconStyle}>
                 <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
@@ -292,10 +289,8 @@ const SelectGoodScreen = () => {
         </View>
       );
     },
-    [colors.primary, doc?.lines, docId],
+    [colors.primary, doc?.lines, handlePressGood],
   );
-
-  const refListGood = React.useRef<FlashList<IGood>>(null);
 
   const handlePressGroup = useCallback(
     (paramName: string, item: IGoodGroup, setFunc: any) => {
@@ -341,6 +336,11 @@ const SelectGoodScreen = () => {
     ],
   );
 
+  const hadndleDismiss = () => {
+    setOrderLine(undefined);
+    hadndleDismissDialog();
+  };
+
   const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
@@ -348,7 +348,7 @@ const SelectGoodScreen = () => {
 
   return (
     <AppScreen style={localStyles.container}>
-      {!!orderLine && <OrderLineEdit orderLine={orderLine} onDismiss={() => setOrderLine(undefined)} />}
+      {!!orderLine && <OrderLineEdit orderLine={orderLine} onDismiss={hadndleDismiss} />}
       {filterVisible && (
         <View>
           <View style={styles.flexDirectionRow}>
@@ -356,9 +356,6 @@ const SelectGoodScreen = () => {
               placeholder="Поиск"
               onChangeText={(text) => {
                 setSearchQuery(text);
-                if (text === '' && goodsByContact.length) {
-                  refListGood?.current?.scrollToIndex({ index: 0, animated: true });
-                }
               }}
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
@@ -377,7 +374,6 @@ const SelectGoodScreen = () => {
         ItemSeparatorComponent={ItemSeparator}
         keyExtractor={keyExtractor}
         extraData={[doc?.lines, docId]}
-        ref={refListGood}
       />
       {(selectedLine || selectedGood) && (
         <OrderLineDialog

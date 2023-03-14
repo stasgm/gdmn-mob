@@ -52,7 +52,7 @@ export interface IReportListFormParam extends IFormParam {
   filterReportOnDE?: string;
   filterReportGroup?: IReferenceData[];
   filterReportGood?: IReferenceData;
-  filterStatusList: IListItem[];
+  filterReportStatusList: IListItem[];
 }
 
 export interface IReportItem {
