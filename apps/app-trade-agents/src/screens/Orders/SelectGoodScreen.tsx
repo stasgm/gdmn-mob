@@ -121,12 +121,6 @@ const SelectGoodScreen = () => {
     }
   }, [filterVisible, searchQuery]);
 
-  useEffect(() => {
-    if ((filterVisible ? goodsByContact : goodModel).length) {
-      refListGood.current?.scrollToIndex({ index: 0, animated: true });
-    }
-  }, [filterVisible, goodModel, goodsByContact]);
-
   const [selectedLine, setSelectedLine] = useState<IOrderLine | undefined>(undefined);
   const [selectedGood, setSelectedGood] = useState<IGood | undefined>(undefined);
 
@@ -295,8 +289,6 @@ const SelectGoodScreen = () => {
     [colors.primary, doc?.lines, docId],
   );
 
-  const refListGood = React.useRef<FlashList<IGood>>(null);
-
   const handlePressGroup = useCallback(
     (paramName: string, item: IGoodGroup, setFunc: any) => {
       setFunc(item);
@@ -356,9 +348,6 @@ const SelectGoodScreen = () => {
               placeholder="Поиск"
               onChangeText={(text) => {
                 setSearchQuery(text);
-                if (text === '' && goodsByContact.length) {
-                  refListGood?.current?.scrollToIndex({ index: 0, animated: true });
-                }
               }}
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
@@ -370,7 +359,6 @@ const SelectGoodScreen = () => {
         </View>
       )}
       <FlashList
-        ref={refListGood}
         data={filterVisible ? goodsByContact : goodModel}
         renderItem={renderGood}
         ListHeaderComponent={filterVisible ? undefined : renderGroupHeader}
