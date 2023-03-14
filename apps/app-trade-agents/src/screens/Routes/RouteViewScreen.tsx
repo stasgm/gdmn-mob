@@ -15,7 +15,7 @@ import {
   SearchButton,
   navBackButton,
 } from '@lib/mobile-ui';
-import { documentActions, docSelectors, useDocThunkDispatch } from '@lib/store';
+import { documentActions, docSelectors, useDocThunkDispatch, refSelectors } from '@lib/store';
 
 import { getDateString, keyExtractor, useFilteredDocList } from '@lib/mobile-hooks';
 
@@ -24,7 +24,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { FlashList } from '@shopify/flash-list';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument, IRouteDocument, IRouteLine, IVisitDocument } from '../../store/types';
+import { IOrderDocument, IOutlet, IRouteDocument, IRouteLine, IRouteLineItem, IVisitDocument } from '../../store/types';
 import actions from '../../store/geo';
 
 import { useDispatch, useSelector as useAppSelector } from '../../store';
@@ -91,8 +91,22 @@ const RouteViewScreen = () => {
     }
   }, [filteredList, searchQuery, routeLineList]);
 
+  const outlets = refSelectors.selectByName<IOutlet>('outlet').data;
   const orders = useFilteredDocList<IOrderDocument>('order');
   const visits = useFilteredDocList<IVisitDocument>('visit');
+
+  const routeList: IRouteLineItem[] | undefined = useMemo(
+    () =>
+      filteredList.routeLineList?.map((r) => {
+        const address = outlets.find((o) => o.id === r.outlet.id)?.address || '';
+        const visit = visits.find((doc) => doc.head?.routeLineId === r.id);
+        const status = !visit ? 0 : visit.head.dateEnd ? 2 : 1;
+        const dateEnd = status === 2 && visit?.head.dateEnd ? getDateString(visit.head.dateEnd) : '';
+
+        return { id: r.id, ordNumber: r.ordNumber, outletName: r.outlet.name, address, dateEnd, status };
+      }),
+    [filteredList.routeLineList, outlets, visits],
+  );
 
   const geoList = useAppSelector((state) => state.geo?.list)?.filter((g) => g.routeId === id);
 
@@ -169,18 +183,18 @@ const RouteViewScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  const handlePressRouteItem = useCallback(
-    (item: IRouteLine) => {
-      if (route) {
-        navigation.navigate('Visit', { routeId: route.id, id: item.id });
-      }
-    },
-    [navigation, route],
-  );
-
   const renderItem = useCallback(
-    ({ item }: { item: IRouteLine }) => <RouteItem item={item} onPressItem={() => handlePressRouteItem(item)} />,
-    [handlePressRouteItem],
+    ({ item }: { item: IRouteLineItem }) => (
+      <RouteItem
+        item={item}
+        onPressItem={() => {
+          if (route) {
+            navigation.navigate('Visit', { routeId: route.id, id: item.id });
+          }
+        }}
+      />
+    ),
+    [navigation, route],
   );
 
   const RouteView = useMemo(() => {
@@ -212,7 +226,7 @@ const RouteViewScreen = () => {
           </>
         )}
         <FlashList
-          data={filteredList.routeLineList}
+          data={routeList}
           renderItem={renderItem}
           estimatedItemSize={60}
           ItemSeparatorComponent={ItemSeparator}
@@ -229,21 +243,7 @@ const RouteViewScreen = () => {
         )}
       </AppScreen>
     );
-  }, [
-    colors.primary,
-    filterVisible,
-    filteredList.routeLineList,
-    isGroupVisible,
-    renderItem,
-    route,
-    routeLineList,
-    searchQuery,
-  ]);
-
-  // const isFocused = useIsFocused();
-  // if (!isFocused) {
-  //   return <AppActivityIndicator />;
-  // }
+  }, [colors.primary, filterVisible, isGroupVisible, renderItem, route, routeLineList?.length, routeList, searchQuery]);
 
   return <>{RouteView}</>;
 };

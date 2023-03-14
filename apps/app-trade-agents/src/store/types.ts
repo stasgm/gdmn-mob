@@ -184,7 +184,14 @@ export interface IRouteLine extends IEntity {
   ordNumber: number; // порядковый номер
   comment?: string;
   visited: boolean;
-  /* result?: typeVisit; -это убрать в визиты */
+}
+
+export interface IRouteLineItem extends IEntity {
+  outletName: string;
+  ordNumber: number;
+  address: string;
+  dateEnd: string;
+  status: number;
 }
 
 export interface IRouteTotalLine {
