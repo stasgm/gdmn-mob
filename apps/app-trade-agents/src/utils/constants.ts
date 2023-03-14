@@ -103,5 +103,5 @@ export const reports: IListItem[] = [
   { id: 'byContact', value: 'В разрезе даты отгрузки и ТО' },
   { id: 'byGroup', value: 'В разрезе групп' },
   { id: 'byGood', value: 'В разрезе товаров' },
-  { id: 'sellBill', value: 'Накладные' },
+  // { id: 'sellBill', value: 'Накладные' },
 ];
