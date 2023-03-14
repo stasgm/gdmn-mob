@@ -1,5 +1,5 @@
-import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { useFocusEffect, useIsFocused, useNavigation, useScrollToTop } from '@react-navigation/native';
+import React, { useLayoutEffect, useMemo, useState } from 'react';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 
 import {
   ItemSeparator,
@@ -15,11 +15,9 @@ import { keyExtractor, useFilteredDocList } from '@lib/mobile-hooks';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { appActions, useDispatch, useSelector } from '@lib/store';
+import { FlashList } from '@shopify/flash-list';
 
-import { FlatList } from 'react-native';
-
-import { IRouteDocument, IRouteFormParam } from '../../store/types';
+import { IRouteDocument } from '../../store/types';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
 
@@ -28,30 +26,11 @@ import RouteListItem from './components/RouteListItem';
 const RouteListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'RouteList'>>();
   const [status, setStatus] = useState<Status>('active');
-  const dispatch = useDispatch();
 
   const list = useFilteredDocList<IRouteDocument>('route').sort((a, b) =>
     status === 'active'
       ? new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime()
       : new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime(),
-  );
-
-  const ref = useRef<FlatList<IRouteDocument>>(null);
-  useScrollToTop(ref);
-
-  const routeItemId = useSelector((state) => state.app.formParams as IRouteFormParam)?.routeItemId;
-
-  //Очищаем первый элемент списка точек маршрута
-  useFocusEffect(
-    React.useCallback(() => {
-      if (routeItemId && routeItemId > 0) {
-        dispatch(
-          appActions.setFormParams({
-            routeItemId: 0,
-          }),
-        );
-      }
-    }, [dispatch, routeItemId]),
   );
 
   const filteredList = useMemo(() => {
@@ -71,10 +50,8 @@ const RouteListScreen = () => {
     });
   }, [navigation]);
 
-  const handlePress = (itemId: string) => navigation.navigate('RouteView', { id: itemId });
-
   const renderItem = ({ item }: { item: IRouteDocument }) => (
-    <RouteListItem key={item.id} item={item} onPress={() => handlePress(item.id)} />
+    <RouteListItem key={item.id} item={item} onPress={() => navigation.navigate('RouteView', { id: item.id })} />
   );
 
   const isFocused = useIsFocused();
@@ -85,15 +62,14 @@ const RouteListScreen = () => {
   return (
     <AppScreen>
       <FilterButtons status={status} onPress={setStatus} />
-      <FlatList
-        ref={ref}
+      <FlashList
         data={filteredList}
-        keyExtractor={keyExtractor}
         renderItem={renderItem}
+        estimatedItemSize={60}
         ItemSeparatorComponent={ItemSeparator}
-        scrollEventThrottle={400}
+        keyExtractor={keyExtractor}
+        keyboardShouldPersistTaps={'handled'}
         ListEmptyComponent={EmptyList}
-        maxToRenderPerBatch={20}
       />
     </AppScreen>
   );

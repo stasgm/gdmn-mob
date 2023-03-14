@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 
 import { RouteProp, useRoute, useTheme, useNavigation } from '@react-navigation/native';
-import { View, Alert, RefreshControl, FlatList } from 'react-native';
+import { View, Alert } from 'react-native';
 import { Divider, Searchbar } from 'react-native-paper';
 
 import {
@@ -20,6 +20,8 @@ import { documentActions, docSelectors, useDocThunkDispatch } from '@lib/store';
 import { getDateString, keyExtractor, useFilteredDocList } from '@lib/mobile-hooks';
 
 import { StackNavigationProp } from '@react-navigation/stack';
+
+import { FlashList } from '@shopify/flash-list';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IRouteDocument, IRouteLine, IVisitDocument } from '../../store/types';
@@ -167,18 +169,12 @@ const RouteViewScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  const RC = useMemo(
-    () => <RefreshControl refreshing={!filteredList.routeLineList} title="загрузка данных..." />,
-    [filteredList.routeLineList],
-  );
-
   const handlePressRouteItem = useCallback(
     (item: IRouteLine) => {
       if (route) {
         navigation.navigate('Visit', { routeId: route.id, id: item.id });
       }
     },
-
     [navigation, route],
   );
 
@@ -215,18 +211,14 @@ const RouteViewScreen = () => {
             <ItemSeparator />
           </>
         )}
-        <FlatList
+        <FlashList
           data={filteredList.routeLineList}
-          keyExtractor={keyExtractor}
           renderItem={renderItem}
+          estimatedItemSize={60}
           ItemSeparatorComponent={ItemSeparator}
-          refreshControl={RC}
-          ListEmptyComponent={EmptyList}
+          keyExtractor={keyExtractor}
           keyboardShouldPersistTaps={'handled'}
-          maxToRenderPerBatch={50}
-          windowSize={60}
-          updateCellsBatchingPeriod={50}
-          initialNumToRender={50}
+          ListEmptyComponent={EmptyList}
         />
         {!!routeLineList?.length && !filterVisible && route?.id && (
           <RouteTotal
@@ -238,16 +230,20 @@ const RouteViewScreen = () => {
       </AppScreen>
     );
   }, [
-    RC,
     colors.primary,
     filterVisible,
     filteredList.routeLineList,
     isGroupVisible,
     renderItem,
     route,
-    routeLineList?.length,
+    routeLineList,
     searchQuery,
   ]);
+
+  // const isFocused = useIsFocused();
+  // if (!isFocused) {
+  //   return <AppActivityIndicator />;
+  // }
 
   return <>{RouteView}</>;
 };

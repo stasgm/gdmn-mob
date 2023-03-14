@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useLayoutEffect, useMemo } from 'react';
-import { View, FlatList, Alert } from 'react-native';
+import { View, FlatList, Alert, TouchableOpacity } from 'react-native';
 import { Searchbar, Divider, Checkbox } from 'react-native-paper';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { IReferenceData, ScreenState } from '@lib/types';
@@ -18,6 +17,8 @@ import {
 } from '@lib/mobile-ui';
 
 import { extraPredicate, keyExtractor } from '@lib/mobile-hooks';
+
+import { FlashList } from '@shopify/flash-list';
 
 import { useDispatch } from '../store';
 
@@ -197,13 +198,14 @@ const SelectRefItemScreen = () => {
           <ItemSeparator />
         </>
       )}
-      <FlatList
-        ref={refList}
+      <FlashList
         data={filteredList}
-        keyExtractor={keyExtractor}
         renderItem={renderItem}
+        estimatedItemSize={40}
         ItemSeparatorComponent={ItemSeparator}
+        keyExtractor={keyExtractor}
         keyboardShouldPersistTaps={'handled'}
+        extraData={[checkedItem, screenState]}
       />
     </AppScreen>
   );

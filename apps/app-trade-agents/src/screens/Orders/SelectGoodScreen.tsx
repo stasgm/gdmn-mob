@@ -23,8 +23,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { Chip, Searchbar, useTheme } from 'react-native-paper';
 
-import { TouchableOpacity as TouchableOpacityGesture } from 'react-native-gesture-handler';
-
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import {
   IGood,
@@ -263,7 +261,7 @@ const SelectGoodScreen = () => {
 
       return (
         <View key={item.id}>
-          <TouchableOpacityGesture onPress={() => handlePressGood(isAdded, item)}>
+          <TouchableOpacity onPress={() => handlePressGood(isAdded, item)}>
             <View style={[localStyles.goodItem, goodStyle]}>
               <View style={iconStyle}>
                 <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
@@ -285,7 +283,7 @@ const SelectGoodScreen = () => {
                 )}
               </View>
             </View>
-          </TouchableOpacityGesture>
+          </TouchableOpacity>
         </View>
       );
     },
