@@ -366,15 +366,16 @@ const SelectGoodScreen = () => {
           <ItemSeparator />
         </View>
       )}
-      <View style={[styles.flexDirectionRow, styles.alignItemsCenter]}>
-        <IconButton
-          icon={isUseMatrix ? 'checkbox-outline' : 'checkbox-blank-outline'}
-          onPress={() => setIsUseMatrix(!isUseMatrix)}
-        />
-        <View style={[styles.directionColumn /*, localStyles.textWidth*/]}>
+      {!filterVisible && (
+        <View style={[styles.flexDirectionRow, styles.alignItemsCenter]}>
+          <IconButton
+            icon={isUseMatrix ? 'checkbox-outline' : 'checkbox-blank-outline'}
+            onPress={() => setIsUseMatrix(!isUseMatrix)}
+            style={localStyles.icon}
+          />
           <MediumText>Использовать матрицы</MediumText>
         </View>
-      </View>
+      )}
       <FlashList
         data={filterVisible ? goodsByContact : goodModel}
         renderItem={renderGood}
@@ -441,4 +442,5 @@ const localStyles = StyleSheet.create({
     textAlignVertical: 'center',
     height: 70,
   },
+  icon: { marginLeft: -2, marginVertical: -0 },
 });
