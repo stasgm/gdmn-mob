@@ -40,7 +40,7 @@ export const ReportListByGroup = () => {
     filterReportOnDB,
     filterReportOnDE,
     filterReportGroup,
-    filterStatusList = [],
+    filterReportStatusList = [],
   } = useSelector((state) => state.app.formParams as IReportListFormParam);
 
   const orders = docSelectors.selectByDocType<IOrderDocument>('order');
@@ -63,8 +63,8 @@ export const ReportListByGroup = () => {
           (filterReportOnDE
             ? new Date(filterReportOnDE).getTime() >= new Date(i.head.onDate.slice(0, 10)).getTime()
             : true) &&
-          (filterStatusList.length > 0
-            ? filterStatusList.find((item) => item.id.toUpperCase() === i.status.toUpperCase())
+          (filterReportStatusList.length > 0
+            ? filterReportStatusList.find((item) => item.id.toUpperCase() === i.status.toUpperCase())
             : true),
       ) || [],
     [
@@ -74,7 +74,7 @@ export const ReportListByGroup = () => {
       filterReportOnDB,
       filterReportOnDE,
       filterReportOutlet,
-      filterStatusList,
+      filterReportStatusList,
       orders,
     ],
   );

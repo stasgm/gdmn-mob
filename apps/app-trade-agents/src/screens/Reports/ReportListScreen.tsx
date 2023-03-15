@@ -27,8 +27,8 @@ import { IReportListFormParam, IOutlet, IReportItem } from '../../store/types';
 import { reports, statusTypes } from '../../utils/constants';
 
 import { ReportListByContact } from './components/ReportListByContact';
-import { ReportListByGroup } from './components/ReportIListByGroup';
-import { ReportListByGood } from './components/ReportIListByGood';
+import { ReportListByGroup } from './components/ReportListByGroup';
+import { ReportListByGood } from './components/ReportListByGood';
 
 export type RefListItem = IReference & { refName: string };
 

@@ -60,7 +60,7 @@ export const ReportListByContact = () => {
     filterReportOnDB,
     filterReportOnDE,
     filterReportGood,
-    filterStatusList = [],
+    filterReportStatusList = [],
   } = useSelector((state) => state.app.formParams as IReportListFormParam);
 
   const outlets = refSelectors.selectByName<IOutlet>('outlet')?.data;
@@ -87,8 +87,8 @@ export const ReportListByContact = () => {
           (filterReportOnDE
             ? new Date(filterReportOnDE).getTime() >= new Date(i.head.onDate.slice(0, 10)).getTime()
             : true) &&
-          (filterStatusList.length > 0
-            ? filterStatusList.find((item) => item.id.toUpperCase() === i.status.toUpperCase())
+          (filterReportStatusList.length > 0
+            ? filterReportStatusList.find((item) => item.id.toUpperCase() === i.status.toUpperCase())
             : true),
       ),
     [
@@ -99,7 +99,7 @@ export const ReportListByContact = () => {
       filterReportOnDB,
       filterReportOnDE,
       filterReportOutlet,
-      filterStatusList,
+      filterReportStatusList,
       orders,
     ],
   );
