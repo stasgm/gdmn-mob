@@ -502,21 +502,12 @@ const VisitScreen = () => {
         <LineTypes />
       </View>
       {lineType === 'new' ? (
-        // <FlatList
-        //   data={orders}
-        //   keyExtractor={keyExtractor}
-        //   renderItem={renderItem}
-        //   scrollEventThrottle={400}
-        //   ItemSeparatorComponent={ItemSeparator}
-        //   ListEmptyComponent={EmptyList}
-        // />
         <FlashList
           data={orders}
           renderItem={renderItem}
           estimatedItemSize={60}
           ItemSeparatorComponent={ItemSeparator}
           keyExtractor={keyExtractor}
-          extraData={[orderDocs]}
           keyboardShouldPersistTaps={'handled'}
           ListEmptyComponent={EmptyList}
         />

@@ -21,9 +21,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { Chip, Searchbar, useTheme } from 'react-native-paper';
-
-// import { TouchableOpacity as TouchableOpacityGesture } from 'react-native-gesture-handler';
+import { Chip, IconButton, Searchbar, useTheme } from 'react-native-paper';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import {
@@ -47,6 +45,8 @@ const SelectGoodScreen = () => {
   const dispatch = useDispatch();
 
   const isUseNetPrice = useSelector((state) => state.settings.data?.isUseNetPrice?.data) as boolean;
+
+  const [isUseMatrix, setIsUseMatrix] = useState(isUseNetPrice);
 
   const syncDate = useSelector((state) => state.app.syncDate);
   const isDemo = useSelector((state) => state.auth.isDemo);
@@ -78,10 +78,10 @@ const SelectGoodScreen = () => {
 
   const model = useMemo(() => {
     if (contactId) {
-      return getGroupModelByContact(groups, goods, goodMatrix[contactId], isUseNetPrice) as IMGroupModel;
+      return getGroupModelByContact(groups, goods, goodMatrix[contactId], isUseMatrix) as IMGroupModel;
     }
     return {};
-  }, [groups, goods, goodMatrix, contactId, isUseNetPrice]);
+  }, [groups, goods, goodMatrix, contactId, isUseMatrix]);
 
   const firstLevelGroups = useMemo(() => Object.values(model).map((item) => item.parent), [model]);
 
@@ -108,12 +108,12 @@ const SelectGoodScreen = () => {
 
   const goodsByContact = useMemo(() => {
     if (contactId) {
-      return getGoodMatrixByContact(goods, goodMatrix[contactId], isUseNetPrice, undefined, searchQuery)?.sort((a, b) =>
+      return getGoodMatrixByContact(goods, goodMatrix[contactId], isUseMatrix, undefined, searchQuery)?.sort((a, b) =>
         a.name < b.name ? -1 : 1,
       );
     }
     return [];
-  }, [contactId, goodMatrix, goods, isUseNetPrice, searchQuery]);
+  }, [contactId, goodMatrix, goods, isUseMatrix, searchQuery]);
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
@@ -239,6 +239,18 @@ const SelectGoodScreen = () => {
     [colors.text, groupButtonStyle],
   );
 
+  const handlePressGood = useCallback(
+    (isAdded: boolean, item: IGood) => {
+      if (isAdded) {
+        setSelectedGood(item);
+      } else {
+        const newLine = { mode: 0, docId, item: { id: generateId(), good: item, quantity: 0 } };
+        setOrderLine(newLine);
+      }
+    },
+    [docId],
+  );
+
   const renderGood = useCallback(
     ({ item }: { item: IGood }) => {
       const lines = doc?.lines?.filter((i) => i.good.id === item.id);
@@ -251,16 +263,7 @@ const SelectGoodScreen = () => {
 
       return (
         <View key={item.id}>
-          <TouchableOpacity
-            onPress={() => {
-              if (isAdded) {
-                setSelectedGood(item);
-              } else {
-                const newLine = { mode: 0, docId, item: { id: generateId(), good: item, quantity: 0 } };
-                setOrderLine(newLine);
-              }
-            }}
-          >
+          <TouchableOpacity onPress={() => handlePressGood(isAdded, item)}>
             <View style={[localStyles.goodItem, goodStyle]}>
               <View style={iconStyle}>
                 <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
@@ -286,7 +289,7 @@ const SelectGoodScreen = () => {
         </View>
       );
     },
-    [colors.primary, doc?.lines, docId],
+    [colors.primary, doc?.lines, handlePressGood],
   );
 
   const handlePressGroup = useCallback(
@@ -333,6 +336,11 @@ const SelectGoodScreen = () => {
     ],
   );
 
+  const hadndleDismiss = () => {
+    setOrderLine(undefined);
+    hadndleDismissDialog();
+  };
+
   const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
@@ -340,7 +348,7 @@ const SelectGoodScreen = () => {
 
   return (
     <AppScreen style={localStyles.container}>
-      {!!orderLine && <OrderLineEdit orderLine={orderLine} onDismiss={() => setOrderLine(undefined)} />}
+      {!!orderLine && <OrderLineEdit orderLine={orderLine} onDismiss={hadndleDismiss} />}
       {filterVisible && (
         <View>
           <View style={styles.flexDirectionRow}>
@@ -358,6 +366,15 @@ const SelectGoodScreen = () => {
           <ItemSeparator />
         </View>
       )}
+      <View style={[styles.flexDirectionRow, styles.alignItemsCenter]}>
+        <IconButton
+          icon={isUseMatrix ? 'checkbox-outline' : 'checkbox-blank-outline'}
+          onPress={() => setIsUseMatrix(!isUseMatrix)}
+        />
+        <View style={[styles.directionColumn /*, localStyles.textWidth*/]}>
+          <MediumText>Использовать матрицы</MediumText>
+        </View>
+      </View>
       <FlashList
         data={filterVisible ? goodsByContact : goodModel}
         renderItem={renderGood}

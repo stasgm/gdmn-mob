@@ -52,17 +52,15 @@ const OrderListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
-
   const { colors } = useTheme();
 
   const orders = useSelector((state) => state.documents.list) as IOrderDocument[];
+  const outlets = refSelectors.selectByName<IOutlet>('outlet')?.data;
 
   const searchStyle = useMemo(() => colors.primary, [colors.primary]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
-
-  const outlets = refSelectors.selectByName<IOutlet>('outlet')?.data;
 
   const {
     filterContact,
@@ -72,18 +70,18 @@ const OrderListScreen = () => {
     filterStatusList = [],
   } = useSelector((state) => state.app.formParams as IOrderListFormParam);
 
-  useEffect(() => {
-    return () => {
-      dispatch(appActions.clearFormParams());
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const handleCleanFormParams = useCallback(() => {
-    dispatch(appActions.clearFormParams());
+    dispatch(
+      appActions.setFormParams({
+        filterContact: undefined,
+        filterOutlet: undefined,
+        filterDateBegin: '',
+        filterDateEnd: '',
+        filterStatusList: undefined,
+      }),
+    );
     setSearchQuery('');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dispatch]);
 
   const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === filterOutlet?.id);
 
@@ -100,13 +98,8 @@ const OrderListScreen = () => {
 
   useEffect(() => {
     // Инициализируем параметры
-    dispatch(
-      appActions.setFormParams({
-        filterDateBegin: '',
-        filterDate: '',
-      }),
-    );
-  }, [dispatch]);
+    handleCleanFormParams();
+  }, [handleCleanFormParams]);
 
   const orderList = useMemo(
     () =>

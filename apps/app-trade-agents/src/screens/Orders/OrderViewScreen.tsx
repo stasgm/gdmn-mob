@@ -477,22 +477,13 @@ const OrderViewScreen = () => {
             ) : null}
           </View>
         </InfoBlock>
-        {/* <FlatList
-          data={order.lines}
-          keyExtractor={keyExtractor}
-          renderItem={renderItem}
-          initialNumToRender={20}
-          maxToRenderPerBatch={20}
-          updateCellsBatchingPeriod={100}
-          ItemSeparatorComponent={ItemSeparator}
-        /> */}
         <FlashList
           data={order.lines}
           renderItem={renderItem}
           estimatedItemSize={60}
           ItemSeparatorComponent={ItemSeparator}
           keyExtractor={keyExtractor}
-          extraData={[order, id, delList, handleAddDeletelList, handlePressOrderLine, isBlocked, isDelList]}
+          extraData={[delList, isBlocked]}
           keyboardShouldPersistTaps={'handled'}
         />
       </View>

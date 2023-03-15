@@ -155,9 +155,9 @@ const DebetListScreen = () => {
         estimatedItemSize={60}
         ItemSeparatorComponent={ItemSeparator}
         keyExtractor={keyExtractor}
-        extraData={[searchQuery, filterVisible, debets]}
+        extraData={[handlePressItem]}
         keyboardShouldPersistTaps={'handled'}
-        ListEmptyComponent={!debets ? EmptyList : null}
+        ListEmptyComponent={!debets.length ? EmptyList : null}
       />
       <SimpleDialog
         visible={visibleDialog}

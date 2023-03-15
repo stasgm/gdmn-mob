@@ -84,7 +84,7 @@ const GoodLineScreen = () => {
           keyExtractor={keyExtractorByIndex}
           renderItem={renderItem}
           ItemSeparatorComponent={ItemSeparator}
-          extraData={[metadata, matrixItem]}
+          estimatedItemSize={60}
         />
         <ItemSeparator />
       </View>

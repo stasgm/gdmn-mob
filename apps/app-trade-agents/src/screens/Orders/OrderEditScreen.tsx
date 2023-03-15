@@ -29,13 +29,10 @@ const OrderEditScreen = () => {
   const { id, routeId } = useRoute<RouteProp<OrdersStackParamList, 'OrderEdit'>>().params || {};
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderEdit'>>();
   const dispatch = useDispatch();
-
   const { colors } = useTheme();
 
   const orders = useFilteredDocList<IOrderDocument>('order');
-
   const order = orders?.find((e) => e.id === id);
-
   const orderType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'order');
@@ -53,15 +50,7 @@ const OrderEditScreen = () => {
 
   // Подразделение по умолчанию
   const departSetting = useSelector((state) => state.auth.user?.settings?.depart?.data);
-
   const defaultDepart = useMemo(() => (isNamedEntity(departSetting) ? departSetting : undefined), [departSetting]);
-
-  useEffect(() => {
-    return () => {
-      dispatch(appActions.clearFormParams());
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === docOutlet?.id);
 
@@ -112,11 +101,14 @@ const OrderEditScreen = () => {
 
       dispatch(
         appActions.setFormParams({
+          contact: undefined,
+          outlet: undefined,
           number: newNumber,
           onDate: newOnDate,
           documentDate: newDocDate,
           status: 'DRAFT',
           depart: defaultDepart,
+          comment: undefined,
         }),
       );
     }
@@ -138,7 +130,6 @@ const OrderEditScreen = () => {
       }
 
       const docId = !id ? generateId() : id;
-
       const newOrderDate = new Date().toISOString();
 
       if (!id) {

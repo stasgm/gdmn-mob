@@ -1,35 +1,34 @@
-import { getDateString, keyExtractorByIndex, round } from '@lib/mobile-hooks';
+import { getDateString } from '@lib/mobile-hooks';
 import {
   AppActivityIndicator,
   AppScreen,
-  EmptyList,
   globalStyles as styles,
-  ItemSeparator,
   navBackDrawer,
   FilterButton,
   PrimeButton,
   SelectableInput,
-  SubTitle,
   Checkbox,
+  Menu,
 } from '@lib/mobile-ui';
-import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
+import { appActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 import { IReference } from '@lib/types';
 import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { SectionListData, View, StyleSheet, SectionList, ListRenderItem, Platform, Keyboard } from 'react-native';
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { SectionListData, View, StyleSheet, Platform, Keyboard } from 'react-native';
 
 import { IListItem } from '@lib/mobile-types';
 
 import { ReportStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument, IReportListFormParam, IOutlet, IReportItem } from '../../store/types';
+import { IReportListFormParam, IOutlet, IReportItem } from '../../store/types';
 
-import { noPackage, statusTypes } from '../../utils/constants';
+import { reports, statusTypes } from '../../utils/constants';
 
-import ReportItem from './components/ReportItem';
-import { ReportTotalByDate, ReportTotal } from './components/ReportTotal';
+import { ReportListByContact } from './components/ReportListByContact';
+import { ReportListByGroup } from './components/ReportListByGroup';
+import { ReportListByGood } from './components/ReportListByGood';
 
 export type RefListItem = IReference & { refName: string };
 
@@ -41,36 +40,40 @@ export type SectionDataProps = SectionListData<IReportItem, ReportListSectionPro
 
 const ReportListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ReportStackParamList, 'ReportList'>>();
+  const [visibleReport, setVisibleReport] = useState(false);
 
   const { colors } = useTheme();
-
   const dispatch = useDispatch();
 
   const {
     filterReportContact,
     filterReportOutlet,
-    filterReportDateBegin,
-    filterReportDateEnd,
+    filterReportDB,
+    filterReportDE,
+    filterReportOnDB,
+    filterReportOnDE,
+    filterReportGroup,
     filterReportGood,
-    filterStatusList = [],
+    filterReportStatusList = [],
   } = useSelector((state) => state.app.formParams as IReportListFormParam);
 
-  const outlets = refSelectors.selectByName<IOutlet>('outlet')?.data;
-
-  const orders = docSelectors.selectByDocType<IOrderDocument>('order');
-
-  useEffect(() => {
-    return () => {
-      dispatch(appActions.clearFormParams());
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const [report, setReport] = useState(reports[0]);
 
   const handleCleanFormParams = useCallback(() => {
-    dispatch(appActions.clearFormParams());
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    dispatch(
+      appActions.setFormParams({
+        filterReportContact: undefined,
+        filterReportOutlet: undefined,
+        filterReportDB: '',
+        filterReportDE: '',
+        filterReportOnDB: '',
+        filterReportOnDE: '',
+        filterReportGroup: undefined,
+        filterReportGood: undefined,
+        filterReportStatusList: undefined,
+      }),
+    );
+  }, [dispatch]);
 
   const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === filterReportOutlet?.id);
 
@@ -78,7 +81,7 @@ const ReportListScreen = () => {
     if (!!filterReportContact && !!filterReportOutlet && filterReportContact.id !== outlet?.company.id) {
       dispatch(
         appActions.setFormParams({
-          filterOutlet: undefined,
+          filterReportOutlet: undefined,
         }),
       );
     }
@@ -87,142 +90,19 @@ const ReportListScreen = () => {
 
   useEffect(() => {
     // Инициализируем параметры
-    dispatch(
-      appActions.setFormParams({
-        filterReportDateBegin: '',
-        filterReportDateEnd: '',
-      }),
-    );
-  }, [dispatch]);
+    handleCleanFormParams();
+  }, [handleCleanFormParams]);
 
   const withParams =
     !!filterReportContact ||
     !!filterReportOutlet ||
+    !!filterReportGroup ||
     !!filterReportGood ||
-    !!filterReportDateBegin ||
-    !!filterReportDateEnd ||
-    filterStatusList.length > 0;
-
-  const filteredOrderList = useMemo(() => {
-    if (withParams) {
-      return orders.filter(
-        (i) =>
-          (filterReportContact?.id ? i.head.contact.id === filterReportContact.id : true) &&
-          (filterReportOutlet?.id ? i.head.outlet.id === filterReportOutlet.id : true) &&
-          (filterReportGood?.id
-            ? i.lines.find((item) => item.good.id === filterReportGood?.id)?.good.id === filterReportGood.id
-            : true) &&
-          (filterReportDateBegin
-            ? new Date(filterReportDateBegin).getTime() <= new Date(i.head.onDate.slice(0, 10)).getTime()
-            : true) &&
-          (filterReportDateEnd
-            ? new Date(filterReportDateEnd).getTime() >= new Date(i.head.onDate.slice(0, 10)).getTime()
-            : true) &&
-          (filterStatusList.length > 0
-            ? filterStatusList.find((item) => item.id.toUpperCase() === i.status.toUpperCase())
-            : true),
-      );
-    } else {
-      return [];
-    }
-  }, [
-    filterReportContact?.id,
-    filterReportDateBegin,
-    filterReportDateEnd,
-    filterReportGood?.id,
-    filterReportOutlet?.id,
-    filterStatusList,
-    orders,
-    withParams,
-  ]);
-
-  const filteredOutletList: IReportItem[] = useMemo(() => {
-    return filteredOrderList
-      .reduce((prev: IReportItem[], cur) => {
-        let itemIndex = prev.findIndex(
-          (e) =>
-            e.outlet.id === cur.head.outlet.id &&
-            new Date(e.onDate.slice(0, 10)).getTime() === new Date(cur.head.onDate.slice(0, 10)).getTime(),
-        );
-
-        if (filterReportGood) {
-          cur.lines.forEach((curLine) => {
-            if (curLine.good.id === filterReportGood.id) {
-              if (itemIndex > -1) {
-                const oldTotalList = prev[itemIndex].totalList || [];
-                const curTotalByPackage = oldTotalList.find(
-                  (item) => item.package.id === (curLine.package?.id || 'noPackage'),
-                );
-                if (curTotalByPackage) {
-                  const newTotalListByPackage = {
-                    ...curTotalByPackage,
-                    quantity: round(curTotalByPackage.quantity + curLine.quantity, 3),
-                  };
-                  const newTotalListByDate = oldTotalList
-                    .filter((i) => i.package.id !== (curLine.package?.id || 'noPackage'))
-                    .concat(newTotalListByPackage);
-                  prev[itemIndex] = { ...prev[itemIndex], totalList: newTotalListByDate };
-                } else {
-                  prev[itemIndex] = {
-                    ...prev[itemIndex],
-                    totalList: [...oldTotalList, { package: curLine.package || noPackage, quantity: curLine.quantity }],
-                  };
-                }
-              } else {
-                const newLine = {
-                  outlet: cur.head.outlet,
-                  onDate: cur.head.onDate,
-                  address: outlets.find((o) => cur?.head?.outlet.id === o.id)?.address,
-                  totalList: [{ package: curLine.package || noPackage, quantity: curLine.quantity }],
-                } as IReportItem;
-                prev = [...prev, newLine];
-                itemIndex = prev.findIndex(
-                  (e) =>
-                    e.outlet.id === cur.head.outlet.id &&
-                    new Date(e.onDate.slice(0, 10)).getTime() === new Date(cur.head.onDate.slice(0, 10)).getTime(),
-                );
-              }
-            }
-          });
-        } else if (itemIndex === -1) {
-          const newLine = {
-            outlet: cur.head.outlet,
-            onDate: cur.head.onDate,
-            address: outlets.find((o) => cur?.head?.outlet.id === o.id)?.address,
-          } as IReportItem;
-          prev = [...prev, newLine];
-        }
-
-        return prev;
-      }, [])
-      ?.sort(
-        (a, b) =>
-          new Date(b.onDate.slice(0, 10)).getTime() - new Date(a.onDate.slice(0, 10)).getTime() ||
-          (a.outlet.name < b.outlet.name ? -1 : 1),
-      );
-  }, [filterReportGood, filteredOrderList, outlets]);
-
-  const sections = useMemo(
-    () =>
-      filteredOutletList.reduce<SectionDataProps>((prev, item) => {
-        const sectionTitle = getDateString(item.onDate);
-        const sectionExists = prev.some(({ title }) => title === sectionTitle);
-        if (sectionExists) {
-          return prev.map((section) =>
-            section.title === sectionTitle ? { ...section, data: [...section.data, item] } : section,
-          );
-        }
-
-        return [
-          ...prev,
-          {
-            title: sectionTitle,
-            data: [item],
-          },
-        ];
-      }, []),
-    [filteredOutletList],
-  );
+    !!filterReportDB ||
+    !!filterReportDE ||
+    !!filterReportOnDB ||
+    !!filterReportOnDE ||
+    filterReportStatusList.length > 0;
 
   const [filterVisible, setFilterVisible] = useState(true);
 
@@ -247,13 +127,15 @@ const ReportListScreen = () => {
   }, [navigation, renderRight]);
 
   const [showDateBegin, setShowDateBegin] = useState(false);
+
   const handleApplyDateBegin = (_event: any, selectedDateBegin: Date | undefined) => {
     setShowDateBegin(false);
 
     if (selectedDateBegin && _event.type !== 'dismissed') {
-      dispatch(appActions.setFormParams({ filterReportDateBegin: selectedDateBegin.toISOString().slice(0, 10) }));
+      dispatch(appActions.setFormParams({ filterReportDB: selectedDateBegin.toISOString().slice(0, 10) }));
     }
   };
+
   const handlePresentDateBegin = () => {
     Keyboard.dismiss();
     setShowDateBegin(true);
@@ -265,13 +147,43 @@ const ReportListScreen = () => {
     setShowDateEnd(false);
 
     if (selectedDateEnd && _event.type !== 'dismissed') {
-      dispatch(appActions.setFormParams({ filterReportDateEnd: selectedDateEnd.toISOString().slice(0, 10) }));
+      dispatch(appActions.setFormParams({ filterReportDE: selectedDateEnd.toISOString().slice(0, 10) }));
     }
   };
 
   const handlePresentDateEnd = () => {
     Keyboard.dismiss();
     setShowDateEnd(true);
+  };
+
+  const [showOnDateBegin, setShowOnDateBegin] = useState(false);
+
+  const handleApplyOnDateBegin = (_event: any, selectedDateBegin: Date | undefined) => {
+    setShowOnDateBegin(false);
+
+    if (selectedDateBegin && _event.type !== 'dismissed') {
+      dispatch(appActions.setFormParams({ filterReportOnDB: selectedDateBegin.toISOString().slice(0, 10) }));
+    }
+  };
+
+  const handlePresentOnDateBegin = () => {
+    Keyboard.dismiss();
+    setShowOnDateBegin(true);
+  };
+
+  const [showOnDateEnd, setShowOnDateEnd] = useState(false);
+
+  const handleApplyOnDateEnd = (_event: any, selectedDateEnd: Date | undefined) => {
+    setShowOnDateEnd(false);
+
+    if (selectedDateEnd && _event.type !== 'dismissed') {
+      dispatch(appActions.setFormParams({ filterReportOnDE: selectedDateEnd.toISOString().slice(0, 10) }));
+    }
+  };
+
+  const handlePresentOnDateEnd = () => {
+    Keyboard.dismiss();
+    setShowOnDateEnd(true);
   };
 
   const handleSearchContact = useCallback(() => {
@@ -305,30 +217,44 @@ const ReportListScreen = () => {
     });
   }, [filterReportGood, navigation]);
 
+  const handleSearchGroup = useCallback(() => {
+    navigation.navigate('SelectRefItem', {
+      refName: 'goodGroup',
+      fieldName: 'filterReportGroup',
+      isMulti: true,
+      clause: {
+        groupParent: 'notNull',
+      },
+      value: filterReportGroup,
+    });
+  }, [filterReportGroup, navigation]);
+
   const handleFilterStatus = useCallback(
     (value: IListItem) => {
       dispatch(
         appActions.setFormParams({
-          filterStatusList: filterStatusList.find((item) => item.id === value.id)
-            ? filterStatusList.filter((i) => i.id !== value.id)
-            : [...filterStatusList, value],
+          filterReportStatusList: filterReportStatusList.find((item) => item.id === value.id)
+            ? filterReportStatusList.filter((i) => i.id !== value.id)
+            : [...filterReportStatusList, value],
         }),
       );
     },
-    [dispatch, filterStatusList],
+    [dispatch, filterReportStatusList],
   );
 
-  const renderItem: ListRenderItem<IReportItem> = ({ item }) => <ReportItem {...item} />;
-
-  const renderSectionHeader = ({ section }: any) => (
-    <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
+  const handleReport = useCallback(
+    (option: IListItem) => {
+      if (!(option.id === report?.id)) {
+        setReport(option);
+      }
+      setVisibleReport(false);
+    },
+    [report?.id],
   );
 
-  const renderSectionFooter = useCallback(
-    ({ section }: any) =>
-      filterReportGood && sections ? <ReportTotalByDate data={section.data} title={section.title} /> : null,
-    [filterReportGood, sections],
-  );
+  const handlePressReport = () => {
+    setVisibleReport(true);
+  };
 
   const isFocused = useIsFocused();
   if (!isFocused) {
@@ -336,31 +262,74 @@ const ReportListScreen = () => {
   }
 
   return (
-    <AppScreen>
+    <AppScreen style={styles.contentTop}>
       {filterVisible && (
         <View style={[localStyles.filter, { borderColor: colors.primary }]}>
+          <View style={localStyles.report}>
+            <Menu
+              key={'report'}
+              options={reports}
+              onChange={handleReport}
+              onPress={handlePressReport}
+              onDismiss={() => setVisibleReport(false)}
+              title={report?.value || ''}
+              visible={visibleReport}
+              activeOptionId={report?.id}
+              style={localStyles.btnTab}
+              iconName={'chevron-down'}
+            />
+          </View>
           <SelectableInput label="Организация" value={filterReportContact?.name || ''} onPress={handleSearchContact} />
           <View style={localStyles.marginTop}>
             <SelectableInput label="Магазин" value={filterReportOutlet?.name || ''} onPress={handleSearchOutlet} />
           </View>
-          <View style={localStyles.marginTop}>
-            <SelectableInput label="Товар" value={filterReportGood?.name || ''} onPress={handleSearchGood} />
+          {report?.id === 'byGroup' && (
+            <View style={localStyles.marginTop}>
+              <SelectableInput
+                label="Группы"
+                value={filterReportGroup?.map((gr) => gr.name).join(',')}
+                onPress={handleSearchGroup}
+              />
+            </View>
+          )}
+          {report?.id === 'byContact' && (
+            <View style={localStyles.marginTop}>
+              <SelectableInput label="Товар" value={filterReportGood?.name || ''} onPress={handleSearchGood} />
+            </View>
+          )}
+          <View style={[styles.flexDirectionRow, localStyles.marginTop]}>
+            <View style={localStyles.width}>
+              <SelectableInput
+                label="С даты"
+                value={filterReportDB ? getDateString(filterReportDB) : ''}
+                onPress={handlePresentDateBegin}
+                style={!filterReportDB && localStyles.fontSize}
+              />
+            </View>
+            <View style={localStyles.width}>
+              <SelectableInput
+                label="По дату"
+                value={filterReportDE ? getDateString(filterReportDE || '') : ''}
+                onPress={handlePresentDateEnd}
+                style={[!filterReportDE && localStyles.fontSize, localStyles.marginInput]}
+              />
+            </View>
           </View>
           <View style={[styles.flexDirectionRow, localStyles.marginTop]}>
             <View style={localStyles.width}>
               <SelectableInput
                 label="С даты отгрузки"
-                value={filterReportDateBegin ? getDateString(filterReportDateBegin) : ''}
-                onPress={handlePresentDateBegin}
-                style={!filterReportDateBegin && localStyles.fontSize}
+                value={filterReportOnDB ? getDateString(filterReportOnDB) : ''}
+                onPress={handlePresentOnDateBegin}
+                style={!filterReportOnDB && localStyles.fontSize}
               />
             </View>
             <View style={localStyles.width}>
               <SelectableInput
                 label="По дату отгрузки"
-                value={filterReportDateEnd ? getDateString(filterReportDateEnd || '') : ''}
-                onPress={handlePresentDateEnd}
-                style={[!filterReportDateEnd && localStyles.fontSize, localStyles.marginInput]}
+                value={filterReportOnDE ? getDateString(filterReportOnDE || '') : ''}
+                onPress={handlePresentOnDateEnd}
+                style={[!filterReportOnDE && localStyles.fontSize, localStyles.marginInput]}
               />
             </View>
           </View>
@@ -370,47 +339,31 @@ const ReportListScreen = () => {
                 <Checkbox
                   key={elem.id}
                   title={elem.value}
-                  selected={!!filterStatusList.find((i) => i.id === elem.id)}
+                  selected={!!filterReportStatusList.find((i) => i.id === elem.id)}
                   onSelect={() => handleFilterStatus(elem)}
                 />
               </View>
             ))}
           </View>
           <View style={localStyles.container}>
-            <PrimeButton
-              icon={'delete-outline'}
-              onPress={handleCleanFormParams}
-              disabled={
-                !(
-                  filterReportContact ||
-                  filterReportOutlet ||
-                  filterReportGood ||
-                  filterReportDateBegin ||
-                  filterReportDateEnd ||
-                  filterStatusList.length
-                )
-              }
-            >
+            <PrimeButton icon={'delete-outline'} onPress={handleCleanFormParams} disabled={!withParams}>
               {'Очистить'}
             </PrimeButton>
           </View>
         </View>
       )}
-      <SectionList
-        sections={sections}
-        renderItem={renderItem}
-        keyExtractor={keyExtractorByIndex}
-        ItemSeparatorComponent={ItemSeparator}
-        renderSectionHeader={renderSectionHeader}
-        renderSectionFooter={renderSectionFooter}
-        ListEmptyComponent={EmptyList}
-        keyboardShouldPersistTaps="never"
-      />
-      {filterReportGood ? <ReportTotal data={filteredOutletList} /> : null}
+      {withParams &&
+        (report?.id === 'byContact' ? (
+          <ReportListByContact />
+        ) : report?.id === 'byGroup' ? (
+          <ReportListByGroup />
+        ) : report?.id === 'byGood' ? (
+          <ReportListByGood />
+        ) : null)}
       {showDateBegin && (
         <DateTimePicker
           testID="dateTimePicker"
-          value={new Date(filterReportDateBegin || new Date())}
+          value={new Date(filterReportDB || new Date())}
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateBegin}
@@ -419,10 +372,28 @@ const ReportListScreen = () => {
       {showDateEnd && (
         <DateTimePicker
           testID="dateTimePicker"
-          value={new Date(filterReportDateEnd || new Date())}
+          value={new Date(filterReportDE || new Date())}
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateEnd}
+        />
+      )}
+      {showOnDateBegin && (
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={new Date(filterReportOnDB || new Date())}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'inline' : 'default'}
+          onChange={handleApplyOnDateBegin}
+        />
+      )}
+      {showOnDateEnd && (
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={new Date(filterReportOnDE || new Date())}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'inline' : 'default'}
+          onChange={handleApplyOnDateEnd}
         />
       )}
     </AppScreen>
@@ -459,5 +430,11 @@ const localStyles = StyleSheet.create({
     marginHorizontal: 5,
     flexDirection: 'row',
     flexWrap: 'wrap',
+  },
+  report: {
+    marginRight: 12,
+  },
+  btnTab: {
+    alignItems: 'flex-end',
   },
 });

@@ -9,7 +9,7 @@ import {
   MediumText,
 } from '@lib/mobile-ui';
 
-import { keyExtractorByIndex, round } from '@lib/mobile-hooks';
+import { formatValue, keyExtractorByIndex, round } from '@lib/mobile-hooks';
 
 import { IReportItem, IReportTotalLine } from '../../../store/types';
 
@@ -42,11 +42,11 @@ const renderTotalItem = ({ item }: { item: IReportTotalLine }) => (
   <View style={styles.itemNoMargin}>
     <View style={styles.details}>
       <View style={styles.directionRow}>
-        <View style={styles.groupWidth}>
+        <View style={localStyles.name}>
           <MediumText>{item.package.name}</MediumText>
         </View>
         <View style={localStyles.quantity}>
-          <MediumText>{round(item.quantity, 3)}</MediumText>
+          <MediumText>{formatValue({ type: 'number' }, round(item.quantity, 3))}</MediumText>
         </View>
       </View>
     </View>
@@ -61,14 +61,13 @@ export const ReportTotalByDate = ({ data, title }: { data: IReportItem[]; title:
       <ItemSeparator />
       <View style={[styles.directionRow, localStyles.margins]}>
         <LargeText style={styles.textTotal}>{`Итого за ${title}, кг: `}</LargeText>
-        <MediumText style={styles.textTotal}>{round(total.totalSum, 3)}</MediumText>
+        <MediumText style={styles.textTotal}>{formatValue({ type: 'number' }, round(total.totalSum, 3))}</MediumText>
       </View>
       <ItemSeparator />
       <FlatList
         data={total.lines}
         keyExtractor={keyExtractorByIndex}
         renderItem={renderTotalItem}
-        style={localStyles.groupMargin}
         ItemSeparatorComponent={ItemSeparator}
       />
     </View>
@@ -82,14 +81,13 @@ export const ReportTotal = ({ data }: { data: IReportItem[] }) => {
     <View style={{ backgroundColor: globalColors.backgroundLight }}>
       <View style={[styles.directionRow, localStyles.margins, { backgroundColor: globalColors.backgroundLight }]}>
         <LargeText style={styles.textTotal}>Общий вес, кг: </LargeText>
-        <MediumText style={styles.textTotal}>{round(total.totalSum, 3)}</MediumText>
+        <MediumText style={styles.textTotal}>{formatValue({ type: 'number' }, round(total.totalSum, 3))}</MediumText>
       </View>
       <ItemSeparator />
       <FlatList
         data={total.lines}
         keyExtractor={keyExtractorByIndex}
         renderItem={renderTotalItem}
-        style={localStyles.groupMargin}
         ItemSeparatorComponent={ItemSeparator}
       />
     </View>
@@ -98,13 +96,14 @@ export const ReportTotal = ({ data }: { data: IReportItem[] }) => {
 
 const localStyles = StyleSheet.create({
   margins: {
-    marginHorizontal: 8,
+    marginHorizontal: 5,
     marginVertical: 5,
   },
-  quantity: {
-    alignItems: 'flex-end',
+  name: {
+    flex: 1,
+    maxWidth: '80%',
   },
-  groupMargin: {
-    marginHorizontal: 5,
+  quantity: {
+    flex: undefined,
   },
 });

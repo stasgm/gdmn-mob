@@ -123,6 +123,9 @@ const globalStyles = StyleSheet.create({
     flex: 1,
     margin: 5,
   },
+  flex: {
+    flex: 1,
+  },
   emptyList: {
     marginTop: 20,
     textAlign: 'center',
