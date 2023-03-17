@@ -21,7 +21,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { Chip, IconButton, Searchbar, useTheme } from 'react-native-paper';
+import { Checkbox, Chip, Searchbar, useTheme } from 'react-native-paper';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import {
@@ -366,16 +366,17 @@ const SelectGoodScreen = () => {
           <ItemSeparator />
         </View>
       )}
-      {!filterVisible && (
-        <View style={[styles.flexDirectionRow, styles.alignItemsCenter]}>
-          <IconButton
-            icon={isUseMatrix ? 'checkbox-outline' : 'checkbox-blank-outline'}
-            onPress={() => setIsUseMatrix(!isUseMatrix)}
-            style={localStyles.icon}
-          />
-          <MediumText>Использовать матрицы</MediumText>
-        </View>
-      )}
+      {!filterVisible && contactId && goodMatrix[contactId] ? (
+        <Checkbox.Item
+          color={colors.primary}
+          uncheckedColor={colors.primary}
+          status={isUseMatrix ? 'checked' : 'unchecked'}
+          onPress={() => setIsUseMatrix(!isUseMatrix)}
+          label="Использовать матрицы"
+          position="leading"
+          style={localStyles.checkBox}
+        />
+      ) : null}
       <FlashList
         data={filterVisible ? goodsByContact : goodModel}
         renderItem={renderGood}
@@ -442,5 +443,5 @@ const localStyles = StyleSheet.create({
     textAlignVertical: 'center',
     height: 70,
   },
-  icon: { marginLeft: -2, marginVertical: -0 },
+  checkBox: { marginLeft: -20, width: 250 },
 });
