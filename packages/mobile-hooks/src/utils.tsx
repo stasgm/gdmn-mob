@@ -27,14 +27,14 @@ const getDateString = (_date: string | Date) => {
   )}.${date.getFullYear()}`;
 };
 
-const extraPredicate = (item: any, params: Record<string, string>) => {
+const extraPredicate = (item: any, params: Record<string, string | undefined>) => {
   let matched = 0;
 
   const paramsEntries = Object.entries(params);
 
   for (const [param, value] of paramsEntries) {
     if (param in item) {
-      if (((item as any)[param] as string).toUpperCase() === value.toUpperCase()) {
+      if (((item as any)[param] as string).toUpperCase() === value?.toUpperCase()) {
         matched++;
       } else {
         break;
@@ -81,16 +81,16 @@ type NumberFormat = 'currency' | 'number' | 'percentage';
 
 interface INumberFormat {
   type: NumberFormat;
-  decimals: number;
+  decimals?: number;
 }
 
 const formatValue = (format: NumberFormat | INumberFormat, value: number | string) => {
   const type = typeof format === 'string' ? format : format.type;
-  const decimals = typeof format === 'string' ? 2 : format.decimals;
+  const decimals = typeof format === 'string' ? 2 : format.decimals || -1;
 
   const transform = function (org: number, n: number, x: number, s: string, c: string) {
-    const re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\D' : 'р') + ')',
-      num = org.toFixed(Math.max(0, Math.floor(n)));
+    const re = '\\d(?=(\\d{' + (x || 3) + '})+' + '(?!\\d))',
+      num = n === -1 ? org.toString() : org.toFixed(Math.max(0, Math.floor(n)));
 
     return (c ? num.replace('.', c) : num).replace(new RegExp(re, 'g'), '$&' + (s || ','));
   };

@@ -3,7 +3,6 @@ import {
   View,
   StyleSheet,
   ListRenderItem,
-  FlatList,
   Alert,
   TouchableHighlight,
   SectionList,
@@ -48,6 +47,8 @@ import { IDocumentType, INamedEntity, ScreenState } from '@lib/types';
 import { Divider, useTheme } from 'react-native-paper';
 
 import { IDelList } from '@lib/mobile-types';
+
+import { FlashList } from '@shopify/flash-list';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import {
@@ -382,8 +383,8 @@ const VisitScreen = () => {
     [colors.background, colors.primary, colors.text, lineType],
   );
 
-  const renderItem: ListRenderItem<IListItemProps> = useCallback(
-    ({ item }) => (
+  const renderItem = useCallback(
+    ({ item }: { item: IListItemProps }) => (
       <ScreenListItem
         {...item}
         onPress={() =>
@@ -501,12 +502,13 @@ const VisitScreen = () => {
         <LineTypes />
       </View>
       {lineType === 'new' ? (
-        <FlatList
+        <FlashList
           data={orders}
-          keyExtractor={keyExtractor}
           renderItem={renderItem}
-          scrollEventThrottle={400}
+          estimatedItemSize={60}
           ItemSeparatorComponent={ItemSeparator}
+          keyExtractor={keyExtractor}
+          keyboardShouldPersistTaps={'handled'}
           ListEmptyComponent={EmptyList}
         />
       ) : (

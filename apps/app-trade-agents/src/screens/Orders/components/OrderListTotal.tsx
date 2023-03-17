@@ -6,7 +6,7 @@ import { Divider } from 'react-native-paper';
 
 import { useTheme } from '@react-navigation/native';
 
-import { keyExtractorByIndex, round, useFilteredDocList } from '@lib/mobile-hooks';
+import { formatValue, keyExtractorByIndex, round, useFilteredDocList } from '@lib/mobile-hooks';
 
 import { IGoodGroup, IOrderDocument, IOrderLine, IOrderTotalLine } from '../../../store/types';
 import { totalList, totalListByGroup } from '../../../utils/helpers';
@@ -49,11 +49,11 @@ const OrderListTotal = ({ sectionOrders }: IItem) => {
       <View style={styles.itemNoMargin}>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <View style={styles.groupWidth}>
+            <View style={localStyles.name}>
               <MediumText>{item.group.name}</MediumText>
             </View>
             <View style={localStyles.quantity}>
-              <MediumText>{round(item.quantity, 3)}</MediumText>
+              <MediumText>{formatValue({ type: 'number' }, round(item.quantity, 3))}</MediumText>
             </View>
           </View>
         </View>
@@ -82,7 +82,7 @@ const OrderListTotal = ({ sectionOrders }: IItem) => {
       ) : null}
       <View style={[styles.directionRow, localStyles.margins]}>
         <LargeText style={styles.textTotal}>Общий вес, кг: </LargeText>
-        <MediumText style={styles.textTotal}>{round(total?.quantity, 3)}</MediumText>
+        <MediumText style={styles.textTotal}>{formatValue({ type: 'number' }, round(total?.quantity, 3))}</MediumText>
       </View>
       <Divider style={{ backgroundColor: colors.primary }} />
       <View style={[styles.directionColumn, localStyles.margins]}>
@@ -109,8 +109,11 @@ const localStyles = StyleSheet.create({
   groupMargin: {
     marginHorizontal: 5,
   },
+  name: {
+    flex: 1,
+    maxWidth: '80%',
+  },
   quantity: {
-    alignItems: 'flex-end',
-    // width: '25%',
+    flex: undefined,
   },
 });

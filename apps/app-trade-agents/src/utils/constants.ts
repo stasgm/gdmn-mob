@@ -98,3 +98,10 @@ export const statusTypes: IListItem[] = [
 ];
 
 export const noPackage: INamedEntity = { id: 'noPackage', name: 'Без упаковки' };
+
+export const reports: IListItem[] = [
+  { id: 'byContact', value: 'В разрезе даты отгрузки и ТО' },
+  { id: 'byGroup', value: 'В разрезе групп' },
+  { id: 'byGood', value: 'В разрезе товаров' },
+  // { id: 'sellBill', value: 'Накладные' },
+];
