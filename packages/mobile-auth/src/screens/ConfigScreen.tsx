@@ -1,13 +1,13 @@
 import React, { useCallback, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { Button, Checkbox, Dialog, HelperText } from 'react-native-paper';
+import { Button, Dialog, HelperText, IconButton } from 'react-native-paper';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import { IApiConfig } from '@lib/client-types';
-import { AppScreen, Input, PrimeButton, ScreenTitle } from '@lib/mobile-ui';
+import { AppScreen, Input, PrimeButton, ScreenTitle, globalStyles as styles, MediumText } from '@lib/mobile-ui';
 
 import { config as firstConfig } from '@lib/client-config';
 
@@ -161,25 +161,18 @@ const ConfigScreen = ({ config, onSetConfig, onSetDemoMode }: Props) => {
       <Dialog visible={visibleDialog} onDismiss={handleVisibleFalse}>
         <Dialog.Title>Укажите необходимые действия</Dialog.Title>
         <Dialog.Content>
-          <Checkbox.Item
-            color={colors.primary}
-            uncheckedColor={colors.primary}
-            status={initConfig ? 'checked' : 'unchecked'}
-            onPress={() => setInitConfig(!initConfig)}
-            label="Установить настройки по умолчанию"
-            position="leading"
-            style={configStyles.checkBox}
-          />
-
-          <Checkbox.Item
-            color={colors.primary}
-            uncheckedColor={colors.primary}
-            status={initDeviceID ? 'checked' : 'unchecked'}
-            onPress={() => setInitDeviceID(!initDeviceID)}
-            label="Удалить данные об устройстве"
-            position="leading"
-            style={configStyles.checkBox}
-          />
+          <TouchableOpacity onPress={() => setInitConfig(!initConfig)}>
+            <View style={[styles.flexDirectionRow, styles.alignItemsCenter]}>
+              <IconButton icon={initConfig ? 'checkbox-outline' : 'checkbox-blank-outline'} />
+              <MediumText style={configStyles.textWidth}>Установить настройки по умолчанию</MediumText>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setInitDeviceID(!initDeviceID)}>
+            <View style={[styles.flexDirectionRow, styles.alignItemsCenter]}>
+              <IconButton icon={initDeviceID ? 'checkbox-outline' : 'checkbox-blank-outline'} />
+              <MediumText style={configStyles.textWidth}>Удалить данные об устройстве</MediumText>
+            </View>
+          </TouchableOpacity>
         </Dialog.Content>
         <Dialog.Actions style={{ borderColor: colors.primary }}>
           <Button
@@ -207,5 +200,5 @@ const configStyles = StyleSheet.create({
   screen: { alignItems: 'center', flexDirection: 'row', flex: 1 },
   keybord: { paddingVertical: 20, flexDirection: 'column' },
   error: { marginTop: -5, paddingTop: -5 },
-  checkBox: { marginLeft: -20, maxWidth: 250 },
+  textWidth: { width: '80%' },
 });
