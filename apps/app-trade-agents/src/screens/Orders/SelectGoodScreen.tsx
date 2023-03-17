@@ -366,16 +366,14 @@ const SelectGoodScreen = () => {
           <ItemSeparator />
         </View>
       )}
-      {!filterVisible && (
-        <View style={[styles.flexDirectionRow, styles.alignItemsCenter]}>
-          <IconButton
-            icon={isUseMatrix ? 'checkbox-outline' : 'checkbox-blank-outline'}
-            onPress={() => setIsUseMatrix(!isUseMatrix)}
-            style={localStyles.icon}
-          />
-          <MediumText>Использовать матрицы</MediumText>
-        </View>
-      )}
+      {!filterVisible && contactId && goodMatrix[contactId] ? (
+        <TouchableOpacity onPress={() => setIsUseMatrix(!isUseMatrix)}>
+          <View style={[styles.flexDirectionRow, styles.alignItemsCenter]}>
+            <IconButton icon={isUseMatrix ? 'checkbox-outline' : 'checkbox-blank-outline'} style={localStyles.icon} />
+            <MediumText>Использовать матрицы</MediumText>
+          </View>
+        </TouchableOpacity>
+      ) : null}
       <FlashList
         data={filterVisible ? goodsByContact : goodModel}
         renderItem={renderGood}
