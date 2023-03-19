@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -161,20 +161,18 @@ const ConfigScreen = ({ config, onSetConfig, onSetDemoMode }: Props) => {
       <Dialog visible={visibleDialog} onDismiss={handleVisibleFalse}>
         <Dialog.Title>Укажите необходимые действия</Dialog.Title>
         <Dialog.Content>
-          <View style={[styles.flexDirectionRow, styles.alignItemsCenter]}>
-            <IconButton
-              icon={initConfig ? 'checkbox-outline' : 'checkbox-blank-outline'}
-              onPress={() => setInitConfig(!initConfig)}
-            />
-            <MediumText style={configStyles.textWidth}>Установить настройки по умолчанию</MediumText>
-          </View>
-          <View style={[styles.flexDirectionRow, styles.alignItemsCenter]}>
-            <IconButton
-              icon={initDeviceID ? 'checkbox-outline' : 'checkbox-blank-outline'}
-              onPress={() => setInitDeviceID(!initDeviceID)}
-            />
-            <MediumText style={configStyles.textWidth}>Удалить данные об устройстве</MediumText>
-          </View>
+          <TouchableOpacity onPress={() => setInitConfig(!initConfig)}>
+            <View style={[styles.flexDirectionRow, styles.alignItemsCenter]}>
+              <IconButton icon={initConfig ? 'checkbox-outline' : 'checkbox-blank-outline'} />
+              <MediumText style={configStyles.textWidth}>Установить настройки по умолчанию</MediumText>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setInitDeviceID(!initDeviceID)}>
+            <View style={[styles.flexDirectionRow, styles.alignItemsCenter]}>
+              <IconButton icon={initDeviceID ? 'checkbox-outline' : 'checkbox-blank-outline'} />
+              <MediumText style={configStyles.textWidth}>Удалить данные об устройстве</MediumText>
+            </View>
+          </TouchableOpacity>
         </Dialog.Content>
         <Dialog.Actions style={{ borderColor: colors.primary }}>
           <Button

@@ -104,8 +104,8 @@ const GoodListScreen = () => {
         data={filteredList}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
-        ItemSeparatorComponent={ItemSeparator}
         estimatedItemSize={60}
+        ItemSeparatorComponent={ItemSeparator}
         ListEmptyComponent={EmptyList}
         keyboardShouldPersistTaps={'handled'}
       />

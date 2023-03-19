@@ -243,8 +243,7 @@ const RouteViewScreen = () => {
         )}
       </AppScreen>
     );
-  }, [colors.primary, filterVisible, isGroupVisible, renderItem, route, routeLineList?.length, routeList, searchQuery]);
-
+  }, [colors.primary, filterVisible, isGroupVisible, renderItem, route, routeLineList, routeList, searchQuery]);
   return <>{RouteView}</>;
 };
 

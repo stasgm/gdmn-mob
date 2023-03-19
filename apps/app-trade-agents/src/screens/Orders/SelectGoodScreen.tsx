@@ -21,7 +21,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { Chip, Searchbar, useTheme } from 'react-native-paper';
+import { Checkbox, Chip, Searchbar, useTheme } from 'react-native-paper';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import {
@@ -45,6 +45,8 @@ const SelectGoodScreen = () => {
   const dispatch = useDispatch();
 
   const isUseNetPrice = useSelector((state) => state.settings.data?.isUseNetPrice?.data) as boolean;
+
+  const [isUseMatrix, setIsUseMatrix] = useState(isUseNetPrice);
 
   const syncDate = useSelector((state) => state.app.syncDate);
   const isDemo = useSelector((state) => state.auth.isDemo);
@@ -76,10 +78,10 @@ const SelectGoodScreen = () => {
 
   const model = useMemo(() => {
     if (contactId) {
-      return getGroupModelByContact(groups, goods, goodMatrix[contactId], isUseNetPrice) as IMGroupModel;
+      return getGroupModelByContact(groups, goods, goodMatrix[contactId], isUseMatrix) as IMGroupModel;
     }
     return {};
-  }, [groups, goods, goodMatrix, contactId, isUseNetPrice]);
+  }, [groups, goods, goodMatrix, contactId, isUseMatrix]);
 
   const firstLevelGroups = useMemo(() => Object.values(model).map((item) => item.parent), [model]);
 
@@ -106,12 +108,12 @@ const SelectGoodScreen = () => {
 
   const goodsByContact = useMemo(() => {
     if (contactId) {
-      return getGoodMatrixByContact(goods, goodMatrix[contactId], isUseNetPrice, undefined, searchQuery)?.sort((a, b) =>
+      return getGoodMatrixByContact(goods, goodMatrix[contactId], isUseMatrix, undefined, searchQuery)?.sort((a, b) =>
         a.name < b.name ? -1 : 1,
       );
     }
     return [];
-  }, [contactId, goodMatrix, goods, isUseNetPrice, searchQuery]);
+  }, [contactId, goodMatrix, goods, isUseMatrix, searchQuery]);
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
@@ -364,6 +366,17 @@ const SelectGoodScreen = () => {
           <ItemSeparator />
         </View>
       )}
+      {!filterVisible && contactId && goodMatrix[contactId] ? (
+        <Checkbox.Item
+          color={colors.primary}
+          uncheckedColor={colors.primary}
+          status={isUseMatrix ? 'checked' : 'unchecked'}
+          onPress={() => setIsUseMatrix(!isUseMatrix)}
+          label="Использовать матрицы"
+          position="leading"
+          style={localStyles.checkBox}
+        />
+      ) : null}
       <FlashList
         data={filterVisible ? goodsByContact : goodModel}
         renderItem={renderGood}
@@ -430,4 +443,5 @@ const localStyles = StyleSheet.create({
     textAlignVertical: 'center',
     height: 70,
   },
+  checkBox: { marginLeft: -20, width: 250 },
 });
