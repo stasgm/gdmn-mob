@@ -434,15 +434,18 @@ export const DocViewScreen = () => {
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
         </>
       </InfoBlock>
-      <TextInput
-        style={styles.scanInput}
-        key={key}
-        autoFocus={true}
-        selectionColor="transparent"
-        ref={ref}
-        showSoftInputOnFocus={false}
-        onChangeText={(text) => setScan(text)}
-      />
+      {isScanerReader ? (
+        <TextInput
+          style={styles.scanInput}
+          key={key}
+          autoFocus={true}
+          selectionColor="transparent"
+          ref={ref}
+          showSoftInputOnFocus={false}
+          onChangeText={(text) => setScan(text)}
+        />
+      ) : null}
+
       <FlashList
         data={doc.lines}
         renderItem={renderItem}
