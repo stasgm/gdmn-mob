@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { View, Alert, TextInput } from 'react-native';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
@@ -62,34 +62,26 @@ export const DocViewScreen = () => {
   const docLineQuantity = doc?.lines?.reduce((sum, line) => sum + line.quantity, 0) || 0;
   const docLineSum = doc?.lines?.reduce((sum, line) => sum + line.quantity * (line?.price || 0), 0) || 0;
 
+  const lines = doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0));
   const isBlocked = doc?.status !== 'DRAFT';
 
   const [scanned, setScanned] = useState(false);
 
   const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
 
-  const currRef = useRef<TextInput>(null);
   const ref = useRef<TextInput>(null);
 
-  useEffect(() => {
-    currRef.current?.clear();
-    ref.current?.clear();
-  }, []);
-
-  useEffect(() => {
-    currRef?.current && setTimeout(() => currRef.current?.focus(), ONE_SECOND_IN_MS);
-  }, []);
-
-  useEffect(() => {
-    if (!scanned && ref?.current) {
-      ref?.current &&
-        setTimeout(() => {
-          ref.current?.focus();
-          ref.current?.clear();
-        }, ONE_SECOND_IN_MS);
-    }
-  }, [scanned, ref]);
-
+  useFocusEffect(
+    useCallback(() => {
+      if (!scanned && ref?.current) {
+        ref?.current &&
+          setTimeout(() => {
+            ref.current?.focus();
+            ref.current?.clear();
+          }, ONE_SECOND_IN_MS);
+      }
+    }, [scanned, ref]),
+  );
   const handleAddDocLine = useCallback(() => {
     navigation.navigate('SelectRemainsItem', {
       docId: id,
@@ -320,7 +312,6 @@ export const DocViewScreen = () => {
         //   иначе подставляем unknownGood cо сканированным шк и добавляем в позицию документа
 
         if (!remItem) {
-          // setScaner({ state: 'error', message: 'Товар не найден' });
           Alert.alert('Внимание!', 'Товар не найден', [
             {
               text: 'ОК',
@@ -339,9 +330,8 @@ export const DocViewScreen = () => {
           buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
           barcode: remItem.good.barcode,
+          sortOrder: (lines?.length || 0) + 1,
         };
-
-        // setScaner({ state: remItem.good.id === 'unknown' ? 'error' : 'found' });
       } else {
         charFrom = charTo;
         charTo = charFrom + weightSettingsCountCode;
@@ -357,7 +347,6 @@ export const DocViewScreen = () => {
           (documentType?.isRemains ? undefined : { good: { ...unknownGood, barcode: brc } });
 
         if (!remItem) {
-          // setScaner({ state: 'error', message: 'Товар не найден' });
           Alert.alert('Внимание!', 'Товар не найден', [
             {
               text: 'ОК',
@@ -375,9 +364,8 @@ export const DocViewScreen = () => {
           buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
           barcode: remItem.good.barcode,
+          sortOrder: (lines?.length || 0) + 1,
         };
-
-        // setScaner({ state: remItem.good.id === 'unknown' ? 'error' : 'found' });
       }
 
       navigation.navigate('DocLine', {
@@ -395,6 +383,7 @@ export const DocViewScreen = () => {
       goodRemains,
       id,
       isInputQuantity,
+      lines?.length,
       navigation,
       weightSettingsCountCode,
       weightSettingsCountWeight,
