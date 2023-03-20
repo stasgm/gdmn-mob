@@ -64,6 +64,7 @@ export interface IMovementLine extends IEntity {
   EID?: string;
   docType?: string;
   weightCode?: string;
+  sortOrder?: number; // порядок сортировки
 }
 
 export type IMovementDocument = MandateProps<IDocument<IMovementHead, IMovementLine>, 'head' | 'lines'>;
