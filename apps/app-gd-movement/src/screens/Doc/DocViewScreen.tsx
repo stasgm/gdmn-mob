@@ -65,22 +65,20 @@ export const DocViewScreen = () => {
   const lines = doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0));
   const isBlocked = doc?.status !== 'DRAFT';
 
-  const [scanned, setScanned] = useState(false);
-
   const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
 
   const ref = useRef<TextInput>(null);
 
   useFocusEffect(
     useCallback(() => {
-      if (!scanned && ref?.current) {
+      if (ref?.current) {
         ref?.current &&
           setTimeout(() => {
             ref.current?.focus();
             ref.current?.clear();
           }, ONE_SECOND_IN_MS);
       }
-    }, [scanned, ref]),
+    }, [ref]),
   );
   const handleAddDocLine = useCallback(() => {
     navigation.navigate('SelectRemainsItem', {
@@ -317,7 +315,6 @@ export const DocViewScreen = () => {
               text: 'ОК',
             },
           ]);
-          setScanned(false);
 
           return;
         }
@@ -352,7 +349,6 @@ export const DocViewScreen = () => {
               text: 'ОК',
             },
           ]);
-          setScanned(false);
           return;
         }
 
@@ -373,8 +369,6 @@ export const DocViewScreen = () => {
         docId: id,
         item: scannedObject,
       });
-
-      setScanned(false);
     },
 
     [
@@ -393,12 +387,8 @@ export const DocViewScreen = () => {
 
   const setScan = (brc: string) => {
     setKey(key + 1);
-    setScanned(true);
     getScannedObject(brc);
   };
-
-  console.log('scann', scanned);
-  // console.log('ref?.current', ref?.current);
 
   useEffect(() => {
     if (screenState === 'sent' || screenState === 'deleted') {
@@ -451,7 +441,7 @@ export const DocViewScreen = () => {
         selectionColor="transparent"
         ref={ref}
         showSoftInputOnFocus={false}
-        onChangeText={(text) => !scanned && setScan(text)}
+        onChangeText={(text) => setScan(text)}
       />
       <FlashList
         data={doc.lines}
