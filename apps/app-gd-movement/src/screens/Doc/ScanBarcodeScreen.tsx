@@ -134,6 +134,7 @@ const ScanBarcodeScreen = () => {
           buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
           barcode: remItem.good.barcode,
+          sortOrder: (document?.lines?.length || 0) + 1,
         });
 
         setScaner({ state: remItem.good.id === 'unknown' ? 'error' : 'found' });
@@ -164,12 +165,14 @@ const ScanBarcodeScreen = () => {
           buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
           barcode: remItem.good.barcode,
+          sortOrder: (document?.lines?.length || 0) + 1,
         });
 
         setScaner({ state: remItem.good.id === 'unknown' ? 'error' : 'found' });
       }
     },
     [
+      document?.lines?.length,
       documentType?.isRemains,
       goodRemains,
       isInputQuantity,

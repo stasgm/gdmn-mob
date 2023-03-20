@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { View, Alert } from 'react-native';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { View, Alert, TextInput } from 'react-native';
+import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
@@ -30,16 +30,19 @@ import {
   useSendDocs,
   sleep,
   keyExtractor,
+  generateId,
 } from '@lib/mobile-hooks';
 
-import { ScreenState } from '@lib/types';
+import { IDocumentType, INamedEntity, ISettingsOption, ScreenState } from '@lib/types';
 
 import { FlashList } from '@shopify/flash-list';
 
 import { IMovementDocument, IMovementLine } from '../../store/types';
 import { DocStackParamList } from '../../navigation/Root/types';
-import { getStatusColor } from '../../utils/constants';
-import { IGood } from '../../store/app/types';
+import { getStatusColor, ONE_SECOND_IN_MS, unknownGood } from '../../utils/constants';
+import { IGood, IMGoodData, IMGoodRemain, IRemains } from '../../store/app/types';
+
+import { getRemGoodByContact } from '../../utils/helpers';
 
 import DocTotal from './components/DocTotal';
 
@@ -52,15 +55,31 @@ export const DocViewScreen = () => {
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
   const id = useRoute<RouteProp<DocStackParamList, 'DocView'>>().params?.id;
-
   const doc = docSelectors.selectByDocId<IMovementDocument>(id);
+
   const loading = useSelector((state) => state.app.loading);
 
   const docLineQuantity = doc?.lines?.reduce((sum, line) => sum + line.quantity, 0) || 0;
   const docLineSum = doc?.lines?.reduce((sum, line) => sum + line.quantity * (line?.price || 0), 0) || 0;
 
+  const lines = doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0));
   const isBlocked = doc?.status !== 'DRAFT';
 
+  const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
+
+  const ref = useRef<TextInput>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (ref?.current) {
+        ref?.current &&
+          setTimeout(() => {
+            ref.current?.focus();
+            ref.current?.clear();
+          }, ONE_SECOND_IN_MS);
+      }
+    }, [ref]),
+  );
   const handleAddDocLine = useCallback(() => {
     navigation.navigate('SelectRemainsItem', {
       docId: id,
@@ -182,7 +201,7 @@ export const DocViewScreen = () => {
                 <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
               )}
               <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
-              <ScanButton onPress={handleDoScan} disabled={screenState !== 'idle'} />
+              {!isScanerReader && <ScanButton onPress={handleDoScan} disabled={screenState !== 'idle'} />}
               <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
             </>
           )}
@@ -196,6 +215,7 @@ export const DocViewScreen = () => {
       handleSaveDocument,
       isBlocked,
       isDelList,
+      isScanerReader,
       loading,
       screenState,
     ],
@@ -242,6 +262,142 @@ export const DocViewScreen = () => {
     );
   };
 
+  const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
+
+  const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
+  const documentType = useMemo(
+    () => documentTypes?.find((d) => d.id === doc?.documentType.id),
+    [doc?.documentType.id, documentTypes],
+  );
+
+  const contactId = useMemo(
+    () => (documentType?.remainsField === 'fromContact' ? doc?.head?.fromContact?.id : doc?.head?.toContact?.id),
+    [doc?.head?.fromContact?.id, doc?.head?.toContact?.id, documentType?.remainsField],
+  );
+
+  const [goodRemains] = useState<IMGoodData<IMGoodRemain>>(() =>
+    contactId ? getRemGoodByContact(goods, remains[contactId], documentType?.isRemains) : {},
+  );
+
+  const settings = useSelector((state) => state.settings?.data);
+
+  const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
+  const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>)?.data || 0;
+  const weightSettingsCountWeight = (settings.countWeight as ISettingsOption<number>)?.data || 0;
+  const isInputQuantity = settings.quantityInput?.data;
+
+  const [key, setKey] = useState(1);
+
+  const getScannedObject = useCallback(
+    (brc: string) => {
+      if (!doc) {
+        return;
+      }
+
+      if (!brc) {
+        return;
+      }
+
+      let charFrom = 0;
+      let charTo = weightSettingsWeightCode.data.length;
+
+      let scannedObject: IMovementLine;
+
+      if (brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
+        const remItem =
+          goodRemains[brc] || (documentType?.isRemains ? undefined : { good: { ...unknownGood, barcode: brc } });
+        // Находим товар из модели остатков по баркоду, если баркод не найден, то
+        //   если выбор из остатков, то undefined,
+        //   иначе подставляем unknownGood cо сканированным шк и добавляем в позицию документа
+
+        if (!remItem) {
+          Alert.alert('Внимание!', 'Товар не найден', [
+            {
+              text: 'ОК',
+            },
+          ]);
+
+          return;
+        }
+
+        scannedObject = {
+          good: { id: remItem.good.id, name: remItem.good.name },
+          id: generateId(),
+          quantity: isInputQuantity ? 1 : 0,
+          price: remItem.remains?.length ? remItem.remains[0].price : 0,
+          buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
+          remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
+          barcode: remItem.good.barcode,
+          sortOrder: (lines?.length || 0) + 1,
+        };
+      } else {
+        charFrom = charTo;
+        charTo = charFrom + weightSettingsCountCode;
+        const code = Number(brc.substring(charFrom, charTo)).toString();
+
+        charFrom = charTo;
+        charTo = charFrom + weightSettingsCountWeight;
+
+        const qty = Number(brc.substring(charFrom, charTo)) / 1000;
+
+        const remItem =
+          Object.values(goodRemains)?.find((item: IMGoodRemain) => item.good.weightCode === code) ||
+          (documentType?.isRemains ? undefined : { good: { ...unknownGood, barcode: brc } });
+
+        if (!remItem) {
+          Alert.alert('Внимание!', 'Товар не найден', [
+            {
+              text: 'ОК',
+            },
+          ]);
+          return;
+        }
+
+        scannedObject = {
+          good: { id: remItem.good.id, name: remItem.good.name } as INamedEntity,
+          id: generateId(),
+          quantity: qty,
+          price: remItem.remains?.length ? remItem.remains[0].price : 0,
+          buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
+          remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
+          barcode: remItem.good.barcode,
+          sortOrder: (lines?.length || 0) + 1,
+        };
+      }
+
+      navigation.navigate('DocLine', {
+        mode: 0,
+        docId: id,
+        item: scannedObject,
+      });
+    },
+
+    [
+      doc,
+      documentType?.isRemains,
+      goodRemains,
+      id,
+      isInputQuantity,
+      lines?.length,
+      navigation,
+      weightSettingsCountCode,
+      weightSettingsCountWeight,
+      weightSettingsWeightCode.data,
+    ],
+  );
+
+  const setScan = (brc: string) => {
+    setKey(key + 1);
+    getScannedObject(brc);
+  };
+
+  useEffect(() => {
+    if (screenState === 'sent' || screenState === 'deleted') {
+      setScreenState('idle');
+      navigation.goBack();
+    }
+  }, [navigation, screenState]);
+
   if (screenState === 'deleting' || screenState === 'sending') {
     return (
       <View style={styles.container}>
@@ -284,6 +440,18 @@ export const DocViewScreen = () => {
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
         </>
       </InfoBlock>
+      {isScanerReader ? (
+        <TextInput
+          style={styles.scanInput}
+          key={key}
+          autoFocus={true}
+          selectionColor="transparent"
+          ref={ref}
+          showSoftInputOnFocus={false}
+          onChangeText={(text) => setScan(text)}
+        />
+      ) : null}
+
       <FlashList
         data={doc.lines}
         renderItem={renderItem}

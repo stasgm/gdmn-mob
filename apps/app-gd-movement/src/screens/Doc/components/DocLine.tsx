@@ -98,6 +98,7 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
   const price = item?.price || 0;
   const remains = item?.remains || 0;
   const buyingPrice = item?.buyingPrice || 0;
+  const barcode = item?.barcode || '';
 
   return (
     <>
@@ -140,6 +141,41 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
           </View>
           <ItemSeparator />
           <View style={styles.item}>
+            <View style={localStyles.details}>
+              <View style={localStyles.new}>
+                <Text style={styles.name}>Количество</Text>
+                <TextInput
+                  style={[textStyle, localStyles.quantitySize]}
+                  showSoftInputOnFocus={false}
+                  caretHidden={true}
+                  keyboardType="numeric"
+                  autoCapitalize="words"
+                  onChangeText={(value) => onSetLine({ ...item, quantity: parseFloat(value || '0') })}
+                  returnKeyType="done"
+                  ref={currRef}
+                  value={item.quantity.toString()}
+                />
+              </View>
+              {isScreenKeyboard && (
+                <View style={localStyles.button}>
+                  <IconButton
+                    icon={isKeyboardOpen ? 'pencil-remove-outline' : 'pencil-outline'}
+                    onPress={() => setIsKeyboardOpen(!isKeyboardOpen)}
+                    size={30}
+                  />
+                </View>
+              )}
+            </View>
+          </View>
+          <ItemSeparator />
+          <View style={styles.item}>
+            <View style={styles.details}>
+              <Text style={styles.name}>Штрихкод</Text>
+              <Text style={textStyle}>{barcode}</Text>
+            </View>
+          </View>
+          <ItemSeparator />
+          <View style={styles.item}>
             <View style={styles.details}>
               <Text style={styles.name}>Цена</Text>
               <Text style={textStyle}>{price.toString()}</Text>
@@ -177,34 +213,6 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
                   </TouchableOpacity>
                 )}
               </View>
-            </View>
-          </View>
-          <ItemSeparator />
-          <View style={styles.item}>
-            <View style={localStyles.details}>
-              <View style={localStyles.new}>
-                <Text style={styles.name}>Количество</Text>
-                <TextInput
-                  style={[textStyle, localStyles.quantitySize]}
-                  showSoftInputOnFocus={false}
-                  caretHidden={true}
-                  keyboardType="numeric"
-                  autoCapitalize="words"
-                  onChangeText={(value) => onSetLine({ ...item, quantity: parseFloat(value || '0') })}
-                  returnKeyType="done"
-                  ref={currRef}
-                  value={item.quantity.toString()}
-                />
-              </View>
-              {isScreenKeyboard && (
-                <View style={localStyles.button}>
-                  <IconButton
-                    icon={isKeyboardOpen ? 'pencil-remove-outline' : 'pencil-outline'}
-                    onPress={() => setIsKeyboardOpen(!isKeyboardOpen)}
-                    size={30}
-                  />
-                </View>
-              )}
             </View>
           </View>
         </View>
