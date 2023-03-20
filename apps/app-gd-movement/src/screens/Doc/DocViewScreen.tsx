@@ -39,7 +39,7 @@ import { FlashList } from '@shopify/flash-list';
 
 import { IMovementDocument, IMovementLine } from '../../store/types';
 import { DocStackParamList } from '../../navigation/Root/types';
-import { getStatusColor, unknownGood } from '../../utils/constants';
+import { getStatusColor, ONE_SECOND_IN_MS, unknownGood } from '../../utils/constants';
 import { IGood, IMGoodData, IMGoodRemain, IRemains } from '../../store/app/types';
 
 import { getRemGoodByContact } from '../../utils/helpers';
@@ -72,8 +72,11 @@ export const DocViewScreen = () => {
   useFocusEffect(
     useCallback(() => {
       if (ref?.current) {
-        ref.current?.focus();
-        ref.current?.clear();
+        ref?.current &&
+          setTimeout(() => {
+            ref.current?.focus();
+            ref.current?.clear();
+          }, ONE_SECOND_IN_MS);
       }
     }, [ref]),
   );
