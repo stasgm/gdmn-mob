@@ -231,7 +231,6 @@ const RouteViewScreen = () => {
           estimatedItemSize={60}
           ItemSeparatorComponent={ItemSeparator}
           keyExtractor={keyExtractor}
-          extraData={[routeLineList, searchQuery]}
           keyboardShouldPersistTaps={'handled'}
           ListEmptyComponent={EmptyList}
         />

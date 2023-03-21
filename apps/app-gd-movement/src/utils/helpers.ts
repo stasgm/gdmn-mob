@@ -17,15 +17,19 @@ export const getNextDocNumber = (documents: IDocument[]) => {
     "111111111" : { good: { id: '3', name: 'Товар 3', value: 'шт.', ...}},
   }
 */
-const getRemGoodByContact = (goods: IGood[], remains: IRemainsData[] = [], isRemains: boolean | undefined = false) => {
+const getRemGoodByContact = (
+  goods: IGood[],
+  remains: IRemainsData[] = [],
+  isRemains: boolean | undefined = false,
+  noZeroRemains = false,
+) => {
   log('getRemGoodByContact', 'Начало построения модели товаров по подразделению в разрезе штрихкодов');
-
   const remGoods: IMGoodData<IMGoodRemain> = {};
 
   if (goods.length) {
     if (remains.length) {
       //Формируем объект остатков тмц
-      const remainsByGoodId = getRemainsByGoodId(remains);
+      const remainsByGoodId = getRemainsByGoodId(remains, noZeroRemains);
 
       //Заполняем объект товаров по штрихкоду, если есть шк и (выбор не из остатков или есть остатки по товару)
       for (const good of goods) {
@@ -63,6 +67,7 @@ const getRemGoodListByContact = (
   goods: IGood[],
   remains: IRemainsData[] = [],
   isRemains: boolean | undefined = false,
+  noZeroRemains = false,
 ) => {
   log('getRemGoodListByContact', 'Начало построения массива товаров по подразделению');
 
@@ -71,7 +76,7 @@ const getRemGoodListByContact = (
     //Если есть остатки, то формируем модель остатков по ид товара
     if (remains.length) {
       //Формируем объект остатков тмц
-      const remainsByGoodId = getRemainsByGoodId(remains);
+      const remainsByGoodId = getRemainsByGoodId(remains, noZeroRemains);
 
       //Формируем массив товаров, добавив свойство цены и остатка
       //Если по товару нет остатков и если модель не для выбора из справочника тмц, (не из остатков)
@@ -79,12 +84,15 @@ const getRemGoodListByContact = (
       for (const good of goods) {
         if (remainsByGoodId && remainsByGoodId[good.id]) {
           for (const r of remainsByGoodId[good.id]) {
-            remGoods.push({
-              good,
-              price: r.price,
-              buyingPrice: r.buyingPrice,
-              remains: r.q,
-            });
+            //Если isRemains true, showZeroRemains false и "isControlRemains" true, то в модель такие товары не добавляем
+            if (!noZeroRemains || r.q !== 0) {
+              remGoods.push({
+                good,
+                price: r.price,
+                buyingPrice: r.buyingPrice,
+                remains: r.q,
+              });
+            }
           }
         } else if (!isRemains) {
           remGoods.push({
@@ -108,13 +116,15 @@ const getRemGoodListByContact = (
 };
 
 //Возвращает объект остатков тмц, пример: {"1": [{ price: 1.2, q: 1 }, { price: 1.3, q: 2 }]}
-const getRemainsByGoodId = (remains: IRemainsData[]) => {
+const getRemainsByGoodId = (remains: IRemainsData[], noZeroRemains = false) => {
   return remains.reduce((p: IMGoodData<IModelRem[]>, { goodId, price = 0, buyingPrice = 0, q = 0 }: IRemainsData) => {
     const x = p[goodId];
-    if (!x) {
-      p[goodId] = [{ price, buyingPrice, q }];
-    } else {
-      x.push({ price, buyingPrice, q });
+    if (!noZeroRemains || q !== 0) {
+      if (!x) {
+        p[goodId] = [{ price, buyingPrice, q }];
+      } else {
+        x.push({ price, buyingPrice, q });
+      }
     }
     return p;
   }, {});

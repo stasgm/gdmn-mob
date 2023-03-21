@@ -185,6 +185,23 @@ const deleteSelectedLineItems = (deleteDocs: () => void) =>
     },
   ]);
 
+const AsyncAlert = (title: string, message: string, okText = 'Да', noText = 'Отмена') => {
+  return new Promise((resolve) => {
+    Alert.alert(
+      title,
+      message,
+      [
+        {
+          text: okText,
+          onPress: () => resolve('YES'),
+        },
+        { text: noText, onPress: () => resolve('NO') },
+      ],
+      { cancelable: false },
+    );
+  });
+};
+
 export {
   truncate,
   log,
@@ -205,4 +222,5 @@ export {
   getDelLineList,
   deleteSelectedLineItems,
   sleep,
+  AsyncAlert,
 };

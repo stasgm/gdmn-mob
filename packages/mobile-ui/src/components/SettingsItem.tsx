@@ -6,6 +6,7 @@ import { SettingValue } from '@lib/types';
 import Input from './Input';
 import { MediumText } from './AppText';
 import Switch from './Switch';
+import Checkbox from './Checkbox';
 
 type Props = {
   label: string;
@@ -24,7 +25,25 @@ const SettingsItem = ({ label, value, disabled = false, onValueChange, onEndEdit
 
   return (
     <View>
-      {typeof value === 'boolean' ? (
+      {typeof value === 'object' && Array.isArray(value) ? (
+        <View>
+          <MediumText style={localStyles.title}>{label}</MediumText>
+          <View style={localStyles.status}>
+            {value?.map((elem) => (
+              <View key={elem.id}>
+                <Checkbox
+                  key={elem.id}
+                  title={elem.value}
+                  selected={elem.selected}
+                  onSelect={() => {
+                    onValueChange(value.map((v) => (v.id === elem.id ? { ...elem, selected: !elem.selected } : v)));
+                  }}
+                />
+              </View>
+            ))}
+          </View>
+        </View>
+      ) : typeof value === 'boolean' ? (
         <View style={localStyles.container}>
           <MediumText>{label}</MediumText>
           <Switch
@@ -94,6 +113,20 @@ const localStyles = StyleSheet.create({
   subHeading: {
     width: '85%',
     fontSize: 15,
+  },
+  status: {
+    margin: 5,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  border: {
+    borderWidth: 1,
+    borderRadius: 2,
+    marginHorizontal: 5,
+  },
+  title: {
+    margin: 3,
+    textAlign: 'center',
   },
 });
 

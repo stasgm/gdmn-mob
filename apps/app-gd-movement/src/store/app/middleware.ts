@@ -46,7 +46,11 @@ export const appInvMiddlewareFactory: PersistedMiddleware =
 
     if (store.getState().auth.user?.id) {
       switch (action.type) {
-        case getType(actions.setModelAsync.success): {
+        case getType(actions.init):
+        case getType(actions.setModelAsync.success):
+        case getType(actions.addUnknownGood):
+        case getType(actions.removeUnknownGood):
+        case getType(actions.removeOldGood): {
           const result = next(action);
           save('appInventory', store.getState().appInventory, store.getState().auth.user?.id).catch((err) => {
             if (err instanceof Error) {

@@ -200,10 +200,10 @@ const SelectRefItemScreen = () => {
       )}
       <FlashList
         data={filteredList}
-        keyExtractor={keyExtractor}
         renderItem={renderItem}
         estimatedItemSize={40}
         ItemSeparatorComponent={ItemSeparator}
+        keyExtractor={keyExtractor}
         keyboardShouldPersistTaps={'handled'}
         extraData={[checkedItem, screenState]}
       />

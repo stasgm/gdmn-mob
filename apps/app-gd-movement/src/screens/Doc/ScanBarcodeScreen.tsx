@@ -13,7 +13,7 @@ import {
 } from '@lib/mobile-ui';
 import { useSelector, refSelectors } from '@lib/store';
 
-import { IDocumentType, INamedEntity, ISettingsOption } from '@lib/types';
+import { IDocumentType, ISettingsOption } from '@lib/types';
 
 import { generateId } from '@lib/mobile-hooks';
 
@@ -21,24 +21,31 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { IScannedObject } from '@lib/client-types';
 
-import { BarCodeScanner } from 'expo-barcode-scanner';
-
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IMovementLine, IMovementDocument } from '../../store/types';
 import { IGood, IMGoodData, IMGoodRemain, IRemains } from '../../store/app/types';
 import { getRemGoodByContact } from '../../utils/helpers';
-import { unknownGood } from '../../utils/constants';
+import { IBarcodeTypes, unknownGood } from '../../utils/constants';
+import { useSelector as useInvSelector } from '../../store';
 
 const ScanBarcodeScreen = () => {
   const docId = useRoute<RouteProp<DocStackParamList, 'ScanBarcode'>>().params?.docId;
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'ScanBarcode'>>();
   const settings = useSelector((state) => state.settings?.data);
 
+  const isScanerReader = settings?.scannerUse?.data;
+  const showZeroRemains = settings?.showZeroRemains?.data;
+  const isInputQuantity = settings?.quantityInput?.data;
+
   const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
   const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>)?.data || 0;
   const weightSettingsCountWeight = (settings.countWeight as ISettingsOption<number>)?.data || 0;
-  const isScanerReader = settings.scannerUse?.data;
-  const isInputQuantity = settings.quantityInput?.data;
+  const barcodeTypes =
+    (settings.barcodeTypes as ISettingsOption<Array<IBarcodeTypes>>)?.data
+      ?.filter((t) => t.selected)
+      .map((t) => t.type) || [];
+
+  const unknownGoods = useInvSelector((state) => state.appInventory.unknownGoods);
 
   const [scaner, setScaner] = useState<IScannedObject>({ state: 'init' });
   const [scannedObject, setScannedObject] = useState<IMovementLine>();
@@ -71,13 +78,35 @@ const ScanBarcodeScreen = () => {
     [document?.head?.fromContact?.id, document?.head?.toContact?.id, documentType?.remainsField],
   );
 
-  const [goodRemains] = useState<IMGoodData<IMGoodRemain>>(() =>
-    contactId ? getRemGoodByContact(goods, remains[contactId], documentType?.isRemains) : {},
+  const noZeroRemains = useMemo(
+    () => !!documentType?.isControlRemains && !showZeroRemains && !!documentType?.isRemains,
+    [documentType?.isControlRemains, documentType?.isRemains, showZeroRemains],
+  );
+
+  const goodRemains = useMemo<IMGoodData<IMGoodRemain>>(
+    () =>
+      contactId
+        ? getRemGoodByContact(
+            goods.concat(unknownGoods.map((item) => item.good)),
+            remains[contactId],
+            documentType?.isRemains,
+            noZeroRemains,
+          )
+        : {},
+    [contactId, documentType?.isRemains, goods, noZeroRemains, remains, unknownGoods],
   );
 
   const getScannedObject = useCallback(
-    (brc: string) => {
+    (brc: string, typeOk = true) => {
       if (!brc) {
+        return;
+      }
+
+      if (!typeOk) {
+        setScaner({
+          state: 'error',
+          message: 'Неверный тип штрихкода',
+        });
         return;
       }
 
@@ -87,6 +116,7 @@ const ScanBarcodeScreen = () => {
       if (brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
         const remItem =
           goodRemains[brc] || (documentType?.isRemains ? undefined : { good: { ...unknownGood, barcode: brc } });
+
         // Находим товар из модели остатков по баркоду, если баркод не найден, то
         //   если выбор из остатков, то undefined,
         //   иначе подставляем unknownGood cо сканированным шк и добавляем в позицию документа
@@ -128,7 +158,7 @@ const ScanBarcodeScreen = () => {
         }
 
         setScannedObject({
-          good: { id: remItem.good.id, name: remItem.good.name } as INamedEntity,
+          good: { id: remItem.good.id, name: remItem.good.name },
           id: generateId(),
           quantity: qty,
           price: remItem.remains?.length ? remItem.remains[0].price : 0,
@@ -206,11 +236,7 @@ const ScanBarcodeScreen = () => {
       onGetScannedObject={getScannedObject}
       onClearScannedObject={handleClearScaner}
       scaner={scaner}
-      barCodeTypes={[
-        BarCodeScanner.Constants.BarCodeType.code128,
-        BarCodeScanner.Constants.BarCodeType.ean13,
-        BarCodeScanner.Constants.BarCodeType.ean8,
-      ]}
+      barCodeTypes={barcodeTypes}
       onSearch={handleShowRemains}
     >
       {scannedObject ? (

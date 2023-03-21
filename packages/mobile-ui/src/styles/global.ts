@@ -213,7 +213,6 @@ const globalStyles = StyleSheet.create({
     textAlign: 'right',
   },
   field: {
-    // opacity: 0.7,
     fontSize: 15,
   },
   normalText: {
@@ -269,7 +268,6 @@ const globalStyles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   textInfo: { fontSize: 18, textAlign: 'left', marginHorizontal: 10 },
-  // textInfo: { fontSize: 18, color: colors.text, textAlign: 'left', marginHorizontal: 10 },
   groupWidth: {
     width: '72%',
   },

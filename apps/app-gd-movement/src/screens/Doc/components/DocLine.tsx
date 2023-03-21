@@ -217,7 +217,6 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
           </View>
         </View>
       </ScrollView>
-
       {isScreenKeyboard && isKeyboardOpen && (
         <NumberKeypad
           oldValue={item.quantity.toString()}

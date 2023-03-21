@@ -24,6 +24,7 @@ export interface IHead {
 export interface IDocumentType extends INamedEntity {
   description?: string;
   isRemains?: boolean;
+  isControlRemains?: boolean;
   remainsField?: string;
   fromDescription?: string;
   fromType?: string;
