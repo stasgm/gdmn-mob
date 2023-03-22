@@ -1,14 +1,5 @@
 import React, { useState, useLayoutEffect, useCallback, useMemo, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ColorValue,
-  Alert,
-  FlatList,
-  useWindowDimensions,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, ColorValue, Alert, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 
@@ -30,9 +21,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { Chip, Searchbar, useTheme } from 'react-native-paper';
-
-import { TouchableOpacity as TouchableOpacityGesture } from 'react-native-gesture-handler';
+import { Checkbox, Chip, Searchbar, useTheme } from 'react-native-paper';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import {
@@ -56,6 +45,8 @@ const SelectGoodScreen = () => {
   const dispatch = useDispatch();
 
   const isUseNetPrice = useSelector((state) => state.settings.data?.isUseNetPrice?.data) as boolean;
+
+  const [isUseMatrix, setIsUseMatrix] = useState(isUseNetPrice);
 
   const syncDate = useSelector((state) => state.app.syncDate);
   const isDemo = useSelector((state) => state.auth.isDemo);
@@ -87,10 +78,10 @@ const SelectGoodScreen = () => {
 
   const model = useMemo(() => {
     if (contactId) {
-      return getGroupModelByContact(groups, goods, goodMatrix[contactId], isUseNetPrice) as IMGroupModel;
+      return getGroupModelByContact(groups, goods, goodMatrix[contactId], isUseMatrix) as IMGroupModel;
     }
     return {};
-  }, [groups, goods, goodMatrix, contactId, isUseNetPrice]);
+  }, [groups, goods, goodMatrix, contactId, isUseMatrix]);
 
   const firstLevelGroups = useMemo(() => Object.values(model).map((item) => item.parent), [model]);
 
@@ -117,24 +108,18 @@ const SelectGoodScreen = () => {
 
   const goodsByContact = useMemo(() => {
     if (contactId) {
-      return getGoodMatrixByContact(goods, goodMatrix[contactId], isUseNetPrice, undefined, searchQuery)?.sort((a, b) =>
+      return getGoodMatrixByContact(goods, goodMatrix[contactId], isUseMatrix, undefined, searchQuery)?.sort((a, b) =>
         a.name < b.name ? -1 : 1,
       );
     }
     return [];
-  }, [contactId, goodMatrix, goods, isUseNetPrice, searchQuery]);
+  }, [contactId, goodMatrix, goods, isUseMatrix, searchQuery]);
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
       setSearchQuery('');
     }
   }, [filterVisible, searchQuery]);
-
-  useEffect(() => {
-    if ((filterVisible ? goodsByContact : goodModel).length) {
-      refListGood.current?.scrollToIndex({ index: 0, animated: true });
-    }
-  }, [filterVisible, goodModel, goodsByContact]);
 
   const [selectedLine, setSelectedLine] = useState<IOrderLine | undefined>(undefined);
   const [selectedGood, setSelectedGood] = useState<IGood | undefined>(undefined);
@@ -254,6 +239,18 @@ const SelectGoodScreen = () => {
     [colors.text, groupButtonStyle],
   );
 
+  const handlePressGood = useCallback(
+    (isAdded: boolean, item: IGood) => {
+      if (isAdded) {
+        setSelectedGood(item);
+      } else {
+        const newLine = { mode: 0, docId, item: { id: generateId(), good: item, quantity: 0 } };
+        setOrderLine(newLine);
+      }
+    },
+    [docId],
+  );
+
   const renderGood = useCallback(
     ({ item }: { item: IGood }) => {
       const lines = doc?.lines?.filter((i) => i.good.id === item.id);
@@ -266,16 +263,7 @@ const SelectGoodScreen = () => {
 
       return (
         <View key={item.id}>
-          <TouchableOpacityGesture
-            onPress={() => {
-              if (isAdded) {
-                setSelectedGood(item);
-              } else {
-                const newLine = { mode: 0, docId, item: { id: generateId(), good: item, quantity: 0 } };
-                setOrderLine(newLine);
-              }
-            }}
-          >
+          <TouchableOpacity onPress={() => handlePressGood(isAdded, item)}>
             <View style={[localStyles.goodItem, goodStyle]}>
               <View style={iconStyle}>
                 <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
@@ -297,14 +285,12 @@ const SelectGoodScreen = () => {
                 )}
               </View>
             </View>
-          </TouchableOpacityGesture>
+          </TouchableOpacity>
         </View>
       );
     },
-    [colors.primary, doc?.lines, docId],
+    [colors.primary, doc?.lines, handlePressGood],
   );
-
-  const refListGood = React.useRef<FlatList<IGood>>(null);
 
   const handlePressGroup = useCallback(
     (paramName: string, item: IGoodGroup, setFunc: any) => {
@@ -350,6 +336,11 @@ const SelectGoodScreen = () => {
     ],
   );
 
+  const hadndleDismiss = () => {
+    setOrderLine(undefined);
+    hadndleDismissDialog();
+  };
+
   const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
@@ -357,7 +348,7 @@ const SelectGoodScreen = () => {
 
   return (
     <AppScreen style={localStyles.container}>
-      {!!orderLine && <OrderLineEdit orderLine={orderLine} onDismiss={() => setOrderLine(undefined)} />}
+      {!!orderLine && <OrderLineEdit orderLine={orderLine} onDismiss={hadndleDismiss} />}
       {filterVisible && (
         <View>
           <View style={styles.flexDirectionRow}>
@@ -365,9 +356,6 @@ const SelectGoodScreen = () => {
               placeholder="Поиск"
               onChangeText={(text) => {
                 setSearchQuery(text);
-                if (text === '' && goodsByContact.length) {
-                  refListGood?.current?.scrollToIndex({ index: 0, animated: true });
-                }
               }}
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
@@ -378,6 +366,17 @@ const SelectGoodScreen = () => {
           <ItemSeparator />
         </View>
       )}
+      {!filterVisible && contactId && goodMatrix[contactId] ? (
+        <Checkbox.Item
+          color={colors.primary}
+          uncheckedColor={colors.primary}
+          status={isUseMatrix ? 'checked' : 'unchecked'}
+          onPress={() => setIsUseMatrix(!isUseMatrix)}
+          label="Использовать матрицы"
+          position="leading"
+          style={localStyles.checkBox}
+        />
+      ) : null}
       <FlashList
         data={filterVisible ? goodsByContact : goodModel}
         renderItem={renderGood}
@@ -444,4 +443,5 @@ const localStyles = StyleSheet.create({
     textAlignVertical: 'center',
     height: 70,
   },
+  checkBox: { marginLeft: -20, width: 250 },
 });

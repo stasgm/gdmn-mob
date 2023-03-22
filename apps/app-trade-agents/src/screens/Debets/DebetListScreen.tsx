@@ -16,8 +16,9 @@ import { refSelectors, useSelector } from '@lib/store';
 import { IReference } from '@lib/types';
 import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { FlashList } from '@shopify/flash-list';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { FlatList, SectionListData, View } from 'react-native';
+import { SectionListData, View } from 'react-native';
 import { Divider, Searchbar } from 'react-native-paper';
 
 import { DebetStackParamList } from '../../navigation/Root/types';
@@ -148,13 +149,14 @@ const DebetListScreen = () => {
           <ItemSeparator />
         </>
       )}
-      <FlatList
+      <FlashList
         data={filteredList}
-        keyExtractor={keyExtractor}
         renderItem={renderItem}
+        estimatedItemSize={60}
         ItemSeparatorComponent={ItemSeparator}
-        ListEmptyComponent={!debets ? EmptyList : null}
+        keyExtractor={keyExtractor}
         keyboardShouldPersistTaps={'handled'}
+        ListEmptyComponent={!debets ? EmptyList : null}
       />
       <SimpleDialog
         visible={visibleDialog}
