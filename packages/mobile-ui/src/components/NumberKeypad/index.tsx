@@ -187,13 +187,13 @@ const styles = StyleSheet.create({
   },
   input: {
     alignItems: 'center',
-    padding: 8,
+    paddingHorizontal: 8,
     marginTop: 2,
     marginHorizontal: 2,
     borderWidth: 1,
     borderRadius: 5,
     flexDirection: 'row',
-    height: 60,
+    height: 50,
     justifyContent: 'space-between',
   },
   keypad: {
