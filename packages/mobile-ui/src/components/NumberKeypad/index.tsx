@@ -180,7 +180,7 @@ export { NumberKeypad };
 const styles = StyleSheet.create({
   container: {
     height: Dimensions.get('window').height / 2.6,
-    minHeight: 300,
+    minHeight: 250,
   },
   currentNumber: {
     fontSize: 17,

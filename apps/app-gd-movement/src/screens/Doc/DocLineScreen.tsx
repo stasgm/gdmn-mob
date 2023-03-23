@@ -4,11 +4,19 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 
 import { docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
-import { SaveButton, globalStyles as styles, AppActivityIndicator, AppScreen, navBackButton } from '@lib/mobile-ui';
+import {
+  SaveButton,
+  globalStyles as styles,
+  AppActivityIndicator,
+  navBackButton,
+  AppInputScreen,
+} from '@lib/mobile-ui';
 
 import { IDocumentType, ScreenState } from '@lib/types';
 
 import { AsyncAlert, generateId } from '@lib/mobile-hooks';
+
+import KeyEvent from 'react-native-keyevent';
 
 import { DocStackParamList } from '../../navigation/Root/types';
 
@@ -37,6 +45,19 @@ export const DocLineScreen = () => {
     () => documentTypes?.find((d) => d.id === document?.documentType.id),
     [document?.documentType.id, documentTypes],
   );
+
+  useEffect(() => {
+    // eslint-disable-next-line import/no-named-as-default-member
+    KeyEvent.onKeyDownListener((keyEvent: any) => {
+      if (keyEvent.keyCode === 66) {
+        setScreenState('saving');
+      }
+      return () => {
+        // eslint-disable-next-line import/no-named-as-default-member
+        KeyEvent.removeKeyDownListener();
+      };
+    });
+  }, []);
 
   useEffect(() => {
     if (screenState === 'saving') {
@@ -119,8 +140,8 @@ export const DocLineScreen = () => {
   }
 
   return (
-    <AppScreen>
+    <AppInputScreen>
       <DocLine item={line} onSetLine={setLine} />
-    </AppScreen>
+    </AppInputScreen>
   );
 };
