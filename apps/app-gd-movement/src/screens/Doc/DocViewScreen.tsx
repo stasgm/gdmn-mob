@@ -329,6 +329,8 @@ export const DocViewScreen = () => {
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
           barcode: remItem.good.barcode,
           sortOrder: (lines?.length || 0) + 1,
+          alias: remItem.good.alias || '',
+          weightCode: remItem.good.weightCode || '',
         };
       } else {
         charFrom = charTo;
@@ -362,6 +364,8 @@ export const DocViewScreen = () => {
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
           barcode: remItem.good.barcode,
           sortOrder: (lines?.length || 0) + 1,
+          alias: remItem.good.alias || '',
+          weightCode: remItem.good.weightCode || '',
         };
       }
 

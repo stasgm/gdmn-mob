@@ -1,16 +1,9 @@
 import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 
 import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigation/native';
 
-import {
-  AppActivityIndicator,
-  globalStyles,
-  LargeText,
-  navBackButton,
-  ScanBarcode,
-  ScanBarcodeReader,
-} from '@lib/mobile-ui';
+import { AppActivityIndicator, globalStyles, LargeText, navBackButton, ScanBarcode } from '@lib/mobile-ui';
 import { useSelector, refSelectors } from '@lib/store';
 
 import { IDocumentType, ISettingsOption } from '@lib/types';
@@ -33,7 +26,6 @@ const ScanBarcodeScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'ScanBarcode'>>();
   const settings = useSelector((state) => state.settings?.data);
 
-  const isScanerReader = settings?.scannerUse?.data;
   const showZeroRemains = settings?.showZeroRemains?.data;
   const isInputQuantity = settings?.quantityInput?.data;
 
@@ -48,7 +40,6 @@ const ScanBarcodeScreen = () => {
   const unknownGoods = useInvSelector((state) => state.appInventory.unknownGoods);
 
   const [scaner, setScaner] = useState<IScannedObject>({ state: 'init' });
-  const [scannedObject, setScannedObject] = useState<IMovementLine>();
   const handleClearScaner = () => setScaner({ state: 'init' });
 
   useLayoutEffect(() => {
@@ -125,8 +116,7 @@ const ScanBarcodeScreen = () => {
           setScaner({ state: 'error', message: 'Товар не найден' });
           return;
         }
-
-        setScannedObject({
+        const scannedObject: IMovementLine = {
           good: { id: remItem.good.id, name: remItem.good.name },
           id: generateId(),
           quantity: isInputQuantity ? 1 : 0,
@@ -135,9 +125,20 @@ const ScanBarcodeScreen = () => {
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
           barcode: remItem.good.barcode,
           sortOrder: (document?.lines?.length || 0) + 1,
-        });
+          alias: remItem.good.alias || '',
+          weightCode: remItem.good.weightCode || '',
+        };
 
-        setScaner({ state: remItem.good.id === 'unknown' ? 'error' : 'found' });
+        if (scannedObject) {
+          navigation.navigate('DocLine', {
+            mode: 0,
+            docId,
+            item: scannedObject,
+          });
+          setScaner({ state: 'init' });
+        } else {
+          setScaner({ state: 'error' });
+        }
       } else {
         charFrom = charTo;
         charTo = charFrom + weightSettingsCountCode;
@@ -157,7 +158,7 @@ const ScanBarcodeScreen = () => {
           return;
         }
 
-        setScannedObject({
+        const scannedObject: IMovementLine = {
           good: { id: remItem.good.id, name: remItem.good.name },
           id: generateId(),
           quantity: qty,
@@ -166,33 +167,34 @@ const ScanBarcodeScreen = () => {
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
           barcode: remItem.good.barcode,
           sortOrder: (document?.lines?.length || 0) + 1,
-        });
+          alias: remItem.good.alias || '',
+          weightCode: remItem.good.weightCode || '',
+        };
 
-        setScaner({ state: remItem.good.id === 'unknown' ? 'error' : 'found' });
+        if (scannedObject) {
+          navigation.navigate('DocLine', {
+            mode: 0,
+            docId,
+            item: scannedObject,
+          });
+          setScaner({ state: 'init' });
+        } else {
+          setScaner({ state: 'error' });
+        }
       }
     },
     [
+      docId,
       document?.lines?.length,
       documentType?.isRemains,
       goodRemains,
       isInputQuantity,
+      navigation,
       weightSettingsCountCode,
       weightSettingsCountWeight,
       weightSettingsWeightCode.data,
     ],
   );
-
-  const handleSaveScannedItem = useCallback(() => {
-    if (!scannedObject) {
-      return;
-    }
-    navigation.navigate('DocLine', {
-      mode: 0,
-      docId,
-      item: scannedObject,
-    });
-    setScaner({ state: 'init' });
-  }, [docId, navigation, scannedObject]);
 
   const isFocused = useIsFocused();
   if (!isFocused) {
@@ -207,75 +209,15 @@ const ScanBarcodeScreen = () => {
     );
   }
 
-  return isScanerReader ? (
-    <ScanBarcodeReader
-      onSave={handleSaveScannedItem}
-      onGetScannedObject={getScannedObject}
-      onClearScannedObject={handleClearScaner}
-      scaner={scaner}
-      onSearch={handleShowRemains}
-    >
-      {scannedObject ? (
-        <View style={localStyles.itemInfo}>
-          <View style={localStyles.goodInfo}>
-            <Text style={localStyles.goodName} numberOfLines={3}>
-              {scannedObject?.good.name}
-            </Text>
-            <Text style={localStyles.barcode}>{scannedObject?.barcode}</Text>
-            <Text style={localStyles.barcode}>
-              цена: {scannedObject?.price || 0} р., остаток: {scannedObject?.remains}
-            </Text>
-            <Text style={localStyles.barcode}>количество: {scannedObject?.quantity}</Text>
-          </View>
-        </View>
-      ) : undefined}
-    </ScanBarcodeReader>
-  ) : (
+  return (
     <ScanBarcode
-      onSave={handleSaveScannedItem}
       onGetScannedObject={getScannedObject}
       onClearScannedObject={handleClearScaner}
       scaner={scaner}
       barCodeTypes={barcodeTypes}
       onSearch={handleShowRemains}
-    >
-      {scannedObject ? (
-        <View style={localStyles.itemInfo}>
-          <View style={localStyles.goodInfo}>
-            <Text style={localStyles.goodName} numberOfLines={3}>
-              {scannedObject?.good.name}
-            </Text>
-            <Text style={localStyles.barcode}>{scannedObject?.barcode}</Text>
-            <Text style={localStyles.barcode}>
-              цена: {scannedObject?.price || 0} р., остаток: {scannedObject?.remains}
-            </Text>
-            <Text style={localStyles.barcode}>количество: {scannedObject?.quantity}</Text>
-          </View>
-        </View>
-      ) : undefined}
-    </ScanBarcode>
+    />
   );
 };
 
 export default ScanBarcodeScreen;
-
-const localStyles = StyleSheet.create({
-  itemInfo: {
-    flexShrink: 1,
-    paddingRight: 10,
-  },
-  goodInfo: {
-    flexShrink: 1,
-    paddingRight: 10,
-  },
-  goodName: {
-    color: '#fff',
-    fontSize: 18,
-    textTransform: 'uppercase',
-  },
-  barcode: {
-    color: '#fff',
-    fontSize: 16,
-    opacity: 0.5,
-  },
-});

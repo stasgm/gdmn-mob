@@ -134,7 +134,8 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
           <View style={localStyles.item}>
             <View>
               <LargeText style={globalStyles.textBold}>{item ? item.good.name || 'товар не найден' : ''}</LargeText>
-              <MediumText>{barcode}</MediumText>
+
+              {barcode ? <MediumText>{barcode}</MediumText> : null}
             </View>
             {item.good.id === 'unknown' && (
               <View style={localStyles.button}>
@@ -144,31 +145,30 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
               </View>
             )}
           </View>
+
           <ItemSeparator />
           <View style={localStyles.item}>
             <View style={localStyles.halfItem}>
-              <View style={globalStyles.itemNoMargin}>
-                <MediumText>Цена:</MediumText>
-                <LargeText style={localStyles.value}>{price.toString()}</LargeText>
-              </View>
+              <MediumText>Арт.:</MediumText>
+              <LargeText style={localStyles.value}>{item.alias || ''}</LargeText>
             </View>
             <View style={[{ backgroundColor: colors.primary }, localStyles.verticalLine]} />
-            <View style={localStyles.halfItemRemView}>
-              <View style={[globalStyles.itemNoMargin]}>
-                <MediumText>Остаток: </MediumText>
-                <LargeText style={localStyles.value}>{remains.toString()}2525252</LargeText>
-              </View>
-              {item.alias ? (
-                <View style={globalStyles.itemNoMargin}>
-                  <MediumText>Артикул: </MediumText>
-                  <LargeText style={localStyles.value}>{item.alias}</LargeText>
-                </View>
-              ) : item.weightCode ? (
-                <View style={globalStyles.itemNoMargin}>
-                  <MediumText>Вес. код: </MediumText>
-                  <LargeText style={localStyles.value}>{item.weightCode}</LargeText>
-                </View>
-              ) : null}
+            <View style={[localStyles.halfItem, localStyles.halfItemRemView]}>
+              <MediumText>Вес. код: </MediumText>
+              <LargeText style={localStyles.value}>{item.weightCode || ''}</LargeText>
+            </View>
+          </View>
+
+          <ItemSeparator />
+          <View style={localStyles.item}>
+            <View style={localStyles.halfItem}>
+              <MediumText>Цена:</MediumText>
+              <LargeText style={localStyles.value}>{price.toString()}</LargeText>
+            </View>
+            <View style={[{ backgroundColor: colors.primary }, localStyles.verticalLine]} />
+            <View style={[localStyles.halfItem, localStyles.halfItemRemView]}>
+              <MediumText>Остаток: </MediumText>
+              <LargeText style={localStyles.value}>{remains.toString()}</LargeText>
             </View>
           </View>
           <ItemSeparator />
@@ -200,34 +200,31 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
               <View>
                 <ItemSeparator />
                 <View style={localStyles.item}>
-                  <View style={{}}>
-                    <MediumText>Количество</MediumText>
-                    <TextInput
-                      style={localStyles.quantitySize}
-                      showSoftInputOnFocus={false}
-                      caretHidden={true}
-                      keyboardType="numeric"
-                      autoCapitalize="words"
-                      onChangeText={(value) => {
-                        setIsKeyboardOpen(false);
-
-                        onSetLine({ ...item, quantity: parseFloat(value || '0') });
-                      }}
-                      returnKeyType="done"
-                      ref={currRef}
-                      value={item.quantity.toString()}
+                  <MediumText>Количество</MediumText>
+                  <TextInput
+                    style={localStyles.quantitySize}
+                    showSoftInputOnFocus={false}
+                    caretHidden={true}
+                    keyboardType="numeric"
+                    autoCapitalize="words"
+                    onChangeText={(value) => {
+                      setIsKeyboardOpen(false);
+                      onSetLine({ ...item, quantity: parseFloat(value || '0') });
+                    }}
+                    returnKeyType="done"
+                    ref={currRef}
+                    value={item.quantity.toString()}
+                  />
+                </View>
+                {isScreenKeyboard && (
+                  <View style={localStyles.button}>
+                    <IconButton
+                      icon={isKeyboardOpen ? 'keyboard-off-outline' : 'keyboard-outline'}
+                      onPress={() => setIsKeyboardOpen(!isKeyboardOpen)}
+                      size={24}
                     />
                   </View>
-                  {isScreenKeyboard && (
-                    <View style={localStyles.button}>
-                      <IconButton
-                        icon={isKeyboardOpen ? 'keyboard-off-outline' : 'keyboard-outline'}
-                        onPress={() => setIsKeyboardOpen(!isKeyboardOpen)}
-                        size={24}
-                      />
-                    </View>
-                  )}
-                </View>
+                )}
               </View>
             ))}
         </View>
@@ -237,23 +234,21 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
           <View>
             <ItemSeparator />
             <View style={localStyles.item}>
-              <View style={{}}>
-                <MediumText>Количество</MediumText>
-                <TextInput
-                  style={localStyles.quantitySize}
-                  showSoftInputOnFocus={false}
-                  caretHidden={true}
-                  keyboardType="numeric"
-                  autoCapitalize="words"
-                  onChangeText={(value) => {
-                    setIsKeyboardOpen(false);
-                    onSetLine({ ...item, quantity: parseFloat(value || '0') });
-                  }}
-                  returnKeyType="done"
-                  ref={currRef}
-                  value={item.quantity.toString()}
-                />
-              </View>
+              <MediumText>Количество:</MediumText>
+              <TextInput
+                style={localStyles.quantitySize}
+                showSoftInputOnFocus={false}
+                caretHidden={true}
+                keyboardType="numeric"
+                autoCapitalize="words"
+                onChangeText={(value) => {
+                  setIsKeyboardOpen(false);
+                  onSetLine({ ...item, quantity: parseFloat(value || '0') });
+                }}
+                returnKeyType="done"
+                ref={currRef}
+                value={item.quantity.toString()}
+              />
               {isScreenKeyboard && (
                 <View style={localStyles.button}>
                   <IconButton
@@ -300,8 +295,12 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
   },
   halfItem: {
-    flexDirection: 'column',
+    flexDirection: 'row',
     width: '50%',
+    marginRight: 3,
+    marginVertical: 2,
+    alignSelf: 'flex-start',
+    flexWrap: 'wrap',
   },
   value: {
     fontWeight: 'bold',
@@ -312,9 +311,7 @@ const localStyles = StyleSheet.create({
     height: '100%',
   },
   halfItemRemView: {
-    flexDirection: 'column',
-    alignSelf: 'flex-start',
-    marginLeft: 8,
+    marginLeft: 3,
   },
   eIdView: {
     flexDirection: 'row',
@@ -323,7 +320,8 @@ const localStyles = StyleSheet.create({
     paddingVertical: 3,
   },
   quantitySize: {
-    fontSize: 36,
+    fontSize: 30,
+    paddingLeft: 5,
     marginVertical: -5,
   },
 });
