@@ -19,6 +19,14 @@ type Props = {
 const SettingsItem = ({ label, value, disabled = false, onValueChange, onEndEditing }: Props) => {
   const [itemValue, setItemValue] = useState(value);
 
+  const handleChangeText = (text: string) => {
+    let newValue = text.replace(',', '.');
+    newValue = !newValue.includes('.') ? parseFloat(newValue).toString() : newValue;
+    newValue = Number.isNaN(parseFloat(newValue)) ? '0' : newValue;
+    const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
+    setItemValue(validNumber.test(newValue) ? newValue : itemValue);
+  };
+
   useEffect(() => {
     setItemValue(value);
   }, [value]);
@@ -61,13 +69,7 @@ const SettingsItem = ({ label, value, disabled = false, onValueChange, onEndEdit
             <Input
               label={label}
               value={itemValue === 0 ? '' : itemValue.toString()}
-              onChangeText={(text) => {
-                let newValue = text.replace(',', '.');
-                newValue = !newValue.includes('.') ? parseFloat(newValue).toString() : newValue;
-                newValue = Number.isNaN(parseFloat(newValue)) ? '0' : newValue;
-                const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
-                setItemValue(validNumber.test(newValue) ? newValue : itemValue);
-              }}
+              onChangeText={handleChangeText}
               keyboardType={'numeric'}
               clearInput={true}
               autoCapitalize="none"
