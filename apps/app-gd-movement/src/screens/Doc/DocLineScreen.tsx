@@ -140,7 +140,7 @@ export const DocLineScreen = () => {
   }
 
   return (
-    <AppInputScreen style={{ justifyContent: 'flex-start' }}>
+    <AppInputScreen style={styles.contentTop}>
       <DocLine item={line} onSetLine={setLine} />
     </AppInputScreen>
   );
