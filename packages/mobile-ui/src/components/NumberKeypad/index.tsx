@@ -1,7 +1,7 @@
 import { Feather } from '@expo/vector-icons';
 import { evaluate, exp } from 'mathjs';
 import React, { useCallback, useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Dimensions } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, useWindowDimensions } from 'react-native';
 
 import globalColors from '../../styles/colors';
 
@@ -104,7 +104,6 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
       setNumber(newExpr);
       setExpression('');
       setFirstOperation(true);
-      // onApply(number ? calc(`${newExpr}${number}`) : newExpr || '0');
       onApply(newExpr || '0');
     }
   };
@@ -149,8 +148,10 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
     ],
   ];
 
+  const windowHeight = useWindowDimensions().height;
+
   return (
-    <View style={styles.container}>
+    <View style={{ height: windowHeight > 650 ? windowHeight / 2.6 : 250 }}>
       <View style={[styles.input, { borderColor: globalColors.border, backgroundColor: globalColors.card }]}>
         <View>
           <Text style={styles.currentNumber}>
@@ -178,10 +179,6 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
 export { NumberKeypad };
 
 const styles = StyleSheet.create({
-  container: {
-    height: Dimensions.get('window').height / 2.6,
-    minHeight: 250,
-  },
   currentNumber: {
     fontSize: 17,
   },

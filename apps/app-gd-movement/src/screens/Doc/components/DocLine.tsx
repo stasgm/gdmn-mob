@@ -267,15 +267,13 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
 
 const localStyles = StyleSheet.create({
   button: {
-    alignItems: 'flex-end',
-    justifyContent: 'center',
     position: 'absolute',
-    right: -10,
+    right: -5,
     zIndex: 5,
   },
   item: {
     flexDirection: 'row',
-    margin: 5,
+    padding: 5,
     alignItems: 'center',
   },
   halfItem: {
@@ -299,9 +297,8 @@ const localStyles = StyleSheet.create({
   },
   eIdView: {
     flexDirection: 'row',
-    alignSelf: 'center',
     width: '80%',
-    paddingVertical: 3,
+    paddingVertical: 8,
   },
   quantitySize: {
     fontSize: 30,
@@ -313,9 +310,12 @@ const localStyles = StyleSheet.create({
   flexGrowEnd: {
     flexGrow: 1,
     justifyContent: 'flex-end',
+    marginHorizontal: 5,
   },
   flexGrowStart: {
     flexGrow: 1,
     justifyContent: 'flex-start',
+    marginHorizontal: 5,
+    marginTop: -5,
   },
 });
