@@ -282,7 +282,6 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     width: '50%',
     paddingRight: 3,
-    marginVertical: 2,
     alignSelf: 'flex-start',
     flexWrap: 'wrap',
     alignItems: 'center',
