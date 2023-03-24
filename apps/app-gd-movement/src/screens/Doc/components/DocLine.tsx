@@ -147,7 +147,7 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
           />
         )}
       </Modal>
-      <ScrollView keyboardShouldPersistTaps="handled">
+      <ScrollView keyboardShouldPersistTaps="handled" style={localStyles.flexGrow}>
         <View style={styles.container}>
           <View style={localStyles.item}>
             <View>
@@ -213,56 +213,36 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
               )}
             </View>
           </View>
-          {!isScreenKeyboard ||
-            (!isKeyboardOpen && (
-              <View>
-                <ItemSeparator />
-                <View style={localStyles.item}>
-                  <MediumText>Количество:</MediumText>
-                  <TextInput
-                    style={localStyles.quantitySize}
-                    showSoftInputOnFocus={false}
-                    caretHidden={true}
-                    keyboardType="numeric"
-                    autoCapitalize="words"
-                    onChangeText={handleChangeText}
-                    returnKeyType="done"
-                    ref={currRef}
-                    value={quantity}
-                  />
-                </View>
-              </View>
-            ))}
         </View>
       </ScrollView>
-      {isScreenKeyboard && isKeyboardOpen && (
-        <>
-          <View>
-            <ItemSeparator />
-            <View style={localStyles.item}>
-              <MediumText>Количество:</MediumText>
-              <TextInput
-                style={localStyles.quantitySize}
-                showSoftInputOnFocus={false}
-                caretHidden={true}
-                keyboardType="numeric"
-                autoCapitalize="words"
-                onChangeText={handleChangeText}
-                returnKeyType="done"
-                ref={currRef}
-                value={quantity}
-              />
-              {isScreenKeyboard && (
-                <View style={localStyles.button}>
-                  <IconButton
-                    icon={isKeyboardOpen ? 'keyboard-off-outline' : 'keyboard-outline'}
-                    onPress={() => setIsKeyboardOpen(!isKeyboardOpen)}
-                    size={24}
-                  />
-                </View>
-              )}
-            </View>
+      <>
+        <View>
+          <ItemSeparator />
+          <View style={localStyles.item}>
+            <MediumText>Количество:</MediumText>
+            <TextInput
+              style={localStyles.quantitySize}
+              showSoftInputOnFocus={false}
+              caretHidden={true}
+              keyboardType="numeric"
+              autoCapitalize="words"
+              onChangeText={handleChangeText}
+              returnKeyType="done"
+              ref={currRef}
+              value={quantity}
+            />
+            {isScreenKeyboard && (
+              <View style={localStyles.button}>
+                <IconButton
+                  icon={isKeyboardOpen ? 'keyboard-off-outline' : 'keyboard-outline'}
+                  onPress={() => setIsKeyboardOpen(!isKeyboardOpen)}
+                  size={24}
+                />
+              </View>
+            )}
           </View>
+        </View>
+        {isScreenKeyboard && isKeyboardOpen && (
           <NumberKeypad
             oldValue={quantity}
             onApply={(value) => {
@@ -271,8 +251,8 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
             }}
             decDigitsForTotal={3}
           />
-        </>
-      )}
+        )}
+      </>
       <AppDialog
         title="Наименование"
         visible={visibleDialog}
@@ -329,6 +309,8 @@ const localStyles = StyleSheet.create({
   quantitySize: {
     fontSize: 30,
     paddingLeft: 5,
-    marginVertical: -5,
+  },
+  flexGrow: {
+    flexGrow: 0,
   },
 });
