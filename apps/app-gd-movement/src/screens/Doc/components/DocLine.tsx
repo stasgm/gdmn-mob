@@ -118,9 +118,11 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
       newValue = !newValue.includes('.') ? parseFloat(newValue).toString() : newValue;
       newValue = Number.isNaN(parseFloat(newValue)) ? '0' : newValue;
       const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
-      setQuantity(validNumber.test(newValue) ? newValue : quantity);
+      const q = validNumber.test(newValue) ? newValue : quantity;
+      setQuantity(q);
+      onSetLine({ ...item, quantity: parseFloat(q || '0') });
     },
-    [isKeyboardOpen, quantity],
+    [isKeyboardOpen, item, onSetLine, quantity],
   );
 
   return (
@@ -224,21 +226,11 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
                     keyboardType="numeric"
                     autoCapitalize="words"
                     onChangeText={handleChangeText}
-                    onEndEditing={() => onSetLine({ ...item, quantity: parseFloat(quantity || '0') })}
                     returnKeyType="done"
                     ref={currRef}
                     value={quantity}
                   />
                 </View>
-                {isScreenKeyboard && (
-                  <View style={localStyles.button}>
-                    <IconButton
-                      icon={isKeyboardOpen ? 'keyboard-off-outline' : 'keyboard-outline'}
-                      onPress={() => setIsKeyboardOpen(!isKeyboardOpen)}
-                      size={24}
-                    />
-                  </View>
-                )}
               </View>
             ))}
         </View>
@@ -255,13 +247,10 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
                 caretHidden={true}
                 keyboardType="numeric"
                 autoCapitalize="words"
-                onChangeText={(value) => {
-                  setIsKeyboardOpen(false);
-                  onSetLine({ ...item, quantity: parseFloat(value || '0') });
-                }}
+                onChangeText={handleChangeText}
                 returnKeyType="done"
                 ref={currRef}
-                value={item.quantity.toString()}
+                value={quantity}
               />
               {isScreenKeyboard && (
                 <View style={localStyles.button}>
@@ -275,8 +264,11 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
             </View>
           </View>
           <NumberKeypad
-            oldValue={item.quantity.toString()}
-            onApply={(value) => onSetLine({ ...item, quantity: parseFloat(value) })}
+            oldValue={quantity}
+            onApply={(value) => {
+              onSetLine({ ...item, quantity: parseFloat(value) });
+              setQuantity(value);
+            }}
             decDigitsForTotal={3}
           />
         </>
