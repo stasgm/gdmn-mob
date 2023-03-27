@@ -212,8 +212,8 @@ const ReportListScreen = () => {
     navigation.navigate('SelectRefItem', {
       refName: 'good',
       fieldName: 'filterReportGood',
-
-      value: filterReportGood && [filterReportGood],
+      isMulti: true,
+      value: filterReportGood,
     });
   }, [filterReportGood, navigation]);
 
@@ -294,7 +294,11 @@ const ReportListScreen = () => {
           )}
           {report?.id === 'byContact' && (
             <View style={localStyles.marginTop}>
-              <SelectableInput label="Товар" value={filterReportGood?.name || ''} onPress={handleSearchGood} />
+              <SelectableInput
+                label="Товары"
+                value={filterReportGood?.map((g) => g.name).join(',')}
+                onPress={handleSearchGood}
+              />
             </View>
           )}
           <View style={[styles.flexDirectionRow, localStyles.marginTop]}>

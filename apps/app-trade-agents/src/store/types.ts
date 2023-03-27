@@ -51,7 +51,7 @@ export interface IReportListFormParam extends IFormParam {
   filterReportOnDB?: string;
   filterReportOnDE?: string;
   filterReportGroup?: IReferenceData[];
-  filterReportGood?: IReferenceData;
+  filterReportGood?: IReferenceData[];
   filterReportStatusList: IListItem[];
 }
 
