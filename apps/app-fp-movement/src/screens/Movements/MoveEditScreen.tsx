@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Alert, View, StyleSheet, ScrollView, Platform } from 'react-native';
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { Alert, ScrollView, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Divider } from 'react-native-paper';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { RouteProp, useNavigation, useRoute, StackActions, useTheme } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { SelectableInput, Input, SaveButton, SubTitle, AppScreen, RadioGroup, navBackButton } from '@lib/mobile-ui';
+import { SelectableInput, Input, SaveButton, SubTitle, AppScreen, navBackButton } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
 import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks';
@@ -16,15 +16,12 @@ import { IDocumentType, IReference, ScreenState } from '@lib/types';
 
 import { MoveStackParamList } from '../../navigation/Root/types';
 import { IMoveFormParam, IMoveDocument } from '../../store/types';
-import { STATUS_LIST } from '../../utils/constants';
 import { getNextDocNumber } from '../../utils/helpers';
 
 export const MoveEditScreen = () => {
   const id = useRoute<RouteProp<MoveStackParamList, 'MoveEdit'>>().params?.id;
   const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'MoveEdit'>>();
   const dispatch = useDispatch();
-
-  const { colors } = useTheme();
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
@@ -87,6 +84,16 @@ export const MoveEditScreen = () => {
   }, [dispatch, doc, defaultDepart, docDocumentSubtype]);
 
   useEffect(() => {
+    if (docDocumentSubtype?.id === 'cellMovement' && docFromDepart) {
+      dispatch(
+        appActions.setFormParams({
+          toDepart: docFromDepart,
+        }),
+      );
+    }
+  }, [dispatch, docDocumentSubtype?.id, docFromDepart]);
+
+  useEffect(() => {
     if (screenState === 'saving') {
       if (!movementType) {
         Alert.alert('Внимание!', 'Тип документа для перемещений не найден.', [{ text: 'OK' }]);
@@ -109,15 +116,24 @@ export const MoveEditScreen = () => {
         return;
       }
 
-      if (
-        !(
-          docNumber &&
-          docDate &&
-          docFromDepart &&
-          (docDocumentSubtype.id === 'cellMovement' ? !docToDepart : docToDepart)
-        )
-      ) {
+      if (docDocumentSubtype?.id === 'prihod' && docFromDepart?.isAddressStore) {
+        Alert.alert('Ошибка!', 'В документе прихода подразделение "Откуда" не можнт быть адресным.', [{ text: 'OK' }]);
+        setScreenState('idle');
+        return;
+      }
+
+      if (!(docNumber && docDate && docFromDepart && docToDepart)) {
         Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
+        setScreenState('idle');
+        return;
+      }
+
+      if (
+        (docDocumentSubtype?.id === 'internalMovement' || docDocumentSubtype?.id === 'movement') &&
+        !docFromDepart.isAddressStore &&
+        docToDepart.isAddressStore
+      ) {
+        Alert.alert('Ошибка!', 'Данные подразделения относятся к типу приход .', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
       }
@@ -135,7 +151,7 @@ export const MoveEditScreen = () => {
           head: {
             comment: docComment && docComment.trim(),
             fromDepart: docFromDepart,
-            toDepart: docDocumentSubtype.id === 'cellMovement' ? docFromDepart : docToDepart,
+            toDepart: docToDepart,
             subtype: docDocumentSubtype,
           },
           lines: [],
@@ -167,7 +183,7 @@ export const MoveEditScreen = () => {
             comment: docComment && docComment.trim(),
             fromDepart: docFromDepart,
             // toDepart: docToDepart,
-            toDepart: docDocumentSubtype.id === 'cellMovement' ? docFromDepart : docToDepart,
+            toDepart: docToDepart,
 
             subtype: docDocumentSubtype,
           },
@@ -277,22 +293,9 @@ export const MoveEditScreen = () => {
     });
   };
 
-  const handleChangeStatus = useCallback(() => {
-    dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
-  }, [dispatch, docStatus]);
-
   const handleChangeNumber = useCallback(
     (text: string) => dispatch(appActions.setFormParams({ number: text })),
     [dispatch],
-  );
-
-  const viewStyle = useMemo(
-    () => [
-      localStyles.switchContainer,
-      localStyles.border,
-      { borderColor: colors.primary, backgroundColor: colors.card },
-    ],
-    [colors.card, colors.primary],
   );
 
   return (
@@ -301,14 +304,6 @@ export const MoveEditScreen = () => {
         <SubTitle>{statusName}</SubTitle>
         <Divider />
         <ScrollView>
-          <View style={viewStyle}>
-            <RadioGroup
-              options={STATUS_LIST}
-              onChange={handleChangeStatus}
-              activeButtonId={STATUS_LIST.find((i) => i.id === docStatus)?.id}
-              directionRow={true}
-            />
-          </View>
           <Input
             label="Номер"
             value={docNumber}
@@ -341,11 +336,12 @@ export const MoveEditScreen = () => {
             label={'Куда'}
             value={docDocumentSubtype?.id === 'cellMovement' ? docFromDepart?.name : docToDepart?.name}
             onPress={handleToDepart}
-            disabled={
-              docDocumentSubtype?.id === 'movement' || docDocumentSubtype?.id === 'cellMovement' || !docDocumentSubtype
-                ? true
-                : isBlocked
-            }
+            // disabled={
+            //   docDocumentSubtype?.id === 'movement' || docDocumentSubtype?.id === 'cellMovement' || !docDocumentSubtype
+            //     ? true
+            //     : isBlocked
+            // }
+            disabled={!docDocumentSubtype ? true : isBlocked}
           />
           <Input
             label="Комментарий"
@@ -370,17 +366,3 @@ export const MoveEditScreen = () => {
     </AppScreen>
   );
 };
-
-export const localStyles = StyleSheet.create({
-  switchContainer: {
-    margin: 10,
-    paddingLeft: 5,
-  },
-  border: {
-    marginHorizontal: 10,
-    marginVertical: 2,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderRadius: 2,
-  },
-});

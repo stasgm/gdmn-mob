@@ -9,6 +9,10 @@ import { useTheme } from 'react-native-paper';
 
 import { ScrollView } from 'react-native-gesture-handler';
 
+import { FlashList } from '@shopify/flash-list';
+
+import { keyExtractor } from '@lib/mobile-hooks';
+
 import { ICell, ICellRef, IMoveDocument, IMoveLine } from '../store/types';
 import { MoveStackParamList } from '../navigation/Root/types';
 
@@ -25,19 +29,39 @@ export const SelectCellScreen = () => {
 
   const { docId, item, mode } = useRoute<RouteProp<MoveStackParamList, 'SelectCell'>>().params;
 
-  console.log('item', item);
+  // console.log('item', item);
   const doc = docSelectors.selectByDocId<IMoveDocument>(docId);
 
   const cells = refSelectors.selectByName<ICellRefList>('cell').data[0];
 
+  const [fromCell, setFromCell] = useState<IMoveLine | undefined>(undefined);
+  const [toCell, setToCell] = useState<IMoveLine | undefined>(undefined);
+  const [selectedChamber, setSelectedChamber] = useState<string | undefined>('');
+  const [selectedRow, setSelectedRow] = useState<string | undefined>('');
+
+  const departId = useMemo(
+    () => (doc?.head.fromDepart.isAddressStore && !fromCell ? doc?.head.fromDepart.id : doc?.head.toDepart.id),
+    [doc?.head.fromDepart.id, doc?.head.fromDepart.isAddressStore, doc?.head.toDepart.id, fromCell],
+  );
+
   const docsLines = (
-    useSelector((state) => state.documents.list)?.filter(
-      (i) =>
-        i.documentType?.name === 'movement' &&
-        i.lines?.find((e) => (e as IMoveLine).fromCell || (e as IMoveLine).toCell),
-    ) as IMoveDocument[]
+    useSelector((state) => state.documents.list)
+      // ?.filter(
+      //   (i) =>
+      //     (doc?.head?.fromDepart?.isAddressStore && doc?.head?.toDepart?.isAddressStore
+      //       ? i.head?.fromDepart?.id === doc?.head?.toDepart?.id && i.head?.toDepart?.id === doc?.head?.fromDepart?.id
+      //       : (i.head?.fromDepart?.isAddressStore && i.head?.fromDepart?.id === doc?.head?.fromDepart?.id) ||
+      //         (i.head?.toDepart?.isAddressStore && i.head?.toDepart?.id === doc?.head?.toDepart?.id)) &&
+      //     i.documentType?.name === 'movement' &&
+      //     i.lines?.find((e) => (e as IMoveLine).fromCell || (e as IMoveLine).toCell),
+      // )
+      ?.filter(
+        (i) =>
+          i.documentType?.name === 'movement' &&
+          (i?.head?.fromDepart.id === departId || i?.head?.toDepart.id === departId),
+      ) as IMoveDocument[]
   ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
-  console.log('docs', jsonFormat(docsLines));
+  // console.log('docs', jsonFormat(docsLines));
 
   const lines = docsLines.reduce((prev: IMoveLine[], cur) => {
     // const lines = docsLines.reduce((prev: ICellRef[], cur) => {
@@ -49,7 +73,9 @@ export const SelectCellScreen = () => {
     return prev;
   }, []);
 
-  const cellList = getCellList(cells[doc?.head.toDepart.id || ''] || [], lines || []);
+  console.log('lineslines', jsonFormat(lines));
+
+  const cellList = getCellList(cells[departId || ''] || [], lines || []);
 
   const { colors } = useTheme();
 
@@ -68,11 +94,6 @@ export const SelectCellScreen = () => {
     },
     [dispatch, docId, navigation],
   );
-
-  const [fromCell, setFromCell] = useState<IMoveLine | undefined>(undefined);
-  const [toCell, setToCell] = useState<IMoveLine | undefined>(undefined);
-  const [selectedChamber, setSelectedChamber] = useState<string | undefined>('');
-  const [selectedRow, setSelectedRow] = useState<string | undefined>('');
 
   useEffect(() => {
     if (item && item.toCell && mode === 1) {
@@ -196,6 +217,51 @@ export const SelectCellScreen = () => {
     [OFFSET, colors.text, groupButtonStyle, windowWidth],
   );
 
+  // const renderGood = useCallback(
+  //   ({ item }: { item: IGood }) => {
+  //     // const lines = doc?.lines?.filter((i) => i.good.id === item.id);
+  //     // const isAdded = !!lines?.length;
+  //     // const iconStyle = [styles.icon, { backgroundColor: isAdded ? '#06567D' : '#E91E63' }];
+
+  //     // const goodStyle = {
+  //     //   backgroundColor: isAdded ? globalColors.backgroundLight : 'transparent',
+  //     // };
+  //     const colorBack = '#d5dce3';
+
+  //     return (
+  //       <View key={keyy} style={styles.flexDirectionRow}>
+  //         {vall?.map((i) => {
+  //           const colorStyle1 = {
+  //             color: i.disabled || !i.barcode ? colors.backdrop : 'white',
+  //           };
+  //           const backColorStyle1 = {
+  //             backgroundColor:
+  //               (fromCell && fromCell.barcode === i.barcode) || (toCell && toCell.barcode === i.barcode)
+  //                 ? colors.notification
+  //                 : i.barcode
+  //                 ? '#226182'
+  //                 : i.disabled
+  //                 ? colors.disabled
+  //                 : colorBack,
+  //           };
+  //           return (
+  //             <TouchableOpacity
+  //               key={i.name}
+  //               style={[localStyles.buttons, backColorStyle1]}
+  //               onPress={() => handleSaveLine(i, keyy)}
+  //               disabled={
+  //                 (doc.head.fromDepart.isAddressStore && !fromCell ? !i.barcode : Boolean(i.barcode)) || i.disabled
+  //               }
+  //             >
+  //               <Text style={[localStyles.buttonLabel, colorStyle1]}>{i.cell}</Text>
+  //             </TouchableOpacity>
+  //           );
+  //         })}
+  //       </View>
+  //     );
+  //   },
+  //   [colors.primary, doc?.lines, docId],
+  // );
   if (!doc) {
     return (
       <View style={[styles.container, styles.alignItemsCenter]}>
@@ -213,85 +279,96 @@ export const SelectCellScreen = () => {
           <Text> Из ячейки {fromCell?.fromCell} </Text>
         </View>
       ) : null}
-
-      <Group
-        values={Object.keys(cellList)}
-        onPress={(i) => setSelectedChamber(i)}
-        selected={selectedChamber}
-        colorBack="#d5dce3"
-        colorSelected={colors.placeholder}
-        title="Камера"
-      />
-      {selectedChamber ? (
+      <ScrollView>
         <Group
-          values={Object.keys(cellList[selectedChamber])}
-          onPress={(i) => setSelectedRow(i)}
-          selected={selectedRow}
-          colorBack="#dbd5da"
-          colorSelected="#854875"
-          title="Ряд"
+          values={Object.keys(cellList)}
+          onPress={(i) => setSelectedChamber(i)}
+          selected={selectedChamber}
+          colorBack="#d5dce3"
+          colorSelected={colors.placeholder}
+          title="Камера"
         />
-      ) : null}
-      {selectedRow && selectedChamber && (
-        <View style={styles.flexDirectionRow}>
-          <View style={styles.directionColumn}>
-            {Object.keys(cellList[selectedChamber][selectedRow])
-              .reverse()
-              .map((keyy) => {
-                // const colorStyle = { color: 'white' };
-                // const backColorStyle = { backgroundColor: colors.accent };
-                return (
-                  <View key={keyy} style={[localStyles.flexColumn, localStyles.height]}>
-                    <TouchableOpacity style={[localStyles.row]}>
-                      <Text style={[localStyles.buttonLabel /*, colorStyle*/]}>{keyy}</Text>
-                    </TouchableOpacity>
-                  </View>
-                );
-              })}
-          </View>
-          <ScrollView horizontal>
+        {selectedChamber ? (
+          <Group
+            values={Object.keys(cellList[selectedChamber])}
+            onPress={(i) => setSelectedRow(i)}
+            selected={selectedRow}
+            colorBack="#dbd5da"
+            colorSelected="#854875"
+            title="Ряд"
+          />
+        ) : null}
+        {/* <FlashList
+        data={filterVisible ? goodsByContact : goodModel}
+        renderItem={renderGood}
+        ListHeaderComponent={filterVisible ? undefined : renderGroupHeader}
+        estimatedItemSize={60}
+        // ItemSeparatorComponent={ItemSeparator}
+        keyExtractor={keyExtractor}
+        extraData={[doc?.lines, docId]}
+        numColumns
+      /> */}
+        {selectedRow && selectedChamber && (
+          <View style={styles.flexDirectionRow}>
             <View style={styles.directionColumn}>
-              {Object.entries(cellList[selectedChamber][selectedRow])
+              {Object.keys(cellList[selectedChamber][selectedRow])
                 .reverse()
-                .map(([keyy, vall]) => {
-                  const colorBack = '#d5dce3';
+                .map((keyy) => {
+                  // const colorStyle = { color: 'white' };
+                  // const backColorStyle = { backgroundColor: colors.accent };
                   return (
-                    <View key={keyy} style={styles.flexDirectionRow}>
-                      {vall?.map((i) => {
-                        const colorStyle1 = {
-                          color: i.disabled || !i.barcode ? colors.backdrop : 'white',
-                        };
-                        const backColorStyle1 = {
-                          backgroundColor:
-                            (fromCell && fromCell.barcode === i.barcode) || (toCell && toCell.barcode === i.barcode)
-                              ? colors.notification
-                              : i.barcode
-                              ? '#226182'
-                              : i.disabled
-                              ? colors.disabled
-                              : colorBack,
-                        };
-                        return (
-                          <TouchableOpacity
-                            key={i.name}
-                            style={[localStyles.buttons, backColorStyle1]}
-                            onPress={() => handleSaveLine(i, keyy)}
-                            disabled={
-                              (doc.head.fromDepart.isAddressStore && !fromCell ? !i.barcode : Boolean(i.barcode)) ||
-                              i.disabled
-                            }
-                          >
-                            <Text style={[localStyles.buttonLabel, colorStyle1]}>{i.cell}</Text>
-                          </TouchableOpacity>
-                        );
-                      })}
+                    <View key={keyy} style={[localStyles.flexColumn, localStyles.height]}>
+                      <View style={[localStyles.row]}>
+                        <Text style={[localStyles.buttonLabel /*, colorStyle*/]}>{keyy}</Text>
+                      </View>
                     </View>
                   );
                 })}
             </View>
-          </ScrollView>
-        </View>
-      )}
+            <ScrollView horizontal>
+              <View style={styles.directionColumn}>
+                {Object.entries(cellList[selectedChamber][selectedRow])
+                  .reverse()
+                  .map(([keyy, vall]) => {
+                    const colorBack = '#d5dce3';
+                    return (
+                      <View key={keyy} style={styles.flexDirectionRow}>
+                        {vall?.map((i) => {
+                          const colorStyle1 = {
+                            color: i.disabled || !i.barcode ? colors.backdrop : 'white',
+                          };
+                          const backColorStyle1 = {
+                            backgroundColor:
+                              (fromCell && fromCell.barcode === i.barcode) || (toCell && toCell.barcode === i.barcode)
+                                ? colors.notification
+                                : i.barcode
+                                ? '#226182'
+                                : i.disabled
+                                ? colors.disabled
+                                : colorBack,
+                          };
+                          return (
+                            <TouchableOpacity
+                              key={i.name}
+                              style={[localStyles.buttons, backColorStyle1]}
+                              onPress={() => handleSaveLine(i, keyy)}
+                              disabled={
+                                (doc.head.fromDepart.isAddressStore && !fromCell ? !i.barcode : Boolean(i.barcode)) ||
+                                i.disabled
+                              }
+                            >
+                              <Text style={[localStyles.buttonLabel, colorStyle1]}>{i.cell}</Text>
+                            </TouchableOpacity>
+                          );
+                        })}
+                      </View>
+                    );
+                  })}
+              </View>
+            </ScrollView>
+          </View>
+        )}
+      </ScrollView>
     </View>
   );
 };

@@ -14,7 +14,7 @@ import { generateId } from '@lib/mobile-hooks';
 import { barcodeSettings, ICell, ICellRef, IMoveDocument, IMoveLine } from '../../store/types';
 import { CellsStackParamList } from '../../navigation/Root/types';
 
-import { getBarcode, getCellList } from '../../utils/helpers';
+import { getBarcode, getCellList, jsonFormat } from '../../utils/helpers';
 import { ICellRefList, IGood } from '../../store/app/types';
 
 export interface ICellList extends ICell, ICellRef {
@@ -26,6 +26,7 @@ export const CellsViewScreen = () => {
 
   const { id } = useRoute<RouteProp<CellsStackParamList, 'CellsView'>>().params;
 
+  console.log('iddd', id);
   const cells = refSelectors.selectByName<ICellRefList>('cell').data[0];
 
   const docsLines = (
@@ -36,11 +37,14 @@ export const CellsViewScreen = () => {
     ) as IMoveDocument[]
   ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
-  const lines = docsLines.reduce((prev: IMoveLine[], cur) => {
-    prev = [...prev, ...cur.lines];
-    return prev;
-  }, []);
+  const lines = docsLines
+    .filter((i) => i.head.fromDepart.id === id || i.head.toDepart.id === id)
+    .reduce((prev: IMoveLine[], cur) => {
+      prev = [...prev, ...cur.lines];
+      return prev;
+    }, []);
 
+  console.log('cells[id]', jsonFormat(cells[id].filter((i) => i.barcode)));
   const cellList = getCellList(cells[id], lines || []);
 
   const { colors } = useTheme();
@@ -86,6 +90,7 @@ export const CellsViewScreen = () => {
         barcode: barc.barcode,
         workDate: barc.workDate,
         numReceived: barc.numReceived,
+        quantPack: barc.quantPack,
         toCell: cell,
       };
       return newLine;
@@ -172,89 +177,91 @@ export const CellsViewScreen = () => {
 
   return (
     <View style={localStyles.groupItem}>
-      <Group
-        values={Object.keys(cellList)}
-        onPress={(item) => setSelectedChamber(item)}
-        selected={selectedChamber}
-        colorBack="#d5dce3"
-        colorSelected={colors.placeholder}
-        title="Камера"
-      />
-      {selectedChamber ? (
+      <ScrollView>
         <Group
-          values={Object.keys(cellList[selectedChamber])}
-          onPress={(item) => setSelectedRow(item)}
-          selected={selectedRow}
-          colorBack="#dbd5da"
-          colorSelected="#854875"
-          title="Ряд"
+          values={Object.keys(cellList)}
+          onPress={(item) => setSelectedChamber(item)}
+          selected={selectedChamber}
+          colorBack="#d5dce3"
+          colorSelected={colors.placeholder}
+          title="Камера"
         />
-      ) : null}
-      {selectedRow && selectedChamber ? (
-        <View style={styles.flexDirectionRow}>
-          <View style={styles.directionColumn}>
-            {Object.keys(cellList[selectedChamber][selectedRow])
-              .reverse()
-              .map((keyy) => {
-                // const colorStyle = { color: 'white' };
-                // const backColorStyle = { backgroundColor: colors.accent };
-                return (
-                  <View key={keyy} style={[localStyles.flexColumn, localStyles.height]}>
-                    <TouchableOpacity style={[localStyles.row]}>
-                      <Text style={[localStyles.buttonLabel /*, colorStyle*/]}>{keyy}</Text>
-                    </TouchableOpacity>
-                  </View>
-                );
-              })}
-          </View>
-          <ScrollView horizontal>
+        {selectedChamber ? (
+          <Group
+            values={Object.keys(cellList[selectedChamber])}
+            onPress={(item) => setSelectedRow(item)}
+            selected={selectedRow}
+            colorBack="#dbd5da"
+            colorSelected="#854875"
+            title="Ряд"
+          />
+        ) : null}
+        {selectedRow && selectedChamber ? (
+          <View style={styles.flexDirectionRow}>
             <View style={styles.directionColumn}>
-              {Object.entries(cellList[selectedChamber][selectedRow])
+              {Object.keys(cellList[selectedChamber][selectedRow])
                 .reverse()
-                .map(([keyy, vall]) => {
-                  const colorBack = '#d5dce3';
+                .map((keyy) => {
+                  // const colorStyle = { color: 'white' };
+                  // const backColorStyle = { backgroundColor: colors.accent };
                   return (
-                    <View key={keyy} style={styles.flexDirectionRow}>
-                      {vall?.map((i) => {
-                        const colorStyle1 = {
-                          color: i.disabled || !i.barcode ? colors.backdrop : 'white',
-                        };
-                        const backColorStyle1 = {
-                          backgroundColor: i.barcode ? '#226182' : i.disabled ? colors.disabled : colorBack,
-                        };
-                        return (
-                          <TouchableOpacity
-                            key={i.name}
-                            style={[
-                              localStyles.buttons,
-                              // {
-                              //   width:
-                              //     windowWidth > 550 ? (windowWidth * 0.215 - 9) / 2 : (windowWidth * 0.295 - 14) / 2,
-                              //   height:
-                              //     windowWidth > 550 ? (windowWidth * 0.215 - 9) / 2 : (windowWidth * 0.295 - 14) / 2,
-                              // },
-                              backColorStyle1,
-                            ]}
-                            onPress={() =>
-                              navigation.navigate('GoodLine', {
-                                item:
-                                  lines.find((e) => e.barcode === i.barcode) ||
-                                  getScannedObject(i.barcode || '', i.name),
-                              })
-                            }
-                            disabled={!i.barcode || i.disabled}
-                          >
-                            <Text style={[localStyles.buttonLabel, colorStyle1]}>{i.cell}</Text>
-                          </TouchableOpacity>
-                        );
-                      })}
+                    <View key={keyy} style={[localStyles.flexColumn, localStyles.height]}>
+                      <TouchableOpacity style={[localStyles.row]}>
+                        <Text style={[localStyles.buttonLabel /*, colorStyle*/]}>{keyy}</Text>
+                      </TouchableOpacity>
                     </View>
                   );
                 })}
             </View>
-          </ScrollView>
-        </View>
-      ) : null}
+            <ScrollView horizontal>
+              <View style={styles.directionColumn}>
+                {Object.entries(cellList[selectedChamber][selectedRow])
+                  .reverse()
+                  .map(([keyy, vall]) => {
+                    const colorBack = '#d5dce3';
+                    return (
+                      <View key={keyy} style={styles.flexDirectionRow}>
+                        {vall?.map((i) => {
+                          const colorStyle1 = {
+                            color: i.disabled || !i.barcode ? colors.backdrop : 'white',
+                          };
+                          const backColorStyle1 = {
+                            backgroundColor: i.barcode ? '#226182' : i.disabled ? colors.disabled : colorBack,
+                          };
+                          return (
+                            <TouchableOpacity
+                              key={i.name}
+                              style={[
+                                localStyles.buttons,
+                                // {
+                                //   width:
+                                //     windowWidth > 550 ? (windowWidth * 0.215 - 9) / 2 : (windowWidth * 0.295 - 14) / 2,
+                                //   height:
+                                //     windowWidth > 550 ? (windowWidth * 0.215 - 9) / 2 : (windowWidth * 0.295 - 14) / 2,
+                                // },
+                                backColorStyle1,
+                              ]}
+                              onPress={() =>
+                                navigation.navigate('GoodLine', {
+                                  item:
+                                    lines.find((e) => e.barcode === i.barcode) ||
+                                    getScannedObject(i.barcode || '', i.name),
+                                })
+                              }
+                              disabled={!i.barcode || i.disabled}
+                            >
+                              <Text style={[localStyles.buttonLabel, colorStyle1]}>{i.cell}</Text>
+                            </TouchableOpacity>
+                          );
+                        })}
+                      </View>
+                    );
+                  })}
+              </View>
+            </ScrollView>
+          </View>
+        ) : null}
+      </ScrollView>
     </View>
   );
 };

@@ -37,6 +37,7 @@ export const getBarcode = (barcode: string, settings: barcodeSettings) => {
   const quantPack = barcode.slice(shcodeLast, quantPackLast);
   const numReceived = barcode.slice(quantPackLast + 1, numReceivedLast);
 
+  console.log('quantPack', quantPack);
   const date = new Date(Number(year), Number(month) - 1, Number(day)).toISOString();
 
   const barcodeObj: IBarcode = {

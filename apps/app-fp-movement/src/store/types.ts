@@ -12,8 +12,8 @@ export interface IMoveFormParam extends IFormParam {
   number?: string;
   documentDate?: string;
   status?: StatusType;
-  fromDepart?: ICodeEntity;
-  toDepart?: ICodeEntity;
+  fromDepart?: IAddressStoreEntity;
+  toDepart?: IAddressStoreEntity;
   comment?: string;
   documentSubtype?: INamedEntity;
 }
@@ -86,6 +86,7 @@ export interface IMoveLine extends IEntity {
   weight: number;
   workDate: string; // Дата производства
   numReceived: string; // Номер партии
+  quantPack: number; // порядковый номер сканирования в документе
   barcode?: string; // технологический код
   sortOrder?: number; // порядок сортировки
   fromCell?: string; // номер ячейки

@@ -17,7 +17,6 @@ import {
   ListItemLine,
   ScanButton,
   navBackButton,
-  SaveDocument,
   SimpleDialog,
 } from '@lib/mobile-ui';
 
@@ -187,19 +186,6 @@ export const MoveViewScreen = () => {
     }
   }, [dispatch, doc?.lines, id]);
 
-  const handleSaveDocument = useCallback(() => {
-    if (!doc) {
-      return;
-    }
-    dispatch(
-      documentActions.updateDocument({
-        docId: id,
-        document: { ...doc, status: 'READY' },
-      }),
-    );
-    navigation.goBack();
-  }, [dispatch, id, navigation, doc]);
-
   const sendDoc = useSendDocs(doc ? [doc] : []);
 
   const [visibleSendDialog, setVisibleSendDialog] = useState(false);
@@ -243,11 +229,10 @@ export const MoveViewScreen = () => {
         doc?.status === 'READY' ? (
           <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
         ) : (
-          doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
+          <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
         )
       ) : (
         <View style={styles.buttons}>
-          {doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />}
           <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
           {!isScanerReader && (
             <ScanButton
@@ -258,7 +243,7 @@ export const MoveViewScreen = () => {
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [actionsMenu, doc?.status, handleSaveDocument, id, isBlocked, isScanerReader, loading, navigation, screenState],
+    [actionsMenu, doc?.status, id, isBlocked, isScanerReader, loading, navigation, screenState],
   );
 
   useLayoutEffect(() => {
@@ -303,18 +288,18 @@ export const MoveViewScreen = () => {
             Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
           </MediumText>
         </View>
-        {doc?.head.fromDepart.isAddressStore && (
+        {doc?.head.fromDepart.isAddressStore ? (
           <View style={styles.flexDirectionRow}>
             <MediumText>Откуда: {item.fromCell || ''}</MediumText>
           </View>
-        )}
-        {doc?.head.toDepart.isAddressStore && (
+        ) : null}
+        {doc?.head.toDepart.isAddressStore ? (
           <View style={styles.flexDirectionRow}>
             <MediumText>
               {doc?.head.fromDepart.isAddressStore ? 'Куда:' : 'Ячейка №'} {item.toCell || ''}
             </MediumText>
           </View>
-        )}
+        ) : null}
       </View>
     </ListItemLine>
   );
@@ -370,6 +355,8 @@ export const MoveViewScreen = () => {
         barcode: barc.barcode,
         workDate: barc.workDate,
         numReceived: barc.numReceived,
+        quantPack: barc.quantPack,
+
         sortOrder: doc.lines?.length + 1,
       };
 
@@ -377,6 +364,11 @@ export const MoveViewScreen = () => {
         (doc.head.subtype.id === 'prihod' && doc.head.toDepart.isAddressStore) ||
         (doc.head.subtype.id !== 'prihod' && doc.head.fromDepart.isAddressStore)
       ) {
+        if (newLine.quantPack < 35) {
+          Alert.alert('Внимание!', 'Вес поддона не может быть меньше 35!', [{ text: 'OK' }]);
+          setScanned(false);
+          return;
+        }
         navigation.navigate('SelectCell', { docId: id, item: newLine, mode: 0 });
       } else {
         dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
@@ -388,6 +380,7 @@ export const MoveViewScreen = () => {
     [doc, minBarcodeLength, goodBarcodeSettings, goods, dispatch, id, navigation],
   );
 
+  console.log('geeet', getBarcode('008680280323104810120005345236', goodBarcodeSettings));
   const [key, setKey] = useState(1);
 
   const setScan = (brc: string) => {
