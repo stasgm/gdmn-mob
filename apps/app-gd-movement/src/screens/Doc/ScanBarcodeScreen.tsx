@@ -126,7 +126,7 @@ const ScanBarcodeScreen = () => {
           barcode: remItem.good.barcode,
           sortOrder: (document?.lines?.length || 0) + 1,
           alias: remItem.good.alias || '',
-          weightCode: remItem.good.weightCode || '',
+          weightCode: remItem.good.weightCode?.trim() || '',
         };
 
         if (scannedObject) {
@@ -142,7 +142,8 @@ const ScanBarcodeScreen = () => {
       } else {
         charFrom = charTo;
         charTo = charFrom + weightSettingsCountCode;
-        const code = Number(brc.substring(charFrom, charTo)).toString();
+        const code = brc.substring(charFrom, charTo);
+        console.log('code', code);
 
         charFrom = charTo;
         charTo = charFrom + weightSettingsCountWeight;
@@ -150,8 +151,10 @@ const ScanBarcodeScreen = () => {
         const qty = Number(brc.substring(charFrom, charTo)) / 1000;
 
         const remItem =
-          Object.values(goodRemains)?.find((item: IMGoodRemain) => item.good.weightCode === code) ||
+          Object.values(goodRemains)?.find((item: IMGoodRemain) => item.good.weightCode?.trim() === code) ||
           (documentType?.isRemains ? undefined : { good: { ...unknownGood, barcode: brc } });
+
+        console.log('remItem', remItem);
 
         if (!remItem) {
           setScaner({ state: 'error', message: 'Товар не найден' });
@@ -168,7 +171,7 @@ const ScanBarcodeScreen = () => {
           barcode: remItem.good.barcode,
           sortOrder: (document?.lines?.length || 0) + 1,
           alias: remItem.good.alias || '',
-          weightCode: remItem.good.weightCode || '',
+          weightCode: remItem.good.weightCode?.trim() || '',
         };
 
         if (scannedObject) {
