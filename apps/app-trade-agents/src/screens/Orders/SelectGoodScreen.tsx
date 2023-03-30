@@ -385,6 +385,7 @@ const SelectGoodScreen = () => {
         ItemSeparatorComponent={ItemSeparator}
         keyExtractor={keyExtractor}
         extraData={[doc?.lines, docId]}
+        keyboardShouldPersistTaps={'handled'}
       />
       {(selectedLine || selectedGood) && (
         <OrderLineDialog
