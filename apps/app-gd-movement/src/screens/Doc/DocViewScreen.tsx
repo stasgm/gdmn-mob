@@ -255,6 +255,7 @@ export const DocViewScreen = () => {
             <MediumText>
               {item.quantity} {good?.valueName} x {(item.price || 0).toString()} р.
             </MediumText>
+            {!!item.barcode && <MediumText style={[styles.number, styles.flexDirectionRow]}>{item.barcode}</MediumText>}
           </View>
         </View>
       </ListItemLine>
@@ -328,6 +329,8 @@ export const DocViewScreen = () => {
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
           barcode: remItem.good.barcode,
           sortOrder: (lines?.length || 0) + 1,
+          alias: remItem.good.alias || '',
+          weightCode: remItem.good.weightCode?.trim() || '',
         };
       } else {
         charFrom = charTo;
@@ -340,7 +343,7 @@ export const DocViewScreen = () => {
         const qty = Number(brc.substring(charFrom, charTo)) / 1000;
 
         const remItem =
-          Object.values(goodRemains)?.find((item: IMGoodRemain) => item.good.weightCode === code) ||
+          Object.values(goodRemains)?.find((item: IMGoodRemain) => item.good.weightCode?.trim() === code) ||
           (documentType?.isRemains ? undefined : { good: { ...unknownGood, barcode: brc } });
 
         if (!remItem) {
@@ -361,6 +364,8 @@ export const DocViewScreen = () => {
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
           barcode: remItem.good.barcode,
           sortOrder: (lines?.length || 0) + 1,
+          alias: remItem.good.alias || '',
+          weightCode: remItem.good.weightCode?.trim() || '',
         };
       }
 
@@ -426,11 +431,16 @@ export const DocViewScreen = () => {
         isBlocked={isBlocked}
       >
         <>
-          <MediumText style={styles.rowCenter}>
-            {(doc.documentType.remainsField === 'fromContact'
-              ? doc.head.fromContact?.name
-              : doc.head.toContact?.name) || ''}
-          </MediumText>
+          {doc.head.fromContact && (
+            <MediumText
+              style={styles.rowCenter}
+            >{`${doc.documentType.fromDescription}: ${doc.head.fromContact?.name}`}</MediumText>
+          )}
+          {doc.head.toContact && (
+            <MediumText
+              style={styles.rowCenter}
+            >{`${doc.documentType.toDescription}: ${doc.head.toContact?.name}`}</MediumText>
+          )}
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
         </>
       </InfoBlock>

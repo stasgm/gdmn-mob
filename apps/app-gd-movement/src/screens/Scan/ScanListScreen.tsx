@@ -176,8 +176,8 @@ export const ScanListScreen = () => {
         ? filteredList.list
         : status === 'active'
         ? filteredList.list.filter((e) => e.status !== 'PROCESSED')
-        : status !== 'archive' && status !== 'all'
-        ? filteredList.list.filter((e) => e.status === status)
+        : status === 'archive'
+        ? filteredList.list.filter((e) => e.status === 'PROCESSED')
         : [];
 
     return res.map((i) => {

@@ -1,19 +1,20 @@
 import { IEntity, ISettingsGroup } from './common';
 
-export type SettingValue = string | number | boolean;
+export type SettingValue = string | number | boolean | Array<any>;
 
 interface ISettingsOption<T = SettingValue> extends IEntity {
   description?: string;
   data: T;
   visible?: boolean;
   sortOrder?: number;
-  type: 'string' | 'date' | 'number' | 'boolean' | 'option' | 'ref';
+  type: 'string' | 'date' | 'number' | 'boolean' | 'option' | 'ref' | 'sets';
   group?: ISettingsGroup;
+  groupInGroup?: ISettingsGroup;
   readonly?: boolean;
 }
 
 type Settings<T = Record<string, SettingValue>> = {
-  [P in keyof T]?: ISettingsOption<T[P]>;
+  [P in keyof T]: ISettingsOption<T[P]>;
 };
 
 interface IBaseSettings {
@@ -33,7 +34,6 @@ interface IInvSettings extends IBaseSettings {
   useKbdScanner: boolean;
   serverAutoCheck: boolean;
 }
-
 const InvSettings: Settings<IInvSettings> =  {
   ...baseSettings,
   useCamera: {
@@ -51,24 +51,5 @@ const InvSettings: Settings<IInvSettings> =  {
     type: 'boolean',
   },
 }; */
-
-// export type SettingValueDoc = string | number | boolean | undefined;
-// export type RefTypeChoose = 'string' | 'date' | 'number' | 'boolean' | 'option' | 'ref';
-
-// interface ISettingsOptionDoc extends IEntity {
-//   description: string;
-//   type: RefTypeChoose;
-//   refName?: string;
-//   sortOrder?: number;
-//   clearInput?: boolean;
-//   disabled?: boolean;
-//   onChangeText?: string;
-//   value?: any;
-//   requeried?: boolean;
-// }
-
-// type MetaData1<T = Record<string, SettingValueDoc>> = {
-//   [P in keyof T]?: ISettingsOptionDoc<T[P]>;
-// };
 
 export { Settings, ISettingsOption, IBaseSettings };

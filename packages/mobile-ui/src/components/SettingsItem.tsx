@@ -6,6 +6,7 @@ import { SettingValue } from '@lib/types';
 import Input from './Input';
 import { MediumText } from './AppText';
 import Switch from './Switch';
+import Checkbox from './Checkbox';
 
 type Props = {
   label: string;
@@ -18,13 +19,39 @@ type Props = {
 const SettingsItem = ({ label, value, disabled = false, onValueChange, onEndEditing }: Props) => {
   const [itemValue, setItemValue] = useState(value);
 
+  const handleChangeText = (text: string) => {
+    let newValue = text.replace(',', '.');
+    newValue = !newValue.includes('.') ? parseFloat(newValue).toString() : newValue;
+    newValue = Number.isNaN(parseFloat(newValue)) ? '0' : newValue;
+    const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
+    setItemValue(validNumber.test(newValue) ? newValue : itemValue);
+  };
+
   useEffect(() => {
     setItemValue(value);
   }, [value]);
 
   return (
     <View>
-      {typeof value === 'boolean' ? (
+      {typeof value === 'object' && Array.isArray(value) ? (
+        <View>
+          <MediumText style={localStyles.title}>{label}</MediumText>
+          <View style={localStyles.status}>
+            {value?.map((elem) => (
+              <View key={elem.id}>
+                <Checkbox
+                  key={elem.id}
+                  title={elem.value}
+                  selected={elem.selected}
+                  onSelect={() => {
+                    onValueChange(value.map((v) => (v.id === elem.id ? { ...elem, selected: !elem.selected } : v)));
+                  }}
+                />
+              </View>
+            ))}
+          </View>
+        </View>
+      ) : typeof value === 'boolean' ? (
         <View style={localStyles.container}>
           <MediumText>{label}</MediumText>
           <Switch
@@ -42,13 +69,7 @@ const SettingsItem = ({ label, value, disabled = false, onValueChange, onEndEdit
             <Input
               label={label}
               value={itemValue === 0 ? '' : itemValue.toString()}
-              onChangeText={(text) => {
-                let newValue = text.replace(',', '.');
-                newValue = !newValue.includes('.') ? parseFloat(newValue).toString() : newValue;
-                newValue = Number.isNaN(parseFloat(newValue)) ? '0' : newValue;
-                const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
-                setItemValue(validNumber.test(newValue) ? newValue : itemValue);
-              }}
+              onChangeText={handleChangeText}
               keyboardType={'numeric'}
               clearInput={true}
               autoCapitalize="none"
@@ -94,6 +115,20 @@ const localStyles = StyleSheet.create({
   subHeading: {
     width: '85%',
     fontSize: 15,
+  },
+  status: {
+    margin: 5,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  border: {
+    borderWidth: 1,
+    borderRadius: 2,
+    marginHorizontal: 5,
+  },
+  title: {
+    margin: 3,
+    textAlign: 'center',
   },
 });
 
