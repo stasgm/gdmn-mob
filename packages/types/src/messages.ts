@@ -31,29 +31,19 @@ export interface IRefCmd {
 
 export type MessageType = ICmd | IDocument[] | IReferences | IUserSettings | IAppSystemSettings;
 
+export interface IMessageBody<T = MessageType> {
+  type: BodyType;
+  version: number;
+  payload: T;
+}
+
 export interface IMessage<T = MessageType> {
   id: string;
   status: StatusType;
   errorMessage?: string;
   version?: string;
   head: IHeadMessage;
-  body: {
-    type: BodyType;
-    version: number;
-    payload: T;
-  };
-}
-
-export function isIHeadMessage(obj: any): obj is IHeadMessage {
-  return typeof obj === 'object';
-}
-
-export function isIMessage(obj: any): obj is IMessage {
-  return obj['body']['version'] === 1 && isIHeadMessage(obj['head']);
-}
-
-export function isIResponseMessage(obj: any): obj is IMessage {
-  return obj['body']['version'] === 1 && isIHeadMessage(obj['head']) && !!obj['head']['replyTo'];
+  body: IMessageBody<T>;
 }
 
 export type NewMessage = Omit<IMessage, 'head' | 'id'> & {

@@ -26,7 +26,7 @@ import {
 
 import { useCallback, useMemo } from 'react';
 
-import { generateId, getDateString, isIReferences, isNumeric } from '../utils';
+import { generateId, getDateString, isIMessage, isIReferences, isNumeric } from '../utils';
 
 import { mobileRequest } from '../mobileRequest';
 
@@ -41,7 +41,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
   const dispatch = useDispatch();
 
   const addError = useCallback(
-    (name: string, message: string, errs: IDeviceLog[]) => {
+    (name: string, message: string, errs: IDeviceLog[], addErrorNotice = true) => {
       const err = {
         id: generateId(),
         name,
@@ -49,7 +49,9 @@ export const useSync = (onSync?: () => Promise<any>) => {
         message,
       };
       //Добавляем в список для отображения в окне процесса
-      dispatch(appActions.addErrorNotice(err));
+      if (addErrorNotice) {
+        dispatch(appActions.addErrorNotice(err));
+      }
       errs.push(err);
     },
     [dispatch],
@@ -95,10 +97,28 @@ export const useSync = (onSync?: () => Promise<any>) => {
         return;
       }
 
+      if (!isIMessage(msg)) {
+        addError(
+          'useSync',
+          `Неверная структура файла ${
+            typeof msg === 'object' && 'id' in msg ? (msg as any).id : ''
+          }. Обратитесь к администратору!`,
+          tempErrs,
+        );
+        return;
+      }
+
       //Если пришло сообщение, статус которого ошибка обработки, то добавляем ошибку с текстом из errorMessage
       if (msg.status === 'PROCESSED_DEADLOCK' || msg.status === 'PROCESSED_INCORRECT') {
-        addError('useSync: processMessage', `Ошибка обработки сообщения id=${msg.id}: ${msg.errorMessage}`, tempErrs);
+        addError('useSync: processMessage', `Сообщение id=${msg.id}: ${msg.errorMessage}`, tempErrs);
       }
+
+      const removeMes = async (message: string) => {
+        const removeMess = await api.message.removeMessage(appRequest, msg.id, params);
+        if (removeMess.type !== 'REMOVE_MESSAGE') {
+          addError('useSync: removeMessage', `${message} ${removeMess.message}`, tempErrs, false);
+        }
+      };
 
       switch (msg.body.type as BodyType) {
         case 'CMD':
@@ -116,6 +136,11 @@ export const useSync = (onSync?: () => Promise<any>) => {
             break;
           }
 
+          if (msg.status === 'PROCESSED_DEADLOCK' || msg.status === 'PROCESSED_INCORRECT') {
+            removeMes(`Сообщение справочников с id=${msg.id} на сервере не удалено.`);
+            break;
+          }
+
           const loadRefs = msg.body.payload as IReferences;
 
           addRequestNotice('Сохранение справочников');
@@ -123,34 +148,18 @@ export const useSync = (onSync?: () => Promise<any>) => {
           if (refLoadType) {
             //Записываем новые справочники из сообщения
             const setRefResponse = await refDispatch(referenceActions.setReferences(loadRefs));
-
             //Если удачно сохранились справочники, удаляем сообщение в json
             if (setRefResponse.type === 'REFERENCES/SET_ALL_SUCCESS') {
-              const removeMess = await api.message.removeMessage(appRequest, msg.id, params);
-              if (removeMess.type !== 'REMOVE_MESSAGE') {
-                addError(
-                  'useSync: api.message.removeMessage',
-                  `Справочники загружены, но сообщение справочников с id=${msg.id} на сервере не удалено. ${removeMess.message}`,
-                  tempErrs,
-                );
-              }
+              removeMes(`Справочники загружены, но сообщение с id=${msg.id} на сервере не удалено.`);
             } else if (setRefResponse.type === 'REFERENCES/SET_ALL_FAILURE') {
               addError('useSync: setReferences', 'Справочники не загружены в хранилище', tempErrs);
             }
           } else {
             //Записываем новые справочники из сообщения
             const addRefResponse = await refDispatch(referenceActions.addReferences(loadRefs));
-
             //Если удачно сохранились справочники, удаляем сообщение в json
             if (addRefResponse.type === 'REFERENCES/ADD_SUCCESS') {
-              const removeMess = await api.message.removeMessage(appRequest, msg.id, params);
-              if (removeMess.type !== 'REMOVE_MESSAGE') {
-                addError(
-                  'useSync: removeMessage',
-                  `Справочники добавлены, но сообщение справочников с id=${msg.id} на сервере не удалено. ${removeMess.message}`,
-                  tempErrs,
-                );
-              }
+              removeMes(`Справочники загружены, но сообщение с id=${msg.id} на сервере не удалено.`);
             } else if (addRefResponse.type === 'REFERENCES/ADD_FAILURE') {
               addError('useSync: addReferences', 'Справочники не добавлены в хранилище', tempErrs);
             }
@@ -170,25 +179,20 @@ export const useSync = (onSync?: () => Promise<any>) => {
             break;
           }
 
+          if (msg.status === 'PROCESSED_DEADLOCK' || msg.status === 'PROCESSED_INCORRECT') {
+            removeMes(`Сообщение справочника с id=${msg.id} на сервере не удалено.`);
+            break;
+          }
+
           if (isIReferences(msg.body.payload)) {
             const loadRef = Object.entries(msg.body.payload);
             const [refName, refData] = loadRef[0];
-
             addRequestNotice(`Сохранение справочника ${refName}`);
-
             //Записываем новый справочник из сообщения
             const setRefResponse = await refDispatch(referenceActions.setOneReference({ refName, refData }));
-
             //Если удачно сохранился справочник, удаляем сообщение в json
             if (setRefResponse.type === 'REFERENCES/SET_ONE_SUCCESS') {
-              const removeMess = await api.message.removeMessage(appRequest, msg.id, params);
-              if (removeMess.type !== 'REMOVE_MESSAGE') {
-                addError(
-                  'useSync: removeMessage',
-                  `Справочник ${refName} загружен, но сообщение справочника с id=${msg.id} на сервере не удалено. ${removeMess.message}`,
-                  tempErrs,
-                );
-              }
+              removeMes(`Справочник загружен, но сообщение с id=${msg.id} на сервере не удалено.`);
             } else if (setRefResponse.type === 'REFERENCES/SET_ONE_FAILURE') {
               addError('useSync: setOneReference', `Справочник ${refName} не загружен в хранилище`, tempErrs);
             }
@@ -209,29 +213,21 @@ export const useSync = (onSync?: () => Promise<any>) => {
             break;
           }
 
-          const removeMes = async () => {
-            const removeMess = await api.message.removeMessage(appRequest, msg.id, params);
-            if (removeMess.type !== 'REMOVE_MESSAGE') {
-              addError(
-                'useSync: api.message.removeMessage',
-                `Документы загружены, но сообщение документов с id=${msg.id} на сервере не удалено. ${removeMess.message}`,
-                tempErrs,
-              );
-            }
-          };
+          if (msg.status === 'PROCESSED_DEADLOCK' || msg.status === 'PROCESSED_INCORRECT') {
+            removeMes(`Сообщение документов с id=${msg.id} на сервере не удалено.`);
+            break;
+          }
 
           const loadDocs = msg.body.payload as IDocument[];
 
           if (!loadDocs.length) {
-            await removeMes();
+            await removeMes(`Сообщение документов с пустыми данными с id=${msg.id} на сервере не удалено.`);
           } else {
             addRequestNotice(`Сохранение документов (${loadDocs.length})`);
-
             const setDocResponse = await docDispatch(documentActions.setDocuments(loadDocs));
-
             //Если удачно сохранились документы, удаляем сообщение в json
             if (setDocResponse.type === 'DOCUMENTS/SET_ALL_SUCCESS') {
-              await removeMes();
+              await removeMes(`Документы загружены, но сообщение с id=${msg.id} на сервере не удалено.`);
             } else if (setDocResponse.type === 'DOCUMENTS/SET_ALL_FAILURE') {
               addError('useSync: setDocuments', 'Документы не загружены в хранилище', tempErrs);
             }
@@ -250,6 +246,11 @@ export const useSync = (onSync?: () => Promise<any>) => {
             break;
           }
 
+          if (msg.status === 'PROCESSED_DEADLOCK' || msg.status === 'PROCESSED_INCORRECT') {
+            removeMes(`Cообщение настроек пользователя с id=${msg.id} на сервере не удалено.`);
+            break;
+          }
+
           addRequestNotice('Сохранение настроек пользователя');
 
           const setUserSettingsResponse = await authDispatch(
@@ -258,15 +259,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
 
           //Если удачно сохранились настройки, удаляем сообщение в json
           if (setUserSettingsResponse.type === 'AUTH/SET_USER_SETTINGS_SUCCESS') {
-            const removeMess = await api.message.removeMessage(appRequest, msg.id, params);
-
-            if (removeMess.type !== 'REMOVE_MESSAGE') {
-              addError(
-                'useSync: api.message.removeMessage',
-                `Настройки пользователя загружены, но сообщение настроек пользователя с id=${msg.id} на сервере не удалено. ${removeMess.message}`,
-                tempErrs,
-              );
-            }
+            removeMes(`Настройки пользователя загружены, но сообщение с id=${msg.id} на сервере не удалено.`);
           } else if (setUserSettingsResponse.type === 'AUTH/SET_USER_SETTINGS_FAILURE') {
             addError('useSync: setUserSettings', 'Настройки пользователя не загружены в хранилище', tempErrs);
           }
@@ -282,6 +275,11 @@ export const useSync = (onSync?: () => Promise<any>) => {
               `Структура загружаемых данных для настроек приложения с версией '${msg.body.version}' не поддерживается приложением`,
               tempErrs,
             );
+            break;
+          }
+
+          if (msg.status === 'PROCESSED_DEADLOCK' || msg.status === 'PROCESSED_INCORRECT') {
+            removeMes(`Cообщение настроек подсистемы с id=${msg.id} на сервере не удалено.`);
             break;
           }
 
@@ -340,14 +338,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
               );
             }
 
-            const removeMess = await api.message.removeMessage(appRequest, msg.id, params);
-            if (removeMess.type !== 'REMOVE_MESSAGE') {
-              addError(
-                'useSync: api.message.removeMessage',
-                `Настройки приложения загружены, но сообщение настроек подсистемы с id=${msg.id} на сервере не удалено. ${removeMess.message}`,
-                tempErrs,
-              );
-            }
+            removeMes(`Настройки подсистемы загружены, но сообщение с id=${msg.id} на сервере не удалено.`);
           } catch (err) {
             addError('useSync', `Настройки приложения не загружены в хранилище: ${err}`, tempErrs);
           }
