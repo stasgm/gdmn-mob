@@ -142,7 +142,7 @@ export const DocLineScreen = () => {
   }
 
   return (
-    <AppInputScreen style={styles.contentTop}>
+    <AppInputScreen>
       <DocLine item={line} onSetLine={setLine} onSetDisabledSave={setDisabledSave} />
     </AppInputScreen>
   );
