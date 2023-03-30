@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, TextInput, View, Modal, TouchableOpacity, StyleSheet, Keyboard } from 'react-native';
 
 import { styles } from '@lib/mobile-navigation';
@@ -29,9 +29,10 @@ import { ONE_SECOND_IN_MS } from '../../../utils/constants';
 interface IProps {
   item: IMovementLine;
   onSetLine: (value: IMovementLine) => void;
+  onSetDisabledSave: (value: boolean) => void;
 }
 
-export const DocLine = ({ item, onSetLine }: IProps) => {
+export const DocLine = ({ item, onSetLine, onSetDisabledSave }: IProps) => {
   const { colors } = useTheme();
 
   const [goodEID, setGoodEID] = useState<string | undefined>(item?.EID?.toString());
@@ -102,6 +103,11 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goodEID]);
 
+  useEffect(() => {
+    onSetDisabledSave(visibleDialog);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visibleDialog]);
+
   const price = item?.price || 0;
   const remains = item?.remains || 0;
   const buyingPrice = item?.buyingPrice || 0;
@@ -125,8 +131,18 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
     [isKeyboardOpen, item, onSetLine, quantity],
   );
 
+  const contentStyle = useMemo(
+    () =>
+      ({
+        flexDirection: 'column',
+        justifyContent: isKeyboardOpen ? 'space-between' : 'flex-start',
+        flex: 1,
+      } as any),
+    [isKeyboardOpen],
+  );
+
   return (
-    <>
+    <View style={contentStyle}>
       <Modal animationType="slide" visible={doScanned}>
         {isScanerReader ? (
           <ScanBarcodeReader
@@ -215,23 +231,25 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
           </View>
         </View>
       </ScrollView>
-      <View style={isKeyboardOpen ? localStyles.flexGrowEnd : localStyles.flexGrowStart}>
-        <ItemSeparator />
-        <View style={localStyles.item}>
-          <MediumText>Количество:</MediumText>
-          <TextInput
-            style={localStyles.quantitySize}
-            showSoftInputOnFocus={false}
-            caretHidden={true}
-            keyboardType="numeric"
-            autoCapitalize="words"
-            onChangeText={handleChangeText}
-            returnKeyType="done"
-            ref={currRef}
-            value={quantity}
-          />
+      <View>
+        <View style={localStyles.quant}>
+          <ItemSeparator />
+          <View style={localStyles.item}>
+            <MediumText>Количество:</MediumText>
+            <TextInput
+              style={localStyles.quantitySize}
+              showSoftInputOnFocus={false}
+              caretHidden={true}
+              keyboardType="numeric"
+              autoCapitalize="words"
+              onChangeText={handleChangeText}
+              returnKeyType="done"
+              ref={currRef}
+              value={quantity}
+            />
+          </View>
           {isScreenKeyboard && (
-            <View style={localStyles.button}>
+            <View style={[localStyles.button, localStyles.zIndex]}>
               <IconButton
                 icon={isKeyboardOpen ? 'keyboard-off-outline' : 'keyboard-outline'}
                 onPress={() => setIsKeyboardOpen(!isKeyboardOpen)}
@@ -261,7 +279,7 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
         okLabel={'Сохранить'}
         okDisabled={goodName ? false : true}
       />
-    </>
+    </View>
   );
 };
 
@@ -307,15 +325,8 @@ const localStyles = StyleSheet.create({
   flexGrow0: {
     flexGrow: 0,
   },
-  flexGrowEnd: {
-    flexGrow: 1,
-    justifyContent: 'flex-end',
+  quant: {
     marginHorizontal: 5,
   },
-  flexGrowStart: {
-    flexGrow: 1,
-    justifyContent: 'flex-start',
-    marginHorizontal: 5,
-    marginTop: -5,
-  },
+  zIndex: { zIndex: 0 },
 });

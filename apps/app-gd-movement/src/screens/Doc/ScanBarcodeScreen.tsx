@@ -142,8 +142,7 @@ const ScanBarcodeScreen = () => {
       } else {
         charFrom = charTo;
         charTo = charFrom + weightSettingsCountCode;
-        const code = brc.substring(charFrom, charTo);
-        console.log('code', code);
+        const code = Number(brc.substring(charFrom, charTo)).toString();
 
         charFrom = charTo;
         charTo = charFrom + weightSettingsCountWeight;
@@ -153,8 +152,6 @@ const ScanBarcodeScreen = () => {
         const remItem =
           Object.values(goodRemains)?.find((item: IMGoodRemain) => item.good.weightCode?.trim() === code) ||
           (documentType?.isRemains ? undefined : { good: { ...unknownGood, barcode: brc } });
-
-        console.log('remItem', remItem);
 
         if (!remItem) {
           setScaner({ state: 'error', message: 'Товар не найден' });

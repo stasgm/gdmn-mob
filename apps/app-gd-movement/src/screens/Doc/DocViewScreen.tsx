@@ -335,7 +335,7 @@ export const DocViewScreen = () => {
       } else {
         charFrom = charTo;
         charTo = charFrom + weightSettingsCountCode;
-        const code = brc.substring(charFrom, charTo);
+        const code = Number(brc.substring(charFrom, charTo)).toString();
 
         charFrom = charTo;
         charTo = charFrom + weightSettingsCountWeight;

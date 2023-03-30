@@ -32,6 +32,7 @@ export const DocLineScreen = () => {
   const dispatch = useDispatch();
   const { mode, docId, item } = useRoute<RouteProp<DocStackParamList, 'DocLine'>>().params;
   const [line, setLine] = useState<IMovementLine>(item);
+  const [disabledSave, setDisabledSave] = useState(false);
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
@@ -49,15 +50,16 @@ export const DocLineScreen = () => {
   useEffect(() => {
     // eslint-disable-next-line import/no-named-as-default-member
     KeyEvent.onKeyDownListener((keyEvent: any) => {
-      if (keyEvent.keyCode === 66) {
+      if (keyEvent.keyCode === 66 && !disabledSave) {
         setScreenState('saving');
       }
-      return () => {
-        // eslint-disable-next-line import/no-named-as-default-member
-        KeyEvent.removeKeyDownListener();
-      };
     });
-  }, []);
+
+    return () => {
+      // eslint-disable-next-line import/no-named-as-default-member
+      KeyEvent.removeKeyDownListener();
+    };
+  }, [disabledSave]);
 
   useEffect(() => {
     if (screenState === 'saving') {
@@ -120,11 +122,11 @@ export const DocLineScreen = () => {
             }
             setScreenState('saving');
           }}
-          disabled={screenState === 'saving'}
+          disabled={screenState === 'saving' || disabledSave}
         />
       </View>
     ),
-    [documentType?.isControlRemains, line.quantity, line.remains, screenState],
+    [disabledSave, documentType?.isControlRemains, line.quantity, line.remains, screenState],
   );
 
   useLayoutEffect(() => {
@@ -141,7 +143,7 @@ export const DocLineScreen = () => {
 
   return (
     <AppInputScreen style={styles.contentTop}>
-      <DocLine item={line} onSetLine={setLine} />
+      <DocLine item={line} onSetLine={setLine} onSetDisabledSave={setDisabledSave} />
     </AppInputScreen>
   );
 };
