@@ -44,14 +44,14 @@
 
 В центральной части страницы представлена информация о количестве компаний, пользователей и устройств.
 
-<img src="img/2.Login/2.DashboardInfo.png" alt="drawing" height="250"/>
+<img src="img/2.Login/2.DashboardInfo.png" alt="drawing" height="200"/>
 
 
 ### 2.1. Панель навигации
 
 В верхней части страницы расположена панель навигации.
 
-<img src="img/2.Login/2.1.Navbar.png" alt="drawing" height="400"/>
+<img src="img/2.Login/2.1.Navbar.png" alt="drawing" height="100"/>
 
 
 В левом углу расположен логотип​, по нажатию на который можно вернуться на главную страницу из любого другого.
