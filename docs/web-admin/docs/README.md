@@ -230,31 +230,22 @@
 
 <img src="img/4.Users/4.1.AddUserERP.png" alt="drawing" width="1000"/>
 
-<img src="img/4.Users/4.1.UserERPTable.png" alt="drawing" width="800"/>
+<img src="img/4.Users/4.1.UserERPTable.png" alt="drawing" width="1000"/>
 
 Поля **Пользователь**, **Пароль** и **Повторите Пароль**  и **Пользователь ERP** являются обязательными для заполнения, поля **Имя**, **Фамилия**, **Телефон**, **Email** необязательны.
 
 После образования пользователя ERP, снова нажимаем на кнопку **Добавить**, чтобы создать обычного пользователя.
 
 <img src="img/4.Users/4.1.Add.png" alt="drawing" width="800"/>
-
-![alt text](img/4.Users/4.1.Add.png)
-
-<img src="img/4.Users/4.1.UserUserERP.png" alt="drawing" height="400"/>
-
-![alt text](img/4.Users/4.1.UserUserERP.png)
+<img src="img/4.Users/4.1.UserUserERP.png" alt="drawing" width="800"/>
 
 Заполним поля и сохраним.
 
-<img src="img/4.Users/4.1.AddUser.png" alt="drawing" height="400"/>
-
-![alt text](img/4.Users/4.1.AddUser.png)
+<img src="img/4.Users/4.1.AddUser.png" alt="drawing" width="800"/>
 
 Новый пользователь отобразиться в таблице.
 
-<img src="img/4.Users/4.1.UserTable.png" alt="drawing" height="400"/>
-
-![alt text](img/4.Users/4.1.UserTable.png)
+<img src="img/4.Users/4.1.UserTable.png" alt="drawing" width="800"/>
 
 ### 4.2. Просмотр информации о пользователе
 
