@@ -251,7 +251,7 @@
 
 Перейдем на страницу просмотра информации о пользователе. Для этого нажмем на имя пользователя.
 
-<img src="img/4.Users/4.2.View.png" alt="drawing" height="400"/>
+<img src="img/4.Users/4.2.View.png" alt="drawing" width="800"/>
 
 ![alt text](img/4.Users/4.2.View.png)
 
