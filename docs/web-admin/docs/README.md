@@ -170,16 +170,16 @@
 
 Для изменения данных компании нажмем на кнопку **Редактировать**.
 
-<img src="img/3.Companies/3.3.Edit.png" alt="drawing" width="800"/>
+<img src="img/3.Companies/3.3.Edit.png" alt="drawing" width="600"/>
 
-<img src="img/3.Companies/3.3.EditAppSystem.png" alt="drawing" width="800"/>
+<img src="img/3.Companies/3.3.EditAppSystem.png" alt="drawing" width="600"/>
 
 
 Так как при добавлении компании мы не указывали город, то поле **Город** является пустым.
 
 Добавим город и сохраним.
 
-<img src="img/3.Companies/3.3.EditCity.png" alt="drawing" width="800"/>
+<img src="img/3.Companies/3.3.EditCity.png" alt="drawing" width="600"/>
 
 Новые данные уже отображены в **Общей информации**.
 
