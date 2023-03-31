@@ -224,25 +224,7 @@
 
 Перейдем к добавлению пользователя по нажатию на кнопку **Добавить**.
 
-<img src="img/4.Users/4.1.AddERP.png" alt="drawing" width="1000"/>
-
-
-![alt text](img/4.Users/4.1.AddERP.png)
-
-<img src="img/4.Users/4.1.UserERPAppSystem.png" alt="drawing" width="1000"/>
-
-![alt text](img/4.Users/4.1.UserERPAppSystem.png)
-
-<img src="img/4.Users/4.1.AddUserERP.png" alt="drawing" width="1000"/>
-
-![alt text](img/4.Users/4.1.AddUserERP.png)
-
-<img src="img/4.Users/4.1.UserERPTable.png" alt="drawing" width="1000"/>
-
-![alt text](img/4.Users/4.1.UserERPTable.png)
-
-
-
+<img src="img/4.Users/4.1.AddERP.png" alt="drawing" width="1000"/>  <img src="img/4.Users/4.1.UserERPAppSystem.png" alt="drawing" width="1000"/>  <img src="img/4.Users/4.1.AddUserERP.png" alt="drawing" width="1000"/>  <img src="img/4.Users/4.1.UserERPTable.png" alt="drawing" width="1000"/>
 
 Поля **Пользователь**, **Пароль** и **Повторите Пароль**  и **Пользователь ERP** являются обязательными для заполнения, поля **Имя**, **Фамилия**, **Телефон**, **Email** необязательны.
 
