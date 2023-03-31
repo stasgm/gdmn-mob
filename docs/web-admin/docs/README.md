@@ -277,7 +277,7 @@
 
 Новые изменения отображены в Общей информации.
 
-<img src="img/4.Users/4.3.UserInfo.png" alt="drawing" width="800"/>
+<img src="img/4.Users/4.3.UserInfo.png" alt="drawing" height="400"/>
 
 ![alt text](img/4.Users/4.3.UserInfo.png)
 
