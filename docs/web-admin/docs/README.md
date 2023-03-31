@@ -218,7 +218,7 @@
 
  Число обычных пользователей не ограничено.
 
- <img src="img/4.Users/4.UsersTable.png" alt="drawing" width="800"/>
+ <img src="img/4.Users/4.UsersTable.png" alt="drawing" width="1000"/>
 
 ![alt text](img/4.Users/4.UsersTable.png)
 
