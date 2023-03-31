@@ -1,5 +1,14 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, useWindowDimensions, Alert, ColorValue } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useWindowDimensions,
+  Alert,
+  ColorValue,
+  FlatList,
+} from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
@@ -270,8 +279,12 @@ export const SelectCellScreen = () => {
     );
   }
 
-  console.log('from', fromCell);
+  // console.log('from', fromCell);
 
+  console.log(
+    'cellList[selectedChamber][selectedRow]',
+    selectedChamber && selectedRow ? cellList?.[selectedChamber][selectedRow] : [],
+  );
   return (
     <View style={localStyles.groupItem}>
       {fromCell ? (
@@ -370,6 +383,86 @@ export const SelectCellScreen = () => {
         )}
       </ScrollView>
     </View>
+    // <View style={localStyles.groupItem}>
+    //   <Group
+    //     values={Object.keys(cellList)}
+    //     onPress={(i) => setSelectedChamber(i)}
+    //     selected={selectedChamber}
+    //     colorBack="#d5dce3"
+    //     colorSelected={colors.placeholder}
+    //     title="Камера"
+    //   />
+    //   {selectedChamber ? (
+    //     <Group
+    //       values={Object.keys(cellList[selectedChamber])}
+    //       onPress={(i) => setSelectedRow(i)}
+    //       selected={selectedRow}
+    //       colorBack="#dbd5da"
+    //       colorSelected="#854875"
+    //       title="Ряд"
+    //     />
+    //   ) : null}
+    //   {selectedRow && selectedChamber && (
+    //     <ScrollView
+    //       horizontal
+    //       showsHorizontalScrollIndicator={false}
+    //       directionalLockEnabled={true}
+    //       alwaysBounceVertical={false}
+    //     >
+    //       <FlatList
+    //         contentContainerStyle={{ alignSelf: 'flex-start' }}
+    //         numColumns={Object.keys(cellList[selectedChamber][selectedRow])?.length}
+    //         showsVerticalScrollIndicator={false}
+    //         showsHorizontalScrollIndicator={false}
+    //         data={cellList[selectedChamber][selectedRow]}
+    //         // renderItem={({ item, index }) => {
+    //         //   //push your code
+    //         // }}
+    //         renderItem={(arr: any) => (
+    //           <View style={styles.directionColumn}>
+    //             {Object.entries(arr)
+    //               .reverse()
+    //               .map(([keyy, vall]) => {
+    //                 const colorBack = '#d5dce3';
+    //                 return (
+    //                   <View key={keyy} style={styles.flexDirectionRow}>
+    //                     {vall?.map((i) => {
+    //                       const colorStyle1 = {
+    //                         color: i.disabled || !i.barcode ? colors.backdrop : 'white',
+    //                       };
+    //                       const backColorStyle1 = {
+    //                         backgroundColor:
+    //                           (fromCell && fromCell.barcode === i.barcode) || (toCell && toCell.barcode === i.barcode)
+    //                             ? colors.notification
+    //                             : i.barcode
+    //                             ? '#226182'
+    //                             : i.disabled
+    //                             ? colors.disabled
+    //                             : colorBack,
+    //                       };
+    //                       return (
+    //                         <TouchableOpacity
+    //                           key={i.name}
+    //                           style={[localStyles.buttons, backColorStyle1]}
+    //                           onPress={() => handleSaveLine(i, keyy)}
+    //                           disabled={
+    //                             (doc.head.fromDepart.isAddressStore && !fromCell ? !i.barcode : Boolean(i.barcode)) ||
+    //                             i.disabled
+    //                           }
+    //                         >
+    //                           <Text style={[localStyles.buttonLabel, colorStyle1]}>{i.cell}</Text>
+    //                         </TouchableOpacity>
+    //                       );
+    //                     })}
+    //                   </View>
+    //                 );
+    //               })}
+    //           </View>
+    //         )}
+    //       />
+    //     </ScrollView>
+    //   )}
+    // </View>
   );
 };
 

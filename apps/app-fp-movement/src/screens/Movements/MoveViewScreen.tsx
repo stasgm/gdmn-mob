@@ -20,7 +20,7 @@ import {
   SimpleDialog,
 } from '@lib/mobile-ui';
 
-import { generateId, getDateString, keyExtractor, useSendDocs, sleep } from '@lib/mobile-hooks';
+import { generateId, getDateString, keyExtractor, useSendDocs, sleep, useSendOneRefRequest } from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
 
@@ -107,7 +107,7 @@ export const MoveViewScreen = () => {
       }
 
       if (good) {
-        const barcodeItem = {
+        const barcodeItem: IMoveLine = {
           good: { id: good.id, name: good.name, shcode: good.shcode },
           id: generateId(),
           weight: barc.weight,
@@ -115,6 +115,7 @@ export const MoveViewScreen = () => {
           workDate: barc.workDate,
           numReceived: barc.numReceived,
           sortOrder: (doc?.lines?.length || 0) + 1,
+          quantPack: barc.quantPack,
         };
         setErrorMessage('');
         if (
@@ -197,8 +198,19 @@ export const MoveViewScreen = () => {
     setScreenState('sent');
   }, [sendDoc]);
 
+  const sendRequest = useSendOneRefRequest('Ячейки', { name: 'cell' });
+
+  const handleSendDebtRequest = useCallback(async () => {
+    setVisibleDialog(false);
+    await sendRequest();
+  }, [sendRequest]);
+
   const actionsMenu = useCallback(() => {
     showActionSheet([
+      {
+        title: 'Отправить запрос на получение справочника ячеек',
+        onPress: handleSendDebtRequest,
+      },
       {
         title: 'Ввести штрих-код',
         onPress: handleShowDialog,
@@ -221,7 +233,7 @@ export const MoveViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
+  }, [showActionSheet, handleSendDebtRequest, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
 
   const renderRight = useCallback(
     () =>
