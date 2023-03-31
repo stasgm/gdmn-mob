@@ -44,14 +44,14 @@
 
 В центральной части страницы представлена информация о количестве компаний, пользователей и устройств.
 
-<img src="img/2.Login/2.DashboardInfo.png" alt="drawing" height="200"/>
+<img src="img/2.Login/2.DashboardInfo.png" alt="drawing" height="180"/>
 
 
 ### 2.1. Панель навигации
 
 В верхней части страницы расположена панель навигации.
 
-<img src="img/2.Login/2.1.Navbar.png" alt="drawing" height="100"/>
+<img src="img/2.Login/2.1.Navbar.png" alt="drawing" height="50"/>
 
 
 В левом углу расположен логотип​, по нажатию на который можно вернуться на главную страницу из любого другого.
@@ -86,29 +86,29 @@
 
 Рассмотрим подробно каждый пункт бокового меню. Начнем с пункта **Компании**.
 
-<img src="img/3.Companies/3.Company.png" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.Company.png" alt="drawing" height="180"/>
 
 
 В первую очередь администратору необходимо создать компанию, в которую будут входить пользователи мобильных устройств.
 
 Так как компания еще не добавлена, таблица является пустой.
 
-<img src="img/3.Companies/3.CompanyEmpty.png" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.CompanyEmpty.png" alt="drawing" height="50"/>
 
 
 В правом верхнем углу расположены две кнопки, предназначенные для добавления и обновления информации.
 
-<img src="img/3.Companies/3.Buttons.png" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.Buttons.png" alt="drawing" height="22"/>
 
 
 В зависимости от размера окна кнопки могут менять вид. При уменьшении окна браузера до среднего сразмера кнопки принимают вид иконок без текста.
 
-<img src="img/3.Companies/3.Icons.png" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.Icons.png" alt="drawing" height="22"/>
 
 
 При уменьшении окна браузера до маленького размера кнопки исчезают полностью, на их месте появляется иконка меню " **⋮** ". При нажатии на нее появляются обе кнопки.
 
-<img src="img/3.Companies/3.IconButtons.png" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.IconButtons.png" alt="drawing" height="50"/>
 
 
 ### 3.1. Добавление компании
@@ -120,7 +120,7 @@
 
 Поле **Наименование компании** является обязательным для заполнения.
 
-<img src="img/3.Companies/3.1.AddCompany.png" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.1.AddCompany.png" alt="drawing" height="180"/>
 
 
 При нажатии на кнопку **Сохранить** данные сохраняются, и компания отображается в таблице.
@@ -136,7 +136,7 @@
 
 При повторной попытке создания компании в левом нижнем углу отобразится сообщение об ошибке, так как у администратора может быть только одна компания.
 
-<img src="img/3.Companies/3.1.Error.png" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.1.Error.png" alt="drawing" height="180"/>
 
 <img src="img/3.Companies/3.1.ErrorWindow.png" alt="drawing" height="400"/>
 
@@ -149,7 +149,7 @@
 
 По умолчанию отображается 10 строк.
 
-<img src="img/3.Companies/3.1.RowsPerPage.png" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.1.RowsPerPage.png" alt="drawing" height="22"/>
 
 
 ### 3.2. Просмотр информации о выбранной компании
