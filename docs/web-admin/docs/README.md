@@ -267,25 +267,17 @@
 
 <img src="img/4.Users/4.3.Password.png" alt="drawing" width="800"/>
 
-![alt text](img/4.Users/4.3.Password.png)
-
 Заполним поля **Имя** и **Фамилия** нажмем **Сохранить**.
 
 <img src="img/4.Users/4.3.EditUser.png" alt="drawing" width="800"/>
-
-![alt text](img/4.Users/4.3.EditUser.png)
 
 Новые изменения отображены в Общей информации.
 
 <img src="img/4.Users/4.3.UserInfo.png" alt="drawing" height="400"/>
 
-![alt text](img/4.Users/4.3.UserInfo.png)
-
 Вернемся на страницу **Пользователи**.
 
 <img src="img/4.Users/4.3.Table.png" alt="drawing" width="800"/>
-
-![alt text](img/4.Users/4.3.Table.png)
 
 ### 4.4. Удаление пользователя
 
