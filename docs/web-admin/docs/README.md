@@ -158,15 +158,11 @@
 
 <img src="img/3.Companies/3.2.CompanyView.png" alt="drawing" height="400"/>
 
-![alt text](img/3.Companies/3.2.CompanyView.png)
-
-На странице представлена Общая информация о компании, а также информация о пользователях данной компании.
+На странице представлена общая информация о компании, а также информация о пользователях данной компании.
 
 В левом верхнем углу расположена кнопка **←​ Назад**​ для возвращения на предыдущую страницу. Возвращение происходит при нажатии на стрелку.
 
 В правом верхнем углу расположены три кнопки, предназначенные для обновления, редактирования и удаления информации.
-
-<img src="img/3.Companies/3.2.Buttons.png" alt="drawing" height="400"/>
 
 ![alt text](img/3.Companies/3.2.Buttons.png)
 
@@ -176,20 +172,14 @@
 
 <img src="img/3.Companies/3.3.Edit.png" alt="drawing" height="400"/>
 
-![alt text](img/3.Companies/3.3.Edit.png)
-
 <img src="img/3.Companies/3.3.EditAppSystem.png" alt="drawing" height="400"/>
 
-
-![alt text](img/3.Companies/3.3.EditAppSystem.png)
 
 Так как при добавлении компании мы не указывали город, то поле **Город** является пустым.
 
 Добавим город и сохраним.
 
 <img src="img/3.Companies/3.3.EditCity.png" alt="drawing" height="400"/>
-
-![alt text](img/3.Companies/3.3.EditCity.png)
 
 Новые данные уже отображены в **Общей информации**.
 
