@@ -170,24 +170,24 @@
 
 Для изменения данных компании нажмем на кнопку **Редактировать**.
 
-<img src="img/3.Companies/3.3.Edit.png" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.3.Edit.png" alt="drawing" width="800"/>
 
-<img src="img/3.Companies/3.3.EditAppSystem.png" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.3.EditAppSystem.png" alt="drawing" width="800"/>
 
 
 Так как при добавлении компании мы не указывали город, то поле **Город** является пустым.
 
 Добавим город и сохраним.
 
-<img src="img/3.Companies/3.3.EditCity.png" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.3.EditCity.png" alt="drawing" width="800"/>
 
 Новые данные уже отображены в **Общей информации**.
 
-<img src="img/3.Companies/3.3.Info.png" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.3.Info.png" alt="drawing" width="800"/>
 
 На странице **Компании** также можно просмотреть всех пользователей данной компании.
 
-<img src="img/3.Companies/3.3.CompanyUsers.png" alt="drawing" height="380"/>
+<img src="img/3.Companies/3.3.CompanyUsers.png" alt="drawing" width="800"/>
 
 На данный момент существует только один пользователь – администратор. При нажатии на имя пользователя попадем на страницу просмотра информации по выбранному пользователю. Данная страница будет подробно рассмотренa при работе с пользователями. Вернуться на страницу компании можно, нажав на стрелку **←​ Назад** в левом верхнем углу.
 
@@ -224,7 +224,7 @@
 
 Перейдем к добавлению пользователя по нажатию на кнопку **Добавить**.
 
-<img src="img/4.Users/4.1.AddERP.png" alt="drawing" width="1000"/>
+<img src="img/4.Users/4.1.AddERP.png" alt="drawing" width="800"/>
 
 <img src="img/4.Users/4.1.UserERPAppSystem.png" alt="drawing" width="800"/>
 
