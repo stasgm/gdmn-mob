@@ -27,7 +27,7 @@
 
 Далее регистрируем администратора компании.
 
-<img src="img/img/1.Register/1.SignUpAdmin.jpg" alt="drawing" height="400"/>
+<img src="img/1.Register/1.SignUpAdmin.jpg" alt="drawing" height="400"/>
 
 ## 2. Вход в учетную запись
 
@@ -44,7 +44,7 @@
 
 В центральной части страницы представлена информация о количестве компаний, пользователей и устройств.
 
-<img src="img/2.Login/2.DashboardInfo.png" alt="drawing" height="400"/>
+<img src="img/2.Login/2.DashboardInfo.png" alt="drawing" height="250"/>
 
 
 ### 2.1. Панель навигации
