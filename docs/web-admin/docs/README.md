@@ -297,8 +297,6 @@
 
 <img src="img/4.Users/4.5.SearchTable.png" alt="drawing" width="800"/>
 
-![alt text](img/4.Users/4.5.SearchTable.png)
-
 Для очищения поля необходимо нажать на крестик либо клавишу Backspace и подтвердить нажатием клавиши Enter.
 
 ### 4.6. Сортировка в таблице
@@ -311,13 +309,9 @@
 
 <img src="img/4.Users/4.6.SortUp.png" alt="drawing" width="800"/>
 
-![alt text](img/4.Users/4.6.SortUp.png)
-
 При сортировке в алфавитном порядке (по возрастанию) в выбранной колонке появляется ↑, в обратном алфавитном порядке (по убыванию) – ↓.
 
 <img src="img/4.Users/4.6.SortDown.png" alt="drawing" width="800"/>
-
-![alt text](img/4.Users/4.6.SortDown.png)
 
 ## 5. Устройства
 
