@@ -206,7 +206,7 @@
 
 Рассмотрим пункт меню **Пользователи**.
 
-![alt text](img/4.Users/4.Users.png)
+<img src="img/4.Users/4.Users.png" alt="drawing" height="400"/>
 
 Теперь администратору необходимо создать пользователя.
 
@@ -218,7 +218,7 @@
 
  Число обычных пользователей не ограничено.
 
- <img src="img/4.Users/4.UsersTable.png" alt="drawing" height="400"/>
+ <img src="img/4.Users/4.UsersTable.png" alt="drawing" width="400"/>
 
 ![alt text](img/4.Users/4.UsersTable.png)
 
