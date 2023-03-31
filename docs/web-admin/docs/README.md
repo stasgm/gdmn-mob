@@ -41,8 +41,6 @@
 <img src="img/2.Login/2.Dashboard.png" alt="drawing" height="400"/>
 
 
-![alt text](img/2.Login/2.Dashboard.png)​
-
 В центральной части страницы представлена информация о количестве компаний, пользователей и устройств.
 
 ![alt text](img/2.Login/2.DashboardInfo.png)​
