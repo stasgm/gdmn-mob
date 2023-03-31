@@ -108,7 +108,7 @@
 
 При уменьшении окна браузера до маленького размера кнопки исчезают полностью, на их месте появляется иконка меню " **⋮** ". При нажатии на нее появляются обе кнопки.
 
-<img src="img/3.Companies/3.IconButtons.png" alt="drawing" height="100"/>
+<img src="img/3.Companies/3.IconButtons.png" alt="drawing" height="180"/>
 
 
 ### 3.1. Добавление компании
@@ -136,7 +136,7 @@
 
 При повторной попытке создания компании в левом нижнем углу отобразится сообщение об ошибке, так как у администратора может быть только одна компания.
 
-<img src="img/3.Companies/3.1.Error.png" alt="drawing" height="80"/>
+<img src="img/3.Companies/3.1.Error.png" alt="drawing" height="50"/>
 
 <img src="img/3.Companies/3.1.ErrorWindow.png" alt="drawing" height="400"/>
 
@@ -156,7 +156,7 @@
 
 Перейдем на страницу просмотра данных по компании, щелкнув мышью по наименованию компании.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.2.CompanyView.png" alt="drawing" height="400"/>
 
 ![alt text](img/3.Companies/3.2.CompanyView.png)
 
@@ -166,7 +166,7 @@
 
 В правом верхнем углу расположены три кнопки, предназначенные для обновления, редактирования и удаления информации.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.2.Buttons.png" alt="drawing" height="400"/>
 
 ![alt text](img/3.Companies/3.2.Buttons.png)
 
@@ -174,11 +174,11 @@
 
 Для изменения данных компании нажмем на кнопку **Редактировать**.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.3.Edit.png" alt="drawing" height="400"/>
 
 ![alt text](img/3.Companies/3.3.Edit.png)
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.3.EditAppSystem.png" alt="drawing" height="400"/>
 
 
 ![alt text](img/3.Companies/3.3.EditAppSystem.png)
@@ -187,19 +187,19 @@
 
 Добавим город и сохраним.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.3.EditCity.png" alt="drawing" height="400"/>
 
 ![alt text](img/3.Companies/3.3.EditCity.png)
 
 Новые данные уже отображены в **Общей информации**.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.3.Info.png" alt="drawing" height="400"/>
 
 ![alt text](img/3.Companies/3.3.Info.png)
 
 На странице **Компании** также можно просмотреть всех пользователей данной компании.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.3.CompanyUsers.png" alt="drawing" height="400"/>
 
 ![alt text](img/3.Companies/3.3.CompanyUsers.png)
 
@@ -212,7 +212,7 @@
 При удалении компании удаляются также все устройства и пользователи компании, кроме администратора.
 При нажатии на кнопку **Удалить** появится диалоговое окно с подтверждением удаления.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.4.Delete" alt="drawing" height="400"/>
 
 ![alt text](img/3.Companies/3.4.Delete.png)
 
@@ -222,7 +222,7 @@
 
 Рассмотрим пункт меню **Пользователи**.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/4.Users/4.Users.png" alt="drawing" height="400"/>
 
 ![alt text](img/4.Users/4.Users.png)
 
@@ -236,7 +236,7 @@
 
  Число обычных пользователей не ограничено.
 
- <img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+ <img src="img/4.Users/4.UsersTable.png" alt="drawing" height="400"/>
 
 ![alt text](img/4.Users/4.UsersTable.png)
 
@@ -244,20 +244,20 @@
 
 Перейдем к добавлению пользователя по нажатию на кнопку **Добавить**.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/4.Users/4.1.AddERP.png" alt="drawing" height="400"/>
 
 
 ![alt text](img/4.Users/4.1.AddERP.png)
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/4.Users/4.1.UserERPAppSystem.png" alt="drawing" height="400"/>
 
 ![alt text](img/4.Users/4.1.UserERPAppSystem.png)
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/4.Users/4.1.AddUserERP.png" alt="drawing" height="400"/>
 
 ![alt text](img/4.Users/4.1.AddUserERP.png)
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/4.Users/4.1.UserERPTable.png" alt="drawing" height="400"/>
 
 ![alt text](img/4.Users/4.1.UserERPTable.png)
 
@@ -268,25 +268,23 @@
 
 После образования пользователя ERP, снова нажимаем на кнопку **Добавить**, чтобы создать обычного пользователя.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/4.Users/4.1.Add.png" alt="drawing" height="400"/>
 
 ![alt text](img/4.Users/4.1.Add.png)
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/4.Users/4.1.UserUserERP.png" alt="drawing" height="400"/>
 
 ![alt text](img/4.Users/4.1.UserUserERP.png)
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
-
 Заполним поля и сохраним.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/4.Users/4.1.AddUser.png" alt="drawing" height="400"/>
 
 ![alt text](img/4.Users/4.1.AddUser.png)
 
 Новый пользователь отобразиться в таблице.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/4.Users/4.1.UserTable.png" alt="drawing" height="400"/>
 
 ![alt text](img/4.Users/4.1.UserTable.png)
 
@@ -294,7 +292,7 @@
 
 Перейдем на страницу просмотра информации о пользователе. Для этого нажмем на имя пользователя.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/4.Users/4.2.View.png" alt="drawing" height="400"/>
 
 ![alt text](img/4.Users/4.2.View.png)
 
@@ -306,31 +304,31 @@
 
 По нажатию на кнопку **Редактировать**, на странице просмотра информации о пользователе, зайдем на страницу редактирования пользователя.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/4.Users/4.3.Edit.png" alt="drawing" height="400"/>
 
 ![alt text](img/4.Users/4.3.Edit.png)
 
 Для смены пароля необходимо нажать на кнопку **Сменить пароль**. По нажатию появляется поле для ввода пароля. Так как оно является обязательным, то нужно либо ввести новый пароль, либо нажать кнопку **Отмена** и вернуться на страницу просмотра информации о пользователе.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/4.Users/4.3.Password.png" alt="drawing" height="400"/>
 
 ![alt text](img/4.Users/4.3.Password.png)
 
 Заполним поля **Имя** и **Фамилия** нажмем **Сохранить**.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/4.Users/4.3.EditUser.png" alt="drawing" height="400"/>
 
 ![alt text](img/4.Users/4.3.EditUser.png)
 
 Новые изменения отображены в Общей информации.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/4.Users/4.3.UserInfo.png" alt="drawing" height="400"/>
 
 ![alt text](img/4.Users/4.3.UserInfo.png)
 
 Вернемся на страницу **Пользователи**.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/4.Users/4.3.Table.png" alt="drawing" height="400"/>
 
 ![alt text](img/4.Users/4.3.Table.png)
 
@@ -338,7 +336,7 @@
 
 Зайдем снова в пользователя User. При нажатии на кнопку **Удалить** появится диалоговое окно с подтверждением удаления.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/4.Users/4.4.Delete.png" alt="drawing" height="400"/>
 
 ![alt text](img/4.Users/4.4.Delete.png)
 
@@ -352,7 +350,7 @@
 
 В поле поиска введем текст и нажмем клавишу Enter. В таблице отобразятся записи, если хоть в каком-нибудь из полей найдется совпадение по искомому тексту:
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/4.Users/4.5.SearchTable.png" alt="drawing" height="400"/>
 
 ![alt text](img/4.Users/4.5.SearchTable.png)
 
@@ -366,13 +364,13 @@
 
 Произведем сортировку по колонке **Пользователь**.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/4.Users/4.6.SortUp.png" alt="drawing" height="400"/>
 
 ![alt text](img/4.Users/4.6.SortUp.png)
 
 При сортировке в алфавитном порядке (по возрастанию) в выбранной колонке появляется ↑, в обратном алфавитном порядке (по убыванию) – ↓.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/4.Users/4.6.SortDown.png" alt="drawing" height="400"/>
 
 ![alt text](img/4.Users/4.6.SortDown.png)
 
