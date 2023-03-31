@@ -283,7 +283,7 @@
 
 Зайдем снова в пользователя User. При нажатии на кнопку **Удалить** появится диалоговое окно с подтверждением удаления.
 
-<img src="img/4.Users/4.4.Delete.png" alt="drawing" height="400"/>
+<img src="img/4.Users/4.4.Delete.png" alt="drawing" height="100"/>
 
 ![alt text](img/4.Users/4.4.Delete.png)
 
