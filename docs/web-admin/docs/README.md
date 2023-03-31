@@ -198,7 +198,7 @@
 При удалении компании удаляются также все устройства и пользователи компании, кроме администратора.
 При нажатии на кнопку **Удалить** появится диалоговое окно с подтверждением удаления.
 
-<img src="img/3.Companies/3.4.Delete" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.4.Delete.png" alt="drawing" height="400"/>
 
 ![alt text](img/3.Companies/3.4.Delete.png)
 
