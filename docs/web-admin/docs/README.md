@@ -253,8 +253,6 @@
 
 <img src="img/4.Users/4.2.View.png" alt="drawing" width="800"/>
 
-![alt text](img/4.Users/4.2.View.png)
-
 Верхняя панель такая же, как и на странице просмотра компаний.
 
 На странице представлена Общая информация о пользователе, а также информация о привязанных устройствах. Так как в данный момент привязанных устройств не существует, то таблица **Устройства пользователя** пуста.
@@ -263,31 +261,29 @@
 
 По нажатию на кнопку **Редактировать**, на странице просмотра информации о пользователе, зайдем на страницу редактирования пользователя.
 
-<img src="img/4.Users/4.3.Edit.png" alt="drawing" height="400"/>
-
-![alt text](img/4.Users/4.3.Edit.png)
+<img src="img/4.Users/4.3.Edit.png" alt="drawing" width="800"/>
 
 Для смены пароля необходимо нажать на кнопку **Сменить пароль**. По нажатию появляется поле для ввода пароля. Так как оно является обязательным, то нужно либо ввести новый пароль, либо нажать кнопку **Отмена** и вернуться на страницу просмотра информации о пользователе.
 
-<img src="img/4.Users/4.3.Password.png" alt="drawing" height="400"/>
+<img src="img/4.Users/4.3.Password.png" alt="drawing" width="800"/>
 
 ![alt text](img/4.Users/4.3.Password.png)
 
 Заполним поля **Имя** и **Фамилия** нажмем **Сохранить**.
 
-<img src="img/4.Users/4.3.EditUser.png" alt="drawing" height="400"/>
+<img src="img/4.Users/4.3.EditUser.png" alt="drawing" width="800"/>
 
 ![alt text](img/4.Users/4.3.EditUser.png)
 
 Новые изменения отображены в Общей информации.
 
-<img src="img/4.Users/4.3.UserInfo.png" alt="drawing" height="400"/>
+<img src="img/4.Users/4.3.UserInfo.png" alt="drawing" width="800"/>
 
 ![alt text](img/4.Users/4.3.UserInfo.png)
 
 Вернемся на страницу **Пользователи**.
 
-<img src="img/4.Users/4.3.Table.png" alt="drawing" height="400"/>
+<img src="img/4.Users/4.3.Table.png" alt="drawing" width="800"/>
 
 ![alt text](img/4.Users/4.3.Table.png)
 
