@@ -77,6 +77,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
   const cleanDocTime = (settings.cleanDocTime as ISettingsOption<number>).data || 0;
   const refLoadType = (settings.refLoadType as ISettingsOption<boolean>).data;
   const isGetReferences = settings.getReferences?.data;
+  const autoSynchPeriod = (settings.autoSynchPeriod?.data as number) || 10;
   const deviceId = config.deviceId!;
   const appRequest = useMemo(() => mobileRequest(authDispatch, authActions), [authDispatch]);
 
@@ -326,7 +327,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
               }
             }
 
-            if (settings.autoSynchPeriod?.data && syncPeriod && settings.autoSynchPeriod?.data < syncPeriod) {
+            if (autoSynchPeriod && syncPeriod && autoSynchPeriod < syncPeriod) {
               settDispatch(
                 settingsActions.updateOption({
                   optionName: 'autoSynchPeriod',
@@ -355,6 +356,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
       addRequestNotice,
       appRequest,
       authDispatch,
+      autoSynchPeriod,
       docDispatch,
       params,
       refDispatch,
