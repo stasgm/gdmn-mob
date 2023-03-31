@@ -285,8 +285,6 @@
 
 <img src="img/4.Users/4.4.Delete.png" alt="drawing" height="100"/>
 
-![alt text](img/4.Users/4.4.Delete.png)
-
 При нажатии на кнопку **Удалить** пользователь и привязанные к нему устройства будут удалены.
 
 У администратора нет возможности удалить свою собственную учетную запись, правом на ее удаление обладает Суперадминистратор.
@@ -297,7 +295,7 @@
 
 В поле поиска введем текст и нажмем клавишу Enter. В таблице отобразятся записи, если хоть в каком-нибудь из полей найдется совпадение по искомому тексту:
 
-<img src="img/4.Users/4.5.SearchTable.png" alt="drawing" height="400"/>
+<img src="img/4.Users/4.5.SearchTable.png" alt="drawing" width="800"/>
 
 ![alt text](img/4.Users/4.5.SearchTable.png)
 
@@ -311,13 +309,13 @@
 
 Произведем сортировку по колонке **Пользователь**.
 
-<img src="img/4.Users/4.6.SortUp.png" alt="drawing" height="400"/>
+<img src="img/4.Users/4.6.SortUp.png" alt="drawing" width="800"/>
 
 ![alt text](img/4.Users/4.6.SortUp.png)
 
 При сортировке в алфавитном порядке (по возрастанию) в выбранной колонке появляется ↑, в обратном алфавитном порядке (по убыванию) – ↓.
 
-<img src="img/4.Users/4.6.SortDown.png" alt="drawing" height="400"/>
+<img src="img/4.Users/4.6.SortDown.png" alt="drawing" width="800"/>
 
 ![alt text](img/4.Users/4.6.SortDown.png)
 
