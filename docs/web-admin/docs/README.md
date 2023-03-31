@@ -206,8 +206,6 @@
 
 Рассмотрим пункт меню **Пользователи**.
 
-<img src="img/4.Users/4.Users.png" alt="drawing" height="400"/>
-
 ![alt text](img/4.Users/4.Users.png)
 
 Теперь администратору необходимо создать пользователя.
