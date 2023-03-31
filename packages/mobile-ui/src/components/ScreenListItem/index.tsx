@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity, View, StyleSheet } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusType } from '@lib/types';
@@ -55,13 +55,14 @@ const ScreenListItem = ({
           ) : null}
         </View>
         <View style={styles.details}>
+          <LargeText style={styles.textBold}>{title}</LargeText>
+
           <View style={styles.directionRow}>
-            <LargeText style={styles.textBold}>{title}</LargeText>
-          </View>
-          <View style={styles.directionRow}>
-            {subtitle ? <MediumText style={{ width: '90%' }}>{subtitle}</MediumText> : null}
-            {addInfo ? <View style={{ width: '90%' }}>{addInfo}</View> : null}
-            <View style={styles.rowCenter}>
+            <View style={localStyles.info}>
+              {subtitle ? <MediumText>{subtitle}</MediumText> : null}
+              {addInfo ? <View>{addInfo}</View> : null}
+            </View>
+            <View style={localStyles.quant}>
               <MediumText>{lineCount}</MediumText>
               <MaterialCommunityIcons name="shopping-outline" size={15} color={colors.text} style={styles.field} />
               {isFromRoute && (
@@ -78,5 +79,16 @@ const ScreenListItem = ({
     </TouchableOpacity>
   );
 };
+
+const localStyles = StyleSheet.create({
+  info: {
+    width: '75%',
+  },
+  quant: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+});
 
 export default ScreenListItem;
