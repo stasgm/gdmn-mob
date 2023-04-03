@@ -482,15 +482,15 @@
 
 После нажатия состояние автоматически меняется с **Не активно** на **Активно**.
 
-<img src="img/5.Devices/5.5.Uid.png" alt="drawing" width="200"/>
+<img src="img/5.Devices/5.5.Uid.png" alt="drawing" width="300"/>
 
 Номер также отображается в общей информации.
 
-<img src="img/5.Devices/5.5.InfoUid.png" alt="drawing" width="200"/>
+<img src="img/5.Devices/5.5.InfoUid.png" alt="drawing" width="300"/>
 
 При получении нового кода состояние снова меняется на **Не активно**.
 
-<img src="img/5.Devices/5.5.InfoCode.png" alt="drawing" width="200"/>
+<img src="img/5.Devices/5.5.InfoCode.png" alt="drawing" width="300"/>
 
 Все данные отображаются в таблице.
 
