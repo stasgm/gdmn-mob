@@ -484,19 +484,13 @@
 
 <img src="img/5.Devices/5.5.Uid.png" alt="drawing" width="200"/>
 
-![alt text](img/5.Devices/5.5.Uid.png)
-
 Номер также отображается в общей информации.
 
 <img src="img/5.Devices/5.5.InfoUid.png" alt="drawing" width="200"/>
 
-![alt text](img/5.Devices/5.5.InfoUid.png)
-
 При получении нового кода состояние снова меняется на **Не активно**.
 
 <img src="img/5.Devices/5.5.InfoCode.png" alt="drawing" width="200"/>
-
-![alt text](img/5.Devices/5.5.InfoCode.png)
 
 Все данные отображаются в таблице.
 
