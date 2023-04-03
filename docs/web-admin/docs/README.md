@@ -462,16 +462,15 @@
 Для регистрации мобильного устройства пользователя Администратору необходимо сгенерировать код активации.
 Чтобы создать его перейдем на страницу **Устройства**. В таблице в колонке **Код активации** нажмем на иконку **⟳**.
 
-<img src="img/5.Devices/5.4.2.View.png" alt="drawing" width="800"/>
-<img src="img/5.Devices/5.5.CreateCode.png" alt="drawing" width="100"/>
+<img src="img/5.Devices/5.4.2.BeforeView.png" alt="drawing" width="800"/> <img src="img/5.Devices/5.5.CreateCode.png" alt="drawing" width="150"/>
 
 При нажатия генерируется код, а состояние автоматически поменяется с **Не зарегистрировано** на **Не активно**.
 
-<img src="img/5.Devices/5.5.Code.png" alt="drawing" width="100"/>
+<img src="img/5.Devices/5.5.Code.png" alt="drawing" width="150"/>
 
 ![alt text](img/5.Devices/5.5.Code.png)
 
-<img src="img/5.Devices/5.5.StateCode.png" alt="drawing" width="100"/>
+<img src="img/5.Devices/5.5.StateCode.png" alt="drawing" width="150"/>
 
 ![alt text](img/5.Devices/5.5.StateCode.png)
 
