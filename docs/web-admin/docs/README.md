@@ -468,11 +468,7 @@
 
 При нажатия генерируется код, а состояние автоматически поменяется с **Не зарегистрировано** на **Не активно**.
 
-<img src="img/5.Devices/5.5.Code.png" alt="drawing" width="150"/>
-
-<img src="img/5.Devices/5.5.StateCode.png" alt="drawing" width="150"/>
-
-![alt text](img/5.Devices/5.5.StateCode.png)
+<img src="img/5.Devices/5.5.Code.png" alt="drawing" width="150"/> <img src="img/5.Devices/5.5.StateCode.png" alt="drawing" width="150"/>
 
 Уникальный номер присваивается устройству во время активации кода в мобильном приложении.
 
@@ -482,33 +478,29 @@
 
 Для создания нажмем на иконку **⟳** в колонке **Номер**.
 
-<img src="img/5.Devices/5.5.CreateUid.png" alt="drawing" width="200"/>
-
-![alt text](img/5.Devices/5.5.CreateUid.png)
+<img src="img/5.Devices/5.5.CreateUid.png" alt="drawing" width="150"/>
 
 После нажатия состояние автоматически меняется с **Не активно** на **Активно**.
 
-<img src="img/5.Devices/5.5.Uid.png" alt="drawing" width="400"/>
+<img src="img/5.Devices/5.5.Uid.png" alt="drawing" width="200"/>
 
 ![alt text](img/5.Devices/5.5.Uid.png)
 
 Номер также отображается в общей информации.
 
-<img src="img/5.Devices/5.5.InfoUid.png" alt="drawing" width="400"/>
+<img src="img/5.Devices/5.5.InfoUid.png" alt="drawing" width="200"/>
 
 ![alt text](img/5.Devices/5.5.InfoUid.png)
 
 При получении нового кода состояние снова меняется на **Не активно**.
 
-<img src="img/5.Devices/5.5.InfoCode.png" alt="drawing" width="400"/>
+<img src="img/5.Devices/5.5.InfoCode.png" alt="drawing" width="200"/>
 
 ![alt text](img/5.Devices/5.5.InfoCode.png)
 
 Все данные отображаются в таблице.
 
 <img src="img/5.Devices/5.5.Table.png" alt="drawing" width="800"/>
-
-![alt text](img/5.Devices/5.5.Table.png)
 
 ## 6. Процессы
 
