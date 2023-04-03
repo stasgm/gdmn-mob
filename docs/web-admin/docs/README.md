@@ -396,7 +396,7 @@
 
 Для этого вернемся в раздел **Пользователи**
 
-<img src="img/4.Users/4.3.Table.png" alt="drawing" width="950"/>
+<img src="img/4.Users/4.3.Table.png" alt="drawing" width="900"/>
 
 и зайдем на страницу просмотра пользователя gdmn. 
 
@@ -433,22 +433,15 @@
 
 <img src="img/5.Devices/5.4.2.BeforeView.png" alt="drawing" width="800"/>
 
-![alt text](img/5.Devices/5.4.2.BeforeView.png)
-
 Зайдем на страницу просмотра данного устройства Android. 
 
 <img src="img/5.Devices/5.4.2.View.png" alt="drawing" width="800"/>
 
-![alt text](img/5.Devices/5.4.2.View.png)
-
 На данной странице отображена общая информация по привязанному устройству.
-
 
 #### 5.4.3. Редактирование привязанного устройства
 
-<img src="img/5.Devices/5.4.3.Edit.png" alt="drawing" width="800"/>
-
-![alt text](img/5.Devices/5.4.3.Edit.png)
+<img src="img/5.Devices/5.4.3.Edit.png" alt="drawing" width="600"/>
 
 Если устройство активируют в мобильном приложении, то статус изменится на **Активно**. Статус можно изменить на **Заблокировано**, в этом случае оно становится заблокированным для привязанного пользователя, и пользователь не имеет доступ к устройству до тех пор, пока не сменится статус.
 
@@ -456,15 +449,11 @@
 
 <img src="img/5.Devices/5.4.3.DeviceUsers.png" alt="drawing" width="800"/>
 
-![alt text](img/5.Devices/5.4.3.DeviceUsers.png)
-
 #### 5.4.4. Удаление привязанного устройства
 
 Вернемся на страницу **Пользователи** и зайдем в пользователя User и в его привязанное устройство Android. При нажатии на кнопку **Удалить** появится диалоговое окно с подтверждением удаления.
 
-<img src="img/5.Devices/5.4.4.Delete.png" alt="drawing" width="800"/>
-
-![alt text](img/5.Devices/5.4.4.Delete.png)
+<img src="img/5.Devices/5.4.4.Delete.png" alt="drawing" width="400"/>
 
 При нажатии на кнопку **Удалить** в данном диалоговом окне привязанное устройство будет удалено.
 
@@ -473,17 +462,17 @@
 Для регистрации мобильного устройства пользователя Администратору необходимо сгенерировать код активации.
 Чтобы создать его перейдем на страницу **Устройства**. В таблице в колонке **Код активации** нажмем на иконку **⟳**.
 
-<img src="img/5.Devices/5.5.CreateCode.png" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.5.CreateCode.png" alt="drawing" width="200"/>
 
 ![alt text](img/5.Devices/5.5.CreateCode.png)
 
 При нажатия генерируется код, а состояние автоматически поменяется с **Не зарегистрировано** на **Не активно**.
 
-<img src="img/5.Devices/5.5.Code.png" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.5.Code.png" alt="drawing" width="200"/>
 
 ![alt text](img/5.Devices/5.5.Code.png)
 
-<img src="img/5.Devices/5.5.StateCode.png" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.5.StateCode.png" alt="drawing" width="200"/>
 
 ![alt text](img/5.Devices/5.5.StateCode.png)
 
@@ -495,25 +484,25 @@
 
 Для создания нажмем на иконку **⟳** в колонке **Номер**.
 
-<img src="img/5.Devices/5.5.CreateUid.png" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.5.CreateUid.png" alt="drawing" width="200"/>
 
 ![alt text](img/5.Devices/5.5.CreateUid.png)
 
 После нажатия состояние автоматически меняется с **Не активно** на **Активно**.
 
-<img src="img/5.Devices/5.5.Uid.png" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.5.Uid.png" alt="drawing" width="400"/>
 
 ![alt text](img/5.Devices/5.5.Uid.png)
 
 Номер также отображается в общей информации.
 
-<img src="img/5.Devices/5.5.InfoUid.png" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.5.InfoUid.png" alt="drawing" width="400"/>
 
 ![alt text](img/5.Devices/5.5.InfoUid.png)
 
 При получении нового кода состояние снова меняется на **Не активно**.
 
-<img src="img/5.Devices/5.5.InfoCode.png" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.5.InfoCode.png" alt="drawing" width="400"/>
 
 ![alt text](img/5.Devices/5.5.InfoCode.png)
 
