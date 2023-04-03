@@ -530,21 +530,14 @@
 
 Зайдем в текущий процесс. При нажатии на кнопку **Удалить** появится диалоговое окно с подтверждением удаления.
 
-<img src="img/7.Process/7.ProcessDelete.png" alt="drawing" width="800"/>
-
-![alt text](img/7.Process/7.ProcessDelete.png)
+<img src="img/7.Process/7.ProcessDelete.png" alt="drawing" width="400"/>
 
 При нажатии на кнопку **Удалить** в данном диалоговом окне процесс будет удален.
-
-
-
 
 ## 7. Профиль
 
 Теперь рассмотрим последний пункт – Профиль.
 
 <img src="img/6.Account/6.Profile.png" alt="drawing" width="800"/>
-
-![alt text](img/6.Account/6.Profile.png)
 
 Данная страница содержит информацию по текущей учетной записи. Здесь можно просмотреть и отредактировать данные Администратора.
