@@ -39,19 +39,19 @@
 После нажатия на кнопку **Войти** попадаем на главную страницу.
 
 
-<img src="img/2.Login/2.Dashboard.png" alt="drawing" height="400"/>
+<img src="img/2.Login/2.Dashboard.png" alt="drawing" width="800"/>
 
 
 В центральной части страницы представлена информация о количестве компаний, пользователей и устройств.
 
-<img src="img/2.Login/2.DashboardInfo.png" alt="drawing" height="180"/>
+<img src="img/2.Login/2.DashboardInfo.png" alt="drawing" width="200"/>
 
 
 ### 2.1. Панель навигации
 
 В верхней части страницы расположена панель навигации.
 
-<img src="img/2.Login/2.1.Navbar.png" alt="drawing" height="50"/>
+<img src="img/2.Login/2.1.Navbar.png" alt="drawing" width="800"/>
 
 
 В левом углу расположен логотип​, по нажатию на который можно вернуться на главную страницу из любого другого.
