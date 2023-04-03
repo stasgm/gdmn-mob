@@ -396,56 +396,37 @@
 
 Для этого вернемся в раздел **Пользователи**
 
-<img src="img/4.Users/4.3.Table.png" alt="drawing" width="800"/>
-
-![alt text](img/4.Users/4.3.Table.png)
+<img src="img/4.Users/4.3.Table.png" alt="drawing" width="950"/>
 
 и зайдем на страницу просмотра пользователя gdmn. 
 
-<img src="img/4.Users/4.5.Table.png" alt="drawing" width="800"/>
-
-![alt text](img/4.Users/4.5.Table.png)
+<img src="img/4.Users/4.5.Table.png" alt="drawing" width="950"/>
 
 В **Устройствах пользователя** нажмем на кнопку **Добавить**.
 
-<img src="img/5.Devices/5.4.1AddERP.png" alt="drawing" width="800"/>
-
-![alt text](img/5.Devices/5.4.1AddERP.png)
+<img src="img/5.Devices/5.4.1AddERP.png" alt="drawing" width="600"/>
 
 Поле **Пользователь** заполняется автоматически, его изменить нельзя. В поле **Устройство** выберем нужное.
 
-<img src="img/5.Devices/5.4.1.DeviceERPName.png" alt="drawing" width="800"/>
-
-![alt text](img/5.Devices/5.4.1.DeviceERPName.png)
-
+<img src="img/5.Devices/5.4.1.DeviceERPName.png" alt="drawing" width="400"/>
 
 По умолчанию статус устройства - **Не зарегистрировано**.
 
-<img src="img/5.Devices/5.4.1.AddDeviceERP.png" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.4.1.AddDeviceERP.png" alt="drawing" width="600"/>
 
-![alt text](img/5.Devices/5.4.1.AddDeviceERP.png)
 
 Нажимаем на сохранить, и таким образом создается привязанное устройство.
 
-<img src="img/5.Devices/5.4.1.UserERPDevices.png" alt="drawing" width="800"/>
-
-![alt text](img/5.Devices/5.4.1.UserERPDevices.png)
+<img src="img/5.Devices/5.4.1.UserERPDevices.png" alt="drawing" width="950"/>
 
 
 Теперь создадим устройство для пользователя User. Снова возращаемся в раздел **Пользователи**. Выбираем нажатием пользователя User, переходим на страницу просмотра пользователя, в Устройствах пользователя нажимаем на кнопку Добавить и выбираем Android.
 
-<img src="img/5.Devices/5.4.1.AddDevice.png" alt="drawing" width="800"/>
-
-
-![alt text](img/5.Devices/5.4.1.AddDevice.png)
+<img src="img/5.Devices/5.4.1.AddDevice.png" alt="drawing" width="600"/>
 
 Нажимаем на сохранить.
 
 <img src="img/5.Devices/5.4.1.UserDevices.png" alt="drawing" width="800"/>
-
-![alt text](img/5.Devices/5.4.1.UserDevices.png)
-
-
 
 В данной таблице сортировка возможна по всем полям.
 
