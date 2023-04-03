@@ -317,7 +317,7 @@
 
 Переходим в пункт меню Устройства.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.Device.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.Device.png)
 
