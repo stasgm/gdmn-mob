@@ -319,29 +319,23 @@
 
 <img src="img/5.Devices/5.Device.png" alt="drawing" width="800"/>
 
-![alt text](img/5.Devices/5.Device.png)
-
 Теперь администратору необходимо создать мобильное устройство, которое далее будет привязано к пользователю. Число устройств не ограничено.
 
 <img src="img/5.Devices/5.Table.png" alt="drawing" width="800"/>
-
-![alt text](img/5.Devices/5.Table.png)
 
 ### 5.1. Добавление устройства
 
 Нажав на кнопку **Добавить** создадим устройство.
 
-<img src="img/5.Devices/5.1.Add.png" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.1.Add.png" alt="drawing" width="600"/>
 
-![alt text](img/5.Devices/5.1.Add.png)
 
 Поля **Наименование устройства** и **Статус** являются обязательными для заполнения. Поля **Код активации** и **Номер** будут заполнятся далее.
 
 **Статус** может быть выбран один из четырех предложенных.
 
-<img src="img/5.Devices/5.1.State.png" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.1.State.png" alt="drawing" width="600"/>
 
-![alt text](img/5.Devices/5.1.State.png)
 
 <!-- - «Не зарегистрировано» – статус, который устройство получает при создании.
 
@@ -361,22 +355,16 @@
 
 Добавим устройство, предназначенное для пользователя ERP.
 
-<img src="img/5.Devices/5.1.AddDeviceERP.png" alt="drawing" width="800"/>
-
-![alt text](img/5.Devices/5.1.AddDeviceERP.png)
+<img src="img/5.Devices/5.1.AddDeviceERP.png" alt="drawing" width="600"/>
 
 После сохранения, новое устройство отобразилось в таблице.
 
 <img src="img/5.Devices/5.1.TableERP.png" alt="drawing" width="800"/>
 
-![alt text](img/5.Devices/5.1.TableERP.png)
-
-
 Теперь добавим устройство для обычного пользователя, нажав снова на кнопку **Добавить** на странице **Устройства** .
 
-<img src="img/5.Devices/5.1.AddDevice.png" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.1.AddDevice.png" alt="drawing" width="600"/>
 
-![alt text](img/5.Devices/5.1.AddDevice.png)
 
 Новое устройство отобразилось в таблице.
 
