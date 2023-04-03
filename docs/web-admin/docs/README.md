@@ -92,13 +92,11 @@
 
 Так как компания еще не добавлена, таблица является пустой.
 
-<img src="img/3.Companies/3.CompanyEmpty.png" alt="drawing" width="400"/>
-
+<img src="img/3.Companies/3.CompanyEmpty.png" alt="drawing" width="600"/>
 
 В правом верхнем углу расположены две кнопки, предназначенные для добавления и обновления информации.
 
 <img src="img/3.Companies/3.Buttons.png" alt="drawing" width="200"/>
-
 
 В зависимости от размера окна кнопки могут менять вид. При уменьшении окна браузера до среднего сразмера кнопки принимают вид иконок без текста.
 
@@ -115,7 +113,6 @@
 Нажмем на кнопку **Добавить** для добавления компании.
 
 <img src="img/3.Companies/3.1.Add.jpg" alt="drawing" height="400"/>
-
 
 Поле **Наименование компании** является обязательным для заполнения.
 
@@ -137,7 +134,7 @@
 
 <img src="img/3.Companies/3.1.Error.png" alt="drawing" height="50"/>
 
-<img src="img/3.Companies/3.1.ErrorWindow.png" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.1.ErrorWindow.png" alt="drawing" width="800"/>
 
 
 В таблицах предусмотрена сортировка. Подробно она будет рассмотрена на странице **Пользователи**.
@@ -155,7 +152,7 @@
 
 Перейдем на страницу просмотра данных по компании, щелкнув мышью по наименованию компании.
 
-<img src="img/3.Companies/3.2.CompanyView.png" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.2.CompanyView.png" alt="drawing" width="800"/>
 
 На странице представлена общая информация о компании, а также информация о пользователях данной компании.
 
