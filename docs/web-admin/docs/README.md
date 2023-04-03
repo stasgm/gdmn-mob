@@ -129,7 +129,7 @@
 
 После сохранения попадаем на страницу со списком компаний.
 
-<img src="img/3.Companies/3.1.CompanyTable.png" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.1.CompanyTable.png" alt="drawing" width="800"/>
 
 
 Теперь в таблице отображаются данные по компании Company – **Наименование**, **Администратор**, **Дата создания** и **Дата редактирования**.
@@ -323,7 +323,7 @@
 
 Теперь администратору необходимо создать мобильное устройство, которое далее будет привязано к пользователю. Число устройств не ограничено.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.Table.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.Table.png)
 
@@ -331,7 +331,7 @@
 
 Нажав на кнопку **Добавить** создадим устройство.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.1.Add.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.1.Add.png)
 
@@ -339,7 +339,7 @@
 
 **Статус** может быть выбран один из четырех предложенных.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.1.State.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.1.State.png)
 
@@ -361,26 +361,26 @@
 
 Добавим устройство, предназначенное для пользователя ERP.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.1.AddDeviceERP.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.1.AddDeviceERP.png)
 
 После сохранения, новое устройство отобразилось в таблице.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.1.TableERP.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.1.TableERP.png)
 
 
 Теперь добавим устройство для обычного пользователя, нажав снова на кнопку **Добавить** на странице **Устройства** .
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.1.AddDevice.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.1.AddDevice.png)
 
 Новое устройство отобразилось в таблице.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.1.Table.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.1.Table.png)
 
@@ -388,13 +388,13 @@
 
 По нажатию на наименование устройства (в таблице устройств), преходим на страницу просмотра устройства, где представлена Общая информация об устройстве, а также Информация о пользователях, к которым привязано данное устройство.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.2.View.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.2.View.png)
 
 На странице редактирования устройства можно изменить наименование устройства и его статус.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.2.Edit.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.2.Edit.png)
 
@@ -402,7 +402,7 @@
 
 При нажатии на кнопку **Удалить** появится диалоговое окно с подтверждением удаления.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.3.Delete.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.3.Delete.png)
 
@@ -416,52 +416,52 @@
 
 Для этого вернемся в раздел **Пользователи**
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/4.Users/4.3.Table.png" alt="drawing" width="800"/>
 
 ![alt text](img/4.Users/4.3.Table.png)
 
 и зайдем на страницу просмотра пользователя gdmn. 
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/4.Users/4.5.Table.png" alt="drawing" width="800"/>
 
 ![alt text](img/4.Users/4.5.Table.png)
 
 В **Устройствах пользователя** нажмем на кнопку **Добавить**.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.4.1AddERP.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.4.1AddERP.png)
 
 Поле **Пользователь** заполняется автоматически, его изменить нельзя. В поле **Устройство** выберем нужное.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.4.1.DeviceERPName.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.4.1.DeviceERPName.png)
 
 
 По умолчанию статус устройства - **Не зарегистрировано**.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.4.1.AddDeviceERP.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.4.1.AddDeviceERP.png)
 
 Нажимаем на сохранить, и таким образом создается привязанное устройство.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.4.1.UserERPDevices.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.4.1.UserERPDevices.png)
 
 
 Теперь создадим устройство для пользователя User. Снова возращаемся в раздел **Пользователи**. Выбираем нажатием пользователя User, переходим на страницу просмотра пользователя, в Устройствах пользователя нажимаем на кнопку Добавить и выбираем Android.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.4.1.AddDevice.png" alt="drawing" width="800"/>
 
 
 ![alt text](img/5.Devices/5.4.1.AddDevice.png)
 
 Нажимаем на сохранить.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.4.1.UserDevices.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.4.1.UserDevices.png)
 
@@ -471,13 +471,13 @@
 
 #### 5.4.2. Просмотр привязанного устройства
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.4.2.BeforeView.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.4.2.BeforeView.png)
 
 Зайдем на страницу просмотра данного устройства Android. 
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.4.2.View.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.4.2.View.png)
 
@@ -486,7 +486,7 @@
 
 #### 5.4.3. Редактирование привязанного устройства
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.4.3.Edit.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.4.3.Edit.png)
 
@@ -494,7 +494,7 @@
 
 Зайдем на страницу **Устройства** и выберем устройство Android. В таблице **Пользователи устройства** появился пользователь данного устройства User.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.4.3.DeviceUsers.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.4.3.DeviceUsers.png)
 
@@ -502,7 +502,7 @@
 
 Вернемся на страницу **Пользователи** и зайдем в пользователя User и в его привязанное устройство Android. При нажатии на кнопку **Удалить** появится диалоговое окно с подтверждением удаления.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.4.4.Delete.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.4.4.Delete.png)
 
@@ -513,17 +513,17 @@
 Для регистрации мобильного устройства пользователя Администратору необходимо сгенерировать код активации.
 Чтобы создать его перейдем на страницу **Устройства**. В таблице в колонке **Код активации** нажмем на иконку **⟳**.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.5.CreateCode.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.5.CreateCode.png)
 
 При нажатия генерируется код, а состояние автоматически поменяется с **Не зарегистрировано** на **Не активно**.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.5.Code.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.5.Code.png)
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.5.StateCode.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.5.StateCode.png)
 
@@ -535,31 +535,31 @@
 
 Для создания нажмем на иконку **⟳** в колонке **Номер**.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.5.CreateUid.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.5.CreateUid.png)
 
 После нажатия состояние автоматически меняется с **Не активно** на **Активно**.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.5.Uid.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.5.Uid.png)
 
 Номер также отображается в общей информации.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.5.InfoUid.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.5.InfoUid.png)
 
 При получении нового кода состояние снова меняется на **Не активно**.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.5.InfoCode.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.5.InfoCode.png)
 
 Все данные отображаются в таблице.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/5.Devices/5.5.Table.png" alt="drawing" width="800"/>
 
 ![alt text](img/5.Devices/5.5.Table.png)
 
@@ -585,15 +585,15 @@
 Процесс в определенной подсистеме компании может быть только один. При существующем процессе новый процесс по данной подсистеме не будет запущен. 
  В конфиге указывается период проверки процессов в минутах.
 
- <img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+ <img src="img/7.Process/7.ProcessFailed.png" alt="drawing" width="800"/>
 
 ![alt text](img/7.Process/7.ProcessFailed.png)
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/7.Process/7.ProcessView.png" alt="drawing" width="800"/>
 
 ![alt text](img/7.Process/7.ProcessView.png)
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/7.Process/7.ProcessFails.png" alt="drawing" width="800"/>
 
 ![alt text](img/7.Process/7.ProcessFails.png)
 
@@ -603,7 +603,7 @@
 
 Зайдем в текущий процесс. При нажатии на кнопку **Удалить** появится диалоговое окно с подтверждением удаления.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/7.Process/7.ProcessDelete.png" alt="drawing" width="800"/>
 
 ![alt text](img/7.Process/7.ProcessDelete.png)
 
@@ -616,7 +616,7 @@
 
 Теперь рассмотрим последний пункт – Профиль.
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
+<img src="img/6.Account/6.Profile.png" alt="drawing" width="800"/>
 
 ![alt text](img/6.Account/6.Profile.png)
 
