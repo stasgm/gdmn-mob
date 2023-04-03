@@ -86,29 +86,28 @@
 
 Рассмотрим подробно каждый пункт бокового меню. Начнем с пункта **Компании**.
 
-<img src="img/3.Companies/3.Company.png" alt="drawing" height="400"/>
-
+<img src="img/3.Companies/3.Company.png" alt="drawing" width="800"/>
 
 В первую очередь администратору необходимо создать компанию, в которую будут входить пользователи мобильных устройств.
 
 Так как компания еще не добавлена, таблица является пустой.
 
-<img src="img/3.Companies/3.CompanyEmpty.png" alt="drawing" height="180"/>
+<img src="img/3.Companies/3.CompanyEmpty.png" alt="drawing" width="400"/>
 
 
 В правом верхнем углу расположены две кнопки, предназначенные для добавления и обновления информации.
 
-<img src="img/3.Companies/3.Buttons.png" alt="drawing" height="50"/>
+<img src="img/3.Companies/3.Buttons.png" alt="drawing" width="200"/>
 
 
 В зависимости от размера окна кнопки могут менять вид. При уменьшении окна браузера до среднего сразмера кнопки принимают вид иконок без текста.
 
-<img src="img/3.Companies/3.Icons.png" alt="drawing" height="50"/>
+<img src="img/3.Companies/3.Icons.png" alt="drawing" width="100"/>
 
 
 При уменьшении окна браузера до маленького размера кнопки исчезают полностью, на их месте появляется иконка меню " **⋮** ". При нажатии на нее появляются обе кнопки.
 
-<img src="img/3.Companies/3.IconButtons.png" alt="drawing" height="180"/>
+<img src="img/3.Companies/3.IconButtons.png" alt="drawing" width="100"/>
 
 
 ### 3.1. Добавление компании
