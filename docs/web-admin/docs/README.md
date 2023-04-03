@@ -520,17 +520,11 @@
 
  <img src="img/7.Process/7.ProcessFailed.png" alt="drawing" width="800"/>
 
-![alt text](img/7.Process/7.ProcessFailed.png)
-
 <img src="img/7.Process/7.ProcessView.png" alt="drawing" width="800"/>
 
-![alt text](img/7.Process/7.ProcessView.png)
 
 <img src="img/7.Process/7.ProcessFails.png" alt="drawing" width="800"/>
 
-![alt text](img/7.Process/7.ProcessFails.png)
-
-<img src="img/1.Register/1.Main.jpg" alt="drawing" width="800"/>
 
 ### 6.1. Удаление процесса
 
