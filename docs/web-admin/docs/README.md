@@ -109,7 +109,7 @@
 
 Нажмем на кнопку **Добавить** для добавления компании.
 
-<img src="img/3.Companies/3.1.Add.jpg" alt="drawing" height="400"/>
+<img src="img/3.Companies/3.1.AddCompany2.png" alt="drawing" width="800"/>
 
 Поле **Наименование компании** является обязательным для заполнения.
 
