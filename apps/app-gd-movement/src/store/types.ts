@@ -64,6 +64,7 @@ export interface IMovementLine extends IEntity {
   EID?: string;
   docType?: string;
   weightCode?: string;
+  alias?: string;
   sortOrder?: number; // порядок сортировки
 }
 

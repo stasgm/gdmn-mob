@@ -18,9 +18,10 @@ import {
   EmptyList,
   SearchButton,
   navBackDrawer,
+  MediumText,
 } from '@lib/mobile-ui';
 
-import { documentActions, refSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
+import { documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -28,11 +29,13 @@ import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@l
 
 import { IDelList, IListItem } from '@lib/mobile-types';
 
-import { IDocumentType } from '@lib/types';
+import { IDocumentType, ISettingsOption } from '@lib/types';
 
 import { IMovementDocument } from '../../store/types';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { statusTypes, dataTypes, docContactTypes } from '../../utils/constants';
+import { appInventoryActions, useSelector as useInvSelector } from '../../store';
+import { IGood } from '../../store/app/types';
 
 export interface DocListProps {
   orders: IListItemProps[];
@@ -51,6 +54,7 @@ export type SectionDataProps = SectionListData<IListItemProps, DocListSectionPro
 export const DocListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'DocList'>>();
   const docDispatch = useDocThunkDispatch();
+  const dispatch = useDispatch();
 
   const { colors } = useTheme();
 
@@ -62,6 +66,34 @@ export const DocListScreen = () => {
   const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
 
   const list = useSelector((state) => state.documents.list) as IMovementDocument[];
+  const unknownGoods = useInvSelector((state) => state.appInventory.unknownGoods);
+  const settings = useSelector((state) => state.settings.data);
+  const cleanDocTime = (settings.cleanDocTime as ISettingsOption<number>).data || 0;
+
+  const [removingUnknownGoods, setRemovingUnknownGoods] = useState(false);
+  const goods = refSelectors.selectByName<IGood>('good')?.data;
+
+  useEffect(() => {
+    if (cleanDocTime > 0) {
+      const maxDocDate = new Date();
+      maxDocDate.setDate(maxDocDate.getDate() - cleanDocTime);
+      if (unknownGoods.find((item) => new Date(item.createdDate).getTime() <= maxDocDate.getTime())) {
+        dispatch(appInventoryActions.removeOldGood(maxDocDate));
+      }
+    }
+  }, [cleanDocTime, dispatch, unknownGoods]);
+
+  useEffect(() => {
+    if (unknownGoods.length > 0 && !removingUnknownGoods && goods) {
+      setRemovingUnknownGoods(true);
+      unknownGoods.forEach((item) => {
+        if (goods.find((g) => g.barcode === item.good.barcode)) {
+          dispatch(appInventoryActions.removeUnknownGood(item.good.id));
+        }
+      });
+      setRemovingUnknownGoods(false);
+    }
+  }, [dispatch, goods, removingUnknownGoods, unknownGoods]);
 
   const [delList, setDelList] = useState<IDelList>({});
   const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
@@ -302,11 +334,16 @@ export const DocListScreen = () => {
         checked={!!delList[item.id]}
         addInfo={
           <View>
-            <Text style={textStyle}>
-              {(doc.documentType.remainsField === 'fromContact'
-                ? doc.head.fromContact?.name
-                : doc.head.toContact?.name) || ''}
-            </Text>
+            {doc.head.fromContact && (
+              <MediumText
+                style={styles.rowCenter}
+              >{`${doc.documentType.fromDescription}: ${doc.head.fromContact?.name}`}</MediumText>
+            )}
+            {doc.head.toContact && (
+              <MediumText
+                style={styles.rowCenter}
+              >{`${doc.documentType.toDescription}: ${doc.head.toContact?.name}`}</MediumText>
+            )}
             <Text style={textStyle}>
               № {doc.number} на {getDateString(doc.documentDate)}
             </Text>

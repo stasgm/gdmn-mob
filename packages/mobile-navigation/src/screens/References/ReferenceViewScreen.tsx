@@ -85,6 +85,7 @@ const ReferenceViewScreen = () => {
         estimatedItemSize={60}
         ItemSeparatorComponent={Divider}
         keyExtractor={keyExtractorByIndex}
+        keyboardShouldPersistTaps={'handled'}
       />
     </AppScreen>
   );

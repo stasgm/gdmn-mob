@@ -2,6 +2,7 @@ import { INamedEntity } from '@lib/types';
 
 export type AppInventoryState = {
   readonly model: IModelData<IMDGoodRemains>;
+  readonly unknownGoods: IUnknownGoods[];
   readonly loading: boolean;
   readonly loadingData: boolean;
   readonly errorMessage: string;
@@ -72,4 +73,9 @@ export interface IEmployee extends INamedEntity {
   lastName?: string;
   middleName?: string;
   position: INamedEntity;
+}
+
+export interface IUnknownGoods {
+  good: IGood;
+  createdDate: Date;
 }

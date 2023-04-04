@@ -1,1 +1,0 @@
-yarn nodemon:start

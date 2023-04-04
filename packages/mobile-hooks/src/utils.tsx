@@ -1,6 +1,6 @@
 import { Alert, Linking, Platform } from 'react-native';
 
-import { IEntity, INamedEntity, IReferences } from '@lib/types';
+import { IEntity, IHeadMessage, IMessage, IMessageBody, INamedEntity, IReferences } from '@lib/types';
 import 'react-native-get-random-values';
 import { customAlphabet } from 'nanoid';
 
@@ -185,6 +185,50 @@ const deleteSelectedLineItems = (deleteDocs: () => void) =>
     },
   ]);
 
+const AsyncAlert = (title: string, message: string, okText = 'Да', noText = 'Отмена') => {
+  return new Promise((resolve) => {
+    Alert.alert(
+      title,
+      message,
+      [
+        {
+          text: okText,
+          onPress: () => resolve('YES'),
+        },
+        { text: noText, onPress: () => resolve('NO') },
+      ],
+      { cancelable: false },
+    );
+  });
+};
+
+const isIHeadMessage = (obj: any): obj is IHeadMessage =>
+  typeof obj === 'object' &&
+  'appSystem' in obj &&
+  'company' in obj &&
+  'producer' in obj &&
+  'consumer' in obj &&
+  'dateTime' in obj &&
+  'order' in obj &&
+  'deviceId' in obj;
+
+const isIMessageBody = (obj: any): obj is IMessageBody =>
+  typeof obj === 'object' &&
+  'type' in obj &&
+  typeof obj.type === 'string' &&
+  'version' in obj &&
+  typeof obj.version === 'number' &&
+  'payload' in obj &&
+  typeof obj.payload === 'object';
+
+const isIMessage = (obj: any): obj is IMessage =>
+  typeof obj === 'object' &&
+  'head' in obj &&
+  isIHeadMessage(obj.head) &&
+  'status' in obj &&
+  'body' in obj &&
+  isIMessageBody(obj.body);
+
 export {
   truncate,
   log,
@@ -205,4 +249,8 @@ export {
   getDelLineList,
   deleteSelectedLineItems,
   sleep,
+  AsyncAlert,
+  isIHeadMessage,
+  isIMessage,
+  isIMessageBody,
 };

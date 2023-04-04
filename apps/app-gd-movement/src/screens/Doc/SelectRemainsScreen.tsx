@@ -29,6 +29,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { getRemGoodListByContact } from '../../utils/helpers';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IMovementDocument, IMovementLine } from '../../store/types';
+import { useSelector as useInvSelector } from '../../store';
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import { DocLineDialog } from './components/DocLineDialog';
@@ -51,14 +52,17 @@ export const SelectRemainsScreen = () => {
 
   const [filterVisible, setFilterVisible] = useState(false);
 
-  const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
+  const settings = useSelector((state) => state.settings?.data);
+  const isScanerReader = settings?.scannerUse?.data;
+  const showZeroRemains = settings?.showZeroRemains?.data;
+  const isInputQuantity = settings?.quantityInput?.data;
 
   const document = docSelectors.selectByDocId<IMovementDocument>(docId);
 
   const goods = refSelectors.selectByName<IGood>('good')?.data;
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
   const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
-  const isInputQuantity = useSelector((state) => state.settings?.data?.quantityInput?.data);
+  const unknownGoods = useInvSelector((state) => state.appInventory.unknownGoods);
 
   const documentType = useMemo(
     () => documentTypes?.find((d) => d.id === document?.documentType.id),
@@ -71,15 +75,36 @@ export const SelectRemainsScreen = () => {
     [document?.head?.fromContact?.id, document?.head?.toContact?.id, documentType?.remainsField],
   );
 
-  const [goodRemains] = useState<IRemGood[]>(() =>
-    contactId ? getRemGoodListByContact(goods, remains[contactId], documentType?.isRemains) : [],
+  const noZeroRemains = useMemo(
+    () => !!documentType?.isControlRemains && !showZeroRemains && !!documentType?.isRemains,
+    [documentType?.isControlRemains, documentType?.isRemains, showZeroRemains],
   );
+
+  const goodRemains = useMemo<IRemGood[]>(() => {
+    return contactId
+      ? getRemGoodListByContact(
+          goods.concat(unknownGoods.map((item) => item.good)).sort((a, b) => (a.name < b.name ? -1 : 1)),
+          remains[contactId],
+          documentType?.isRemains,
+          noZeroRemains,
+        )
+      : [];
+  }, [contactId, documentType?.isRemains, goods, noZeroRemains, remains, unknownGoods]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredList, setFilteredList] = useState<IFilteredList>({
     searchQuery: '',
     goodRemains,
   });
+
+  useEffect(
+    () =>
+      setFilteredList({
+        searchQuery: '',
+        goodRemains,
+      }),
+    [goodRemains],
+  );
 
   useEffect(() => {
     if (searchQuery !== filteredList.searchQuery) {
@@ -92,7 +117,8 @@ export const SelectRemainsScreen = () => {
         const lower = searchQuery.toLowerCase();
 
         const fn = isNaN(Number(lower))
-          ? ({ good }: IRemGood) => good.name?.toLowerCase().includes(lower)
+          ? ({ good }: IRemGood) =>
+              good.name?.toLowerCase().includes(lower) || good.alias?.toLowerCase().includes(lower)
           : ({ good }: IRemGood) =>
               good.barcode?.includes(searchQuery) ||
               good.name?.toLowerCase().includes(lower) ||
@@ -157,6 +183,8 @@ export const SelectRemainsScreen = () => {
             remains: selectedLine.remains,
             price: selectedLine.price,
             buyingPrice: selectedLine.buyingPrice,
+            barcode: selectedLine.barcode,
+            alias: selectedLine.alias,
           },
         });
         setSelectedLine(undefined);
@@ -171,6 +199,8 @@ export const SelectRemainsScreen = () => {
             remains: selectedGood.remains,
             price: selectedGood.price,
             buyingPrice: selectedGood.buyingPrice,
+            barcode: selectedGood.good.barcode,
+            alias: selectedGood.good.alias,
           },
         });
         setSelectedGood(undefined);
@@ -185,6 +215,8 @@ export const SelectRemainsScreen = () => {
             remains: item.remains,
             price: item.price,
             buyingPrice: item.buyingPrice,
+            barcode: item.good.barcode,
+            alias: item.good.alias,
           },
         });
       }
@@ -361,7 +393,12 @@ const localStyles = StyleSheet.create({
     fontWeight: 'bold',
     opacity: 0.9,
   },
-  lineView: { display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginTop: 6 },
+  lineView: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 6,
+  },
   lineChip: {
     margin: 2,
   },

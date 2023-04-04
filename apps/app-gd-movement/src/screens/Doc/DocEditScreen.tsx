@@ -37,7 +37,7 @@ export const DocEditScreen = () => {
   const { colors } = useTheme();
 
   const documents = useSelector((state) =>
-    state.documents.list.filter((i) => i.documentType.name === 'prihod' || i.documentType.name === 'inventory'),
+    state.documents.list.filter((i) => i.documentType.subtype === 'inventory'),
   ) as IMovementDocument[];
 
   const documentTypes = refSelectors
