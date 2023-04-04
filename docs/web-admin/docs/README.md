@@ -24,19 +24,17 @@
 
 Так как это первая регистрация, то пользователь автоматически становится суперадминистратором.
 
-Далее регистрируем администратора компании.
+Далее выходим из учётной записи суперадминистратора и регистрируем администратора компании.
 
-<img src="img/1.Register/1.SignUpAdmin.jpg" alt="drawing" height="400"/>
+<img src="img/1.Register/1.SignUpAdmin2.png" alt="drawing" width="800"/>
 
 ## 2. Вход в учетную запись
 
 Для входа в систему администрирования вводим имя пользователя и пароль администратора.
 
-<img src="img/2.Login/2.SignInAdmin.jpg" alt="drawing" height="400"/>
-
+<img src="img/2.Login/2.SignInAdmin2.png" alt="drawing" width="800"/>
 
 После нажатия на кнопку **Войти** попадаем на главную страницу.
-
 
 <img src="img/2.Login/2.Dashboard.png" alt="drawing" width="800"/>
 
