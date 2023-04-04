@@ -14,14 +14,13 @@
 
 По нажатию переходим на страницу регистрации.
 
-<img src="img/1.Register/1.SignUpWindow.jpg" alt="drawing" height="400"/>
+<img src="img/1.Register/1.SignUpWindow2.png" alt="drawing" width="800"/>
 
 Для регистрации необходимо заполнить поля **Учетная запись** и **Пароль**, **Повторите Пароль** и нажать на кнопку **Зарегистрироваться**.
 
 Поле **Email** является необязательным, его можно будет заполнить при редактировании пользователя.
 
-<img src="img/1.Register/1.SignUpSuperadmin.jpg" alt="drawing" height="400"/>
-
+<img src="img/1.Register/1.SignUpSuperadmin2.png" alt="drawing" width="800"/>
 
 Так как это первая регистрация, то пользователь автоматически становится суперадминистратором.
 
