@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useLayoutEffect, useEffect } from 'react';
-import { View, FlatList } from 'react-native';
+import { View } from 'react-native';
 import { Divider, Searchbar } from 'react-native-paper';
-import { useScrollToTop, RouteProp, useRoute, useNavigation } from '@react-navigation/native';
+import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
 import { SubTitle, ItemSeparator, SearchButton, AppScreen, navBackButton } from '@lib/mobile-ui';
 
 import { refSelectors } from '@lib/store';
@@ -54,10 +54,6 @@ const ReferenceViewScreen = () => {
       </AppScreen>
     );
   }
-
-  const ref = React.useRef<FlatList<INamedEntity>>(null);
-
-  useScrollToTop(ref);
 
   const renderItem = ({ item }: { item: INamedEntity }) => <ReferenceItem item={item} refName={refName} />;
 
