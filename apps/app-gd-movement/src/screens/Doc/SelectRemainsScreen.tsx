@@ -185,6 +185,7 @@ export const SelectRemainsScreen = () => {
             buyingPrice: selectedLine.buyingPrice,
             barcode: selectedLine.barcode,
             alias: selectedLine.alias,
+            sortOrder: (document?.lines?.length || 0) + 1,
           },
         });
         setSelectedLine(undefined);
@@ -201,6 +202,7 @@ export const SelectRemainsScreen = () => {
             buyingPrice: selectedGood.buyingPrice,
             barcode: selectedGood.good.barcode,
             alias: selectedGood.good.alias,
+            sortOrder: (document?.lines?.length || 0) + 1,
           },
         });
         setSelectedGood(undefined);
@@ -217,11 +219,12 @@ export const SelectRemainsScreen = () => {
             buyingPrice: item.buyingPrice,
             barcode: item.good.barcode,
             alias: item.good.alias,
+            sortOrder: (document?.lines?.length || 0) + 1,
           },
         });
       }
     },
-    [docId, isInputQuantity, navigation, selectedGood, selectedLine],
+    [docId, document?.lines?.length, isInputQuantity, navigation, selectedGood, selectedLine],
   );
 
   const handleEditLine = useCallback(() => {
