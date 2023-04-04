@@ -8,7 +8,7 @@
 
 ## 1. Регистрация пользователя
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/1.Register/1.Main2.png" alt="drawing" width="800"/>
 
 При первом подключении необходимо пройти регистрацию. Для этого необходимо нажать на **Зарегистрироваться**​.
 
@@ -202,7 +202,7 @@
 
 Рассмотрим пункт меню **Пользователи**.
 
-<img src="img/4.Users/4.Users.png" alt="drawing" height="400"/>
+<img src="img/4.Users/4.Users.png" alt="drawing" width="800"/>
 
 Теперь администратору необходимо создать пользователя.
 
