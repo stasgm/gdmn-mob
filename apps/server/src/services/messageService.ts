@@ -58,6 +58,7 @@ const addOne = async ({
     producerId,
     consumerId: newMessage.head.consumerId,
     deviceId,
+    commandType: newMessage.body.type,
   };
 
   return await messages.insert(newMessage, { companyId, appSystemName: appSystem.name }, fileInfo);

@@ -13,6 +13,11 @@ import { generateId } from '../helpers';
 
 import { CollectionItem } from './CollectionItem';
 
+const getRegExp = (isNewFormat: boolean): RegExp => {
+  if (isNewFormat) return /(.+)_from_(.+)_to_(.+)_dev_(.+)_t_(.+)\.json/gi;
+  return /(.+)_from_(.+)_to_(.+)_dev_(.+)\.json/gi;
+};
+
 /**
  *
  * @param fileName Имя файла без пути, но с расширением.
@@ -20,7 +25,8 @@ import { CollectionItem } from './CollectionItem';
  */
 
 export const messageFileName2params = (fileName: string): IFileMessageInfo => {
-  const re = /(.+)_from_(.+)_to_(.+)_dev_(.+)\.json/gi;
+  const isNewFormat = fileName.includes('_t_');
+  const re = getRegExp(isNewFormat);
   const match = re.exec(fileName);
 
   if (!match) {
@@ -32,11 +38,12 @@ export const messageFileName2params = (fileName: string): IFileMessageInfo => {
     producerId: match[2],
     consumerId: match[3],
     deviceId: match[4],
+    commandType: isNewFormat ? match[5] : 'undefined',
   };
 };
 
-export const params2messageFileName = ({ id, producerId, consumerId, deviceId }: IFileMessageInfo) =>
-  `${id}_from_${producerId}_to_${consumerId}_dev_${deviceId}.json`;
+export const params2messageFileName = ({ id, producerId, consumerId, deviceId, commandType }: IFileMessageInfo) =>
+  `${id}_from_${producerId}_to_${consumerId}_dev_${deviceId}_t_${commandType}.json`;
 
 /**
  * @template T

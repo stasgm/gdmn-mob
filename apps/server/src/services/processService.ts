@@ -147,6 +147,7 @@ export const prepareById = ({
       producerId: producerId,
       consumerId: newMes.head.consumerId,
       deviceId: newMes.head.deviceId,
+      commandType: newMes.body.type,
     });
 
     if (newMes.status === 'PROCESSED_INCORRECT' || newMes.status === 'PROCESSED_DEADLOCK') {
