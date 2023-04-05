@@ -33,17 +33,19 @@ export type MessageType = ICmd | IDocument[] | IReferences | IUserSettings | IAp
 
 export type IMessage<T = MessageType> = ISimpleMessage<T> | IMultipartMessage;
 
+export interface IMessageBody<T = MessageType> {
+  type: BodyType;
+  version: number;
+  payload: T;
+}
+
 export interface ISimpleMessage<T = MessageType> {
   id: string;
   status: StatusType;
   errorMessage?: string;
   version?: string;
   head: IHeadMessage;
-  body: {
-    type: BodyType;
-    version: number;
-    payload: T;
-  };
+  body: IMessageBody<T>;
 }
 
 export interface IMultipartMessage extends ISimpleMessage {

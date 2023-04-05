@@ -183,6 +183,9 @@ export const SelectRemainsScreen = () => {
             remains: selectedLine.remains,
             price: selectedLine.price,
             buyingPrice: selectedLine.buyingPrice,
+            barcode: selectedLine.barcode,
+            alias: selectedLine.alias,
+            sortOrder: (document?.lines?.length || 0) + 1,
           },
         });
         setSelectedLine(undefined);
@@ -197,6 +200,9 @@ export const SelectRemainsScreen = () => {
             remains: selectedGood.remains,
             price: selectedGood.price,
             buyingPrice: selectedGood.buyingPrice,
+            barcode: selectedGood.good.barcode,
+            alias: selectedGood.good.alias,
+            sortOrder: (document?.lines?.length || 0) + 1,
           },
         });
         setSelectedGood(undefined);
@@ -211,11 +217,14 @@ export const SelectRemainsScreen = () => {
             remains: item.remains,
             price: item.price,
             buyingPrice: item.buyingPrice,
+            barcode: item.good.barcode,
+            alias: item.good.alias,
+            sortOrder: (document?.lines?.length || 0) + 1,
           },
         });
       }
     },
-    [docId, isInputQuantity, navigation, selectedGood, selectedLine],
+    [docId, document?.lines?.length, isInputQuantity, navigation, selectedGood, selectedLine],
   );
 
   const handleEditLine = useCallback(() => {
@@ -387,7 +396,12 @@ const localStyles = StyleSheet.create({
     fontWeight: 'bold',
     opacity: 0.9,
   },
-  lineView: { display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginTop: 6 },
+  lineView: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 6,
+  },
   lineChip: {
     margin: 2,
   },

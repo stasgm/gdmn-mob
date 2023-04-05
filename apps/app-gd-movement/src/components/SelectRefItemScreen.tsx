@@ -182,20 +182,12 @@ export const SelectRefItemScreen = () => {
           <ItemSeparator />
         </>
       )}
-      {/* <FlatList
-        ref={refList}
-        data={filteredList}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        ItemSeparatorComponent={ItemSeparator}
-      /> */}
       <FlashList
         data={filteredList}
         estimatedItemSize={60}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
         ListEmptyComponent={EmptyList}
-        // keyboardShouldPersistTaps="handled"
         extraData={[screenState, checkedItem]}
         keyExtractor={keyExtractor}
       />

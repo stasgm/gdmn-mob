@@ -77,14 +77,15 @@ const GoodLineScreen = () => {
 
   return (
     <>
-      <SubTitle style={[styles.title]}>{matrixItem?.name}</SubTitle>
-      <View style={[styles.content]}>
+      <SubTitle style={styles.title}>{matrixItem?.name}</SubTitle>
+      <View style={styles.content}>
         <FlashList
           data={refData}
           keyExtractor={keyExtractorByIndex}
           renderItem={renderItem}
           ItemSeparatorComponent={ItemSeparator}
           estimatedItemSize={60}
+          keyboardShouldPersistTaps={'handled'}
         />
         <ItemSeparator />
       </View>

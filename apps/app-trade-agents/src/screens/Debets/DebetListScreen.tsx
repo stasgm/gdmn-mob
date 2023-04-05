@@ -90,15 +90,10 @@ const DebetListScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  const handlePressItem = useCallback(
-    (id: string) => {
-      if (!loading) {
-        setContactId(id);
-        setVisibleDialog(true);
-      }
-    },
-    [loading],
-  );
+  const handlePressItem = useCallback((id: string) => {
+    setContactId(id);
+    setVisibleDialog(true);
+  }, []);
 
   const renderItem = useCallback(
     ({ item }: { item: IDebt }) => <DebetItem item={item} onPress={() => handlePressItem(item.id)} />,

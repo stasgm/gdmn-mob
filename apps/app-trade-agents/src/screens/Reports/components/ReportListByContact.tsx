@@ -72,9 +72,6 @@ export const ReportListByContact = () => {
         (i) =>
           (filterReportContact?.id ? i.head.contact.id === filterReportContact.id : true) &&
           (filterReportOutlet?.id ? i.head.outlet.id === filterReportOutlet.id : true) &&
-          (filterReportGood?.id
-            ? i.lines.find((item) => item.good.id === filterReportGood?.id)?.good.id === filterReportGood.id
-            : true) &&
           (filterReportDB
             ? new Date(filterReportDB).getTime() <= new Date(i.documentDate.slice(0, 10)).getTime()
             : true) &&
@@ -95,7 +92,6 @@ export const ReportListByContact = () => {
       filterReportContact,
       filterReportDB,
       filterReportDE,
-      filterReportGood,
       filterReportOnDB,
       filterReportOnDE,
       filterReportOutlet,
@@ -115,7 +111,7 @@ export const ReportListByContact = () => {
 
         if (filterReportGood) {
           cur.lines.forEach((curLine) => {
-            if (curLine.good.id === filterReportGood.id) {
+            if (filterReportGood.find((g) => g.id === curLine.good.id)) {
               if (itemIndex > -1) {
                 const oldTotalList = prev[itemIndex].totalList || [];
                 const curTotalByPackage = oldTotalList.find(

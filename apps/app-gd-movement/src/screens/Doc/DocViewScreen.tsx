@@ -329,6 +329,8 @@ export const DocViewScreen = () => {
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
           barcode: remItem.good.barcode,
           sortOrder: (lines?.length || 0) + 1,
+          alias: remItem.good.alias || '',
+          weightCode: remItem.good.weightCode?.trim() || '',
         };
       } else {
         charFrom = charTo;
@@ -341,7 +343,7 @@ export const DocViewScreen = () => {
         const qty = Number(brc.substring(charFrom, charTo)) / 1000;
 
         const remItem =
-          Object.values(goodRemains)?.find((item: IMGoodRemain) => item.good.weightCode === code) ||
+          Object.values(goodRemains)?.find((item: IMGoodRemain) => item.good.weightCode?.trim() === code) ||
           (documentType?.isRemains ? undefined : { good: { ...unknownGood, barcode: brc } });
 
         if (!remItem) {
@@ -362,6 +364,8 @@ export const DocViewScreen = () => {
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
           barcode: remItem.good.barcode,
           sortOrder: (lines?.length || 0) + 1,
+          alias: remItem.good.alias || '',
+          weightCode: remItem.good.weightCode?.trim() || '',
         };
       }
 
