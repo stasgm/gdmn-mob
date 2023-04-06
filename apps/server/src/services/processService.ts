@@ -2,7 +2,7 @@
 
 import { unlinkSync, renameSync, existsSync } from 'fs';
 
-import { IAddProcessResponse, IStatusResponse, AddProcess, IProcessedFiles, NewMessage } from '@lib/types';
+import { IAddProcessResponse, IStatusResponse, AddProcess, IProcessedFiles, NewMessage, ICmd } from '@lib/types';
 
 import log from '../utils/logger';
 
@@ -142,12 +142,15 @@ export const prepareById = ({
 
   for (const mes of processedFiles) {
     const newMes = makeDBNewMessageSync(mes, producerId);
+    const commandType = (
+      newMes.body.type === 'CMD' ? (newMes.body.payload as ICmd).name : newMes.body.type
+    ).toLowerCase();
     const newFn = params2messageFileName({
       id: newMes.id,
       producerId: producerId,
       consumerId: newMes.head.consumerId,
       deviceId: newMes.head.deviceId,
-      commandType: newMes.body.type,
+      commandType: commandType,
     });
 
     if (newMes.status === 'PROCESSED_INCORRECT' || newMes.status === 'PROCESSED_DEADLOCK') {

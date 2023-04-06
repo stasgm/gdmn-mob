@@ -14,7 +14,7 @@ import { generateId } from '../helpers';
 import { CollectionItem } from './CollectionItem';
 
 const getRegExp = (isNewFormat: boolean): RegExp => {
-  if (isNewFormat) return /(.+)_from_(.+)_to_(.+)_dev_(.+)_t_(.+)\.json/gi;
+  if (isNewFormat) return /(.+)_from_(.+)_to_(.+)_dev_(.+)__(.+)\.json/gi;
   return /(.+)_from_(.+)_to_(.+)_dev_(.+)\.json/gi;
 };
 
@@ -25,7 +25,7 @@ const getRegExp = (isNewFormat: boolean): RegExp => {
  */
 
 export const messageFileName2params = (fileName: string): IFileMessageInfo => {
-  const isNewFormat = fileName.includes('_t_');
+  const isNewFormat = fileName.includes('__');
   const re = getRegExp(isNewFormat);
   const match = re.exec(fileName);
 
@@ -42,9 +42,10 @@ export const messageFileName2params = (fileName: string): IFileMessageInfo => {
   };
 };
 
-export const params2messageFileName = ({ id, producerId, consumerId, deviceId, commandType }: IFileMessageInfo) =>
-  `${id}_from_${producerId}_to_${consumerId}_dev_${deviceId}_t_${commandType}.json`;
-
+export const params2messageFileName = ({ id, producerId, consumerId, deviceId, commandType }: IFileMessageInfo) => {
+  const commandtypestr = commandType !== 'undefined' ? `__${commandType}` : '';
+  return `${id}_from_${producerId}_to_${consumerId}_dev_${deviceId}${commandtypestr}.json`;
+};
 /**
  * @template T
  */

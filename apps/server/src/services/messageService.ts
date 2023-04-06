@@ -1,4 +1,4 @@
-import { IDBMessage, IFileMessageInfo, IMessage, NewMessage } from '@lib/types';
+import { ICmd, IDBMessage, IFileMessageInfo, IMessage, NewMessage } from '@lib/types';
 
 import { DataNotFoundException, InnerErrorException } from '../exceptions';
 import { generateId } from '../utils/helpers';
@@ -53,12 +53,16 @@ const addOne = async ({
 
   const newMessage = await makeDBNewMessage(msgObject, producerId, deviceId);
 
+  const commandType = (
+    newMessage.body.type === 'CMD' ? (newMessage.body.payload as ICmd).name : newMessage.body.type
+  ).toLowerCase();
+
   const fileInfo: IFileMessageInfo = {
     id: newMessage.id,
     producerId,
     consumerId: newMessage.head.consumerId,
     deviceId,
-    commandType: newMessage.body.type,
+    commandType: commandType,
   };
 
   return await messages.insert(newMessage, { companyId, appSystemName: appSystem.name }, fileInfo);
