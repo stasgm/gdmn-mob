@@ -434,7 +434,7 @@
 
 Для увеличения области окна с данными отчета, можно скрывать форму параметров, нажатием на иконку фильтрации <img src="img/1.Connection/7.IconFiltr.jpg" alt="drawing" height="20"/>.
 
-<img src="img/4.Returns/4.ReportWithoutFiltr.jpg" alt="drawing" height="250"/> <img src="img/4.Returns/4.ReportWithFiltr.jpg" alt="drawing" height="250"/>
+<img src="img/4.Returns/4.ReportWithoutFiltr.jpg" alt="drawing" height="400"/> <img src="img/4.Returns/4.ReportWithFiltr.jpg" alt="drawing" height="400"/>
 
 На экране **Отчёты** можно ПРОСМОТРЕТЬ ДАННЫЕ о сделанных заявках:
   - по названию организации
@@ -443,7 +443,7 @@
   - по статусу заявки
   - в определённый период (по дате отгрузки или по дате создания документа)
 
-  <img src="img/4.Returns/4.Report.jpg" alt="drawing" height="400"/>
+<img src="img/4.Returns/4.Report.jpg" alt="drawing" height="400"/>
 
 А в правом верхнем углу отображен компонент с выпадающим списком отчетов: 
 
@@ -458,7 +458,6 @@
  Если есть необходимость просмотреть не только саму заявку, а, например, и ещё отгруженные позиции, то надо перейти в пункт меню **Заявки** и воспользоваться фильтром, так как в **Отчёте** отображается только список магазинов по товару.
  
  <img src="img/4.Returns/4.AgainReport.jpg" alt="drawing" height="400"/>
-
 
 ## 9. Маршруты
 
