@@ -1,14 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  useWindowDimensions,
-  Alert,
-  ColorValue,
-  FlatList,
-} from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, useWindowDimensions, Alert, ColorValue } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
@@ -18,14 +9,14 @@ import { useTheme } from 'react-native-paper';
 
 import { ScrollView } from 'react-native-gesture-handler';
 
-import { FlashList } from '@shopify/flash-list';
+// import { FlashList } from '@shopify/flash-list';
 
-import { keyExtractor } from '@lib/mobile-hooks';
+// import { keyExtractor } from '@lib/mobile-hooks';
 
 import { ICell, ICellRef, IMoveDocument, IMoveLine } from '../store/types';
 import { MoveStackParamList } from '../navigation/Root/types';
 
-import { getCellItem, getCellList, jsonFormat } from '../utils/helpers';
+import { getCellItem, getCellList } from '../utils/helpers';
 import { ICellRefList, ICellsData } from '../store/app/types';
 
 export interface ICellList extends ICell, ICellRef {
@@ -38,7 +29,6 @@ export const SelectCellScreen = () => {
 
   const { docId, item, mode } = useRoute<RouteProp<MoveStackParamList, 'SelectCell'>>().params;
 
-  // console.log('item', item);
   const doc = docSelectors.selectByDocId<IMoveDocument>(docId);
 
   const cells = refSelectors.selectByName<ICellRefList>('cell').data[0];
@@ -50,39 +40,22 @@ export const SelectCellScreen = () => {
 
   const departId = useMemo(
     () => (doc?.head.fromDepart.isAddressStore && !fromCell ? doc?.head.fromDepart.id : doc?.head.toDepart.id),
-    [doc?.head.fromDepart.id, doc?.head.fromDepart.isAddressStore, doc?.head.toDepart.id, fromCell],
+    [doc?.head, fromCell],
   );
 
   const docsLines = (
-    useSelector((state) => state.documents.list)
-      // ?.filter(
-      //   (i) =>
-      //     (doc?.head?.fromDepart?.isAddressStore && doc?.head?.toDepart?.isAddressStore
-      //       ? i.head?.fromDepart?.id === doc?.head?.toDepart?.id && i.head?.toDepart?.id === doc?.head?.fromDepart?.id
-      //       : (i.head?.fromDepart?.isAddressStore && i.head?.fromDepart?.id === doc?.head?.fromDepart?.id) ||
-      //         (i.head?.toDepart?.isAddressStore && i.head?.toDepart?.id === doc?.head?.toDepart?.id)) &&
-      //     i.documentType?.name === 'movement' &&
-      //     i.lines?.find((e) => (e as IMoveLine).fromCell || (e as IMoveLine).toCell),
-      // )
-      ?.filter(
-        (i) =>
-          i.documentType?.name === 'movement' &&
-          (i?.head?.fromDepart.id === departId || i?.head?.toDepart.id === departId),
-      ) as IMoveDocument[]
+    useSelector((state) => state.documents.list)?.filter(
+      (i) =>
+        i.documentType?.name === 'movement' &&
+        i.status !== 'PROCESSED' &&
+        (i?.head?.fromDepart.id === departId || i?.head?.toDepart.id === departId),
+    ) as IMoveDocument[]
   ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
-  // console.log('docs', jsonFormat(docsLines));
 
   const lines = docsLines.reduce((prev: IMoveLine[], cur) => {
-    // const lines = docsLines.reduce((prev: ICellRef[], cur) => {
-    // const curLines = cur.lines.map((i) => {
-    //   // const cell = ;
-    //   return { name: i.toCell || '', barcode: i.barcode || '', disabled: false };
-    // });
     prev = [...prev, ...cur.lines];
     return prev;
   }, []);
-
-  console.log('lineslines', jsonFormat(lines));
 
   const cellList = getCellList(cells[departId || ''] || [], lines || []);
 
@@ -226,51 +199,6 @@ export const SelectCellScreen = () => {
     [OFFSET, colors.text, groupButtonStyle, windowWidth],
   );
 
-  // const renderGood = useCallback(
-  //   ({ item }: { item: IGood }) => {
-  //     // const lines = doc?.lines?.filter((i) => i.good.id === item.id);
-  //     // const isAdded = !!lines?.length;
-  //     // const iconStyle = [styles.icon, { backgroundColor: isAdded ? '#06567D' : '#E91E63' }];
-
-  //     // const goodStyle = {
-  //     //   backgroundColor: isAdded ? globalColors.backgroundLight : 'transparent',
-  //     // };
-  //     const colorBack = '#d5dce3';
-
-  //     return (
-  //       <View key={keyy} style={styles.flexDirectionRow}>
-  //         {vall?.map((i) => {
-  //           const colorStyle1 = {
-  //             color: i.disabled || !i.barcode ? colors.backdrop : 'white',
-  //           };
-  //           const backColorStyle1 = {
-  //             backgroundColor:
-  //               (fromCell && fromCell.barcode === i.barcode) || (toCell && toCell.barcode === i.barcode)
-  //                 ? colors.notification
-  //                 : i.barcode
-  //                 ? '#226182'
-  //                 : i.disabled
-  //                 ? colors.disabled
-  //                 : colorBack,
-  //           };
-  //           return (
-  //             <TouchableOpacity
-  //               key={i.name}
-  //               style={[localStyles.buttons, backColorStyle1]}
-  //               onPress={() => handleSaveLine(i, keyy)}
-  //               disabled={
-  //                 (doc.head.fromDepart.isAddressStore && !fromCell ? !i.barcode : Boolean(i.barcode)) || i.disabled
-  //               }
-  //             >
-  //               <Text style={[localStyles.buttonLabel, colorStyle1]}>{i.cell}</Text>
-  //             </TouchableOpacity>
-  //           );
-  //         })}
-  //       </View>
-  //     );
-  //   },
-  //   [colors.primary, doc?.lines, docId],
-  // );
   if (!doc) {
     return (
       <View style={[styles.container, styles.alignItemsCenter]}>
@@ -279,12 +207,6 @@ export const SelectCellScreen = () => {
     );
   }
 
-  // console.log('from', fromCell);
-
-  console.log(
-    'cellList[selectedChamber][selectedRow]',
-    selectedChamber && selectedRow ? cellList?.[selectedChamber][selectedRow] : [],
-  );
   return (
     <View style={localStyles.groupItem}>
       {fromCell ? (
@@ -311,28 +233,16 @@ export const SelectCellScreen = () => {
             title="Ряд"
           />
         ) : null}
-        {/* <FlashList
-        data={filterVisible ? goodsByContact : goodModel}
-        renderItem={renderGood}
-        ListHeaderComponent={filterVisible ? undefined : renderGroupHeader}
-        estimatedItemSize={60}
-        // ItemSeparatorComponent={ItemSeparator}
-        keyExtractor={keyExtractor}
-        extraData={[doc?.lines, docId]}
-        numColumns
-      /> */}
         {selectedRow && selectedChamber && (
           <View style={styles.flexDirectionRow}>
             <View style={styles.directionColumn}>
               {Object.keys(cellList[selectedChamber][selectedRow])
                 .reverse()
-                .map((keyy) => {
-                  // const colorStyle = { color: 'white' };
-                  // const backColorStyle = { backgroundColor: colors.accent };
+                .map((row) => {
                   return (
-                    <View key={keyy} style={[localStyles.flexColumn, localStyles.height]}>
+                    <View key={row} style={[localStyles.flexColumn, localStyles.height]}>
                       <View style={[localStyles.row]}>
-                        <Text style={[localStyles.buttonLabel /*, colorStyle*/]}>{keyy}</Text>
+                        <Text style={localStyles.buttonLabel}>{row}</Text>
                       </View>
                     </View>
                   );
@@ -342,11 +252,11 @@ export const SelectCellScreen = () => {
               <View style={styles.directionColumn}>
                 {Object.entries(cellList[selectedChamber][selectedRow])
                   .reverse()
-                  .map(([keyy, vall]) => {
+                  .map(([row, celll]) => {
                     const colorBack = '#d5dce3';
                     return (
-                      <View key={keyy} style={styles.flexDirectionRow}>
-                        {vall?.map((i) => {
+                      <View key={row} style={styles.flexDirectionRow}>
+                        {celll?.map((i) => {
                           const colorStyle1 = {
                             color: i.disabled || !i.barcode ? colors.backdrop : 'white',
                           };
@@ -364,7 +274,7 @@ export const SelectCellScreen = () => {
                             <TouchableOpacity
                               key={i.name}
                               style={[localStyles.buttons, backColorStyle1]}
-                              onPress={() => handleSaveLine(i, keyy)}
+                              onPress={() => handleSaveLine(i, row)}
                               disabled={
                                 (doc.head.fromDepart.isAddressStore && !fromCell ? !i.barcode : Boolean(i.barcode)) ||
                                 i.disabled
@@ -383,86 +293,6 @@ export const SelectCellScreen = () => {
         )}
       </ScrollView>
     </View>
-    // <View style={localStyles.groupItem}>
-    //   <Group
-    //     values={Object.keys(cellList)}
-    //     onPress={(i) => setSelectedChamber(i)}
-    //     selected={selectedChamber}
-    //     colorBack="#d5dce3"
-    //     colorSelected={colors.placeholder}
-    //     title="Камера"
-    //   />
-    //   {selectedChamber ? (
-    //     <Group
-    //       values={Object.keys(cellList[selectedChamber])}
-    //       onPress={(i) => setSelectedRow(i)}
-    //       selected={selectedRow}
-    //       colorBack="#dbd5da"
-    //       colorSelected="#854875"
-    //       title="Ряд"
-    //     />
-    //   ) : null}
-    //   {selectedRow && selectedChamber && (
-    //     <ScrollView
-    //       horizontal
-    //       showsHorizontalScrollIndicator={false}
-    //       directionalLockEnabled={true}
-    //       alwaysBounceVertical={false}
-    //     >
-    //       <FlatList
-    //         contentContainerStyle={{ alignSelf: 'flex-start' }}
-    //         numColumns={Object.keys(cellList[selectedChamber][selectedRow])?.length}
-    //         showsVerticalScrollIndicator={false}
-    //         showsHorizontalScrollIndicator={false}
-    //         data={cellList[selectedChamber][selectedRow]}
-    //         // renderItem={({ item, index }) => {
-    //         //   //push your code
-    //         // }}
-    //         renderItem={(arr: any) => (
-    //           <View style={styles.directionColumn}>
-    //             {Object.entries(arr)
-    //               .reverse()
-    //               .map(([keyy, vall]) => {
-    //                 const colorBack = '#d5dce3';
-    //                 return (
-    //                   <View key={keyy} style={styles.flexDirectionRow}>
-    //                     {vall?.map((i) => {
-    //                       const colorStyle1 = {
-    //                         color: i.disabled || !i.barcode ? colors.backdrop : 'white',
-    //                       };
-    //                       const backColorStyle1 = {
-    //                         backgroundColor:
-    //                           (fromCell && fromCell.barcode === i.barcode) || (toCell && toCell.barcode === i.barcode)
-    //                             ? colors.notification
-    //                             : i.barcode
-    //                             ? '#226182'
-    //                             : i.disabled
-    //                             ? colors.disabled
-    //                             : colorBack,
-    //                       };
-    //                       return (
-    //                         <TouchableOpacity
-    //                           key={i.name}
-    //                           style={[localStyles.buttons, backColorStyle1]}
-    //                           onPress={() => handleSaveLine(i, keyy)}
-    //                           disabled={
-    //                             (doc.head.fromDepart.isAddressStore && !fromCell ? !i.barcode : Boolean(i.barcode)) ||
-    //                             i.disabled
-    //                           }
-    //                         >
-    //                           <Text style={[localStyles.buttonLabel, colorStyle1]}>{i.cell}</Text>
-    //                         </TouchableOpacity>
-    //                       );
-    //                     })}
-    //                   </View>
-    //                 );
-    //               })}
-    //           </View>
-    //         )}
-    //       />
-    //     </ScrollView>
-    //   )}
-    // </View>
   );
 };
 
@@ -518,3 +348,73 @@ const localStyles = StyleSheet.create({
   },
   height: { height: 50 },
 });
+
+/* <View style={{ flex: 1 }}>
+<FlashList
+  data={Object.entries(cellList[selectedChamber][selectedRow]).reverse()}
+  renderItem={renderGood}
+  // ListHeaderComponent={filterVisible ? undefined : renderGroupHeader}
+  estimatedItemSize={78}
+  // ItemSeparatorComponent={ItemSeparator}
+  keyExtractor={keyExtractor}
+  extraData={[
+    colors.backdrop,
+    colors.disabled,
+    colors.notification,
+    doc?.head.fromDepart.isAddressStore,
+    fromCell,
+    handleSaveLine,
+    toCell,
+  ]}
+/>
+</View> */
+
+// const renderGood = useCallback(
+//   ({ item }: { item: any }) => {
+//     const row = item?.[0];
+//     console.log('row, ', row);
+//     const celll = item?.[1];
+//     // console.log('1235', jsonFormat(item));
+//     const colorBack = '#d5dce3';
+//     return (
+//       <View key={row} style={styles.flexDirectionRow}>
+//       {celll?.map((i) => {
+//           const colorStyle1 = {
+//             color: i.disabled || !i.barcode ? colors.backdrop : 'white',
+//           };
+//           const backColorStyle1 = {
+//             backgroundColor:
+//               (fromCell && fromCell.barcode === i.barcode) || (toCell && toCell.barcode === i.barcode)
+//                 ? colors.notification
+//                 : i.barcode
+//                 ? '#226182'
+//                 : i.disabled
+//                 ? colors.disabled
+//                 : colorBack,
+//           };
+//           return (
+//             <TouchableOpacity
+//               key={i.name}
+//               style={[localStyles.buttons, backColorStyle1]}
+//               onPress={() => handleSaveLine(i, row)}
+//               disabled={
+//                 (doc.head.fromDepart.isAddressStore && !fromCell ? !i.barcode : Boolean(i.barcode)) || i.disabled
+//               }
+//             >
+//               <Text style={[localStyles.buttonLabel, colorStyle1]}>{i.cell}</Text>
+//             </TouchableOpacity>
+//           );
+//         })}
+//       </View>
+//     );
+//   },
+//   [
+//     colors.backdrop,
+//     colors.disabled,
+//     colors.notification,
+//     doc?.head.fromDepart.isAddressStore,
+//     fromCell,
+//     handleSaveLine,
+//     toCell,
+//   ],
+// );

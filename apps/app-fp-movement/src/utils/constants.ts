@@ -182,6 +182,15 @@ export const appSettings: Settings = {
     visible: true,
     group: goodGroup,
   },
+  boxNumber: {
+    id: 'boxNumber',
+    sortOrder: 15,
+    description: 'Количество коробок',
+    data: 35,
+    type: 'number',
+    visible: true,
+    group: goodGroup,
+  },
   countOrderBarcodeLentgh: {
     id: 'countOrderBarcodeLentgh',
     sortOrder: 15,

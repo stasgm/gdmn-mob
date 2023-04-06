@@ -55,7 +55,7 @@ const ScanGoodScreen = () => {
 
   const tempOrder = useFpSelector((state) => state.fpMovement.list).find((i) => i.orderId === shipment?.head?.orderId);
 
-  const minBarcodeLength = settings.minBarcodeLength?.data || 0;
+  const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
 
   const handleGetScannedObject = useCallback(
     (brc: string) => {
@@ -170,13 +170,30 @@ const ScanGoodScreen = () => {
         (shipment?.head.subtype.id === 'prihod' && shipment?.head.toDepart.isAddressStore) ||
         (shipment?.head.subtype.id !== 'prihod' && shipment?.head.fromDepart.isAddressStore)
       ) {
+        if (scannedObject.quantPack < goodBarcodeSettings.boxNumber) {
+          Alert.alert('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}!`, [
+            { text: 'OK' },
+          ]);
+          setScaner({ state: 'init' });
+          return;
+        }
         navigation.navigate('SelectCell', { docId, item: scannedObject, mode: 0 });
       } else {
         dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
       }
       setScaner({ state: 'init' });
     }
-  }, [scannedObject, tempOrder, shipment, fpDispatch, dispatch, docId, navigation]);
+  }, [
+    scannedObject,
+    tempOrder,
+    shipment?.documentType.name,
+    shipment?.head,
+    fpDispatch,
+    dispatch,
+    docId,
+    goodBarcodeSettings.boxNumber,
+    navigation,
+  ]);
 
   const handleClearScaner = () => setScaner({ state: 'init' });
 
