@@ -130,16 +130,10 @@ export const useSync = (onSync?: () => Promise<any>) => {
 
       //Если часть сборного сообщения, то удаляем его файл
       if ('multipartId' in msg) {
-        const removeMess = await api.message.removeMessage(appRequest, msg.id, params);
-        if (removeMess.type !== 'REMOVE_MESSAGE') {
-          addError(
-            'useSync: api.message.removeMessage',
-            `Часть справочников сохранена, но сообщение с id=${msg.id} на сервере не удалено. ${removeMess.message}`,
-            tempErrs,
-          );
-        }
+        await removeMes(`Часть справочников сохранена, но сообщение с id=${msg.id} на сервере не удалено.`);
         return;
       }
+
       switch (msg.body.type as BodyType) {
         case 'CMD':
           //TODO: обработка
@@ -157,7 +151,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
           }
 
           if (msg.status === 'PROCESSED_DEADLOCK' || msg.status === 'PROCESSED_INCORRECT') {
-            removeMes(`Сообщение справочников с id=${msg.id} на сервере не удалено.`);
+            await removeMes(`Сообщение справочников с id=${msg.id} на сервере не удалено.`);
             break;
           }
 
@@ -174,7 +168,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
               if (multipartId) {
                 dispatch(messageActions.removeMultipartItem(multipartId));
               } else {
-                removeMes(`Справочники загружены, но сообщение с id=${msg.id} на сервере не удалено.`);
+                await removeMes(`Справочники загружены, но сообщение с id=${msg.id} на сервере не удалено.`);
               }
             } else if (setRefResponse.type === 'REFERENCES/SET_ALL_FAILURE') {
               addError('useSync: setReferences', 'Справочники не загружены в хранилище', tempErrs);
@@ -185,7 +179,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
 
             //Если удачно сохранились справочники, удаляем сообщение в json
             if (addRefResponse.type === 'REFERENCES/ADD_SUCCESS') {
-              removeMes(`Справочники загружены, но сообщение с id=${msg.id} на сервере не удалено.`);
+              await removeMes(`Справочники загружены, но сообщение с id=${msg.id} на сервере не удалено.`);
             } else if (addRefResponse.type === 'REFERENCES/ADD_FAILURE') {
               addError('useSync: addReferences', 'Справочники не добавлены в хранилище', tempErrs);
             }
@@ -206,7 +200,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
           }
 
           if (msg.status === 'PROCESSED_DEADLOCK' || msg.status === 'PROCESSED_INCORRECT') {
-            removeMes(`Сообщение справочника с id=${msg.id} на сервере не удалено.`);
+            await removeMes(`Сообщение справочника с id=${msg.id} на сервере не удалено.`);
             break;
           }
 
@@ -224,7 +218,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
               if (multipartId) {
                 dispatch(messageActions.removeMultipartItem(multipartId));
               } else {
-                removeMes(`Справочник загружен, но сообщение с id=${msg.id} на сервере не удалено.`);
+                await removeMes(`Справочник загружен, но сообщение с id=${msg.id} на сервере не удалено.`);
               }
             } else if (setRefResponse.type === 'REFERENCES/SET_ONE_FAILURE') {
               addError('useSync: setOneReference', `Справочник ${refName} не загружен в хранилище`, tempErrs);
@@ -247,7 +241,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
           }
 
           if (msg.status === 'PROCESSED_DEADLOCK' || msg.status === 'PROCESSED_INCORRECT') {
-            removeMes(`Сообщение документов с id=${msg.id} на сервере не удалено.`);
+            await removeMes(`Сообщение документов с id=${msg.id} на сервере не удалено.`);
             break;
           }
 
@@ -282,7 +276,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
           }
 
           if (msg.status === 'PROCESSED_DEADLOCK' || msg.status === 'PROCESSED_INCORRECT') {
-            removeMes(`Cообщение настроек пользователя с id=${msg.id} на сервере не удалено.`);
+            await removeMes(`Cообщение настроек пользователя с id=${msg.id} на сервере не удалено.`);
             break;
           }
 
@@ -294,7 +288,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
 
           //Если удачно сохранились настройки, удаляем сообщение в json
           if (setUserSettingsResponse.type === 'AUTH/SET_USER_SETTINGS_SUCCESS') {
-            removeMes(`Настройки пользователя загружены, но сообщение с id=${msg.id} на сервере не удалено.`);
+            await removeMes(`Настройки пользователя загружены, но сообщение с id=${msg.id} на сервере не удалено.`);
           } else if (setUserSettingsResponse.type === 'AUTH/SET_USER_SETTINGS_FAILURE') {
             addError('useSync: setUserSettings', 'Настройки пользователя не загружены в хранилище', tempErrs);
           }
@@ -314,7 +308,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
           }
 
           if (msg.status === 'PROCESSED_DEADLOCK' || msg.status === 'PROCESSED_INCORRECT') {
-            removeMes(`Cообщение настроек подсистемы с id=${msg.id} на сервере не удалено.`);
+            await removeMes(`Cообщение настроек подсистемы с id=${msg.id} на сервере не удалено.`);
             break;
           }
 
@@ -373,7 +367,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
               );
             }
 
-            removeMes(`Настройки подсистемы загружены, но сообщение с id=${msg.id} на сервере не удалено.`);
+            await removeMes(`Настройки подсистемы загружены, но сообщение с id=${msg.id} на сервере не удалено.`);
           } catch (err) {
             addError('useSync', `Настройки приложения не загружены в хранилище: ${err}`, tempErrs);
           }
@@ -419,7 +413,6 @@ export const useSync = (onSync?: () => Promise<any>) => {
           `Не определены данные: пользователь ${user?.name}, компания ${company?.name}, подсистема ${appSystem?.name}, пользователь ERP ${user?.erpUser?.name}`,
           tempErrs,
         );
-        // withError = true;
       } else {
         // Если нет функции из пропсов
         if (!onSync) {
@@ -496,33 +489,36 @@ export const useSync = (onSync?: () => Promise<any>) => {
               let getMessagesResponse = await api.message.getMessages(appRequest, {
                 appSystemId: appSystem.id,
                 companyId: company.id,
+                limitFiles: '1',
               });
 
               //Если сообщения получены успешно, то
               //  справочники: очищаем старые и записываем в хранилище новые данные
               //  документы: добавляем новые, а старые заменяем, только если был статус 'DRAFT'
               //  отправляем запросы за остальными данными
-              if (getMessagesResponse.type === 'GET_MESSAGES') {
-                while (getMessagesResponse.type === 'GET_MESSAGES' && getMessagesResponse.messageList.length > 0) {
-                  for (const message of getMessagesResponse.messageList) {
-                    //Получая сообщение(я) у которого присутствует признак multipartId, помещаем его в хранилище
-                    //Файл сообщения удаляем
-                    if ('multipartId' in message) {
-                      const addMultipartMessResponse = dispatch(messageActions.addMultipartMessage(message));
-                      if (addMultipartMessResponse.type === 'MESSAGES/ADD_MULTIPART_MESSAGE') {
-                        await processMessage(message, tempErrs);
-                      }
-                    } else {
+              // if (getMessagesResponse.type === 'GET_MESSAGES') {
+              while (getMessagesResponse.type === 'GET_MESSAGES' && getMessagesResponse.messageList.length > 0) {
+                for (const message of getMessagesResponse.messageList) {
+                  //Получая сообщение(я) у которого присутствует признак multipartId, помещаем его в хранилище
+                  //Файл сообщения удаляем
+                  if ('multipartId' in message) {
+                    const addMultipartMessResponse = dispatch(messageActions.addMultipartMessage(message));
+                    if (addMultipartMessResponse.type === 'MESSAGES/ADD_MULTIPART_MESSAGE') {
                       await processMessage(message, tempErrs);
                     }
+                  } else {
+                    await processMessage(message, tempErrs);
                   }
-
-                  getMessagesResponse = await api.message.getMessages(appRequest, {
-                    appSystemId: appSystem.id,
-                    companyId: company.id,
-                  });
                 }
 
+                getMessagesResponse = await api.message.getMessages(appRequest, {
+                  appSystemId: appSystem.id,
+                  companyId: company.id,
+                  limitFiles: '1',
+                });
+              }
+
+              if (getMessagesResponse.type === 'GET_MESSAGES') {
                 const state = store.getState() as RootState;
                 //Обрабатываем все сборные сообщения
                 for (const [key, value] of Object.entries(state.messages.multipartData as IMultipartData)) {
