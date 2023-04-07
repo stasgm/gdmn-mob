@@ -6,7 +6,9 @@
   },
   "watch": ["src/"],
   "env": {
-    "NODE_ENV": "dev"
+    "NODE_ENV": "development"
   },
   "ext": "js,json,ts"
 }
+
+

@@ -31,13 +31,15 @@ export interface IRefCmd {
 
 export type MessageType = ICmd | IDocument[] | IReferences | IUserSettings | IAppSystemSettings;
 
+export type IMessage<T = MessageType> = ISimpleMessage<T> | IMultipartMessage;
+
 export interface IMessageBody<T = MessageType> {
   type: BodyType;
   version: number;
   payload: T;
 }
 
-export interface IMessage<T = MessageType> {
+export interface ISimpleMessage<T = MessageType> {
   id: string;
   status: StatusType;
   errorMessage?: string;
@@ -46,9 +48,21 @@ export interface IMessage<T = MessageType> {
   body: IMessageBody<T>;
 }
 
-export type NewMessage = Omit<IMessage, 'head' | 'id'> & {
+export interface IMultipartMessage extends ISimpleMessage {
+  multipartId: string;
+  multipartSeq: number;
+  multipartEOF?: boolean;
+}
+
+export type SimpleNewMessage = Omit<ISimpleMessage, 'head' | 'id'> & {
   head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
 };
+
+export type MultipartNewMessage = Omit<IMultipartMessage, 'head' | 'id'> & {
+  head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
+};
+
+export type NewMessage = SimpleNewMessage | MultipartNewMessage;
 
 export interface IDataMessage<T = any> {
   id: string;
@@ -70,8 +84,16 @@ export interface IDBHeadMessage extends Omit<IHeadMessage, 'company' | 'producer
   consumerId: string;
 }
 
-export interface IDBMessage<T = MessageType> extends Omit<IMessage<T>, 'head'> {
+export type IDBMessage<T = MessageType> = IDBSimpleMessage<T> | IDBMultipartMessage;
+
+export interface IDBSimpleMessage<T = MessageType> extends Omit<ISimpleMessage<T>, 'head'> {
   head: IDBHeadMessage;
+}
+
+export interface IDBMultipartMessage extends IDBSimpleMessage {
+  multipartId: string;
+  multipartSeq: number;
+  multipartEOF?: boolean;
 }
 
 export interface IFileMessageInfo {
@@ -79,6 +101,7 @@ export interface IFileMessageInfo {
   producerId: string;
   consumerId: string;
   deviceId: string;
+  commandType: string;
 }
 
 export interface ICheckTransafer {

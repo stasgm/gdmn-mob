@@ -51,7 +51,6 @@ const OrderEditScreen = () => {
   // Подразделение по умолчанию
   const departSetting = useSelector((state) => state.auth.user?.settings?.depart?.data);
   const defaultDepart = useMemo(() => (isNamedEntity(departSetting) ? departSetting : undefined), [departSetting]);
-
   const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === docOutlet?.id);
 
   useEffect(() => {

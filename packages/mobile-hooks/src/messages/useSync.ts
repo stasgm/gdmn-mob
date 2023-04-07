@@ -1,3 +1,5 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   appActions,
   authActions,
@@ -10,6 +12,10 @@ import {
   useRefThunkDispatch,
   useSelector,
   useSettingThunkDispatch,
+  messageActions,
+  useAppStore,
+  IMultipartData,
+  RootState,
 } from '@lib/store';
 
 import api, { isConnectError } from '@lib/client-api';
@@ -30,7 +36,7 @@ import { generateId, getDateString, isIMessage, isIReferences, isNumeric } from 
 
 import { mobileRequest } from '../mobileRequest';
 
-import { getNextOrder } from './helpers';
+import { getNextOrder, MULTIPART_ITEM_LIVE_IN_MS } from './helpers';
 import { useSaveErrors } from './useSaveErrors';
 
 export const useSync = (onSync?: () => Promise<any>) => {
@@ -80,6 +86,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
   const autoSynchPeriod = (settings.autoSynchPeriod?.data as number) || 10;
   const deviceId = config.deviceId!;
   const appRequest = useMemo(() => mobileRequest(authDispatch, authActions), [authDispatch]);
+  const store = useAppStore();
 
   const refVersion = 1;
   const docVersion = 1;
@@ -93,7 +100,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
   );
 
   const processMessage = useCallback(
-    async (msg: IMessage, tempErrs: IDeviceLog[]) => {
+    async (msg: IMessage, tempErrs: IDeviceLog[], multipartId?: string) => {
       if (!msg || !params) {
         return;
       }
@@ -121,6 +128,18 @@ export const useSync = (onSync?: () => Promise<any>) => {
         }
       };
 
+      //Если часть сборного сообщения, то удаляем его файл
+      if ('multipartId' in msg) {
+        const removeMess = await api.message.removeMessage(appRequest, msg.id, params);
+        if (removeMess.type !== 'REMOVE_MESSAGE') {
+          addError(
+            'useSync: api.message.removeMessage',
+            `Часть справочников сохранена, но сообщение с id=${msg.id} на сервере не удалено. ${removeMess.message}`,
+            tempErrs,
+          );
+        }
+        return;
+      }
       switch (msg.body.type as BodyType) {
         case 'CMD':
           //TODO: обработка
@@ -149,15 +168,21 @@ export const useSync = (onSync?: () => Promise<any>) => {
           if (refLoadType) {
             //Записываем новые справочники из сообщения
             const setRefResponse = await refDispatch(referenceActions.setReferences(loadRefs));
+
             //Если удачно сохранились справочники, удаляем сообщение в json
             if (setRefResponse.type === 'REFERENCES/SET_ALL_SUCCESS') {
-              removeMes(`Справочники загружены, но сообщение с id=${msg.id} на сервере не удалено.`);
+              if (multipartId) {
+                dispatch(messageActions.removeMultipartItem(multipartId));
+              } else {
+                removeMes(`Справочники загружены, но сообщение с id=${msg.id} на сервере не удалено.`);
+              }
             } else if (setRefResponse.type === 'REFERENCES/SET_ALL_FAILURE') {
               addError('useSync: setReferences', 'Справочники не загружены в хранилище', tempErrs);
             }
           } else {
             //Записываем новые справочники из сообщения
             const addRefResponse = await refDispatch(referenceActions.addReferences(loadRefs));
+
             //Если удачно сохранились справочники, удаляем сообщение в json
             if (addRefResponse.type === 'REFERENCES/ADD_SUCCESS') {
               removeMes(`Справочники загружены, но сообщение с id=${msg.id} на сервере не удалено.`);
@@ -188,12 +213,19 @@ export const useSync = (onSync?: () => Promise<any>) => {
           if (isIReferences(msg.body.payload)) {
             const loadRef = Object.entries(msg.body.payload);
             const [refName, refData] = loadRef[0];
+
             addRequestNotice(`Сохранение справочника ${refName}`);
+
             //Записываем новый справочник из сообщения
             const setRefResponse = await refDispatch(referenceActions.setOneReference({ refName, refData }));
+
             //Если удачно сохранился справочник, удаляем сообщение в json
             if (setRefResponse.type === 'REFERENCES/SET_ONE_SUCCESS') {
-              removeMes(`Справочник загружен, но сообщение с id=${msg.id} на сервере не удалено.`);
+              if (multipartId) {
+                dispatch(messageActions.removeMultipartItem(multipartId));
+              } else {
+                removeMes(`Справочник загружен, но сообщение с id=${msg.id} на сервере не удалено.`);
+              }
             } else if (setRefResponse.type === 'REFERENCES/SET_ONE_FAILURE') {
               addError('useSync: setOneReference', `Справочник ${refName} не загружен в хранилище`, tempErrs);
             }
@@ -225,7 +257,9 @@ export const useSync = (onSync?: () => Promise<any>) => {
             await removeMes(`Сообщение документов с пустыми данными с id=${msg.id} на сервере не удалено.`);
           } else {
             addRequestNotice(`Сохранение документов (${loadDocs.length})`);
+
             const setDocResponse = await docDispatch(documentActions.setDocuments(loadDocs));
+
             //Если удачно сохранились документы, удаляем сообщение в json
             if (setDocResponse.type === 'DOCUMENTS/SET_ALL_SUCCESS') {
               await removeMes(`Документы загружены, но сообщение с id=${msg.id} на сервере не удалено.`);
@@ -343,7 +377,6 @@ export const useSync = (onSync?: () => Promise<any>) => {
           } catch (err) {
             addError('useSync', `Настройки приложения не загружены в хранилище: ${err}`, tempErrs);
           }
-
           break;
         }
 
@@ -357,6 +390,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
       appRequest,
       authDispatch,
       autoSynchPeriod,
+      dispatch,
       docDispatch,
       params,
       refDispatch,
@@ -459,29 +493,92 @@ export const useSync = (onSync?: () => Promise<any>) => {
             if (!connectError) {
               addRequestNotice('Получение данных');
               //2. Получаем все сообщения для мобильного
-              const getMessagesResponse = await api.message.getMessages(appRequest, {
+              let getMessagesResponse = await api.message.getMessages(appRequest, {
                 appSystemId: appSystem.id,
                 companyId: company.id,
               });
 
               //Если сообщения получены успешно, то
               //  справочники: очищаем старые и записываем в хранилище новые данные
-              //  документы: добавляем новые, а старые заменеям только если был статус 'DRAFT'
+              //  документы: добавляем новые, а старые заменяем, только если был статус 'DRAFT'
               //  отправляем запросы за остальными данными
               if (getMessagesResponse.type === 'GET_MESSAGES') {
-                const sortedMessages = getMessagesResponse.messageList.sort((a, b) => a.head.order - b.head.order);
-                for (const message of sortedMessages) {
-                  // eslint-disable-next-line no-await-in-loop
-                  await processMessage(message, tempErrs);
+                while (getMessagesResponse.type === 'GET_MESSAGES' && getMessagesResponse.messageList.length > 0) {
+                  for (const message of getMessagesResponse.messageList) {
+                    //Получая сообщение(я) у которого присутствует признак multipartId, помещаем его в хранилище
+                    //Файл сообщения удаляем
+                    if ('multipartId' in message) {
+                      const addMultipartMessResponse = dispatch(messageActions.addMultipartMessage(message));
+                      if (addMultipartMessResponse.type === 'MESSAGES/ADD_MULTIPART_MESSAGE') {
+                        await processMessage(message, tempErrs);
+                      }
+                    } else {
+                      await processMessage(message, tempErrs);
+                    }
+                  }
+
+                  getMessagesResponse = await api.message.getMessages(appRequest, {
+                    appSystemId: appSystem.id,
+                    companyId: company.id,
+                  });
                 }
 
-                // addError('useSync: api.message.sendMessages', new Date().toISOString(), tempErrs);
-                // withError = true;
-                // await Promise.all(
-                //   getMessagesResponse.messageList
-                //     .sort((a, b) => a.head.order - b.head.order)
-                //     ?.map((message) => processMessage(message, errList, okList, params)),
-                // );
+                const state = store.getState() as RootState;
+                //Обрабатываем все сборные сообщения
+                for (const [key, value] of Object.entries(state.messages.multipartData as IMultipartData)) {
+                  //Если присутствуют идентификаторы последовательностей, с момента последнего сообщения в которых прошло более заданного промежутка (например, 1 час),
+                  //то вся недопринятая последовательность удаляется, в лог помещается ошибка.
+                  if (new Date().getTime() - new Date(value.lastLoadDate).getTime() > MULTIPART_ITEM_LIVE_IN_MS) {
+                    dispatch(messageActions.removeMultipartItem(key));
+                    addError(
+                      'useSync: removeMultipartItem',
+                      'Сборные справочники не загружены, не все файлы пришли вовремя',
+                      tempErrs,
+                    );
+                  } else if (value.messages.find((m) => m.multipartEOF)) {
+                    //Если получено сообщение, помеченное как последнее в последовательности
+                    const sortedMessages = value.messages.sort((a, b) => a.multipartSeq - b.multipartSeq);
+                    let isAll = true;
+                    let c = 0;
+                    for (; c < sortedMessages.length && isAll; c++) {
+                      if (c + 1 !== sortedMessages[c].multipartSeq) {
+                        isAll = false;
+                      }
+                    }
+                    //Если в последовательности все номера,
+                    //сообщения из последовательности сливается в одно большое сообщение (т.е. данные/массивы сливаются в один поток).
+                    if (isAll) {
+                      const newPayload = sortedMessages.reduce((prev: IReferences, cur) => {
+                        for (const [refName, refData] of Object.entries(cur.body.payload)) {
+                          const data = prev[refName]?.data || [];
+                          prev[refName] = prev[refName]
+                            ? { ...prev[refName], data: [...data, ...refData.data] }
+                            : refData;
+                        }
+
+                        return prev;
+                      }, {});
+                      //Данные для общего сообщения берем из первого сообщения
+                      const firstMessage = sortedMessages[0];
+                      const { multipartId, multipartSeq, multipartEOF, ...rest } = firstMessage;
+                      const newMessage: IMessage = {
+                        ...rest,
+                        body: { ...firstMessage.body, payload: newPayload },
+                      };
+
+                      await processMessage(newMessage, tempErrs, multipartId);
+                    } else {
+                      //Если в последовательности пропущен хотя бы один номер,
+                      //то вся последовательность удаляется из памяти, в лог заносится сообщение об ошибке.
+                      dispatch(messageActions.removeMultipartItem(key));
+                      addError(
+                        'useSync: removeMultipartItem',
+                        'Сборные справочники не загружены, пришли не все файлы',
+                        tempErrs,
+                      );
+                    }
+                  }
+                }
 
                 if (isGetReferences) {
                   //Формируем запрос на получение справочников для следующего раза

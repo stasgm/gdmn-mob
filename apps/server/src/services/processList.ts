@@ -156,7 +156,7 @@ const getPath = (folders: string[], fn = '') => {
 };
 
 const getPathSystem = ({ companyId, appSystemId }: IMessageParams) =>
-  `DB_${companyId}/${getDb().appSystems.findById(appSystemId)?.name}`;
+  `db_${companyId}/${getDb().appSystems.findById(appSystemId)?.name}`;
 
 export const getPathPrepared = (params: IMessageParams, fn = '') => getPath([getPathSystem(params), 'prepared'], fn);
 export const getPathMessages = (params: IMessageParams, fn = '') => getPath([getPathSystem(params), 'messages'], fn);
@@ -378,7 +378,7 @@ export const makeMessageSync = (message: IDBMessage): IMessage => {
   const company = users.getNamedItem(message.head.companyId);
   const appSystem = users.getNamedItem(message.head.appSystemId);
 
-  return {
+  const newMessage = {
     id: message.id,
     head: {
       appSystem,
@@ -393,10 +393,18 @@ export const makeMessageSync = (message: IDBMessage): IMessage => {
     errorMessage: message.errorMessage,
     body: message.body,
   };
+  return 'multipartId' in message
+    ? {
+        ...newMessage,
+        multipartId: message.multipartId,
+        multipartSeq: message.multipartSeq,
+        multipartEOF: message.multipartEOF,
+      }
+    : newMessage;
 };
 
 export const makeDBNewMessageSync = (message: NewMessage, producerId: string): IDBMessage => {
-  return {
+  const newDBMessage = {
     id: generateId(),
     head: {
       appSystemId: message.head.appSystem.id,
@@ -412,6 +420,14 @@ export const makeDBNewMessageSync = (message: NewMessage, producerId: string): I
     errorMessage: message.errorMessage,
     body: message.body,
   };
+  return 'multipartId' in message
+    ? {
+        ...newDBMessage,
+        multipartId: message.multipartId,
+        multipartSeq: message.multipartSeq,
+        multipartEOF: message.multipartEOF,
+      }
+    : newDBMessage;
 };
 
 export const makeProcess = (process: IDBProcess): IProcess => {

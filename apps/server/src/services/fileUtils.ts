@@ -78,13 +78,12 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
   }
 
   const getRx = (str: string): RegExp => {
-    if (str.includes('_to_')) return /_from_(.+)_to_(.+)_dev_(.+)\.json/gi;
-    return /from_(.+)_dev_(.+)\.json/gi;
+    const isNewFormat = str.includes('__');
+    const isMess = str.includes('_to_');
+    if (!(isNewFormat && isMess)) return /from_(.+)_dev_(.+)\.json/gi;
+    if (isNewFormat) return /_from_(.+)_to_(.+)_dev_(.+)__(.+)\.json/gi;
+    return /_from_(.+)_to_(.+)_dev_(.+)\.json/gi;
   };
-
-  //const reMessage = arr[3].includes('_to_') ?
-  //  /_from_(.+)_to_(.+)_dev_(.+)\.json/gi
-  //: /from_(.+)_dev_(.+)\.json/gi;
 
   const reMessage = getRx(arr[3]);
   const matchMessage = reMessage.exec(arr[3]);
@@ -124,7 +123,7 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
     appSystem: appSystemName && appSystemName ? { id: appSystemId, name: appSystemName } : undefined,
     producer: producerName ? { id: producerId, name: producerName } : undefined,
     consumer: consumerId && consumerName ? { id: consumerId, name: consumerName } : undefined,
-    device: deviceId && deviceName ? { id: deviceId, name: deviceName } : undefined,
+    device: deviceUid && deviceName ? { id: deviceUid, name: deviceName } : undefined,
   };
 };
 

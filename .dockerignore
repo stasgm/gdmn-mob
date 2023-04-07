@@ -1,0 +1,10 @@
+**/.vscode/
+**/node_modules/
+
+**/docker-compose.yaml
+**/Dockerfile
+**/.dockerignore
+**/.git
+**/.gitignore
+
+readme.md

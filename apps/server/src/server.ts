@@ -18,6 +18,8 @@ import { historyApiFallback } from 'koa2-connect-history-api-fallback';
 
 import { IUser } from '@lib/types';
 
+import dotenv from 'dotenv';
+
 import koaConfig from '../config/koa';
 
 import config from '../config';
@@ -35,7 +37,6 @@ import { MSEС_IN_MIN, MSEС_IN_DAY } from './utils/constants';
 
 interface IServer {
   name: string;
-  port: number;
   dbName: string;
   dbPath: string;
 }
@@ -147,7 +148,7 @@ export const startServer = (app: KoaApp) => {
    * HTTPS сервер с платным сертификатом
    */
 
-  const cert = fs.readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.crt'));
+  /*   const cert = fs.readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.crt'));
   const key = fs.readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.key'));
 
   const ca = fs
@@ -160,8 +161,8 @@ export const startServer = (app: KoaApp) => {
     throw new Error('No CA file or file is invalid');
   }
 
-  https.createServer({ cert, ca, key }, koaCallback).listen(config.HTTPS_PORT, () =>
-    log.info(`>>> HTTPS server is running at
-  http://localhost:${config.HTTPS_PORT}`),
-  );
+  https
+    .createServer({ cert, ca, key }, koaCallback)
+    .listen(config.HTTPS_PORT, () =>
+    log.info(`>>> HTTPS server is running at https://localhost:${config.HTTPS_PORT}`)); */
 };

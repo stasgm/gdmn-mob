@@ -1,10 +1,10 @@
 export default {
   server: {
-    protocol: 'http://',
-    name: 'localhost',
-    port: 3651,
+    protocol: 'https://',
+    name: 'server.gdmn.app',
+    port: 3654,
   },
-  timeout: 10000,
+  timeout: 60000,
   apiPath: 'api',
   version: 'v1',
   debug: {

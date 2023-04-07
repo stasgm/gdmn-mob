@@ -4,7 +4,7 @@ import { Divider, Searchbar } from 'react-native-paper';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
 import { SubTitle, ItemSeparator, SearchButton, AppScreen, navBackButton } from '@lib/mobile-ui';
 
-import { refSelectors } from '@lib/store';
+import { refSelectors, useSelector } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 
 import { keyExtractorByIndex } from '@lib/mobile-hooks';

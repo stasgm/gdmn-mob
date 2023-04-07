@@ -109,3 +109,6 @@ log/*
 
 # yarn
 yarn-error.log
+
+.env.development
+.env.production
