@@ -91,14 +91,14 @@ const RouteViewScreen = () => {
     }
   }, [filteredList, searchQuery, routeLineList]);
 
-  const outlets = refSelectors.selectByName<IOutlet>('outlet').data;
+  const outlets = refSelectors.selectByName<IOutlet>('outlet')?.data;
   const orders = useFilteredDocList<IOrderDocument>('order');
   const visits = useFilteredDocList<IVisitDocument>('visit');
 
   const routeList: IRouteLineItem[] | undefined = useMemo(
     () =>
       filteredList.routeLineList?.map((r) => {
-        const address = outlets.find((o) => o.id === r.outlet.id)?.address || '';
+        const address = outlets?.find((o) => o.id === r.outlet.id)?.address || '';
         const visit = visits.find((doc) => doc.head?.routeLineId === r.id);
         const status = !visit ? 0 : visit.head.dateEnd ? 2 : 1;
         const dateEnd = status === 2 && visit?.head.dateEnd ? getDateString(visit.head.dateEnd) : '';
