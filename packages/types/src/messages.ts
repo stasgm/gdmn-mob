@@ -101,6 +101,7 @@ export interface IFileMessageInfo {
   producerId: string;
   consumerId: string;
   deviceId: string;
+  commandType: string;
 }
 
 export interface ICheckTransafer {
