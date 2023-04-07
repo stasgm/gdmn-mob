@@ -35,7 +35,7 @@
     "@types/react-native": "0.70.8",
     "nanoid": "^3.3.4",
     "react": "18.1.0",
-    "react-native": "0.70.5",
+    "react-native": "0.70.8",
     "react-native-get-random-values": "^1.8.0",
     "react-native-paper": "^4.12.5",
     "react-native-reanimated": "~2.12.0",
