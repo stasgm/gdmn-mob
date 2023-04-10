@@ -9,15 +9,11 @@ import { useTheme } from 'react-native-paper';
 
 import { ScrollView } from 'react-native-gesture-handler';
 
-// import { FlashList } from '@shopify/flash-list';
-
-// import { keyExtractor } from '@lib/mobile-hooks';
-
 import { ICell, ICellRef, IMoveDocument, IMoveLine } from '../store/types';
 import { MoveStackParamList } from '../navigation/Root/types';
 
 import { getCellItem, getCellList } from '../utils/helpers';
-import { ICellRefList, ICellsData } from '../store/app/types';
+import { ICellRefList, ICellData } from '../store/app/types';
 
 export interface ICellList extends ICell, ICellRef {
   department?: string;
@@ -31,7 +27,7 @@ export const SelectCellScreen = () => {
 
   const doc = docSelectors.selectByDocId<IMoveDocument>(docId);
 
-  const cells = refSelectors.selectByName<ICellRefList>('cell').data[0];
+  const cells = refSelectors.selectByName<ICellRefList>('cell')?.data[0];
 
   const [fromCell, setFromCell] = useState<IMoveLine | undefined>(undefined);
   const [toCell, setToCell] = useState<IMoveLine | undefined>(undefined);
@@ -85,7 +81,7 @@ export const SelectCellScreen = () => {
     }
   }, [item, mode]);
 
-  const handleSaveLine = (cellData: ICellsData, tier: string) => {
+  const handleSaveLine = (cellData: ICellData, tier: string) => {
     const newCell = `${selectedChamber}-${selectedRow}-${tier}-${cellData.cell}`;
 
     if (mode === 0) {

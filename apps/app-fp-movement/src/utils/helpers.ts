@@ -37,13 +37,12 @@ export const getBarcode = (barcode: string, settings: barcodeSettings) => {
   const quantPack = barcode.slice(shcodeLast, quantPackLast);
   const numReceived = barcode.slice(quantPackLast + 1, numReceivedLast);
 
-  // console.log('quantPack', quantPack);
-  const date = new Date(Number(year), Number(month) - 1, Number(day)).toISOString();
+  const workDate = new Date(Number(year), Number(month) - 1, Number(day)).toISOString();
 
   const barcodeObj: IBarcode = {
     barcode: barcode,
     weight: Number(weight) / 1000,
-    workDate: date,
+    workDate,
     shcode: shcode,
     numReceived: numReceived,
     quantPack: Number(quantPack),
@@ -64,6 +63,7 @@ export const getCellItem = (str: string) => {
 };
 
 export const getCellList = (list: ICellRef[], lines: IMoveLine[]) => {
+  console.log('getCellList');
   const model = list?.reduce((prev: IModelData, cur) => {
     const cellItem = getCellItem(cur.name);
 

@@ -35,7 +35,7 @@ const ContactListScreen = () => {
   const [filterVisible, setFilterVisible] = useState(false);
   const { colors } = useTheme();
 
-  const cells = refSelectors.selectByName<ICellRefList>('cell').data[0];
+  const cells = refSelectors.selectByName<ICellRefList>('cell')?.data[0];
   const department = refSelectors.selectByName<IDepartment>('depart')?.data || [];
 
   const contacts = department?.filter((i) => cells?.[i.id]);

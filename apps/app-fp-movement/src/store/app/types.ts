@@ -61,13 +61,13 @@ export interface IChamberData {
 }
 
 export interface IRowData {
-  [id: string]: ICellsData[];
+  [id: string]: ICellData[];
 }
 
 export interface ICellRefList {
   [id: string]: ICellRef[];
 }
 
-export interface ICellsData extends ICellRef {
+export interface ICellData extends ICellRef {
   cell: string;
 }
