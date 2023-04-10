@@ -91,7 +91,8 @@ const FileListTable = ({
   }, [isFilterVisible]);
 
   const handleSearchClick = () => {
-    onSetPageParams({ ...pageParams, filesFilters: formik.values });
+    onSetPageParams({ ...pageParams, filesFilters: formik.values, page: 0 });
+    setPage(0);
   };
 
   const handleKeyPress = (key: string) => {

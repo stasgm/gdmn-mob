@@ -38,7 +38,7 @@ const AppSystemList = () => {
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.setPageParam({ filterText: pageParamLocal?.filterText }));
+    dispatch(actions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
     fetchAppSystems(pageParamLocal?.filterText);
   };
 
@@ -49,7 +49,7 @@ const AppSystemList = () => {
   };
 
   const handleClearSearch = () => {
-    dispatch(actions.setPageParam({ filterText: undefined }));
+    dispatch(actions.setPageParam({ filterText: undefined, page: 0 }));
     setPageParamLocal({ filterText: undefined });
     fetchAppSystems();
   };

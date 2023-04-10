@@ -84,7 +84,8 @@ const DeviceLogFilesListTable = ({
   }, [isFilterVisible]);
 
   const handleSearchClick = () => {
-    onSetPageParams({ ...pageParams, logFilters: formik.values });
+    onSetPageParams({ ...pageParams, logFilters: formik.values, page: 0 });
+    setPage(0);
   };
 
   const handleKeyPress = (key: string) => {

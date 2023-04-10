@@ -54,7 +54,7 @@ const FileList = () => {
   }, [fetchFiles, pageParams?.filesFilters]);
 
   const handleSearchClick = () => {
-    dispatch(actions.fileSystemActions.setPageParam({ filterText: pageParamLocal?.filterText }));
+    dispatch(actions.fileSystemActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
     fetchFiles(pageParamLocal?.filesFilters ? pageParamLocal?.filesFilters : undefined, pageParamLocal?.filterText);
   };
 
@@ -143,7 +143,7 @@ const FileList = () => {
   const handleFilter = useCallback(() => {
     if (filterVisible) {
       setFilterVisible(false);
-      dispatch(actions.fileSystemActions.setPageParam({ filesFilters: undefined }));
+      dispatch(actions.fileSystemActions.setPageParam({ filesFilters: undefined, page: 0 }));
     } else {
       setFilterVisible(true);
     }
@@ -164,6 +164,7 @@ const FileList = () => {
     dispatch(actions.fileSystemActions.setPageParam({ filterText: undefined }));
     setPageParamLocal({ filterText: undefined });
     fetchFiles(pageParamLocal?.filesFilters || undefined);
+    dispatch(actions.fileSystemActions.setPageParam({ page: 0 }));
   };
 
   const buttons: IToolBarButton[] = [
