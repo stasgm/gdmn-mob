@@ -485,18 +485,16 @@ export const useSync = (onSync?: () => Promise<any>) => {
             //Если до сих пор не было ошибки сети, то продолжаем
             if (!connectError) {
               addRequestNotice('Получение данных');
-              //2. Получаем все сообщения для мобильного
+              //2. Получаем сообщения для мобильного
               let getMessagesResponse = await api.message.getMessages(appRequest, {
                 appSystemId: appSystem.id,
                 companyId: company.id,
-                limitFiles: '1',
               });
 
               //Если сообщения получены успешно, то
               //  справочники: очищаем старые и записываем в хранилище новые данные
               //  документы: добавляем новые, а старые заменяем, только если был статус 'DRAFT'
               //  отправляем запросы за остальными данными
-              // if (getMessagesResponse.type === 'GET_MESSAGES') {
               while (getMessagesResponse.type === 'GET_MESSAGES' && getMessagesResponse.messageList.length > 0) {
                 for (const message of getMessagesResponse.messageList) {
                   //Получая сообщение(я) у которого присутствует признак multipartId, помещаем его в хранилище
@@ -514,7 +512,6 @@ export const useSync = (onSync?: () => Promise<any>) => {
                 getMessagesResponse = await api.message.getMessages(appRequest, {
                   appSystemId: appSystem.id,
                   companyId: company.id,
-                  limitFiles: '1',
                 });
               }
 
