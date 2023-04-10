@@ -46,7 +46,7 @@ const CompanyList = () => {
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.companyActions.setPageParam({ filterText: pageParamLocal?.filterText }));
+    dispatch(actions.companyActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
 
     fetchCompanies(pageParamLocal?.filterText);
   };
@@ -58,7 +58,7 @@ const CompanyList = () => {
   };
 
   const handleClearSearch = () => {
-    dispatch(actions.companyActions.setPageParam({ filterText: undefined }));
+    dispatch(actions.companyActions.setPageParam({ filterText: undefined, page: 0 }));
     setPageParamLocal({ filterText: undefined });
     fetchCompanies();
   };

@@ -56,7 +56,7 @@ const DeviceList = () => {
   };
 
   const handleSearchClick = () => {
-    dispatch(deviceActions.setPageParam({ filterText: pageParamLocal?.filterText }));
+    dispatch(deviceActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
     fetchDevices(pageParamLocal?.filterText);
   };
 
@@ -67,7 +67,7 @@ const DeviceList = () => {
   };
 
   const handleClearSearch = () => {
-    dispatch(deviceActions.setPageParam({ filterText: undefined }));
+    dispatch(deviceActions.setPageParam({ filterText: undefined, page: 0 }));
     setPageParamLocal({ filterText: undefined });
     fetchDevices();
   };

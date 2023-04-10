@@ -29,15 +29,6 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
   const { list: users, loading: loadingUsers } = useSelector((state) => state.users);
 
   const { user: authUser } = useSelector((state) => state.auth);
-
-  const appSystems = companies?.map((d) => ({ appSystems: d.appSystems }))?.[0]?.appSystems;
-
-  const erpUsers = useMemo(() => {
-    return users?.filter((i) => i.appSystem).map((d) => ({ id: d.id, name: d.name }));
-  }, [users]);
-
-  const companyList = companies?.map((d) => ({ id: d.id, name: d.name }));
-
   const formik = useFormik<IUser | NewUser | IUserCredentials>({
     enableReinitialize: true,
     initialValues: isAdmin
@@ -58,6 +49,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
           phoneNumber: user.phoneNumber || '',
           email: user.email || '',
           appSystem: (user.appSystem || null) as INamedEntity,
+          company: (user.company || null) as INamedEntity,
           erpUser: (user.erpUser || null) as INamedEntity,
           externalId: user.externalId || '',
           disabled: user.disabled || false,
@@ -86,6 +78,16 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
           } as IUser | NewUser);
     },
   });
+  const appSystems =
+    authUser?.role === 'SuperAdmin'
+      ? companies?.find((i) => i.id === (formik.values as NewUser | IUser).company?.id)?.appSystems || []
+      : companies?.map((d) => ({ appSystems: d.appSystems }))?.[0]?.appSystems;
+
+  const erpUsers = useMemo(() => {
+    return users?.filter((i) => i.appSystem).map((d) => ({ id: d.id, name: d.name }));
+  }, [users]);
+
+  const companyList = companies?.map((d) => ({ id: d.id, name: d.name }));
 
   useEffect(() => {
     if (Object.keys(user).length == 0) {
@@ -271,7 +273,11 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                             (formik.touched as FormikTouched<NewUser | IUser>).appSystem &&
                               (formik.errors as FormikTouched<NewUser | IUser>).appSystem,
                           )}
-                          disabled={loading || loadingСompanies}
+                          disabled={
+                            (authUser?.role === 'SuperAdmin' && !(formik.values as NewUser | IUser).company) ||
+                            loading ||
+                            loadingСompanies
+                          }
                           required={userERP ? true : false}
                         />
                       </Grid>
@@ -291,7 +297,11 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                             (formik.touched as FormikTouched<NewUser | IUser>).erpUser &&
                             Boolean((formik.errors as FormikTouched<NewUser | IUser>).erpUser)
                           }
-                          disabled={loading || loadingUsers}
+                          disabled={
+                            (authUser?.role === 'SuperAdmin' && !(formik.values as NewUser | IUser).company) ||
+                            loading ||
+                            loadingUsers
+                          }
                           required={userERP || user.role === 'Admin' || user.role === 'SuperAdmin' ? false : true}
                         />
                       </Grid>
