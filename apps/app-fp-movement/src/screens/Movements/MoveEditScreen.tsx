@@ -182,7 +182,6 @@ export const MoveEditScreen = () => {
             ...doc.head,
             comment: docComment && docComment.trim(),
             fromDepart: docFromDepart,
-            // toDepart: docToDepart,
             toDepart: docToDepart,
 
             subtype: docDocumentSubtype,
@@ -329,18 +328,12 @@ export const MoveEditScreen = () => {
             value={docFromDepart?.name}
             onPress={handleFromDepart}
             disabled={!docDocumentSubtype ? true : isBlocked}
-            // disabled={docDocumentSubtype?.id === 'internalMovement' || !docDocumentSubtype ? true : isBlocked}
           />
 
           <SelectableInput
             label={'Куда'}
             value={docDocumentSubtype?.id === 'cellMovement' ? docFromDepart?.name : docToDepart?.name}
             onPress={handleToDepart}
-            // disabled={
-            //   docDocumentSubtype?.id === 'movement' || docDocumentSubtype?.id === 'cellMovement' || !docDocumentSubtype
-            //     ? true
-            //     : isBlocked
-            // }
             disabled={!docDocumentSubtype ? true : isBlocked}
           />
           <Input

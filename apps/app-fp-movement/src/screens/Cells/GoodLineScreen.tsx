@@ -12,7 +12,6 @@ import { CellsStackParamList } from '../../navigation/Root/types';
 import { IMoveLine } from '../../store/types';
 
 const LineItem = React.memo(({ item }: { item: IMoveLine }) => {
-  console.log('line', item);
   const { colors } = useTheme();
 
   const textStyle = useMemo(() => [styles.number, styles.field, { color: colors.text }], [colors.text]);

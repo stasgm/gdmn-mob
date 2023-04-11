@@ -59,7 +59,8 @@ export const MoveViewScreen = () => {
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
   const loading = useSelector((state) => state.app.loading);
 
-  console.log('doc.head', doc?.status);
+  const [visibleSendDialog, setVisibleSendDialog] = useState(false);
+
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
   const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0) || 0;
 
@@ -125,21 +126,19 @@ export const MoveViewScreen = () => {
 
   const sendDoc = useSendDocs(doc ? [doc] : []);
 
-  const [visibleSendDialog, setVisibleSendDialog] = useState(false);
-
-  const handleSendDocument = useCallback(async () => {
-    setVisibleSendDialog(false);
-    setScreenState('sending');
-    await sendDoc();
-    setScreenState('sent');
-  }, [sendDoc]);
-
   const sendRequest = useSendOneRefRequest('Ячейки', { name: 'cell' });
 
   const handleSendDebtRequest = useCallback(async () => {
     setVisibleDialog(false);
     await sendRequest();
   }, [sendRequest]);
+  const handleSendDocument = useCallback(async () => {
+    setVisibleSendDialog(false);
+    setScreenState('sending');
+    await sendDoc();
+    handleSendDebtRequest();
+    setScreenState('sent');
+  }, [handleSendDebtRequest, sendDoc]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -215,13 +214,12 @@ export const MoveViewScreen = () => {
   //   return sum;
   // }, []);
 
-  // const renderItem: ListRenderItem<IMoveLine> = ({ item }) => (
   const renderItem = useCallback(
     ({ item }: { item: IMoveLine }) => {
       return (
         <ListItemLine
           key={item.id}
-          readonly={!(doc?.head.subtype.name === 'prihod') || isBlocked}
+          readonly={!(doc?.head.subtype.id === 'prihod') || isBlocked}
           onPress={() => navigation.navigate('SelectCell', { docId: id, item, mode: 1 })}
         >
           <View style={styles.details}>

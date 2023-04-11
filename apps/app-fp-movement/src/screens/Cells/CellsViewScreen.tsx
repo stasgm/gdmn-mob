@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, SectionListData, SectionList, ListRenderItem } from 'react-native';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { refSelectors, useSelector } from '@lib/store';
 import {
@@ -13,6 +13,7 @@ import {
   SearchButton,
   SubTitle,
   AppScreen,
+  AppActivityIndicator,
 } from '@lib/mobile-ui';
 
 import { Searchbar, useTheme } from 'react-native-paper';
@@ -27,7 +28,7 @@ import { CellsStackParamList } from '../../navigation/Root/types';
 import { getBarcode, getCellList } from '../../utils/helpers';
 import { ICellRefList, ICellData, ICodeEntity, IGood } from '../../store/app/types';
 
-import { Group } from './components/Group';
+import { Group } from '../../components/Group';
 
 export interface ICellList extends ICell, ICellRef {
   department?: string;
@@ -257,6 +258,11 @@ export const CellsViewScreen = () => {
     ),
     [Cell],
   );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   if (!id) {
     return (
