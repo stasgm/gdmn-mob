@@ -180,6 +180,7 @@ const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined
     const fileStat = await stat(fullFileName);
     const fileSize = fileStat.size / BYTES_PER_KB;
     const fileDate = fileStat.birthtime.toString();
+    const fileModifiedDate = fileStat.mtime.toString();
 
     const alias = fullFileName2alias(fullFileName);
     if (!alias) {
@@ -194,6 +195,7 @@ const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined
       device: { id: match[2], name: deviceName },
       date: fileDate,
       size: fileSize,
+      mdate: fileModifiedDate,
     };
   } catch (err) {
     console.error(`Ошибка чтения статистики файла-- ${err}`);
