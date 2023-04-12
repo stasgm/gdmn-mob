@@ -59,12 +59,7 @@ export const ScanViewScreen = () => {
 
   const isBlocked = doc?.status !== 'DRAFT';
 
-  const currRef = useRef<TextInput>(null);
   const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
-
-  useEffect(() => {
-    currRef?.current && setTimeout(() => currRef.current?.focus(), ONE_SECOND_IN_MS);
-  }, []);
 
   const handleEditDocHead = useCallback(() => {
     navigation.navigate('ScanEdit', { id });
@@ -261,7 +256,8 @@ export const ScanViewScreen = () => {
     setScanned(true);
     getScannedObject(brc);
   };
-
+  // console.log('scann', scanned);
+  console.log('ref?.current', ref?.current);
   useEffect(() => {
     if (!scanned && ref?.current) {
       ref?.current &&

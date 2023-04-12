@@ -31,34 +31,38 @@ export interface IRefCmd {
 
 export type MessageType = ICmd | IDocument[] | IReferences | IUserSettings | IAppSystemSettings;
 
-export interface IMessage<T = MessageType> {
+export type IMessage<T = MessageType> = ISimpleMessage<T> | IMultipartMessage;
+
+export interface IMessageBody<T = MessageType> {
+  type: BodyType;
+  version: number;
+  payload: T;
+}
+
+export interface ISimpleMessage<T = MessageType> {
   id: string;
   status: StatusType;
   errorMessage?: string;
   version?: string;
   head: IHeadMessage;
-  body: {
-    type: BodyType;
-    version: number;
-    payload: T;
-  };
+  body: IMessageBody<T>;
 }
 
-export function isIHeadMessage(obj: any): obj is IHeadMessage {
-  return typeof obj === 'object';
+export interface IMultipartMessage extends ISimpleMessage {
+  multipartId: string;
+  multipartSeq: number;
+  multipartEOF?: boolean;
 }
 
-export function isIMessage(obj: any): obj is IMessage {
-  return obj['body']['version'] === 1 && isIHeadMessage(obj['head']);
-}
-
-export function isIResponseMessage(obj: any): obj is IMessage {
-  return obj['body']['version'] === 1 && isIHeadMessage(obj['head']) && !!obj['head']['replyTo'];
-}
-
-export type NewMessage = Omit<IMessage, 'head' | 'id'> & {
+export type SimpleNewMessage = Omit<ISimpleMessage, 'head' | 'id'> & {
   head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
 };
+
+export type MultipartNewMessage = Omit<IMultipartMessage, 'head' | 'id'> & {
+  head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
+};
+
+export type NewMessage = SimpleNewMessage | MultipartNewMessage;
 
 export interface IDataMessage<T = any> {
   id: string;
@@ -80,18 +84,16 @@ export interface IDBHeadMessage extends Omit<IHeadMessage, 'company' | 'producer
   consumerId: string;
 }
 
-export interface IDBMessage<T = MessageType> extends Omit<IMessage<T>, 'head'> {
+export type IDBMessage<T = MessageType> = IDBSimpleMessage<T> | IDBMultipartMessage;
+
+export interface IDBSimpleMessage<T = MessageType> extends Omit<ISimpleMessage<T>, 'head'> {
   head: IDBHeadMessage;
 }
 
-//TODO: добавить более специфические условия проверки
-export function isIDBHeadMessage(obj: any): obj is IDBHeadMessage {
-  return typeof obj === 'object';
-}
-
-//TODO: добавить более специфические условия проверки
-export function isIDBMessage(obj: any): obj is IDBMessage {
-  return obj['body']['version'] === 1 && isIDBHeadMessage(obj['head']);
+export interface IDBMultipartMessage extends IDBSimpleMessage {
+  multipartId: string;
+  multipartSeq: number;
+  multipartEOF?: boolean;
 }
 
 export interface IFileMessageInfo {
@@ -99,6 +101,7 @@ export interface IFileMessageInfo {
   producerId: string;
   consumerId: string;
   deviceId: string;
+  commandType: string;
 }
 
 export interface ICheckTransafer {

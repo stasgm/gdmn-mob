@@ -120,10 +120,6 @@ const DeviceView = () => {
     setOpen(false);
   };
 
-  // useEffect(() => {
-  //   fetchUsers();
-  // }, [fetchUsers]);
-
   const handleUpdateInput = (value: string) => {
     const inputValue: string = value;
 
@@ -135,31 +131,23 @@ const DeviceView = () => {
   };
 
   const handleSearchClick = () => {
-    // const inputValue = valueRef?.current?.value;
     dispatch(userActions.userActions.setPageParam({ filterText: pageParamLocal?.filterText }));
     fetchUsers(pageParamLocal?.filterText as string);
-
-    // fetchUsers(inputValue);
   };
 
   const handleKeyPress = (key: string) => {
     if (key !== 'Enter') return;
 
     handleSearchClick();
-    // const inputValue = valueRef?.current?.value;
-
-    // fetchUsers(inputValue);
   };
 
-  const userButtons: IToolBarButton[] = [
-    // {
-    //   name: 'Добавить',
-    //   color: 'primary',
-    //   variant: 'contained',
-    //   onClick: () => navigate('app/users/new'),
-    //   icon: <AddCircleOutlineIcon />,
-    // },
-  ];
+  const handleClearSearch = () => {
+    dispatch(userActions.userActions.setPageParam({ filterText: undefined }));
+    setPageParamLocal({ filterText: undefined });
+    fetchUsers();
+  };
+
+  const userButtons: IToolBarButton[] = [];
 
   if (!device) {
     return (
@@ -272,13 +260,13 @@ const DeviceView = () => {
           <ToolbarActionsWithSearch
             buttons={userButtons}
             searchTitle={'Найти пользователя'}
-            // valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
             value={(pageParamLocal?.filterText as undefined) || ''}
+            clearOnClick={handleClearSearch}
           />
-          <Box /*sx={{ pt: 2 }}*/>
+          <Box>
             <SortableTable<IUser> headCells={headCells} data={users} path={'/app/users/'} />
           </Box>
         </Container>

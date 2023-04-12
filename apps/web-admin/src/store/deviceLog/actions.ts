@@ -1,7 +1,7 @@
 import { IDeviceLog, IDeviceLogFiles } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
-import { IPageParam } from '../../types';
+import { IDeviceLogPageParam } from '../../types';
 
 const init = createAction('DEVICE_LOG/INIT')();
 const clearError = createAction('DEVICE_LOG/CLEAR_ERROR')();
@@ -31,7 +31,7 @@ const removeDeviceLogsAsync = createAsyncAction(
   'DEVICE_LOG/REMOVE_MANY_FAILURE',
 )<string | undefined, string[], string>();
 
-const setPageParam = createAction('DEVICE_LOG/SET_PARAM')<IPageParam | undefined>();
+const setPageParam = createAction('DEVICE_LOG/SET_PARAM')<IDeviceLogPageParam | undefined>();
 const clearPageParams = createAction('DEVICE_LOG/CLEAR_PARAMS')();
 
 export const deviceLogActions = {

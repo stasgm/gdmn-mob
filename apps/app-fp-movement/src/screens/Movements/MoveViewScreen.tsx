@@ -73,7 +73,7 @@ export const MoveViewScreen = () => {
     return prev;
   }, {});
 
-  const minBarcodeLength = settings.minBarcodeLength?.data || 0;
+  const minBarcodeLength = (settings.minBarcodeLength?.data || 0) as number;
 
   const handleGetBarcode = useCallback(
     (brc: string) => {

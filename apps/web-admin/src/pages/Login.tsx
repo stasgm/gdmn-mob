@@ -11,7 +11,6 @@ import { useEffect, useRef, useState } from 'react';
 import { authActions, useSelector, useDispatch, useAuthThunkDispatch } from '@lib/store';
 
 import Reaptcha from 'reaptcha';
-import { ReCAPTCHA } from 'react-google-recaptcha';
 
 import Logo from '../components/Logo';
 
@@ -38,11 +37,6 @@ const Login = () => {
     }),
     onSubmit: (values: IUserCredentials) => {
       authDispatch(authActions.login(webRequest(dispatch, authActions), values));
-
-      // if (captchaRef) {
-      //   const token = captchaRef.current?.getValue();
-      //   captchaRef.current?.reset();
-      // }
     },
   });
 
@@ -138,24 +132,6 @@ const Login = () => {
                 sitekey={process.env.REACT_APP_SITE_KEY}
                 ref={captchaRef}
                 onVerify={(token) => setCaptchaToken(token)}
-              />
-            </Box>
-            <Box
-              sx={{
-                // mb: 2,
-                marginTop: 1,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <ReCAPTCHA
-                sitekey={process.env.REACT_APP_SITE_KEY || ''}
-                // sitekey={process.env.REACT_APP_SITE_KEY as string}
-                theme="dark"
-                ref={captchaRef}
-                // onClick={(event) => setCaptchaToken(event.currentTarget.nodeValue)}
-                style={{ display: 'inline-block' }}
               />
             </Box>
             <Box sx={{ py: 2 }}>

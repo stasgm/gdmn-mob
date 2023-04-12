@@ -1,13 +1,13 @@
 import { IListItem } from '@lib/mobile-types';
-import { baseSettingGroup } from '@lib/store';
-import { Settings, StatusType } from '@lib/types';
+import { mainSettingGroup } from '@lib/store';
+import { INamedEntity, Settings, StatusType } from '@lib/types';
 
 export const ONE_SECOND_IN_MS = 1000;
 
 const statusColors = ['#E91E63', '#06567D', '#80B12C', '#FFA700'] as const;
 
 export const getStatusColor = (status: StatusType) => {
-  let statusColor: typeof statusColors[number];
+  let statusColor: (typeof statusColors)[number];
 
   switch (status) {
     case 'DRAFT':
@@ -49,7 +49,7 @@ export const appSettings: Settings = {
     type: 'boolean',
     sortOrder: 3,
     visible: true,
-    group: baseSettingGroup,
+    group: mainSettingGroup,
   },
 };
 
@@ -95,4 +95,13 @@ export const statusTypes: IListItem[] = [
     id: 'PROCESSED',
     value: 'Обработано',
   },
+];
+
+export const noPackage: INamedEntity = { id: 'noPackage', name: 'Без упаковки' };
+
+export const reports: IListItem[] = [
+  { id: 'byContact', value: 'В разрезе даты отгрузки и ТО' },
+  { id: 'byGroup', value: 'В разрезе групп' },
+  { id: 'byGood', value: 'В разрезе товаров' },
+  // { id: 'sellBill', value: 'Накладные' },
 ];

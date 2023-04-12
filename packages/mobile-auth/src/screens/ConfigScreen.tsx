@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -21,23 +21,23 @@ export type Props = {
   onSetDemoMode: () => void;
 };
 
-const ConfigScreen = (props: Props) => {
+const ConfigScreen = ({ config, onSetConfig, onSetDemoMode }: Props) => {
   const navigation = useNavigation<StackNavigationProp<AuthStackParamList, 'Config'>>();
   const { colors } = useTheme();
 
-  const { config, onSetConfig, onSetDemoMode } = props;
   const [serverName, setServerName] = useState(`${config?.protocol}${config?.server}` || '');
   const [serverPort, setServerPort] = useState(config?.port?.toString() || '');
   const [timeout] = useState(config?.timeout?.toString() || '');
   const [deviceId, setDeviceId] = useState(config?.deviceId || '');
-  const [err, setErr] = useState(false);
+  const [nameErr, setNameErr] = useState(false);
+  const [portErr, setPortErr] = useState(false);
 
   const [visibleDialog, setVisibleDialog] = useState(false);
   const [initConfig, setInitConfig] = useState(false);
   const [initDeviceID, setInitDeviceID] = useState(false);
 
   const handleSaveConfig = () => {
-    if (err) {
+    if (nameErr) {
       return;
     }
     const match = serverName.match(/^(.*:\/\/)([A-Za-z0-9\-.]+)/);
@@ -63,7 +63,12 @@ const ConfigScreen = (props: Props) => {
   };
 
   const handleProtocolError = () => {
-    setErr(!(serverName.includes('http://') || serverName.includes('https://')));
+    setNameErr(!(serverName.includes('http://') || serverName.includes('https://')));
+  };
+
+  const handlePortError = () => {
+    const validPort = new RegExp(/^(6553[0-5]|655[0-2]\d|65[0-4]\d\d|6[0-4]\d{3}|[1-5]\d{4}|[1-9]\d{0,3}|0)$/);
+    setPortErr(!validPort.test(serverPort));
   };
 
   const handleInitConfig = () => {
@@ -106,13 +111,23 @@ const ConfigScreen = (props: Props) => {
             clearInput={true}
             onEndEditing={handleProtocolError}
           />
-          {err && (
+          {nameErr && (
             <HelperText type="error" style={configStyles.error}>
               Неверный протокол, пример: http://localhost
             </HelperText>
           )}
-          <Input label="Порт" value={serverPort} onChangeText={setServerPort} clearInput={true} />
-          {/* <Input label="ID устройства" value={deviceId} onChangeText={setDeviceId} clearInput={true} /> */}
+          <Input
+            label="Порт"
+            value={serverPort}
+            onChangeText={setServerPort}
+            clearInput={true}
+            onEndEditing={handlePortError}
+          />
+          {portErr && (
+            <HelperText type="error" style={configStyles.error}>
+              Неверный порт, пример: 3653
+            </HelperText>
+          )}
           <View style={localStyles.buttonsView}>
             <PrimeButton
               outlined
@@ -133,7 +148,7 @@ const ConfigScreen = (props: Props) => {
               icon="check"
               onPress={handleSaveConfig}
               style={localStyles.button}
-              disabled={!serverName || !serverPort || !timeout}
+              disabled={!serverName || !serverPort || !timeout || portErr || nameErr}
             >
               Сохранить
             </PrimeButton>
@@ -146,20 +161,18 @@ const ConfigScreen = (props: Props) => {
       <Dialog visible={visibleDialog} onDismiss={handleVisibleFalse}>
         <Dialog.Title>Укажите необходимые действия</Dialog.Title>
         <Dialog.Content>
-          <View style={[styles.flexDirectionRow, styles.alignItemsCenter]}>
-            <IconButton
-              icon={initConfig ? 'checkbox-outline' : 'checkbox-blank-outline'}
-              onPress={() => setInitConfig(!initConfig)}
-            />
-            <MediumText style={configStyles.textWidth}>Установить настройки по умолчанию</MediumText>
-          </View>
-          <View style={[styles.flexDirectionRow, styles.alignItemsCenter]}>
-            <IconButton
-              icon={initDeviceID ? 'checkbox-outline' : 'checkbox-blank-outline'}
-              onPress={() => setInitDeviceID(!initDeviceID)}
-            />
-            <MediumText style={configStyles.textWidth}>Удалить данные об устройстве</MediumText>
-          </View>
+          <TouchableOpacity onPress={() => setInitConfig(!initConfig)}>
+            <View style={[styles.flexDirectionRow, styles.alignItemsCenter]}>
+              <IconButton icon={initConfig ? 'checkbox-outline' : 'checkbox-blank-outline'} />
+              <MediumText style={configStyles.textWidth}>Установить настройки по умолчанию</MediumText>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setInitDeviceID(!initDeviceID)}>
+            <View style={[styles.flexDirectionRow, styles.alignItemsCenter]}>
+              <IconButton icon={initDeviceID ? 'checkbox-outline' : 'checkbox-blank-outline'} />
+              <MediumText style={configStyles.textWidth}>Удалить данные об устройстве</MediumText>
+            </View>
+          </TouchableOpacity>
         </Dialog.Content>
         <Dialog.Actions style={{ borderColor: colors.primary }}>
           <Button

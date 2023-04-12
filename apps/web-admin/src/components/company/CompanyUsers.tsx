@@ -1,15 +1,12 @@
 import { Box, Container } from '@material-ui/core';
 import { useCallback, useEffect, useRef, useState } from 'react';
-// import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import { IUser } from '@lib/types';
 
 import SortableTable from '../../components/SortableTable';
-// import UserListTable from '../../components/user/UserListTable';
 import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
 import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
 import { useDispatch, useSelector } from '../../store';
 import actions from '../../store/user';
-import companyActions from '../../store/company';
 
 interface IProps {
   users: IUser[];
@@ -17,7 +14,6 @@ interface IProps {
 
 const CompanyUsers = ({ users }: IProps) => {
   const dispatch = useDispatch();
-  const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
   const { pageParams } = useSelector((state) => state.users);
 
@@ -32,12 +28,8 @@ const CompanyUsers = ({ users }: IProps) => {
 
   useEffect(() => {
     /* Загружаем данные при загрузке компонента */
-    fetchUsers(pageParams?.filterText as string);
+    fetchUsers(pageParams?.filterText);
   }, [fetchUsers, pageParams?.filterText]);
-
-  // useEffect(() => {
-  //   fetchUsers();
-  // }, [fetchUsers]);
 
   const handleUpdateInput = (value: string) => {
     const inputValue: string = value;
@@ -52,28 +44,37 @@ const CompanyUsers = ({ users }: IProps) => {
   const handleSearchClick = () => {
     dispatch(actions.userActions.setPageParam({ filterText: pageParamLocal?.filterText }));
     fetchUsers(pageParamLocal?.filterText as string);
-    // const inputValue = valueRef?.current?.value;
-
-    // fetchUsers(inputValue);
   };
 
   const handleKeyPress = (key: string) => {
     if (key !== 'Enter') return;
     handleSearchClick();
-    // const inputValue = valueRef?.current?.value;
-
-    // fetchUsers(inputValue);
   };
 
-  const userButtons: IToolBarButton[] = [
-    // {
-    //   name: 'Добавить',
-    //   color: 'primary',
-    //   variant: 'contained',
-    //   onClick: () => navigate('app/users/new'),
-    //   icon: <AddCircleOutlineIcon />,
-    // },
-  ];
+  const handleClearSearch = () => {
+    dispatch(actions.userActions.setPageParam({ filterText: undefined }));
+    setPageParamLocal({ filterText: undefined });
+    fetchUsers();
+  };
+
+  const handleSetPageParams = useCallback(
+    (pageParams: IPageParam) => {
+      dispatch(
+        actions.userActions.setPageParam({
+          companyPage: pageParams.page,
+          companyLimit: pageParams.limit,
+        }),
+      );
+    },
+    [dispatch],
+  );
+
+  const newPageParams: IPageParam = {
+    limit: pageParams?.companyLimit && !isNaN(Number(pageParams?.limit)) ? Number(pageParams?.limit) : 10,
+    page: pageParams?.companyPage && !isNaN(Number(pageParams?.page)) ? Number(pageParams.companyPage) : 0,
+  };
+
+  const userButtons: IToolBarButton[] = [];
 
   const headCells: IHeadCells<IUser>[] = [
     { id: 'name', label: 'Пользователь', sortEnable: true },
@@ -95,15 +96,20 @@ const CompanyUsers = ({ users }: IProps) => {
         <ToolbarActionsWithSearch
           buttons={userButtons}
           searchTitle={'Найти пользователя'}
-          // valueRef={valueRef}
           updateInput={handleUpdateInput}
           searchOnClick={handleSearchClick}
           keyPress={handleKeyPress}
           value={(pageParamLocal?.filterText as undefined) || ''}
+          clearOnClick={handleClearSearch}
         />
-        <Box /*sx={{ pt: 2 }}*/>
-          {/* <UserListTable users={users} /> */}
-          <SortableTable<IUser> headCells={headCells} data={users} path={'/app/users/'} />
+        <Box>
+          <SortableTable<IUser>
+            headCells={headCells}
+            data={users}
+            path={'/app/users/'}
+            onSetPageParams={handleSetPageParams}
+            pageParams={newPageParams}
+          />
         </Box>
       </Container>
     </Box>

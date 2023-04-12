@@ -1,11 +1,11 @@
 import { Context, Next } from 'koa';
 import { IUser } from '@lib/types';
 
-import { UnauthorizedException } from '../exceptions';
+import { ForbiddenException } from '../exceptions';
 
 export const appSystemMiddleware = async (ctx: Context, next: Next) => {
   if ((ctx.state.user as IUser).role !== 'SuperAdmin') {
-    throw new UnauthorizedException('Нет прав на операцию');
+    throw new ForbiddenException('Нет прав на операцию');
   }
 
   await next();

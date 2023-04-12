@@ -25,7 +25,7 @@ const ProcessList = () => {
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchProcesses(pageParams?.filterText as string);
+    fetchProcesses(pageParams?.filterText);
   }, [fetchProcesses, pageParams?.filterText]);
 
   const fetchCompanies = useCallback(async () => {
@@ -49,13 +49,19 @@ const ProcessList = () => {
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.setPageParam({ filterText: pageParamLocal?.filterText }));
-    fetchProcesses(pageParamLocal?.filterText as string);
+    dispatch(actions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
+    fetchProcesses(pageParamLocal?.filterText);
   };
 
   const handleKeyPress = (key: string) => {
     if (key !== 'Enter') return;
     handleSearchClick();
+  };
+
+  const handleClearSearch = () => {
+    dispatch(actions.setPageParam({ filterText: undefined, page: 0 }));
+    setPageParamLocal({ filterText: undefined });
+    fetchProcesses();
   };
 
   const buttons: IToolBarButton[] = [
@@ -87,6 +93,7 @@ const ProcessList = () => {
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
             value={(pageParamLocal?.filterText as undefined) || ''}
+            clearOnClick={handleClearSearch}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />

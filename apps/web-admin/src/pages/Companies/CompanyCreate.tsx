@@ -2,10 +2,14 @@ import { Box, CardHeader, CircularProgress } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
 import { ICompany, NewCompany } from '@lib/types';
 
+import { useEffect } from 'react';
+
 import CompanyDetails from '../../components/company/CompanyDetails';
 
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/company';
+import appSystemActions from '../../store/appSystem';
+import userActions from '../../store/user';
 
 const CompanyCreate = () => {
   const navigate = useNavigate();
@@ -13,6 +17,11 @@ const CompanyCreate = () => {
   const dispatch: AppDispatch = useDispatch();
 
   const { loading } = useSelector((state) => state.companies);
+
+  useEffect(() => {
+    dispatch(appSystemActions.fetchAppSystems());
+    dispatch(userActions.fetchUsers());
+  }, [dispatch]);
 
   const handleGoBack = () => {
     navigate(-1);

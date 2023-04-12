@@ -7,15 +7,27 @@ import { AppState } from '..';
 
 import { webRequest } from '../webRequest';
 
+import { IDeviceLogFileFilter } from '../../types';
+
 import { deviceLogActions, DeviceLogActionType } from './actions';
 
 export type AppThunk = ThunkAction<Promise<DeviceLogActionType>, AppState, null, DeviceLogActionType>;
 
-const fetchDeviceLogFiles = (): AppThunk => {
+const fetchDeviceLogFiles = (
+  logFilters?: IDeviceLogFileFilter,
+  filterText?: string,
+  fromRecord?: number,
+  toRecord?: number,
+): AppThunk => {
+  const params: Record<string, string | number> = logFilters ? logFilters : {};
+
+  if (filterText) params.filterText = filterText;
+  if (fromRecord) params.fromRecord = fromRecord;
+  if (toRecord) params.toRecord = toRecord;
   return async (dispatch) => {
     dispatch(deviceLogActions.fetchDeviceLogFilesAsync.request(''));
 
-    const response = await api.deviceLog.getDeviceLogFiles(webRequest(dispatch, authActions));
+    const response = await api.deviceLog.getDeviceLogFiles(webRequest(dispatch, authActions), params);
 
     if (response.type === 'GET_DEVICELOGS') {
       return dispatch(deviceLogActions.fetchDeviceLogFilesAsync.success(response.deviceLogs));

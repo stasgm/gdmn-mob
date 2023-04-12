@@ -15,37 +15,37 @@ const SettingsScreen = () => {
   const dispatch = useDispatch();
   const showActionSheet = useActionSheet();
   const data = useSelector((state) => state.settings.data);
-  const config = useSelector((state) => state.auth.config);
 
   const { colors } = useTheme();
 
+  //Если группа не указана, подставляем базовую группу
   const settsData = useMemo(
     () =>
-      Object.entries(data).reduce((prev: Settings, cur: [string, ISettingsOption<SettingValue> | undefined]) => {
-        if (cur[1]) {
-          const newCur = cur[1]?.group ? cur[1] : { ...cur[1], group: baseSettingGroup };
-          prev[cur[0]] = newCur;
-        }
-        return prev;
-      }, {}),
+      Object.entries(data).reduce(
+        (prev: Settings, [idx, value]: [string, ISettingsOption<SettingValue> | undefined]) => {
+          if (value) {
+            const newCur = value?.group ? value : { ...value, group: baseSettingGroup };
+            prev[idx] = newCur;
+          }
+          return prev;
+        },
+        {},
+      ),
     [data],
   );
 
   //Массив уникальных групп настроек
   const parents = useMemo(
     () =>
-      Object.entries(settsData).reduce(
-        (prev: INamedEntity[], cur: [string, ISettingsOption<SettingValue> | undefined]) => {
-          const obj = cur[1];
-
-          if (obj?.group === undefined || prev.find((gr) => gr.id === obj?.group?.id)) {
+      Object.values(settsData)
+        .sort((itema, itemb) => (itema?.group?.sortOrder || 0) - (itemb?.group?.sortOrder || 0))
+        .reduce((prev: INamedEntity[], value: ISettingsOption<SettingValue>) => {
+          if (value?.group === undefined || prev.find((gr) => gr.id === value?.group?.id)) {
             return prev;
           }
 
-          return [...prev, obj.group];
-        },
-        [],
-      ),
+          return [...prev, value.group];
+        }, []),
     [settsData],
   );
 
@@ -78,42 +78,20 @@ const SettingsScreen = () => {
     });
   }, [navigation, actionsMenu]);
 
-  // const serverPath = `${config?.protocol}${config?.server}:${config?.port}/${config?.apiPath}`;
-
-  const handleCheckSettings = (optionName: string, value: ISettingsOption) => {
-    if (optionName === 'scannerUse') {
-      const screenKeyboard = Object.values(settsData).find((i) => i?.id === 'screenKeyboard');
-
-      if (screenKeyboard) {
-        dispatch(
-          settingsActions.updateOption({
-            optionName: 'screenKeyboard',
-            value: { ...screenKeyboard, readonly: !value.data, data: true },
-          }),
-        );
-      }
-    }
-  };
-
   return (
     <AppScreen>
       <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={[{ padding: 5, flexDirection: 'column' }]}>
         <View>
           {parents.map((group, groupKey) => {
-            const list = Object.entries(settsData)
-              .filter(([_, item]) => item?.visible && item.group?.id === group.id)
-              .sort(([, itema], [, itemb]) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0));
+            const list = Object.values(settsData)
+              .filter((item) => item?.visible && item.group?.id === group.id)
+              .sort((itema, itemb) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0));
             return (
               <View key={groupKey}>
                 {group.id === 'base' ? (
-                  <SettingsGroup
-                    key={groupKey}
-                    list={list}
-                    onValueChange={handleUpdate}
-                    onCheckSettings={handleCheckSettings}
-                  />
+                  <SettingsGroup key={groupKey} list={list} onValueChange={handleUpdate} />
                 ) : (
-                  <View key={groupKey} style={localStyles.group}>
+                  <View key={groupKey}>
                     <Divider />
                     <TouchableOpacity
                       onPress={() => {
@@ -151,8 +129,5 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  group: {
-    paddingTop: 6,
   },
 });

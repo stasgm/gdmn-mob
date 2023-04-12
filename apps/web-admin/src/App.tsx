@@ -12,6 +12,8 @@ import GlobalStyles from './components/GlobalStyles';
 import theme from './theme';
 import routes from './routes';
 
+import useClearPageParams from './utils/useClearPageParams';
+
 const Router = () => {
   const dispatch = useDispatch();
   const isLogged = authSelectors.isLogged();
@@ -27,6 +29,8 @@ const Router = () => {
     // f();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useClearPageParams();
 
   return useRoutes(routes(isLogged));
 };

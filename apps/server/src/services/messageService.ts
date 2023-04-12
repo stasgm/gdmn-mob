@@ -1,4 +1,4 @@
-import { IDBMessage, IFileMessageInfo, IMessage, NewMessage } from '@lib/types';
+import { ICmd, IDBMessage, IFileMessageInfo, IMessage, NewMessage } from '@lib/types';
 
 import { DataNotFoundException, InnerErrorException } from '../exceptions';
 import { generateId } from '../utils/helpers';
@@ -53,11 +53,16 @@ const addOne = async ({
 
   const newMessage = await makeDBNewMessage(msgObject, producerId, deviceId);
 
+  const commandType = (
+    newMessage.body.type === 'CMD' ? (newMessage.body.payload as ICmd).name : newMessage.body.type
+  ).toLowerCase();
+
   const fileInfo: IFileMessageInfo = {
     id: newMessage.id,
     producerId,
     consumerId: newMessage.head.consumerId,
     deviceId,
+    commandType: commandType,
   };
 
   return await messages.insert(newMessage, { companyId, appSystemName: appSystem.name }, fileInfo);
@@ -76,11 +81,13 @@ const FindMany = async ({
   companyId,
   consumerId,
   deviceId,
+  limitFiles,
 }: {
   appSystemName: string;
   companyId: string;
   consumerId: string;
   deviceId: string;
+  limitFiles: string;
 }) => {
   const { messages, users, devices } = getDb();
 
@@ -94,7 +101,9 @@ const FindMany = async ({
 
   try {
     const messageList = await messages.readByConsumerId({ companyId, appSystemName }, consumerId, deviceId);
-    const pr = messageList.map(async (i) => await makeMessage(i));
+    const limit = Number(limitFiles) || messageList.length;
+    const limitedList = messageList.sort((a, b) => a.head.order - b.head.order).slice(0, limit);
+    const pr = limitedList.map(async (i) => await makeMessage(i));
     return Promise.all(pr);
   } catch (err) {
     throw new InnerErrorException(`Поиск сообщений завершился с ошибкой ${err}`);
@@ -128,7 +137,7 @@ const clear = async ({ companyId, appSystemName }: { companyId: string; appSyste
 export const makeMessage = async (message: IDBMessage): Promise<IMessage> => {
   const { users, companies, appSystems } = getDb();
 
-  return {
+  const newMessage = {
     id: message.id,
     head: {
       appSystem: appSystems.getNamedItem(message.head.appSystemId),
@@ -143,6 +152,15 @@ export const makeMessage = async (message: IDBMessage): Promise<IMessage> => {
     errorMessage: message.errorMessage,
     body: message.body,
   };
+
+  return 'multipartId' in message
+    ? {
+        ...newMessage,
+        multipartId: message.multipartId,
+        multipartSeq: message.multipartSeq,
+        multipartEOF: message.multipartEOF,
+      }
+    : newMessage;
 };
 
 export const makeDBNewMessage = async (

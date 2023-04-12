@@ -1,0 +1,20 @@
+version: "3"
+services:
+  gdmn-mob:
+    image: gdmn-mob/server
+    container_name: server
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: server
+    env_file:
+      - .env.production
+    ports:
+      - "3655:3655"
+      - "3654:3654"
+    volumes:
+      - db:/var/lib/gdmn-mob_db
+      - ./apps/server/ssl:/usr/src/gdmn-mob/apps/server/ssl:ro
+volumes:
+  db:

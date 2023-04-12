@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useLayoutEffect, useMemo } from 'react';
-import { View, FlatList, Alert } from 'react-native';
+import { View, FlatList, Alert, TouchableOpacity } from 'react-native';
 import { Searchbar, Divider, Checkbox } from 'react-native-paper';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { IReferenceData, ScreenState } from '@lib/types';
@@ -18,6 +17,8 @@ import {
 } from '@lib/mobile-ui';
 
 import { extraPredicate, keyExtractor } from '@lib/mobile-hooks';
+
+import { FlashList } from '@shopify/flash-list';
 
 import { useDispatch } from '../store';
 
@@ -42,23 +43,35 @@ const SelectRefItemScreen = () => {
 
   const list = useMemo(() => {
     if (clause && refObj?.data) {
-      return refObj?.data.filter((item) => {
-        const newParams = Object.assign({}, clause);
+      return refObj?.data
+        .filter((item) => {
+          const newParams = Object.assign({}, clause);
 
-        let companyFound = true;
+          let companyFound = true;
+          let parentFound = true;
 
-        Object.keys(clause).forEach((i) => {
-          if (i in item) {
-            if (typeof clause[i] !== 'object' && typeof item[i] !== 'object' && item[i] === clause[i]) {
+          Object.keys(clause).forEach((i) => {
+            if (i in item) {
+              if (typeof clause[i] !== 'object' && typeof item[i] !== 'object' && item[i] === clause[i]) {
+              }
             }
-          }
-        });
-        companyFound = (item as IOutlet).company.id.includes(newParams.companyId);
-        delete newParams.companyId;
+          });
+          companyFound = newParams.companyId ? (item as IOutlet).company.id.includes(newParams.companyId) : true;
+          delete newParams.companyId;
 
-        return companyFound && extraPredicate(item, newParams);
-      });
+          parentFound =
+            newParams.groupParent === 'notNull'
+              ? !!item.parent?.id
+              : newParams.groupParent && item.parent?.id
+              ? item.parent.id.includes(newParams.groupParent)
+              : true;
+          delete newParams.groupParent;
+
+          return companyFound && parentFound && extraPredicate(item, newParams);
+        })
+        .sort((a, b) => (a[refFieldName] < b[refFieldName] ? -1 : 1));
     }
+
     return refObj?.data?.sort((a, b) => (a[refFieldName] < b[refFieldName] ? -1 : 1));
   }, [clause, refFieldName, refObj?.data]);
 
@@ -98,7 +111,9 @@ const SelectRefItemScreen = () => {
   const handleSelectItem = useCallback(
     (item: IReferenceData) => {
       if (isMulti) {
-        setCheckedItem((prev) => [...(prev as IReferenceData[]), item]);
+        setCheckedItem((prev) =>
+          prev.find((i) => i.id === item.id) ? prev.filter((i) => i.id !== item.id) : [...prev, item],
+        );
       } else if (checkedItem.find((i) => i.id === item.id)) {
         setCheckedItem([]);
         dispatch(
@@ -183,13 +198,14 @@ const SelectRefItemScreen = () => {
           <ItemSeparator />
         </>
       )}
-      <FlatList
-        ref={refList}
+      <FlashList
         data={filteredList}
-        keyExtractor={keyExtractor}
         renderItem={renderItem}
+        estimatedItemSize={40}
         ItemSeparatorComponent={ItemSeparator}
+        keyExtractor={keyExtractor}
         keyboardShouldPersistTaps={'handled'}
+        extraData={[checkedItem, screenState]}
       />
     </AppScreen>
   );

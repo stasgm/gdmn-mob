@@ -34,7 +34,7 @@ const UserList = () => {
 
   useEffect(() => {
     /* Загружаем данные при загрузке компонента */
-    fetchUsers(pageParams?.filterText as string);
+    fetchUsers(pageParams?.filterText);
   }, [fetchUsers, pageParams?.filterText]);
 
   const handleUpdateInput = (value: string) => {
@@ -48,8 +48,14 @@ const UserList = () => {
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.userActions.setPageParam({ filterText: pageParamLocal?.filterText }));
-    fetchUsers(pageParamLocal?.filterText as string);
+    dispatch(actions.userActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
+    fetchUsers(pageParamLocal?.filterText);
+  };
+
+  const handleClearSearch = () => {
+    dispatch(actions.userActions.setPageParam({ filterText: undefined, page: 0 }));
+    setPageParamLocal({ filterText: undefined });
+    fetchUsers();
   };
 
   const handleKeyPress = (key: string) => {
@@ -57,6 +63,18 @@ const UserList = () => {
 
     handleSearchClick();
   };
+
+  const handleSetPageParams = useCallback(
+    (pageParams: IPageParam) => {
+      dispatch(
+        actions.userActions.setPageParam({
+          page: pageParams.page,
+          limit: pageParams.limit,
+        }),
+      );
+    },
+    [dispatch],
+  );
 
   const buttons: IToolBarButton[] = [
     {
@@ -78,7 +96,7 @@ const UserList = () => {
     { id: 'name', label: 'Пользователь', sortEnable: true },
     { id: 'lastName', label: 'Фамилия', sortEnable: true },
     { id: 'firstName', label: 'Имя', sortEnable: true },
-    { id: 'externalId', label: 'Идентификатор из ERP системы', sortEnable: false },
+    { id: 'externalId', label: 'ID из ERP системы', sortEnable: false },
     { id: 'erpUser', label: 'Пользователь ERP', sortEnable: true },
     { id: 'appSystem', label: 'Подсистема', sortEnable: true },
     { id: 'creationDate', label: 'Дата создания', sortEnable: true },
@@ -105,12 +123,19 @@ const UserList = () => {
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
             value={(pageParamLocal?.filterText as undefined) || ''}
+            clearOnClick={handleClearSearch}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <SortableTable<IUser> headCells={headCells} data={list} path={'/app/users/'} />
+              <SortableTable<IUser>
+                headCells={headCells}
+                data={list}
+                path={'/app/users/'}
+                onSetPageParams={handleSetPageParams}
+                pageParams={pageParams}
+              />
             </Box>
           )}
         </Container>

@@ -2,98 +2,58 @@ import { Box, Card, CardContent, Grid, TextField, Divider, Button, Checkbox } fr
 
 import { useEffect, useMemo, useState } from 'react';
 
-import { INamedEntity, IUser, NewUser } from '@lib/types';
+import { INamedEntity, IUser, IUserCredentials, NewUser } from '@lib/types';
 import { FormikTouched, useFormik, Field, FormikProvider } from 'formik';
 import * as yup from 'yup';
-
-import api from '@lib/client-api';
 
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 
 import ComboBox from '../ComboBox';
-import companyActions from '../../store/company';
-import userActions from '../../store/user';
-import { useDispatch, useSelector } from '../../store';
+import { useSelector } from '../../store';
 
 interface IProps {
   loading: boolean;
   user: IUser | NewUser;
   onSubmit: (values: IUser | NewUser) => void;
+  onSubmitAdmin?: (values: IUserCredentials) => void;
   onCancel: () => void;
 }
 
-const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
+const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProps) => {
   const [open, setOpen] = useState(false);
   const [userERP, setUserERP] = useState(user.appSystem ? true : false);
 
-  // const [appSystems, setAppSystems] = useState<INamedEntity[] | undefined>([]);
-  // const [loadingAppSystems, setLoadingAppSystems] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(user.role === 'Admin');
 
-  // const [users, setUsers] = useState<INamedEntity[]>([]);
-  // const [loadingUsers, setLoadingUsers] = useState(true);
-
-  const { list: appSystems, loading: loadingAppSystems } = useSelector((state) => state.appSystems);
+  const { list: companies, loading: loadingСompanies } = useSelector((state) => state.companies);
   const { list: users, loading: loadingUsers } = useSelector((state) => state.users);
 
-  const erpUsers = useMemo(() => {
-    return users.filter((i) => i.appSystem).map((d) => ({ id: d.id, name: d.name }));
-  }, [users]);
-
-  // useEffect(() => {
-  //   let unmounted = false;
-  //   const getCompanies = async () => {
-  //     const res = await api.company.getCompanies();
-  //     if (res.type === 'GET_COMPANIES' && !unmounted) {
-  //       const companyAppSystems = res.companies.map((d) => ({ appSystems: d.appSystems }));
-  //       setAppSystems(companyAppSystems[0].appSystems);
-  //       setLoadingAppSystems(false);
-  //     }
-  //   };
-  //   getCompanies();
-  //   return () => {
-  //     unmounted = true;
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   let unmounted = false;
-  //   const getUsers = async () => {
-  //     const res = await api.user.getUsers();
-  //     if (res.type === 'GET_USERS' && !unmounted) {
-  //       setUsers(res.users.filter((i) => i.appSystem).map((d) => ({ id: d.id, name: d.name })));
-  //       setLoadingUsers(false);
-  //     }
-  //   };
-  //   getUsers();
-  //   return () => {
-  //     unmounted = true;
-  //   };
-  // }, []);
-
-  // const dispatch = useDispatch();
-
-  // useEffect(() => {
-  //   dispatch(companyActions.fetchCompanies());
-  //   dispatch(userActions.fetchUsers());
-  // }, []);
-
-  const formik = useFormik<IUser | NewUser>({
+  const { user: authUser } = useSelector((state) => state.auth);
+  const formik = useFormik<IUser | NewUser | IUserCredentials>({
     enableReinitialize: true,
-    initialValues: {
-      ...user,
-      name: user.name || '',
-      firstName: user.firstName || '',
-      lastName: user.lastName || '',
-      middleName: user.middleName || '',
-      verifyPassword: '',
-      password: (user as NewUser).password || '',
-      phoneNumber: user.phoneNumber || '',
-      email: user.email || '',
-      appSystem: (user.appSystem || null) as INamedEntity,
-      erpUser: (user.erpUser || null) as INamedEntity,
-      externalId: user.externalId || '',
-      disabled: user.disabled || false,
-    },
+    initialValues: isAdmin
+      ? {
+          name: user.name || '',
+          email: user.email || '',
+          password: (user as NewUser).password || '',
+          verifyPassword: '',
+        }
+      : {
+          ...user,
+          name: user.name || '',
+          firstName: user.firstName || '',
+          lastName: user.lastName || '',
+          middleName: user.middleName || '',
+          verifyPassword: '',
+          password: (user as NewUser).password || '',
+          phoneNumber: user.phoneNumber || '',
+          email: user.email || '',
+          appSystem: (user.appSystem || null) as INamedEntity,
+          company: (user.company || null) as INamedEntity,
+          erpUser: (user.erpUser || null) as INamedEntity,
+          externalId: user.externalId || '',
+          disabled: user.disabled || false,
+        },
 
     validationSchema: yup.object().shape({
       name: yup.string().required('Заполните это поле'),
@@ -103,18 +63,31 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
         Object.keys(user).length == 0 ? yup.string().required('Заполните это поле') : yup.string().notRequired(),
     }),
     onSubmit: (values) => {
-      onSubmit({
-        ...values,
-        name: values.name.trim(),
-        firstName: values.firstName?.trim(),
-        lastName: values.lastName?.trim(),
-        middleName: values.middleName?.trim(),
-        phoneNumber: values.phoneNumber?.trim(),
-        email: values.email?.trim(),
-        externalId: values.externalId?.trim(),
-      });
+      isAdmin
+        ? onSubmitAdmin &&
+          onSubmitAdmin({ ...values, name: values.name.trim(), password: (values as IUserCredentials).password.trim() })
+        : onSubmit({
+            ...values,
+            name: values.name.trim(),
+            firstName: (values as IUser | NewUser).firstName?.trim(),
+            lastName: (values as IUser | NewUser).lastName?.trim(),
+            middleName: (values as IUser | NewUser).middleName?.trim(),
+            phoneNumber: (values as IUser | NewUser).phoneNumber?.trim(),
+            email: (values as IUser | NewUser).email?.trim(),
+            externalId: (values as IUser | NewUser).externalId?.trim(),
+          } as IUser | NewUser);
     },
   });
+  const appSystems =
+    authUser?.role === 'SuperAdmin'
+      ? companies?.find((i) => i.id === (formik.values as NewUser | IUser).company?.id)?.appSystems || []
+      : companies?.map((d) => ({ appSystems: d.appSystems }))?.[0]?.appSystems;
+
+  const erpUsers = useMemo(() => {
+    return users?.filter((i) => i.appSystem).map((d) => ({ id: d.id, name: d.name }));
+  }, [users]);
+
+  const companyList = companies?.map((d) => ({ id: d.id, name: d.name }));
 
   useEffect(() => {
     if (Object.keys(user).length == 0) {
@@ -130,6 +103,13 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
     userERP ? setUserERP(false) : setUserERP(true);
   };
 
+  const validPassword = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/);
+
+  const passwordCondition =
+    !validPassword.test((formik.values as NewUser | IUserCredentials).password) &&
+    open &&
+    (isAdmin || (user.role && user.role !== 'User'));
+
   return (
     <FormikProvider value={formik}>
       <Box
@@ -142,6 +122,39 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
           <Card sx={{ p: 1 }}>
             <CardContent>
               <Grid container spacing={3}>
+                {authUser?.role === 'SuperAdmin' && user.role !== 'User' && (
+                  <>
+                    <Grid item md={isAdmin ? 12 : 6} xs={12}>
+                      <Checkbox
+                        checked={isAdmin}
+                        color="primary"
+                        onChange={() => setIsAdmin(!isAdmin)}
+                        disabled={user.role === 'Admin'}
+                      />
+                      Администратор
+                    </Grid>
+                    {!isAdmin && (
+                      <Grid item md={6} xs={12}>
+                        <Field
+                          component={ComboBox}
+                          name="company"
+                          label="Компания"
+                          type="company"
+                          options={companyList || []}
+                          setFieldValue={formik.setFieldValue}
+                          setTouched={formik.setTouched}
+                          error={Boolean(
+                            (formik.touched as FormikTouched<NewUser | IUser>).company &&
+                              (formik.errors as IUser | NewUser).company,
+                          )}
+                          disabled={loading || loadingСompanies}
+                          required={authUser.role === 'SuperAdmin'}
+                        />
+                      </Grid>
+                    )}
+                  </>
+                )}
+
                 <Grid item md={6} xs={12}>
                   <TextField
                     error={formik.touched.name && Boolean(formik.errors.name)}
@@ -157,62 +170,78 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     value={formik.values.name}
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
-                  <TextField
-                    error={formik.touched.lastName && Boolean(formik.errors.lastName)}
-                    fullWidth
-                    label="Фамилия"
-                    name="lastName"
-                    variant="outlined"
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    type="lastName"
-                    disabled={loading}
-                    value={formik.values.lastName}
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <TextField
-                    error={formik.touched.firstName && Boolean(formik.errors.firstName)}
-                    fullWidth
-                    label="Имя"
-                    name="firstName"
-                    variant="outlined"
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    type="firstName"
-                    disabled={loading}
-                    value={formik.values.firstName}
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <TextField
-                    error={formik.touched.middleName && Boolean(formik.errors.middleName)}
-                    fullWidth
-                    label="Отчество"
-                    name="middleName"
-                    variant="outlined"
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    type="middleName"
-                    disabled={loading}
-                    value={formik.values.middleName}
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <TextField
-                    error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
-                    fullWidth
-                    label="Телефон"
-                    name="phoneNumber"
-                    variant="outlined"
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    type="phoneNumber"
-                    disabled={loading}
-                    value={formik.values.phoneNumber}
-                  />
-                </Grid>
+                {!isAdmin && (
+                  <>
+                    <Grid item md={6} xs={12}>
+                      <TextField
+                        error={
+                          (formik.touched as FormikTouched<NewUser | IUser>).lastName &&
+                          Boolean((formik.errors as FormikTouched<NewUser | IUser>).lastName)
+                        }
+                        fullWidth
+                        label="Фамилия"
+                        name="lastName"
+                        variant="outlined"
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        type="lastName"
+                        disabled={loading}
+                        value={(formik.values as IUser | NewUser).lastName}
+                      />
+                    </Grid>
+                    <Grid item md={6} xs={12}>
+                      <TextField
+                        error={
+                          (formik.touched as FormikTouched<NewUser | IUser>).firstName &&
+                          Boolean((formik.errors as FormikTouched<NewUser | IUser>).firstName)
+                        }
+                        fullWidth
+                        label="Имя"
+                        name="firstName"
+                        variant="outlined"
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        type="firstName"
+                        disabled={loading}
+                        value={(formik.values as IUser | NewUser).firstName}
+                      />
+                    </Grid>
+                    <Grid item md={6} xs={12}>
+                      <TextField
+                        error={
+                          (formik.touched as FormikTouched<NewUser | IUser>).middleName &&
+                          Boolean((formik.errors as FormikTouched<NewUser | IUser>).middleName)
+                        }
+                        fullWidth
+                        label="Отчество"
+                        name="middleName"
+                        variant="outlined"
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        type="middleName"
+                        disabled={loading}
+                        value={(formik.values as IUser | NewUser).middleName}
+                      />
+                    </Grid>
+                    <Grid item md={6} xs={12}>
+                      <TextField
+                        error={
+                          (formik.touched as FormikTouched<NewUser | IUser>).phoneNumber &&
+                          Boolean((formik.errors as FormikTouched<NewUser | IUser>).phoneNumber)
+                        }
+                        fullWidth
+                        label="Телефон"
+                        name="phoneNumber"
+                        variant="outlined"
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        type="phoneNumber"
+                        disabled={loading}
+                        value={(formik.values as IUser | NewUser).phoneNumber}
+                      />
+                    </Grid>
+                  </>
+                )}
                 <Grid item md={6} xs={12}>
                   <TextField
                     error={formik.touched.email && Boolean(formik.errors.email)}
@@ -228,75 +257,95 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     value={formik.values.email}
                   />
                 </Grid>
-                {userERP ? (
-                  <Grid item md={6} xs={12}>
-                    <Field
-                      component={ComboBox}
-                      name="appSystem"
-                      label="Подсистема"
-                      type="appSystem"
-                      options={appSystems?.map((d) => ({ id: d.id, name: d.name })) || []}
-                      setFieldValue={formik.setFieldValue}
-                      setTouched={formik.setTouched}
-                      error={Boolean(formik.touched.appSystem && formik.errors.appSystem)}
-                      disabled={loading || loadingAppSystems}
-                      required={userERP ? true : false}
-                    />
-                  </Grid>
-                ) : (
-                  <Grid item md={6} xs={12}>
-                    <Field
-                      component={ComboBox}
-                      name="erpUser"
-                      label="Пользователь ERP"
-                      type="erpUser"
-                      options={erpUsers || []}
-                      setFieldValue={formik.setFieldValue}
-                      setTouched={formik.setTouched}
-                      onBlur={formik.handleBlur}
-                      onChange={formik.handleChange}
-                      error={formik.touched.erpUser && Boolean(formik.errors.erpUser)}
-                      disabled={loading || loadingUsers}
-                      required={userERP ? false : true}
-                    />
-                  </Grid>
+                {!isAdmin && (
+                  <>
+                    {userERP ? (
+                      <Grid item md={6} xs={12}>
+                        <Field
+                          component={ComboBox}
+                          name="appSystem"
+                          label="Подсистема"
+                          type="appSystem"
+                          options={appSystems?.map((d) => ({ id: d.id, name: d.name })) || []}
+                          setFieldValue={formik.setFieldValue}
+                          setTouched={formik.setTouched}
+                          error={Boolean(
+                            (formik.touched as FormikTouched<NewUser | IUser>).appSystem &&
+                              (formik.errors as FormikTouched<NewUser | IUser>).appSystem,
+                          )}
+                          disabled={
+                            (authUser?.role === 'SuperAdmin' && !(formik.values as NewUser | IUser).company) ||
+                            loading ||
+                            loadingСompanies
+                          }
+                          required={userERP ? true : false}
+                        />
+                      </Grid>
+                    ) : (
+                      <Grid item md={6} xs={12}>
+                        <Field
+                          component={ComboBox}
+                          name="erpUser"
+                          label="Пользователь ERP"
+                          type="erpUser"
+                          options={erpUsers || []}
+                          setFieldValue={formik.setFieldValue}
+                          setTouched={formik.setTouched}
+                          onBlur={formik.handleBlur}
+                          onChange={formik.handleChange}
+                          error={
+                            (formik.touched as FormikTouched<NewUser | IUser>).erpUser &&
+                            Boolean((formik.errors as FormikTouched<NewUser | IUser>).erpUser)
+                          }
+                          disabled={
+                            (authUser?.role === 'SuperAdmin' && !(formik.values as NewUser | IUser).company) ||
+                            loading ||
+                            loadingUsers
+                          }
+                          required={userERP || user.role === 'Admin' || user.role === 'SuperAdmin' ? false : true}
+                        />
+                      </Grid>
+                    )}
+                    <Grid item md={6} xs={12}>
+                      <TextField
+                        error={
+                          (formik.touched as FormikTouched<NewUser | IUser>).externalId &&
+                          Boolean((formik.errors as FormikTouched<NewUser | IUser>).externalId)
+                        }
+                        fullWidth
+                        required={userERP || (user.role && user.role !== 'User') || isAdmin ? false : true}
+                        label="ID из ERP системы"
+                        name="externalId"
+                        variant="outlined"
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        type="externalId"
+                        disabled={loading}
+                        value={(formik.values as IUser | NewUser).externalId}
+                      />
+                    </Grid>
+                    <Grid item md={6} xs={12}>
+                      <Checkbox checked={userERP} color="primary" onChange={handleUserERP} />
+                      Пользователь ERP
+                    </Grid>
+                    <Grid item md={6} xs={12}>
+                      <Field
+                        id="disabled"
+                        type="checkbox"
+                        name="disabled"
+                        label="Неактивен"
+                        variant="outlined"
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        disabled={loading}
+                        value={(formik.values as IUser | NewUser).disabled}
+                        checked={(formik.values as IUser | NewUser).disabled}
+                        component={Checkbox}
+                      />
+                      Неактивен
+                    </Grid>
+                  </>
                 )}
-
-                <Grid item md={6} xs={12}>
-                  <TextField
-                    error={formik.touched.externalId && Boolean(formik.errors.externalId)}
-                    fullWidth
-                    required={userERP || (user.role && user.role !== 'User') ? false : true}
-                    label="Идентификатор из ERP системы"
-                    name="externalId"
-                    variant="outlined"
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    type="externalId"
-                    disabled={loading}
-                    value={formik.values.externalId}
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Checkbox checked={userERP} color="primary" onChange={handleUserERP} />
-                  Пользователь ERP
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Field
-                    id="disabled"
-                    type="checkbox"
-                    name="disabled"
-                    label="Неактивен"
-                    variant="outlined"
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    disabled={loading}
-                    value={formik.values.disabled}
-                    checked={formik.values.disabled}
-                    component={Checkbox}
-                  />
-                  Неактивен
-                </Grid>
                 <Grid item md={6} xs={12} display={open ? 'block' : 'none'}>
                   <TextField
                     error={
@@ -312,7 +361,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     onChange={formik.handleChange}
                     type="password"
                     disabled={loading}
-                    value={(formik.values as NewUser).password.trim()}
+                    value={(formik.values as NewUser | IUserCredentials).password.trim()}
                   />
                 </Grid>
                 <Grid item md={6} xs={12} display={open ? 'block' : 'none'}>
@@ -330,10 +379,17 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     onChange={formik.handleChange}
                     type="password"
                     disabled={loading}
-                    value={(formik.values as NewUser).verifyPassword?.trim()}
+                    value={(formik.values as NewUser | IUserCredentials).verifyPassword?.trim()}
                   />
                 </Grid>
-                {(formik.values as NewUser).password !== (formik.values as NewUser).verifyPassword &&
+                {passwordCondition && (
+                  <Grid item md={6} xs={12} display={open ? 'block' : 'none'} style={{ color: 'GrayText' }}>
+                    Пароль должен содержать не менее восьми знаков, включать буквы (заглавные и строчные), цифры и
+                    специальные символы
+                  </Grid>
+                )}
+                {(formik.values as NewUser | IUserCredentials).password !==
+                  (formik.values as NewUser | IUserCredentials).verifyPassword &&
                   (formik.values as NewUser).verifyPassword && (
                     <Grid item md={6} xs={12} display={open ? 'block' : 'none'} style={{ color: 'red' }}>
                       Пароли не совпадают
@@ -347,7 +403,11 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                 <Button
                   color="primary"
                   disabled={
-                    loading || (formik.values as NewUser).verifyPassword !== (formik.values as NewUser).password
+                    loading ||
+                    (formik.values as NewUser).verifyPassword !== (formik.values as NewUser).password ||
+                    (!validPassword.test((formik.values as NewUser).password) &&
+                      Boolean((formik.values as NewUser).password) &&
+                      (user.role === 'Admin' || user.role === 'SuperAdmin'))
                   }
                   type="submit"
                   variant="contained"
@@ -365,13 +425,6 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     </Button>
                   )}
                 </Grid>
-                {/* <Grid display={open ? 'block' : 'none'}>
-                  {Object.keys(user).length != 0 && (
-                    <Button color="primary" disabled={loading} onClick={handleClickClose} sx={{ m: 1 }}>
-                      <NoEncryptionOutlinedIcon style={{ height: 18 }} /> Отменить смену пароля
-                    </Button>
-                  )}
-                </Grid> */}
               </Grid>
             </>
           </Card>

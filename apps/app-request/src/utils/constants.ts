@@ -4,7 +4,7 @@ import { companies, user2, device } from '@lib/mock';
 const statusColors = ['#E91E63', '#06567D', '#80B12C', '#FFA700', '#1F92CC'] as const;
 
 const getStatusColor = (status: StatusType) => {
-  let statusColor: typeof statusColors[number];
+  let statusColor: (typeof statusColors)[number];
 
   switch (status) {
     case 'DRAFT':

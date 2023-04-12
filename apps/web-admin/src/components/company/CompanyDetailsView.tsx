@@ -67,26 +67,6 @@ const CompanyDetailsView = ({ company }: IProps) => {
                   </Typography>
                 ))}
               </Grid>
-              {/* <Grid item md={2} xs={6}>
-                <Typography variant="subtitle1" gutterBottom>
-                  Дата создания
-                </Typography>
-              </Grid>
-              <Grid item md={10} xs={6}>
-                <Typography variant="h4" gutterBottom>
-                  {new Date(company.creationDate || '').toLocaleString('ru', { hour12: false })}
-                </Typography>
-              </Grid>
-              <Grid item md={2} xs={6}>
-                <Typography variant="subtitle1" gutterBottom>
-                  Дата редактирования
-                </Typography>
-              </Grid>
-              <Grid item md={10} xs={6}>
-                <Typography variant="h4" gutterBottom>
-                  {new Date(company.editionDate || '').toLocaleString('ru', { hour12: false })}
-                </Typography>
-              </Grid> */}
             </Grid>
           </Grid>
         </Grid>

@@ -1,8 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ScrollView, TextInput, View, Text, Modal, TouchableOpacity, StyleSheet, Keyboard } from 'react-native';
+import { ScrollView, TextInput, View, Modal, TouchableOpacity, StyleSheet, Keyboard } from 'react-native';
 
 import { styles } from '@lib/mobile-navigation';
-import { ItemSeparator, NumberKeypad, ScanBarcode, ScanBarcodeReader } from '@lib/mobile-ui';
+import {
+  AppDialog,
+  ItemSeparator,
+  LargeText,
+  MediumText,
+  NumberKeypad,
+  ScanBarcode,
+  ScanBarcodeReader,
+  globalStyles,
+} from '@lib/mobile-ui';
 import { useSelector } from '@lib/store';
 
 import { IconButton } from 'react-native-paper';
@@ -20,15 +29,17 @@ import { ONE_SECOND_IN_MS } from '../../../utils/constants';
 interface IProps {
   item: IMovementLine;
   onSetLine: (value: IMovementLine) => void;
+  onSetDisabledSave: (value: boolean) => void;
 }
 
-export const DocLine = ({ item, onSetLine }: IProps) => {
+export const DocLine = ({ item, onSetLine, onSetDisabledSave }: IProps) => {
   const { colors } = useTheme();
-
-  const textStyle = useMemo(() => [styles.number, styles.field, { color: colors.text }], [colors.text]);
 
   const [goodEID, setGoodEID] = useState<string | undefined>(item?.EID?.toString());
   const [doScanned, setDoScanned] = useState(false);
+
+  const [goodName, setGoodName] = useState<string>(item?.good.name || '');
+  const [visibleDialog, setVisibleDialog] = useState(false);
 
   const [scaner, setScaner] = useState<IScannedObject>({ state: 'init' });
 
@@ -41,22 +52,24 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(isScreenKeyboard);
 
   useEffect(() => {
-    (isKeyboardOpen || currRef?.current) &&
+    !visibleDialog &&
+      (isKeyboardOpen || currRef?.current) &&
       setTimeout(() => {
         currRef.current?.focus();
       }, ONE_SECOND_IN_MS);
-  }, [isKeyboardOpen]);
+  }, [isKeyboardOpen, visibleDialog]);
 
   useEffect(() => {
-    Keyboard.addListener('keyboardDidShow', () => {
-      Keyboard.dismiss();
-      currRef.current?.focus();
-    });
-
+    if (!visibleDialog) {
+      Keyboard.addListener('keyboardDidShow', () => {
+        Keyboard.dismiss();
+        currRef.current?.focus();
+      });
+    }
     return () => {
       Keyboard.removeAllListeners('keyboardDidShow');
     };
-  }, []);
+  }, [visibleDialog]);
 
   const handleGetScannedObject = useCallback((brc: string) => {
     setScaner({ state: 'found' });
@@ -80,17 +93,56 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
     setDoScanned(true);
   };
 
+  const handleAddName = () => {
+    onSetLine({ ...item, good: { ...item.good, name: goodName } });
+    setVisibleDialog(false);
+  };
+
   useEffect(() => {
     onSetLine({ ...item, EID: goodEID });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goodEID]);
 
+  useEffect(() => {
+    onSetDisabledSave(visibleDialog);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visibleDialog]);
+
   const price = item?.price || 0;
   const remains = item?.remains || 0;
   const buyingPrice = item?.buyingPrice || 0;
+  const barcode = item?.barcode || '';
+
+  const [quantity, setQuantity] = useState(item.quantity.toString());
+
+  const handleChangeText = useCallback(
+    (text: string) => {
+      if (isKeyboardOpen) {
+        setIsKeyboardOpen(false);
+      }
+      let newValue = text.replace(',', '.');
+      newValue = !newValue.includes('.') ? parseFloat(newValue).toString() : newValue;
+      newValue = Number.isNaN(parseFloat(newValue)) ? '0' : newValue;
+      const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
+      const q = validNumber.test(newValue) ? newValue : quantity;
+      setQuantity(q);
+      onSetLine({ ...item, quantity: parseFloat(q || '0') });
+    },
+    [isKeyboardOpen, item, onSetLine, quantity],
+  );
+
+  const contentStyle = useMemo(
+    () =>
+      ({
+        flexDirection: 'column',
+        justifyContent: isKeyboardOpen ? 'space-between' : 'flex-start',
+        flex: 1,
+      } as any),
+    [isKeyboardOpen],
+  );
 
   return (
-    <>
+    <View style={contentStyle}>
       <Modal animationType="slide" visible={doScanned}>
         {isScanerReader ? (
           <ScanBarcodeReader
@@ -111,112 +163,170 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
           />
         )}
       </Modal>
-      <ScrollView keyboardShouldPersistTaps="handled">
-        <View style={styles.content}>
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Наименование</Text>
-              <Text style={textStyle}>{item ? item.good.name || 'товар не найден' : ''}</Text>
+      <ScrollView keyboardShouldPersistTaps="handled" style={localStyles.flexGrow0}>
+        <View style={styles.container}>
+          <View style={localStyles.item}>
+            <View>
+              <LargeText style={globalStyles.textBold}>{item ? item.good.name || 'товар не найден' : ''}</LargeText>
+              {barcode ? <MediumText>{barcode}</MediumText> : null}
             </View>
-          </View>
-          <ItemSeparator />
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Цена</Text>
-              <Text style={textStyle}>{price.toString()}</Text>
-            </View>
-          </View>
-          <ItemSeparator />
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Покупная цена</Text>
-              <Text style={textStyle}>{buyingPrice.toString()}</Text>
-            </View>
-          </View>
-          <ItemSeparator />
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Остаток</Text>
-              <Text style={textStyle}>{remains.toString()}</Text>
-            </View>
-          </View>
-          <ItemSeparator />
-          <View style={styles.item}>
-            <View style={localStyles.details}>
-              <View style={localStyles.new}>
-                <Text style={styles.name}>EID</Text>
-                <Text style={textStyle}>{item?.EID || 'Не указан'}</Text>
-              </View>
+            {item.good.id === 'unknown' && (
               <View style={localStyles.button}>
-                {item?.EID ? (
-                  <TouchableOpacity>
-                    <IconButton icon="close" size={20} onPress={() => setGoodEID(undefined)} />
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity>
-                    <IconButton icon="barcode-scan" size={30} onPress={handleDoScan} />
-                  </TouchableOpacity>
-                )}
+                <TouchableOpacity>
+                  <IconButton icon="pencil-outline" size={24} onPress={() => setVisibleDialog(true)} />
+                </TouchableOpacity>
               </View>
+            )}
+          </View>
+          <ItemSeparator />
+          {item.alias || item.weightCode ? (
+            <View>
+              <View style={localStyles.item}>
+                <View style={localStyles.halfItem}>
+                  <MediumText>Арт.:</MediumText>
+                  <LargeText style={localStyles.value}>{item.alias || ''}</LargeText>
+                </View>
+                <View style={[{ backgroundColor: colors.primary }, localStyles.verticalLine]} />
+                <View style={[localStyles.halfItem, localStyles.halfItemRemView]}>
+                  <MediumText>Вес. код: </MediumText>
+                  <LargeText style={localStyles.value}>{item.weightCode || ''}</LargeText>
+                </View>
+              </View>
+              <ItemSeparator />
+            </View>
+          ) : null}
+          <View style={localStyles.item}>
+            <View style={localStyles.halfItem}>
+              <MediumText>Цена:</MediumText>
+              <LargeText style={localStyles.value}>{price.toString()}</LargeText>
+            </View>
+            <View style={[{ backgroundColor: colors.primary }, localStyles.verticalLine]} />
+            <View style={[localStyles.halfItem, localStyles.halfItemRemView]}>
+              <MediumText>Остаток:</MediumText>
+              <LargeText style={localStyles.value}>{remains.toString()}</LargeText>
             </View>
           </View>
           <ItemSeparator />
-          <View style={styles.item}>
-            <View style={localStyles.details}>
-              <View style={localStyles.new}>
-                <Text style={styles.name}>Количество</Text>
-                <TextInput
-                  autoFocus={true}
-                  style={[textStyle, localStyles.quantitySize]}
-                  showSoftInputOnFocus={false}
-                  caretHidden={true}
-                  keyboardType="numeric"
-                  autoCapitalize="words"
-                  onChangeText={(value) => onSetLine({ ...item, quantity: parseFloat(value || '0') })}
-                  returnKeyType="done"
-                  ref={currRef}
-                  value={item.quantity.toString()}
-                />
-              </View>
-              {isScreenKeyboard && (
-                <View style={localStyles.button}>
-                  <IconButton
-                    icon={isKeyboardOpen ? 'pencil-remove-outline' : 'pencil-outline'}
-                    onPress={() => setIsKeyboardOpen(!isKeyboardOpen)}
-                    size={30}
-                  />
-                </View>
+          <View style={localStyles.item}>
+            <MediumText>Покупная цена:</MediumText>
+            <LargeText style={localStyles.value}>{buyingPrice.toString()}</LargeText>
+          </View>
+          <ItemSeparator />
+          <View style={localStyles.item}>
+            <View style={localStyles.eIdView}>
+              <MediumText>EID:</MediumText>
+              <LargeText style={localStyles.value}>{item?.EID}</LargeText>
+            </View>
+            <View style={localStyles.button}>
+              {item?.EID ? (
+                <TouchableOpacity>
+                  <IconButton icon="close" size={20} onPress={() => setGoodEID(undefined)} />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity>
+                  <IconButton icon="barcode-scan" size={24} onPress={handleDoScan} />
+                </TouchableOpacity>
               )}
             </View>
           </View>
         </View>
       </ScrollView>
-      {isScreenKeyboard && isKeyboardOpen && (
-        <NumberKeypad
-          oldValue={item.quantity.toString()}
-          onApply={(value) => onSetLine({ ...item, quantity: parseFloat(value) })}
-          decDigitsForTotal={3}
-        />
-      )}
-    </>
+      <View>
+        <View style={localStyles.quant}>
+          <ItemSeparator />
+          <View style={localStyles.item}>
+            <MediumText>Количество:</MediumText>
+            <TextInput
+              style={localStyles.quantitySize}
+              showSoftInputOnFocus={false}
+              caretHidden={true}
+              keyboardType="numeric"
+              autoCapitalize="words"
+              onChangeText={handleChangeText}
+              returnKeyType="done"
+              ref={currRef}
+              value={quantity}
+            />
+          </View>
+          {isScreenKeyboard && (
+            <View style={[localStyles.button, localStyles.zIndex]}>
+              <IconButton
+                icon={isKeyboardOpen ? 'keyboard-off-outline' : 'keyboard-outline'}
+                onPress={() => setIsKeyboardOpen(!isKeyboardOpen)}
+                size={24}
+              />
+            </View>
+          )}
+        </View>
+        {isScreenKeyboard && isKeyboardOpen && (
+          <NumberKeypad
+            oldValue={quantity}
+            onApply={(value) => {
+              onSetLine({ ...item, quantity: parseFloat(value) });
+              setQuantity(value);
+            }}
+            decDigitsForTotal={3}
+          />
+        )}
+      </View>
+      <AppDialog
+        title="Наименование"
+        visible={visibleDialog}
+        text={goodName || ''}
+        onChangeText={setGoodName}
+        onCancel={() => setVisibleDialog(false)}
+        onOk={handleAddName}
+        okLabel={'Сохранить'}
+        okDisabled={goodName ? false : true}
+      />
+    </View>
   );
 };
 
 const localStyles = StyleSheet.create({
   button: {
-    alignItems: 'flex-end',
-    justifyContent: 'center',
     position: 'absolute',
-    right: -10,
+    right: -5,
     zIndex: 5,
   },
-  new: {
-    width: '90%',
+  item: {
+    flexDirection: 'row',
+    padding: 5,
+    alignItems: 'center',
   },
-  details: {
-    flex: 1,
-    margin: 5,
-    justifyContent: 'center',
+  halfItem: {
+    flexDirection: 'row',
+    width: '50%',
+    paddingRight: 3,
+    alignSelf: 'flex-start',
+    flexWrap: 'wrap',
+    alignItems: 'center',
   },
-  quantitySize: { fontSize: 40 },
+  value: {
+    fontWeight: 'bold',
+    paddingLeft: 5,
+  },
+  verticalLine: {
+    width: 1,
+    height: '100%',
+  },
+  halfItemRemView: {
+    marginLeft: 3,
+  },
+  eIdView: {
+    flexDirection: 'row',
+    width: '80%',
+    paddingVertical: 8,
+  },
+  quantitySize: {
+    fontSize: 30,
+    paddingLeft: 5,
+  },
+  flexGrow0: {
+    flexGrow: 0,
+  },
+  quant: {
+    marginHorizontal: 5,
+  },
+  zIndex: { zIndex: 0 },
 });

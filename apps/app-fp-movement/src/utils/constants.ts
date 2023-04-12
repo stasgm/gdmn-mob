@@ -1,5 +1,5 @@
 import { IListItem } from '@lib/mobile-types';
-import { baseSettingGroup } from '@lib/store';
+import { mainSettingGroup } from '@lib/store';
 import { Settings, StatusType } from '@lib/types';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 
@@ -61,7 +61,7 @@ export const STATUS_LIST: IListItem[] = [
 ];
 
 export const getStatusColor = (status: StatusType) => {
-  let statusColor: typeof statusColors[number];
+  let statusColor: (typeof statusColors)[number];
 
   switch (status) {
     case 'DRAFT':
@@ -99,7 +99,7 @@ export const appSettings: Settings = {
     data: true,
     type: 'boolean',
     visible: true,
-    group: baseSettingGroup,
+    group: mainSettingGroup,
   },
   minBarcodeLength: {
     id: 'minBarcodeLength',

@@ -4,6 +4,7 @@ import { Searchbar, Divider, Checkbox } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { IReferenceData, ScreenState } from '@lib/types';
 import { appActions, refSelectors } from '@lib/store';
+import { FlashList } from '@shopify/flash-list';
 import {
   AppScreen,
   ItemSeparator,
@@ -13,6 +14,7 @@ import {
   globalStyles as styles,
   navBackButton,
   LargeText,
+  EmptyList,
 } from '@lib/mobile-ui';
 
 import { extraPredicate } from '@lib/mobile-hooks';
@@ -180,12 +182,14 @@ export const SelectRefItemScreen = () => {
           <ItemSeparator />
         </>
       )}
-      <FlatList
-        ref={refList}
+      <FlashList
         data={filteredList}
-        keyExtractor={keyExtractor}
+        estimatedItemSize={60}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
+        ListEmptyComponent={EmptyList}
+        extraData={[screenState, checkedItem]}
+        keyExtractor={keyExtractor}
       />
     </AppScreen>
   );

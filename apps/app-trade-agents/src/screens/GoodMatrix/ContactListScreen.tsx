@@ -133,7 +133,6 @@ const ContactListScreen = () => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
         renderSectionHeader={renderSectionHeader}
-        // scrollEventThrottle={400}
         ListEmptyComponent={!contacts || !goodMatrix ? EmptyList : null}
         keyboardShouldPersistTaps={'handled'}
       />
