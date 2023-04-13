@@ -57,7 +57,7 @@ const ScanOrderScreen = () => {
 
   const shipmentType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === docTypeId);
 
-  const depart = useSelector((state) => state.auth.user?.settings?.depart?.data) as ICodeEntity;
+  const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as ICodeEntity;
 
   const tempOrders = useFpSelector((state) => state.fpMovement.list);
 
@@ -90,6 +90,8 @@ const ScanOrderScreen = () => {
       dispatch(fpActions.addTempOrder(newTempOrder));
     }
 
+    const depart = defaultDepart || scannedObject.head.depart;
+
     const shipmentDoc: IShipmentDocument = {
       id: generateId(),
       documentType: shipmentType!,
@@ -111,12 +113,20 @@ const ScanOrderScreen = () => {
 
     dispatch(documentActions.addDocument(shipmentDoc));
 
-    navigation.dispatch(
-      StackActions.replace('ShipmentView', {
-        id: shipmentDoc.id,
-      }),
-    );
-  }, [scannedObject, shipments, tempOrders, shipmentType, depart, dispatch, navigation]);
+    if (defaultDepart) {
+      navigation.dispatch(
+        StackActions.replace('ShipmentView', {
+          id: shipmentDoc.id,
+        }),
+      );
+    } else {
+      navigation.dispatch(
+        StackActions.replace('ShipmentEdit', {
+          id: shipmentDoc.id,
+        }),
+      );
+    }
+  }, [scannedObject, shipments, tempOrders, defaultDepart, shipmentType, dispatch, navigation]);
 
   const [scaner, setScaner] = useState<IScannedObject>({ state: 'init' });
 

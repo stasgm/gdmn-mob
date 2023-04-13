@@ -247,7 +247,12 @@ export const FreeShipmentEditScreen = () => {
             onPress={handlePresentDate}
             disabled={docStatus !== 'DRAFT'}
           />
-          <SelectableInput label={'Подразделение'} value={docDepart?.name} onPress={handleDepart} disabled={true} />
+          <SelectableInput
+            label={'Подразделение'}
+            value={docDepart?.name}
+            onPress={handleDepart}
+            disabled={isBlocked}
+          />
 
           <Input
             label="Комментарий"

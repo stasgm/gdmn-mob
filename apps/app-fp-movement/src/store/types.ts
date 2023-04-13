@@ -23,6 +23,7 @@ export interface IShipmentFormParam extends IFormParam {
   documentDate?: string;
   status?: StatusType;
   comment?: string;
+  depart?: ICodeEntity;
 }
 
 export interface IFreeShipmentFormParam extends IFormParam {
