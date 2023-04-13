@@ -241,9 +241,9 @@
 
 Экран сканирования на мобильном устройстве:
 
-<img src="img/3.Docs/3.Scan.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.ScanOne.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.Scan.jpg" alt="drawing" height="400"/>
 
-Сканируем штрихкод, нажимаем на нужную кнопку (**Пересканировать** или **Товар**) и переходим на экран позиции документа для ввода количества товара:
+Сканируем штрихкод и переходим на экран позиции документа для ввода количества товара:
 
 <img src="img/3.Docs/3.PrihodGoodLineFour.jpg" alt="drawing" height="400"/>
 
@@ -256,7 +256,7 @@
 
 Если отсканированный штрихкод не найден в справочнике, и если документ работает не только с остатками товаров (например, документ прихода), то в позицию подставится "неизвестный товар":
 
-<img src="img/3.Docs/3.ScanUnknown.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodGoodLineUnknownZero.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.PrihodGoodLineUnknownZero.jpg" alt="drawing" height="400"/>
 
 Но если документ работает только с остатками (например, документ инвентаризации), то товар с неизвестным штрихкодом добавить в документ нельзя.
 
