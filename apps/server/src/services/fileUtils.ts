@@ -80,7 +80,7 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
   const getRx = (str: string): RegExp => {
     const isNewFormat = str.includes('__');
     const isMess = str.includes('_to_');
-    if (!(isNewFormat && isMess)) return /from_(.+)_dev_(.+)\.json/gi;
+    if (!isMess) return /from_(.+)_dev_(.+)\.json/gi;
     if (isNewFormat) return /_from_(.+)_to_(.+)_dev_(.+)__(.+)\.json/gi;
     return /_from_(.+)_to_(.+)_dev_(.+)\.json/gi;
   };
