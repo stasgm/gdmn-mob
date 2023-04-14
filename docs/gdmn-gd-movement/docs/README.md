@@ -263,10 +263,9 @@
 
 <img src="img/3.Docs/3.PrihodViewUnknow.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodRemainsUnknown.jpg" alt="drawing" height="400"/>
 
-
 Но если документ работает только с остатками (например, документ инвентаризации), то товар с неизвестным штрихкодом добавить в документ нельзя.
 
-<img src="img/3.Docs/3.ScanNotFound.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.ScanNotFound1.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.ScanNotFound1.jpg" alt="drawing" height="400"/>
 
 #### _Добавление товара вручную_
 
