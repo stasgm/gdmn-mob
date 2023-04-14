@@ -257,16 +257,16 @@
 Если отсканированный штрихкод не найден в справочнике, и если документ работает не только с остатками товаров (например, документ прихода), то в позицию подставится "Неизвестный товар".
 При первом добавлении возможно отредактировать его название. При нажатии на иконку рядом с компонентом имени товара "Неизвестный товар" отрисуется диалоговое окно для ввода. После отправки на сервер, этот товар будет приходить как обычный.
 
-<img src="img/3.Docs/3.PrihodGoodLineUnknownZero.jpg" alt="drawing" height="400"/><img src="img/3.Docs/3.PrihodGoodLineUnknownZeroOne.jpg" alt="drawing" height="400"/><img src="img/3.Docs/3.PrihodGoodLineUnknownZeroTwo.jpg" alt="drawing" height="400"/><img src="img/3.Docs/3.PrihodGoodLineUnknownZeroFour.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.PrihodGoodLineUnknownZero.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodGoodLineUnknownZeroOne.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodGoodLineUnknownZeroTwo.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodGoodLineUnknownZeroFour.jpg" alt="drawing" height="400"/>
 
-Так выглядит отредактированный "Неизвестный товар" в документе и в списках товаров
+Так выглядит отредактированный "Неизвестный товар" в документе и в списках товаров:
 
-<img src="img/3.Docs/3.PrihodViewUnknow.jpg" alt="drawing" height="400"/><img src="img/3.Docs/3.PrihodRemainsUnknown.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.PrihodViewUnknow.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodRemainsUnknown.jpg" alt="drawing" height="400"/>
 
 
 Но если документ работает только с остатками (например, документ инвентаризации), то товар с неизвестным штрихкодом добавить в документ нельзя.
 
-<img src="img/3.Docs/3.ScanNotFound.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.ScanNotFound.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.ScanNotFound1.jpg" alt="drawing" height="400"/>
 
 #### _Добавление товара вручную_
 
