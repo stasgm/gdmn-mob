@@ -317,7 +317,7 @@
 
 При создании документ имеет статус **Черновик** <img src="img/1.Connection/1.IconDraft.jpg" alt="drawing" height="22"/> (красный цвет иконки или боковой полосы шапки документа).
 
-
+<img src="img/3.Docs/3.DocsListOne.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodRedView.jpg" alt="drawing" height="400"/>
 
 После ввода необходимых данных, чтобы отправить документ на обработку, необходимо поменять признак **Черновик** на признак **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.jpg" alt="drawing" height="22"/> (с помощью иконки <img src="img/1.Connection/1.IconAutoTransl.jpg" alt="drawing" height="22"/> или вручную, нажав на значок <img src="img/1.Connection/1.IconEdit.jpg" alt="drawing" height="22"/> на шапке документа)
 
@@ -325,9 +325,7 @@
 - отправить на сервер ОДИН документ, для этого нажать на иконку <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/> **Отправка документа**, находящуюся над шапкой документа.
 - оставить документ в состоянии **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.jpg" alt="drawing" height="22"/> (переведенный в это состояние с помощью иконки <img src="img/1.Connection/1.IconAutoTransl.jpg" alt="drawing" height="22"/> или вручную, с помощью <img src="img/1.Connection/1.IconEdit.jpg" alt="drawing" height="22"/> на шапке документа) и перейти к работе с другими документами, а данный будет отправлен на сервер при ручной или автоматической синхронизации.
 
-Когда документ перейдет в состояние **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.jpg" alt="drawing" height="22"/> (зеленый цвет) - его данные редактировать уже нельзя.
-
-Но, пока документ не отправлен, его можно вернуть из статуса **Готов к отправке** в статус **Черновик** и отредактировать данные.
+Когда документ перейдет в состояние **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.jpg" alt="drawing" height="22"/> (зеленый цвет) - его данные редактировать уже нельзя. Но, пока документ не отправлен, его можно вернуть из статуса **Готов к отправке** в статус **Черновик** и отредактировать данные.
 
 <img src="img/3.Docs/3.DocsReady.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.DocPrihod.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodEditReady.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodEditDraft.jpg" alt="drawing" height="400"/> 
 
