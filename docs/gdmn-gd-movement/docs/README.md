@@ -321,6 +321,8 @@
 
 После ввода необходимых данных, чтобы отправить документ на обработку, необходимо поменять признак **Черновик** на признак **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.jpg" alt="drawing" height="22"/> (с помощью иконки <img src="img/1.Connection/1.IconAutoTransl.jpg" alt="drawing" height="22"/> или вручную, нажав на значок <img src="img/1.Connection/1.IconEdit.jpg" alt="drawing" height="22"/> на шапке документа)
 
+<img src="img/3.Docs/3.DocsListEnter.jpg" alt="drawing" height="400"/> или <img src="img/3.Docs/3.DocsLisEdit.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.DocTypesOpenNew.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodEditReadyNew.jpg" alt="drawing" height="400"/>
+
 Есть два способа отправки документа на сервер:
 - отправить на сервер ОДИН документ, для этого нажать на иконку <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/> **Отправка документа**, находящуюся над шапкой документа.
 - оставить документ в состоянии **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.jpg" alt="drawing" height="22"/> (переведенный в это состояние с помощью иконки <img src="img/1.Connection/1.IconAutoTransl.jpg" alt="drawing" height="22"/> или вручную, с помощью <img src="img/1.Connection/1.IconEdit.jpg" alt="drawing" height="22"/> на шапке документа) и перейти к работе с другими документами, а данный будет отправлен на сервер при ручной или автоматической синхронизации.
