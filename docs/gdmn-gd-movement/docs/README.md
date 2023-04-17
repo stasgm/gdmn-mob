@@ -329,7 +329,7 @@
 
 Когда документ перейдет в состояние **Готов к отправке** <img src="img/1.Connection/1.IconReadyToGo.jpg" alt="drawing" height="22"/> (зеленый цвет иконки или боковой полосы шапки документа) - его данные редактировать уже нельзя. Но, пока документ не отправлен, его можно вернуть из статуса **Готов к отправке** в статус **Черновик** и отредактировать данные.
 
-<img src="img/3.Docs/3.DocsReady.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.DocPrihod.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodEditReadyNew.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodEditDraft.jpg" alt="drawing" height="400"/> 
+<img src="img/3.Docs/3.DocsReady.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.DocPrihod.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodEditReadyNew.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.DocsDraft.jpg" alt="drawing" height="400"/> 
 
 Чтобы отправить ВСЕ документы со статусом **Готов к отправке** на сервер из экрана **Документы**, необходимо нажать на кнопку  <img src="img/1.Connection/1.Sync.jpg" alt="drawing" height="22"/> **Синхронизировать** в боковом меню (открыть боковое меню можно нажатием на иконку меню " **≡** ", находящуюся в верхнем углу приложения слева, или смахнув пальцем вправо с левого края устройства). Или дождаться выполнения автосинхронизации и автоматической отправки всех документов со статусом **Готов к отправке**.
 
