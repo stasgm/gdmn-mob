@@ -492,7 +492,7 @@
 |<img src="img/7.Remains/7.IconFiltr.jpg" alt="drawing" height="20"/>      | фильтр 
 | <img src="img/1.Connection/1.IconFlash.jpg" alt="drawing" height="22">   | вспышка выключена|
 | <img src="img/1.Connection/1.IconVibr.jpg" alt="drawing" height="22"/>   | вибрация выключена|
-|<img src="img/1.Connection/1.IconEditUnknown.jpg" alt="drawing" height="20"/>|    |
+|<img src="img/1.Connection/1.IconEditUnknown.jpg" alt="drawing" height="20"/>|pедактированиe названия неизвестного товара    |
 | **✓**     | сохранить|
 | **≡**     | меню документа |
 | ✚         | добавление нового документа|
