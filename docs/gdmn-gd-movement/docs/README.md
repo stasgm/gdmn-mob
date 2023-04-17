@@ -390,7 +390,6 @@
 
 <img src="img/9.Profile/9.Profile.jpg" alt="drawing" height="400"/> 
 
-
 Этот экран позволяет: 
 
 |  Параметр   |  Описание |
@@ -402,9 +401,11 @@
 
 Для этого необходимо нажать на иконку меню " **⁝** ", расположенную в правом верхнем углу, и выбрать пункт, соответственно необходимости.
 
- <img src="img/9.Profile/9.ClearData.jpg" alt="drawing" height="400"/>
+ <img src="img/9.Profile/9.ClearData.jpg" alt="drawing" height="400"/> 
 
 Если параметр "Не выходить из профиля" отключен, то при каждом новом открытии приложения необходимо будет вновь вводить данные пользователя.
+
+<img src="img/9.Profile/9.ProfileNotUser.jpg" alt="drawing" height="400"/> <img src="img/1.Connection/1.Login.jpg" alt="drawing" height="400"/>
 
 ## 8. Сканирование
 
