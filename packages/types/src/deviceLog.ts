@@ -30,6 +30,7 @@ export interface IDeviceLogFiles extends IEntity {
   device: INamedEntity;
   date: string;
   size: number;
+  mdate: string;
 }
 
 export interface IDeviceLogOptions {

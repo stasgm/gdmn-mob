@@ -14,6 +14,7 @@ export interface IFileSystem extends IEntity, IExtraFileInfo {
   size: number;
   fileName: string;
   path: string;
+  mdate: string;
 }
 
 export interface IFileSearchOptions {
