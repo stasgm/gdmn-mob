@@ -144,6 +144,7 @@ const CompanyList = () => {
                 path={'/app/companies/'}
                 onSetPageParams={handleSetPageParams}
                 pageParams={pageParams}
+                style={{ overflowY: 'auto', maxHeight: window.innerHeight - 268 }}
               />
             </Box>
           )}

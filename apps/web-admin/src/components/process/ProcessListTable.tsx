@@ -157,7 +157,7 @@ const ProcessListTable = ({
   return (
     <Card>
       <PerfectScrollbar>
-        <Box sx={{ p: 1, overflowX: 'auto' }}>
+        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight: window.innerHeight - 268 }}>
           <Table>
             <TableHead>
               <TableRow>
