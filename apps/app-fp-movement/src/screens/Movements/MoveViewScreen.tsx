@@ -264,24 +264,24 @@ export const MoveViewScreen = () => {
 
       if (!brc.match(/^-{0,1}\d+$/)) {
         if (visibleDialog) {
+          setErrorMessage('Штрих-код неверного формата');
+        } else {
           Alert.alert('Внимание!', 'Штрих-код не определен. Повторите сканирование!', [{ text: 'OK' }]);
           setScanned(false);
-        } else {
-          setErrorMessage('Штрих-код неверного формата');
         }
         return;
       }
 
       if (brc.length < minBarcodeLength) {
         if (visibleDialog) {
+          setErrorMessage('Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!');
+        } else {
           Alert.alert(
             'Внимание!',
             'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
             [{ text: 'OK' }],
           );
           setScanned(false);
-        } else {
-          setErrorMessage('Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!');
         }
         return;
       }
@@ -292,10 +292,10 @@ export const MoveViewScreen = () => {
 
       if (!good) {
         if (visibleDialog) {
+          setErrorMessage('Товар не найден');
+        } else {
           Alert.alert('Внимание!', 'Товар не найден!', [{ text: 'OK' }]);
           setScanned(false);
-        } else {
-          setErrorMessage('Товар не найден');
         }
         return;
       }
@@ -304,10 +304,10 @@ export const MoveViewScreen = () => {
 
       if (line) {
         if (visibleDialog) {
+          setErrorMessage('Товар уже добавлен');
+        } else {
           Alert.alert('Внимание!', 'Данный штрих-код уже добавлен!', [{ text: 'OK' }]);
           setScanned(false);
-        } else {
-          setErrorMessage('Товар уже добавлен');
         }
         return;
       }

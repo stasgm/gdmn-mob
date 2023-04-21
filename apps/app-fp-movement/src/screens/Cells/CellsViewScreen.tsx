@@ -102,6 +102,8 @@ export const CellsViewScreen = () => {
     [docs, id],
   );
 
+  // console.log('lines', jsonFormat(lines));
+
   const goods = refSelectors.selectByName<IGood>('good').data;
 
   const cells = refSelectors.selectByName<ICellRefList>('cell')?.data[0];
@@ -127,13 +129,18 @@ export const CellsViewScreen = () => {
     const upper = searchQuery.toUpperCase();
     return (
       cellListByGood
-        ?.filter(
-          (i) =>
-            i.barcode?.toUpperCase().includes(upper) ||
-            i.good?.shcode.toUpperCase().includes(upper) ||
-            i.good?.name.toUpperCase().includes(upper) ||
-            i.name.toUpperCase().includes(upper) ||
-            getDateString(i.workDate).includes(upper),
+        ?.filter((i) =>
+          // i.barcode?.toUpperCase().includes(upper) ||
+          // i.good?.shcode.toUpperCase().includes(upper) ||
+          // i.good?.name.toUpperCase().includes(upper) ||
+          // i.name.toUpperCase().includes(upper) ||
+          // getDateString(i.workDate).includes(upper),
+          i.barcode || i?.good?.name || i?.good?.shcode || i.name || i.workDate
+            ? i?.good?.shcode.toUpperCase().includes(searchQuery.toUpperCase()) ||
+              i?.good?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+              i?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+              getDateString(i?.workDate).includes(getDateString(searchQuery))
+            : false,
         )
         ?.sort((a, b) => new Date(b.workDate).getTime() - new Date(a.workDate).getTime()) || []
     );
@@ -229,6 +236,10 @@ export const CellsViewScreen = () => {
       const backColorStyle = {
         backgroundColor: item.barcode ? '#226182' : item.disabled ? colors.disabled : '#d5dce3',
       };
+      const newItem = lines.find((e) => e.barcode === item.barcode) || getScannedObject(item.barcode || '', item.name);
+      const defaultCell = cells[id || ''].find((i) => i.defaultGoodShcode === newItem.good.shcode && !i.barcode);
+
+      const good = goods.find((i) => `0000${i.shcode}`.slice(-4) === defaultCell?.defaultGoodShcode);
 
       return (
         <TouchableOpacity
@@ -236,7 +247,7 @@ export const CellsViewScreen = () => {
           style={[localStyles.buttons, backColorStyle]}
           onPress={() =>
             navigation.navigate('GoodLine', {
-              item: lines.find((e) => e.barcode === item.barcode) || getScannedObject(item.barcode || '', item.name),
+              item: newItem,
             })
           }
           disabled={!item.barcode || item.disabled}
@@ -245,7 +256,7 @@ export const CellsViewScreen = () => {
         </TouchableOpacity>
       );
     },
-    [colors.backdrop, colors.disabled, getScannedObject, lines, navigation],
+    [cells, colors.backdrop, colors.disabled, getScannedObject, goods, id, lines, navigation],
   );
 
   const CellsColumn = useCallback(

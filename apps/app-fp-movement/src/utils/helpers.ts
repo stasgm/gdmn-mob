@@ -26,8 +26,8 @@ export const getBarcode = (barcode: string, settings: barcodeSettings) => {
   const monthLast = dayLast + settings.countMonth;
   const yearLast = monthLast + settings.countYear;
   const shcodeLast = yearLast + 4 + settings.countCode;
-  const quantPackLast = shcodeLast + settings.countQuantPack;
-  const numReceivedLast = quantPackLast + settings.countType + settings.countNumReceived;
+  const quantPackLast = shcodeLast + settings.countQuantPack + settings.countType;
+  const numReceivedLast = quantPackLast + settings.countNumReceived;
 
   const weight = barcode.slice(0, weightLast);
   const day = barcode.slice(weightLast, dayLast);

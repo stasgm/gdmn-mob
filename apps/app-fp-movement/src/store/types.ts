@@ -74,6 +74,7 @@ export interface ICellRef {
   name: string;
   barcode?: string;
   disabled?: boolean;
+  defaultGoodShcode?: string;
 }
 export interface IMoveHead extends IHead {
   fromDepart: IAddressStoreEntity;

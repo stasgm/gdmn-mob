@@ -30,6 +30,7 @@ export const MoveEditScreen = () => {
   const doc = movements?.find((e) => e.id === id);
 
   const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data);
+  const defaultSecondDepart = useSelector((state) => state.auth.user?.settings?.secondDepart?.data);
 
   const movementType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
@@ -74,14 +75,19 @@ export const MoveEditScreen = () => {
           number: newNumber,
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
-          fromDepart: docDocumentSubtype?.id === 'internalMovement' ? defaultDepart : undefined,
+          fromDepart:
+            docDocumentSubtype?.id === 'internalMovement'
+              ? defaultDepart
+              : docDocumentSubtype?.id === 'movement'
+              ? defaultSecondDepart
+              : undefined,
           toDepart:
             docDocumentSubtype?.id === 'movement' || docDocumentSubtype?.id === 'prihod' ? defaultDepart : undefined,
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, doc, defaultDepart, docDocumentSubtype]);
+  }, [dispatch, doc, defaultDepart, defaultSecondDepart, docDocumentSubtype]);
 
   useEffect(() => {
     if (docDocumentSubtype?.id === 'cellMovement' && docFromDepart) {
