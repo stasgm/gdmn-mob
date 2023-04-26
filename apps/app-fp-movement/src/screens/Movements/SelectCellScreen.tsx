@@ -9,6 +9,8 @@ import { Checkbox, useTheme } from 'react-native-paper';
 
 import { ScrollView } from 'react-native-gesture-handler';
 
+import { generateId, round } from '@lib/mobile-hooks';
+
 import { ICell, ICellRef, IMoveDocument, IMoveLine } from '../../store/types';
 import { MoveStackParamList } from '../../navigation/Root/types';
 
@@ -92,7 +94,7 @@ export const SelectCellScreen = () => {
     }
   }, [item, mode]);
 
-  const defaultGoodCell = cells[departId || ''].find((i) => i.defaultGoodShcode === item.good.shcode);
+  const defaultGoodCell = (cells[departId || ''] || []).find((i) => i.defaultGoodShcode === item.good.shcode);
 
   useEffect(() => {
     if (defaultGoodCell && mode === 0) {
@@ -141,8 +143,17 @@ export const SelectCellScreen = () => {
             handleAddLine(newLine);
           }
         } else {
-          const newLine: IMoveLine = { ...item, toCell: newCell };
-          handleAddLine(newLine);
+          if (isDoublePallet && neighbourSells.length) {
+            const newWeight = round(item.weight / 2, 2);
+            const newFirstLine: IMoveLine = { ...item, toCell: toCell?.toCell, weight: newWeight };
+            const newSecondLine: IMoveLine = { ...newFirstLine, id: generateId(), toCell: newCell };
+            handleAddLine(newFirstLine);
+
+            handleAddLine(newSecondLine);
+          } else {
+            const newLine: IMoveLine = { ...item, toCell: newCell };
+            handleAddLine(newLine);
+          }
         }
       } else {
         const newLine: IMoveLine = { ...item, toCell: newCell };
@@ -162,11 +173,14 @@ export const SelectCellScreen = () => {
       docId,
       fromCell,
       handleAddLine,
+      isDoublePallet,
       item,
       mode,
       navigation,
+      neighbourSells.length,
       selectedChamber,
       selectedRow,
+      toCell?.toCell,
     ],
   );
 

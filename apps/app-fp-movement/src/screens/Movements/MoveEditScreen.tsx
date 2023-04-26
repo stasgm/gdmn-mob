@@ -12,11 +12,12 @@ import { useDispatch, documentActions, appActions, useSelector, refSelectors } f
 
 import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks';
 
-import { IDocumentType, IReference, ScreenState } from '@lib/types';
+import { IDocumentType, INamedEntity, IReference, ScreenState } from '@lib/types';
 
 import { MoveStackParamList } from '../../navigation/Root/types';
 import { IMoveFormParam, IMoveDocument } from '../../store/types';
 import { getNextDocNumber } from '../../utils/helpers';
+import { IAddressStoreEntity } from '../../store/app/types';
 
 export const MoveEditScreen = () => {
   const id = useRoute<RouteProp<MoveStackParamList, 'MoveEdit'>>().params?.id;
@@ -29,8 +30,12 @@ export const MoveEditScreen = () => {
 
   const doc = movements?.find((e) => e.id === id);
 
-  const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data);
-  const defaultSecondDepart = useSelector((state) => state.auth.user?.settings?.secondDepart?.data);
+  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
+
+  const userDefaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity;
+  const defaultDepart = departs.find((i) => i.id === userDefaultDepart?.id);
+  const userDefaultSecondDepart = useSelector((state) => state.auth.user?.settings?.secondDepart?.data) as INamedEntity;
+  const defaultSecondDepart = departs.find((i) => i.id === userDefaultSecondDepart?.id);
 
   const movementType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
@@ -122,11 +127,11 @@ export const MoveEditScreen = () => {
         return;
       }
 
-      if (docDocumentSubtype?.id === 'prihod' && docFromDepart?.isAddressStore) {
-        Alert.alert('Ошибка!', 'В документе прихода подразделение "Откуда" не можнт быть адресным.', [{ text: 'OK' }]);
-        setScreenState('idle');
-        return;
-      }
+      // if (docDocumentSubtype?.id === 'prihod' && docFromDepart?.isAddressStore) {
+      //   Alert.alert('Ошибка!', 'В документе прихода подразделение "Откуда" не можнт быть адресным.', [{ text: 'OK' }]);
+      //   setScreenState('idle');
+      //   return;
+      // }
 
       if (!(docNumber && docDate && docFromDepart && docToDepart)) {
         Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
@@ -134,15 +139,15 @@ export const MoveEditScreen = () => {
         return;
       }
 
-      if (
-        (docDocumentSubtype?.id === 'internalMovement' || docDocumentSubtype?.id === 'movement') &&
-        !docFromDepart.isAddressStore &&
-        docToDepart.isAddressStore
-      ) {
-        Alert.alert('Ошибка!', 'Данные подразделения относятся к типу приход .', [{ text: 'OK' }]);
-        setScreenState('idle');
-        return;
-      }
+      // if (
+      //   (docDocumentSubtype?.id === 'internalMovement' || docDocumentSubtype?.id === 'movement') &&
+      //   !docFromDepart.isAddressStore &&
+      //   docToDepart.isAddressStore
+      // ) {
+      //   Alert.alert('Ошибка!', 'Данные подразделения относятся к типу приход .', [{ text: 'OK' }]);
+      //   setScreenState('idle');
+      //   return;
+      // }
 
       const docId = !id ? generateId() : id;
       const createdDate = new Date().toISOString();

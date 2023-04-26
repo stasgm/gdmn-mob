@@ -33,7 +33,7 @@ import { MoveStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import { getBarcode } from '../../utils/helpers';
-import { IGood } from '../../store/app/types';
+import { IAddressStoreEntity, IGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
 
@@ -68,6 +68,7 @@ export const MoveViewScreen = () => {
 
   const goods = refSelectors.selectByName<IGood>('good').data;
   const settings = useSelector((state) => state.settings?.data);
+  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
 
   const goodBarcodeSettings = Object.entries(settings).reduce((prev: barcodeSettings, [idx, item]) => {
     if (item && item.group?.id !== 'base' && typeof item.data === 'number') {
@@ -324,10 +325,10 @@ export const MoveViewScreen = () => {
         sortOrder: doc.lines?.length + 1,
       };
 
-      if (
-        (doc.head.subtype.id === 'prihod' && doc.head.toDepart.isAddressStore) ||
-        (doc.head.subtype.id !== 'prihod' && doc.head.fromDepart.isAddressStore)
-      ) {
+      const isFromAddressed = departs.find((i) => i.id === doc.head.fromDepart.id && i.isAddressStore);
+      const isToAddressed = departs.find((i) => i.id === doc.head.toDepart.id && i.isAddressStore);
+
+      if (doc.head.toDepart.isAddressStore || doc.head.fromDepart.isAddressStore || isFromAddressed || isToAddressed) {
         if (newLine.quantPack < goodBarcodeSettings.boxNumber) {
           Alert.alert('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}!`, [
             { text: 'OK' },
@@ -349,8 +350,10 @@ export const MoveViewScreen = () => {
       }
     },
 
-    [doc, minBarcodeLength, goodBarcodeSettings, goods, visibleDialog, navigation, id, dispatch],
+    [doc, minBarcodeLength, goodBarcodeSettings, goods, departs, visibleDialog, navigation, id, dispatch],
   );
+
+  console.log('doc.head.fromDepart', doc.head.fromDepart, 'doc.head.toDepart', doc.head.toDepart);
 
   const handleSearchBarcode = () => {
     getScannedObject(barcode);

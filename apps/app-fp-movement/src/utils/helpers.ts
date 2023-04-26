@@ -35,7 +35,7 @@ export const getBarcode = (barcode: string, settings: barcodeSettings) => {
   const year = '20' + barcode.slice(monthLast, yearLast);
   const shcode = barcode.slice(yearLast + 4, shcodeLast);
   const quantPack = barcode.slice(shcodeLast, quantPackLast);
-  const numReceived = barcode.slice(quantPackLast + 1, numReceivedLast);
+  const numReceived = barcode.slice(quantPackLast, numReceivedLast);
 
   const workDate = new Date(Number(year), Number(month) - 1, Number(day)).toISOString();
 
