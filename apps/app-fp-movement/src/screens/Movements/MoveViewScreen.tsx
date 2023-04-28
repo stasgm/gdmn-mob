@@ -220,7 +220,8 @@ export const MoveViewScreen = () => {
       return (
         <ListItemLine
           key={item.id}
-          readonly={!(doc?.head.subtype.id === 'prihod') || isBlocked}
+          readonly={isBlocked}
+          // readonly={!(doc?.head.subtype.id === 'prihod') || isBlocked}
           onPress={() => navigation.navigate('SelectCell', { docId: id, item, mode: 1 })}
         >
           <View style={styles.details}>
@@ -352,8 +353,6 @@ export const MoveViewScreen = () => {
 
     [doc, minBarcodeLength, goodBarcodeSettings, goods, departs, visibleDialog, navigation, id, dispatch],
   );
-
-  console.log('doc.head.fromDepart', doc.head.fromDepart, 'doc.head.toDepart', doc.head.toDepart);
 
   const handleSearchBarcode = () => {
     getScannedObject(barcode);

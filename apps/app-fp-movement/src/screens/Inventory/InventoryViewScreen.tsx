@@ -27,8 +27,8 @@ import { ScreenState } from '@lib/types';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { barcodeSettings, IReturnDocument, IReturnLine } from '../../store/types';
-import { ReturnStackParamList } from '../../navigation/Root/types';
+import { barcodeSettings, IInventoryDocument, IInventoryLine } from '../../store/types';
+import { InventoryStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import { getBarcode } from '../../utils/helpers';
@@ -37,19 +37,19 @@ import { IGood } from '../../store/app/types';
 import ViewTotal from '../../components/ViewTotal';
 
 export interface IScanerObject {
-  item?: IReturnLine;
+  item?: IInventoryLine;
   barcode: string;
   state: 'scan' | 'added' | 'notFound';
 }
 
-export const ReturnViewScreen = () => {
+export const InventoryViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
-  const navigation = useNavigation<StackNavigationProp<ReturnStackParamList, 'ReturnView'>>();
+  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'InventoryView'>>();
 
-  const id = useRoute<RouteProp<ReturnStackParamList, 'ReturnView'>>().params?.id;
-  const doc = docSelectors.selectByDocId<IReturnDocument>(id);
+  const id = useRoute<RouteProp<InventoryStackParamList, 'InventoryView'>>().params?.id;
+  const doc = docSelectors.selectByDocId<IInventoryDocument>(id);
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
 
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
@@ -65,7 +65,7 @@ export const ReturnViewScreen = () => {
     return prev;
   }, {});
 
-  const minBarcodeLength = settings.minBarcodeLength?.data || 0;
+  const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -142,7 +142,7 @@ export const ReturnViewScreen = () => {
   };
 
   const handleEditDocHead = useCallback(() => {
-    navigation.navigate('ReturnEdit', { id });
+    navigation.navigate('InventoryEdit', { id });
   }, [navigation, id]);
 
   const handleDelete = useCallback(() => {
@@ -257,7 +257,7 @@ export const ReturnViewScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  const renderItem: ListRenderItem<IReturnLine> = ({ item }) => (
+  const renderItem: ListRenderItem<IInventoryLine> = ({ item }) => (
     <ListItemLine key={item.id} readonly={true}>
       <View style={styles.details}>
         <LargeText style={styles.textBold}>{item.good.name}</LargeText>
@@ -318,7 +318,7 @@ export const ReturnViewScreen = () => {
         return;
       }
 
-      const newLine: IReturnLine = {
+      const newLine: IInventoryLine = {
         good: { id: good.id, name: good.name, shcode: good.shcode },
         id: generateId(),
         weight: barc.weight,

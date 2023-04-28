@@ -25,21 +25,23 @@ import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@l
 
 import { IDelList } from '@lib/mobile-types';
 
-import { IReturnDocument } from '../../store/types';
-import { ReturnStackParamList } from '../../navigation/Root/types';
+import { IInventoryDocument } from '../../store/types';
+import { InventoryStackParamList } from '../../navigation/Root/types';
 
-export interface ReturnListSectionProps {
+export interface InventoryListSectionProps {
   title: string;
 }
 
-export type SectionDataProps = SectionListData<IListItemProps, ReturnListSectionProps>[];
+export type SectionDataProps = SectionListData<IListItemProps, InventoryListSectionProps>[];
 
-export const ReturnListScreen = () => {
-  const navigation = useNavigation<StackNavigationProp<ReturnStackParamList, 'ReturnList'>>();
+export const InventoryListScreen = () => {
+  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'InventoryList'>>();
   const docDispatch = useDocThunkDispatch();
 
   const list = (
-    useSelector((state) => state.documents.list)?.filter((i) => i.documentType?.name === 'return') as IReturnDocument[]
+    useSelector((state) => state.documents.list)?.filter(
+      (i) => i.documentType?.name === 'inventory',
+    ) as IInventoryDocument[]
   ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   const [delList, setDelList] = useState<IDelList>({});
@@ -110,7 +112,7 @@ export const ReturnListScreen = () => {
         {isDelList ? (
           <DeleteButton onPress={handleDeleteDocs} />
         ) : (
-          <AddButton onPress={() => navigation.navigate('ReturnEdit')} />
+          <AddButton onPress={() => navigation.navigate('InventoryEdit')} />
         )}
       </View>
     ),
@@ -123,7 +125,7 @@ export const ReturnListScreen = () => {
     navigation.setOptions({
       headerLeft: isDelList ? renderLeft : navBackDrawer,
       headerRight: renderRight,
-      title: isDelList ? `Выделено возвратов: ${Object.values(delList).length}` : 'Возвраты',
+      title: isDelList ? `Выделено: ${Object.values(delList).length}` : 'Инвентаризация',
     });
   }, [delList, isDelList, navigation, renderLeft, renderRight]);
 
@@ -135,7 +137,7 @@ export const ReturnListScreen = () => {
         onPress={() =>
           isDelList
             ? setDelList(getDelList(delList, item.id, item.status!))
-            : navigation.navigate('ReturnView', { id: item.id })
+            : navigation.navigate('InventoryView', { id: item.id })
         }
         onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
         checked={!!delList[item.id]}

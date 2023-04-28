@@ -34,7 +34,7 @@ export interface IFreeShipmentFormParam extends IFormParam {
   comment?: string;
 }
 
-export interface IReturnFormParam extends IFormParam {
+export interface IInventoryFormParam extends IFormParam {
   number?: string;
   documentDate?: string;
   status?: StatusType;
@@ -63,18 +63,22 @@ export interface IContact extends INamedEntity, IReferenceData {
   phoneNumber: string; // Номер телефона
 }
 
-export interface ICell {
+export interface ICellName {
   chamber: string;
   row: string;
-  tier: string;
   cell: string;
+}
+
+export interface ICell extends ICellName {
+  tier: string;
 }
 
 export interface ICellRef {
   name: string;
+  tier: string;
   barcode?: string;
   disabled?: boolean;
-  defaultGoodShcode?: string;
+  defaultGroup?: INamedEntity;
 }
 export interface IMoveHead extends IHead {
   fromDepart: IAddressStoreEntity;
@@ -148,14 +152,12 @@ export interface IFreeShipmentLine extends IEntity {
 }
 export type IFreeShipmentDocument = MandateProps<IDocument<IFreeShipmentHead, IFreeShipmentLine>, 'head' | 'lines'>;
 
-export interface IReturnHead extends IHead {
-  contact: ICodeEntity; //организация-плательщик
-  outlet: ICodeEntity; // магазин –подразделение организации плательщика
+export interface IInventoryHead extends IHead {
   depart: ICodeEntity;
   comment?: string; // Комvентарий
 }
 
-export interface IReturnLine extends IEntity {
+export interface IInventoryLine extends IEntity {
   good: IGood;
   weight: number;
   workDate: string; // Дата производства
@@ -166,7 +168,7 @@ export interface IReturnLine extends IEntity {
   // toCell?: string; // номер ячейки
 }
 
-export type IReturnDocument = MandateProps<IDocument<IReturnHead, IReturnLine>, 'head' | 'lines'>;
+export type IInventoryDocument = MandateProps<IDocument<IInventoryHead, IInventoryLine>, 'head' | 'lines'>;
 export interface ICellMovementHead extends IHead {
   depart: IAddressStoreEntity;
   comment?: string; // Коментарий

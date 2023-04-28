@@ -49,7 +49,7 @@ import { messageFpMovement, tempOrders } from './src/store/mock';
 import { FreeShipmentNavigator } from './src/navigation/FreeShipmentNavigator';
 import { ShipmentNavigator } from './src/navigation/ShipmentNavigator';
 import { CellsNavigator } from './src/navigation/CellsNavigator';
-import { ReturnNavigator } from './src/navigation/ReturnNavigator';
+import { InventoryNavigator } from './src/navigation/InventoryNavigator';
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -73,10 +73,10 @@ const Root = () => {
         component: FreeShipmentNavigator,
       },
       {
-        name: 'Return',
-        title: 'Возвраты',
+        name: 'Inventory',
+        title: 'Инвентаризация',
         icon: 'file-restore-outline',
-        component: ReturnNavigator,
+        component: InventoryNavigator,
       },
       {
         name: 'CellShipment',

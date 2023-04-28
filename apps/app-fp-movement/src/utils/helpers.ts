@@ -7,8 +7,9 @@ import {
   ICell,
   ICellRef,
   IMoveLine,
+  ICellName,
 } from '../store/types';
-import { IBarcode, IModelData } from '../store/app/types';
+import { IBarcode, ICellData, IModelData } from '../store/app/types';
 
 export const getNextDocNumber = (
   documents: IMoveDocument[] | IShipmentDocument[] | IFreeShipmentDocument[] | ICellMovementDocument[],
@@ -59,24 +60,27 @@ const getLastMovingPos = (pos: ICellRef, lines: IMoveLine[]) => {
 
 export const getCellItem = (str: string) => {
   const cellArray = str.split('-');
-  return { chamber: cellArray[0], row: cellArray[1], tier: cellArray[2], cell: cellArray[3] } as ICell;
+  return { chamber: cellArray[0], row: cellArray[1], cell: cellArray[2] } as ICellName;
 };
 
 export const getCellList = (list: ICellRef[], lines: IMoveLine[]) => {
   console.log('getCellList');
   const model = list?.reduce((prev: IModelData, cur) => {
-    const cellItem = getCellItem(cur.name);
+    const cellNameItem = getCellItem(cur.name);
+    const cellItem: ICell = { ...cellNameItem, tier: cur.tier };
 
     const chamber = prev?.[cellItem?.chamber];
 
     const { from, to } = getLastMovingPos(cur, lines);
 
-    const newCell = {
+    const newCell: ICellData = {
       name: cur.name,
       cell: cellItem.cell,
       barcode: from ? '' : to ? to.barcode : cur.barcode || '',
       // barcode: cur.barcode || '',
+      tier: cur.tier,
       disabled: cur.disabled || false,
+      defaultGroup: cur.defaultGroup,
     };
 
     if (!chamber) {

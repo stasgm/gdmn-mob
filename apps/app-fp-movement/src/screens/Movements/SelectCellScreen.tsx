@@ -5,16 +5,14 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 import { globalStyles as styles, LargeText, navBackButton, AppScreen, AppActivityIndicator } from '@lib/mobile-ui';
 
-import { Checkbox, useTheme } from 'react-native-paper';
+import { useTheme } from 'react-native-paper';
 
 import { ScrollView } from 'react-native-gesture-handler';
 
-import { generateId, round } from '@lib/mobile-hooks';
-
-import { ICell, ICellRef, IMoveDocument, IMoveLine } from '../../store/types';
+import { ICell, ICellName, ICellRef, IMoveDocument, IMoveLine } from '../../store/types';
 import { MoveStackParamList } from '../../navigation/Root/types';
 
-import { getCellItem, getCellList, jsonFormat } from '../../utils/helpers';
+import { getCellItem, getCellList } from '../../utils/helpers';
 import { ICellRefList, ICellData } from '../../store/app/types';
 import { Group } from '../../components/Group';
 
@@ -46,10 +44,7 @@ export const SelectCellScreen = () => {
   const [selectedChamber, setSelectedChamber] = useState<string | undefined>('');
   const [selectedRow, setSelectedRow] = useState<string | undefined>('');
 
-  const [defaultCell, setDefaultCell] = useState<string | undefined>(undefined);
-
-  const [isDoublePallet, setIsDoublePallet] = useState(false);
-  const [neighbourSells, setNeighbourCells] = useState<ICellData[]>([]);
+  const [defaultCell, setDefaultCell] = useState<string[]>([]);
 
   const departId = useMemo(
     () => (doc?.head.fromDepart.isAddressStore && !fromCell ? doc?.head.fromDepart.id : doc?.head.toDepart.id),
@@ -94,23 +89,28 @@ export const SelectCellScreen = () => {
     }
   }, [item, mode]);
 
-  const defaultGoodCell = (cells[departId || ''] || []).find((i) => i.defaultGoodShcode === item.good.shcode);
+  const defaultGoodCells = (cells[departId || ''] || []).filter((i) => i.defaultGroup?.id === item.good.goodGroupId);
 
   useEffect(() => {
-    if (defaultGoodCell && mode === 0) {
-      const dividedCell = getCellItem(defaultGoodCell.name);
+    if (defaultGoodCells.length && mode === 0) {
+      const dividedCells = defaultGoodCells.reduce((prev: ICellName[], cur) => {
+        const dividedCell = getCellItem(cur.name);
 
-      const currentCell = cellList[dividedCell.chamber][dividedCell.row][dividedCell.tier].find(
-        (i) => i.cell === dividedCell.cell,
+        prev = [...prev, dividedCell];
+        return prev;
+      }, []);
+
+      const currentCell = cellList[dividedCells[0].chamber][dividedCells[0].row][defaultGoodCells[0].tier].find(
+        (i) => i.cell === dividedCells[0].cell,
       );
 
       if (!currentCell?.barcode) {
-        setSelectedChamber(dividedCell.chamber);
-        setSelectedRow(dividedCell.row);
-        setDefaultCell(defaultGoodCell.name);
+        setSelectedChamber(dividedCells[0].chamber);
+        setSelectedRow(dividedCells[0].row);
+        setDefaultCell(defaultGoodCells.map((i) => i.name));
       }
     }
-  }, [cellList, defaultGoodCell, item, mode]);
+  }, [cellList, defaultGoodCells, item, mode]);
 
   const cellsByRow = useMemo(
     () => (selectedChamber && selectedRow ? Object.entries(cellList[selectedChamber][selectedRow]).reverse() : []),
@@ -118,8 +118,8 @@ export const SelectCellScreen = () => {
   );
 
   const handleSaveLine = useCallback(
-    (cellData: ICellData, tier: string) => {
-      const newCell = `${selectedChamber}-${selectedRow}-${tier}-${cellData.cell}`;
+    (cellData: ICellData /*, tier: string*/) => {
+      const newCell = `${selectedChamber}-${selectedRow}-${cellData.cell}`;
 
       if (mode === 0) {
         if (doc?.head.fromDepart.isAddressStore) {
@@ -143,17 +143,8 @@ export const SelectCellScreen = () => {
             handleAddLine(newLine);
           }
         } else {
-          if (isDoublePallet && neighbourSells.length) {
-            const newWeight = round(item.weight / 2, 2);
-            const newFirstLine: IMoveLine = { ...item, toCell: toCell?.toCell, weight: newWeight };
-            const newSecondLine: IMoveLine = { ...newFirstLine, id: generateId(), toCell: newCell };
-            handleAddLine(newFirstLine);
-
-            handleAddLine(newSecondLine);
-          } else {
-            const newLine: IMoveLine = { ...item, toCell: newCell };
-            handleAddLine(newLine);
-          }
+          const newLine: IMoveLine = { ...item, toCell: newCell };
+          handleAddLine(newLine);
         }
       } else {
         const newLine: IMoveLine = { ...item, toCell: newCell };
@@ -173,63 +164,13 @@ export const SelectCellScreen = () => {
       docId,
       fromCell,
       handleAddLine,
-      isDoublePallet,
       item,
       mode,
       navigation,
-      neighbourSells.length,
       selectedChamber,
       selectedRow,
-      toCell?.toCell,
     ],
   );
-
-  const handleAddDouble = useCallback(
-    (cellData: ICellData, tier: string) => {
-      const newCell = `${selectedChamber}-${selectedRow}-${tier}-${cellData.cell}`;
-      const newLine: IMoveLine = { ...item, toCell: newCell };
-
-      if (isDoublePallet) {
-        const cellsInRow = cellsByRow.find((i) => i[0] === tier)?.[1];
-        const firstPart = cellsInRow?.find((i) => i.name === newCell);
-        const index = cellsInRow?.indexOf(firstPart);
-
-        const isLeftFree =
-          cellsInRow &&
-          index &&
-          cellsInRow[index - 1] &&
-          !cellsInRow[index - 1].barcode &&
-          !cellsInRow[index - 1].disabled;
-        const isRightFree =
-          cellsInRow &&
-          index &&
-          cellsInRow[index + 1] &&
-          !cellsInRow[index + 1].barcode &&
-          !cellsInRow[index + 1].disabled;
-        if (isLeftFree || isRightFree) {
-          setNeighbourCells(
-            isLeftFree && isRightFree
-              ? [cellsInRow[index - 1], cellsInRow[index + 1]]
-              : isLeftFree
-              ? [cellsInRow[index - 1]]
-              : [cellsInRow[index + 1]],
-          );
-          setToCell(newLine);
-          return;
-        } else {
-          Alert.alert('Ошибка выбора ячейки!', 'Выберите другую ячейку.', [
-            {
-              text: 'ОК',
-            },
-          ]);
-          return;
-        }
-      }
-    },
-    [cellsByRow, isDoublePallet, item, selectedChamber, selectedRow],
-  );
-
-  console.log('ssss', neighbourSells);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -238,28 +179,25 @@ export const SelectCellScreen = () => {
   }, [navigation]);
 
   const Cell = useCallback(
-    ({ i, row }: { row: string; i: ICellData }) => {
-      const iss =
-        isDoublePallet && Boolean(neighbourSells.length) && Boolean(!neighbourSells.find((e) => e.name === i.name));
+    ({ i /*, row*/ }: { /*row: string;*/ i: ICellData }) => {
       const colorStyle = {
         color:
-          defaultCell && defaultCell === i.name
+          defaultCell.length && defaultCell.find((e) => e === i.name)
             ? 'white'
-            : (iss && i.barcode) || i.disabled || !i.barcode
+            : i.disabled || !i.barcode
             ? colors.backdrop
             : 'white',
       };
       const colorBack = '#d5dce3';
       const backColorStyle = {
         backgroundColor:
-          (fromCell && fromCell.barcode === i.barcode) ||
-          (toCell && toCell.barcode === i.barcode) ||
-          (toCell && toCell.toCell === i.name) ||
-          (defaultCell && defaultCell === i.name)
-            ? '#b557a2'
+          (fromCell && fromCell.barcode === i.barcode) || (toCell && toCell.barcode === i.barcode)
+            ? colors.error
+            : defaultCell.length && defaultCell.find((e) => e === i.name)
+            ? '#2b7849'
             : i.barcode
             ? '#226182'
-            : i.disabled || iss
+            : i.disabled
             ? colors.disabled
             : colorBack,
       };
@@ -268,9 +206,9 @@ export const SelectCellScreen = () => {
         <TouchableOpacity
           key={i.name}
           style={[localStyles.buttons, backColorStyle]}
-          onPress={() => (isDoublePallet && !neighbourSells.length ? handleAddDouble(i, row) : handleSaveLine(i, row))}
+          onPress={() => handleSaveLine(i /*, row*/)}
           disabled={
-            (doc?.head.fromDepart.isAddressStore && !fromCell ? !i.barcode : Boolean(i.barcode)) || i.disabled || iss
+            (doc?.head.fromDepart.isAddressStore && !fromCell ? !i.barcode : Boolean(i.barcode)) || Boolean(i.disabled)
           }
         >
           <Text style={[localStyles.buttonLabel, colorStyle]}>{i.cell}</Text>
@@ -280,22 +218,20 @@ export const SelectCellScreen = () => {
     [
       colors.backdrop,
       colors.disabled,
+      colors.error,
       defaultCell,
       doc?.head.fromDepart.isAddressStore,
       fromCell,
-      handleAddDouble,
       handleSaveLine,
-      isDoublePallet,
-      neighbourSells,
       toCell,
     ],
   );
 
   const CellsColumn = useCallback(
-    ({ row, cellData }: { row: string; cellData: ICellData[] }) => (
+    ({ /*row,*/ cellData }: { /*row: string;*/ cellData: ICellData[] }) => (
       <View style={styles.flexDirectionRow}>
         {cellData?.map((i) => (
-          <Cell key={i.name} row={row} i={i} />
+          <Cell key={i.name} /*row={row}*/ i={i} />
         ))}
       </View>
     ),
@@ -324,18 +260,6 @@ export const SelectCellScreen = () => {
           </View>
         ) : null}
         <ScrollView>
-          {departId && cells[departId] ? (
-            <Checkbox.Item
-              color={colors.primary}
-              uncheckedColor={colors.primary}
-              status={isDoublePallet ? 'checked' : 'unchecked'}
-              onPress={() => setIsDoublePallet(!isDoublePallet)}
-              label="Двойной поддон"
-              position="leading"
-              style={[localStyles.checkBox]}
-              labelStyle={localStyles.buttonLabel}
-            />
-          ) : null}
           <Group
             values={Object.keys(cellList)}
             onPress={(i) => setSelectedChamber(i)}
@@ -370,7 +294,7 @@ export const SelectCellScreen = () => {
                 <ScrollView horizontal>
                   <View style={styles.directionColumn}>
                     {cellsByRow.map(([key, data]) => (
-                      <CellsColumn key={key} row={key} cellData={data} />
+                      <CellsColumn key={key} /*row={key}*/ cellData={data} />
                     ))}
                   </View>
                 </ScrollView>

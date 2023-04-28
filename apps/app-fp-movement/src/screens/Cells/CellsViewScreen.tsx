@@ -231,15 +231,22 @@ export const CellsViewScreen = () => {
   const Cell = useCallback(
     ({ item }: { item: ICellData }) => {
       const colorStyle = {
-        color: item.disabled || !item.barcode ? colors.backdrop : 'white',
+        color:
+          item.disabled || (!item.barcode && !(item.defaultGroup && item.defaultGroup.id)) ? colors.backdrop : 'white',
       };
       const backColorStyle = {
-        backgroundColor: item.barcode ? '#226182' : item.disabled ? colors.disabled : '#d5dce3',
+        backgroundColor: item.barcode
+          ? '#226182'
+          : item.disabled
+          ? colors.backdrop
+          : item.defaultGroup && item.defaultGroup.id
+          ? '#2b7849'
+          : '#d5dce3',
       };
       const newItem = lines.find((e) => e.barcode === item.barcode) || getScannedObject(item.barcode || '', item.name);
-      const defaultCell = cells[id || ''].find((i) => i.defaultGoodShcode === newItem.good.shcode && !i.barcode);
+      // const defaultCell = cells[id || ''].find((i) => i.defaultGroup === newItem.good.shcode && !i.barcode);
 
-      const good = goods.find((i) => `0000${i.shcode}`.slice(-4) === defaultCell?.defaultGoodShcode);
+      // const good = goods.find((i) => `0000${i.shcode}`.slice(-4) === defaultCell?.defaultGoodShcode);
 
       return (
         <TouchableOpacity
@@ -256,7 +263,7 @@ export const CellsViewScreen = () => {
         </TouchableOpacity>
       );
     },
-    [cells, colors.backdrop, colors.disabled, getScannedObject, goods, id, lines, navigation],
+    [colors.backdrop, getScannedObject, lines, navigation],
   );
 
   const CellsColumn = useCallback(

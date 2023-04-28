@@ -14,21 +14,21 @@ import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks
 
 import { IDocumentType, IReference, ScreenState } from '@lib/types';
 
-import { ReturnStackParamList } from '../../navigation/Root/types';
-import { IReturnFormParam, IReturnDocument, IOutlet } from '../../store/types';
+import { InventoryStackParamList } from '../../navigation/Root/types';
+import { IInventoryFormParam, IInventoryDocument } from '../../store/types';
 import { STATUS_LIST } from '../../utils/constants';
 import { getNextDocNumber } from '../../utils/helpers';
 
-export const ReturnEditScreen = () => {
-  const id = useRoute<RouteProp<ReturnStackParamList, 'ReturnEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<ReturnStackParamList, 'ReturnEdit'>>();
+export const InventoryEditScreen = () => {
+  const id = useRoute<RouteProp<InventoryStackParamList, 'InventoryEdit'>>().params?.id;
+  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'InventoryEdit'>>();
   const dispatch = useDispatch();
 
   const { colors } = useTheme();
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
-  const shipments = useFilteredDocList<IReturnDocument>('return');
+  const shipments = useFilteredDocList<IInventoryDocument>('inventory');
 
   const doc = shipments?.find((e) => e.id === id);
 
@@ -36,18 +36,16 @@ export const ReturnEditScreen = () => {
 
   const shipmentType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data.find((t) => t.name === 'return');
+    ?.data.find((t) => t.name === 'inventory');
 
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {
     depart: docDepart,
-    outlet: docOutlet,
-    contact: docContact,
     documentDate: docDate,
     number: docNumber,
     comment: docComment,
     status: docStatus,
-  } = useSelector((state) => state.app.formParams as IReturnFormParam);
+  } = useSelector((state) => state.app.formParams as IInventoryFormParam);
 
   useEffect(() => {
     return () => {
@@ -55,19 +53,6 @@ export const ReturnEditScreen = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === docOutlet?.id);
-
-  useEffect(() => {
-    if (!docContact && !!docOutlet) {
-      dispatch(
-        appActions.setFormParams({
-          contact: outlet?.company,
-        }),
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, docOutlet, outlet?.company]);
 
   useEffect(() => {
     // Инициализируем параметры
@@ -100,7 +85,7 @@ export const ReturnEditScreen = () => {
   useEffect(() => {
     if (screenState === 'saving') {
       if (!shipmentType) {
-        Alert.alert('Внимание!', 'Тип документа для возвратов не найден.', [{ text: 'OK' }]);
+        Alert.alert('Внимание!', 'Тип документа для инвентаризации не найден.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
       }
@@ -110,7 +95,7 @@ export const ReturnEditScreen = () => {
         return;
       }
 
-      if (!(docNumber && docDepart && docContact && docOutlet && docDate)) {
+      if (!(docNumber && docDepart && docDate)) {
         Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
@@ -120,7 +105,7 @@ export const ReturnEditScreen = () => {
       const createdDate = new Date().toISOString();
 
       if (!id) {
-        const newDoc: IReturnDocument = {
+        const newDoc: IInventoryDocument = {
           id: docId,
           documentType: shipmentType,
           number: docNumber && docNumber.trim(),
@@ -129,8 +114,6 @@ export const ReturnEditScreen = () => {
           head: {
             comment: docComment && docComment.trim(),
             depart: docDepart,
-            contact: docContact,
-            outlet: docOutlet,
           },
           lines: [],
           creationDate: createdDate,
@@ -139,7 +122,7 @@ export const ReturnEditScreen = () => {
 
         dispatch(documentActions.addDocument(newDoc));
 
-        navigation.dispatch(StackActions.replace('ReturnView', { id: newDoc.id }));
+        navigation.dispatch(StackActions.replace('InventoryView', { id: newDoc.id }));
       } else {
         if (!doc) {
           setScreenState('idle');
@@ -148,7 +131,7 @@ export const ReturnEditScreen = () => {
 
         const updatedDate = new Date().toISOString();
 
-        const updatedDoc: IReturnDocument = {
+        const updatedDoc: IInventoryDocument = {
           ...doc,
           id,
           number: docNumber && docNumber.trim(),
@@ -160,8 +143,6 @@ export const ReturnEditScreen = () => {
             ...doc.head,
             comment: docComment && docComment.trim(),
             depart: docDepart,
-            contact: docContact,
-            outlet: docOutlet,
           },
           lines: doc.lines,
           creationDate: doc.creationDate || updatedDate,
@@ -169,25 +150,11 @@ export const ReturnEditScreen = () => {
         };
 
         dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
-        navigation.navigate('ReturnView', { id });
+        navigation.navigate('InventoryView', { id });
       }
       setScreenState('idle');
     }
-  }, [
-    dispatch,
-    doc,
-    docComment,
-    docContact,
-    docDate,
-    docDepart,
-    docNumber,
-    docOutlet,
-    docStatus,
-    id,
-    navigation,
-    screenState,
-    shipmentType,
-  ]);
+  }, [dispatch, doc, docComment, docDate, docDepart, docNumber, docStatus, id, navigation, screenState, shipmentType]);
 
   const renderRight = useCallback(
     () => <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />,
@@ -237,37 +204,6 @@ export const ReturnEditScreen = () => {
     });
   };
 
-  const handleOutlet = () => {
-    if (isBlocked) {
-      return;
-    }
-
-    // const params: Record<string, string> = {};
-
-    // if (docContact?.id) {
-    //   params.companyId = docContact?.id;
-    // }
-
-    navigation.navigate('SelectRefItem', {
-      refName: 'outlet',
-      fieldName: 'outlet',
-      value: docOutlet && [docOutlet],
-      // clause: params,
-    });
-  };
-
-  const handleContact = () => {
-    if (isBlocked) {
-      return;
-    }
-
-    navigation.navigate('SelectRefItem', {
-      refName: 'contact',
-      fieldName: 'contact',
-      value: docContact && [docContact],
-    });
-  };
-
   const handleChangeStatus = useCallback(() => {
     dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
   }, [dispatch, docStatus]);
@@ -313,9 +249,12 @@ export const ReturnEditScreen = () => {
             onPress={handlePresentDate}
             disabled={docStatus !== 'DRAFT'}
           />
-          <SelectableInput label={'Организация'} value={docContact?.name} onPress={handleContact} disabled={false} />
-          <SelectableInput label={'Магазин'} value={docOutlet?.name} onPress={handleOutlet} disabled={false} />
-          <SelectableInput label={'Подразделение'} value={docDepart?.name} onPress={handleDepart} disabled={true} />
+          <SelectableInput
+            label={'Подразделение'}
+            value={docDepart?.name}
+            onPress={handleDepart}
+            disabled={docStatus !== 'DRAFT'}
+          />
           <Input
             label="Комментарий"
             value={docComment}

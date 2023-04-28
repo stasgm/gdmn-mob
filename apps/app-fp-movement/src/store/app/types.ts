@@ -20,9 +20,7 @@ export type FpMovementState = {
 
 // Товары
 export interface IGood extends ICodeEntity {
-  valueName?: string; // Наименование ед. изм.
-  invWeight?: number; // Вес единицы товара
-  scale?: number; //количество единиц в месте
+  goodGroupId?: string;
 }
 
 export interface IEmployee extends INamedEntity {

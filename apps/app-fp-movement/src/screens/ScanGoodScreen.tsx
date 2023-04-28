@@ -167,8 +167,8 @@ const ScanGoodScreen = () => {
       ]);
     } else {
       if (
-        (shipment?.head.subtype.id === 'prihod' && shipment?.head.toDepart.isAddressStore) ||
-        (shipment?.head.subtype.id !== 'prihod' && shipment?.head.fromDepart.isAddressStore)
+        (shipment?.head.subtype && shipment?.head.subtype?.id === 'prihod' && shipment?.head.toDepart.isAddressStore) ||
+        (shipment?.head.subtype && shipment?.head.subtype?.id !== 'prihod' && shipment?.head.fromDepart.isAddressStore)
       ) {
         if (scannedObject.quantPack < goodBarcodeSettings.boxNumber) {
           Alert.alert('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}!`, [
