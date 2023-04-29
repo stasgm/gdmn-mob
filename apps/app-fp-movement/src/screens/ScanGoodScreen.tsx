@@ -89,7 +89,7 @@ const ScanGoodScreen = () => {
       }
 
       setScannedObject({
-        good: { id: good.id, name: good.name, shcode: good.shcode },
+        good: { id: good.id, name: good.name, shcode: good.shcode, goodGroupId: good.goodGroupId },
         id: generateId(),
         weight: barc.weight,
         barcode: barc.barcode,

@@ -3,7 +3,14 @@ import { View, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
-import { globalStyles as styles, LargeText, navBackButton, AppScreen, AppActivityIndicator } from '@lib/mobile-ui';
+import {
+  globalStyles as styles,
+  LargeText,
+  navBackButton,
+  AppScreen,
+  AppActivityIndicator,
+  InfoButton,
+} from '@lib/mobile-ui';
 
 import { useTheme } from 'react-native-paper';
 
@@ -91,26 +98,25 @@ export const SelectCellScreen = () => {
 
   const defaultGoodCells = (cells[departId || ''] || []).filter((i) => i.defaultGroup?.id === item.good.goodGroupId);
 
+  const dividedCells = defaultGoodCells.reduce((prev: ICellName[], cur) => {
+    const dividedCell = getCellItem(cur.name);
+
+    prev = [...prev, dividedCell];
+    return prev;
+  }, []);
+
+  const currentCell = cellList[dividedCells[0].chamber][dividedCells[0].row][defaultGoodCells[0].tier].find(
+    (i) => i.cell === dividedCells[0].cell,
+  );
+
   useEffect(() => {
-    if (defaultGoodCells.length && mode === 0) {
-      const dividedCells = defaultGoodCells.reduce((prev: ICellName[], cur) => {
-        const dividedCell = getCellItem(cur.name);
-
-        prev = [...prev, dividedCell];
-        return prev;
-      }, []);
-
-      const currentCell = cellList[dividedCells[0].chamber][dividedCells[0].row][defaultGoodCells[0].tier].find(
-        (i) => i.cell === dividedCells[0].cell,
-      );
-
-      if (!currentCell?.barcode) {
-        setSelectedChamber(dividedCells[0].chamber);
-        setSelectedRow(dividedCells[0].row);
-        setDefaultCell(defaultGoodCells.map((i) => i.name));
-      }
+    if (!currentCell?.barcode && doc?.head.toDepart.isAddressStore) {
+      setSelectedChamber(dividedCells[0].chamber);
+      setSelectedRow(dividedCells[0].row);
+      setDefaultCell(defaultGoodCells.map((i) => i.name));
     }
-  }, [cellList, defaultGoodCells, item, mode]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentCell?.barcode, mode]);
 
   const cellsByRow = useMemo(
     () => (selectedChamber && selectedRow ? Object.entries(cellList[selectedChamber][selectedRow]).reverse() : []),
@@ -172,12 +178,20 @@ export const SelectCellScreen = () => {
     ],
   );
 
+  const renderRight = useCallback(
+    () => <InfoButton />,
+
+    [],
+  );
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackButton,
+      headerRight: renderRight,
     });
-  }, [navigation]);
+  }, [navigation, renderRight]);
 
+  console.log('def', defaultCell);
   const Cell = useCallback(
     ({ i /*, row*/ }: { /*row: string;*/ i: ICellData }) => {
       const colorStyle = {
@@ -193,12 +207,12 @@ export const SelectCellScreen = () => {
         backgroundColor:
           (fromCell && fromCell.barcode === i.barcode) || (toCell && toCell.barcode === i.barcode)
             ? colors.error
-            : defaultCell.length && defaultCell.find((e) => e === i.name)
-            ? '#2b7849'
-            : i.barcode
-            ? '#226182'
             : i.disabled
             ? colors.disabled
+            : defaultCell.length && defaultCell.find((e) => e === i.name)
+            ? '#5aa176'
+            : i.barcode
+            ? '#226182'
             : colorBack,
       };
 
