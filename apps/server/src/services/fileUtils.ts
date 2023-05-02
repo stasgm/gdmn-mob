@@ -48,11 +48,15 @@ export const checkFiles = async (): Promise<void> => {
   const root = getDb().dbPath;
   const files = await _readDir(root, [...defaultExclude, 'deviceLogs']);
   for (const file of files) {
-    // eslint-disable-next-line no-await-in-loop
-    const fileStat = await stat(file);
-    const fileDate = fileStat.birthtimeMs;
-    if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > config.FILES_CHECK_PERIOD_IN_DAYS) {
-      unlink(file);
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      const fileStat = await stat(file);
+      const fileDate = fileStat.birthtimeMs;
+      if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > config.FILES_CHECK_PERIOD_IN_DAYS) {
+        unlink(file);
+      }
+    } catch (err) {
+      log.warn(`Ошибка при удалении старого файла-- ${err}`);
     }
   }
 };
@@ -70,7 +74,7 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
   const appSystemId = await getAppSystemId(arr[1]);
   const appSystemName = arr[1];
 
-  const companyId = arr[1];
+  const companyId = arr[0];
   const companyName = companies.findById(arr[0])?.name;
 
   if (!companyName) {
@@ -141,6 +145,7 @@ const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => 
   const fileStat = await stat(root);
   const fileSize = fileStat.size / BYTES_PER_KB;
   const fileDate = fileStat.birthtime.toString();
+  const fileModifiedDate = fileStat.mtime.toString();
 
   const alias = fullFileName2alias(root);
 
@@ -157,6 +162,7 @@ const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => 
       producer: fileInfo.producer,
       consumer: fileInfo.consumer,
       device: fileInfo.device,
+      mdate: fileModifiedDate,
     };
   }
 
@@ -166,6 +172,7 @@ const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => 
     size: fileSize,
     fileName: name,
     path: subPath,
+    mdate: fileModifiedDate,
   };
 };
 
@@ -237,6 +244,7 @@ export const readListFiles = async (params: Record<string, string | number>): Pr
       filteredFiles
     );
   });
+  files = files.sort((a, b) => new Date(b.mdate).getTime() - new Date(a.mdate).getTime());
   return getListPart(files, params);
 };
 
