@@ -48,11 +48,15 @@ export const checkFiles = async (): Promise<void> => {
   const root = getDb().dbPath;
   const files = await _readDir(root, [...defaultExclude, 'deviceLogs']);
   for (const file of files) {
-    // eslint-disable-next-line no-await-in-loop
-    const fileStat = await stat(file);
-    const fileDate = fileStat.birthtimeMs;
-    if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > config.FILES_CHECK_PERIOD_IN_DAYS) {
-      unlink(file);
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      const fileStat = await stat(file);
+      const fileDate = fileStat.birthtimeMs;
+      if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > config.FILES_CHECK_PERIOD_IN_DAYS) {
+        unlink(file);
+      }
+    } catch (err) {
+      log.warn(`Ошибка при удалении старого файла-- ${err}`);
     }
   }
 };
