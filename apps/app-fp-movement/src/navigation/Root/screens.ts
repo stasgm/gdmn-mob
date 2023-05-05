@@ -11,6 +11,9 @@ import {
 import { FreeShipmentListScreen, FreeShipmentEditScreen, FreeShipmentViewScreen } from '../../screens/FreeShipment';
 import { InventoryListScreen, InventoryEditScreen, InventoryViewScreen } from '../../screens/Inventory';
 import { CellsViewScreen, ContactListScreen, GoodLineScreen } from '../../screens/Cells';
+import { LaboratoryListScreen, LaboratoryEditScreen, LaboratoryViewScreen } from '../../screens/Laboratory';
+import { ReturnListScreen, ReturnEditScreen, ReturnViewScreen } from '../../screens/Return';
+
 import { SelectRefItemScreen } from '../../components';
 
 export const moveScreens = {
@@ -66,4 +69,26 @@ export const cellsScreens = {
 
 export const cellsListScreens = {
   ContactList: { title: 'Ячейки', component: ContactListScreen },
+};
+
+export const laboratoryScreens = {
+  LaboratoryEdit: { title: 'Лаборатория', component: LaboratoryEditScreen },
+  LaboratoryView: { title: '', component: LaboratoryViewScreen },
+  SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
+  ScanGood: { title: 'Сканер', component: ScanGoodScreen },
+};
+
+export const laboratoryListScreens = {
+  LaboratoryList: { title: 'Лаборатория', component: LaboratoryListScreen },
+};
+
+export const returnScreens = {
+  ReturnEdit: { title: 'Возврат', component: ReturnEditScreen },
+  ReturnView: { title: '', component: ReturnViewScreen },
+  SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
+  ScanGood: { title: 'Сканер', component: ScanGoodScreen },
+};
+
+export const returnListScreens = {
+  ReturnList: { title: 'Возвраты', component: ReturnListScreen },
 };

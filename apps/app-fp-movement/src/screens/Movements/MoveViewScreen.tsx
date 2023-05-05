@@ -220,8 +220,7 @@ export const MoveViewScreen = () => {
       return (
         <ListItemLine
           key={item.id}
-          readonly={isBlocked}
-          // readonly={!(doc?.head.subtype.id === 'prihod') || isBlocked}
+          readonly={!doc?.head.toDepart.isAddressStore || isBlocked}
           onPress={() => navigation.navigate('SelectCell', { docId: id, item, mode: 1 })}
         >
           <View style={styles.details}>

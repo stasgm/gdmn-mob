@@ -52,6 +52,22 @@ export interface ICellMovementFormParam extends IFormParam {
   comment?: string;
 }
 
+export interface ILaboratoryFormParam extends IFormParam {
+  number?: string;
+  documentDate?: string;
+  status?: StatusType;
+  depart?: ICodeEntity;
+  comment?: string;
+}
+
+export interface IReturnFormParam extends IFormParam {
+  number?: string;
+  documentDate?: string;
+  status?: StatusType;
+  depart?: ICodeEntity;
+  comment?: string;
+}
+
 //Подразделения-склады
 export type Department = INamedEntity;
 export type DepartmentType = INamedEntity;
@@ -182,6 +198,39 @@ export interface CellMovementLine extends IEntity {
 }
 
 export type ICellMovementDocument = MandateProps<IDocument<ICellMovementHead, CellMovementLine>, 'head' | 'lines'>;
+
+export interface ILaboratoryHead extends IHead {
+  depart: ICodeEntity;
+  comment?: string; // Коментарий
+}
+export interface ILaboratoryLine extends IEntity {
+  good: IGood;
+  weight: number;
+  workDate: string; // Дата производства
+  numReceived: string; // Номер партии
+  barcode?: string; // технологический код
+  sortOrder?: number; // порядок сортировки
+  scannedBarcode?: string;
+  quantPack: number; // порядковый номер сканирования в документе
+}
+
+export type ILaboratoryDocument = MandateProps<IDocument<ILaboratoryHead, ILaboratoryLine>, 'head' | 'lines'>;
+
+export interface IReturnHead extends IHead {
+  depart: ICodeEntity;
+  comment?: string; // Коментарий
+}
+export interface IReturnLine extends IEntity {
+  good: IGood;
+  weight: number;
+  workDate: string; // Дата производства
+  numReceived: string; // Номер партии
+  barcode?: string; // технологический код
+  sortOrder?: number; // порядок сортировки
+  scannedBarcode?: string;
+  quantPack: number; // порядковый номер сканирования в документе
+}
+export type IReturnDocument = MandateProps<IDocument<IReturnHead, IReturnLine>, 'head' | 'lines'>;
 
 export type barcodeSettings = {
   [name: string]: number;

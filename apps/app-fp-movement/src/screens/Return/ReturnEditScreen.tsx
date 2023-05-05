@@ -1,56 +1,51 @@
-import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { Alert, ScrollView, Platform } from 'react-native';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { Alert, View, StyleSheet, ScrollView, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Divider } from 'react-native-paper';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, StackActions, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { SelectableInput, Input, SaveButton, SubTitle, AppScreen, navBackButton } from '@lib/mobile-ui';
+import { SelectableInput, Input, SaveButton, SubTitle, AppScreen, RadioGroup, navBackButton } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
 import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks';
 
-import { IDocumentType, INamedEntity, IReference, ScreenState } from '@lib/types';
+import { IDocumentType, IReference, ScreenState } from '@lib/types';
 
-import { MoveStackParamList } from '../../navigation/Root/types';
-import { IMoveFormParam, IMoveDocument } from '../../store/types';
+import { ReturnStackParamList } from '../../navigation/Root/types';
+import { IReturnFormParam, IReturnDocument } from '../../store/types';
+import { STATUS_LIST } from '../../utils/constants';
 import { getNextDocNumber } from '../../utils/helpers';
-import { IAddressStoreEntity } from '../../store/app/types';
 
-export const MoveEditScreen = () => {
-  const id = useRoute<RouteProp<MoveStackParamList, 'MoveEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'MoveEdit'>>();
+export const ReturnEditScreen = () => {
+  const id = useRoute<RouteProp<ReturnStackParamList, 'ReturnEdit'>>().params?.id;
+  const navigation = useNavigation<StackNavigationProp<ReturnStackParamList, 'ReturnEdit'>>();
   const dispatch = useDispatch();
+
+  const { colors } = useTheme();
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
-  const movements = useFilteredDocList<IMoveDocument>('movement');
+  const shipments = useFilteredDocList<IReturnDocument>('return');
 
-  const doc = movements?.find((e) => e.id === id);
+  const doc = shipments?.find((e) => e.id === id);
 
-  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
+  const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data);
 
-  const userDefaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity;
-  const defaultDepart = departs.find((i) => i.id === userDefaultDepart?.id);
-  const userDefaultSecondDepart = useSelector((state) => state.auth.user?.settings?.secondDepart?.data) as INamedEntity;
-  const defaultSecondDepart = departs.find((i) => i.id === userDefaultSecondDepart?.id);
-
-  const movementType = refSelectors
+  const shipmentType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data.find((t) => t.name === 'movement');
+    ?.data.find((t) => t.name === 'return');
 
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {
-    documentSubtype: docDocumentSubtype,
-    fromDepart: docFromDepart,
-    toDepart: docToDepart,
+    depart: docDepart,
     documentDate: docDate,
     number: docNumber,
     comment: docComment,
     status: docStatus,
-  } = useSelector((state) => state.app.formParams as IMoveFormParam);
+  } = useSelector((state) => state.app.formParams as IReturnFormParam);
 
   useEffect(() => {
     return () => {
@@ -68,70 +63,37 @@ export const MoveEditScreen = () => {
           documentDate: doc.documentDate,
           status: doc.status,
           comment: doc.head.comment,
-          fromDepart: doc.head.fromDepart,
-          toDepart: doc.head.toDepart,
-          documentSubtype: doc.head.subtype,
+          depart: doc.head.depart,
         }),
       );
     } else {
-      const newNumber = getNextDocNumber(movements);
+      const newNumber = getNextDocNumber(shipments);
       dispatch(
         appActions.setFormParams({
           number: newNumber,
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
-          fromDepart:
-            docDocumentSubtype?.id === 'internalMovement'
-              ? defaultDepart
-              : docDocumentSubtype?.id === 'movement'
-              ? defaultSecondDepart
-              : undefined,
-          toDepart:
-            docDocumentSubtype?.id === 'movement'
-              ? defaultDepart
-              : docDocumentSubtype?.id === 'internalMovement'
-              ? defaultSecondDepart
-              : undefined,
+          depart: defaultDepart,
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, doc, defaultDepart, defaultSecondDepart, docDocumentSubtype]);
-
-  useEffect(() => {
-    if (docDocumentSubtype?.id === 'cellMovement' && docFromDepart) {
-      dispatch(
-        appActions.setFormParams({
-          toDepart: docFromDepart,
-        }),
-      );
-    }
-  }, [dispatch, docDocumentSubtype?.id, docFromDepart]);
+  }, [dispatch, doc, defaultDepart]);
 
   useEffect(() => {
     if (screenState === 'saving') {
-      if (!movementType) {
-        Alert.alert('Внимание!', 'Тип документа для перемещений не найден.', [{ text: 'OK' }]);
+      if (!shipmentType) {
+        Alert.alert('Внимание!', 'Тип документа для заявок не найден.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
       }
-
-      if (!docDocumentSubtype) {
-        Alert.alert('Ошибка!', 'Не указан тип документа.', [{ text: 'OK' }]);
-        setScreenState('idle');
-        return;
-      }
-
-      if (
-        (docDocumentSubtype?.id === 'internalMovement' && !docFromDepart) ||
-        (docDocumentSubtype?.id === 'movement' && !docToDepart)
-      ) {
+      if (!docDepart) {
         Alert.alert('Ошибка!', 'Нет подразделения пользователя. Обратитесь к администратору.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
       }
 
-      if (!(docNumber && docDate && docFromDepart && docToDepart)) {
+      if (!(docNumber && docDepart && docDate)) {
         Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
@@ -141,17 +103,15 @@ export const MoveEditScreen = () => {
       const createdDate = new Date().toISOString();
 
       if (!id) {
-        const newDoc: IMoveDocument = {
+        const newDoc: IReturnDocument = {
           id: docId,
-          documentType: movementType,
+          documentType: shipmentType,
           number: docNumber && docNumber.trim(),
           documentDate: docDate,
           status: 'DRAFT',
           head: {
             comment: docComment && docComment.trim(),
-            fromDepart: docFromDepart,
-            toDepart: docToDepart,
-            subtype: docDocumentSubtype,
+            depart: docDepart,
           },
           lines: [],
           creationDate: createdDate,
@@ -160,7 +120,7 @@ export const MoveEditScreen = () => {
 
         dispatch(documentActions.addDocument(newDoc));
 
-        navigation.dispatch(StackActions.replace('MoveView', { id: newDoc.id }));
+        navigation.dispatch(StackActions.replace('ReturnView', { id: newDoc.id }));
       } else {
         if (!doc) {
           setScreenState('idle');
@@ -169,46 +129,30 @@ export const MoveEditScreen = () => {
 
         const updatedDate = new Date().toISOString();
 
-        const updatedDoc: IMoveDocument = {
+        const updatedDoc: IReturnDocument = {
           ...doc,
           id,
           number: docNumber && docNumber.trim(),
           status: docStatus || 'DRAFT',
           documentDate: docDate,
-          documentType: movementType,
+          documentType: shipmentType,
           errorMessage: undefined,
           head: {
             ...doc.head,
             comment: docComment && docComment.trim(),
-            fromDepart: docFromDepart,
-            toDepart: docToDepart,
-
-            subtype: docDocumentSubtype,
+            depart: docDepart,
           },
           lines: doc.lines,
           creationDate: doc.creationDate || updatedDate,
           editionDate: updatedDate,
         };
-        setScreenState('idle');
+
         dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
-        navigation.navigate('MoveView', { id });
+        navigation.navigate('ReturnView', { id });
       }
+      setScreenState('idle');
     }
-  }, [
-    dispatch,
-    doc,
-    docComment,
-    docDate,
-    docDocumentSubtype,
-    docFromDepart,
-    docNumber,
-    docStatus,
-    docToDepart,
-    id,
-    movementType,
-    navigation,
-    screenState,
-  ]);
+  }, [dispatch, doc, docComment, docDate, docDepart, docNumber, docStatus, id, navigation, screenState, shipmentType]);
 
   const renderRight = useCallback(
     () => <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />,
@@ -246,54 +190,34 @@ export const MoveEditScreen = () => {
     setShowDate(true);
   };
 
-  const handlePresentSubtype = () => {
-    if (isBlocked) {
-      return;
-    }
-
-    navigation.navigate('SelectRefItem', {
-      refName: 'documentSubtype',
-      fieldName: 'documentSubtype',
-      value: docDocumentSubtype && [docDocumentSubtype],
-    });
-  };
-
-  const handleFromDepart = () => {
+  const handleDepart = () => {
     if (isBlocked) {
       return;
     }
 
     navigation.navigate('SelectRefItem', {
       refName: 'depart',
-      fieldName: 'fromDepart',
-      value: docFromDepart && [docFromDepart],
-      descrFieldName: 'shcode',
+      fieldName: 'depart',
+      value: docDepart && [docDepart],
     });
   };
 
-  const handleToDepart = () => {
-    if (isBlocked) {
-      return;
-    }
-
-    const params: Record<string, string> = {};
-
-    if (docDocumentSubtype?.id === 'cellMovement') {
-      params.isAddressedStore = 'true';
-    }
-
-    navigation.navigate('SelectRefItem', {
-      refName: 'depart',
-      fieldName: 'toDepart',
-      value: docToDepart && [docToDepart],
-      descrFieldName: 'shcode',
-      clause: params,
-    });
-  };
+  const handleChangeStatus = useCallback(() => {
+    dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
+  }, [dispatch, docStatus]);
 
   const handleChangeNumber = useCallback(
     (text: string) => dispatch(appActions.setFormParams({ number: text })),
     [dispatch],
+  );
+
+  const viewStyle = useMemo(
+    () => [
+      localStyles.switchContainer,
+      localStyles.border,
+      { borderColor: colors.primary, backgroundColor: colors.card },
+    ],
+    [colors.card, colors.primary],
   );
 
   return (
@@ -302,6 +226,14 @@ export const MoveEditScreen = () => {
         <SubTitle>{statusName}</SubTitle>
         <Divider />
         <ScrollView>
+          <View style={viewStyle}>
+            <RadioGroup
+              options={STATUS_LIST}
+              onChange={handleChangeStatus}
+              activeButtonId={STATUS_LIST.find((i) => i.id === docStatus)?.id}
+              directionRow={true}
+            />
+          </View>
           <Input
             label="Номер"
             value={docNumber}
@@ -316,25 +248,12 @@ export const MoveEditScreen = () => {
             disabled={docStatus !== 'DRAFT'}
           />
           <SelectableInput
-            label={'Тип'}
-            value={docDocumentSubtype?.name}
-            onPress={handlePresentSubtype}
-            disabled={id ? true : isBlocked}
+            label={'Подразделение'}
+            value={docDepart?.name}
+            onPress={handleDepart}
+            disabled={isBlocked}
           />
 
-          <SelectableInput
-            label={'Откуда'}
-            value={docFromDepart?.name}
-            onPress={handleFromDepart}
-            disabled={!docDocumentSubtype ? true : isBlocked}
-          />
-
-          <SelectableInput
-            label={'Куда'}
-            value={docDocumentSubtype?.id === 'cellMovement' ? docFromDepart?.name : docToDepart?.name}
-            onPress={handleToDepart}
-            disabled={!docDocumentSubtype ? true : isBlocked}
-          />
           <Input
             label="Комментарий"
             value={docComment}
@@ -358,3 +277,17 @@ export const MoveEditScreen = () => {
     </AppScreen>
   );
 };
+
+export const localStyles = StyleSheet.create({
+  switchContainer: {
+    margin: 10,
+    paddingLeft: 5,
+  },
+  border: {
+    marginHorizontal: 10,
+    marginVertical: 2,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderRadius: 2,
+  },
+});

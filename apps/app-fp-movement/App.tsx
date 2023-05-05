@@ -50,6 +50,8 @@ import { FreeShipmentNavigator } from './src/navigation/FreeShipmentNavigator';
 import { ShipmentNavigator } from './src/navigation/ShipmentNavigator';
 import { CellsNavigator } from './src/navigation/CellsNavigator';
 import { InventoryNavigator } from './src/navigation/InventoryNavigator';
+import { ReturnNavigator } from './src/navigation/ReturnNavigator';
+import { LaboratoryNavigator } from './src/navigation/LaboratoryNavigator';
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -73,16 +75,29 @@ const Root = () => {
         component: FreeShipmentNavigator,
       },
       {
-        name: 'Inventory',
-        title: 'Инвентаризация',
-        icon: 'file-restore-outline',
-        component: InventoryNavigator,
-      },
-      {
-        name: 'CellShipment',
+        name: 'Cells',
         title: 'Ячейки',
         icon: 'table-split-cell',
         component: CellsNavigator,
+      },
+      {
+        name: 'return',
+        title: 'Возврат',
+        icon: 'file-restore-outline',
+        component: ReturnNavigator,
+      },
+      {
+        name: 'Inventory',
+        title: 'Инвентаризация',
+        icon: 'file-document-outline',
+        component: InventoryNavigator,
+      },
+
+      {
+        name: 'labaratory',
+        title: 'Лаборатория',
+        icon: 'file-document-edit-outline',
+        component: LaboratoryNavigator,
       },
     ],
     [],
