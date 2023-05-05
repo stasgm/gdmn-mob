@@ -74,6 +74,9 @@ const ShipmentViewScreen = () => {
   const [barcode, setBarcode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
+  const [visibleQuantPackDialog, setVisibleQuantPackDialog] = useState(false);
+  const [quantPack, setQuantPack] = useState('');
+
   const goods = refSelectors.selectByName<IGood>('good').data;
 
   const goodBarcodeSettings = Object.entries(settings).reduce((prev: barcodeSettings, [idx, item]) => {
@@ -83,7 +86,7 @@ const ShipmentViewScreen = () => {
     return prev;
   }, {});
 
-  const minBarcodeLength = settings.minBarcodeLength?.data || 0;
+  const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
 
   const handleGetBarcode = useCallback(
     (brc: string) => {
@@ -197,6 +200,20 @@ const ShipmentViewScreen = () => {
     setVisibleDialog(false);
     setBarcode('');
     setErrorMessage('');
+  };
+
+  const handleAddQuantPack = (quantity: string) => {
+    console.log('quantPack', quantity);
+  };
+
+  const handleEditQuantPack = () => {
+    handleAddQuantPack(quantPack);
+  };
+
+  const handleDismissQuantPack = () => {
+    setVisibleQuantPackDialog(false);
+    setQuantPack('');
+    // setErrorMessage('');
   };
 
   const handleEditShipmentHead = useCallback(() => navigation.navigate('ShipmentEdit', { id }), [navigation, id]);
@@ -512,7 +529,7 @@ const ShipmentViewScreen = () => {
   );
 
   const renderShipmentItem: ListRenderItem<IShipmentLine> = ({ item }) => (
-    <ListItemLine key={item.id} readonly={true}>
+    <ListItemLine key={item.id} readonly={item.sortOrder !== shipmentLines?.length}>
       <View style={styles.details}>
         <LargeText style={styles.textBold}>{item.good.name}</LargeText>
         <View style={styles.flexDirectionRow}>
@@ -621,6 +638,16 @@ const ShipmentViewScreen = () => {
         onOk={handleSearchBarcode}
         okLabel={'Найти'}
         errorMessage={errorMessage}
+      />
+      <AppDialog
+        title="Количество"
+        visible={visibleQuantPackDialog}
+        text={quantPack}
+        onChangeText={setQuantPack}
+        onCancel={handleDismissQuantPack}
+        onOk={handleEditQuantPack}
+        okLabel={'Ок'}
+        // errorMessage={errorMessage}
       />
       <SimpleDialog
         visible={visibleSendDialog}

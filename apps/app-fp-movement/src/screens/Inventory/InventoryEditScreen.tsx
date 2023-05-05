@@ -12,12 +12,13 @@ import { useDispatch, documentActions, appActions, useSelector, refSelectors } f
 
 import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks';
 
-import { IDocumentType, IReference, ScreenState } from '@lib/types';
+import { IDocumentType, INamedEntity, IReference, ScreenState } from '@lib/types';
 
 import { InventoryStackParamList } from '../../navigation/Root/types';
 import { IInventoryFormParam, IInventoryDocument } from '../../store/types';
 import { STATUS_LIST } from '../../utils/constants';
 import { getNextDocNumber } from '../../utils/helpers';
+import { IAddressStoreEntity } from '../../store/app/types';
 
 export const InventoryEditScreen = () => {
   const id = useRoute<RouteProp<InventoryStackParamList, 'InventoryEdit'>>().params?.id;
@@ -32,7 +33,11 @@ export const InventoryEditScreen = () => {
 
   const doc = shipments?.find((e) => e.id === id);
 
-  const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data);
+  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
+
+  const userDefaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity;
+
+  const defaultDepart = departs.find((i) => i.id === userDefaultDepart?.id);
 
   const shipmentType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
@@ -40,7 +45,7 @@ export const InventoryEditScreen = () => {
 
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {
-    depart: docDepart,
+    toDepart: docToDepart,
     documentDate: docDate,
     number: docNumber,
     comment: docComment,
@@ -63,7 +68,7 @@ export const InventoryEditScreen = () => {
           documentDate: doc.documentDate,
           status: doc.status,
           comment: doc.head.comment,
-          depart: doc.head.depart,
+          toDepart: doc.head.toDepart,
           outlet: doc.head.outlet,
           contact: doc.head.contact,
         }),
@@ -75,7 +80,7 @@ export const InventoryEditScreen = () => {
           number: newNumber,
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
-          depart: defaultDepart,
+          toDepart: defaultDepart,
         }),
       );
     }
@@ -89,13 +94,13 @@ export const InventoryEditScreen = () => {
         setScreenState('idle');
         return;
       }
-      if (!docDepart) {
+      if (!docToDepart) {
         Alert.alert('Ошибка!', 'Нет подразделения пользователя. Обратитесь к администратору.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
       }
 
-      if (!(docNumber && docDepart && docDate)) {
+      if (!(docNumber && docToDepart && docDate)) {
         Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
@@ -113,7 +118,7 @@ export const InventoryEditScreen = () => {
           status: 'DRAFT',
           head: {
             comment: docComment && docComment.trim(),
-            depart: docDepart,
+            toDepart: docToDepart,
           },
           lines: [],
           creationDate: createdDate,
@@ -142,7 +147,7 @@ export const InventoryEditScreen = () => {
           head: {
             ...doc.head,
             comment: docComment && docComment.trim(),
-            depart: docDepart,
+            toDepart: docToDepart,
           },
           lines: doc.lines,
           creationDate: doc.creationDate || updatedDate,
@@ -154,7 +159,19 @@ export const InventoryEditScreen = () => {
       }
       setScreenState('idle');
     }
-  }, [dispatch, doc, docComment, docDate, docDepart, docNumber, docStatus, id, navigation, screenState, shipmentType]);
+  }, [
+    dispatch,
+    doc,
+    docComment,
+    docDate,
+    docNumber,
+    docStatus,
+    docToDepart,
+    id,
+    navigation,
+    screenState,
+    shipmentType,
+  ]);
 
   const renderRight = useCallback(
     () => <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />,
@@ -199,8 +216,8 @@ export const InventoryEditScreen = () => {
 
     navigation.navigate('SelectRefItem', {
       refName: 'depart',
-      fieldName: 'depart',
-      value: docDepart && [docDepart],
+      fieldName: 'toDepart',
+      value: docToDepart && [docToDepart],
     });
   };
 
@@ -251,7 +268,7 @@ export const InventoryEditScreen = () => {
           />
           <SelectableInput
             label={'Подразделение'}
-            value={docDepart?.name}
+            value={docToDepart?.name}
             onPress={handleDepart}
             disabled={docStatus !== 'DRAFT'}
           />

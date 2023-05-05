@@ -65,12 +65,15 @@ export const FreeShipmentViewScreen = () => {
     return prev;
   }, {});
 
-  const minBarcodeLength = settings.minBarcodeLength?.data || 0;
+  const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
   const [barcode, setBarcode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+
+  const [visibleQuantPackDialog, setVisibleQuantPackDialog] = useState(false);
+  const [quantPack, setQuantPack] = useState('');
 
   const handleGetBarcode = useCallback(
     (brc: string) => {
@@ -105,7 +108,7 @@ export const FreeShipmentViewScreen = () => {
       }
 
       if (good) {
-        const barcodeItem = {
+        const barcodeItem: IFreeShipmentLine = {
           good: { id: good.id, name: good.name, shcode: good.shcode },
           id: generateId(),
           weight: barc.weight,
@@ -113,6 +116,7 @@ export const FreeShipmentViewScreen = () => {
           workDate: barc.workDate,
           numReceived: barc.numReceived,
           sortOrder: doc?.lines?.length + 1,
+          quantPack: barc.quantPack,
         };
         setErrorMessage('');
         dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
@@ -139,6 +143,73 @@ export const FreeShipmentViewScreen = () => {
     setVisibleDialog(false);
     setBarcode('');
     setErrorMessage('');
+  };
+
+  const handleAddQuantPack = useCallback(
+    (quantity: number) => {
+      const line = lines?.[0];
+      if (!line) {
+        return;
+      }
+
+      const weight = line?.weight * quantity;
+
+      if (weight < 1000) {
+        const newLine: IFreeShipmentLine = {
+          ...line,
+          quantPack: quantity,
+          weight,
+          scannedBarcode: line?.barcode,
+        };
+
+        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+      } else {
+        const maxQuantPack = Math.floor(999.99 / line?.weight);
+
+        let newQuantity = quantity;
+        let sortOrder = line.sortOrder || lines.length;
+
+        while (newQuantity > 0) {
+          const q = newQuantity > maxQuantPack ? maxQuantPack : newQuantity;
+          const newWeight = line?.weight * q;
+
+          const newLine: IFreeShipmentLine = {
+            ...line,
+            quantPack: q,
+            weight: newWeight,
+            scannedBarcode: line?.barcode,
+          };
+
+          if (newQuantity === quantity) {
+            dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+          } else {
+            sortOrder = sortOrder + 1;
+
+            const addedLine = { ...newLine, id: generateId(), sortOrder };
+            dispatch(
+              documentActions.addDocumentLine({
+                docId: id,
+                line: addedLine,
+              }),
+            );
+          }
+          newQuantity = newQuantity - maxQuantPack;
+        }
+      }
+    },
+    [dispatch, id, lines],
+  );
+
+  const handleEditQuantPack = () => {
+    handleAddQuantPack(Number(quantPack));
+    setVisibleQuantPackDialog(false);
+    setQuantPack('');
+  };
+
+  const handleDismissQuantPack = () => {
+    setVisibleQuantPackDialog(false);
+    setQuantPack('');
+    // setErrorMessage('');
   };
 
   const handleEditDocHead = useCallback(() => {
@@ -172,7 +243,16 @@ export const FreeShipmentViewScreen = () => {
 
   const hanldeCancelLastScan = useCallback(() => {
     if (lines?.length) {
-      dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lines[0].id }));
+      if (lines[0].scannedBarcode) {
+        const lineIds = lines
+          .filter((i) => i.scannedBarcode === lines[0].scannedBarcode)
+          .map((i) => {
+            return i.id;
+          });
+        dispatch(documentActions.removeDocumentLines({ docId: id, lineIds }));
+      } else {
+        dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lines[0].id }));
+      }
     }
   }, [dispatch, id, lines]);
 
@@ -258,7 +338,11 @@ export const FreeShipmentViewScreen = () => {
   }, [navigation, renderRight]);
 
   const renderItem: ListRenderItem<IFreeShipmentLine> = ({ item }) => (
-    <ListItemLine key={item.id} readonly={true}>
+    <ListItemLine
+      key={item.id}
+      readonly={item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
+      onPress={() => setVisibleQuantPackDialog(true)}
+    >
       <View style={styles.details}>
         <LargeText style={styles.textBold}>{item.good.name}</LargeText>
         <View style={styles.flexDirectionRow}>
@@ -268,6 +352,11 @@ export const FreeShipmentViewScreen = () => {
         <View style={styles.flexDirectionRow}>
           <MediumText>
             Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
+          </MediumText>
+        </View>
+        <View style={styles.flexDirectionRow}>
+          <MediumText>
+            quantPack {item.quantPack || ''}, sortOrder {item.sortOrder || ''}
           </MediumText>
         </View>
       </View>
@@ -326,6 +415,7 @@ export const FreeShipmentViewScreen = () => {
         workDate: barc.workDate,
         numReceived: barc.numReceived,
         sortOrder: doc?.lines?.length + 1,
+        quantPack: barc.quantPack,
       };
 
       dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
@@ -428,6 +518,17 @@ export const FreeShipmentViewScreen = () => {
         onOk={handleSearchBarcode}
         okLabel={'Найти'}
         errorMessage={errorMessage}
+      />
+      <AppDialog
+        title="Количество"
+        visible={visibleQuantPackDialog}
+        text={quantPack}
+        onChangeText={setQuantPack}
+        onCancel={handleDismissQuantPack}
+        onOk={handleEditQuantPack}
+        okLabel={'Ок'}
+        keyboardType="numbers-and-punctuation"
+        // errorMessage={errorMessage}
       />
       <SimpleDialog
         visible={visibleSendDialog}

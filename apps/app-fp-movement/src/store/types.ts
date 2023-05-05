@@ -40,7 +40,7 @@ export interface IInventoryFormParam extends IFormParam {
   status?: StatusType;
   contact?: ICodeEntity;
   outlet?: ICodeEntity;
-  depart?: ICodeEntity;
+  toDepart?: ICodeEntity;
   comment?: string;
 }
 
@@ -149,11 +149,13 @@ export interface IFreeShipmentLine extends IEntity {
   numReceived: string; // Номер партии
   barcode?: string; // технологический код
   sortOrder?: number; // порядок сортировки
+  scannedBarcode?: string;
+  quantPack: number; // порядковый номер сканирования в документе
 }
 export type IFreeShipmentDocument = MandateProps<IDocument<IFreeShipmentHead, IFreeShipmentLine>, 'head' | 'lines'>;
 
 export interface IInventoryHead extends IHead {
-  depart: ICodeEntity;
+  toDepart: IAddressStoreEntity;
   comment?: string; // Комvентарий
 }
 
@@ -165,7 +167,7 @@ export interface IInventoryLine extends IEntity {
   barcode?: string; // технологический код
   sortOrder?: number; // порядок сортировки
   // fromCell?: string; // номер ячейки
-  // toCell?: string; // номер ячейки
+  toCell?: string; // номер ячейки
 }
 
 export type IInventoryDocument = MandateProps<IDocument<IInventoryHead, IInventoryLine>, 'head' | 'lines'>;

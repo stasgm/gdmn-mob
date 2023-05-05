@@ -8,11 +8,17 @@ import {
   ICellRef,
   IMoveLine,
   ICellName,
+  IInventoryDocument,
 } from '../store/types';
 import { IBarcode, ICellData, IModelData } from '../store/app/types';
 
 export const getNextDocNumber = (
-  documents: IMoveDocument[] | IShipmentDocument[] | IFreeShipmentDocument[] | ICellMovementDocument[],
+  documents:
+    | IMoveDocument[]
+    | IShipmentDocument[]
+    | IFreeShipmentDocument[]
+    | ICellMovementDocument[]
+    | IInventoryDocument[],
 ) => {
   return (
     documents

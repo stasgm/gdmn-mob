@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Alert, Pressable } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
@@ -16,12 +16,14 @@ import { useTheme } from 'react-native-paper';
 
 import { ScrollView } from 'react-native-gesture-handler';
 
-import { ICell, ICellName, ICellRef, IMoveDocument, IMoveLine } from '../../store/types';
-import { MoveStackParamList } from '../../navigation/Root/types';
+import { ICell, ICellName, ICellRef, IInventoryLine, IMoveDocument, IMoveLine } from '../store/types';
+import { MoveStackParamList } from '../navigation/Root/types';
 
-import { getCellItem, getCellList } from '../../utils/helpers';
-import { ICellRefList, ICellData } from '../../store/app/types';
-import { Group } from '../../components/Group';
+import { getCellItem, getCellList } from '../utils/helpers';
+import { ICellRefList, ICellData } from '../store/app/types';
+import { Group } from '../components/Group';
+import { cellColors } from '../utils/constants';
+import { InfoDialog } from '../components/InfoDialog';
 
 export interface ICellList extends ICell, ICellRef {
   department?: string;
@@ -40,21 +42,25 @@ export const SelectCellScreen = () => {
   const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'SelectCell'>>();
   const { colors } = useTheme();
 
-  const { docId, item, mode } = useRoute<RouteProp<MoveStackParamList, 'SelectCell'>>().params;
+  const [visibleDialog, setVisibleDialog] = useState(false);
+  const { docId, item, mode, docType } = useRoute<RouteProp<MoveStackParamList, 'SelectCell'>>().params;
 
   const doc = docSelectors.selectByDocId<IMoveDocument>(docId);
 
   const cells = refSelectors.selectByName<ICellRefList>('cell')?.data[0];
 
   const [fromCell, setFromCell] = useState<IMoveLine | undefined>(undefined);
-  const [toCell, setToCell] = useState<IMoveLine | undefined>(undefined);
+  const [toCell, setToCell] = useState<IMoveLine | IInventoryLine | undefined>(undefined);
   const [selectedChamber, setSelectedChamber] = useState<string | undefined>('');
   const [selectedRow, setSelectedRow] = useState<string | undefined>('');
 
   const [defaultCell, setDefaultCell] = useState<string[]>([]);
 
   const departId = useMemo(
-    () => (doc?.head.fromDepart.isAddressStore && !fromCell ? doc?.head.fromDepart.id : doc?.head.toDepart.id),
+    () =>
+      doc?.head.fromDepart && doc?.head.fromDepart?.isAddressStore && !fromCell
+        ? doc?.head.fromDepart?.id
+        : doc?.head.toDepart.id,
     [doc?.head, fromCell],
   );
 
@@ -65,12 +71,12 @@ export const SelectCellScreen = () => {
       docList
         ?.filter(
           (i) =>
-            i.documentType?.name === 'movement' &&
+            i.documentType?.name === (docType ? docType : 'movement') &&
             i.status !== 'PROCESSED' &&
-            (i?.head?.fromDepart.id === departId || i?.head?.toDepart.id === departId),
+            (i?.head?.fromDepart?.id === departId || i?.head?.toDepart.id === departId),
         )
         .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()) as IMoveDocument[],
-    [departId, docList],
+    [departId, docList, docType],
   );
 
   const lines = docs.reduce((prev: IMoveLine[], cur) => {
@@ -96,8 +102,11 @@ export const SelectCellScreen = () => {
     }
   }, [item, mode]);
 
-  const defaultGoodCells = (cells[departId || ''] || []).filter((i) => i.defaultGroup?.id === item.good.goodGroupId);
+  const defaultGoodCells = (cells[departId || ''] || []).filter(
+    (i) => i.defaultGroup?.id && i.defaultGroup?.id === item.good.goodGroupId,
+  );
 
+  console.log('defaultGoodCells', defaultGoodCells);
   const dividedCells = defaultGoodCells.reduce((prev: ICellName[], cur) => {
     const dividedCell = getCellItem(cur.name);
 
@@ -105,12 +114,16 @@ export const SelectCellScreen = () => {
     return prev;
   }, []);
 
-  const currentCell = cellList[dividedCells[0].chamber][dividedCells[0].row][defaultGoodCells[0].tier].find(
-    (i) => i.cell === dividedCells[0].cell,
-  );
+  const currentCell = dividedCells.length
+    ? cellList[dividedCells[0].chamber][dividedCells[0].row][defaultGoodCells[0].tier].find(
+        (i) => i.cell === dividedCells[0].cell,
+      )
+    : undefined;
+
+  // console.log('dividedCells', dividedCells);
 
   useEffect(() => {
-    if (!currentCell?.barcode && doc?.head.toDepart.isAddressStore) {
+    if (currentCell && !currentCell?.barcode && doc?.head.toDepart.isAddressStore) {
       setSelectedChamber(dividedCells[0].chamber);
       setSelectedRow(dividedCells[0].row);
       setDefaultCell(defaultGoodCells.map((i) => i.name));
@@ -128,7 +141,7 @@ export const SelectCellScreen = () => {
       const newCell = `${selectedChamber}-${selectedRow}-${cellData.cell}`;
 
       if (mode === 0) {
-        if (doc?.head.fromDepart.isAddressStore) {
+        if (doc?.head.fromDepart?.isAddressStore) {
           if (!fromCell) {
             if (cellData.barcode === item?.barcode) {
               if (!doc?.head.toDepart.isAddressStore) {
@@ -165,7 +178,7 @@ export const SelectCellScreen = () => {
     },
     [
       dispatch,
-      doc?.head.fromDepart.isAddressStore,
+      doc?.head.fromDepart?.isAddressStore,
       doc?.head.toDepart.isAddressStore,
       docId,
       fromCell,
@@ -178,11 +191,7 @@ export const SelectCellScreen = () => {
     ],
   );
 
-  const renderRight = useCallback(
-    () => <InfoButton />,
-
-    [],
-  );
+  const renderRight = useCallback(() => <InfoButton onPress={() => setVisibleDialog(true)} />, []);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -191,50 +200,48 @@ export const SelectCellScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  console.log('def', defaultCell);
+  // console.log('def', defaultCell);
   const Cell = useCallback(
     ({ i /*, row*/ }: { /*row: string;*/ i: ICellData }) => {
       const colorStyle = {
         color:
           defaultCell.length && defaultCell.find((e) => e === i.name)
-            ? 'white'
+            ? cellColors.textWhite
             : i.disabled || !i.barcode
             ? colors.backdrop
-            : 'white',
+            : cellColors.textWhite,
       };
-      const colorBack = '#d5dce3';
       const backColorStyle = {
         backgroundColor:
           (fromCell && fromCell.barcode === i.barcode) || (toCell && toCell.barcode === i.barcode)
             ? colors.error
             : i.disabled
-            ? colors.disabled
+            ? colors.backdrop
             : defaultCell.length && defaultCell.find((e) => e === i.name)
-            ? '#5aa176'
+            ? cellColors.default
             : i.barcode
-            ? '#226182'
-            : colorBack,
+            ? cellColors.barcode
+            : cellColors.free,
       };
 
       return (
-        <TouchableOpacity
+        <Pressable
           key={i.name}
           style={[localStyles.buttons, backColorStyle]}
           onPress={() => handleSaveLine(i /*, row*/)}
           disabled={
-            (doc?.head.fromDepart.isAddressStore && !fromCell ? !i.barcode : Boolean(i.barcode)) || Boolean(i.disabled)
+            (doc?.head.fromDepart?.isAddressStore && !fromCell ? !i.barcode : Boolean(i.barcode)) || Boolean(i.disabled)
           }
         >
           <Text style={[localStyles.buttonLabel, colorStyle]}>{i.cell}</Text>
-        </TouchableOpacity>
+        </Pressable>
       );
     },
     [
       colors.backdrop,
-      colors.disabled,
       colors.error,
       defaultCell,
-      doc?.head.fromDepart.isAddressStore,
+      doc?.head.fromDepart?.isAddressStore,
       fromCell,
       handleSaveLine,
       toCell,
@@ -317,6 +324,7 @@ export const SelectCellScreen = () => {
           )}
         </ScrollView>
       </View>
+      <InfoDialog onOk={() => setVisibleDialog(false)} title="Ячейки" visible={visibleDialog} />
     </AppScreen>
   );
 };
@@ -359,5 +367,4 @@ const localStyles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 4,
   },
-  checkBox: { marginLeft: -20, width: 180, marginVertical: -5 },
 });

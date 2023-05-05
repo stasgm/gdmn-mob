@@ -1,5 +1,14 @@
 import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, SectionListData, SectionList, ListRenderItem } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  SectionListData,
+  SectionList,
+  ListRenderItem,
+  Alert,
+} from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { refSelectors, useSelector } from '@lib/store';
@@ -14,13 +23,21 @@ import {
   SubTitle,
   AppScreen,
   AppActivityIndicator,
+  InfoButton,
+  Checkbox,
 } from '@lib/mobile-ui';
 
 import { Searchbar, useTheme } from 'react-native-paper';
 
 import { ScrollView } from 'react-native-gesture-handler';
 
-import { generateId, getDateString } from '@lib/mobile-hooks';
+import { generateId, getDateString, keyExtractor } from '@lib/mobile-hooks';
+
+import { IListItem } from '@lib/mobile-types';
+
+import { INamedEntity } from '@lib/types';
+
+import { FlashList } from '@shopify/flash-list';
 
 import { barcodeSettings, ICell, ICellRef, IMoveDocument, IMoveLine } from '../../store/types';
 import { CellsStackParamList } from '../../navigation/Root/types';
@@ -29,6 +46,8 @@ import { getBarcode, getCellList } from '../../utils/helpers';
 import { ICellRefList, ICellData, ICodeEntity, IGood } from '../../store/app/types';
 
 import { Group } from '../../components/Group';
+import { InfoDialog } from '../../components/InfoDialog';
+import { cellColors } from '../../utils/constants';
 
 export interface ICellList extends ICell, ICellRef {
   department?: string;
@@ -39,12 +58,14 @@ export interface OrderListSectionProps {
 }
 
 export interface IListItemProps {
-  barcode: string;
+  id: string;
+  barcode?: string;
   name: string;
-  good: ICodeEntity;
-  workDate: string;
-  weight: number;
-  numReceived: string;
+  good?: ICodeEntity;
+  workDate?: string;
+  weight?: number;
+  numReceived?: string;
+  group?: INamedEntity;
 }
 
 export type SectionDataProps = SectionListData<IListItemProps, OrderListSectionProps>[];
@@ -62,6 +83,8 @@ export const CellsViewScreen = () => {
   const { colors } = useTheme();
 
   const id = useRoute<RouteProp<CellsStackParamList, 'CellsView'>>().params.id;
+
+  const [visibleInfo, setVisibleInfo] = useState(false);
 
   const [filterVisible, setFilterVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -106,17 +129,50 @@ export const CellsViewScreen = () => {
 
   const goods = refSelectors.selectByName<IGood>('good').data;
 
+  console.log(
+    '12345,',
+    goods.find((g) => g.id === '147048882'),
+  );
+
   const cells = refSelectors.selectByName<ICellRefList>('cell')?.data[0];
+
+  const cellListByGroup = useMemo(
+    () =>
+      cells[id]
+        .filter((i) => i.defaultGroup?.id)
+        .reduce((prev: IListItemProps[], cur) => {
+          const gr = prev.find((i) => i.group?.id === cur.defaultGroup?.id);
+
+          if (!gr) {
+            prev = [
+              ...prev,
+              {
+                id: cur.name,
+                name: cur.name,
+                group: cur.defaultGroup,
+              } as IListItemProps,
+            ];
+          }
+
+          return prev;
+        }, []),
+    [cells, id],
+  );
+
+  console.log('cellsByGroup', cellListByGroup);
+
   const cellListByGood = useMemo(
     () =>
       cells[id]
         .filter((i) => i.barcode)
         .map((i) => {
           const { shcode, workDate, weight, numReceived } = getBarcode(i.barcode || '', goodBarcodeSettings);
+          console.log('goods.find((g) => g.shcode === shcode),', shcode);
           return {
+            id: i.name,
             barcode: i.barcode,
             name: i.name,
-            good: goods.find((g) => g.shcode === shcode),
+            good: goods.find((g) => `0000${g.shcode}`.slice(-4) === shcode),
             workDate,
             weight,
             numReceived,
@@ -125,8 +181,25 @@ export const CellsViewScreen = () => {
     [cells, goodBarcodeSettings, goods, id],
   );
 
+  const filteredListByGroup = useMemo(() => {
+    // const upper = searchQuery.toUpperCase();
+    return (
+      cellListByGroup?.filter((i) =>
+        // i.barcode?.toUpperCase().includes(upper) ||
+        // i.good?.shcode.toUpperCase().includes(upper) ||
+        // i.good?.name.toUpperCase().includes(upper) ||
+        // i.name.toUpperCase().includes(upper) ||
+        // getDateString(i.workDate).includes(upper),
+        i?.group?.name
+          ? i?.group?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+            i?.name.toUpperCase().includes(searchQuery.toUpperCase())
+          : false,
+      ) || []
+    );
+  }, [cellListByGroup, searchQuery]);
+
   const filteredList = useMemo(() => {
-    const upper = searchQuery.toUpperCase();
+    // const upper = searchQuery.toUpperCase();
     return (
       cellListByGood
         ?.filter((i) =>
@@ -139,17 +212,17 @@ export const CellsViewScreen = () => {
             ? i?.good?.shcode.toUpperCase().includes(searchQuery.toUpperCase()) ||
               i?.good?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
               i?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-              getDateString(i?.workDate).includes(getDateString(searchQuery))
+              (i.workDate && getDateString(i?.workDate).includes(getDateString(searchQuery)))
             : false,
         )
-        ?.sort((a, b) => new Date(b.workDate).getTime() - new Date(a.workDate).getTime()) || []
+        ?.sort((a, b) => new Date(b.workDate || 0).getTime() - new Date(a.workDate || 0).getTime()) || []
     );
   }, [cellListByGood, searchQuery]);
 
   const sections = useMemo(
     () =>
       filteredList.reduce<SectionDataProps>((prev, item) => {
-        const sectionTitle = getDateString(item.workDate);
+        const sectionTitle = getDateString(item.workDate || '');
         const sectionExists = prev.some(({ title }) => title === sectionTitle);
         if (sectionExists) {
           return prev.map((section) =>
@@ -174,7 +247,12 @@ export const CellsViewScreen = () => {
   const [selectedRow, setSelectedRow] = useState<string>('');
 
   const renderRight = useCallback(
-    () => <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={filterVisible} />,
+    () => (
+      <View style={styles.buttons}>
+        <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={filterVisible} />
+        <InfoButton onPress={() => setVisibleInfo(true)} />
+      </View>
+    ),
     [filterVisible],
   );
 
@@ -191,6 +269,7 @@ export const CellsViewScreen = () => {
 
       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
+      console.log('GOOD', good);
       const newLine: IMoveLine = {
         good: { id: good?.id || '', name: good?.name || '', shcode: good?.shcode || '' },
         id: generateId(),
@@ -210,12 +289,13 @@ export const CellsViewScreen = () => {
   const cellsByRow =
     selectedChamber && selectedRow ? Object.entries(cellList[selectedChamber][selectedRow]).reverse() : [];
 
-  const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
+  const renderItemSection: ListRenderItem<IListItemProps> = ({ item }) => {
     return (
       <View style={styles.item} key={item.name}>
         <View style={styles.details}>
           <LargeText style={styles.textBold}>{item.name} </LargeText>
-          <MediumText>{item.good.name}</MediumText>
+
+          <MediumText>{item.good?.name}</MediumText>
           <View style={styles.directionRow}>
             <MediumText style={styles.number}>Партия: {item.numReceived || ''}</MediumText>
             <MediumText style={styles.number}>{(item.weight || 0).toString()} кг</MediumText>
@@ -224,40 +304,58 @@ export const CellsViewScreen = () => {
       </View>
     );
   };
+
+  const renderItemList = useCallback(({ item }: { item: IListItemProps }) => {
+    return (
+      <View style={styles.item} key={item.name}>
+        <View style={styles.details}>
+          <LargeText style={styles.textBold}>{item.name} </LargeText>
+
+          <MediumText>{item.group?.name}</MediumText>
+        </View>
+      </View>
+    );
+  }, []);
+
   const renderSectionHeader = ({ section }: any) => (
     <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
+
+  const handleAlert = (label: string, text: string) => {
+    Alert.alert(label, `Рекомендуется: ${text}`, [{ text: 'OK' }]);
+  };
 
   const Cell = useCallback(
     ({ item }: { item: ICellData }) => {
       const colorStyle = {
         color:
-          item.disabled || (!item.barcode && !(item.defaultGroup && item.defaultGroup.id)) ? colors.backdrop : 'white',
+          item.disabled || (!item.barcode && !(item.defaultGroup && item.defaultGroup.id))
+            ? colors.backdrop
+            : cellColors.textWhite,
       };
       const backColorStyle = {
         backgroundColor: item.barcode
-          ? '#226182'
+          ? cellColors.barcode
           : item.disabled
           ? colors.backdrop
           : item.defaultGroup && item.defaultGroup.id
-          ? '#2b7849'
-          : '#d5dce3',
+          ? cellColors.default
+          : cellColors.free,
       };
       const newItem = lines.find((e) => e.barcode === item.barcode) || getScannedObject(item.barcode || '', item.name);
-      // const defaultCell = cells[id || ''].find((i) => i.defaultGroup === newItem.good.shcode && !i.barcode);
-
-      // const good = goods.find((i) => `0000${i.shcode}`.slice(-4) === defaultCell?.defaultGoodShcode);
 
       return (
         <TouchableOpacity
           key={item.name}
           style={[localStyles.buttons, backColorStyle]}
           onPress={() =>
-            navigation.navigate('GoodLine', {
-              item: newItem,
-            })
+            item.defaultGroup?.id && !item.barcode
+              ? handleAlert(item.name, item.defaultGroup.name)
+              : navigation.navigate('GoodLine', {
+                  item: newItem,
+                })
           }
-          disabled={!item.barcode || item.disabled}
+          disabled={(!item.barcode && !item.defaultGroup?.id) || item.disabled}
         >
           <Text style={[localStyles.buttonLabel, colorStyle]}>{item.cell}</Text>
         </TouchableOpacity>
@@ -276,6 +374,13 @@ export const CellsViewScreen = () => {
     ),
     [Cell],
   );
+
+  const searchTypes: IListItem[] = [
+    { id: 'good', value: 'товар' },
+    { id: 'group', value: 'группа' },
+  ];
+
+  const [searchType, setSearchType] = useState<IListItem>(searchTypes[0]);
 
   const isFocused = useIsFocused();
   if (!isFocused) {
@@ -304,15 +409,39 @@ export const CellsViewScreen = () => {
               selectionColor={colors.primary}
             />
           </View>
+          <View style={[localStyles.status]}>
+            {searchTypes.map((elem) => (
+              <View key={elem.id}>
+                <Checkbox
+                  key={elem.id}
+                  title={elem.value}
+                  selected={searchType.id === elem.id}
+                  onSelect={() => setSearchType(elem)}
+                />
+              </View>
+            ))}
+          </View>
           <ItemSeparator />
-          <SectionList
-            sections={sections}
-            renderItem={renderItem}
-            ItemSeparatorComponent={ItemSeparator}
-            renderSectionHeader={renderSectionHeader}
-            ListEmptyComponent={EmptyList}
-            keyboardShouldPersistTaps={'handled'}
-          />
+          {searchType.id === 'good' ? (
+            <SectionList
+              sections={sections}
+              renderItem={renderItemSection}
+              ItemSeparatorComponent={ItemSeparator}
+              renderSectionHeader={renderSectionHeader}
+              ListEmptyComponent={EmptyList}
+              keyboardShouldPersistTaps={'handled'}
+            />
+          ) : (
+            <FlashList
+              data={filteredListByGroup}
+              renderItem={renderItemList}
+              estimatedItemSize={60}
+              ItemSeparatorComponent={ItemSeparator}
+              keyExtractor={keyExtractor}
+              extraData={[filteredListByGroup]}
+              keyboardShouldPersistTaps={'handled'}
+            />
+          )}
         </>
       ) : (
         <View style={localStyles.groupItem}>
@@ -359,6 +488,7 @@ export const CellsViewScreen = () => {
           </ScrollView>
         </View>
       )}
+      <InfoDialog onOk={() => setVisibleInfo(false)} title="Ячейки" visible={visibleInfo} />
     </AppScreen>
   );
 };
@@ -401,5 +531,10 @@ const localStyles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
     marginTop: 4,
+  },
+  status: {
+    marginHorizontal: 5,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
 });

@@ -1,6 +1,6 @@
 import { IReferenceData } from '@lib/types';
 
-import { IMoveLine } from '../../store/types';
+import { IInventoryLine, IMoveLine } from '../../store/types';
 
 export type IRefSelectParams = {
   refName: string;
@@ -21,7 +21,8 @@ export type MoveParamList = RefParamList & {
   MoveView: { id: string; docType?: string };
   MoveEdit: { id: string; docType?: string } | undefined;
   ScanGood: { docId: string };
-  SelectCell: { docId: string; /*lineId: string;*/ item: IMoveLine; mode: number };
+  SelectCell: { docId: string; /*lineId: string;*/ item: IMoveLine; mode: number; docType?: string };
+  InventoryView: { id: string; docType?: string };
 };
 
 export type MoveStackParamList = { MoveList: undefined } & MoveParamList;
@@ -32,7 +33,7 @@ export type ShipmentParamList = RefParamList & {
   ShipmentView: { id: string };
   ScanOrder: { docTypeId: string };
   ScanGood: { docId: string };
-  SelectCell: { docId: string; /*lineId: string;*/ item: IMoveLine; mode?: number };
+  SelectCell: { docId: string; /*lineId: string;*/ item: IMoveLine; mode?: number; docType?: string };
 };
 
 export type ShipmentStackParamList = { ShipmentList: undefined } & ShipmentParamList;
@@ -49,6 +50,7 @@ export type InventoryParamList = RefParamList & {
   InventoryView: { id: string; docType?: string };
   InventoryEdit: { id: string; docType?: string } | undefined; //itemId: string;
   ScanGood: { docId: string; docType?: string };
+  SelectCell: { docId: string; /*lineId: string;*/ item: IInventoryLine; mode?: number; docType?: string };
 };
 
 export type InventoryStackParamList = { InventoryList: undefined } & InventoryParamList;
