@@ -125,7 +125,7 @@ export const LaboratoryListScreen = () => {
     navigation.setOptions({
       headerLeft: isDelList ? renderLeft : navBackDrawer,
       headerRight: renderRight,
-      title: isDelList ? `Выделено отвесов: ${Object.values(delList).length}` : 'Отвесы',
+      title: isDelList ? `Выделено документов: ${Object.values(delList).length}` : 'Документы',
     });
   }, [delList, isDelList, navigation, renderLeft, renderRight]);
 

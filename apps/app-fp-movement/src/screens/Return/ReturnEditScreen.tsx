@@ -83,7 +83,7 @@ export const ReturnEditScreen = () => {
   useEffect(() => {
     if (screenState === 'saving') {
       if (!shipmentType) {
-        Alert.alert('Внимание!', 'Тип документа для заявок не найден.', [{ text: 'OK' }]);
+        Alert.alert('Внимание!', 'Тип документа для возвратов не найден.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
       }

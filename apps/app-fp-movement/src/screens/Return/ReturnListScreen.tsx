@@ -123,7 +123,7 @@ export const ReturnListScreen = () => {
     navigation.setOptions({
       headerLeft: isDelList ? renderLeft : navBackDrawer,
       headerRight: renderRight,
-      title: isDelList ? `Выделено отвесов: ${Object.values(delList).length}` : 'Отвесы',
+      title: isDelList ? `Выделено возвратов: ${Object.values(delList).length}` : 'Возвраты',
     });
   }, [delList, isDelList, navigation, renderLeft, renderRight]);
 

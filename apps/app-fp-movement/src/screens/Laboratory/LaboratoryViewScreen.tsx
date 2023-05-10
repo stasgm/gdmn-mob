@@ -72,8 +72,8 @@ export const LaboratoryViewScreen = () => {
   const [barcode, setBarcode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const [visibleQuantPackDialog, setVisibleQuantPackDialog] = useState(false);
-  const [quantPack, setQuantPack] = useState('');
+  const [visibleWeightDialog, setVisibleWeightDialog] = useState(false);
+  const [weight, setWeight] = useState('');
 
   const handleGetBarcode = useCallback(
     (brc: string) => {
@@ -145,70 +145,37 @@ export const LaboratoryViewScreen = () => {
     setErrorMessage('');
   };
 
-  const handleAddQuantPack = useCallback(
-    (quantity: number) => {
+  const handleUpdateWeight = useCallback(
+    (newWeight: number) => {
       const line = lines?.[0];
       if (!line) {
         return;
       }
 
-      const weight = line?.weight * quantity;
-
-      if (weight < 1000) {
+      if (newWeight < 1000) {
         const newLine: ILaboratoryLine = {
           ...line,
-          quantPack: quantity,
-          weight,
+          weight: newWeight,
           scannedBarcode: line?.barcode,
         };
 
         dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
       } else {
-        const maxQuantPack = Math.floor(999.99 / line?.weight);
-
-        let newQuantity = quantity;
-        let sortOrder = line.sortOrder || lines.length;
-
-        while (newQuantity > 0) {
-          const q = newQuantity > maxQuantPack ? maxQuantPack : newQuantity;
-          const newWeight = line?.weight * q;
-
-          const newLine: ILaboratoryLine = {
-            ...line,
-            quantPack: q,
-            weight: newWeight,
-            scannedBarcode: line?.barcode,
-          };
-
-          if (newQuantity === quantity) {
-            dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-          } else {
-            sortOrder = sortOrder + 1;
-
-            const addedLine = { ...newLine, id: generateId(), sortOrder };
-            dispatch(
-              documentActions.addDocumentLine({
-                docId: id,
-                line: addedLine,
-              }),
-            );
-          }
-          newQuantity = newQuantity - maxQuantPack;
-        }
+        Alert.alert('Ошибка!', 'Неверный вес', [{ text: 'OK' }]);
       }
     },
     [dispatch, id, lines],
   );
 
-  const handleEditQuantPack = () => {
-    handleAddQuantPack(Number(quantPack));
-    setVisibleQuantPackDialog(false);
-    setQuantPack('');
+  const handleEditWeight = () => {
+    handleUpdateWeight(Number(weight));
+    setVisibleWeightDialog(false);
+    setWeight('');
   };
 
   const handleDismissQuantPack = () => {
-    setVisibleQuantPackDialog(false);
-    setQuantPack('');
+    setVisibleWeightDialog(false);
+    setWeight('');
     // setErrorMessage('');
   };
 
@@ -341,7 +308,7 @@ export const LaboratoryViewScreen = () => {
     <ListItemLine
       key={item.id}
       readonly={item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
-      onPress={() => setVisibleQuantPackDialog(true)}
+      onPress={() => setVisibleWeightDialog(true)}
     >
       <View style={styles.details}>
         <LargeText style={styles.textBold}>{item.good.name}</LargeText>
@@ -521,13 +488,13 @@ export const LaboratoryViewScreen = () => {
       />
       <AppDialog
         title="Количество"
-        visible={visibleQuantPackDialog}
-        text={quantPack}
-        onChangeText={setQuantPack}
+        visible={visibleWeightDialog}
+        text={weight}
+        onChangeText={setWeight}
         onCancel={handleDismissQuantPack}
-        onOk={handleEditQuantPack}
+        onOk={handleEditWeight}
         okLabel={'Ок'}
-        keyboardType="numbers-and-punctuation"
+        // keyboardType="numbers-and-punctuation"
         // errorMessage={errorMessage}
       />
       <SimpleDialog

@@ -72,144 +72,14 @@ export const ReturnViewScreen = () => {
   const [barcode, setBarcode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const [visibleQuantPackDialog, setVisibleQuantPackDialog] = useState(false);
-  const [quantPack, setQuantPack] = useState('');
-
-  const handleGetBarcode = useCallback(
-    (brc: string) => {
-      if (!doc) {
-        return;
-      }
-
-      if (!brc.match(/^-{0,1}\d+$/)) {
-        setErrorMessage('Штрих-код неверного формата');
-        return;
-      }
-
-      if (brc.length < minBarcodeLength) {
-        setErrorMessage('Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!');
-        return;
-      }
-
-      const barc = getBarcode(brc, goodBarcodeSettings);
-
-      const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
-
-      if (!good) {
-        setErrorMessage('Товар не найден');
-        return;
-      }
-
-      const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
-
-      if (line) {
-        setErrorMessage('Товар уже добавлен');
-        return;
-      }
-
-      if (good) {
-        const barcodeItem: IReturnLine = {
-          good: { id: good.id, name: good.name, shcode: good.shcode },
-          id: generateId(),
-          weight: barc.weight,
-          barcode: barc.barcode,
-          workDate: barc.workDate,
-          numReceived: barc.numReceived,
-          sortOrder: doc?.lines?.length + 1,
-          quantPack: barc.quantPack,
-        };
-        setErrorMessage('');
-        dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
-
-        setVisibleDialog(false);
-        setBarcode('');
-      } else {
-        setErrorMessage('Товар не найден');
-      }
-    },
-
-    [dispatch, doc, goodBarcodeSettings, goods, id, minBarcodeLength],
-  );
-
   const handleShowDialog = () => {
     setVisibleDialog(true);
-  };
-
-  const handleSearchBarcode = () => {
-    handleGetBarcode(barcode);
   };
 
   const handleDismissBarcode = () => {
     setVisibleDialog(false);
     setBarcode('');
     setErrorMessage('');
-  };
-
-  const handleAddQuantPack = useCallback(
-    (quantity: number) => {
-      const line = lines?.[0];
-      if (!line) {
-        return;
-      }
-
-      const weight = line?.weight * quantity;
-
-      if (weight < 1000) {
-        const newLine: IReturnLine = {
-          ...line,
-          quantPack: quantity,
-          weight,
-          scannedBarcode: line?.barcode,
-        };
-
-        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-      } else {
-        const maxQuantPack = Math.floor(999.99 / line?.weight);
-
-        let newQuantity = quantity;
-        let sortOrder = line.sortOrder || lines.length;
-
-        while (newQuantity > 0) {
-          const q = newQuantity > maxQuantPack ? maxQuantPack : newQuantity;
-          const newWeight = line?.weight * q;
-
-          const newLine: IReturnLine = {
-            ...line,
-            quantPack: q,
-            weight: newWeight,
-            scannedBarcode: line?.barcode,
-          };
-
-          if (newQuantity === quantity) {
-            dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-          } else {
-            sortOrder = sortOrder + 1;
-
-            const addedLine = { ...newLine, id: generateId(), sortOrder };
-            dispatch(
-              documentActions.addDocumentLine({
-                docId: id,
-                line: addedLine,
-              }),
-            );
-          }
-          newQuantity = newQuantity - maxQuantPack;
-        }
-      }
-    },
-    [dispatch, id, lines],
-  );
-
-  const handleEditQuantPack = () => {
-    handleAddQuantPack(Number(quantPack));
-    setVisibleQuantPackDialog(false);
-    setQuantPack('');
-  };
-
-  const handleDismissQuantPack = () => {
-    setVisibleQuantPackDialog(false);
-    setQuantPack('');
-    // setErrorMessage('');
   };
 
   const handleEditDocHead = useCallback(() => {
@@ -338,11 +208,7 @@ export const ReturnViewScreen = () => {
   }, [navigation, renderRight]);
 
   const renderItem: ListRenderItem<IReturnLine> = ({ item }) => (
-    <ListItemLine
-      key={item.id}
-      readonly={item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
-      onPress={() => setVisibleQuantPackDialog(true)}
-    >
+    <ListItemLine key={item.id} readonly={true}>
       <View style={styles.details}>
         <LargeText style={styles.textBold}>{item.good.name}</LargeText>
         <View style={styles.flexDirectionRow}>
@@ -352,11 +218,6 @@ export const ReturnViewScreen = () => {
         <View style={styles.flexDirectionRow}>
           <MediumText>
             Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
-          </MediumText>
-        </View>
-        <View style={styles.flexDirectionRow}>
-          <MediumText>
-            quantPack {item.quantPack || ''}, sortOrder {item.sortOrder || ''}
           </MediumText>
         </View>
       </View>
@@ -374,18 +235,26 @@ export const ReturnViewScreen = () => {
       }
 
       if (!brc.match(/^-{0,1}\d+$/)) {
-        Alert.alert('Внимание!', 'Штрих-код не определен. Повторите сканирование!', [{ text: 'OK' }]);
-        setScanned(false);
+        if (visibleDialog) {
+          setErrorMessage('Штрих-код неверного формата');
+        } else {
+          Alert.alert('Внимание!', 'Штрих-код не определен. Повторите сканирование!', [{ text: 'OK' }]);
+          setScanned(false);
+        }
         return;
       }
 
       if (brc.length < minBarcodeLength) {
-        Alert.alert(
-          'Внимание!',
-          'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
-          [{ text: 'OK' }],
-        );
-        setScanned(false);
+        if (visibleDialog) {
+          setErrorMessage('Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!');
+        } else {
+          Alert.alert(
+            'Внимание!',
+            'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
+            [{ text: 'OK' }],
+          );
+          setScanned(false);
+        }
         return;
       }
 
@@ -394,16 +263,24 @@ export const ReturnViewScreen = () => {
       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
       if (!good) {
-        Alert.alert('Внимание!', 'Товар не найден!', [{ text: 'OK' }]);
-        setScanned(false);
+        if (visibleDialog) {
+          setErrorMessage('Товар не найден');
+        } else {
+          Alert.alert('Внимание!', 'Товар не найден!', [{ text: 'OK' }]);
+          setScanned(false);
+        }
         return;
       }
 
       const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
 
       if (line) {
-        Alert.alert('Внимание!', 'Данный штрих-код уже добавлен!', [{ text: 'OK' }]);
-        setScanned(false);
+        if (visibleDialog) {
+          setErrorMessage('Товар уже добавлен');
+        } else {
+          Alert.alert('Внимание!', 'Данный штрих-код уже добавлен!', [{ text: 'OK' }]);
+          setScanned(false);
+        }
         return;
       }
 
@@ -420,11 +297,21 @@ export const ReturnViewScreen = () => {
 
       dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
 
-      setScanned(false);
+      if (visibleDialog) {
+        setVisibleDialog(false);
+        setBarcode('');
+        setErrorMessage('');
+      } else {
+        setScanned(false);
+      }
     },
 
-    [doc, minBarcodeLength, goodBarcodeSettings, goods, dispatch, id],
+    [doc, minBarcodeLength, goodBarcodeSettings, goods, dispatch, id, visibleDialog],
   );
+
+  const handleSearchBarcode = () => {
+    getScannedObject(barcode);
+  };
 
   const [key, setKey] = useState(1);
 
@@ -518,17 +405,6 @@ export const ReturnViewScreen = () => {
         onOk={handleSearchBarcode}
         okLabel={'Найти'}
         errorMessage={errorMessage}
-      />
-      <AppDialog
-        title="Количество"
-        visible={visibleQuantPackDialog}
-        text={quantPack}
-        onChangeText={setQuantPack}
-        onCancel={handleDismissQuantPack}
-        onOk={handleEditQuantPack}
-        okLabel={'Ок'}
-        keyboardType="numbers-and-punctuation"
-        // errorMessage={errorMessage}
       />
       <SimpleDialog
         visible={visibleSendDialog}
