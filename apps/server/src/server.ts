@@ -20,6 +20,8 @@ import { IUser } from '@lib/types';
 
 import dotenv from 'dotenv';
 
+import { RotatingFileStream, createStream } from 'rotating-file-stream';
+
 import koaConfig from '../config/koa';
 
 import config from '../config';
@@ -90,7 +92,12 @@ export async function createServer(server: IServer): Promise<KoaApp> {
     fs.mkdirSync(logPath);
   }
 
-  const accessLogStream: fs.WriteStream = fs.createWriteStream(config.LOG_ACCESS_PATH, { flags: 'a' });
+  const accessLogStream: RotatingFileStream = createStream('access.log', {
+    size: '20M',
+    maxFiles: 1,
+    path: logPath,
+    initialRotation: true,
+  });
 
   app
     .use(errorHandler)
@@ -147,7 +154,7 @@ export const startServer = (app: KoaApp) => {
   /**
    * HTTPS сервер с платным сертификатом
    */
-
+  /*
   const cert = fs.readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.crt'));
   const key = fs.readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.key'));
 
@@ -163,5 +170,6 @@ export const startServer = (app: KoaApp) => {
 
   https
     .createServer({ cert, ca, key }, koaCallback)
-    .listen(config.HTTPS_PORT, () => log.info(`>>> HTTPS server is running at https://localhost:${config.HTTPS_PORT}`));
+    .listen(config.HTTPS_PORT, () =>
+     log.info(`>>> HTTPS server is running at https://localhost:${config.HTTPS_PORT}`)); */
 };
