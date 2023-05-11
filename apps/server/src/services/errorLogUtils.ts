@@ -67,7 +67,7 @@ export const saveDeviceLogFile = async (
   }
 };
 
-const getListFiles = async (root: string): Promise<string[]> => {
+export const getListFiles = async (root: string): Promise<string[]> => {
   let newFiles: string[] = [];
   if (!(await checkFileExists(root))) {
     log.error(`Robust-protocol.errorDirectory: Ошибка чтения директории - ${root}`);

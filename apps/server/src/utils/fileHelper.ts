@@ -85,6 +85,26 @@ export const readJsonFile = async <T>(fileName: string): Promise<T | string> => 
   }
 };
 
+export const readTextFile = async <T>(
+  fileName: string,
+  start: number | undefined,
+  end: number | undefined,
+): Promise<T | string> => {
+  const check = await checkFileExists(fileName);
+
+  try {
+    console.log('start', start);
+    const streamRead = createReadStream(fileName, { encoding: 'utf8', start: start, end: end });
+    const data = [];
+    for await (const chunk of streamRead) {
+      data.push(chunk);
+    }
+    return data.join('').toString();
+  } catch (err) {
+    return `Ошибка чтения файла ${fileName} - ${err} `;
+  }
+};
+
 const finishedPromisify = promisify(finished);
 
 export const writeIterableToFile = async (filename: string, iterable: string, options?: any): Promise<void> => {
