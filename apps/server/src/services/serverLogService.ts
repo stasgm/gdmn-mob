@@ -2,7 +2,7 @@ import path from 'path';
 
 import { stat } from 'fs/promises';
 
-import { IServerLogFile } from '@lib/types';
+import { IServerLogFile, IServerLogResponse } from '@lib/types';
 
 import { checkFileExists, readTextFile, writeIterableToFile } from '../utils/fileHelper';
 
@@ -52,7 +52,7 @@ const findOne = async (
   fid: string,
   start: number | undefined,
   end: number | undefined,
-): Promise<string | undefined> => {
+): Promise<IServerLogResponse | undefined> => {
   const fileName = fid.split('_EXT_').join('.').split('_D_').join(path.sep);
   const logPath = path.join(process.cwd(), config.LOG_PATH);
   const fullName = path.join(logPath, fileName);
@@ -61,8 +61,13 @@ const findOne = async (
     return undefined;
   }
   try {
-    const filetext: string = await readTextFile(fullName, start, end);
-    return filetext;
+    const fileText: string = await readTextFile(fullName, start, end);
+    const fileStat = await stat(fullName);
+    const isEndOfFile: boolean = end === undefined ? true : fileStat.size <= end;
+    return {
+      isFinished: isEndOfFile,
+      textFile: fileText,
+    };
   } catch (err) {
     log.error(`Невозможно прочитать файл '${fileName} `);
     return undefined;

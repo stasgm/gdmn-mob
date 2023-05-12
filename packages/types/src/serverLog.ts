@@ -8,3 +8,8 @@ export interface IServerLogFile extends IEntity {
   path: string;
   mdate: string;
 }
+
+export interface IServerLogResponse {
+  isFinished: boolean;
+  textFile: string;
+}

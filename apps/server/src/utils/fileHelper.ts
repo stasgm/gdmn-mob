@@ -93,7 +93,6 @@ export const readTextFile = async <T>(
   const check = await checkFileExists(fileName);
 
   try {
-    console.log('start', start);
     const streamRead = createReadStream(fileName, { encoding: 'utf8', start: start, end: end });
     const data = [];
     for await (const chunk of streamRead) {
