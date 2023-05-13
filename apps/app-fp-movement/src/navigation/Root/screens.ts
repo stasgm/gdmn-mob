@@ -1,4 +1,6 @@
 import { MoveListScreen, MoveEditScreen, MoveViewScreen, SelectCellScreen } from '../../screens/Movements';
+import { MoveFromListScreen, MoveFromEditScreen, MoveFromViewScreen } from '../../screens/MovementFrom';
+import { MoveToListScreen, MoveToEditScreen, MoveToViewScreen } from '../../screens/MovementTo';
 
 import {
   ShipmentListScreen,
@@ -9,7 +11,12 @@ import {
 } from '../../screens/Shipment';
 
 import { FreeShipmentListScreen, FreeShipmentEditScreen, FreeShipmentViewScreen } from '../../screens/FreeShipment';
-import { InventoryListScreen, InventoryEditScreen, InventoryViewScreen } from '../../screens/Inventory';
+import {
+  InventoryListScreen,
+  InventoryEditScreen,
+  InventoryViewScreen,
+  SelectCellScreen as InvSelectCellScreen,
+} from '../../screens/Inventory';
 import { CellsViewScreen, ContactListScreen, GoodLineScreen } from '../../screens/Cells';
 import { LaboratoryListScreen, LaboratoryEditScreen, LaboratoryViewScreen } from '../../screens/Laboratory';
 import { ReturnListScreen, ReturnEditScreen, ReturnViewScreen } from '../../screens/Return';
@@ -26,6 +33,29 @@ export const moveScreens = {
 
 export const moveListScreens = {
   MoveList: { title: 'Перемещение', component: MoveListScreen },
+};
+
+export const moveFromScreens = {
+  MoveFromEdit: { title: 'С хранения', component: MoveFromEditScreen },
+  MoveFromView: { title: '', component: MoveFromViewScreen },
+  SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
+  ScanGood: { title: 'Сканер', component: ScanGoodScreen },
+  SelectCell: { title: 'Выбор ячейки', component: SelectCellScreen },
+};
+
+export const moveFromListScreens = {
+  MoveFromList: { title: 'С хранения', component: MoveFromListScreen },
+};
+export const moveToScreens = {
+  MoveToEdit: { title: 'На хранение', component: MoveToEditScreen },
+  MoveToView: { title: '', component: MoveToViewScreen },
+  SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
+  ScanGood: { title: 'Сканер', component: ScanGoodScreen },
+  SelectCell: { title: 'Выбор ячейки', component: SelectCellScreen },
+};
+
+export const moveToListScreens = {
+  MoveToList: { title: 'На хранение', component: MoveToListScreen },
 };
 
 export const shipmentScreens = {
@@ -56,6 +86,7 @@ export const inventoryScreens = {
   InventoryView: { title: '', component: InventoryViewScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
   ScanGood: { title: 'Сканер', component: ScanGoodScreen },
+  SelectCell: { title: 'Выбор ячейки', component: InvSelectCellScreen },
 };
 
 export const inventoryListScreens = {

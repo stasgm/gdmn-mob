@@ -27,6 +27,26 @@ export type MoveParamList = RefParamList & {
 
 export type MoveStackParamList = { MoveList: undefined } & MoveParamList;
 
+export type MoveFromParamList = RefParamList & {
+  MoveFromView: { id: string; docType?: string };
+  MoveFromEdit: { id: string; docType?: string } | undefined;
+  ScanGood: { docId: string };
+  SelectCell: { docId: string; /*lineId: string;*/ item: IMoveLine; mode: number; docType?: string };
+  InventoryView: { id: string; docType?: string };
+};
+
+export type MoveFromStackParamList = { MoveFromList: undefined } & MoveFromParamList;
+
+export type MoveToParamList = RefParamList & {
+  MoveToView: { id: string; docType?: string };
+  MoveToEdit: { id: string; docType?: string } | undefined;
+  ScanGood: { docId: string };
+  SelectCell: { docId: string; /*lineId: string;*/ item: IMoveLine; mode: number; docType?: string };
+  InventoryView: { id: string; docType?: string };
+};
+
+export type MoveToStackParamList = { MoveToList: undefined } & MoveToParamList;
+
 export type ShipmentParamList = RefParamList & {
   TempView: { id: string };
   ShipmentEdit: { id: string };

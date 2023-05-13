@@ -69,3 +69,31 @@ export interface ICellRefList {
 export interface ICellData extends ICellRef {
   cell: string;
 }
+
+export interface IMGoodData<T = unknown> {
+  [id: string]: T;
+}
+
+export interface IMGoodRemain {
+  good: IGood;
+  remains?: IModelRem[];
+}
+export interface IRemainsData {
+  goodId: string;
+  q?: number;
+  dateReceived: string;
+  numReceived: string;
+}
+
+export interface IModelRem {
+  dateReceived: string;
+  numReceived: string;
+  q: number;
+}
+
+export interface IRemGood {
+  good: IGood;
+  remains: number;
+  dateReceived: string;
+  numReceived: string;
+}

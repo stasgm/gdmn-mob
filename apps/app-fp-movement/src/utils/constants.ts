@@ -101,6 +101,15 @@ export const appSettings: Settings = {
     visible: true,
     group: mainSettingGroup,
   },
+  addressStore: {
+    id: 'addressStore',
+    sortOrder: 4,
+    description: 'Адресное хранение',
+    data: false,
+    type: 'boolean',
+    visible: true,
+    group: mainSettingGroup,
+  },
   minBarcodeLength: {
     id: 'minBarcodeLength',
     sortOrder: 6,

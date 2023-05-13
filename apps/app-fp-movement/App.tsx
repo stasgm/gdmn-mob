@@ -52,61 +52,119 @@ import { CellsNavigator } from './src/navigation/CellsNavigator';
 import { InventoryNavigator } from './src/navigation/InventoryNavigator';
 import { ReturnNavigator } from './src/navigation/ReturnNavigator';
 import { LaboratoryNavigator } from './src/navigation/LaboratoryNavigator';
+import { MoveToNavigator } from './src/navigation/MoveToNavigator';
+import { MoveFromNavigator } from './src/navigation/MoveFromNavigator';
 
 const Root = () => {
-  const navItems: INavItem[] = useMemo(
-    () => [
-      {
-        name: 'Movement',
-        title: 'Перемещение',
-        icon: 'transfer',
-        component: MoveNavigator,
-      },
-      {
-        name: 'Shipment',
-        title: 'Отвес по заявке',
-        icon: 'playlist-check',
-        component: ShipmentNavigator,
-      },
-      {
-        name: 'FreeShipment',
-        title: 'Отвес',
-        icon: 'playlist-plus',
-        component: FreeShipmentNavigator,
-      },
-      {
-        name: 'Cells',
-        title: 'Ячейки',
-        icon: 'table-split-cell',
-        component: CellsNavigator,
-      },
-      {
-        name: 'return',
-        title: 'Возврат',
-        icon: 'file-restore-outline',
-        component: ReturnNavigator,
-      },
-      {
-        name: 'Inventory',
-        title: 'Инвентаризация',
-        icon: 'file-document-outline',
-        component: InventoryNavigator,
-      },
+  const { isInit, data: settings } = useSelector((state) => state.settings);
 
-      {
-        name: 'labaratory',
-        title: 'Лаборатория',
-        icon: 'file-document-edit-outline',
-        component: LaboratoryNavigator,
-      },
-    ],
-    [],
+  const isAddressStore = useMemo(() => settings.addressStore?.data || false, [settings.addressStore?.data]);
+
+  const navItems: INavItem[] = useMemo(
+    () =>
+      isAddressStore
+        ? [
+            {
+              name: 'InternalMovement',
+              title: 'На хранение',
+              icon: 'file-plus',
+              component: MoveToNavigator,
+            },
+            {
+              name: 'Movement',
+              title: 'С хранения',
+              icon: 'file-plus',
+              component: MoveFromNavigator,
+            },
+            {
+              name: 'BaseMovement',
+              title: 'Перемещение',
+              icon: 'transfer',
+              component: MoveNavigator,
+            },
+            {
+              name: 'Shipment',
+              title: 'Отвес по заявке',
+              icon: 'playlist-check',
+              component: ShipmentNavigator,
+            },
+            {
+              name: 'FreeShipment',
+              title: 'Отвес',
+              icon: 'playlist-plus',
+              component: FreeShipmentNavigator,
+            },
+            {
+              name: 'Cells',
+              title: 'Ячейки',
+              icon: 'table-split-cell',
+              component: CellsNavigator,
+            },
+            {
+              name: 'Return',
+              title: 'Возврат',
+              icon: 'file-restore-outline',
+              component: ReturnNavigator,
+            },
+            {
+              name: 'Inventory',
+              title: 'Инвентаризация',
+              icon: 'file-document-outline',
+              component: InventoryNavigator,
+            },
+
+            {
+              name: 'Labaratory',
+              title: 'Лаборатория',
+              icon: 'file-document-edit-outline',
+              component: LaboratoryNavigator,
+            },
+          ]
+        : [
+            {
+              name: 'Movement',
+              title: 'Перемещение',
+              icon: 'transfer',
+              component: MoveNavigator,
+            },
+            {
+              name: 'Shipment',
+              title: 'Отвес по заявке',
+              icon: 'playlist-check',
+              component: ShipmentNavigator,
+            },
+            {
+              name: 'FreeShipment',
+              title: 'Отвес',
+              icon: 'playlist-plus',
+              component: FreeShipmentNavigator,
+            },
+            {
+              name: 'Return',
+              title: 'Возврат',
+              icon: 'file-restore-outline',
+              component: ReturnNavigator,
+            },
+            {
+              name: 'Inventory',
+              title: 'Инвентаризация',
+              icon: 'file-document-outline',
+              component: InventoryNavigator,
+            },
+
+            {
+              name: 'Labaratory',
+              title: 'Лаборатория',
+              icon: 'file-document-edit-outline',
+              component: LaboratoryNavigator,
+            },
+          ],
+    [isAddressStore],
   );
 
   const dispatch = useDispatch();
 
   //Загружаем в стор дополнительные настройки приложения
-  const isInit = useSelector((state) => state.settings.isInit);
   const authLoading = useSelector((state) => state.auth.loadingData);
   const appDataLoading = appSelectors.selectLoading();
   const isLogged = authSelectors.isLoggedWithCompany();

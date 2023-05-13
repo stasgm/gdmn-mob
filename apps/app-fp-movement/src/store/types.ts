@@ -95,6 +95,7 @@ export interface ICellRef {
   barcode?: string;
   disabled?: boolean;
   defaultGroup?: INamedEntity;
+  sortOrder?: number;
 }
 export interface IMoveHead extends IHead {
   fromDepart: IAddressStoreEntity;

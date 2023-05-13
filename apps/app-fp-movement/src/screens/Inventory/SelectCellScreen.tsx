@@ -16,14 +16,14 @@ import { useTheme } from 'react-native-paper';
 
 import { ScrollView } from 'react-native-gesture-handler';
 
-import { ICell, ICellName, ICellRef, IInventoryLine, IMoveDocument, IMoveLine } from '../store/types';
-import { MoveStackParamList } from '../navigation/Root/types';
+import { ICell, ICellRef, IInventoryLine, IMoveDocument, IMoveLine } from '../../store/types';
+import { InventoryStackParamList } from '../../navigation/Root/types';
 
-import { getCellItem, getCellList } from '../utils/helpers';
-import { ICellRefList, ICellData } from '../store/app/types';
-import { Group } from '../components/Group';
-import { cellColors } from '../utils/constants';
-import { InfoDialog } from '../components/InfoDialog';
+import { getCellItem, getCellList, getCellListRef } from '../../utils/helpers';
+import { ICellRefList, ICellData } from '../../store/app/types';
+import { Group } from '../../components/Group';
+import { cellColors } from '../../utils/constants';
+import { InfoDialog } from '../../components/InfoDialog';
 
 export interface ICellList extends ICell, ICellRef {
   department?: string;
@@ -39,30 +39,21 @@ const NamedRow = ({ item }: { item: string }) => (
 
 export const SelectCellScreen = () => {
   const dispatch = useDispatch();
-  const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'SelectCell'>>();
+  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'SelectCell'>>();
   const { colors } = useTheme();
 
   const [visibleDialog, setVisibleDialog] = useState(false);
-  const { docId, item, mode, docType } = useRoute<RouteProp<MoveStackParamList, 'SelectCell'>>().params;
+  const { docId, item, mode } = useRoute<RouteProp<InventoryStackParamList, 'SelectCell'>>().params;
 
   const doc = docSelectors.selectByDocId<IMoveDocument>(docId);
 
   const cells = refSelectors.selectByName<ICellRefList>('cell')?.data[0];
 
-  const [fromCell, setFromCell] = useState<IMoveLine | undefined>(undefined);
   const [toCell, setToCell] = useState<IMoveLine | IInventoryLine | undefined>(undefined);
   const [selectedChamber, setSelectedChamber] = useState<string | undefined>('');
   const [selectedRow, setSelectedRow] = useState<string | undefined>('');
 
-  const [defaultCell, setDefaultCell] = useState<string[]>([]);
-
-  const departId = useMemo(
-    () =>
-      doc?.head.fromDepart && doc?.head.fromDepart?.isAddressStore && !fromCell
-        ? doc?.head.fromDepart?.id
-        : doc?.head.toDepart.id,
-    [doc?.head, fromCell],
-  );
+  const departId = doc?.head.toDepart.id;
 
   const docList = useSelector((state) => state.documents.list);
 
@@ -71,12 +62,12 @@ export const SelectCellScreen = () => {
       docList
         ?.filter(
           (i) =>
-            i.documentType?.name === (docType ? docType : 'movement') &&
+            i.documentType?.name === 'movement' &&
             i.status !== 'PROCESSED' &&
             (i?.head?.fromDepart?.id === departId || i?.head?.toDepart.id === departId),
         )
         .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()) as IMoveDocument[],
-    [departId, docList, docType],
+    [departId, docList],
   );
 
   const lines = docs.reduce((prev: IMoveLine[], cur) => {
@@ -86,47 +77,23 @@ export const SelectCellScreen = () => {
 
   const cellList = useMemo(() => getCellList(cells[departId || ''] || [], lines || []), [cells, departId, lines]);
 
-  const handleAddLine = useCallback(
-    (line: IMoveLine) => {
-      dispatch(documentActions.addDocumentLine({ docId, line }));
-      navigation.goBack();
-    },
-    [dispatch, docId, navigation],
-  );
+  const cellListRef = getCellListRef(cellList);
+
+  const cell = cellListRef.find((i) => i.barcode === item.barcode);
 
   useEffect(() => {
-    if (item && item.toCell && mode === 1) {
-      setSelectedChamber(getCellItem(item.toCell).chamber);
-      setSelectedRow(getCellItem(item.toCell).row);
+    if (item && cell) {
+      setSelectedChamber(getCellItem(cell.name).chamber);
+      setSelectedRow(getCellItem(cell.name).row);
       setToCell(item);
+    } else {
+      Alert.alert('Ошибка!', 'Для данный товар не находится в ячейке', [
+        {
+          text: 'ОК',
+        },
+      ]);
     }
-  }, [item, mode]);
-
-  const defaultGoodCells = (cells[departId || ''] || []).filter(
-    (i) => i.defaultGroup?.id && i.defaultGroup?.id === item.good.goodGroupId,
-  );
-
-  const dividedCells = defaultGoodCells.reduce((prev: ICellName[], cur) => {
-    const dividedCell = getCellItem(cur.name);
-
-    prev = [...prev, dividedCell];
-    return prev;
-  }, []);
-
-  const currentCell = dividedCells.length
-    ? cellList[dividedCells[0].chamber][dividedCells[0].row][defaultGoodCells[0].tier].find(
-        (i) => i.cell === dividedCells[0].cell,
-      )
-    : undefined;
-
-  useEffect(() => {
-    if (currentCell && !currentCell?.barcode && doc?.head.toDepart.isAddressStore) {
-      setSelectedChamber(dividedCells[0].chamber);
-      setSelectedRow(dividedCells[0].row);
-      setDefaultCell(defaultGoodCells.map((i) => i.name));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentCell?.barcode, mode]);
+  }, [cell, item, mode]);
 
   const cellsByRow = useMemo(
     () => (selectedChamber && selectedRow ? Object.entries(cellList?.[selectedChamber][selectedRow]).reverse() : []),
@@ -137,55 +104,11 @@ export const SelectCellScreen = () => {
     (cellData: ICellData) => {
       const newCell = `${selectedChamber}-${selectedRow}-${cellData.cell}`;
 
-      if (mode === 0) {
-        if (doc?.head.fromDepart?.isAddressStore) {
-          if (!fromCell) {
-            if (cellData.barcode === item?.barcode) {
-              if (!doc?.head.toDepart.isAddressStore) {
-                const newLine: IMoveLine = { ...item, fromCell: newCell };
-                handleAddLine(newLine);
-              } else {
-                setFromCell({ ...item, fromCell: newCell });
-              }
-            } else {
-              Alert.alert('Ошибка выбора ячейки!', 'Данная ячейка занята другим товаром, выберите другую ячейку.', [
-                {
-                  text: 'ОК',
-                },
-              ]);
-            }
-          } else {
-            const newLine: IMoveLine = { ...fromCell, toCell: newCell };
-            handleAddLine(newLine);
-          }
-        } else {
-          const newLine: IMoveLine = { ...item, toCell: newCell };
-          handleAddLine(newLine);
-        }
-      } else {
-        const newLine: IMoveLine = { ...item, toCell: newCell };
-        dispatch(
-          documentActions.updateDocumentLine({
-            docId,
-            line: newLine,
-          }),
-        );
-        navigation.goBack();
-      }
+      const newLine: IInventoryLine = { ...item, toCell: newCell };
+      dispatch(documentActions.addDocumentLine({ docId, line: newLine }));
+      navigation.goBack();
     },
-    [
-      dispatch,
-      doc?.head.fromDepart?.isAddressStore,
-      doc?.head.toDepart.isAddressStore,
-      docId,
-      fromCell,
-      handleAddLine,
-      item,
-      mode,
-      navigation,
-      selectedChamber,
-      selectedRow,
-    ],
+    [dispatch, docId, item, navigation, selectedChamber, selectedRow],
   );
 
   const renderRight = useCallback(() => <InfoButton onPress={() => setVisibleDialog(true)} />, []);
@@ -200,24 +123,11 @@ export const SelectCellScreen = () => {
   const Cell = useCallback(
     ({ i }: { i: ICellData }) => {
       const colorStyle = {
-        color:
-          defaultCell.length && defaultCell.find((e) => e === i.name)
-            ? cellColors.textWhite
-            : i.disabled || !i.barcode
-            ? colors.backdrop
-            : cellColors.textWhite,
+        color: i.disabled || !i.barcode ? colors.backdrop : cellColors.textWhite,
       };
       const backColorStyle = {
         backgroundColor:
-          (fromCell && fromCell.barcode === i.barcode) || (toCell && toCell.barcode === i.barcode)
-            ? colors.error
-            : i.disabled
-            ? colors.backdrop
-            : defaultCell.length && defaultCell.find((e) => e === i.name)
-            ? cellColors.default
-            : i.barcode
-            ? cellColors.barcode
-            : cellColors.free,
+          toCell && toCell.barcode === i.barcode ? cellColors.barcode : i.disabled ? colors.backdrop : cellColors.free,
       };
 
       return (
@@ -225,23 +135,13 @@ export const SelectCellScreen = () => {
           key={i.name}
           style={[localStyles.buttons, backColorStyle]}
           onPress={() => handleSaveLine(i)}
-          disabled={
-            (doc?.head.fromDepart?.isAddressStore && !fromCell ? !i.barcode : Boolean(i.barcode)) || Boolean(i.disabled)
-          }
+          disabled={i.barcode !== item.barcode || Boolean(i.disabled)}
         >
           <Text style={[localStyles.buttonLabel, colorStyle]}>{i.cell}</Text>
         </Pressable>
       );
     },
-    [
-      colors.backdrop,
-      colors.error,
-      defaultCell,
-      doc?.head.fromDepart?.isAddressStore,
-      fromCell,
-      handleSaveLine,
-      toCell,
-    ],
+    [colors.backdrop, handleSaveLine, item.barcode, toCell],
   );
 
   const CellsColumn = useCallback(
@@ -271,11 +171,6 @@ export const SelectCellScreen = () => {
   return (
     <AppScreen>
       <View style={localStyles.groupItem}>
-        {fromCell ? (
-          <View style={styles.alignItemsCenter}>
-            <Text style={localStyles.buttonLabel}>Из {fromCell?.fromCell}</Text>
-          </View>
-        ) : null}
         <ScrollView>
           <Group
             values={Object.keys(cellList)}
@@ -311,7 +206,7 @@ export const SelectCellScreen = () => {
                 <ScrollView horizontal>
                   <View style={styles.directionColumn}>
                     {cellsByRow.map(([key, data]) => (
-                      <CellsColumn key={key} /*row={key}*/ cellData={data} />
+                      <CellsColumn key={key} cellData={data} />
                     ))}
                   </View>
                 </ScrollView>

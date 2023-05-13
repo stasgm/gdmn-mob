@@ -1,3 +1,5 @@
+import { log } from '@lib/mobile-hooks';
+
 import {
   IMoveDocument,
   IFreeShipmentDocument,
@@ -10,7 +12,17 @@ import {
   ICellName,
   IInventoryDocument,
 } from '../store/types';
-import { IBarcode, ICellData, IModelData } from '../store/app/types';
+import {
+  IBarcode,
+  ICellData,
+  IGood,
+  IMGoodData,
+  IMGoodRemain,
+  IModelData,
+  IModelRem,
+  IRemGood,
+  IRemainsData,
+} from '../store/app/types';
 
 export const getNextDocNumber = (
   documents:
@@ -87,6 +99,7 @@ export const getCellList = (list: ICellRef[], lines: IMoveLine[]) => {
       tier: cur.tier,
       disabled: cur.disabled || false,
       defaultGroup: cur.defaultGroup,
+      sortOrder: cur.sortOrder,
     };
 
     if (!chamber) {
@@ -119,6 +132,147 @@ export const getCellList = (list: ICellRef[], lines: IMoveLine[]) => {
   return model;
 };
 
+export const getCellListRef = (model: IModelData) => {
+  const list: ICellRef[] = Object.entries(model).reduce((prev: ICellRef[], curChamber) => {
+    const chamberData = curChamber[1];
+    const cellListByChamber = Object.entries(chamberData).reduce((listByChamber: ICellRef[], curRow) => {
+      const rowData = curRow[1];
+
+      const cellListByRow: ICellRef[] = Object.values(rowData).reduce((listByRow: ICellRef[], curCell) => {
+        const cellInRow = curCell.map((i) => {
+          const cell: ICellRef = {
+            name: i.name,
+            tier: i.tier,
+            barcode: i.barcode,
+            defaultGroup: i.defaultGroup,
+            disabled: i.disabled,
+            sortOrder: i.sortOrder,
+          };
+          return cell;
+        });
+
+        listByRow = [...listByRow, ...cellInRow];
+        return listByRow;
+      }, []);
+      listByChamber = [...listByChamber, ...cellListByRow];
+      return listByChamber;
+    }, []);
+    prev = [...prev, ...cellListByChamber];
+    return prev;
+  }, []);
+
+  const sortedList = list.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+  return sortedList;
+};
+
 export const jsonFormat = (str: any) => {
   return JSON.stringify(str, null, '\t');
 };
+
+const getRemGoodByContact = (
+  goods: IGood[],
+  remains: IRemainsData[] = [],
+  isRemains: boolean | undefined = false,
+  noZeroRemains = false,
+) => {
+  log('getRemGoodByContact', 'Начало построения модели товаров по подразделению в разрезе штрихкодов');
+  const remGoods: IMGoodData<IMGoodRemain> = {};
+
+  if (goods.length) {
+    if (remains.length) {
+      //Формируем объект остатков тмц
+      const remainsByGoodId = getRemainsByGoodId(remains, noZeroRemains);
+
+      //Заполняем объект товаров по штрихкоду, если есть шк и (выбор не из остатков или есть остатки по товару)
+      for (const good of goods) {
+        const code = good.shcode;
+        if (code && (!isRemains || remainsByGoodId[good.id])) {
+          remGoods[code] = {
+            good,
+            remains: remainsByGoodId ? remainsByGoodId[good.id] : [],
+          };
+        }
+      }
+    } else if (!isRemains) {
+      //Если по контакту нет остатков и  выбор не из остатков, добавляем объект товара без remains
+      for (const good of goods) {
+        const code = good.shcode;
+        if (code) {
+          remGoods[code] = { good };
+        }
+      }
+    }
+  }
+
+  log('getRemGoodByContact', 'Окончание построения модели товаров по подразделению в разрезе штрихкодов');
+  return remGoods;
+};
+
+const getRemGoodListByContact = (
+  goods: IGood[],
+  remains: IRemainsData[] = [],
+  isRemains: boolean | undefined = false,
+  noZeroRemains = false,
+) => {
+  log('getRemGoodListByContact', 'Начало построения массива товаров по подразделению');
+
+  const remGoods: IRemGood[] = [];
+  if (goods.length) {
+    //Если есть остатки, то формируем модель остатков по ид товара
+    if (remains.length) {
+      //Формируем объект остатков тмц
+      const remainsByGoodId = getRemainsByGoodId(remains, noZeroRemains);
+
+      //Формируем массив товаров, добавив свойство цены и остатка
+      //Если по товару нет остатков и если модель не для выбора из справочника тмц, (не из остатков)
+      //то добавляем запись с нулевыми значениями цены и остатка
+      for (const good of goods) {
+        if (remainsByGoodId && remainsByGoodId[good.id]) {
+          for (const r of remainsByGoodId[good.id]) {
+            //Если isRemains true, showZeroRemains false и "isControlRemains" true, то в модель такие товары не добавляем
+            if (!noZeroRemains || r.q !== 0) {
+              remGoods.push({
+                good,
+                dateReceived: r.dateReceived,
+                numReceived: r.numReceived,
+                remains: r.q,
+              });
+            }
+          }
+        } else if (!isRemains) {
+          remGoods.push({
+            good,
+            dateReceived,
+            numReceived,
+            remains: 0,
+          });
+        }
+      }
+    } else if (!isRemains) {
+      //Если по контакту нет остатков и выбор не из остатков, добавляем объект товара c 0
+      for (const good of goods) {
+        remGoods.push({ good, dateReceived, numReceived, remains: 0 });
+      }
+    }
+  }
+
+  log('getRemGoodListByContact', 'Окончание построения массива товаров по подразделению');
+  return remGoods;
+};
+
+//Возвращает объект остатков тмц, пример: {"1": [{ price: 1.2, q: 1 }, { price: 1.3, q: 2 }]}
+const getRemainsByGoodId = (remains: IRemainsData[], noZeroRemains = false) => {
+  return remains.reduce((p: IMGoodData<IModelRem[]>, { goodId, dateReceived, numReceived, q = 0 }: IRemainsData) => {
+    const x = p[goodId];
+    if (!noZeroRemains || q !== 0) {
+      if (!x) {
+        p[goodId] = [{ dateReceived, numReceived, q }];
+      } else {
+        x.push({ dateReceived, numReceived, q });
+      }
+    }
+    return p;
+  }, {});
+};
+
+export { getRemGoodByContact, getRemGoodListByContact };

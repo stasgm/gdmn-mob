@@ -42,7 +42,7 @@ import { FlashList } from '@shopify/flash-list';
 import { barcodeSettings, ICell, ICellRef, IMoveDocument, IMoveLine } from '../../store/types';
 import { CellsStackParamList } from '../../navigation/Root/types';
 
-import { getBarcode, getCellList } from '../../utils/helpers';
+import { getBarcode, getCellList, getCellListRef } from '../../utils/helpers';
 import { ICellRefList, ICellData, ICodeEntity, IGood } from '../../store/app/types';
 
 import { Group } from '../../components/Group';
@@ -125,16 +125,13 @@ export const CellsViewScreen = () => {
     [docs, id],
   );
 
-  // console.log('lines', jsonFormat(lines));
-
   const goods = refSelectors.selectByName<IGood>('good').data;
 
-  console.log(
-    '12345,',
-    goods.find((g) => g.id === '147048882'),
-  );
-
   const cells = refSelectors.selectByName<ICellRefList>('cell')?.data[0];
+
+  const cellList = useMemo(() => getCellList(cells[id], lines || []), [cells, id, lines]);
+
+  const cellListRef = getCellListRef(cellList);
 
   const cellListByGroup = useMemo(
     () =>
@@ -159,15 +156,13 @@ export const CellsViewScreen = () => {
     [cells, id],
   );
 
-  console.log('cellsByGroup', cellListByGroup);
-
   const cellListByGood = useMemo(
     () =>
-      cells[id]
+      cellListRef
         .filter((i) => i.barcode)
         .map((i) => {
           const { shcode, workDate, weight, numReceived } = getBarcode(i.barcode || '', goodBarcodeSettings);
-          console.log('goods.find((g) => g.shcode === shcode),', shcode);
+
           return {
             id: i.name,
             barcode: i.barcode,
@@ -178,42 +173,29 @@ export const CellsViewScreen = () => {
             numReceived,
           } as IListItemProps;
         }),
-    [cells, goodBarcodeSettings, goods, id],
+    [cellListRef, goodBarcodeSettings, goods],
   );
 
   const filteredListByGroup = useMemo(() => {
-    // const upper = searchQuery.toUpperCase();
+    const upper = searchQuery.toUpperCase();
     return (
-      cellListByGroup?.filter((i) =>
-        // i.barcode?.toUpperCase().includes(upper) ||
-        // i.good?.shcode.toUpperCase().includes(upper) ||
-        // i.good?.name.toUpperCase().includes(upper) ||
-        // i.name.toUpperCase().includes(upper) ||
-        // getDateString(i.workDate).includes(upper),
-        i?.group?.name
-          ? i?.group?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-            i?.name.toUpperCase().includes(searchQuery.toUpperCase())
-          : false,
+      cellListByGroup?.filter(
+        (i) => i?.group?.name?.toUpperCase().includes(upper) || i?.name.toUpperCase().includes(upper),
       ) || []
     );
   }, [cellListByGroup, searchQuery]);
 
   const filteredList = useMemo(() => {
-    // const upper = searchQuery.toUpperCase();
+    const upper = searchQuery.toUpperCase();
     return (
       cellListByGood
-        ?.filter((i) =>
-          // i.barcode?.toUpperCase().includes(upper) ||
-          // i.good?.shcode.toUpperCase().includes(upper) ||
-          // i.good?.name.toUpperCase().includes(upper) ||
-          // i.name.toUpperCase().includes(upper) ||
-          // getDateString(i.workDate).includes(upper),
-          i.barcode || i?.good?.name || i?.good?.shcode || i.name || i.workDate
-            ? i?.good?.shcode.toUpperCase().includes(searchQuery.toUpperCase()) ||
-              i?.good?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-              i?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-              (i.workDate && getDateString(i?.workDate).includes(getDateString(searchQuery)))
-            : false,
+        ?.filter(
+          (i) =>
+            i.barcode?.toUpperCase().includes(upper) ||
+            i.good?.shcode.toUpperCase().includes(upper) ||
+            i.good?.name.toUpperCase().includes(upper) ||
+            i.name.toUpperCase().includes(upper) ||
+            (i.workDate && getDateString(i.workDate).includes(upper)),
         )
         ?.sort((a, b) => new Date(b.workDate || 0).getTime() - new Date(a.workDate || 0).getTime()) || []
     );
@@ -241,8 +223,6 @@ export const CellsViewScreen = () => {
     [filteredList],
   );
 
-  const cellList = useMemo(() => getCellList(cells[id], lines || []), [cells, id, lines]);
-
   const [selectedChamber, setSelectedChamber] = useState<string>('');
   const [selectedRow, setSelectedRow] = useState<string>('');
 
@@ -269,7 +249,6 @@ export const CellsViewScreen = () => {
 
       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
-      console.log('GOOD', good);
       const newLine: IMoveLine = {
         good: { id: good?.id || '', name: good?.name || '', shcode: good?.shcode || '' },
         id: generateId(),
@@ -287,7 +266,7 @@ export const CellsViewScreen = () => {
   );
 
   const cellsByRow =
-    selectedChamber && selectedRow ? Object.entries(cellList[selectedChamber][selectedRow]).reverse() : [];
+    selectedChamber && selectedRow ? Object.entries(cellList?.[selectedChamber][selectedRow])?.reverse() : [];
 
   const renderItemSection: ListRenderItem<IListItemProps> = ({ item }) => {
     return (

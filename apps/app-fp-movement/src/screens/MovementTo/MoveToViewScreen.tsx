@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, FlatList, Alert, TextInput, ListRenderItem } from 'react-native';
+import { View, Alert, TextInput } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
@@ -12,23 +12,24 @@ import {
   SendButton,
   AppActivityIndicator,
   MediumText,
-  AppDialog,
   LargeText,
+  AppDialog,
   ListItemLine,
   ScanButton,
   navBackButton,
-  SaveDocument,
   SimpleDialog,
 } from '@lib/mobile-ui';
 
-import { generateId, getDateString, keyExtractor, useSendDocs, sleep } from '@lib/mobile-hooks';
+import { generateId, getDateString, keyExtractor, useSendDocs, sleep, useSendOneRefRequest } from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { barcodeSettings, IInventoryDocument, IInventoryLine } from '../../store/types';
-import { InventoryStackParamList } from '../../navigation/Root/types';
+import { FlashList } from '@shopify/flash-list';
+
+import { barcodeSettings, IMoveDocument, IMoveLine } from '../../store/types';
+import { MoveToStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import { getBarcode } from '../../utils/helpers';
@@ -37,27 +38,38 @@ import { IAddressStoreEntity, IGood } from '../../store/app/types';
 import ViewTotal from '../../components/ViewTotal';
 
 export interface IScanerObject {
-  item?: IInventoryLine;
+  item?: IMoveLine;
   barcode: string;
   state: 'scan' | 'added' | 'notFound';
 }
 
-export const InventoryViewScreen = () => {
+export const MoveToViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
-  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'InventoryView'>>();
+  const navigation = useNavigation<StackNavigationProp<MoveToStackParamList, 'MoveToView'>>();
 
-  const id = useRoute<RouteProp<InventoryStackParamList, 'InventoryView'>>().params?.id;
-  const doc = docSelectors.selectByDocId<IInventoryDocument>(id);
+  const [screenState, setScreenState] = useState<ScreenState>('idle');
+  const [visibleDialog, setVisibleDialog] = useState(false);
+  const [barcode, setBarcode] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const id = useRoute<RouteProp<MoveToStackParamList, 'MoveToView'>>().params?.id;
+  const doc = docSelectors.selectByDocId<IMoveDocument>(id);
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
+  const loading = useSelector((state) => state.app.loading);
+
+  const [visibleSendDialog, setVisibleSendDialog] = useState(false);
 
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
   const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0) || 0;
+
   const isBlocked = doc?.status !== 'DRAFT';
+
   const goods = refSelectors.selectByName<IGood>('good').data;
   const settings = useSelector((state) => state.settings?.data);
-  const loading = useSelector((state) => state.app.loading);
+  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
+
   const goodBarcodeSettings = Object.entries(settings).reduce((prev: barcodeSettings, [idx, item]) => {
     if (item && item.group?.id !== 'base' && typeof item.data === 'number') {
       prev[idx] = item.data;
@@ -66,13 +78,6 @@ export const InventoryViewScreen = () => {
   }, {});
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
-
-  const [screenState, setScreenState] = useState<ScreenState>('idle');
-  const [visibleDialog, setVisibleDialog] = useState(false);
-  const [barcode, setBarcode] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-
-  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
 
   const handleShowDialog = () => {
     setVisibleDialog(true);
@@ -85,7 +90,7 @@ export const InventoryViewScreen = () => {
   };
 
   const handleEditDocHead = useCallback(() => {
-    navigation.navigate('InventoryEdit', { id });
+    navigation.navigate('MoveToEdit', { id });
   }, [navigation, id]);
 
   const handleDelete = useCallback(() => {
@@ -114,24 +119,34 @@ export const InventoryViewScreen = () => {
   }, [docDispatch, id]);
 
   const hanldeCancelLastScan = useCallback(() => {
-    if (lines?.length) {
-      dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lines[0].id }));
+    const lastId = doc?.lines?.[0]?.id;
+    if (lastId) {
+      dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
     }
-  }, [dispatch, id, lines]);
+  }, [dispatch, doc?.lines, id]);
 
   const sendDoc = useSendDocs(doc ? [doc] : []);
 
-  const [visibleSendDialog, setVisibleSendDialog] = useState(false);
+  const sendRequest = useSendOneRefRequest('Ячейки', { name: 'cell' });
 
+  const handleSendDebtRequest = useCallback(async () => {
+    setVisibleDialog(false);
+    await sendRequest();
+  }, [sendRequest]);
   const handleSendDocument = useCallback(async () => {
     setVisibleSendDialog(false);
     setScreenState('sending');
     await sendDoc();
+    handleSendDebtRequest();
     setScreenState('sent');
-  }, [sendDoc]);
+  }, [handleSendDebtRequest, sendDoc]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
+      {
+        title: 'Отправить запрос на получение справочника ячеек',
+        onPress: handleSendDebtRequest,
+      },
       {
         title: 'Ввести штрих-код',
         onPress: handleShowDialog,
@@ -154,32 +169,14 @@ export const InventoryViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
-
-  const handleSaveDocument = useCallback(() => {
-    if (!doc) {
-      return;
-    }
-    dispatch(
-      documentActions.updateDocument({
-        docId: id,
-        document: { ...doc, status: 'READY' },
-      }),
-    );
-    navigation.goBack();
-  }, [dispatch, id, navigation, doc]);
+  }, [showActionSheet, handleSendDebtRequest, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
 
   const renderRight = useCallback(
     () =>
       isBlocked ? (
-        doc?.status === 'READY' ? (
-          <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
-        ) : (
-          doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
-        )
+        <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
       ) : (
         <View style={styles.buttons}>
-          {doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />}
           <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
           {!isScanerReader && (
             <ScanButton
@@ -190,7 +187,7 @@ export const InventoryViewScreen = () => {
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [actionsMenu, doc?.status, handleSaveDocument, id, isBlocked, isScanerReader, loading, navigation, screenState],
+    [actionsMenu, id, isBlocked, isScanerReader, loading, navigation, screenState],
   );
 
   useLayoutEffect(() => {
@@ -200,28 +197,60 @@ export const InventoryViewScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  const renderItem: ListRenderItem<IInventoryLine> = ({ item }) => (
-    <ListItemLine key={item.id} readonly={true}>
-      <View style={styles.details}>
-        <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-        <View style={styles.flexDirectionRow}>
-          <MaterialCommunityIcons name="shopping-outline" size={18} />
-          <MediumText> {(item.weight || 0).toString()} кг</MediumText>
-        </View>
-        <View style={styles.flexDirectionRow}>
-          <MediumText>
-            Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
-          </MediumText>
-        </View>
-        {doc?.head.toDepart.isAddressStore ? (
-          <View style={styles.flexDirectionRow}>
-            <MediumText>
-              {'Ячейка №'} {item.toCell || ''}
-            </MediumText>
+  //////////////////////// Не удалять //////////////////////////////////
+  // const linesList = doc.lines?.reduce((sum: IMoveLine[], line) => {
+  //   if (!sum.length) {
+  //     sum.push(line);
+  //   }
+
+  //   if (sum.find((i) => i.id !== line.id)) {
+  //     const lineSum = sum.find((i) => i.good.id === line.good.id && i.numReceived === line.numReceived);
+  //     if (lineSum) {
+  //       const lineTotal: IMoveLine = { ...lineSum, weight: round(lineSum.weight + line.weight) };
+  //       sum.splice(sum.indexOf(lineSum), 1, lineTotal);
+  //     } else {
+  //       sum.push(line);
+  //     }
+  //   }
+  //   return sum;
+  // }, []);
+
+  const renderItem = useCallback(
+    ({ item }: { item: IMoveLine }) => {
+      return (
+        <ListItemLine
+          key={item.id}
+          readonly={!doc?.head.toDepart.isAddressStore || isBlocked}
+          onPress={() => navigation.navigate('SelectCell', { docId: id, item, mode: 1 })}
+        >
+          <View style={styles.details}>
+            <LargeText style={styles.textBold}>{item.good.name}</LargeText>
+            <View style={styles.flexDirectionRow}>
+              <MaterialCommunityIcons name="shopping-outline" size={18} />
+              <MediumText> {(item.weight || 0).toString()} кг</MediumText>
+            </View>
+            <View style={styles.flexDirectionRow}>
+              <MediumText>
+                Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
+              </MediumText>
+            </View>
+            {doc?.head.fromDepart.isAddressStore ? (
+              <View style={styles.flexDirectionRow}>
+                <MediumText>Откуда: {item.fromCell || ''}</MediumText>
+              </View>
+            ) : null}
+            {doc?.head.toDepart.isAddressStore ? (
+              <View style={styles.flexDirectionRow}>
+                <MediumText>
+                  {doc?.head.fromDepart.isAddressStore ? 'Куда:' : 'Ячейка №'} {item.toCell || ''}
+                </MediumText>
+              </View>
+            ) : null}
           </View>
-        ) : null}
-      </View>
-    </ListItemLine>
+        </ListItemLine>
+      );
+    },
+    [doc?.head, id, isBlocked, navigation],
   );
 
   const [scanned, setScanned] = useState(false);
@@ -272,7 +301,7 @@ export const InventoryViewScreen = () => {
         return;
       }
 
-      const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
+      const line = doc.lines?.find((i) => i.barcode === barc.barcode);
 
       if (line) {
         if (visibleDialog) {
@@ -284,20 +313,30 @@ export const InventoryViewScreen = () => {
         return;
       }
 
-      const newLine: IInventoryLine = {
-        good: { id: good.id, name: good.name, shcode: good.shcode },
+      const newLine: IMoveLine = {
+        good: { id: good.id, name: good.name, shcode: good.shcode, goodGroupId: good.goodGroupId },
         id: generateId(),
         weight: barc.weight,
         barcode: barc.barcode,
         workDate: barc.workDate,
         numReceived: barc.numReceived,
-        sortOrder: doc?.lines?.length + 1,
+        quantPack: barc.quantPack,
+
+        sortOrder: doc.lines?.length + 1,
       };
 
+      const isFromAddressed = departs.find((i) => i.id === doc.head.fromDepart.id && i.isAddressStore);
       const isToAddressed = departs.find((i) => i.id === doc.head.toDepart.id && i.isAddressStore);
 
-      if (doc.head.toDepart.isAddressStore || isToAddressed) {
-        navigation.navigate('SelectCell', { docId: id, item: newLine, mode: 0, docType: doc.documentType.name });
+      if (doc.head.toDepart.isAddressStore || doc.head.fromDepart.isAddressStore || isFromAddressed || isToAddressed) {
+        if (newLine.quantPack < goodBarcodeSettings.boxNumber) {
+          Alert.alert('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}!`, [
+            { text: 'OK' },
+          ]);
+          setScanned(false);
+          return;
+        }
+        navigation.navigate('SelectCell', { docId: id, item: newLine, mode: 0 });
       } else {
         dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
       }
@@ -311,7 +350,7 @@ export const InventoryViewScreen = () => {
       }
     },
 
-    [doc, minBarcodeLength, goodBarcodeSettings, goods, departs, dispatch, id, visibleDialog, navigation],
+    [doc, minBarcodeLength, goodBarcodeSettings, goods, departs, visibleDialog, navigation, id, dispatch],
   );
 
   const handleSearchBarcode = () => {
@@ -371,15 +410,20 @@ export const InventoryViewScreen = () => {
     <View style={styles.container}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
-        title={doc.documentType.description || ''}
+        title={doc.head.subtype.name || ''}
         onPress={handleEditDocHead}
         disabled={!['DRAFT', 'READY'].includes(doc.status)}
         isBlocked={isBlocked}
       >
-        <View style={styles.infoBlock}>
-          <MediumText>{doc.head.toDepart.name || ''}</MediumText>
-          <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
-        </View>
+        <>
+          <MediumText style={styles.rowCenter}>
+            {`№ ${doc.number} от ${getDateString(doc.documentDate)}` || ''}
+          </MediumText>
+          <MediumText style={styles.rowCenter}>Откуда: {doc.head.fromDepart?.name || ''}</MediumText>
+          <View style={styles.rowCenter}>
+            <MediumText>Куда: {doc.head.toDepart?.name || ''}</MediumText>
+          </View>
+        </>
       </InfoBlock>
       <TextInput
         style={styles.scanInput}
@@ -390,17 +434,16 @@ export const InventoryViewScreen = () => {
         showSoftInputOnFocus={false}
         onChangeText={(text) => !scanned && setScan(text)}
       />
-      <FlatList
+      <FlashList
         data={lines}
-        keyExtractor={keyExtractor}
         renderItem={renderItem}
+        estimatedItemSize={60}
         ItemSeparatorComponent={ItemSeparator}
-        initialNumToRender={10}
-        maxToRenderPerBatch={10}
-        updateCellsBatchingPeriod={100}
-        windowSize={7}
+        keyExtractor={keyExtractor}
+        extraData={[lines, isBlocked]}
+        keyboardShouldPersistTaps={'handled'}
       />
-      {lines?.length ? <ViewTotal quantity={lineSum || 0} weight={lines?.length || 0} /> : null}
+      {doc?.lines?.length ? <ViewTotal quantity={lineSum || 0} weight={lines?.length || 0} /> : null}
       <AppDialog
         title="Введите штрих-код"
         visible={visibleDialog}

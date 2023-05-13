@@ -152,11 +152,10 @@ export const LaboratoryViewScreen = () => {
         return;
       }
 
-      if (newWeight < 1000) {
+      if (newWeight < 1000 || newWeight <= line.weight) {
         const newLine: ILaboratoryLine = {
           ...line,
           weight: newWeight,
-          scannedBarcode: line?.barcode,
         };
 
         dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
