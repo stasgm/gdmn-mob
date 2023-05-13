@@ -1,28 +1,22 @@
 import { Helmet } from 'react-helmet';
-import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText } from '@material-ui/core';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Box, Container } from '@material-ui/core';
+import { useCallback, useEffect } from 'react';
 import CachedIcon from '@material-ui/icons/Cached';
-import FilterIcon from '@material-ui/icons/FilterAltOutlined';
-import DeleteIcon from '@material-ui/icons/DeleteOutline';
-
-import { IFileSystem } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import { IFileFilter, IHeadCells, IFilePageParam, IToolBarButton, IServerLog } from '../../types';
+import { IFileFilter, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
 import actions from '../../store/serverLog';
-import FileListTable from '../../components/file/FileListTable';
+
 import ServerLogListTable from '../../components/serverLog/ServerLogListTable';
 
 const ServerLogList = () => {
   const dispatch = useDispatch();
 
-  const { list: newList, loading, errorMessage } = useSelector((state) => state.serverLogs);
+  const { list, loading, errorMessage } = useSelector((state) => state.serverLogs);
 
-  const list: IServerLog[] = [{ name: 'access' }, { name: 'combined' }, { name: 'error' }];
-  // const sortedList = useMemo(() => list.sort((a, b) => (a.path < b.path ? -1 : 1)), [list]);
   const fetchServerLogs = useCallback(
     (filesFilters?: IFileFilter, filterText?: string, fromRecord?: number, toRecord?: number) => {
       dispatch(actions.fetchServerLogs());

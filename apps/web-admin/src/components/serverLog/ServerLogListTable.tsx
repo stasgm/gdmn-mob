@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
@@ -16,12 +16,13 @@ import {
   Typography,
 } from '@material-ui/core';
 
+import { IServerLogFile } from '@lib/types';
+
 import { adminPath } from '../../utils/constants';
-import { IServerLog } from '../../types';
 
 interface IProps {
-  serverLogs: IServerLog[];
-  selectedServerLogs?: IServerLog[];
+  serverLogs: IServerLogFile[];
+  selectedServerLogs?: IServerLogFile[];
   limitRows?: number;
   onChangeSelectedDevices?: (newSelectedDeviceIds: any[]) => void;
 }
@@ -32,7 +33,9 @@ const ServerLogListTable = ({
   selectedServerLogs = [],
   limitRows = 0,
 }: IProps) => {
-  const [selectedServerLogsIds, setSelectedServerLogsIds] = useState<IServerLog[]>(selectedServerLogs);
+  const navigate = useNavigate();
+
+  const [selectedServerLogsIds, setSelectedServerLogsIds] = useState<IServerLogFile[]>(selectedServerLogs);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
 
@@ -49,10 +52,10 @@ const ServerLogListTable = ({
     onChangeSelectedDevices && onChangeSelectedDevices(newSelectedServerLogIds);
   };
 
-  const handleSelectOne = (_event: any, serverLog: IServerLog) => {
-    const selectedIndex = selectedServerLogsIds.map((item: IServerLog) => item.name).indexOf(serverLog.name);
+  const handleSelectOne = (_event: any, serverLog: IServerLogFile) => {
+    const selectedIndex = selectedServerLogsIds.map((item: IServerLogFile) => item.name).indexOf(serverLog.name);
 
-    let newSelectedServerLogIds: IServerLog[] = [];
+    let newSelectedServerLogIds: IServerLogFile[] = [];
 
     if (selectedIndex === -1) {
       newSelectedServerLogIds = newSelectedServerLogIds.concat(selectedServerLogsIds, serverLog);
@@ -87,7 +90,7 @@ const ServerLogListTable = ({
 
     if (selectedServerLogsIds.length === 0) {
       if (selectedServerLogs.length > 0) {
-        const newSelectedServerLogIds = selectedServerLogs.map((serverLog: IServerLog) => serverLog);
+        const newSelectedServerLogIds = selectedServerLogs.map((serverLog: IServerLogFile) => serverLog);
 
         setSelectedServerLogsIds(newSelectedServerLogIds);
       }
@@ -95,18 +98,25 @@ const ServerLogListTable = ({
   }, [limitRows, selectedServerLogsIds.length, selectedServerLogs]);
 
   const TableRows = () => {
-    const serverLogList = serverLogs.slice(page * limit, page * limit + limit).map((serverLog: IServerLog) => {
+    const serverLogList = serverLogs.slice(page * limit, page * limit + limit).map((serverLog: IServerLogFile) => {
       return (
         <TableRow
           hover
-          key={serverLog.name}
+          key={serverLog.id}
           selected={selectedServerLogsIds.findIndex((d) => d.name === serverLog?.name) !== -1}
+          onClick={(event) => {
+            event.preventDefault();
+            navigate(`${adminPath}/app/serverLogs/${serverLog.id}`);
+          }}
+          sx={{
+            cursor: 'pointer',
+          }}
         >
           <TableCell padding="checkbox">
             <Checkbox
               checked={
                 selectedServerLogsIds
-                  .map((item: IServerLog) => {
+                  .map((item: IServerLogFile) => {
                     return item.name;
                   })
                   .indexOf(serverLog.name) !== -1
@@ -115,20 +125,11 @@ const ServerLogListTable = ({
               value="true"
             />
           </TableCell>
-          <TableCell style={{ padding: '0 16px' }}>
-            <Box
-              sx={{
-                alignItems: 'center',
-                display: 'flex',
-              }}
-            >
-              <NavLink to={`${adminPath}/app/serverLogs/${serverLog.name}`}>
-                <Typography color="textPrimary" variant="body1" key={serverLog.name}>
-                  {serverLog.name}
-                </Typography>
-              </NavLink>
-            </Box>
-          </TableCell>
+          <TableCell style={{ padding: '0 16px' }}>{serverLog.fileName}</TableCell>
+          <TableCell>{serverLog.path}</TableCell>
+          <TableCell> {new Date(serverLog.date || '').toLocaleString('ru', { hour12: false })}</TableCell>
+          <TableCell> {new Date(serverLog.mdate || '').toLocaleString('ru', { hour12: false })}</TableCell>
+          <TableCell> {Math.ceil(serverLog.size).toString()} кб</TableCell>
         </TableRow>
       );
     });
@@ -163,6 +164,10 @@ const ServerLogListTable = ({
                   />
                 </TableCell>
                 <TableCell>Название</TableCell>
+                <TableCell>Путь</TableCell>
+                <TableCell>Дата создания</TableCell>
+                <TableCell>Дата редактирования</TableCell>
+                <TableCell>Размер</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

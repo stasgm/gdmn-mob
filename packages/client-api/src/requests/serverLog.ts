@@ -1,16 +1,17 @@
+import { IServerLogFile, IServerLogResponse } from '@lib/types';
+
 import { error, serverLog as types } from '../types';
 import { response2Log, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
-import { IServerLog } from '../types/serverLog';
 
 class ServerLog extends BaseRequest {
   constructor(api: BaseApi) {
     super(api);
   }
 
-  getServerLog = async (customRequest: CustomRequest, serverLog: string) => {
+  getServerLog = async (customRequest: CustomRequest, serverLogId: string) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -23,7 +24,7 @@ class ServerLog extends BaseRequest {
     const res = await customRequest<any>({
       api: this.api.axios,
       method: 'GET',
-      url: `/serverLogs/${serverLog}`,
+      url: `/serverLogs/${serverLogId}`,
     });
 
     if (res.type === 'SUCCESS') {
@@ -49,7 +50,7 @@ class ServerLog extends BaseRequest {
       } as types.IGetServerLogsResponse;
     }
 
-    const res = await customRequest<IServerLog[]>({
+    const res = await customRequest<IServerLogFile[]>({
       api: this.api.axios,
       method: 'GET',
       url: '/serverLogs',

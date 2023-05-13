@@ -17,45 +17,30 @@ import serverLogActions from '../../store/serverLog';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import { adminPath } from '../../utils/constants';
 import ServerLogDetailsView from '../../components/serverLog/ServerLogDetailsView';
+import serverLogSelectors from '../../store/serverLog/selectors';
 
 export type Params = {
-  name: string;
+  id: string;
 };
 
 const ServerLogView = () => {
-  const { name } = useParams<keyof Params>() as Params;
+  const { id } = useParams<keyof Params>() as Params;
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const serverLog = `::ffff:192.168.0.71 - - [23/Feb/2022:11:18:19 +0000] "OPTIONS /api/v1/auth/login HTTP/1.1" 204 - "http://192.168.0.71:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0"
-::ffff:192.168.0.71 - - [23/Feb/2022:11:18:20 +0000] "POST /api/v1/auth/login HTTP/1.1" 200 302 "http://192.168.0.71:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0"
-::ffff:192.168.0.71 - - [23/Feb/2022:11:18:22 +0000] "GET /api/v1/companies HTTP/1.1" 200 254 "http://192.168.0.71:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0"
-::ffff:192.168.0.71 - - [23/Feb/2022:11:18:24 +0000] "GET /api/v1/users HTTP/1.1" 200 3435 "http://192.168.0.71:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0"
-::ffff:192.168.0.71 - - [23/Feb/2022:11:18:24 +0000] "GET /api/v1/companies/dc3673f0-45eb-11ec-aa5c-b7494455c651 HTTP/1.1" 200 252 "http://192.168.0.71:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0"
-::ffff:192.168.0.71 - - [23/Feb/2022:11:18:24 +0000] "GET /api/v1/users?companyId=dc3673f0-45eb-11ec-aa5c-b7494455c651 HTTP/1.1" 200 3435 "http://192.168.0.71:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0"
-::ffff:192.168.0.71 - - [23/Feb/2022:11:18:37 +0000] "GET /api/v1/users HTTP/1.1" 200 3435 "http://192.168.0.71:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0"
-::ffff:192.168.0.71 - - [23/Feb/2022:11:18:42 +0000] "GET /api/v1/devices HTTP/1.1" 200 1733 "http://192.168.0.71:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0"
-::ffff:192.168.0.71 - - [23/Feb/2022:11:18:42 +0000] "GET /api/v1/codes HTTP/1.1" 200 25 "http://192.168.0.71:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0"
-::ffff:192.168.0.71 - - [23/Feb/2022:11:18:50 +0000] "GET /api/v1/users/d35f6c00-45eb-11ec-aa5c-b7494455c651 HTTP/1.1" 200 302 "http://192.168.0.71:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0"
-::ffff:192.168.0.71 - - [23/Feb/2022:11:18:52 +0000] "GET /api/v1/companies HTTP/1.1" 200 254 "http://192.168.0.71:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0"
-::ffff:192.168.0.71 - - [23/Feb/2022:11:18:57 +0000] "GET /api/v1/companies HTTP/1.1" 200 254 "http://192.168.0.71:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0"
-::ffff:192.168.0.71 - - [23/Feb/2022:11:18:58 +0000] "GET /api/v1/users HTTP/1.1" 200 3435 "http://192.168.0.71:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0"
-::ffff:192.168.0.71 - - [23/Feb/2022:12:55:47 +0000] "GET /api/v1/users HTTP/1.1" 200 3435 "http://192.168.0.71:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0"
-::ffff:192.168.0.71 - - [23/Feb/2022:12:56:03 +0000] "OPTIONS /api/v1/users HTTP/1.1" 204 - "http://192.168.0.71:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0"
-::ffff:192.168.0.71 - - [23/Feb/2022:12:56:03 +0000] "POST /api/v1/users HTTP/1.1" 201 392 "http://192.168.0.71:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0"
-`;
-
-  const { loading, errorMessage, serverLog: log } = useSelector((state) => state.serverLogs);
+  const { loading, errorMessage, serverLog, list } = useSelector((state) => state.serverLogs);
 
   const fetchServerLog = useCallback(() => {
-    dispatch(serverLogActions.fetchServerLog(name));
-  }, [dispatch, name]);
+    dispatch(serverLogActions.fetchServerLog(id));
+  }, [dispatch, id]);
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
     fetchServerLog();
   }, [fetchServerLog]);
+
+  const log = serverLogSelectors.serverLogById(id);
 
   const [open, setOpen] = useState(false);
 
@@ -64,8 +49,8 @@ const ServerLogView = () => {
   };
 
   const refreshData = useCallback(() => {
-    dispatch(serverLogActions.fetchServerLog(name));
-  }, [dispatch, name]);
+    dispatch(serverLogActions.fetchServerLog(id));
+  }, [dispatch, id]);
 
   useEffect(() => {
     refreshData();
@@ -137,7 +122,7 @@ const ServerLogView = () => {
                 minHeight: '100%',
               }}
             >
-              <ServerLogDetailsView serverLog={serverLog} />
+              <ServerLogDetailsView serverLog={serverLog} title={log?.fileName} />
             </Box>
           </>
         ) : (

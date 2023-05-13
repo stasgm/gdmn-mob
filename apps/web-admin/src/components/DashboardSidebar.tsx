@@ -10,6 +10,7 @@ import {
   List as ProcessIcon,
   Server as AppSystemsIcon,
   File as FileIcon,
+  FileText as FileTextIcon,
   AlertCircle as AlertIcon,
 } from 'react-feather';
 
@@ -85,7 +86,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
           },
           {
             href: `${adminPath}/app/serverLogs`,
-            icon: FileIcon,
+            icon: FileTextIcon,
             title: 'Логи сервера',
           },
           {

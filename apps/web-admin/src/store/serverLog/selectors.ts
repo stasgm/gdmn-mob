@@ -1,7 +1,7 @@
 import { useSelector } from '..';
 
-const fileById = (id: string) => {
-  return useSelector((state) => state.files.list.find((i) => i.id === id));
+const serverLogById = (id: string) => {
+  return useSelector((state) => state.serverLogs.list.find((i) => i.id === id));
 };
 
-export default { fileById };
+export default { serverLogById };
