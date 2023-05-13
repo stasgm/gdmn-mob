@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, AppState } from 'react-native';
 import { Store } from 'redux';
 
 import {
+  appActions,
   authActions,
   authSelectors,
   documentActions,
@@ -22,7 +23,7 @@ import { Snackbar } from 'react-native-paper';
 
 import { NavigationContainer } from '@react-navigation/native';
 
-import { mobileRequest, truncate, useSync } from '@lib/mobile-hooks';
+import { mobileRequest, truncate, useSync, generateId } from '@lib/mobile-hooks';
 
 export interface IApp {
   items?: INavItem[];
@@ -113,6 +114,16 @@ const MobileApp = ({ loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
   }, [errList]);
 
   const closeSnackbar = useCallback(() => {
+    dispatch(
+      appActions.addErrors([
+        {
+          id: generateId(),
+          name: 'app: loadingErrors',
+          date: new Date().toISOString(),
+          message: errList.join(','),
+        },
+      ]),
+    );
     authLoadingError && dispatch(authActions.setLoadingError(''));
     docsLoadingError && dispatch(documentActions.setLoadingError(''));
     refsLoadingError && dispatch(referenceActions.setLoadingError(''));
@@ -123,6 +134,7 @@ const MobileApp = ({ loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
     authLoadingError,
     dispatch,
     docsLoadingError,
+    errList,
     loadingErrors?.length,
     onClearLoadingErrors,
     refsLoadingError,

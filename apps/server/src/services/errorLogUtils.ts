@@ -198,7 +198,7 @@ const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined
       mdate: fileModifiedDate,
     };
   } catch (err) {
-    console.error(`Ошибка чтения статистики файла-- ${err}`);
+    log.error(`Ошибка чтения статистики файла-- ${err}`);
     return undefined;
   }
 };
