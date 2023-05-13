@@ -142,38 +142,43 @@ const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => 
   }
   const nameWithoutExt = path.basename(root, ext);
   const subPath = path.dirname(root);
-  const fileStat = await stat(root);
-  const fileSize = fileStat.size / BYTES_PER_KB;
-  const fileDate = fileStat.birthtime.toString();
-  const fileModifiedDate = fileStat.mtime.toString();
+  try {
+    const fileStat = await stat(root);
+    const fileSize = fileStat.size / BYTES_PER_KB;
+    const fileDate = fileStat.birthtime.toString();
+    const fileModifiedDate = fileStat.mtime.toString();
 
-  const alias = fullFileName2alias(root);
+    const alias = fullFileName2alias(root);
 
-  const fileInfo = await splitFileMessage(root);
-  if (fileInfo) {
+    const fileInfo = await splitFileMessage(root);
+    if (fileInfo) {
+      return {
+        id: alias ?? nameWithoutExt,
+        date: fileDate,
+        size: fileSize,
+        fileName: name,
+        path: subPath,
+        company: fileInfo.company,
+        appSystem: fileInfo.appSystem,
+        producer: fileInfo.producer,
+        consumer: fileInfo.consumer,
+        device: fileInfo.device,
+        mdate: fileModifiedDate,
+      };
+    }
+
     return {
       id: alias ?? nameWithoutExt,
       date: fileDate,
       size: fileSize,
       fileName: name,
       path: subPath,
-      company: fileInfo.company,
-      appSystem: fileInfo.appSystem,
-      producer: fileInfo.producer,
-      consumer: fileInfo.consumer,
-      device: fileInfo.device,
       mdate: fileModifiedDate,
     };
+  } catch (err) {
+    log.error(`Invalid filename ${root}`);
+    return undefined;
   }
-
-  return {
-    id: alias ?? nameWithoutExt,
-    date: fileDate,
-    size: fileSize,
-    fileName: name,
-    path: subPath,
-    mdate: fileModifiedDate,
-  };
 };
 
 export const readListFiles = async (params: Record<string, string | number>): Promise<IFileSystem[]> => {
