@@ -84,6 +84,11 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
             title: 'Файловая система',
           },
           {
+            href: `${adminPath}/app/serverLogs`,
+            icon: FileIcon,
+            title: 'Логи сервера',
+          },
+          {
             href: `${adminPath}/app/account`,
             icon: SettingsIcon,
             title: 'Профиль',

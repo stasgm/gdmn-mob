@@ -76,3 +76,7 @@ export interface ILinkedEntity extends IEntity {
   value: string | number | INamedEntity | INamedEntity[] | undefined;
   link?: string;
 }
+
+export interface IServerLog {
+  name: string;
+}

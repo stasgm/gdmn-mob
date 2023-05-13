@@ -1,10 +1,10 @@
 import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@material-ui/core';
 
 interface IProps {
-  file: any;
+  serverLog: any;
 }
 
-const FileContentView = ({ file }: IProps) => {
+const ServerLogDetailsView = ({ serverLog }: IProps) => {
   return (
     <Card>
       <CardHeader title="Общая информация" />
@@ -15,7 +15,7 @@ const FileContentView = ({ file }: IProps) => {
             <Grid item>
               <pre>
                 <Typography variant="subtitle1" gutterBottom>
-                  {JSON.stringify(file, null, '\t')}
+                  {serverLog}
                 </Typography>
               </pre>
             </Grid>
@@ -26,4 +26,4 @@ const FileContentView = ({ file }: IProps) => {
   );
 };
 
-export default FileContentView;
+export default ServerLogDetailsView;
