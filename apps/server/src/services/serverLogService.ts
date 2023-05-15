@@ -69,7 +69,7 @@ const findOne = async (
       textFile: fileText,
     };
   } catch (err) {
-    log.error(`Невозможно прочитать файл '${fileName} `);
+    log.warn(`Невозможно прочитать файл '${fileName} `);
     return undefined;
   }
 };
