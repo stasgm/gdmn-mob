@@ -38,7 +38,7 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getMessages = async (ctx: ParameterizedContext): Promise<void> => {
-  const { companyId, appSystemName, deviceId, limitFiles } = ctx.query;
+  const { companyId, appSystemName, deviceId, limitFiles, maxDataVolume } = ctx.query;
 
   if (typeof deviceId !== 'string') {
     throw new InvalidParameterException('Не указан идентификатор устройства');
@@ -49,12 +49,11 @@ const getMessages = async (ctx: ParameterizedContext): Promise<void> => {
     appSystemName: appSystemName as string,
     consumerId: ctx.state.user.id,
     deviceId: deviceId,
-    limitFiles: limitFiles as string,
+    maxDataVolume: typeof maxDataVolume === 'string' ? Number(maxDataVolume) : undefined,
+    maxFiles: typeof limitFiles === 'string' ? Number(limitFiles) : undefined,
   });
 
-  const limitedList = messageList.sort((a, b) => a.head.order - b.head.order);
-
-  ok(ctx as Context, limitedList, `getMessages: message deviceId=${deviceId} is successfully received`);
+  ok(ctx as Context, messageList, `getMessages: message deviceId=${deviceId} is successfully received`);
 };
 
 const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
