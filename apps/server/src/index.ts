@@ -1,3 +1,5 @@
+import config from '../config';
+
 import { createServer, KoaApp, startServer } from './server';
 require('dotenv').config();
 
@@ -8,7 +10,7 @@ export interface IItemDatabase {
 
 const defaultDatabase: IItemDatabase = {
   name: 'db',
-  path: process.env.FILES_PATH || '',
+  path: config.FILES_PATH || '',
 };
 
 const run = async (dbase?: IItemDatabase): Promise<KoaApp> => {

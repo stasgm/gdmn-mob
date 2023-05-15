@@ -45,7 +45,7 @@ const DeviceLogFilesList = () => {
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.deviceLogActions.setPageParam({ filterText: pageParamLocal?.filterText }));
+    dispatch(actions.deviceLogActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
     fetchDeviceLogFiles(pageParams?.logFilters ? pageParams?.logFilters : undefined, pageParamLocal?.filterText);
   };
 
@@ -71,7 +71,7 @@ const DeviceLogFilesList = () => {
   const handleFilter = useCallback(() => {
     if (filterVisible) {
       setFilterVisible(false);
-      dispatch(actions.deviceLogActions.setPageParam({ logFilters: undefined }));
+      dispatch(actions.deviceLogActions.setPageParam({ logFilters: undefined, page: 0 }));
     } else {
       setFilterVisible(true);
     }
@@ -137,7 +137,7 @@ const DeviceLogFilesList = () => {
   }, [dispatch, selectedDeviceLogFileIds]);
 
   const handleClearSearch = () => {
-    dispatch(actions.deviceLogActions.setPageParam({ filterText: undefined }));
+    dispatch(actions.deviceLogActions.setPageParam({ filterText: undefined, page: 0 }));
     setPageParamLocal({ filterText: undefined });
     fetchDeviceLogFiles(pageParamLocal?.logFilters || undefined);
   };

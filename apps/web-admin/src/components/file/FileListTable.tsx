@@ -39,6 +39,7 @@ interface IProps {
   selectedFileIds: IFileSystem[];
   onSetPageParams: (filesFilters: IPageParam) => void;
   pageParams?: IFilePageParam | undefined;
+  height?: number | undefined;
 }
 
 const FileListTable = ({
@@ -53,6 +54,7 @@ const FileListTable = ({
   selectedFileIds,
   onSetPageParams,
   pageParams,
+  height,
 }: IProps) => {
   const [limit, setLimit] = useState(
     pageParams?.limit && !isNaN(Number(pageParams?.limit)) ? Number(pageParams?.limit) : 10,
@@ -91,7 +93,8 @@ const FileListTable = ({
   }, [isFilterVisible]);
 
   const handleSearchClick = () => {
-    onSetPageParams({ ...pageParams, filesFilters: formik.values });
+    onSetPageParams({ ...pageParams, filesFilters: formik.values, page: 0 });
+    setPage(0);
   };
 
   const handleKeyPress = (key: string) => {
@@ -203,7 +206,7 @@ const FileListTable = ({
   return (
     <Card>
       <PerfectScrollbar>
-        <Box sx={{ p: 1, overflowX: 'auto' }}>
+        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight: window.innerHeight - 268 }}>
           <Table>
             <TableHead>
               <TableRow>

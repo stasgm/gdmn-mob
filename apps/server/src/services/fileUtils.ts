@@ -48,11 +48,15 @@ export const checkFiles = async (): Promise<void> => {
   const root = getDb().dbPath;
   const files = await _readDir(root, [...defaultExclude, 'deviceLogs']);
   for (const file of files) {
-    // eslint-disable-next-line no-await-in-loop
-    const fileStat = await stat(file);
-    const fileDate = fileStat.birthtimeMs;
-    if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > config.FILES_CHECK_PERIOD_IN_DAYS) {
-      unlink(file);
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      const fileStat = await stat(file);
+      const fileDate = fileStat.birthtimeMs;
+      if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > config.FILES_CHECK_PERIOD_IN_DAYS) {
+        unlink(file);
+      }
+    } catch (err) {
+      log.warn(`Ошибка при удалении старого файла-- ${err}`);
     }
   }
 };
@@ -70,7 +74,7 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
   const appSystemId = await getAppSystemId(arr[1]);
   const appSystemName = arr[1];
 
-  const companyId = arr[1];
+  const companyId = arr[0];
   const companyName = companies.findById(arr[0])?.name;
 
   if (!companyName) {
@@ -80,7 +84,7 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
   const getRx = (str: string): RegExp => {
     const isNewFormat = str.includes('__');
     const isMess = str.includes('_to_');
-    if (!(isNewFormat && isMess)) return /from_(.+)_dev_(.+)\.json/gi;
+    if (!isMess) return /from_(.+)_dev_(.+)\.json/gi;
     if (isNewFormat) return /_from_(.+)_to_(.+)_dev_(.+)__(.+)\.json/gi;
     return /_from_(.+)_to_(.+)_dev_(.+)\.json/gi;
   };
@@ -138,35 +142,43 @@ const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => 
   }
   const nameWithoutExt = path.basename(root, ext);
   const subPath = path.dirname(root);
-  const fileStat = await stat(root);
-  const fileSize = fileStat.size / BYTES_PER_KB;
-  const fileDate = fileStat.birthtime.toString();
+  try {
+    const fileStat = await stat(root);
+    const fileSize = fileStat.size / BYTES_PER_KB;
+    const fileDate = fileStat.birthtime.toString();
+    const fileModifiedDate = fileStat.mtime.toString();
 
-  const alias = fullFileName2alias(root);
+    const alias = fullFileName2alias(root);
 
-  const fileInfo = await splitFileMessage(root);
-  if (fileInfo) {
+    const fileInfo = await splitFileMessage(root);
+    if (fileInfo) {
+      return {
+        id: alias ?? nameWithoutExt,
+        date: fileDate,
+        size: fileSize,
+        fileName: name,
+        path: subPath,
+        company: fileInfo.company,
+        appSystem: fileInfo.appSystem,
+        producer: fileInfo.producer,
+        consumer: fileInfo.consumer,
+        device: fileInfo.device,
+        mdate: fileModifiedDate,
+      };
+    }
+
     return {
       id: alias ?? nameWithoutExt,
       date: fileDate,
       size: fileSize,
       fileName: name,
       path: subPath,
-      company: fileInfo.company,
-      appSystem: fileInfo.appSystem,
-      producer: fileInfo.producer,
-      consumer: fileInfo.consumer,
-      device: fileInfo.device,
+      mdate: fileModifiedDate,
     };
+  } catch (err) {
+    log.error(`Invalid filename ${root}`);
+    return undefined;
   }
-
-  return {
-    id: alias ?? nameWithoutExt,
-    date: fileDate,
-    size: fileSize,
-    fileName: name,
-    path: subPath,
-  };
 };
 
 export const readListFiles = async (params: Record<string, string | number>): Promise<IFileSystem[]> => {
@@ -237,6 +249,7 @@ export const readListFiles = async (params: Record<string, string | number>): Pr
       filteredFiles
     );
   });
+  files = files.sort((a, b) => new Date(b.mdate).getTime() - new Date(a.mdate).getTime());
   return getListPart(files, params);
 };
 

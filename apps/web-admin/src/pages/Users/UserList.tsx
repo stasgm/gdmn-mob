@@ -48,8 +48,14 @@ const UserList = () => {
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.userActions.setPageParam({ filterText: pageParamLocal?.filterText }));
+    dispatch(actions.userActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
     fetchUsers(pageParamLocal?.filterText);
+  };
+
+  const handleClearSearch = () => {
+    dispatch(actions.userActions.setPageParam({ filterText: undefined, page: 0 }));
+    setPageParamLocal({ filterText: undefined });
+    fetchUsers();
   };
 
   const handleKeyPress = (key: string) => {
@@ -117,6 +123,7 @@ const UserList = () => {
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
             value={(pageParamLocal?.filterText as undefined) || ''}
+            clearOnClick={handleClearSearch}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
@@ -128,6 +135,7 @@ const UserList = () => {
                 path={'/app/users/'}
                 onSetPageParams={handleSetPageParams}
                 pageParams={pageParams}
+                style={{ overflowY: 'auto', maxHeight: window.innerHeight - 268 }}
               />
             </Box>
           )}
