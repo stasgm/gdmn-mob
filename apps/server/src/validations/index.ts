@@ -8,6 +8,7 @@ import * as processValidation from './process';
 import * as appSystemValidation from './appSystem';
 import * as deviceLogValidation from './deviceLog';
 import * as fileValidation from './file';
+import * as serverLogValidation from './serverLog';
 
 export {
   authValidation,
@@ -20,4 +21,5 @@ export {
   appSystemValidation,
   deviceLogValidation,
   fileValidation,
+  serverLogValidation,
 };
