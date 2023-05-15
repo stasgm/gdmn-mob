@@ -20,6 +20,8 @@ import { IUser } from '@lib/types';
 
 import dotenv from 'dotenv';
 
+import { RotatingFileStream, createStream } from 'rotating-file-stream';
+
 import koaConfig from '../config/koa';
 
 import config from '../config';
@@ -90,7 +92,12 @@ export async function createServer(server: IServer): Promise<KoaApp> {
     fs.mkdirSync(logPath);
   }
 
-  const accessLogStream: fs.WriteStream = fs.createWriteStream(config.LOG_ACCESS_PATH, { flags: 'a' });
+  const accessLogStream: RotatingFileStream = createStream('access.log', {
+    size: '20M',
+    maxFiles: 1,
+    path: logPath,
+    initialRotation: true,
+  });
 
   app
     .use(errorHandler)
