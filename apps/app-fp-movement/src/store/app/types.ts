@@ -81,12 +81,12 @@ export interface IMGoodRemain {
 export interface IRemainsData {
   goodId: string;
   q?: number;
-  dateReceived: string;
+  workDate: string;
   numReceived: string;
 }
 
 export interface IModelRem {
-  dateReceived: string;
+  workDate: string;
   numReceived: string;
   q: number;
 }
@@ -94,6 +94,10 @@ export interface IModelRem {
 export interface IRemGood {
   good: IGood;
   remains: number;
-  dateReceived: string;
+  workDate: string;
   numReceived: string;
+}
+
+export interface IRemains {
+  [id: string]: IRemainsData[];
 }

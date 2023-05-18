@@ -75,68 +75,8 @@ export const LaboratoryViewScreen = () => {
   const [visibleWeightDialog, setVisibleWeightDialog] = useState(false);
   const [weight, setWeight] = useState('');
 
-  const handleGetBarcode = useCallback(
-    (brc: string) => {
-      if (!doc) {
-        return;
-      }
-
-      if (!brc.match(/^-{0,1}\d+$/)) {
-        setErrorMessage('Штрих-код неверного формата');
-        return;
-      }
-
-      if (brc.length < minBarcodeLength) {
-        setErrorMessage('Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!');
-        return;
-      }
-
-      const barc = getBarcode(brc, goodBarcodeSettings);
-
-      const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
-
-      if (!good) {
-        setErrorMessage('Товар не найден');
-        return;
-      }
-
-      const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
-
-      if (line) {
-        setErrorMessage('Товар уже добавлен');
-        return;
-      }
-
-      if (good) {
-        const barcodeItem: ILaboratoryLine = {
-          good: { id: good.id, name: good.name, shcode: good.shcode },
-          id: generateId(),
-          weight: barc.weight,
-          barcode: barc.barcode,
-          workDate: barc.workDate,
-          numReceived: barc.numReceived,
-          sortOrder: doc?.lines?.length + 1,
-          quantPack: barc.quantPack,
-        };
-        setErrorMessage('');
-        dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
-
-        setVisibleDialog(false);
-        setBarcode('');
-      } else {
-        setErrorMessage('Товар не найден');
-      }
-    },
-
-    [dispatch, doc, goodBarcodeSettings, goods, id, minBarcodeLength],
-  );
-
   const handleShowDialog = () => {
     setVisibleDialog(true);
-  };
-
-  const handleSearchBarcode = () => {
-    handleGetBarcode(barcode);
   };
 
   const handleDismissBarcode = () => {
@@ -340,18 +280,26 @@ export const LaboratoryViewScreen = () => {
       }
 
       if (!brc.match(/^-{0,1}\d+$/)) {
-        Alert.alert('Внимание!', 'Штрих-код не определен. Повторите сканирование!', [{ text: 'OK' }]);
-        setScanned(false);
+        if (visibleDialog) {
+          setErrorMessage('Штрих-код неверного формата');
+        } else {
+          Alert.alert('Внимание!', 'Штрих-код не определен. Повторите сканирование!', [{ text: 'OK' }]);
+          setScanned(false);
+        }
         return;
       }
 
       if (brc.length < minBarcodeLength) {
-        Alert.alert(
-          'Внимание!',
-          'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
-          [{ text: 'OK' }],
-        );
-        setScanned(false);
+        if (visibleDialog) {
+          setErrorMessage('Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!');
+        } else {
+          Alert.alert(
+            'Внимание!',
+            'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
+            [{ text: 'OK' }],
+          );
+          setScanned(false);
+        }
         return;
       }
 
@@ -360,16 +308,24 @@ export const LaboratoryViewScreen = () => {
       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
       if (!good) {
-        Alert.alert('Внимание!', 'Товар не найден!', [{ text: 'OK' }]);
-        setScanned(false);
+        if (visibleDialog) {
+          setErrorMessage('Товар не найден');
+        } else {
+          Alert.alert('Внимание!', 'Товар не найден!', [{ text: 'OK' }]);
+          setScanned(false);
+        }
         return;
       }
 
       const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
 
       if (line) {
-        Alert.alert('Внимание!', 'Данный штрих-код уже добавлен!', [{ text: 'OK' }]);
-        setScanned(false);
+        if (visibleDialog) {
+          setErrorMessage('Товар уже добавлен');
+        } else {
+          Alert.alert('Внимание!', 'Данный штрих-код уже добавлен!', [{ text: 'OK' }]);
+          setScanned(false);
+        }
         return;
       }
 
@@ -389,8 +345,12 @@ export const LaboratoryViewScreen = () => {
       setScanned(false);
     },
 
-    [doc, minBarcodeLength, goodBarcodeSettings, goods, dispatch, id],
+    [doc, minBarcodeLength, goodBarcodeSettings, goods, dispatch, id, visibleDialog],
   );
+
+  const handleSearchBarcode = () => {
+    getScannedObject(barcode);
+  };
 
   const [key, setKey] = useState(1);
 

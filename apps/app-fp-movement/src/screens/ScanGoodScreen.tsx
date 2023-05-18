@@ -15,8 +15,8 @@ import { IScannedObject } from '@lib/client-types';
 import { ShipmentStackParamList } from '../navigation/Root/types';
 import { IShipmentLine, IShipmentDocument, barcodeSettings } from '../store/types';
 
-import { IGood } from '../store/app/types';
-import { getBarcode } from '../utils/helpers';
+import { IGood, IRemains, IRemGood } from '../store/app/types';
+import { getBarcode, getNewDate, getRemGoodListByContact, getTotalWeight } from '../utils/helpers';
 import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../store/index';
 
 import { barCodeTypes } from '../utils/constants';
@@ -57,6 +57,29 @@ const ScanGoodScreen = () => {
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
 
+  const docList = useSelector((state) => state.documents.list);
+
+  const docs = useMemo(
+    () =>
+      docList?.filter(
+        (i) =>
+          (i.documentType?.name === 'shipment' ||
+            i.documentType?.name === 'currShipment' ||
+            i.documentType?.name === 'freeShipment') &&
+          i.status !== 'PROCESSED' &&
+          i?.head?.depart?.id === shipment?.head.depart?.id,
+      ) as IShipmentDocument[],
+    [shipment?.head.depart?.id, docList],
+  );
+
+  const remainsUse = Boolean(settings.remainsUse?.data);
+
+  const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
+
+  const goodRemains = useMemo<IRemGood[]>(() => {
+    return shipment?.head.depart.id ? getRemGoodListByContact(goods, remains[shipment?.head.depart.id]) : [];
+  }, [goods, remains, shipment?.head.depart.id]);
+
   const handleGetScannedObject = useCallback(
     (brc: string) => {
       if (!brc.match(/^-{0,1}\d+$/)) {
@@ -74,35 +97,76 @@ const ScanGoodScreen = () => {
 
       const barc = getBarcode(brc, goodBarcodeSettings);
 
-      const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
+      if (remainsUse) {
+        const good = goodRemains.find(
+          (item) =>
+            `0000${item.good.shcode}`.slice(-4) === barc.shcode &&
+            item.numReceived === barc.numReceived &&
+            new Date(getNewDate(item.workDate)).getTime() === new Date(barc.workDate).getTime(),
+        );
 
-      if (!good) {
-        setScaner({ state: 'error', message: 'Товар не найден' });
-        return;
+        if (!good) {
+          setScaner({ state: 'error', message: 'Товар не найден' });
+          return;
+        }
+
+        const linesWeight = getTotalWeight(good, docs);
+
+        if (good.remains < linesWeight + barc.weight) {
+          setScaner({ state: 'error', message: 'Вес товара превышает вес в остатках' });
+          return;
+        }
+
+        const line = shipmentLines?.find((i) => i.barcode === barc.barcode);
+
+        if (line) {
+          setScaner({ state: 'error', message: 'Штрих-код уже добавлен' });
+          return;
+        }
+
+        setScannedObject({
+          good: { id: good.good.id, name: good.good.name, shcode: good.good.shcode },
+          id: generateId(),
+          weight: barc.weight,
+          barcode: barc.barcode,
+          workDate: barc.workDate,
+          numReceived: barc.numReceived,
+          quantPack: barc.quantPack,
+          sortOrder: (shipmentLines?.length || 0) + 1,
+        });
+
+        setScaner({ state: 'found' });
+      } else {
+        const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
+
+        if (!good) {
+          setScaner({ state: 'error', message: 'Товар не найден' });
+          return;
+        }
+
+        const line = shipmentLines?.find((i) => i.barcode === barc.barcode);
+
+        if (line) {
+          setScaner({ state: 'error', message: 'Штрих-код уже добавлен' });
+          return;
+        }
+
+        setScannedObject({
+          good: { id: good.id, name: good.name, shcode: good.shcode, goodGroupId: good.goodGroupId },
+          id: generateId(),
+          weight: barc.weight,
+          barcode: barc.barcode,
+          workDate: barc.workDate,
+          numReceived: barc.numReceived,
+          quantPack: barc.quantPack,
+          sortOrder: (shipmentLines?.length || 0) + 1,
+        });
+
+        setScaner({ state: 'found' });
       }
-
-      const line = shipmentLines?.find((i) => i.barcode === barc.barcode);
-
-      if (line) {
-        setScaner({ state: 'error', message: 'Штрих-код уже добавлен' });
-        return;
-      }
-
-      setScannedObject({
-        good: { id: good.id, name: good.name, shcode: good.shcode, goodGroupId: good.goodGroupId },
-        id: generateId(),
-        weight: barc.weight,
-        barcode: barc.barcode,
-        workDate: barc.workDate,
-        numReceived: barc.numReceived,
-        quantPack: barc.quantPack,
-        sortOrder: (shipmentLines?.length || 0) + 1,
-      });
-
-      setScaner({ state: 'found' });
     },
 
-    [goodBarcodeSettings, goods, minBarcodeLength, shipmentLines],
+    [docs, goodBarcodeSettings, goodRemains, goods, minBarcodeLength, remainsUse, shipmentLines],
   );
 
   const handleSaveScannedItem = useCallback(() => {

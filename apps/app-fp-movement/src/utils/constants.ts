@@ -110,6 +110,15 @@ export const appSettings: Settings = {
     visible: true,
     group: mainSettingGroup,
   },
+  remainsUse: {
+    id: 'remainsUse',
+    sortOrder: 5,
+    description: 'Использовать остатки',
+    data: true,
+    type: 'boolean',
+    visible: true,
+    group: mainSettingGroup,
+  },
   minBarcodeLength: {
     id: 'minBarcodeLength',
     sortOrder: 6,
