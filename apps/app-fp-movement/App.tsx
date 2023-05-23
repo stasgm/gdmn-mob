@@ -67,13 +67,13 @@ const Root = () => {
             {
               name: 'InternalMovement',
               title: 'На хранение',
-              icon: 'file-plus',
+              icon: 'store-plus-outline',
               component: MoveToNavigator,
             },
             {
               name: 'Movement',
               title: 'С хранения',
-              icon: 'file-plus',
+              icon: 'store-minus-outline',
               component: MoveFromNavigator,
             },
             {

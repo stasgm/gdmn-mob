@@ -77,8 +77,8 @@ const ScanGoodScreen = () => {
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return shipment?.head.depart.id ? getRemGoodListByContact(goods, remains[shipment?.head.depart.id]) : [];
-  }, [goods, remains, shipment?.head.depart.id]);
+    return shipment?.head.depart?.id ? getRemGoodListByContact(goods, remains[shipment?.head.depart?.id]) : [];
+  }, [goods, remains, shipment?.head.depart?.id]);
 
   const handleGetScannedObject = useCallback(
     (brc: string) => {
@@ -97,7 +97,12 @@ const ScanGoodScreen = () => {
 
       const barc = getBarcode(brc, goodBarcodeSettings);
 
-      if (remainsUse) {
+      if (
+        remainsUse &&
+        (shipment?.documentType.name === 'shipment' ||
+          shipment?.documentType.name === 'freeShipment' ||
+          shipment?.documentType.name === 'currShipment')
+      ) {
         const good = goodRemains.find(
           (item) =>
             `0000${item.good.shcode}`.slice(-4) === barc.shcode &&
@@ -166,7 +171,16 @@ const ScanGoodScreen = () => {
       }
     },
 
-    [docs, goodBarcodeSettings, goodRemains, goods, minBarcodeLength, remainsUse, shipmentLines],
+    [
+      docs,
+      goodBarcodeSettings,
+      goodRemains,
+      goods,
+      minBarcodeLength,
+      remainsUse,
+      shipment?.documentType.name,
+      shipmentLines,
+    ],
   );
 
   const handleSaveScannedItem = useCallback(() => {
@@ -231,8 +245,10 @@ const ScanGoodScreen = () => {
       ]);
     } else {
       if (
-        (shipment?.head.subtype && shipment?.head.subtype?.id === 'prihod' && shipment?.head.toDepart.isAddressStore) ||
-        (shipment?.head.subtype && shipment?.head.subtype?.id !== 'prihod' && shipment?.head.fromDepart.isAddressStore)
+        (shipment?.head.subtype &&
+          shipment?.head.subtype?.id === 'prihod' &&
+          shipment?.head.toDepart?.isAddressStore) ||
+        (shipment?.head.subtype && shipment?.head.subtype?.id !== 'prihod' && shipment?.head.fromDepart?.isAddressStore)
       ) {
         if (scannedObject.quantPack < goodBarcodeSettings.boxNumber) {
           Alert.alert('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}!`, [
