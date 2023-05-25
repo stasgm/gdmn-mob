@@ -53,7 +53,13 @@ export const InventoryViewScreen = () => {
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
 
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
-  const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0) || 0;
+  const lineSum = lines?.reduce(
+    (sum, line) => {
+      return { ...sum, quantPack: sum.quantPack + (line.quantPack || 0), weight: sum.weight + (line.weight || 0) };
+    },
+    { quantPack: 0, weight: 0 },
+  );
+
   const isBlocked = doc?.status !== 'DRAFT';
   const goods = refSelectors.selectByName<IGood>('good').data;
   const settings = useSelector((state) => state.settings?.data);
@@ -292,6 +298,7 @@ export const InventoryViewScreen = () => {
         workDate: barc.workDate,
         numReceived: barc.numReceived,
         sortOrder: doc?.lines?.length + 1,
+        quantPack: barc.quantPack,
       };
 
       const isToAddressed = departs.find((i) => i.id === doc.head.toDepart.id && i.isAddressStore);
@@ -400,7 +407,7 @@ export const InventoryViewScreen = () => {
         updateCellsBatchingPeriod={100}
         windowSize={7}
       />
-      {lines?.length ? <ViewTotal quantity={lineSum || 0} weight={lines?.length || 0} /> : null}
+      {lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
       <AppDialog
         title="Введите штрих-код"
         visible={visibleDialog}

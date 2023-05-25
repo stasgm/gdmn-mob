@@ -151,6 +151,7 @@ export interface IShipmentLine extends IEntity {
   barcode: string; // технологический код
   quantPack: number; // порядковый номер сканирования в документе
   sortOrder?: number; // порядок сортировки
+  scannedBarcode?: string;
 }
 
 export type IShipmentDocument = MandateProps<IDocument<IShipmentHead, IShipmentLine>, 'head' | 'lines'>;
@@ -185,6 +186,7 @@ export interface IInventoryLine extends IEntity {
   sortOrder?: number; // порядок сортировки
   // fromCell?: string; // номер ячейки
   toCell?: string; // номер ячейки
+  quantPack: number; // порядковый номер сканирования в документе
 }
 
 export type IInventoryDocument = MandateProps<IDocument<IInventoryHead, IInventoryLine>, 'head' | 'lines'>;

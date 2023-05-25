@@ -97,3 +97,10 @@ export type CellsParamList = RefParamList & {
 };
 
 export type CellsStackParamList = { ContactList: undefined } & CellsParamList;
+
+export type RemainsParamList = RefParamList & {
+  GoodList: { id: string };
+  GoodLine: { item: any };
+};
+
+export type RemainsStackParamList = { ContactList: undefined } & RemainsParamList;

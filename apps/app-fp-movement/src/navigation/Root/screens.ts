@@ -20,6 +20,11 @@ import {
 import { CellsViewScreen, ContactListScreen, GoodLineScreen } from '../../screens/Cells';
 import { LaboratoryListScreen, LaboratoryEditScreen, LaboratoryViewScreen } from '../../screens/Laboratory';
 import { ReturnListScreen, ReturnEditScreen, ReturnViewScreen } from '../../screens/Return';
+import {
+  ContactListScreen as ContactRemListScreen,
+  GoodListScreen,
+  GoodLineScreen as GoodRemLineScreen,
+} from '../../screens/Remains';
 
 import { SelectRefItemScreen } from '../../components';
 
@@ -122,4 +127,13 @@ export const returnScreens = {
 
 export const returnListScreens = {
   ReturnList: { title: 'Возвраты', component: ReturnListScreen },
+};
+
+export const remainsListScreens = {
+  ContactList: { title: 'Остатки', component: ContactRemListScreen },
+};
+
+export const remainsScreens = {
+  GoodList: { title: 'Остатки', component: GoodListScreen },
+  GoodLine: { title: 'Позиция остатков', component: GoodRemLineScreen },
 };

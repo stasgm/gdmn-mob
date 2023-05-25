@@ -54,6 +54,7 @@ import { ReturnNavigator } from './src/navigation/ReturnNavigator';
 import { LaboratoryNavigator } from './src/navigation/LaboratoryNavigator';
 import { MoveToNavigator } from './src/navigation/MoveToNavigator';
 import { MoveFromNavigator } from './src/navigation/MoveFromNavigator';
+import RemainsNavigator from './src/navigation/RemainsNavigator';
 
 const Root = () => {
   const { isInit, data: settings } = useSelector((state) => state.settings);
@@ -101,6 +102,12 @@ const Root = () => {
               component: CellsNavigator,
             },
             {
+              name: 'Remains',
+              title: 'Остатки',
+              icon: 'dolly',
+              component: RemainsNavigator,
+            },
+            {
               name: 'Return',
               title: 'Возврат',
               icon: 'file-restore-outline',
@@ -138,6 +145,12 @@ const Root = () => {
               title: 'Отвес',
               icon: 'playlist-plus',
               component: FreeShipmentNavigator,
+            },
+            {
+              name: 'Remains',
+              title: 'Остатки',
+              icon: 'dolly',
+              component: RemainsNavigator,
             },
             {
               name: 'Return',

@@ -28,12 +28,12 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { FlashList } from '@shopify/flash-list';
 
-import { barcodeSettings, IMoveDocument, IMoveLine } from '../../store/types';
+import { barcodeSettings, IMoveDocument, IMoveLine, IShipmentDocument } from '../../store/types';
 import { MoveStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { getBarcode } from '../../utils/helpers';
-import { IAddressStoreEntity, IGood } from '../../store/app/types';
+import { getBarcode, getLineGood, getRemGoodListByContact } from '../../utils/helpers';
+import { IAddressStoreEntity, IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
 
@@ -62,7 +62,12 @@ export const MoveViewScreen = () => {
   const [visibleSendDialog, setVisibleSendDialog] = useState(false);
 
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
-  const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0) || 0;
+  const lineSum = lines?.reduce(
+    (sum, line) => {
+      return { ...sum, quantPack: sum.quantPack + (line.quantPack || 0), weight: sum.weight + (line.weight || 0) };
+    },
+    { quantPack: 0, weight: 0 },
+  );
 
   const isBlocked = doc?.status !== 'DRAFT';
 
@@ -78,6 +83,42 @@ export const MoveViewScreen = () => {
   }, {});
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
+
+  const docList = useSelector((state) => state.documents.list);
+
+  const docsSubtraction = useMemo(
+    () =>
+      docList?.filter(
+        (i) =>
+          i.documentType?.name !== 'order' &&
+          i.documentType?.name !== 'inventory' &&
+          i.documentType?.name !== 'return' &&
+          i.status !== 'PROCESSED' &&
+          (i?.head?.depart?.id === doc?.head.fromDepart?.id || i?.head?.fromDepart?.id === doc?.head.fromDepart?.id),
+      ) as IShipmentDocument[],
+    [doc?.head.fromDepart?.id, docList],
+  );
+
+  const docsAddition = useMemo(
+    () =>
+      docList?.filter(
+        (i) =>
+          i.documentType?.name !== 'order' &&
+          i.documentType?.name !== 'inventory' &&
+          i.documentType?.name !== 'return' &&
+          i.status !== 'PROCESSED' &&
+          i?.head?.toDepart?.id === doc?.head.fromDepart?.id,
+      ) as IShipmentDocument[],
+    [doc?.head.fromDepart?.id, docList],
+  );
+
+  const remainsUse = Boolean(settings.remainsUse?.data);
+
+  const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
+
+  const goodRemains = useMemo<IRemGood[]>(() => {
+    return doc?.head.fromDepart?.id ? getRemGoodListByContact(goods, remains[doc?.head.fromDepart?.id]) : [];
+  }, [doc?.head.fromDepart?.id, goods, remains]);
 
   const handleShowDialog = () => {
     setVisibleDialog(true);
@@ -289,13 +330,23 @@ export const MoveViewScreen = () => {
 
       const barc = getBarcode(brc, goodBarcodeSettings);
 
-      const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
+      const lineGood = getLineGood(barc, goods, goodRemains, remainsUse, docsSubtraction, docsAddition);
 
-      if (!good) {
+      if (!lineGood.good) {
         if (visibleDialog) {
           setErrorMessage('Товар не найден');
         } else {
           Alert.alert('Внимание!', 'Товар не найден!', [{ text: 'OK' }]);
+          setScanned(false);
+        }
+        return;
+      }
+
+      if (!lineGood.isRightWeight) {
+        if (visibleDialog) {
+          setErrorMessage('Вес товара превышает вес в остатках');
+        } else {
+          Alert.alert('Внимание!', 'Вес товара превышает вес в остатках!', [{ text: 'OK' }]);
           setScanned(false);
         }
         return;
@@ -314,7 +365,7 @@ export const MoveViewScreen = () => {
       }
 
       const newLine: IMoveLine = {
-        good: { id: good.id, name: good.name, shcode: good.shcode, goodGroupId: good.goodGroupId },
+        good: lineGood.good,
         id: generateId(),
         weight: barc.weight,
         barcode: barc.barcode,
@@ -350,7 +401,21 @@ export const MoveViewScreen = () => {
       }
     },
 
-    [doc, minBarcodeLength, goodBarcodeSettings, goods, departs, visibleDialog, navigation, id, dispatch],
+    [
+      doc,
+      minBarcodeLength,
+      goodBarcodeSettings,
+      remainsUse,
+      visibleDialog,
+      goodRemains,
+      docsSubtraction,
+      docsAddition,
+      departs,
+      navigation,
+      id,
+      dispatch,
+      goods,
+    ],
   );
 
   const handleSearchBarcode = () => {
@@ -443,7 +508,7 @@ export const MoveViewScreen = () => {
         extraData={[lines, isBlocked]}
         keyboardShouldPersistTaps={'handled'}
       />
-      {doc?.lines?.length ? <ViewTotal quantity={lineSum || 0} weight={lines?.length || 0} /> : null}
+      {doc?.lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
       <AppDialog
         title="Введите штрих-код"
         visible={visibleDialog}

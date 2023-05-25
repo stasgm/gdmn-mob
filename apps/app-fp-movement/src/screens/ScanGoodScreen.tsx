@@ -59,17 +59,30 @@ const ScanGoodScreen = () => {
 
   const docList = useSelector((state) => state.documents.list);
 
-  const docs = useMemo(
+  const docsSubtraction = useMemo(
     () =>
       docList?.filter(
         (i) =>
-          (i.documentType?.name === 'shipment' ||
-            i.documentType?.name === 'currShipment' ||
-            i.documentType?.name === 'freeShipment') &&
+          i.documentType?.name !== 'order' &&
+          i.documentType?.name !== 'inventory' &&
+          i.documentType?.name !== 'return' &&
           i.status !== 'PROCESSED' &&
-          i?.head?.depart?.id === shipment?.head.depart?.id,
+          (i?.head?.depart?.id === shipment?.head.depart?.id || i?.head?.fromDepart?.id === shipment?.head.depart?.id),
       ) as IShipmentDocument[],
-    [shipment?.head.depart?.id, docList],
+    [docList, shipment?.head.depart?.id],
+  );
+
+  const docsAddition = useMemo(
+    () =>
+      docList?.filter(
+        (i) =>
+          i.documentType?.name !== 'order' &&
+          i.documentType?.name !== 'inventory' &&
+          i.documentType?.name !== 'return' &&
+          i.status !== 'PROCESSED' &&
+          i?.head?.toDepart?.id === shipment?.head.depart?.id,
+      ) as IShipmentDocument[],
+    [docList, shipment?.head.depart?.id],
   );
 
   const remainsUse = Boolean(settings.remainsUse?.data);
@@ -97,12 +110,7 @@ const ScanGoodScreen = () => {
 
       const barc = getBarcode(brc, goodBarcodeSettings);
 
-      if (
-        remainsUse &&
-        (shipment?.documentType.name === 'shipment' ||
-          shipment?.documentType.name === 'freeShipment' ||
-          shipment?.documentType.name === 'currShipment')
-      ) {
+      if (remainsUse && shipment?.documentType.name !== 'return' && shipment?.documentType.name !== 'inventory') {
         const good = goodRemains.find(
           (item) =>
             `0000${item.good.shcode}`.slice(-4) === barc.shcode &&
@@ -115,9 +123,10 @@ const ScanGoodScreen = () => {
           return;
         }
 
-        const linesWeight = getTotalWeight(good, docs);
+        const linesSubtractionWeight = getTotalWeight(good, docsSubtraction);
+        const linesAdditiontionWeight = getTotalWeight(good, docsAddition);
 
-        if (good.remains < linesWeight + barc.weight) {
+        if (good.remains + linesAdditiontionWeight < linesSubtractionWeight + barc.weight) {
           setScaner({ state: 'error', message: 'Вес товара превышает вес в остатках' });
           return;
         }
@@ -172,7 +181,8 @@ const ScanGoodScreen = () => {
     },
 
     [
-      docs,
+      docsAddition,
+      docsSubtraction,
       goodBarcodeSettings,
       goodRemains,
       goods,

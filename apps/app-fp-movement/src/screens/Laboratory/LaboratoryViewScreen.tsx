@@ -27,12 +27,12 @@ import { ScreenState } from '@lib/types';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { barcodeSettings, ILaboratoryDocument, ILaboratoryLine } from '../../store/types';
+import { barcodeSettings, ILaboratoryDocument, ILaboratoryLine, IShipmentDocument } from '../../store/types';
 import { LaboratoryStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { getBarcode } from '../../utils/helpers';
-import { IGood } from '../../store/app/types';
+import { getBarcode, getLineGood, getNewDate, getRemGoodListByContact, getTotalWeight } from '../../utils/helpers';
+import { IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
 
@@ -53,7 +53,13 @@ export const LaboratoryViewScreen = () => {
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
 
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
-  const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0) || 0;
+  const lineSum = lines?.reduce(
+    (sum, line) => {
+      return { ...sum, quantPack: sum.quantPack + (line.quantPack || 0), weight: sum.weight + (line.weight || 0) };
+    },
+    { quantPack: 0, weight: 0 },
+  );
+
   const isBlocked = doc?.status !== 'DRAFT';
   const goods = refSelectors.selectByName<IGood>('good').data;
   const settings = useSelector((state) => state.settings?.data);
@@ -66,6 +72,42 @@ export const LaboratoryViewScreen = () => {
   }, {});
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
+
+  const docList = useSelector((state) => state.documents.list);
+
+  const docsSubtraction = useMemo(
+    () =>
+      docList?.filter(
+        (i) =>
+          i.documentType?.name !== 'order' &&
+          i.documentType?.name !== 'inventory' &&
+          i.documentType?.name !== 'return' &&
+          i.status !== 'PROCESSED' &&
+          (i?.head?.depart?.id === doc?.head.depart?.id || i?.head?.fromDepart?.id === doc?.head.depart?.id),
+      ) as IShipmentDocument[],
+    [doc?.head.depart?.id, docList],
+  );
+
+  const docsAddition = useMemo(
+    () =>
+      docList?.filter(
+        (i) =>
+          i.documentType?.name !== 'order' &&
+          i.documentType?.name !== 'inventory' &&
+          i.documentType?.name !== 'return' &&
+          i.status !== 'PROCESSED' &&
+          i?.head?.toDepart?.id === doc?.head.depart?.id,
+      ) as IShipmentDocument[],
+    [doc?.head.depart?.id, docList],
+  );
+
+  const remainsUse = Boolean(settings.remainsUse?.data);
+
+  const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
+
+  const goodRemains = useMemo<IRemGood[]>(() => {
+    return doc?.head.depart.id ? getRemGoodListByContact(goods, remains[doc?.head.depart.id]) : [];
+  }, [doc?.head.depart.id, goods, remains]);
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -92,18 +134,49 @@ export const LaboratoryViewScreen = () => {
         return;
       }
 
-      if (newWeight < 1000 || newWeight <= line.weight) {
-        const newLine: ILaboratoryLine = {
-          ...line,
-          weight: newWeight,
-        };
+      if (remainsUse) {
+        const good = goodRemains.find(
+          (item) =>
+            `0000${item.good.shcode}`.slice(-4) === line.good.shcode &&
+            item.numReceived === line.numReceived &&
+            new Date(getNewDate(item.workDate)).getTime() === new Date(line.workDate).getTime(),
+        );
 
-        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+        if (good) {
+          const linesSubtractionWeight = getTotalWeight(good, docsSubtraction);
+          const linesAdditiontionWeight = getTotalWeight(good, docsAddition);
+
+          if (good.remains + linesAdditiontionWeight < linesSubtractionWeight + newWeight - line.weight) {
+            Alert.alert('Внимание!', 'Вес товара превышает вес в остатках!', [{ text: 'OK' }]);
+
+            return;
+          } else if (newWeight < 1000 || newWeight <= line.weight) {
+            const newLine: ILaboratoryLine = {
+              ...line,
+              weight: newWeight,
+            };
+
+            dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+          }
+        } else {
+          Alert.alert('Ошибка!', 'Товар не найден', [{ text: 'OK' }]);
+          return;
+        }
       } else {
-        Alert.alert('Ошибка!', 'Неверный вес', [{ text: 'OK' }]);
+        if (newWeight < 1000 || newWeight <= line.weight) {
+          const newLine: ILaboratoryLine = {
+            ...line,
+            weight: newWeight,
+          };
+
+          dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+        } else {
+          Alert.alert('Ошибка!', 'Неверный вес', [{ text: 'OK' }]);
+          return;
+        }
       }
     },
-    [dispatch, id, lines],
+    [dispatch, docsAddition, docsSubtraction, goodRemains, id, lines, remainsUse],
   );
 
   const handleEditWeight = () => {
@@ -246,7 +319,7 @@ export const LaboratoryViewScreen = () => {
   const renderItem: ListRenderItem<ILaboratoryLine> = ({ item }) => (
     <ListItemLine
       key={item.id}
-      readonly={item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
+      readonly={doc?.status !== 'DRAFT' || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
       onPress={() => setVisibleWeightDialog(true)}
     >
       <View style={styles.details}>
@@ -258,11 +331,6 @@ export const LaboratoryViewScreen = () => {
         <View style={styles.flexDirectionRow}>
           <MediumText>
             Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
-          </MediumText>
-        </View>
-        <View style={styles.flexDirectionRow}>
-          <MediumText>
-            quantPack {item.quantPack || ''}, sortOrder {item.sortOrder || ''}
           </MediumText>
         </View>
       </View>
@@ -305,13 +373,23 @@ export const LaboratoryViewScreen = () => {
 
       const barc = getBarcode(brc, goodBarcodeSettings);
 
-      const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
+      const lineGood = getLineGood(barc, goods, goodRemains, remainsUse, docsSubtraction, docsAddition);
 
-      if (!good) {
+      if (!lineGood.good) {
         if (visibleDialog) {
           setErrorMessage('Товар не найден');
         } else {
           Alert.alert('Внимание!', 'Товар не найден!', [{ text: 'OK' }]);
+          setScanned(false);
+        }
+        return;
+      }
+
+      if (!lineGood.isRightWeight) {
+        if (visibleDialog) {
+          setErrorMessage('Вес товара превышает вес в остатках');
+        } else {
+          Alert.alert('Внимание!', 'Вес товара превышает вес в остатках!', [{ text: 'OK' }]);
           setScanned(false);
         }
         return;
@@ -330,7 +408,7 @@ export const LaboratoryViewScreen = () => {
       }
 
       const newLine: ILaboratoryLine = {
-        good: { id: good.id, name: good.name, shcode: good.shcode },
+        good: lineGood.good,
         id: generateId(),
         weight: barc.weight,
         barcode: barc.barcode,
@@ -345,7 +423,19 @@ export const LaboratoryViewScreen = () => {
       setScanned(false);
     },
 
-    [doc, minBarcodeLength, goodBarcodeSettings, goods, dispatch, id, visibleDialog],
+    [
+      doc,
+      minBarcodeLength,
+      goodBarcodeSettings,
+      remainsUse,
+      visibleDialog,
+      goodRemains,
+      docsSubtraction,
+      docsAddition,
+      dispatch,
+      id,
+      goods,
+    ],
   );
 
   const handleSearchBarcode = () => {
@@ -434,7 +524,7 @@ export const LaboratoryViewScreen = () => {
         updateCellsBatchingPeriod={100}
         windowSize={7}
       />
-      {lines?.length ? <ViewTotal quantity={lineSum || 0} weight={lines?.length || 0} /> : null}
+      {lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
       <AppDialog
         title="Введите штрих-код"
         visible={visibleDialog}

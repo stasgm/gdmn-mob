@@ -195,6 +195,43 @@ export const getTotalWeight = (good: IRemGood, docs: IShipmentDocument[]) => {
   return linesWeight;
 };
 
+export const getLineGood = (
+  barc: IBarcode,
+  goods: IGood[],
+  goodRemains: IRemGood[],
+  remainsUse: boolean,
+  docsSubtraction: IShipmentDocument[],
+  docsAddition: IShipmentDocument[],
+) => {
+  if (remainsUse) {
+    const good = goodRemains.find(
+      (item) =>
+        `0000${item.good.shcode}`.slice(-4) === barc.shcode &&
+        item.numReceived === barc.numReceived &&
+        new Date(getNewDate(item.workDate)).getTime() === new Date(barc.workDate).getTime(),
+    );
+
+    if (good) {
+      const linesSubtractionWeight = getTotalWeight(good, docsSubtraction);
+      const linesAdditiontionWeight = getTotalWeight(good, docsAddition);
+
+      const isRightWeight = good.remains + linesAdditiontionWeight >= linesSubtractionWeight + barc.weight;
+
+      console.log(
+        `${good.remains} + ${linesAdditiontionWeight} >= ${linesSubtractionWeight} + ${barc.weight}`,
+        isRightWeight,
+      );
+
+      return { good: { id: good.good.id, name: good.good.name, shcode: good.good.shcode }, isRightWeight };
+    } else {
+      return { good: undefined, isRightWeight: false };
+    }
+  } else {
+    const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
+    return { good: good ? { id: good.id, name: good.name, shcode: good.shcode } : undefined, isRightWeight: true };
+  }
+};
+
 const getRemGoodByContact = (goods: IGood[], remains: IRemainsData[] = []) => {
   log('getRemGoodByContact', 'Начало построения модели товаров по подразделению в разрезе штрихкодов');
   const remGoods: IMGoodData<IMGoodRemain> = {};

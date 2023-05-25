@@ -31,7 +31,7 @@ import { barcodeSettings, IFreeShipmentDocument, IFreeShipmentLine, IShipmentDoc
 import { FreeShipmentStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { getBarcode, getNewDate, getRemGoodListByContact, getTotalWeight } from '../../utils/helpers';
+import { getBarcode, getLineGood, getNewDate, getRemGoodListByContact, getTotalWeight } from '../../utils/helpers';
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
@@ -53,7 +53,14 @@ export const FreeShipmentViewScreen = () => {
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
 
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
-  const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0) || 0;
+
+  const lineSum = lines?.reduce(
+    (sum, line) => {
+      return { ...sum, quantPack: sum.quantPack + (line.quantPack || 0), weight: sum.weight + (line.weight || 0) };
+    },
+    { quantPack: 0, weight: 0 },
+  );
+
   const isBlocked = doc?.status !== 'DRAFT';
   const goods = refSelectors.selectByName<IGood>('good').data;
 
@@ -70,15 +77,28 @@ export const FreeShipmentViewScreen = () => {
 
   const docList = useSelector((state) => state.documents.list);
 
-  const docs = useMemo(
+  const docsSubtraction = useMemo(
     () =>
       docList?.filter(
         (i) =>
-          (i.documentType?.name === 'shipment' ||
-            i.documentType?.name === 'currShipment' ||
-            i.documentType?.name === 'freeShipment') &&
+          i.documentType?.name !== 'order' &&
+          i.documentType?.name !== 'inventory' &&
+          i.documentType?.name !== 'return' &&
           i.status !== 'PROCESSED' &&
-          i?.head?.depart?.id === doc?.head.depart?.id,
+          (i?.head?.depart?.id === doc?.head.depart?.id || i?.head?.fromDepart?.id === doc?.head.depart?.id),
+      ) as IShipmentDocument[],
+    [doc?.head.depart?.id, docList],
+  );
+
+  const docsAddition = useMemo(
+    () =>
+      docList?.filter(
+        (i) =>
+          i.documentType?.name !== 'order' &&
+          i.documentType?.name !== 'inventory' &&
+          i.documentType?.name !== 'return' &&
+          i.status !== 'PROCESSED' &&
+          i?.head?.toDepart?.id === doc?.head.depart?.id,
       ) as IShipmentDocument[],
     [doc?.head.depart?.id, docList],
   );
@@ -90,6 +110,8 @@ export const FreeShipmentViewScreen = () => {
   const goodRemains = useMemo<IRemGood[]>(() => {
     return doc?.head.depart.id ? getRemGoodListByContact(goods, remains[doc?.head.depart.id]) : [];
   }, [doc?.head.depart.id, goods, remains]);
+
+  // console.log('goodRemains', jsonFormat(goodRemains));
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -118,50 +140,114 @@ export const FreeShipmentViewScreen = () => {
 
       const weight = line?.weight * quantity;
 
-      if (weight < 1000) {
-        const newLine: IFreeShipmentLine = {
-          ...line,
-          quantPack: quantity,
-          weight,
-          scannedBarcode: line?.barcode,
-        };
+      if (remainsUse) {
+        const good = goodRemains.find(
+          (item) =>
+            `0000${item.good.shcode}`.slice(-4) === line.good.shcode &&
+            item.numReceived === line.numReceived &&
+            new Date(getNewDate(item.workDate)).getTime() === new Date(line.workDate).getTime(),
+        );
 
-        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+        if (good) {
+          const linesSubtractionWeight = getTotalWeight(good, docsSubtraction);
+          const linesAdditiontionWeight = getTotalWeight(good, docsAddition);
+
+          if (good.remains + linesAdditiontionWeight < linesSubtractionWeight + weight - line.weight) {
+            Alert.alert('Внимание!', 'Вес товара превышает вес в остатках!', [{ text: 'OK' }]);
+
+            return;
+          } else if (weight < 1000) {
+            const newLine: IFreeShipmentLine = {
+              ...line,
+              quantPack: quantity,
+              weight,
+              scannedBarcode: line?.barcode,
+            };
+
+            dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+          } else {
+            const maxQuantPack = Math.floor(999.99 / line?.weight);
+
+            let newQuantity = quantity;
+            let sortOrder = line.sortOrder || lines.length;
+
+            while (newQuantity > 0) {
+              const q = newQuantity > maxQuantPack ? maxQuantPack : newQuantity;
+              const newWeight = line?.weight * q;
+
+              const newLine: IFreeShipmentLine = {
+                ...line,
+                quantPack: q,
+                weight: newWeight,
+                scannedBarcode: line?.barcode,
+              };
+
+              if (newQuantity === quantity) {
+                dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+              } else {
+                sortOrder = sortOrder + 1;
+
+                const addedLine = { ...newLine, id: generateId(), sortOrder };
+                dispatch(
+                  documentActions.addDocumentLine({
+                    docId: id,
+                    line: addedLine,
+                  }),
+                );
+              }
+              newQuantity = newQuantity - maxQuantPack;
+            }
+          }
+        } else {
+          Alert.alert('Ошибка!', 'Товар не найден', [{ text: 'OK' }]);
+          return;
+        }
       } else {
-        const maxQuantPack = Math.floor(999.99 / line?.weight);
-
-        let newQuantity = quantity;
-        let sortOrder = line.sortOrder || lines.length;
-
-        while (newQuantity > 0) {
-          const q = newQuantity > maxQuantPack ? maxQuantPack : newQuantity;
-          const newWeight = line?.weight * q;
-
+        if (weight < 1000) {
           const newLine: IFreeShipmentLine = {
             ...line,
-            quantPack: q,
-            weight: newWeight,
+            quantPack: quantity,
+            weight,
             scannedBarcode: line?.barcode,
           };
 
-          if (newQuantity === quantity) {
-            dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-          } else {
-            sortOrder = sortOrder + 1;
+          dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+        } else {
+          const maxQuantPack = Math.floor(999.99 / line?.weight);
 
-            const addedLine = { ...newLine, id: generateId(), sortOrder };
-            dispatch(
-              documentActions.addDocumentLine({
-                docId: id,
-                line: addedLine,
-              }),
-            );
+          let newQuantity = quantity;
+          let sortOrder = line.sortOrder || lines.length;
+
+          while (newQuantity > 0) {
+            const q = newQuantity > maxQuantPack ? maxQuantPack : newQuantity;
+            const newWeight = line?.weight * q;
+
+            const newLine: IFreeShipmentLine = {
+              ...line,
+              quantPack: q,
+              weight: newWeight,
+              scannedBarcode: line?.barcode,
+            };
+
+            if (newQuantity === quantity) {
+              dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+            } else {
+              sortOrder = sortOrder + 1;
+
+              const addedLine = { ...newLine, id: generateId(), sortOrder };
+              dispatch(
+                documentActions.addDocumentLine({
+                  docId: id,
+                  line: addedLine,
+                }),
+              );
+            }
+            newQuantity = newQuantity - maxQuantPack;
           }
-          newQuantity = newQuantity - maxQuantPack;
         }
       }
     },
-    [dispatch, id, lines],
+    [dispatch, docsAddition, docsSubtraction, goodRemains, id, lines, remainsUse],
   );
 
   const handleEditQuantPack = () => {
@@ -304,7 +390,7 @@ export const FreeShipmentViewScreen = () => {
   const renderItem: ListRenderItem<IFreeShipmentLine> = ({ item }) => (
     <ListItemLine
       key={item.id}
-      readonly={item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
+      readonly={doc?.status !== 'DRAFT' || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
       onPress={() => setVisibleQuantPackDialog(true)}
     >
       <View style={styles.details}>
@@ -318,11 +404,6 @@ export const FreeShipmentViewScreen = () => {
             Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
           </MediumText>
         </View>
-        <View style={styles.flexDirectionRow}>
-          <MediumText>
-            quantPack {item.quantPack || ''}, sortOrder {item.sortOrder || ''}
-          </MediumText>
-        </View>
       </View>
     </ListItemLine>
   );
@@ -334,12 +415,6 @@ export const FreeShipmentViewScreen = () => {
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!doc) {
-        return;
-      }
-
-      if (!brc.match(/^-{0,1}\d+$/)) {
-        Alert.alert('Внимание!', 'Штрих-код не определен. Повторите сканирование!', [{ text: 'OK' }]);
-        setScanned(false);
         return;
       }
 
@@ -369,103 +444,69 @@ export const FreeShipmentViewScreen = () => {
 
       const barc = getBarcode(brc, goodBarcodeSettings);
 
-      if (remainsUse) {
-        const good = goodRemains.find(
-          (item) =>
-            `0000${item.good.shcode}`.slice(-4) === barc.shcode &&
-            item.numReceived === barc.numReceived &&
-            new Date(getNewDate(item.workDate)).getTime() === new Date(barc.workDate).getTime(),
-        );
+      const lineGood = getLineGood(barc, goods, goodRemains, remainsUse, docsSubtraction, docsAddition);
 
-        if (!good) {
-          if (visibleDialog) {
-            setErrorMessage('Товар не найден');
-          } else {
-            Alert.alert('Внимание!', 'Товар не найден!', [{ text: 'OK' }]);
-            setScanned(false);
-          }
-          return;
+      if (!lineGood.good) {
+        if (visibleDialog) {
+          setErrorMessage('Товар не найден');
+        } else {
+          Alert.alert('Внимание!', 'Товар не найден!', [{ text: 'OK' }]);
+          setScanned(false);
         }
-
-        const linesWeight = getTotalWeight(good, docs);
-
-        if (good.remains < linesWeight + barc.weight) {
-          if (visibleDialog) {
-            setErrorMessage('Вес товара превышает вес в остатках');
-          } else {
-            Alert.alert('Внимание!', 'Вес товара превышает вес в остатках!', [{ text: 'OK' }]);
-            setScanned(false);
-          }
-          return;
-        }
-
-        const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
-
-        if (line) {
-          if (visibleDialog) {
-            setErrorMessage('Товар уже добавлен');
-          } else {
-            Alert.alert('Внимание!', 'Данный штрих-код уже добавлен!', [{ text: 'OK' }]);
-            setScanned(false);
-          }
-          return;
-        }
-
-        const newLine: IFreeShipmentLine = {
-          good: { id: good.good.id, name: good.good.name, shcode: good.good.shcode },
-          id: generateId(),
-          weight: barc.weight,
-          barcode: barc.barcode,
-          workDate: barc.workDate,
-          numReceived: barc.numReceived,
-          sortOrder: doc?.lines?.length + 1,
-          quantPack: barc.quantPack,
-        };
-
-        dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
-      } else {
-        const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
-
-        if (!good) {
-          if (visibleDialog) {
-            setErrorMessage('Товар не найден');
-          } else {
-            Alert.alert('Внимание!', 'Товар не найден!', [{ text: 'OK' }]);
-            setScanned(false);
-          }
-          return;
-        }
-
-        const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
-
-        if (line) {
-          if (visibleDialog) {
-            setErrorMessage('Товар уже добавлен');
-          } else {
-            Alert.alert('Внимание!', 'Данный штрих-код уже добавлен!', [{ text: 'OK' }]);
-            setScanned(false);
-          }
-          return;
-        }
-
-        const newLine: IFreeShipmentLine = {
-          good: { id: good.id, name: good.name, shcode: good.shcode },
-          id: generateId(),
-          weight: barc.weight,
-          barcode: barc.barcode,
-          workDate: barc.workDate,
-          numReceived: barc.numReceived,
-          sortOrder: doc?.lines?.length + 1,
-          quantPack: barc.quantPack,
-        };
-
-        dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+        return;
       }
+
+      if (!lineGood.isRightWeight) {
+        if (visibleDialog) {
+          setErrorMessage('Вес товара превышает вес в остатках');
+        } else {
+          Alert.alert('Внимание!', 'Вес товара превышает вес в остатках!', [{ text: 'OK' }]);
+          setScanned(false);
+        }
+        return;
+      }
+
+      const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
+
+      if (line) {
+        if (visibleDialog) {
+          setErrorMessage('Товар уже добавлен');
+        } else {
+          Alert.alert('Внимание!', 'Данный штрих-код уже добавлен!', [{ text: 'OK' }]);
+          setScanned(false);
+        }
+        return;
+      }
+
+      const newLine: IFreeShipmentLine = {
+        good: lineGood.good,
+        id: generateId(),
+        weight: barc.weight,
+        barcode: barc.barcode,
+        workDate: barc.workDate,
+        numReceived: barc.numReceived,
+        sortOrder: doc?.lines?.length + 1,
+        quantPack: barc.quantPack,
+      };
+
+      dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
 
       setScanned(false);
     },
 
-    [doc, minBarcodeLength, goodBarcodeSettings, remainsUse, goodRemains, goods, docs, dispatch, id, visibleDialog],
+    [
+      doc,
+      minBarcodeLength,
+      goodBarcodeSettings,
+      remainsUse,
+      visibleDialog,
+      goodRemains,
+      docsSubtraction,
+      docsAddition,
+      dispatch,
+      id,
+      goods,
+    ],
   );
 
   const handleSearchBarcode = () => {
@@ -554,7 +595,7 @@ export const FreeShipmentViewScreen = () => {
         updateCellsBatchingPeriod={100}
         windowSize={7}
       />
-      {lines?.length ? <ViewTotal quantity={lineSum || 0} weight={lines?.length || 0} /> : null}
+      {lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
       <AppDialog
         title="Введите штрих-код"
         visible={visibleDialog}
