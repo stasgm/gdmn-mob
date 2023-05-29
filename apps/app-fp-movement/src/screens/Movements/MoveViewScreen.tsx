@@ -298,6 +298,15 @@ export const MoveViewScreen = () => {
 
   const ref = useRef<TextInput>(null);
 
+  const handleErrorMessage = (visible: boolean, text: string) => {
+    if (visible) {
+      setErrorMessage(text);
+    } else {
+      Alert.alert('Внимание!', `${text}!`, [{ text: 'OK' }]);
+      setScanned(false);
+    }
+  };
+
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!doc) {
@@ -305,26 +314,15 @@ export const MoveViewScreen = () => {
       }
 
       if (!brc.match(/^-{0,1}\d+$/)) {
-        if (visibleDialog) {
-          setErrorMessage('Штрих-код неверного формата');
-        } else {
-          Alert.alert('Внимание!', 'Штрих-код не определен. Повторите сканирование!', [{ text: 'OK' }]);
-          setScanned(false);
-        }
+        handleErrorMessage(visibleDialog, 'Штрих-код не определён. Повторите сканирование!');
         return;
       }
 
       if (brc.length < minBarcodeLength) {
-        if (visibleDialog) {
-          setErrorMessage('Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!');
-        } else {
-          Alert.alert(
-            'Внимание!',
-            'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
-            [{ text: 'OK' }],
-          );
-          setScanned(false);
-        }
+        handleErrorMessage(
+          visibleDialog,
+          'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
+        );
         return;
       }
 
@@ -333,34 +331,19 @@ export const MoveViewScreen = () => {
       const lineGood = getLineGood(barc, goods, goodRemains, remainsUse, docsSubtraction, docsAddition);
 
       if (!lineGood.good) {
-        if (visibleDialog) {
-          setErrorMessage('Товар не найден');
-        } else {
-          Alert.alert('Внимание!', 'Товар не найден!', [{ text: 'OK' }]);
-          setScanned(false);
-        }
+        handleErrorMessage(visibleDialog, 'Товар не найден');
         return;
       }
 
       if (!lineGood.isRightWeight) {
-        if (visibleDialog) {
-          setErrorMessage('Вес товара превышает вес в остатках');
-        } else {
-          Alert.alert('Внимание!', 'Вес товара превышает вес в остатках!', [{ text: 'OK' }]);
-          setScanned(false);
-        }
+        handleErrorMessage(visibleDialog, 'Вес товара превышает вес в остатках!');
         return;
       }
 
       const line = doc.lines?.find((i) => i.barcode === barc.barcode);
 
       if (line) {
-        if (visibleDialog) {
-          setErrorMessage('Товар уже добавлен');
-        } else {
-          Alert.alert('Внимание!', 'Данный штрих-код уже добавлен!', [{ text: 'OK' }]);
-          setScanned(false);
-        }
+        handleErrorMessage(visibleDialog, 'Данный штрих-код уже добавлен');
         return;
       }
 
@@ -381,10 +364,7 @@ export const MoveViewScreen = () => {
 
       if (doc.head.toDepart.isAddressStore || doc.head.fromDepart.isAddressStore || isFromAddressed || isToAddressed) {
         if (newLine.quantPack < goodBarcodeSettings.boxNumber) {
-          Alert.alert('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}!`, [
-            { text: 'OK' },
-          ]);
-          setScanned(false);
+          handleErrorMessage(visibleDialog, `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}!`);
           return;
         }
         navigation.navigate('SelectCell', { docId: id, item: newLine, mode: 0 });

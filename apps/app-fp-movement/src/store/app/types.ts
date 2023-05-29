@@ -21,6 +21,7 @@ export type FpMovementState = {
 // Товары
 export interface IGood extends ICodeEntity {
   goodGroupId?: string;
+  isCattle?: number;
 }
 
 export interface IEmployee extends INamedEntity {

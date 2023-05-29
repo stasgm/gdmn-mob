@@ -52,7 +52,7 @@ export const FreeShipmentViewScreen = () => {
   const doc = docSelectors.selectByDocId<IFreeShipmentDocument>(id);
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
 
-  const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
+  const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)) || [], [doc?.lines]);
 
   const lineSum = lines?.reduce(
     (sum, line) => {
@@ -60,6 +60,8 @@ export const FreeShipmentViewScreen = () => {
     },
     { quantPack: 0, weight: 0 },
   );
+
+  const isCattle = useMemo(() => (lines?.length > 0 ? lines?.[0].good.isCattle : undefined), [lines]);
 
   const isBlocked = doc?.status !== 'DRAFT';
   const goods = refSelectors.selectByName<IGood>('good').data;
@@ -408,6 +410,15 @@ export const FreeShipmentViewScreen = () => {
     </ListItemLine>
   );
 
+  const handleErrorMessage = (visible: boolean, text: string) => {
+    if (visible) {
+      setErrorMessage(text);
+    } else {
+      Alert.alert('Внимание!', `${text}!`, [{ text: 'OK' }]);
+      setScanned(false);
+    }
+  };
+
   const [scanned, setScanned] = useState(false);
 
   const ref = useRef<TextInput>(null);
@@ -419,26 +430,15 @@ export const FreeShipmentViewScreen = () => {
       }
 
       if (!brc.match(/^-{0,1}\d+$/)) {
-        if (visibleDialog) {
-          setErrorMessage('Штрих-код неверного формата');
-        } else {
-          Alert.alert('Внимание!', 'Штрих-код не определен. Повторите сканирование!', [{ text: 'OK' }]);
-          setScanned(false);
-        }
+        handleErrorMessage(visibleDialog, 'Штрих-код не определён. Повторите сканирование!');
         return;
       }
 
       if (brc.length < minBarcodeLength) {
-        if (visibleDialog) {
-          setErrorMessage('Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!');
-        } else {
-          Alert.alert(
-            'Внимание!',
-            'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
-            [{ text: 'OK' }],
-          );
-          setScanned(false);
-        }
+        handleErrorMessage(
+          visibleDialog,
+          'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
+        );
         return;
       }
 
@@ -447,34 +447,31 @@ export const FreeShipmentViewScreen = () => {
       const lineGood = getLineGood(barc, goods, goodRemains, remainsUse, docsSubtraction, docsAddition);
 
       if (!lineGood.good) {
-        if (visibleDialog) {
-          setErrorMessage('Товар не найден');
-        } else {
-          Alert.alert('Внимание!', 'Товар не найден!', [{ text: 'OK' }]);
-          setScanned(false);
-        }
+        handleErrorMessage(visibleDialog, 'Товар не найден');
+        return;
+      }
+
+      const isGoodCattle = lineGood.good.isCattle;
+
+      if (isCattle === 1 && !isGoodCattle) {
+        handleErrorMessage(visibleDialog, 'Товар не относится к группе КРС');
+
+        return;
+      } else if (isCattle === 0 && isGoodCattle) {
+        handleErrorMessage(visibleDialog, 'Товар относится к группе КРС');
+
         return;
       }
 
       if (!lineGood.isRightWeight) {
-        if (visibleDialog) {
-          setErrorMessage('Вес товара превышает вес в остатках');
-        } else {
-          Alert.alert('Внимание!', 'Вес товара превышает вес в остатках!', [{ text: 'OK' }]);
-          setScanned(false);
-        }
+        handleErrorMessage(visibleDialog, 'Вес товара превышает вес в остатках');
         return;
       }
 
       const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
 
       if (line) {
-        if (visibleDialog) {
-          setErrorMessage('Товар уже добавлен');
-        } else {
-          Alert.alert('Внимание!', 'Данный штрих-код уже добавлен!', [{ text: 'OK' }]);
-          setScanned(false);
-        }
+        handleErrorMessage(visibleDialog, 'Данный штрих-код уже добавлен');
         return;
       }
 
@@ -498,14 +495,15 @@ export const FreeShipmentViewScreen = () => {
       doc,
       minBarcodeLength,
       goodBarcodeSettings,
-      remainsUse,
-      visibleDialog,
+      goods,
       goodRemains,
+      remainsUse,
       docsSubtraction,
       docsAddition,
+      isCattle,
       dispatch,
       id,
-      goods,
+      visibleDialog,
     ],
   );
 
@@ -562,6 +560,8 @@ export const FreeShipmentViewScreen = () => {
     );
   }
 
+  console.log('isCattle', isCattle);
+  // console.log('lines', jsonFormat(lines));
   return (
     <View style={styles.container}>
       <InfoBlock

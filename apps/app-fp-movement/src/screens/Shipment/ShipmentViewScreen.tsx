@@ -58,7 +58,7 @@ const ShipmentViewScreen = () => {
 
   const shipment = docSelectors.selectByDocId<IShipmentDocument>(id);
   const shipmentLines = useMemo(
-    () => shipment?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)),
+    () => shipment?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)) || [],
     [shipment?.lines],
   );
 
@@ -66,6 +66,11 @@ const ShipmentViewScreen = () => {
   const tempOrderLines = tempOrder?.lines?.filter((i) => i.weight > 0) as ITempLine[];
 
   const isBlocked = shipment?.status !== 'DRAFT';
+
+  const isCattle = useMemo(
+    () => (shipmentLines?.length > 0 ? shipmentLines?.[0].good.isCattle : undefined),
+    [shipmentLines],
+  );
 
   const shipmentLineSum = shipmentLines?.reduce(
     (sum, line) => {
@@ -428,35 +433,31 @@ const ShipmentViewScreen = () => {
 
   const ref = useRef<TextInput>(null);
 
+  const handleErrorMessage = (visible: boolean, text: string) => {
+    if (visible) {
+      setErrorMessage(text);
+    } else {
+      Alert.alert('Внимание!', `${text}!`, [{ text: 'OK' }]);
+      setScanned(false);
+    }
+  };
+
   const getScannedObject = useCallback(
     (brc: string) => {
-      if (!brc.match(/^-{0,1}\d+$/)) {
-        Alert.alert('Внимание!', 'Штрих-код не определен. Повторите сканирование!', [{ text: 'OK' }]);
-        setScanned(false);
+      if (!shipment) {
         return;
       }
 
       if (!brc.match(/^-{0,1}\d+$/)) {
-        if (visibleDialog) {
-          setErrorMessage('Штрих-код неверного формата');
-        } else {
-          Alert.alert('Внимание!', 'Штрих-код не определен. Повторите сканирование!', [{ text: 'OK' }]);
-          setScanned(false);
-        }
+        handleErrorMessage(visibleDialog, 'Штрих-код не определён. Повторите сканирование!');
         return;
       }
 
       if (brc.length < minBarcodeLength) {
-        if (visibleDialog) {
-          setErrorMessage('Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!');
-        } else {
-          Alert.alert(
-            'Внимание!',
-            'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
-            [{ text: 'OK' }],
-          );
-          setScanned(false);
-        }
+        handleErrorMessage(
+          visibleDialog,
+          'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
+        );
         return;
       }
 
@@ -464,30 +465,31 @@ const ShipmentViewScreen = () => {
       const lineGood = getLineGood(barc, goods, goodRemains, remainsUse, docsSubtraction, docsAddition);
 
       if (!lineGood.good) {
-        if (visibleDialog) {
-          setErrorMessage('Товар не найден');
-        } else {
-          Alert.alert('Внимание!', 'Товар не найден!', [{ text: 'OK' }]);
-          setScanned(false);
-        }
+        handleErrorMessage(visibleDialog, 'Товар не найден');
+        return;
+      }
+
+      const isGoodCattle = lineGood.good.isCattle;
+
+      if (isCattle === 1 && !isGoodCattle) {
+        handleErrorMessage(visibleDialog, 'Товар не относится к группе КРС');
+
+        return;
+      } else if (isCattle === 0 && isGoodCattle) {
+        handleErrorMessage(visibleDialog, 'Товар относится к группе КРС');
+
         return;
       }
 
       if (!lineGood.isRightWeight) {
-        if (visibleDialog) {
-          setErrorMessage('Вес товара превышает вес в остатках');
-        } else {
-          Alert.alert('Внимание!', 'Вес товара превышает вес в остатках!', [{ text: 'OK' }]);
-          setScanned(false);
-        }
+        handleErrorMessage(visibleDialog, 'Вес товара превышает вес в остатках!');
         return;
       }
 
       const line = shipmentLines?.find((i) => i.barcode === barc.barcode);
 
       if (line) {
-        Alert.alert('Внимание!', 'Данный штрих-код уже добавлен!', [{ text: 'OK' }]);
-        setScanned(false);
+        handleErrorMessage(visibleDialog, 'Данный штрих-код уже добавлен');
         return;
       }
 
@@ -559,19 +561,21 @@ const ShipmentViewScreen = () => {
     },
 
     [
+      shipment,
       minBarcodeLength,
       goodBarcodeSettings,
-      remainsUse,
+      goods,
       goodRemains,
+      remainsUse,
       docsSubtraction,
       docsAddition,
+      isCattle,
       shipmentLines,
       tempOrder,
       visibleDialog,
       fpDispatch,
       dispatch,
       id,
-      goods,
     ],
   );
 

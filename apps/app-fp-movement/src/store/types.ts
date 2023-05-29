@@ -169,6 +169,7 @@ export interface IFreeShipmentLine extends IEntity {
   sortOrder?: number; // порядок сортировки
   scannedBarcode?: string;
   quantPack: number; // порядковый номер сканирования в документе
+  isCattle?: number;
 }
 export type IFreeShipmentDocument = MandateProps<IDocument<IFreeShipmentHead, IFreeShipmentLine>, 'head' | 'lines'>;
 

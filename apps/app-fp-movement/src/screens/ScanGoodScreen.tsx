@@ -16,7 +16,7 @@ import { ShipmentStackParamList } from '../navigation/Root/types';
 import { IShipmentLine, IShipmentDocument, barcodeSettings } from '../store/types';
 
 import { IGood, IRemains, IRemGood } from '../store/app/types';
-import { getBarcode, getNewDate, getRemGoodListByContact, getTotalWeight } from '../utils/helpers';
+import { getBarcode, getLineGood, getRemGoodListByContact } from '../utils/helpers';
 import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../store/index';
 
 import { barCodeTypes } from '../utils/constants';
@@ -110,74 +110,44 @@ const ScanGoodScreen = () => {
 
       const barc = getBarcode(brc, goodBarcodeSettings);
 
-      if (remainsUse && shipment?.documentType.name !== 'return' && shipment?.documentType.name !== 'inventory') {
-        const good = goodRemains.find(
-          (item) =>
-            `0000${item.good.shcode}`.slice(-4) === barc.shcode &&
-            item.numReceived === barc.numReceived &&
-            new Date(getNewDate(item.workDate)).getTime() === new Date(barc.workDate).getTime(),
-        );
+      const lineGood = getLineGood(
+        barc,
+        goods,
+        goodRemains,
+        remainsUse && shipment?.documentType.name !== 'return' && shipment?.documentType.name !== 'inventory',
+        docsSubtraction,
+        docsAddition,
+      );
 
-        if (!good) {
-          setScaner({ state: 'error', message: 'Товар не найден' });
-          return;
-        }
-
-        const linesSubtractionWeight = getTotalWeight(good, docsSubtraction);
-        const linesAdditiontionWeight = getTotalWeight(good, docsAddition);
-
-        if (good.remains + linesAdditiontionWeight < linesSubtractionWeight + barc.weight) {
-          setScaner({ state: 'error', message: 'Вес товара превышает вес в остатках' });
-          return;
-        }
-
-        const line = shipmentLines?.find((i) => i.barcode === barc.barcode);
-
-        if (line) {
-          setScaner({ state: 'error', message: 'Штрих-код уже добавлен' });
-          return;
-        }
-
-        setScannedObject({
-          good: { id: good.good.id, name: good.good.name, shcode: good.good.shcode },
-          id: generateId(),
-          weight: barc.weight,
-          barcode: barc.barcode,
-          workDate: barc.workDate,
-          numReceived: barc.numReceived,
-          quantPack: barc.quantPack,
-          sortOrder: (shipmentLines?.length || 0) + 1,
-        });
-
-        setScaner({ state: 'found' });
-      } else {
-        const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
-
-        if (!good) {
-          setScaner({ state: 'error', message: 'Товар не найден' });
-          return;
-        }
-
-        const line = shipmentLines?.find((i) => i.barcode === barc.barcode);
-
-        if (line) {
-          setScaner({ state: 'error', message: 'Штрих-код уже добавлен' });
-          return;
-        }
-
-        setScannedObject({
-          good: { id: good.id, name: good.name, shcode: good.shcode, goodGroupId: good.goodGroupId },
-          id: generateId(),
-          weight: barc.weight,
-          barcode: barc.barcode,
-          workDate: barc.workDate,
-          numReceived: barc.numReceived,
-          quantPack: barc.quantPack,
-          sortOrder: (shipmentLines?.length || 0) + 1,
-        });
-
-        setScaner({ state: 'found' });
+      if (!lineGood.good) {
+        setScaner({ state: 'error', message: 'Товар не найден' });
+        return;
       }
+
+      if (!lineGood.isRightWeight) {
+        setScaner({ state: 'error', message: 'Вес товара превышает вес в остатках' });
+        return;
+      }
+
+      const line = shipmentLines?.find((i) => i.barcode === barc.barcode);
+
+      if (line) {
+        setScaner({ state: 'error', message: 'Штрих-код уже добавлен' });
+        return;
+      }
+
+      setScannedObject({
+        good: lineGood.good,
+        id: generateId(),
+        weight: barc.weight,
+        barcode: barc.barcode,
+        workDate: barc.workDate,
+        numReceived: barc.numReceived,
+        quantPack: barc.quantPack,
+        sortOrder: (shipmentLines?.length || 0) + 1,
+      });
+
+      setScaner({ state: 'found' });
     },
 
     [

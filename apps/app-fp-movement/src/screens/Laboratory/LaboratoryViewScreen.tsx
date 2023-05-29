@@ -31,7 +31,7 @@ import { barcodeSettings, ILaboratoryDocument, ILaboratoryLine, IShipmentDocumen
 import { LaboratoryStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { getBarcode, getLineGood, getNewDate, getRemGoodListByContact, getTotalWeight } from '../../utils/helpers';
+import { getBarcode, getLineGood, getRemGoodListByContact, getTotalWeight } from '../../utils/helpers';
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
@@ -135,12 +135,7 @@ export const LaboratoryViewScreen = () => {
       }
 
       if (remainsUse) {
-        const good = goodRemains.find(
-          (item) =>
-            `0000${item.good.shcode}`.slice(-4) === line.good.shcode &&
-            item.numReceived === line.numReceived &&
-            new Date(getNewDate(item.workDate)).getTime() === new Date(line.workDate).getTime(),
-        );
+        const good = goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === line.good.shcode);
 
         if (good) {
           const linesSubtractionWeight = getTotalWeight(good, docsSubtraction);
@@ -341,6 +336,15 @@ export const LaboratoryViewScreen = () => {
 
   const ref = useRef<TextInput>(null);
 
+  const handleErrorMessage = (visible: boolean, text: string) => {
+    if (visible) {
+      setErrorMessage(text);
+    } else {
+      Alert.alert('Внимание!', `${text}!`, [{ text: 'OK' }]);
+      setScanned(false);
+    }
+  };
+
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!doc) {
@@ -348,26 +352,15 @@ export const LaboratoryViewScreen = () => {
       }
 
       if (!brc.match(/^-{0,1}\d+$/)) {
-        if (visibleDialog) {
-          setErrorMessage('Штрих-код неверного формата');
-        } else {
-          Alert.alert('Внимание!', 'Штрих-код не определен. Повторите сканирование!', [{ text: 'OK' }]);
-          setScanned(false);
-        }
+        handleErrorMessage(visibleDialog, 'Штрих-код не определён. Повторите сканирование!');
         return;
       }
 
       if (brc.length < minBarcodeLength) {
-        if (visibleDialog) {
-          setErrorMessage('Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!');
-        } else {
-          Alert.alert(
-            'Внимание!',
-            'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
-            [{ text: 'OK' }],
-          );
-          setScanned(false);
-        }
+        handleErrorMessage(
+          visibleDialog,
+          'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
+        );
         return;
       }
 
@@ -376,34 +369,19 @@ export const LaboratoryViewScreen = () => {
       const lineGood = getLineGood(barc, goods, goodRemains, remainsUse, docsSubtraction, docsAddition);
 
       if (!lineGood.good) {
-        if (visibleDialog) {
-          setErrorMessage('Товар не найден');
-        } else {
-          Alert.alert('Внимание!', 'Товар не найден!', [{ text: 'OK' }]);
-          setScanned(false);
-        }
+        handleErrorMessage(visibleDialog, 'Товар не найден');
         return;
       }
 
       if (!lineGood.isRightWeight) {
-        if (visibleDialog) {
-          setErrorMessage('Вес товара превышает вес в остатках');
-        } else {
-          Alert.alert('Внимание!', 'Вес товара превышает вес в остатках!', [{ text: 'OK' }]);
-          setScanned(false);
-        }
+        handleErrorMessage(visibleDialog, 'Вес товара превышает вес в остатках!');
         return;
       }
 
       const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
 
       if (line) {
-        if (visibleDialog) {
-          setErrorMessage('Товар уже добавлен');
-        } else {
-          Alert.alert('Внимание!', 'Данный штрих-код уже добавлен!', [{ text: 'OK' }]);
-          setScanned(false);
-        }
+        handleErrorMessage(visibleDialog, 'Товар уже добавлен');
         return;
       }
 

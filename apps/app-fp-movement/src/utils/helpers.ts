@@ -81,6 +81,7 @@ export const getCellItem = (str: string) => {
   return { chamber: cellArray[0], row: cellArray[1], cell: cellArray[2] } as ICellName;
 };
 
+// Формирует модель с ячейками по подразделениям
 export const getCellList = (list: ICellRef[], lines: IMoveLine[]) => {
   console.log('getCellList');
   const model = list?.reduce((prev: IModelData, cur) => {
@@ -132,6 +133,7 @@ export const getCellList = (list: ICellRef[], lines: IMoveLine[]) => {
   return model;
 };
 
+// Формирует справочник из модели с ячейками
 export const getCellListRef = (model: IModelData) => {
   const list: ICellRef[] = Object.entries(model).reduce((prev: ICellRef[], curChamber) => {
     const chamberData = curChamber[1];
@@ -169,6 +171,7 @@ export const jsonFormat = (str: any) => {
   return JSON.stringify(str, null, '\t');
 };
 
+// Возвращает новую дату со врменем 00:00:00
 export const getNewDate = (date: string) => {
   const newDate = new Date(date);
   return new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDate()).toISOString();
@@ -178,10 +181,10 @@ export const getTotalWeight = (good: IRemGood, docs: IShipmentDocument[]) => {
   const linesWeight = docs.reduce((prev, cur) => {
     const weight = cur.lines
       .filter(
-        (i) =>
-          i.good.id === good.good?.id &&
-          i.numReceived === good.numReceived &&
-          new Date(i.workDate).getTime() === new Date(getNewDate(good.workDate)).getTime(),
+        (i) => i.good.id === good.good?.id,
+        // &&
+        // i.numReceived === good.numReceived &&
+        // new Date(i.workDate).getTime() === new Date(getNewDate(good.workDate)).getTime(),
       )
       .reduce((sum, line) => {
         sum = sum + line.weight;
@@ -195,6 +198,7 @@ export const getTotalWeight = (good: IRemGood, docs: IShipmentDocument[]) => {
   return linesWeight;
 };
 
+// Возвращает товар для добавления в позицию
 export const getLineGood = (
   barc: IBarcode,
   goods: IGood[],
@@ -205,10 +209,10 @@ export const getLineGood = (
 ) => {
   if (remainsUse) {
     const good = goodRemains.find(
-      (item) =>
-        `0000${item.good.shcode}`.slice(-4) === barc.shcode &&
-        item.numReceived === barc.numReceived &&
-        new Date(getNewDate(item.workDate)).getTime() === new Date(barc.workDate).getTime(),
+      (item) => `0000${item.good.shcode}`.slice(-4) === barc.shcode,
+      //  &&
+      // item.numReceived === barc.numReceived &&
+      // new Date(getNewDate(item.workDate)).getTime() === new Date(barc.workDate).getTime(),
     );
 
     if (good) {
@@ -222,13 +226,19 @@ export const getLineGood = (
         isRightWeight,
       );
 
-      return { good: { id: good.good.id, name: good.good.name, shcode: good.good.shcode }, isRightWeight };
+      return {
+        good: { id: good.good.id, name: good.good.name, shcode: good.good.shcode, isCattle: good.good.isCattle },
+        isRightWeight,
+      };
     } else {
       return { good: undefined, isRightWeight: false };
     }
   } else {
     const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
-    return { good: good ? { id: good.id, name: good.name, shcode: good.shcode } : undefined, isRightWeight: true };
+    return {
+      good: good ? { id: good.id, name: good.name, shcode: good.shcode, isCattle: good.isCattle } : undefined,
+      isRightWeight: true,
+    };
   }
 };
 
