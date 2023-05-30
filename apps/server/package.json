@@ -30,6 +30,7 @@
     "@lib/types": "*",
     "@types/inquirer": "^9.0.3",
     "bcrypt": "^5.1.0",
+    "dotenv": "~16.0.3",
     "koa": "^2.14.1",
     "koa-bodyparser": "^4.3",
     "koa-compose": "^4.1.0",
@@ -44,7 +45,8 @@
     "nanoid": "^3.3.4",
     "passport-local": "^1.0",
     "ramda": "^0.28.0",
-    "dotenv": "~16.0.3"
+    "rotating-file-stream": "^3.1.0",
+    "winston-daily-rotate-file": "^4.7.1"
   },
   "devDependencies": {
     "@config/eslint-config": "*",

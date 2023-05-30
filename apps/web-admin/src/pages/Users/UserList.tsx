@@ -135,6 +135,7 @@ const UserList = () => {
                 path={'/app/users/'}
                 onSetPageParams={handleSetPageParams}
                 pageParams={pageParams}
+                style={{ overflowY: 'auto', maxHeight: window.innerHeight - 268 }}
               />
             </Box>
           )}
