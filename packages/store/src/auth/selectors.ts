@@ -3,8 +3,8 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../';
 
 const isLogged = (): boolean => {
-  const auth = useSelector((state: RootState) => state.auth);
-  return auth && Boolean(auth.user);
+  const user = useSelector((state: RootState) => state.auth.user);
+  return Boolean(user);
 };
 
 const isLoggedWithCompany = (): boolean => {
