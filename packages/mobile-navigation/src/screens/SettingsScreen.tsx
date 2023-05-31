@@ -80,7 +80,7 @@ const SettingsScreen = () => {
 
   return (
     <AppScreen>
-      <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={[{ padding: 5, flexDirection: 'column' }]}>
+      <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={localStyles.scrollView}>
         <View>
           {parents.map((group, groupKey) => {
             const list = Object.values(settsData)
@@ -129,5 +129,9 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  scrollView: {
+    padding: 5,
+    flexDirection: 'column',
   },
 });
