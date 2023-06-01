@@ -67,9 +67,9 @@ const ScanGoodScreen = () => {
           i.documentType?.name !== 'inventory' &&
           i.documentType?.name !== 'return' &&
           i.status !== 'PROCESSED' &&
-          (i?.head?.depart?.id === shipment?.head.depart?.id || i?.head?.fromDepart?.id === shipment?.head.depart?.id),
+          i?.head?.fromDepart?.id === shipment?.head.fromDepart?.id,
       ) as IShipmentDocument[],
-    [docList, shipment?.head.depart?.id],
+    [docList, shipment?.head.fromDepart?.id],
   );
 
   const docsAddition = useMemo(
@@ -80,9 +80,9 @@ const ScanGoodScreen = () => {
           i.documentType?.name !== 'inventory' &&
           i.documentType?.name !== 'return' &&
           i.status !== 'PROCESSED' &&
-          i?.head?.toDepart?.id === shipment?.head.depart?.id,
+          i?.head?.toDepart?.id === shipment?.head.fromDepart?.id,
       ) as IShipmentDocument[],
-    [docList, shipment?.head.depart?.id],
+    [docList, shipment?.head.fromDepart?.id],
   );
 
   const remainsUse = Boolean(settings.remainsUse?.data);
@@ -90,8 +90,8 @@ const ScanGoodScreen = () => {
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return shipment?.head.depart?.id ? getRemGoodListByContact(goods, remains[shipment?.head.depart?.id]) : [];
-  }, [goods, remains, shipment?.head.depart?.id]);
+    return shipment?.head.fromDepart?.id ? getRemGoodListByContact(goods, remains[shipment?.head.fromDepart?.id]) : [];
+  }, [goods, remains, shipment?.head.fromDepart?.id]);
 
   const handleGetScannedObject = useCallback(
     (brc: string) => {

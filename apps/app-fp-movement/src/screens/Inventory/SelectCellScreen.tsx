@@ -53,7 +53,7 @@ export const SelectCellScreen = () => {
   const [selectedChamber, setSelectedChamber] = useState<string | undefined>('');
   const [selectedRow, setSelectedRow] = useState<string | undefined>('');
 
-  const departId = doc?.head.toDepart.id;
+  const departId = doc?.head.toDepart?.id;
 
   const docList = useSelector((state) => state.documents.list);
 
@@ -64,7 +64,7 @@ export const SelectCellScreen = () => {
           (i) =>
             i.documentType?.name === 'movement' &&
             i.status !== 'PROCESSED' &&
-            (i?.head?.fromDepart?.id === departId || i?.head?.toDepart.id === departId),
+            (i?.head?.fromDepart?.id === departId || i?.head?.toDepart?.id === departId),
         )
         .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()) as IMoveDocument[],
     [departId, docList],

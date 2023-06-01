@@ -82,21 +82,15 @@ export interface IMGoodRemain {
 export interface IRemainsData {
   goodId: string;
   q?: number;
-  workDate: string;
-  numReceived: string;
 }
 
 export interface IModelRem {
-  workDate: string;
-  numReceived: string;
   q: number;
 }
 
 export interface IRemGood {
   good: IGood;
   remains: number;
-  workDate: string;
-  numReceived: string;
 }
 
 export interface IRemains {

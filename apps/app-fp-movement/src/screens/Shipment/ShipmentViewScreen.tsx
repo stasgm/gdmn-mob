@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Alert, View, FlatList, TouchableHighlight, TextInput, ListRenderItem } from 'react-native';
+import { Alert, View, TouchableHighlight, TextInput } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -22,11 +22,13 @@ import {
   SimpleDialog,
 } from '@lib/mobile-ui';
 
-import { sleep, generateId, getDateString, round, useSendDocs } from '@lib/mobile-hooks';
+import { sleep, generateId, getDateString, round, useSendDocs, useSendOneRefRequest } from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+import { FlashList } from '@shopify/flash-list';
 
 import { barcodeSettings, IShipmentDocument, IShipmentLine, ITempLine } from '../../store/types';
 
@@ -37,7 +39,7 @@ import { getStatusColor, lineTypes, ONE_SECOND_IN_MS } from '../../utils/constan
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
 import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../../store/index';
 
-import { getBarcode, getLineGood, getNewDate, getRemGoodListByContact, getTotalWeight } from '../../utils/helpers';
+import { getBarcode, getLineGood, getRemGoodListByContact, getTotalWeight } from '../../utils/helpers';
 import ViewTotal from '../../components/ViewTotal';
 
 const keyExtractor = (item: IShipmentLine | ITempLine) => item.id;
@@ -114,9 +116,9 @@ const ShipmentViewScreen = () => {
           i.documentType?.name !== 'inventory' &&
           i.documentType?.name !== 'return' &&
           i.status !== 'PROCESSED' &&
-          (i?.head?.depart?.id === shipment?.head.depart?.id || i?.head?.fromDepart?.id === shipment?.head.depart?.id),
+          i?.head?.fromDepart?.id === shipment?.head.fromDepart?.id,
       ) as IShipmentDocument[],
-    [docList, shipment?.head.depart?.id],
+    [docList, shipment?.head.fromDepart?.id],
   );
 
   const docsAddition = useMemo(
@@ -127,9 +129,9 @@ const ShipmentViewScreen = () => {
           i.documentType?.name !== 'inventory' &&
           i.documentType?.name !== 'return' &&
           i.status !== 'PROCESSED' &&
-          i?.head?.toDepart?.id === shipment?.head.depart?.id,
+          i?.head?.toDepart?.id === shipment?.head.fromDepart?.id,
       ) as IShipmentDocument[],
-    [docList, shipment?.head.depart?.id],
+    [docList, shipment?.head.fromDepart?.id],
   );
 
   const remainsUse = Boolean(settings.remainsUse?.data);
@@ -137,8 +139,8 @@ const ShipmentViewScreen = () => {
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return shipment?.head.depart.id ? getRemGoodListByContact(goods, remains[shipment?.head.depart.id]) : [];
-  }, [goods, remains, shipment?.head.depart.id]);
+    return shipment?.head.fromDepart?.id ? getRemGoodListByContact(goods, remains[shipment?.head.fromDepart?.id]) : [];
+  }, [goods, remains, shipment?.head.fromDepart?.id]);
 
   const handleShowDialog = () => {
     setVisibleDialog(true);
@@ -160,12 +162,7 @@ const ShipmentViewScreen = () => {
       const weight = line?.weight * quantity;
 
       if (remainsUse) {
-        const good = goodRemains.find(
-          (item) =>
-            `0000${item.good.shcode}`.slice(-4) === line.good.shcode &&
-            item.numReceived === line.numReceived &&
-            new Date(getNewDate(item.workDate)).getTime() === new Date(line.workDate).getTime(),
-        );
+        const good = goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === line.good.shcode);
 
         if (good) {
           const linesSubtractionWeight = getTotalWeight(good, docsSubtraction);
@@ -368,16 +365,25 @@ const ShipmentViewScreen = () => {
     navigation.goBack();
   }, [dispatch, id, navigation, shipment]);
 
+  const [visibleSendDialog, setVisibleSendDialog] = useState(false);
+
   const sendDoc = useSendDocs(shipment ? [shipment] : []);
 
-  const [visibleSendDialog, setVisibleSendDialog] = useState(false);
+  const sendRemainsRequest = useSendOneRefRequest('Остатки', { name: 'remains' });
+
+  const handleSendRemainsRequest = useCallback(async () => {
+    setVisibleDialog(false);
+    await sendRemainsRequest();
+  }, [sendRemainsRequest]);
 
   const handleSendDocument = useCallback(async () => {
     setVisibleSendDialog(false);
     setScreenState('sending');
     await sendDoc();
+
+    handleSendRemainsRequest();
     setScreenState('sent');
-  }, [sendDoc]);
+  }, [handleSendRemainsRequest, sendDoc]);
 
   const renderRight = useCallback(
     () =>
@@ -636,38 +642,46 @@ const ShipmentViewScreen = () => {
     [colors.background, colors.primary, colors.text, lineType],
   );
 
-  const renderShipmentItem: ListRenderItem<IShipmentLine> = ({ item }) => (
-    <ListItemLine
-      key={item.id}
-      readonly={
-        shipment?.status !== 'DRAFT' || item.sortOrder !== shipmentLines?.length || Boolean(item.scannedBarcode)
-      }
-    >
-      <View style={styles.details}>
-        <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-        <View style={styles.flexDirectionRow}>
-          <MaterialCommunityIcons name="shopping-outline" size={18} />
-          <MediumText> {(item.weight || 0).toString()} кг</MediumText>
-        </View>
-        <View style={styles.flexDirectionRow}>
-          <MediumText>
-            Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
-          </MediumText>
-        </View>
-      </View>
-    </ListItemLine>
+  const renderShipmentItem = useCallback(
+    ({ item }: { item: IShipmentLine }) => {
+      return (
+        <ListItemLine
+          key={item.id}
+          readonly={
+            shipment?.status !== 'DRAFT' || item.sortOrder !== shipmentLines?.length || Boolean(item.scannedBarcode)
+          }
+          onPress={() => setVisibleQuantPackDialog(true)}
+        >
+          <View style={styles.details}>
+            <LargeText style={styles.textBold}>{item.good.name}</LargeText>
+            <View style={styles.flexDirectionRow}>
+              <MaterialCommunityIcons name="shopping-outline" size={18} />
+              <MediumText> {(item.weight || 0).toString()} кг</MediumText>
+            </View>
+            <View style={styles.flexDirectionRow}>
+              <MediumText>
+                Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
+              </MediumText>
+            </View>
+          </View>
+        </ListItemLine>
+      );
+    },
+    [shipment?.status, shipmentLines?.length],
   );
 
-  const renderTempItem: ListRenderItem<ITempLine> = ({ item }) => (
-    <ListItemLine key={item.id} readonly={true}>
-      <View style={styles.details}>
-        <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-        <View style={styles.directionRow}>
-          <MediumText>Вес: {(item.weight || 0).toString()} кг</MediumText>
+  const renderTempItem = useCallback(({ item }: { item: ITempLine }) => {
+    return (
+      <ListItemLine key={item.id} readonly={true}>
+        <View style={styles.details}>
+          <LargeText style={styles.textBold}>{item.good.name}</LargeText>
+          <View style={styles.directionRow}>
+            <MediumText>Вес: {(item.weight || 0).toString()} кг</MediumText>
+          </View>
         </View>
-      </View>
-    </ListItemLine>
-  );
+      </ListItemLine>
+    );
+  }, []);
 
   const isFocused = useIsFocused();
   if (!isFocused) {
@@ -719,25 +733,29 @@ const ShipmentViewScreen = () => {
       />
       {lineType === 'shipment' ? (
         <>
-          <FlatList
+          <FlashList
             key={lineType}
             data={shipmentLines}
-            keyExtractor={keyExtractor}
             renderItem={renderShipmentItem}
-            scrollEventThrottle={400}
+            estimatedItemSize={60}
             ItemSeparatorComponent={ItemSeparator}
+            keyExtractor={keyExtractor}
+            extraData={[shipmentLines, isBlocked]}
+            keyboardShouldPersistTaps={'handled'}
           />
           <ViewTotal quantPack={shipmentLineSum?.quantPack} weight={shipmentLineSum?.weight || 0} />
         </>
       ) : (
         <>
-          <FlatList
+          <FlashList
             key={lineType}
             data={tempOrderLines}
-            keyExtractor={keyExtractor}
             renderItem={renderTempItem}
-            scrollEventThrottle={400}
+            estimatedItemSize={60}
             ItemSeparatorComponent={ItemSeparator}
+            keyExtractor={keyExtractor}
+            extraData={[tempOrderLines, isBlocked]}
+            keyboardShouldPersistTaps={'handled'}
           />
           <ViewTotal weight={tempLineSum.weight || 0} />
         </>

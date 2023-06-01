@@ -31,7 +31,7 @@ import {
 
 import { ActivityIndicator, Caption, Text } from 'react-native-paper';
 
-import { IDocument, IReferences, IUserSettings } from '@lib/types';
+import { IDocument, IReferences, ISettingsOption, IUserSettings } from '@lib/types';
 
 import { sleep, dialCall } from '@lib/mobile-hooks';
 
@@ -184,6 +184,7 @@ const Root = () => {
   const fpLoading = useFpSelector((state) => state.fpMovement.loading);
   const isDemo = useSelector((state) => state.auth.isDemo);
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
+  const getReferences = useSelector((state) => state.settings?.data?.getReferences);
 
   const refDispatch = useRefThunkDispatch();
   const docDispatch = useDocThunkDispatch();
@@ -209,6 +210,12 @@ const Root = () => {
   useEffect(() => {
     if (appSettings && isInit) {
       dispatch(settingsActions.addSettings(appSettings));
+      dispatch(
+        settingsActions.updateOption({
+          optionName: 'getReferences',
+          value: { ...getReferences, data: false } as ISettingsOption,
+        }),
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInit]);

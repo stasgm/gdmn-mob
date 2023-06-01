@@ -60,7 +60,7 @@ export const SelectCellScreen = () => {
     () =>
       doc?.head.fromDepart && doc?.head.fromDepart?.isAddressStore && !fromCell
         ? doc?.head.fromDepart?.id
-        : doc?.head.toDepart.id,
+        : doc?.head.toDepart?.id,
     [doc?.head, fromCell],
   );
 
@@ -73,7 +73,7 @@ export const SelectCellScreen = () => {
           (i) =>
             i.documentType?.name === (docType ? docType : 'movement') &&
             i.status !== 'PROCESSED' &&
-            (i?.head?.fromDepart?.id === departId || i?.head?.toDepart.id === departId),
+            (i?.head?.fromDepart?.id === departId || i?.head?.toDepart?.id === departId),
         )
         .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()) as IMoveDocument[],
     [departId, docList, docType],
@@ -120,7 +120,7 @@ export const SelectCellScreen = () => {
     : undefined;
 
   useEffect(() => {
-    if (currentCell && !currentCell?.barcode && doc?.head.toDepart.isAddressStore) {
+    if (currentCell && !currentCell?.barcode && doc?.head.toDepart?.isAddressStore) {
       setSelectedChamber(dividedCells[0].chamber);
       setSelectedRow(dividedCells[0].row);
       setDefaultCell(defaultGoodCells.map((i) => i.name));
@@ -141,7 +141,7 @@ export const SelectCellScreen = () => {
         if (doc?.head.fromDepart?.isAddressStore) {
           if (!fromCell) {
             if (cellData.barcode === item?.barcode) {
-              if (!doc?.head.toDepart.isAddressStore) {
+              if (!doc?.head.toDepart?.isAddressStore) {
                 const newLine: IMoveLine = { ...item, fromCell: newCell };
                 handleAddLine(newLine);
               } else {
@@ -176,7 +176,7 @@ export const SelectCellScreen = () => {
     [
       dispatch,
       doc?.head.fromDepart?.isAddressStore,
-      doc?.head.toDepart.isAddressStore,
+      doc?.head.toDepart?.isAddressStore,
       docId,
       fromCell,
       handleAddLine,

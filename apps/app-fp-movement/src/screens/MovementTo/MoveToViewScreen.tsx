@@ -84,6 +84,8 @@ export const MoveToViewScreen = () => {
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
 
+  const isAddressStore = Boolean(settings.addressStore?.data);
+
   const docList = useSelector((state) => state.documents.list);
 
   const docsSubtraction = useMemo(
@@ -94,7 +96,7 @@ export const MoveToViewScreen = () => {
           i.documentType?.name !== 'inventory' &&
           i.documentType?.name !== 'return' &&
           i.status !== 'PROCESSED' &&
-          (i?.head?.depart?.id === doc?.head.fromDepart?.id || i?.head?.fromDepart?.id === doc?.head.fromDepart?.id),
+          i?.head?.fromDepart?.id === doc?.head.fromDepart?.id,
       ) as IShipmentDocument[],
     [doc?.head.fromDepart?.id, docList],
   );
@@ -117,8 +119,8 @@ export const MoveToViewScreen = () => {
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return doc?.head.fromDepart.id ? getRemGoodListByContact(goods, remains[doc?.head.fromDepart.id]) : [];
-  }, [doc?.head.fromDepart.id, goods, remains]);
+    return doc?.head.fromDepart?.id ? getRemGoodListByContact(goods, remains[doc?.head.fromDepart?.id]) : [];
+  }, [doc?.head.fromDepart?.id, goods, remains]);
 
   const handleShowDialog = () => {
     setVisibleDialog(true);
@@ -168,25 +170,36 @@ export const MoveToViewScreen = () => {
 
   const sendDoc = useSendDocs(doc ? [doc] : []);
 
-  const sendRequest = useSendOneRefRequest('Ячейки', { name: 'cell' });
+  const sendCellRequest = useSendOneRefRequest('Ячейки', { name: 'cell' });
 
-  const handleSendDebtRequest = useCallback(async () => {
+  const handleSendCellRequest = useCallback(async () => {
     setVisibleDialog(false);
-    await sendRequest();
-  }, [sendRequest]);
+    await sendCellRequest();
+  }, [sendCellRequest]);
+
+  const sendRemainsRequest = useSendOneRefRequest('Остатки', { name: 'remains' });
+
+  const handleSendRemainsRequest = useCallback(async () => {
+    setVisibleDialog(false);
+    await sendRemainsRequest();
+  }, [sendRemainsRequest]);
+
   const handleSendDocument = useCallback(async () => {
     setVisibleSendDialog(false);
     setScreenState('sending');
     await sendDoc();
-    handleSendDebtRequest();
+    if (isAddressStore) {
+      handleSendCellRequest();
+    }
+    handleSendRemainsRequest();
     setScreenState('sent');
-  }, [handleSendDebtRequest, sendDoc]);
+  }, [handleSendCellRequest, handleSendRemainsRequest, isAddressStore, sendDoc]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
         title: 'Отправить запрос на получение справочника ячеек',
-        onPress: handleSendDebtRequest,
+        onPress: handleSendCellRequest,
       },
       {
         title: 'Ввести штрих-код',
@@ -210,13 +223,11 @@ export const MoveToViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleSendDebtRequest, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
+  }, [showActionSheet, handleSendCellRequest, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
 
   const renderRight = useCallback(
     () =>
-      isBlocked ? (
-        <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
-      ) : (
+      !isBlocked && (
         <View style={styles.buttons}>
           <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
           {!isScanerReader && (
@@ -261,7 +272,7 @@ export const MoveToViewScreen = () => {
       return (
         <ListItemLine
           key={item.id}
-          readonly={!doc?.head.toDepart.isAddressStore || isBlocked}
+          readonly={!doc?.head.toDepart?.isAddressStore || isBlocked}
           onPress={() => navigation.navigate('SelectCell', { docId: id, item, mode: 1 })}
         >
           <View style={styles.details}>
@@ -275,15 +286,15 @@ export const MoveToViewScreen = () => {
                 Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
               </MediumText>
             </View>
-            {doc?.head.fromDepart.isAddressStore ? (
+            {doc?.head.fromDepart?.isAddressStore ? (
               <View style={styles.flexDirectionRow}>
                 <MediumText>Откуда: {item.fromCell || ''}</MediumText>
               </View>
             ) : null}
-            {doc?.head.toDepart.isAddressStore ? (
+            {doc?.head.toDepart?.isAddressStore ? (
               <View style={styles.flexDirectionRow}>
                 <MediumText>
-                  {doc?.head.fromDepart.isAddressStore ? 'Куда:' : 'Ячейка №'} {item.toCell || ''}
+                  {doc?.head.fromDepart?.isAddressStore ? 'Куда:' : 'Ячейка №'} {item.toCell || ''}
                 </MediumText>
               </View>
             ) : null}
@@ -359,10 +370,15 @@ export const MoveToViewScreen = () => {
         sortOrder: doc.lines?.length + 1,
       };
 
-      const isFromAddressed = departs.find((i) => i.id === doc.head.fromDepart.id && i.isAddressStore);
-      const isToAddressed = departs.find((i) => i.id === doc.head.toDepart.id && i.isAddressStore);
+      const isFromAddressed = departs.find((i) => i.id === doc.head.fromDepart?.id && i.isAddressStore);
+      const isToAddressed = departs.find((i) => i.id === doc.head.toDepart?.id && i.isAddressStore);
 
-      if (doc.head.toDepart.isAddressStore || doc.head.fromDepart.isAddressStore || isFromAddressed || isToAddressed) {
+      if (
+        doc.head.toDepart?.isAddressStore ||
+        doc.head.fromDepart?.isAddressStore ||
+        isFromAddressed ||
+        isToAddressed
+      ) {
         if (newLine.quantPack < goodBarcodeSettings.boxNumber) {
           handleErrorMessage(visibleDialog, `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}!`);
 

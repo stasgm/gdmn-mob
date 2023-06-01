@@ -5,7 +5,6 @@ import {
   IFreeShipmentDocument,
   IShipmentDocument,
   barcodeSettings,
-  ICellMovementDocument,
   ICell,
   ICellRef,
   IMoveLine,
@@ -25,12 +24,7 @@ import {
 } from '../store/app/types';
 
 export const getNextDocNumber = (
-  documents:
-    | IMoveDocument[]
-    | IShipmentDocument[]
-    | IFreeShipmentDocument[]
-    | ICellMovementDocument[]
-    | IInventoryDocument[],
+  documents: IMoveDocument[] | IShipmentDocument[] | IFreeShipmentDocument[] | IInventoryDocument[],
 ) => {
   return (
     documents
@@ -288,8 +282,6 @@ const getRemGoodListByContact = (goods: IGood[], remains: IRemainsData[] = []) =
             if (r.q !== 0) {
               remGoods.push({
                 good,
-                workDate: r.workDate,
-                numReceived: r.numReceived,
                 remains: r.q,
               });
             }
@@ -305,13 +297,13 @@ const getRemGoodListByContact = (goods: IGood[], remains: IRemainsData[] = []) =
 
 //Возвращает объект остатков тмц, пример: {"1": [{ price: 1.2, q: 1 }, { price: 1.3, q: 2 }]}
 const getRemainsByGoodId = (remains: IRemainsData[]) => {
-  return remains.reduce((p: IMGoodData<IModelRem[]>, { goodId, workDate, numReceived, q = 0 }: IRemainsData) => {
+  return remains.reduce((p: IMGoodData<IModelRem[]>, { goodId, q = 0 }: IRemainsData) => {
     const x = p[goodId];
     if (q !== 0) {
       if (!x) {
-        p[goodId] = [{ workDate, numReceived, q }];
+        p[goodId] = [{ q }];
       } else {
-        x.push({ workDate, numReceived, q });
+        x.push({ q });
       }
     }
     return p;

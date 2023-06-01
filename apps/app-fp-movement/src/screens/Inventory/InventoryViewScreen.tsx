@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, FlatList, Alert, TextInput, ListRenderItem } from 'react-native';
+import { View, Alert, TextInput } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
@@ -26,6 +26,8 @@ import { generateId, getDateString, keyExtractor, useSendDocs, sleep } from '@li
 import { ScreenState } from '@lib/types';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+import { FlashList } from '@shopify/flash-list';
 
 import { barcodeSettings, IInventoryDocument, IInventoryLine } from '../../store/types';
 import { InventoryStackParamList } from '../../navigation/Root/types';
@@ -206,28 +208,33 @@ export const InventoryViewScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  const renderItem: ListRenderItem<IInventoryLine> = ({ item }) => (
-    <ListItemLine key={item.id} readonly={true}>
-      <View style={styles.details}>
-        <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-        <View style={styles.flexDirectionRow}>
-          <MaterialCommunityIcons name="shopping-outline" size={18} />
-          <MediumText> {(item.weight || 0).toString()} кг</MediumText>
-        </View>
-        <View style={styles.flexDirectionRow}>
-          <MediumText>
-            Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
-          </MediumText>
-        </View>
-        {doc?.head.toDepart.isAddressStore ? (
-          <View style={styles.flexDirectionRow}>
-            <MediumText>
-              {'Ячейка №'} {item.toCell || ''}
-            </MediumText>
+  const renderItem = useCallback(
+    ({ item }: { item: IInventoryLine }) => {
+      return (
+        <ListItemLine key={item.id} readonly={true}>
+          <View style={styles.details}>
+            <LargeText style={styles.textBold}>{item.good.name}</LargeText>
+            <View style={styles.flexDirectionRow}>
+              <MaterialCommunityIcons name="shopping-outline" size={18} />
+              <MediumText> {(item.weight || 0).toString()} кг</MediumText>
+            </View>
+            <View style={styles.flexDirectionRow}>
+              <MediumText>
+                Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
+              </MediumText>
+            </View>
+            {doc?.head.fromDepart?.isAddressStore ? (
+              <View style={styles.flexDirectionRow}>
+                <MediumText>
+                  {'Ячейка №'} {item.toCell || ''}
+                </MediumText>
+              </View>
+            ) : null}
           </View>
-        ) : null}
-      </View>
-    </ListItemLine>
+        </ListItemLine>
+      );
+    },
+    [doc?.head.fromDepart?.isAddressStore],
   );
 
   const [scanned, setScanned] = useState(false);
@@ -289,9 +296,9 @@ export const InventoryViewScreen = () => {
         quantPack: barc.quantPack,
       };
 
-      const isToAddressed = departs.find((i) => i.id === doc.head.toDepart.id && i.isAddressStore);
+      const isToAddressed = departs.find((i) => i.id === doc.head.fromDepart?.id && i.isAddressStore);
 
-      if (doc.head.toDepart.isAddressStore || isToAddressed) {
+      if (doc.head.fromDepart?.isAddressStore || isToAddressed) {
         navigation.navigate('SelectCell', { docId: id, item: newLine, mode: 0, docType: doc.documentType.name });
       } else {
         dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
@@ -372,7 +379,7 @@ export const InventoryViewScreen = () => {
         isBlocked={isBlocked}
       >
         <View style={styles.infoBlock}>
-          <MediumText>{doc.head.toDepart.name || ''}</MediumText>
+          <MediumText>{doc.head.fromDepart?.name || ''}</MediumText>
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
         </View>
       </InfoBlock>
@@ -385,15 +392,14 @@ export const InventoryViewScreen = () => {
         showSoftInputOnFocus={false}
         onChangeText={(text) => !scanned && setScan(text)}
       />
-      <FlatList
+      <FlashList
         data={lines}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
-        initialNumToRender={10}
-        maxToRenderPerBatch={10}
-        updateCellsBatchingPeriod={100}
-        windowSize={7}
+        estimatedItemSize={60}
+        extraData={[lines, isBlocked]}
+        keyboardShouldPersistTaps={'handled'}
       />
       {lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
       <AppDialog

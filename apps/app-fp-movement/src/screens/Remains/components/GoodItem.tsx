@@ -5,8 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles, LargeText, MediumText } from '@lib/mobile-ui';
 
-import { getDateString } from '@lib/mobile-hooks';
-
 import { RemainsParamList } from '../../../navigation/Root/types';
 import { IRemGood } from '../../../store/app/types';
 
@@ -33,11 +31,6 @@ const GoodItem = ({ item }: IProps) => {
             <MaterialCommunityIcons name="shopping-outline" size={18} />
 
             <MediumText>{item.remains} кг</MediumText>
-          </View>
-          <View style={styles.flexDirectionRow}>
-            <MediumText>
-              Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
-            </MediumText>
           </View>
         </View>
       </View>

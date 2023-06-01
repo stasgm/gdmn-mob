@@ -40,7 +40,7 @@ export const FreeShipmentEditScreen = () => {
 
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {
-    depart: docDepart,
+    fromDepart: docFromDepart,
     documentDate: docDate,
     number: docNumber,
     comment: docComment,
@@ -63,7 +63,7 @@ export const FreeShipmentEditScreen = () => {
           documentDate: doc.documentDate,
           status: doc.status,
           comment: doc.head.comment,
-          depart: doc.head.depart,
+          fromDepart: doc.head.fromDepart,
         }),
       );
     } else {
@@ -73,7 +73,7 @@ export const FreeShipmentEditScreen = () => {
           number: newNumber,
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
-          depart: defaultDepart,
+          fromDepart: defaultDepart,
         }),
       );
     }
@@ -87,13 +87,13 @@ export const FreeShipmentEditScreen = () => {
         setScreenState('idle');
         return;
       }
-      if (!docDepart) {
+      if (!docFromDepart) {
         Alert.alert('Ошибка!', 'Нет подразделения пользователя. Обратитесь к администратору.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
       }
 
-      if (!(docNumber && docDepart && docDate)) {
+      if (!(docNumber && docFromDepart && docDate)) {
         Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
@@ -111,7 +111,7 @@ export const FreeShipmentEditScreen = () => {
           status: 'DRAFT',
           head: {
             comment: docComment && docComment.trim(),
-            depart: docDepart,
+            fromDepart: docFromDepart,
           },
           lines: [],
           creationDate: createdDate,
@@ -140,7 +140,7 @@ export const FreeShipmentEditScreen = () => {
           head: {
             ...doc.head,
             comment: docComment && docComment.trim(),
-            depart: docDepart,
+            fromDepart: docFromDepart,
           },
           lines: doc.lines,
           creationDate: doc.creationDate || updatedDate,
@@ -152,7 +152,19 @@ export const FreeShipmentEditScreen = () => {
       }
       setScreenState('idle');
     }
-  }, [dispatch, doc, docComment, docDate, docDepart, docNumber, docStatus, id, navigation, screenState, shipmentType]);
+  }, [
+    dispatch,
+    doc,
+    docComment,
+    docDate,
+    docFromDepart,
+    docNumber,
+    docStatus,
+    id,
+    navigation,
+    screenState,
+    shipmentType,
+  ]);
 
   const renderRight = useCallback(
     () => <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />,
@@ -197,8 +209,8 @@ export const FreeShipmentEditScreen = () => {
 
     navigation.navigate('SelectRefItem', {
       refName: 'depart',
-      fieldName: 'depart',
-      value: docDepart && [docDepart],
+      fieldName: 'fromDepart',
+      value: docFromDepart && [docFromDepart],
     });
   };
 
@@ -249,7 +261,7 @@ export const FreeShipmentEditScreen = () => {
           />
           <SelectableInput
             label={'Подразделение'}
-            value={docDepart?.name}
+            value={docFromDepart?.name}
             onPress={handleDepart}
             disabled={isBlocked}
           />

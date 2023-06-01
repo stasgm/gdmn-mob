@@ -120,7 +120,7 @@ export const CellsViewScreen = () => {
   const lines = useMemo(
     () =>
       docs
-        .filter((i) => i.head.fromDepart.id === id || i.head.toDepart.id === id)
+        .filter((i) => i.head.fromDepart?.id === id || i.head.toDepart?.id === id)
         .reduce((prev: IMoveLine[], cur) => [...prev, ...cur.lines], []),
     [docs, id],
   );

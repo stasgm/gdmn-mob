@@ -101,7 +101,7 @@ const ScanOrderScreen = () => {
       head: {
         barcode: scannedObject.head.barcode,
         contact: scannedObject.head.contact,
-        depart: depart,
+        fromDepart: depart,
         outlet: scannedObject.head.outlet,
         onDate: scannedObject.head.onDate,
         orderId: scannedObject.id,

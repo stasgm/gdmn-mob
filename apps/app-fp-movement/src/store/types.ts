@@ -23,14 +23,14 @@ export interface IShipmentFormParam extends IFormParam {
   documentDate?: string;
   status?: StatusType;
   comment?: string;
-  depart?: ICodeEntity;
+  fromDepart?: ICodeEntity;
 }
 
 export interface IFreeShipmentFormParam extends IFormParam {
   number?: string;
   documentDate?: string;
   status?: StatusType;
-  depart?: ICodeEntity;
+  fromDepart?: ICodeEntity;
   comment?: string;
 }
 
@@ -40,15 +40,7 @@ export interface IInventoryFormParam extends IFormParam {
   status?: StatusType;
   contact?: ICodeEntity;
   outlet?: ICodeEntity;
-  toDepart?: ICodeEntity;
-  comment?: string;
-}
-
-export interface ICellMovementFormParam extends IFormParam {
-  number?: string;
-  documentDate?: string;
-  status?: StatusType;
-  depart?: IAddressStoreEntity;
+  fromDepart?: ICodeEntity;
   comment?: string;
 }
 
@@ -56,7 +48,7 @@ export interface ILaboratoryFormParam extends IFormParam {
   number?: string;
   documentDate?: string;
   status?: StatusType;
-  depart?: ICodeEntity;
+  fromDepart?: ICodeEntity;
   comment?: string;
 }
 
@@ -64,7 +56,7 @@ export interface IReturnFormParam extends IFormParam {
   number?: string;
   documentDate?: string;
   status?: StatusType;
-  depart?: ICodeEntity;
+  fromDepart?: ICodeEntity;
   comment?: string;
 }
 
@@ -121,6 +113,7 @@ export type IMoveDocument = MandateProps<IDocument<IMoveHead, IMoveLine>, 'head'
 export interface IOrderHead extends IHead {
   contact: ICodeEntity; //организация-плательщик
   outlet: ICodeEntity; // магазин –подразделение организации плательщика
+  depart?: ICodeEntity; // магазин –подразделение организации плательщика
   onDate: string; //  Дата отгрузки
   barcode: string;
 }
@@ -136,7 +129,7 @@ export type IOrderDocument = MandateProps<IDocument<IOrderHead, IOrderLine>, 'he
 export interface IShipmentHead extends IHead {
   contact: ICodeEntity; //организация-плательщик
   outlet: ICodeEntity; // магазин –подразделение организации плательщика
-  depart: IAddressStoreEntity; // подразделение сотрудника (кладовщик, работающий с терминалом)
+  fromDepart: IAddressStoreEntity; // подразделение сотрудника (кладовщик, работающий с терминалом)
   onDate: string; // Дата отгрузки
   barcode: string; // штрих-код заявки, по которой создан
   // ovСode?: string; // штрих-код документа-отвеса
@@ -157,7 +150,7 @@ export interface IShipmentLine extends IEntity {
 export type IShipmentDocument = MandateProps<IDocument<IShipmentHead, IShipmentLine>, 'head' | 'lines'>;
 
 export interface IFreeShipmentHead extends IHead {
-  depart: ICodeEntity;
+  fromDepart: ICodeEntity;
   comment?: string; // Коментарий
 }
 export interface IFreeShipmentLine extends IEntity {
@@ -174,7 +167,7 @@ export interface IFreeShipmentLine extends IEntity {
 export type IFreeShipmentDocument = MandateProps<IDocument<IFreeShipmentHead, IFreeShipmentLine>, 'head' | 'lines'>;
 
 export interface IInventoryHead extends IHead {
-  toDepart: IAddressStoreEntity;
+  fromDepart: IAddressStoreEntity;
   comment?: string; // Комvентарий
 }
 
@@ -191,20 +184,9 @@ export interface IInventoryLine extends IEntity {
 }
 
 export type IInventoryDocument = MandateProps<IDocument<IInventoryHead, IInventoryLine>, 'head' | 'lines'>;
-export interface ICellMovementHead extends IHead {
-  depart: IAddressStoreEntity;
-  comment?: string; // Коментарий
-}
-export interface CellMovementLine extends IEntity {
-  barcode: string; // технологический код
-  fromCell: string;
-  toCell: string;
-}
-
-export type ICellMovementDocument = MandateProps<IDocument<ICellMovementHead, CellMovementLine>, 'head' | 'lines'>;
 
 export interface ILaboratoryHead extends IHead {
-  depart: ICodeEntity;
+  fromDepart: ICodeEntity;
   comment?: string; // Коментарий
 }
 export interface ILaboratoryLine extends IEntity {
@@ -221,7 +203,7 @@ export interface ILaboratoryLine extends IEntity {
 export type ILaboratoryDocument = MandateProps<IDocument<ILaboratoryHead, ILaboratoryLine>, 'head' | 'lines'>;
 
 export interface IReturnHead extends IHead {
-  depart: ICodeEntity;
+  fromDepart: ICodeEntity;
   comment?: string; // Коментарий
 }
 export interface IReturnLine extends IEntity {

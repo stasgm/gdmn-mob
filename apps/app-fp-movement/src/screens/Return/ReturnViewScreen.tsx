@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, FlatList, Alert, TextInput, ListRenderItem } from 'react-native';
+import { View, Alert, TextInput } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
@@ -26,6 +26,8 @@ import { generateId, getDateString, keyExtractor, useSendDocs, sleep } from '@li
 import { ScreenState } from '@lib/types';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+import { FlashList } from '@shopify/flash-list';
 
 import { barcodeSettings, IReturnDocument, IReturnLine } from '../../store/types';
 import { ReturnStackParamList } from '../../navigation/Root/types';
@@ -213,22 +215,24 @@ export const ReturnViewScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  const renderItem: ListRenderItem<IReturnLine> = ({ item }) => (
-    <ListItemLine key={item.id} readonly={true}>
-      <View style={styles.details}>
-        <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-        <View style={styles.flexDirectionRow}>
-          <MaterialCommunityIcons name="shopping-outline" size={18} />
-          <MediumText> {(item.weight || 0).toString()} кг</MediumText>
+  const renderItem = useCallback(({ item }: { item: IReturnLine }) => {
+    return (
+      <ListItemLine key={item.id} readonly={true}>
+        <View style={styles.details}>
+          <LargeText style={styles.textBold}>{item.good.name}</LargeText>
+          <View style={styles.flexDirectionRow}>
+            <MaterialCommunityIcons name="shopping-outline" size={18} />
+            <MediumText> {(item.weight || 0).toString()} кг</MediumText>
+          </View>
+          <View style={styles.flexDirectionRow}>
+            <MediumText>
+              Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
+            </MediumText>
+          </View>
         </View>
-        <View style={styles.flexDirectionRow}>
-          <MediumText>
-            Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
-          </MediumText>
-        </View>
-      </View>
-    </ListItemLine>
-  );
+      </ListItemLine>
+    );
+  }, []);
 
   const [scanned, setScanned] = useState(false);
 
@@ -366,7 +370,7 @@ export const ReturnViewScreen = () => {
         isBlocked={isBlocked}
       >
         <View style={styles.infoBlock}>
-          <MediumText>{doc.head.depart.name || ''}</MediumText>
+          <MediumText>{doc.head.fromDepart?.name || ''}</MediumText>
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
         </View>
       </InfoBlock>
@@ -379,15 +383,14 @@ export const ReturnViewScreen = () => {
         showSoftInputOnFocus={false}
         onChangeText={(text) => !scanned && setScan(text)}
       />
-      <FlatList
+      <FlashList
         data={lines}
-        keyExtractor={keyExtractor}
         renderItem={renderItem}
+        estimatedItemSize={60}
         ItemSeparatorComponent={ItemSeparator}
-        initialNumToRender={10}
-        maxToRenderPerBatch={10}
-        updateCellsBatchingPeriod={100}
-        windowSize={7}
+        keyExtractor={keyExtractor}
+        extraData={[lines, isBlocked]}
+        keyboardShouldPersistTaps={'handled'}
       />
       {lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
       <AppDialog

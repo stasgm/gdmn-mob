@@ -6,8 +6,6 @@ import { styles } from '@lib/mobile-navigation';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { AppActivityIndicator, AppScreen, ItemSeparator, navBackButton, SubTitle } from '@lib/mobile-ui';
 
-import { getDateString } from '@lib/mobile-hooks';
-
 import { RemainsStackParamList } from '../../navigation/Root/types';
 import { IRemGood } from '../../store/app/types';
 
@@ -32,20 +30,6 @@ const LineItem = React.memo(({ item }: { item: IRemGood }) => {
             <View style={styles.details}>
               <Text style={styles.name}>Остаток</Text>
               <Text style={textStyle}>{`${item?.remains} кг`}</Text>
-            </View>
-          </View>
-          <ItemSeparator />
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Партия</Text>
-              <Text style={textStyle}>{item?.numReceived} </Text>
-            </View>
-          </View>
-          <ItemSeparator />
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Дата производства</Text>
-              <Text style={textStyle}>{getDateString(item?.workDate)}</Text>
             </View>
           </View>
         </View>

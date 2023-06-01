@@ -183,7 +183,7 @@ const GoodListScreen = () => {
       )}
       <FlashList
         data={filteredList.goodRemains}
-        estimatedItemSize={60}
+        estimatedItemSize={100}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
         keyboardShouldPersistTaps="handled"

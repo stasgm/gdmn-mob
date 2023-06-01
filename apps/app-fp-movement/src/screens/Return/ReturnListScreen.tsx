@@ -61,7 +61,7 @@ export const ReturnListScreen = () => {
       (i) =>
         ({
           id: i.id,
-          title: i.head.depart.name || '',
+          title: i.head.fromDepart?.name || '',
           documentDate: getDateString(i.documentDate),
           status: i.status,
           subtitle: `№ ${i.number} на ${getDateString(i.documentDate)}` || '',
