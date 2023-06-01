@@ -79,6 +79,8 @@ class Api extends BaseApi {
     this._axios.defaults.params = {};
     this._axios.defaults.withCredentials = true;
 
+    const isDebug = process.env.NODE_ENV === 'development';
+
     if (!this._config) {
       throw new Error('Config is not valid');
     }
@@ -89,11 +91,15 @@ class Api extends BaseApi {
           // Добавляем device_ID
           request.params.deviceId = this._config.deviceId;
         }
-        console.info('✉️ request', request.baseURL, request.url, request.params);
+        if (isDebug) {
+          console.info('✉️ request', request.baseURL, request.url, request.params);
+        }
         return request;
       },
       (error) => {
-        console.info('✉️ request error', error);
+        if (isDebug) {
+          console.info('✉️ request error', error);
+        }
 
         return {
           type: 'ERROR',
@@ -104,11 +110,15 @@ class Api extends BaseApi {
 
     this._axios.interceptors.response.use(
       (response) => {
-        console.info('✉️ response', response.status);
+        if (isDebug) {
+          console.info('✉️ response', response.status);
+        }
         return response;
       },
       (error) => {
-        console.info('✉️ response error', error);
+        if (isDebug) {
+          console.info('✉️ response error', error);
+        }
         throw error;
       },
     );
