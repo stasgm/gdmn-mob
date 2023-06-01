@@ -14,9 +14,9 @@ import {
 } from '@lib/mobile-ui';
 import { IconButton } from 'react-native-paper';
 
+import { GDMN_SECURITY_POLICY } from '../constants';
+
 import localStyles from './styles';
-// import api from '@lib/client-api';
-// import { user as mockUser } from '@lib/mock';
 
 /*
   Порядок работы:
@@ -78,9 +78,7 @@ const SignInScreen = (props: Props) => {
             <MediumText>
               {'Продолжая, Вы подтверждаете, что согласны с '}
               <MediumText
-                onPress={() =>
-                  Linking.openURL('https://gsbelarus.com/gs/wiki/index.php/GedeminWiki:Политика_конфиденциальности')
-                }
+                onPress={() => Linking.openURL(GDMN_SECURITY_POLICY)}
                 selectable={true}
                 style={styles.textDecorationLine}
               >

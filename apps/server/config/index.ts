@@ -34,4 +34,6 @@ export default {
   DEVICE_LOG_MAX_LINES: getNumber(process.env.DEVICE_LOG_MAX_LINES, 1000),
   /** Период проверки файлов, в днях */
   FILES_CHECK_PERIOD_IN_DAYS: getNumber(process.env.FILES_CHECK_PERIOD_IN_DAYS, 7),
+  /** Максимальный объем файла при обработки сообщений, в мегабайтах */
+  MAX_DATA_VOLUME: getNumber(process.env.MAX_DATA_VOLUME, 100),
 };

@@ -13,6 +13,7 @@ import Processes from './pages/Processes';
 import AppSystems from './pages/AppSystems';
 import DeviceLogs from './pages/DeviceLogs';
 import Files from './pages/Files';
+import ServerLogs from './pages/ServerLogs';
 import Register from './pages/Register';
 import Login from './pages/Login';
 
@@ -31,6 +32,7 @@ const routes = (isLoggedIn: boolean): RouteObject[] => [
       { path: 'appSystems/*', element: <AppSystems /> },
       { path: 'deviceLogs/*', element: <DeviceLogs /> },
       { path: 'files/*', element: <Files /> },
+      { path: 'serverLogs/*', element: <ServerLogs /> },
       { path: '', element: <Dashboard /> },
       { path: '*', element: <Navigate to={`${adminPath}/404`} /> },
     ],

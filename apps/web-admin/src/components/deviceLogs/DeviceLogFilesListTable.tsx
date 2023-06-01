@@ -63,6 +63,7 @@ const DeviceLogFilesListTable = ({
       device: '',
       uid: '',
       date: '',
+      mDate: '',
     };
   }, []);
 
@@ -166,6 +167,7 @@ const DeviceLogFilesListTable = ({
             <TableCell>{deviceLogFile.device.name}</TableCell>
             <TableCell>{deviceLogFile.device.id}</TableCell>
             <TableCell>{new Date(deviceLogFile.date || '').toLocaleString('ru', { hour12: false })}</TableCell>
+            <TableCell>{new Date(deviceLogFile.mdate || '').toLocaleString('ru', { hour12: false })}</TableCell>
             <TableCell>{Math.ceil(deviceLogFile.size).toString()} кб</TableCell>
           </TableRow>
         );
@@ -207,7 +209,8 @@ const DeviceLogFilesListTable = ({
                 <TableCell>Пользователь</TableCell>
                 <TableCell>Устройство</TableCell>
                 <TableCell>Идентификатор</TableCell>
-                <TableCell>Дата</TableCell>
+                <TableCell>Дата создания</TableCell>
+                <TableCell>Дата редактирования</TableCell>
                 <TableCell>Размер</TableCell>
               </TableRow>
               {isFilterVisible ? (
