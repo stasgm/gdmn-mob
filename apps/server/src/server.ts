@@ -104,7 +104,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
       helmet.contentSecurityPolicy({
         directives: {
           defaultSrc: ['*'],
-          styleSrc: ["'self'", 'https://fonts.googleapis.com'],
+          styleSrc: ["'unsafe-inline'", 'https://fonts.googleapis.com'],
           imgSrc: ['*', 'data:'],
         },
       }),
