@@ -49,7 +49,7 @@ const ShipmentEditScreen = () => {
   const {
     documentDate: docDocumentDate,
     status: docStatus,
-    depart: docDepart,
+    fromDepart: docFromDepart,
   } = useSelector((state) => state.app.formParams as IShipmentFormParam);
 
   useEffect(() => {
@@ -66,7 +66,7 @@ const ShipmentEditScreen = () => {
         appActions.setFormParams({
           documentDate: shipment.documentDate,
           status: shipment.status,
-          depart: shipment.head?.depart,
+          fromDepart: shipment.head?.fromDepart,
         }),
       );
     } else {
@@ -87,7 +87,7 @@ const ShipmentEditScreen = () => {
         return;
       }
 
-      if (!docDocumentDate || !docDepart) {
+      if (!docDocumentDate || !docFromDepart) {
         Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
@@ -106,7 +106,7 @@ const ShipmentEditScreen = () => {
           id,
           status: docStatus || 'DRAFT',
           documentDate: docDocumentDate,
-          head: { ...shipment.head, depart: docDepart },
+          head: { ...shipment.head, fromDepart: docFromDepart },
           creationDate: shipment.creationDate || updatedShipmentDate,
           editionDate: updatedShipmentDate,
         };
@@ -116,7 +116,7 @@ const ShipmentEditScreen = () => {
       }
       setScreenState('idle');
     }
-  }, [shipmentType, docDocumentDate, id, shipment, docStatus, dispatch, navigation, screenState, docDepart]);
+  }, [shipmentType, docDocumentDate, id, shipment, docStatus, dispatch, navigation, screenState, docFromDepart]);
 
   const renderRight = useCallback(
     () => (
@@ -157,8 +157,8 @@ const ShipmentEditScreen = () => {
 
     navigation.navigate('SelectRefItem', {
       refName: 'depart',
-      fieldName: 'depart',
-      value: docDepart && [docDepart],
+      fieldName: 'fromDepart',
+      value: docFromDepart && [docFromDepart],
       descrFieldName: 'shcode',
     });
   };
@@ -189,7 +189,7 @@ const ShipmentEditScreen = () => {
         <Input label="Дата отгрузки" value={getDateString(onDate || '')} disabled={true} />
         <Input label="Организация" value={contact?.name} disabled={true} />
         <Input label="Магазин" value={outlet?.name} disabled={true} />
-        <SelectableInput label="Склад" value={docDepart?.name} disabled={true} onPress={handleDepart} />
+        <SelectableInput label="Склад" value={docFromDepart?.name} disabled={true} onPress={handleDepart} />
       </ScrollView>
     </AppInputScreen>
   );

@@ -25,7 +25,9 @@ import { FlashList } from '@shopify/flash-list';
 import { RemainsStackParamList } from '../../navigation/Root/types';
 
 import { IEmployee, IGood, IRemains, IRemGood } from '../../store/app/types';
-import { getRemGoodListByContact } from '../../utils/helpers';
+import { getRemGoodListByContact, getTotalLines } from '../../utils/helpers';
+
+import { IShipmentDocument, IShipmentLine } from '../../store/types';
 
 import GoodItem from './components/GoodItem';
 
@@ -45,12 +47,48 @@ const GoodListScreen = () => {
     | IEmployee[];
   const contact = contacts?.find((i) => i.id === id);
 
+  const docList = useSelector((state) => state.documents.list);
+
+  const docsSubtraction = useMemo(
+    () =>
+      (
+        docList?.filter(
+          (i) =>
+            i.documentType?.name !== 'order' &&
+            i.documentType?.name !== 'inventory' &&
+            i.documentType?.name !== 'return' &&
+            i.status !== 'PROCESSED' &&
+            i?.head?.fromDepart?.id === id,
+        ) as IShipmentDocument[]
+      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
+    [docList, id],
+  );
+
+  const linesSubtraction = getTotalLines(docsSubtraction);
+
+  const docsAddition = useMemo(
+    () =>
+      (
+        docList?.filter(
+          (i) =>
+            i.documentType?.name !== 'order' &&
+            i.documentType?.name !== 'inventory' &&
+            i.documentType?.name !== 'return' &&
+            i.status !== 'PROCESSED' &&
+            i?.head?.toDepart?.id === id,
+        ) as IShipmentDocument[]
+      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
+    [docList, id],
+  );
+
+  const linesAddition = getTotalLines(docsAddition);
+
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goods = refSelectors.selectByName<IGood>('good')?.data;
 
   const [goodRemains] = useState<IRemGood[]>(() =>
-    contact?.id ? getRemGoodListByContact(goods, remains[contact.id]) : [],
+    contact?.id ? getRemGoodListByContact(goods, remains[contact.id], linesAddition, linesSubtraction) : [],
   );
 
   const [searchQuery, setSearchQuery] = useState('');

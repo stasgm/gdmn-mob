@@ -28,11 +28,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { FlashList } from '@shopify/flash-list';
 
-import { barcodeSettings, IMoveDocument, IMoveLine, IShipmentDocument } from '../../store/types';
+import { barcodeSettings, IMoveDocument, IMoveLine, IShipmentDocument, IShipmentLine } from '../../store/types';
 import { MoveFromStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { getBarcode, getLineGood, getRemGoodListByContact } from '../../utils/helpers';
+import { getBarcode, getLineGood, getRemGoodListByContact, getTotalLines } from '../../utils/helpers';
 import { IAddressStoreEntity, IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
@@ -90,37 +90,46 @@ export const MoveFromViewScreen = () => {
 
   const docsSubtraction = useMemo(
     () =>
-      docList?.filter(
-        (i) =>
-          i.documentType?.name !== 'order' &&
-          i.documentType?.name !== 'inventory' &&
-          i.documentType?.name !== 'return' &&
-          i.status !== 'PROCESSED' &&
-          i?.head?.fromDepart?.id === doc?.head.fromDepart?.id,
-      ) as IShipmentDocument[],
+      (
+        docList?.filter(
+          (i) =>
+            i.documentType?.name !== 'order' &&
+            i.documentType?.name !== 'inventory' &&
+            i.documentType?.name !== 'return' &&
+            i.status !== 'PROCESSED' &&
+            i?.head?.fromDepart?.id === doc?.head.fromDepart?.id,
+        ) as IShipmentDocument[]
+      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
     [doc?.head.fromDepart?.id, docList],
   );
 
   const docsAddition = useMemo(
     () =>
-      docList?.filter(
-        (i) =>
-          i.documentType?.name !== 'order' &&
-          i.documentType?.name !== 'inventory' &&
-          i.documentType?.name !== 'return' &&
-          i.status !== 'PROCESSED' &&
-          i?.head?.toDepart?.id === doc?.head.fromDepart?.id,
-      ) as IShipmentDocument[],
+      (
+        docList?.filter(
+          (i) =>
+            i.documentType?.name !== 'order' &&
+            i.documentType?.name !== 'inventory' &&
+            i.documentType?.name !== 'return' &&
+            i.status !== 'PROCESSED' &&
+            i?.head?.toDepart?.id === doc?.head.fromDepart?.id,
+        ) as IShipmentDocument[]
+      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
     [doc?.head.fromDepart?.id, docList],
   );
+
+  const linesSubtraction = getTotalLines(docsSubtraction);
+  const linesAddition = getTotalLines(docsAddition);
 
   const remainsUse = Boolean(settings.remainsUse?.data);
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return doc?.head.fromDepart?.id ? getRemGoodListByContact(goods, remains[doc?.head.fromDepart?.id]) : [];
-  }, [doc?.head.fromDepart?.id, goods, remains]);
+    return doc?.head.fromDepart?.id
+      ? getRemGoodListByContact(goods, remains[doc?.head.fromDepart?.id], linesAddition, linesSubtraction)
+      : [];
+  }, [doc?.head.fromDepart?.id, goods, linesAddition, linesSubtraction, remains]);
 
   const handleShowDialog = () => {
     setVisibleDialog(true);
@@ -339,7 +348,7 @@ export const MoveFromViewScreen = () => {
 
       const barc = getBarcode(brc, goodBarcodeSettings);
 
-      const lineGood = getLineGood(barc, goods, goodRemains, remainsUse, docsSubtraction, docsAddition);
+      const lineGood = getLineGood(barc.shcode, barc.weight, goods, goodRemains, remainsUse);
 
       if (!lineGood.good) {
         handleErrorMessage(visibleDialog, 'Товар не найден!');
@@ -422,8 +431,6 @@ export const MoveFromViewScreen = () => {
       remainsUse,
       visibleDialog,
       goodRemains,
-      docsSubtraction,
-      docsAddition,
       departs,
       navigation,
       id,

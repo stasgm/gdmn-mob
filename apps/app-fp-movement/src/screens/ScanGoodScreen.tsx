@@ -15,8 +15,8 @@ import { IScannedObject } from '@lib/client-types';
 import { ShipmentStackParamList } from '../navigation/Root/types';
 import { IShipmentLine, IShipmentDocument, barcodeSettings } from '../store/types';
 
-import { IGood, IRemains, IRemGood } from '../store/app/types';
-import { getBarcode, getLineGood, getRemGoodListByContact } from '../utils/helpers';
+import { IAddressStoreEntity, IGood, IRemains, IRemGood } from '../store/app/types';
+import { getBarcode, getLineGood, getRemGoodListByContact, getTotalLines } from '../utils/helpers';
 import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../store/index';
 
 import { barCodeTypes } from '../utils/constants';
@@ -57,41 +57,52 @@ const ScanGoodScreen = () => {
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
 
+  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
+
   const docList = useSelector((state) => state.documents.list);
 
   const docsSubtraction = useMemo(
     () =>
-      docList?.filter(
-        (i) =>
-          i.documentType?.name !== 'order' &&
-          i.documentType?.name !== 'inventory' &&
-          i.documentType?.name !== 'return' &&
-          i.status !== 'PROCESSED' &&
-          i?.head?.fromDepart?.id === shipment?.head.fromDepart?.id,
-      ) as IShipmentDocument[],
-    [docList, shipment?.head.fromDepart?.id],
+      (
+        docList?.filter(
+          (i) =>
+            i.documentType?.name !== 'order' &&
+            i.documentType?.name !== 'inventory' &&
+            i.documentType?.name !== 'return' &&
+            i.status !== 'PROCESSED' &&
+            i?.head?.fromDepart?.id === shipment?.head.fromDepart?.id,
+        ) as IShipmentDocument[]
+      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
+    [shipment?.head.fromDepart?.id, docList],
   );
 
   const docsAddition = useMemo(
     () =>
-      docList?.filter(
-        (i) =>
-          i.documentType?.name !== 'order' &&
-          i.documentType?.name !== 'inventory' &&
-          i.documentType?.name !== 'return' &&
-          i.status !== 'PROCESSED' &&
-          i?.head?.toDepart?.id === shipment?.head.fromDepart?.id,
-      ) as IShipmentDocument[],
-    [docList, shipment?.head.fromDepart?.id],
+      (
+        docList?.filter(
+          (i) =>
+            i.documentType?.name !== 'order' &&
+            i.documentType?.name !== 'inventory' &&
+            i.documentType?.name !== 'return' &&
+            i.status !== 'PROCESSED' &&
+            i?.head?.toDepart?.id === shipment?.head.fromDepart?.id,
+        ) as IShipmentDocument[]
+      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
+    [shipment?.head.fromDepart?.id, docList],
   );
+
+  const linesSubtraction = getTotalLines(docsSubtraction);
+  const linesAddition = getTotalLines(docsAddition);
 
   const remainsUse = Boolean(settings.remainsUse?.data);
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return shipment?.head.fromDepart?.id ? getRemGoodListByContact(goods, remains[shipment?.head.fromDepart?.id]) : [];
-  }, [goods, remains, shipment?.head.fromDepart?.id]);
+    return shipment?.head.fromDepart?.id
+      ? getRemGoodListByContact(goods, remains[shipment?.head.fromDepart?.id], linesAddition, linesSubtraction)
+      : [];
+  }, [goods, linesAddition, linesSubtraction, remains, shipment?.head.fromDepart?.id]);
 
   const handleGetScannedObject = useCallback(
     (brc: string) => {
@@ -110,13 +121,48 @@ const ScanGoodScreen = () => {
 
       const barc = getBarcode(brc, goodBarcodeSettings);
 
+      // let lineGood: IGood;
+
+      // if (remainsUse && shipment?.documentType.name !== 'return' && shipment?.documentType.name !== 'inventory') {
+      //   const good = goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === barc.shcode);
+
+      //   if (!good) {
+      //     setScaner({ state: 'error', message: 'Товар не найден' });
+      //     return;
+      //   }
+      //   const isRightWeight = good.remains >= barc.weight;
+
+      //   if (!isRightWeight) {
+      //     setScaner({ state: 'error', message: 'Вес товара превышает вес в остатках' });
+      //     return;
+      //   }
+      //   lineGood = {
+      //     id: good.good.id,
+      //     name: good.good.name,
+      //     shcode: good.good.shcode,
+      //     isCattle: good.good.isCattle,
+      //   };
+      // } else {
+      //   const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
+      //   if (!good) {
+      //     setScaner({ state: 'error', message: 'Товар не найден' });
+      //     return;
+      //   }
+
+      //   lineGood = {
+      //     id: good.id,
+      //     name: good.name,
+      //     shcode: good.shcode,
+      //     isCattle: good.isCattle,
+      //   };
+      // }
+
       const lineGood = getLineGood(
-        barc,
+        barc.shcode,
+        barc.weight,
         goods,
         goodRemains,
         remainsUse && shipment?.documentType.name !== 'return' && shipment?.documentType.name !== 'inventory',
-        docsSubtraction,
-        docsAddition,
       );
 
       if (!lineGood.good) {
@@ -150,17 +196,7 @@ const ScanGoodScreen = () => {
       setScaner({ state: 'found' });
     },
 
-    [
-      docsAddition,
-      docsSubtraction,
-      goodBarcodeSettings,
-      goodRemains,
-      goods,
-      minBarcodeLength,
-      remainsUse,
-      shipment?.documentType.name,
-      shipmentLines,
-    ],
+    [goodBarcodeSettings, goodRemains, goods, minBarcodeLength, remainsUse, shipment?.documentType.name, shipmentLines],
   );
 
   const handleSaveScannedItem = useCallback(() => {
@@ -224,11 +260,13 @@ const ScanGoodScreen = () => {
         },
       ]);
     } else {
+      const isFromAddressed = departs.find((i) => i.id === shipment?.head.fromDepart?.id && i.isAddressStore);
+      const isToAddressed = departs.find((i) => i.id === shipment?.head.toDepart?.id && i.isAddressStore);
       if (
-        (shipment?.head.subtype &&
-          shipment?.head.subtype?.id === 'prihod' &&
-          shipment?.head.toDepart?.isAddressStore) ||
-        (shipment?.head.subtype && shipment?.head.subtype?.id !== 'prihod' && shipment?.head.fromDepart?.isAddressStore)
+        shipment?.head.toDepart?.isAddressStore ||
+        shipment?.head.fromDepart?.isAddressStore ||
+        isFromAddressed ||
+        isToAddressed
       ) {
         if (scannedObject.quantPack < goodBarcodeSettings.boxNumber) {
           Alert.alert('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}!`, [
@@ -247,10 +285,14 @@ const ScanGoodScreen = () => {
     scannedObject,
     tempOrder,
     shipment?.documentType.name,
-    shipment?.head,
+    shipment?.head.toDepart?.isAddressStore,
+    shipment?.head.toDepart?.id,
+    shipment?.head.fromDepart?.isAddressStore,
+    shipment?.head.fromDepart?.id,
     fpDispatch,
     dispatch,
     docId,
+    departs,
     goodBarcodeSettings.boxNumber,
     navigation,
   ]);

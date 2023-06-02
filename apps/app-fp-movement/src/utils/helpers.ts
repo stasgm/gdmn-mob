@@ -10,13 +10,14 @@ import {
   IMoveLine,
   ICellName,
   IInventoryDocument,
+  IShipmentLine,
 } from '../store/types';
 import {
   IBarcode,
   ICellData,
   IGood,
   IMGoodData,
-  IMGoodRemain,
+  // IMGoodRemain,
   IModelData,
   IModelRem,
   IRemGood,
@@ -171,15 +172,11 @@ export const getNewDate = (date: string) => {
   return new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDate()).toISOString();
 };
 
+//Возвращает суммарный вес товара в позициях документов
 export const getTotalWeight = (good: IRemGood, docs: IShipmentDocument[]) => {
   const linesWeight = docs.reduce((prev, cur) => {
     const weight = cur.lines
-      .filter(
-        (i) => i.good.id === good.good?.id,
-        // &&
-        // i.numReceived === good.numReceived &&
-        // new Date(i.workDate).getTime() === new Date(getNewDate(good.workDate)).getTime(),
-      )
+      .filter((i) => i.good.id === good.good?.id)
       .reduce((sum, line) => {
         sum = sum + line.weight;
         return sum;
@@ -194,31 +191,17 @@ export const getTotalWeight = (good: IRemGood, docs: IShipmentDocument[]) => {
 
 // Возвращает товар для добавления в позицию
 export const getLineGood = (
-  barc: IBarcode,
+  shcode: string,
+  weight: number,
   goods: IGood[],
   goodRemains: IRemGood[],
   remainsUse: boolean,
-  docsSubtraction: IShipmentDocument[],
-  docsAddition: IShipmentDocument[],
 ) => {
   if (remainsUse) {
-    const good = goodRemains.find(
-      (item) => `0000${item.good.shcode}`.slice(-4) === barc.shcode,
-      //  &&
-      // item.numReceived === barc.numReceived &&
-      // new Date(getNewDate(item.workDate)).getTime() === new Date(barc.workDate).getTime(),
-    );
+    const good = goodRemains.find((item) => item.good && `0000${item.good.shcode}`.slice(-4) === shcode);
 
     if (good) {
-      const linesSubtractionWeight = getTotalWeight(good, docsSubtraction);
-      const linesAdditiontionWeight = getTotalWeight(good, docsAddition);
-
-      const isRightWeight = good.remains + linesAdditiontionWeight >= linesSubtractionWeight + barc.weight;
-
-      console.log(
-        `${good.remains} + ${linesAdditiontionWeight} >= ${linesSubtractionWeight} + ${barc.weight}`,
-        isRightWeight,
-      );
+      const isRightWeight = good.remains >= weight;
 
       return {
         good: { id: good.good.id, name: good.good.name, shcode: good.good.shcode, isCattle: good.good.isCattle },
@@ -228,7 +211,7 @@ export const getLineGood = (
       return { good: undefined, isRightWeight: false };
     }
   } else {
-    const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
+    const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === shcode);
     return {
       good: good ? { id: good.id, name: good.name, shcode: good.shcode, isCattle: good.isCattle } : undefined,
       isRightWeight: true,
@@ -236,33 +219,66 @@ export const getLineGood = (
   }
 };
 
-const getRemGoodByContact = (goods: IGood[], remains: IRemainsData[] = []) => {
-  log('getRemGoodByContact', 'Начало построения модели товаров по подразделению в разрезе штрихкодов');
-  const remGoods: IMGoodData<IMGoodRemain> = {};
+// const getRemGoodByContact = (goods: IGood[], remains: IRemainsData[] = []) => {
+//   log('getRemGoodByContact', 'Начало построения модели товаров по подразделению в разрезе штрихкодов');
+//   const remGoods: IMGoodData<IMGoodRemain> = {};
 
-  if (goods.length) {
-    if (remains.length) {
-      //Формируем объект остатков тмц
-      const remainsByGoodId = getRemainsByGoodId(remains);
+//   if (goods.length) {
+//     if (remains.length) {
+//       //Формируем объект остатков тмц
+//       const remainsByGoodId = getRemainsByGoodId(remains);
 
-      //Заполняем объект товаров по штрихкоду, если есть шк и (выбор не из остатков или есть остатки по товару)
-      for (const good of goods) {
-        const shcode = good.shcode;
-        if (shcode && remainsByGoodId[good.id]) {
-          remGoods[shcode] = {
-            good,
-            remains: remainsByGoodId ? remainsByGoodId[good.id] : [],
-          };
-        }
-      }
+//       //Заполняем объект товаров по штрихкоду, если есть шк и (выбор не из остатков или есть остатки по товару)
+//       for (const good of goods) {
+//         const shcode = good.shcode;
+//         if (shcode && remainsByGoodId[good.id]) {
+//           remGoods[shcode] = {
+//             good,
+//             remains: remainsByGoodId ? remainsByGoodId[good.id] : [],
+//           };
+//         }
+//       }
+//     }
+//   }
+
+//   log('getRemGoodByContact', 'Окончание построения модели товаров по подразделению в разрезе штрихкодов');
+//   return remGoods;
+// };
+
+// export const getTotalWeight1 = (good: IModelRem, docs: IShipmentDocument[]) => {
+//   const linesWeight = docs.reduce((prev, cur) => {
+//     const weight = cur.lines
+//       .filter((i) => i.good.id === good)
+//       .reduce((sum, line) => {
+//         sum = sum + line.weight;
+//         return sum;
+//       }, 0);
+
+//     prev = prev + weight;
+//     return prev;
+//   }, 0);
+
+//   return linesWeight;
+// };
+
+export const getTotalLines = (docsSubtraction: IShipmentLine[]) =>
+  docsSubtraction.reduce((prev: IRemainsData[], cur) => {
+    const index = prev.findIndex((i) => i.goodId === cur.good.id);
+    if (index > -1) {
+      prev[index] = { ...prev[index], q: prev[index].q + cur.weight };
+    } else {
+      prev = [...prev, { goodId: cur.good.id, q: cur.weight }];
     }
-  }
+    return prev;
+  }, []);
 
-  log('getRemGoodByContact', 'Окончание построения модели товаров по подразделению в разрезе штрихкодов');
-  return remGoods;
-};
-
-const getRemGoodListByContact = (goods: IGood[], remains: IRemainsData[] = []) => {
+export const getRemGoodListByContact = (
+  goods: IGood[],
+  remains: IRemainsData[] = [],
+  linesAddition: IRemainsData[] = [],
+  linesSubtraction: IRemainsData[],
+  // docsAddition: IShipmentDocument[]
+) => {
   log('getRemGoodListByContact', 'Начало построения массива товаров по подразделению');
 
   const remGoods: IRemGood[] = [];
@@ -270,7 +286,7 @@ const getRemGoodListByContact = (goods: IGood[], remains: IRemainsData[] = []) =
     //Если есть остатки, то формируем модель остатков по ид товара
     if (remains.length) {
       //Формируем объект остатков тмц
-      const remainsByGoodId = getRemainsByGoodId(remains);
+      const remainsByGoodId = getRemainsByGoodId(remains, linesAddition, linesSubtraction);
 
       //Формируем массив товаров, добавив свойство цены и остатка
       //Если по товару нет остатков и если модель не для выбора из справочника тмц, (не из остатков)
@@ -296,18 +312,26 @@ const getRemGoodListByContact = (goods: IGood[], remains: IRemainsData[] = []) =
 };
 
 //Возвращает объект остатков тмц, пример: {"1": [{ price: 1.2, q: 1 }, { price: 1.3, q: 2 }]}
-const getRemainsByGoodId = (remains: IRemainsData[]) => {
+const getRemainsByGoodId = (
+  remains: IRemainsData[],
+  linesAddition: IRemainsData[] = [],
+  linesSubtraction: IRemainsData[] = [],
+) => {
   return remains.reduce((p: IMGoodData<IModelRem[]>, { goodId, q = 0 }: IRemainsData) => {
     const x = p[goodId];
-    if (q !== 0) {
+    const qAdd = linesAddition?.find((i) => i.goodId === goodId)?.q || 0;
+    const qSubstr = linesSubtraction?.find((i) => i.goodId === goodId)?.q || 0;
+
+    const newQ = q + qAdd - qSubstr;
+    if (newQ !== 0) {
       if (!x) {
-        p[goodId] = [{ q }];
+        p[goodId] = [{ q: newQ }];
       } else {
-        x.push({ q });
+        x.push({ q: newQ });
       }
     }
     return p;
   }, {});
 };
 
-export { getRemGoodByContact, getRemGoodListByContact };
+// export { getRemGoodByContact, getRemGoodListByContact };

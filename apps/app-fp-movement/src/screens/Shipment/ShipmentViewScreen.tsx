@@ -39,7 +39,7 @@ import { getStatusColor, lineTypes, ONE_SECOND_IN_MS } from '../../utils/constan
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
 import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../../store/index';
 
-import { getBarcode, getLineGood, getRemGoodListByContact, getTotalWeight } from '../../utils/helpers';
+import { getBarcode, getLineGood, getRemGoodListByContact, getTotalLines } from '../../utils/helpers';
 import ViewTotal from '../../components/ViewTotal';
 
 const keyExtractor = (item: IShipmentLine | ITempLine) => item.id;
@@ -110,37 +110,48 @@ const ShipmentViewScreen = () => {
 
   const docsSubtraction = useMemo(
     () =>
-      docList?.filter(
-        (i) =>
-          i.documentType?.name !== 'order' &&
-          i.documentType?.name !== 'inventory' &&
-          i.documentType?.name !== 'return' &&
-          i.status !== 'PROCESSED' &&
-          i?.head?.fromDepart?.id === shipment?.head.fromDepart?.id,
-      ) as IShipmentDocument[],
+      (
+        docList?.filter(
+          (i) =>
+            i.documentType?.name !== 'order' &&
+            i.documentType?.name !== 'inventory' &&
+            i.documentType?.name !== 'return' &&
+            i.status !== 'PROCESSED' &&
+            i?.head?.fromDepart?.id === shipment?.head.fromDepart?.id,
+        ) as IShipmentDocument[]
+      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
+
     [docList, shipment?.head.fromDepart?.id],
   );
 
   const docsAddition = useMemo(
     () =>
-      docList?.filter(
-        (i) =>
-          i.documentType?.name !== 'order' &&
-          i.documentType?.name !== 'inventory' &&
-          i.documentType?.name !== 'return' &&
-          i.status !== 'PROCESSED' &&
-          i?.head?.toDepart?.id === shipment?.head.fromDepart?.id,
-      ) as IShipmentDocument[],
+      (
+        docList?.filter(
+          (i) =>
+            i.documentType?.name !== 'order' &&
+            i.documentType?.name !== 'inventory' &&
+            i.documentType?.name !== 'return' &&
+            i.status !== 'PROCESSED' &&
+            i?.head?.toDepart?.id === shipment?.head.fromDepart?.id,
+        ) as IShipmentDocument[]
+      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
+
     [docList, shipment?.head.fromDepart?.id],
   );
+
+  const linesSubtraction = getTotalLines(docsSubtraction);
+  const linesAddition = getTotalLines(docsAddition);
 
   const remainsUse = Boolean(settings.remainsUse?.data);
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return shipment?.head.fromDepart?.id ? getRemGoodListByContact(goods, remains[shipment?.head.fromDepart?.id]) : [];
-  }, [goods, remains, shipment?.head.fromDepart?.id]);
+    return shipment?.head.fromDepart?.id
+      ? getRemGoodListByContact(goods, remains[shipment?.head.fromDepart?.id], linesAddition, linesSubtraction)
+      : [];
+  }, [goods, linesAddition, linesSubtraction, remains, shipment?.head.fromDepart?.id]);
 
   const handleShowDialog = () => {
     setVisibleDialog(true);
@@ -165,10 +176,7 @@ const ShipmentViewScreen = () => {
         const good = goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === line.good.shcode);
 
         if (good) {
-          const linesSubtractionWeight = getTotalWeight(good, docsSubtraction);
-          const linesAdditiontionWeight = getTotalWeight(good, docsAddition);
-
-          if (good.remains + linesAdditiontionWeight < linesSubtractionWeight + weight - line.weight) {
+          if (good.remains < weight - line.weight) {
             Alert.alert('Внимание!', 'Вес товара превышает вес в остатках!', [{ text: 'OK' }]);
 
             return;
@@ -263,7 +271,7 @@ const ShipmentViewScreen = () => {
         }
       }
     },
-    [dispatch, docsAddition, docsSubtraction, goodRemains, id, remainsUse, shipmentLines],
+    [dispatch, goodRemains, id, remainsUse, shipmentLines],
   );
 
   const handleEditQuantPack = () => {
@@ -468,7 +476,7 @@ const ShipmentViewScreen = () => {
       }
 
       const barc = getBarcode(brc, goodBarcodeSettings);
-      const lineGood = getLineGood(barc, goods, goodRemains, remainsUse, docsSubtraction, docsAddition);
+      const lineGood = getLineGood(barc.shcode, barc.weight, goods, goodRemains, remainsUse);
 
       if (!lineGood.good) {
         handleErrorMessage(visibleDialog, 'Товар не найден');
@@ -573,8 +581,6 @@ const ShipmentViewScreen = () => {
       goods,
       goodRemains,
       remainsUse,
-      docsSubtraction,
-      docsAddition,
       isCattle,
       shipmentLines,
       tempOrder,

@@ -1,4 +1,4 @@
-import { getDateString, keyExtractor } from '@lib/mobile-hooks';
+import { getDateString, keyExtractor, useSendOneRefRequest } from '@lib/mobile-hooks';
 import {
   AppScreen,
   EmptyList,
@@ -7,6 +7,8 @@ import {
   navBackDrawer,
   SearchButton,
   SubTitle,
+  useActionSheet,
+  MenuButton,
 } from '@lib/mobile-ui';
 import { refSelectors, useSelector } from '@lib/store';
 import { IDepartment, IReference } from '@lib/types';
@@ -34,6 +36,7 @@ const ContactListScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
   const { colors } = useTheme();
+  const showActionSheet = useActionSheet();
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
   const department = refSelectors.selectByName<IDepartment>('depart')?.data || [];
@@ -78,9 +81,34 @@ const ContactListScreen = () => {
     }
   }, [filterVisible, searchQuery]);
 
+  const sendRequest = useSendOneRefRequest('Остатки', { name: 'remains' });
+
+  const handleSendRequest = useCallback(async () => {
+    await sendRequest();
+  }, [sendRequest]);
+
+  const actionsMenu = useCallback(() => {
+    showActionSheet([
+      {
+        title: 'Отправить запрос на получение справочника остатков',
+        onPress: handleSendRequest,
+      },
+
+      {
+        title: 'Отмена',
+        type: 'cancel',
+      },
+    ]);
+  }, [handleSendRequest, showActionSheet]);
   const renderRight = useCallback(
-    () => <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={filterVisible} />,
-    [filterVisible],
+    () => (
+      <View style={styles.buttons}>
+        <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={filterVisible} />
+
+        <MenuButton actionsMenu={actionsMenu} />
+      </View>
+    ),
+    [actionsMenu, filterVisible],
   );
 
   useLayoutEffect(() => {

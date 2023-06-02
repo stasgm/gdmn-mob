@@ -81,7 +81,7 @@ export interface IMGoodRemain {
 }
 export interface IRemainsData {
   goodId: string;
-  q?: number;
+  q: number;
 }
 
 export interface IModelRem {
