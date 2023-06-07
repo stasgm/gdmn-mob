@@ -33,7 +33,9 @@ export default {
   /**максимальное количество записей в журнале ошибок устройства*/
   DEVICE_LOG_MAX_LINES: getNumber(process.env.DEVICE_LOG_MAX_LINES, 1000),
   /** Период проверки файлов, в днях */
-  FILES_CHECK_PERIOD_IN_DAYS: getNumber(process.env.FILES_CHECK_PERIOD_IN_DAYS, 7),
+  FILES_CHECK_PERIOD_IN_DAYS: getNumber(process.env.FILES_CHECK_PERIOD_IN_DAYS, 2),
+  /** Период хранения файлов, в днях */
+  FILES_SAVING_PERIOD_IN_DAYS: getNumber(process.env.FILES_SAVING_PERIOD_IN_DAYS, 7),
   /** Максимальный объем файла при обработки сообщений, в мегабайтах */
   MAX_DATA_VOLUME: getNumber(process.env.MAX_DATA_VOLUME, 100),
 };
