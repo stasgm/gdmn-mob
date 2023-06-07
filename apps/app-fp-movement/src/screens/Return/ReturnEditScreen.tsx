@@ -148,9 +148,9 @@ export const ReturnEditScreen = () => {
         };
 
         dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
+        setScreenState('idle');
         navigation.navigate('ReturnView', { id });
       }
-      setScreenState('idle');
     }
   }, [
     dispatch,

@@ -163,6 +163,43 @@ const ShipmentViewScreen = () => {
     setErrorMessage('');
   };
 
+  const addQuantPack = useCallback(
+    (quantity: number, line: IShipmentLine) => {
+      const maxQuantPack = round(Math.floor(999.99 / line?.weight), 3);
+
+      let newQuantity = quantity;
+      let sortOrder = line.sortOrder || shipmentLines?.length;
+
+      while (newQuantity > 0) {
+        const q = newQuantity > maxQuantPack ? maxQuantPack : newQuantity;
+        const newWeight = round(line?.weight * q, 3);
+
+        const newLine: IShipmentLine = {
+          ...line,
+          quantPack: q,
+          weight: newWeight,
+          scannedBarcode: line?.barcode,
+        };
+
+        if (newQuantity === quantity) {
+          dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+        } else {
+          sortOrder = sortOrder + 1;
+
+          const addedLine = { ...newLine, id: generateId(), sortOrder };
+          dispatch(
+            documentActions.addDocumentLine({
+              docId: id,
+              line: addedLine,
+            }),
+          );
+        }
+        newQuantity = newQuantity - maxQuantPack;
+      }
+    },
+    [dispatch, id, shipmentLines?.length],
+  );
+
   const handleAddQuantPack = useCallback(
     (quantity: number) => {
       const line = shipmentLines?.[0];
@@ -170,56 +207,60 @@ const ShipmentViewScreen = () => {
         return;
       }
 
-      const weight = line?.weight * quantity;
+      const weight = round(line?.weight * quantity, 3);
+
+      const tempLine = tempOrder?.lines?.find((i) => line.good.id === i.good.id);
+      if (!tempLine || !tempOrder) {
+        return;
+      }
 
       if (remainsUse) {
         const good = goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === line.good.shcode);
 
         if (good) {
-          if (good.remains < weight - line.weight) {
+          if (good.remains + line.weight < weight) {
             Alert.alert('Внимание!', 'Вес товара превышает вес в остатках!', [{ text: 'OK' }]);
 
             return;
-          } else if (weight < 1000) {
-            const newLine: IShipmentLine = {
-              ...line,
-              quantPack: quantity,
-              weight,
-              scannedBarcode: line?.barcode,
-            };
-
-            dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
           } else {
-            const maxQuantPack = Math.floor(999.99 / line?.weight);
+            const newTempLine = { ...tempLine, weight: round(tempLine?.weight + line.weight - weight, 3) };
+            if (newTempLine.weight >= 0) {
+              fpDispatch(
+                fpMovementActions.updateTempOrderLine({
+                  docId: tempOrder?.id,
+                  line: newTempLine,
+                }),
+              );
+            } else {
+              Alert.alert('Данное количество превышает количество в заявке.', 'Добавить позицию?', [
+                {
+                  text: 'Да',
+                  onPress: () => {
+                    fpDispatch(
+                      fpMovementActions.updateTempOrderLine({
+                        docId: tempOrder?.id,
+                        line: newTempLine,
+                      }),
+                    );
+                  },
+                },
+                {
+                  text: 'Отмена',
+                },
+              ]);
+            }
 
-            let newQuantity = quantity;
-            let sortOrder = line.sortOrder || shipmentLines?.length;
-
-            while (newQuantity > 0) {
-              const q = newQuantity > maxQuantPack ? maxQuantPack : newQuantity;
-              const newWeight = line?.weight * q;
-
+            if (weight < 1000) {
               const newLine: IShipmentLine = {
                 ...line,
-                quantPack: q,
-                weight: newWeight,
+                quantPack: quantity,
+                weight,
                 scannedBarcode: line?.barcode,
               };
 
-              if (newQuantity === quantity) {
-                dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-              } else {
-                sortOrder = sortOrder + 1;
-
-                const addedLine = { ...newLine, id: generateId(), sortOrder };
-                dispatch(
-                  documentActions.addDocumentLine({
-                    docId: id,
-                    line: addedLine,
-                  }),
-                );
-              }
-              newQuantity = newQuantity - maxQuantPack;
+              dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+            } else {
+              addQuantPack(quantity, line);
             }
           }
         } else {
@@ -227,6 +268,33 @@ const ShipmentViewScreen = () => {
           return;
         }
       } else {
+        const newTempLine = { ...tempLine, weight: round(tempLine?.weight + line.weight - weight, 3) };
+        if (newTempLine.weight >= 0) {
+          fpDispatch(
+            fpMovementActions.updateTempOrderLine({
+              docId: tempOrder?.id,
+              line: newTempLine,
+            }),
+          );
+        } else {
+          Alert.alert('Данное количество превышает количество в заявке.', 'Добавить позицию?', [
+            {
+              text: 'Да',
+              onPress: () => {
+                fpDispatch(
+                  fpMovementActions.updateTempOrderLine({
+                    docId: tempOrder?.id,
+                    line: newTempLine,
+                  }),
+                );
+              },
+            },
+            {
+              text: 'Отмена',
+            },
+          ]);
+        }
+
         if (weight < 1000) {
           const newLine: IShipmentLine = {
             ...line,
@@ -237,41 +305,11 @@ const ShipmentViewScreen = () => {
 
           dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
         } else {
-          const maxQuantPack = Math.floor(999.99 / line?.weight);
-
-          let newQuantity = quantity;
-          let sortOrder = line.sortOrder || shipmentLines?.length;
-
-          while (newQuantity > 0) {
-            const q = newQuantity > maxQuantPack ? maxQuantPack : newQuantity;
-            const newWeight = line?.weight * q;
-
-            const newLine: IShipmentLine = {
-              ...line,
-              quantPack: q,
-              weight: newWeight,
-              scannedBarcode: line?.barcode,
-            };
-
-            if (newQuantity === quantity) {
-              dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-            } else {
-              sortOrder = sortOrder + 1;
-
-              const addedLine = { ...newLine, id: generateId(), sortOrder };
-              dispatch(
-                documentActions.addDocumentLine({
-                  docId: id,
-                  line: addedLine,
-                }),
-              );
-            }
-            newQuantity = newQuantity - maxQuantPack;
-          }
+          addQuantPack(quantity, line);
         }
       }
     },
-    [dispatch, goodRemains, id, remainsUse, shipmentLines],
+    [shipmentLines, remainsUse, goodRemains, tempOrder, fpDispatch, dispatch, id, addQuantPack],
   );
 
   const handleEditQuantPack = () => {
@@ -317,15 +355,15 @@ const ShipmentViewScreen = () => {
 
   const hanldeCancelLastScan = useCallback(() => {
     if (shipmentLines?.length) {
-      const ShipmentLine = shipmentLines?.[0];
-      dispatch(documentActions.removeDocumentLine({ docId: id, lineId: ShipmentLine.id }));
+      const shipmentLine = shipmentLines?.[0];
+      dispatch(documentActions.removeDocumentLine({ docId: id, lineId: shipmentLine.id }));
 
-      const tempLine = tempOrder?.lines?.find((i) => ShipmentLine.good.id === i.good.id);
+      const tempLine = tempOrder?.lines?.find((i) => shipmentLine.good.id === i.good.id);
       if (tempLine && tempOrder) {
         fpDispatch(
           fpMovementActions.updateTempOrderLine({
             docId: tempOrder.id,
-            line: { ...tempLine, weight: round(tempLine.weight + ShipmentLine.weight, 3) },
+            line: { ...tempLine, weight: round(tempLine.weight + shipmentLine.weight, 3) },
           }),
         );
       }

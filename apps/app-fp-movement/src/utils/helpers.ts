@@ -1,4 +1,4 @@
-import { log } from '@lib/mobile-hooks';
+import { log, round } from '@lib/mobile-hooks';
 
 import {
   IMoveDocument,
@@ -55,11 +55,11 @@ export const getBarcode = (barcode: string, settings: barcodeSettings) => {
 
   const barcodeObj: IBarcode = {
     barcode: barcode,
-    weight: Number(weight) / 1000,
+    weight: round(Number(weight) / 1000, 3),
     workDate,
     shcode: shcode,
     numReceived: numReceived,
-    quantPack: Number(quantPack),
+    quantPack: Number(weight) < settings.boxWeight * 1000 ? 1 : Number(quantPack),
   };
 
   return barcodeObj;

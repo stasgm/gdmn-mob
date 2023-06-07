@@ -21,7 +21,15 @@ import {
   SimpleDialog,
 } from '@lib/mobile-ui';
 
-import { generateId, getDateString, keyExtractor, useSendDocs, sleep, useSendOneRefRequest } from '@lib/mobile-hooks';
+import {
+  generateId,
+  getDateString,
+  keyExtractor,
+  useSendDocs,
+  sleep,
+  useSendOneRefRequest,
+  round,
+} from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
 
@@ -64,7 +72,11 @@ export const FreeShipmentViewScreen = () => {
 
   const lineSum = lines?.reduce(
     (sum, line) => {
-      return { ...sum, quantPack: sum.quantPack + (line.quantPack || 0), weight: sum.weight + (line.weight || 0) };
+      return {
+        ...sum,
+        quantPack: sum.quantPack + (line.quantPack || 0),
+        weight: sum.weight + (line.weight || 0),
+      };
     },
     { quantPack: 0, weight: 0 },
   );
@@ -154,7 +166,7 @@ export const FreeShipmentViewScreen = () => {
         return;
       }
 
-      const weight = line?.weight * quantity;
+      const weight = round(line?.weight * quantity, 3);
 
       if (remainsUse) {
         const good = goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === line.good.shcode);
@@ -174,14 +186,14 @@ export const FreeShipmentViewScreen = () => {
 
             dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
           } else {
-            const maxQuantPack = Math.floor(999.99 / line?.weight);
+            const maxQuantPack = round(Math.floor(999.99 / line?.weight), 3);
 
             let newQuantity = quantity;
             let sortOrder = line.sortOrder || lines.length;
 
             while (newQuantity > 0) {
               const q = newQuantity > maxQuantPack ? maxQuantPack : newQuantity;
-              const newWeight = line?.weight * q;
+              const newWeight = round(line?.weight * q, 3);
 
               const newLine: IFreeShipmentLine = {
                 ...line,
@@ -221,14 +233,14 @@ export const FreeShipmentViewScreen = () => {
 
           dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
         } else {
-          const maxQuantPack = Math.floor(999.99 / line?.weight);
+          const maxQuantPack = round(Math.floor(999.99 / line?.weight), 3);
 
           let newQuantity = quantity;
           let sortOrder = line.sortOrder || lines.length;
 
           while (newQuantity > 0) {
             const q = newQuantity > maxQuantPack ? maxQuantPack : newQuantity;
-            const newWeight = line?.weight * q;
+            const newWeight = round(line?.weight * q, 3);
 
             const newLine: IFreeShipmentLine = {
               ...line,

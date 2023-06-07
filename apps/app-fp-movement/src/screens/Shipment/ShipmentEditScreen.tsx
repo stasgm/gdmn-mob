@@ -112,9 +112,9 @@ const ShipmentEditScreen = () => {
         };
 
         dispatch(documentActions.updateDocument({ docId: id, document: updatedShipment }));
+        setScreenState('idle');
         navigation.navigate('ShipmentView', { id });
       }
-      setScreenState('idle');
     }
   }, [shipmentType, docDocumentDate, id, shipment, docStatus, dispatch, navigation, screenState, docFromDepart]);
 

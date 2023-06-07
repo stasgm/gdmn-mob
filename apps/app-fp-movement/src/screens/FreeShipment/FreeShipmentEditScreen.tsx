@@ -148,9 +148,9 @@ export const FreeShipmentEditScreen = () => {
         };
 
         dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
+        setScreenState('idle');
         navigation.navigate('FreeShipmentView', { id });
       }
-      setScreenState('idle');
     }
   }, [
     dispatch,

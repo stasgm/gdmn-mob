@@ -155,9 +155,9 @@ export const InventoryEditScreen = () => {
         };
 
         dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
+        setScreenState('idle');
         navigation.navigate('InventoryView', { id });
       }
-      setScreenState('idle');
     }
   }, [
     dispatch,

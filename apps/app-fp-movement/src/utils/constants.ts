@@ -209,6 +209,15 @@ export const appSettings: Settings = {
     visible: true,
     group: goodGroup,
   },
+  boxWeight: {
+    id: 'boxWeight',
+    sortOrder: 16,
+    description: 'Мин. вес поддона, кг',
+    data: 25,
+    type: 'number',
+    visible: true,
+    group: goodGroup,
+  },
   countOrderBarcodeLentgh: {
     id: 'countOrderBarcodeLentgh',
     sortOrder: 15,
