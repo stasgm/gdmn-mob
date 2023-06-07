@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, Grid, TextField, Divider, Button, Checkbox } from '@material-ui/core';
+import { Box, Card, CardContent, Grid, TextField, Divider, Button, Checkbox } from '@mui/material';
 
 import { useEffect, useMemo, useState } from 'react';
 
@@ -6,7 +6,7 @@ import { INamedEntity, IUser, IUserCredentials, NewUser } from '@lib/types';
 import { FormikTouched, useFormik, Field, FormikProvider } from 'formik';
 import * as yup from 'yup';
 
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 import ComboBox from '../ComboBox';
 import { useSelector } from '../../store';
@@ -33,6 +33,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
     enableReinitialize: true,
     initialValues: isAdmin
       ? {
+          ...user,
           name: user.name || '',
           email: user.email || '',
           password: (user as NewUser).password || '',

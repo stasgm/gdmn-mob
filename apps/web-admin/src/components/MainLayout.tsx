@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import { experimentalStyled } from '@material-ui/core';
+import { experimentalStyled } from '@mui/material';
 
 const MainLayoutRoot = experimentalStyled('div')(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,

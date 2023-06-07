@@ -1,5 +1,5 @@
-import { Box, Container } from '@material-ui/core';
-import LibraryAddCheckIcon from '@material-ui/icons/LibraryAddCheck';
+import { Box, Container } from '@mui/material';
+import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import { IDeviceBinding } from '@lib/types';
 
 import { useCallback, useEffect, useState } from 'react';

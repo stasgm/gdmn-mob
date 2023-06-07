@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
-import { Box, Container } from '@material-ui/core';
+import { Box, Container } from '@mui/material';
 import { useCallback, useEffect } from 'react';
-import CachedIcon from '@material-ui/icons/Cached';
+import CachedIcon from '@mui/icons-material/Cached';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';

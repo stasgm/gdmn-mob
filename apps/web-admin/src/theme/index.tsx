@@ -1,5 +1,5 @@
-import { ThemeOptions, createTheme } from '@material-ui/core/styles';
-import { colors } from '@material-ui/core';
+import { ThemeOptions, createTheme } from '@mui/material/styles';
+import { colors } from '@mui/material';
 
 import shadows from './shadows';
 import typography from './typography';

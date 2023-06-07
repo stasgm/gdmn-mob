@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { Avatar, Box, Divider, Drawer, List, Typography } from '@material-ui/core';
+import { Avatar, Box, Divider, Drawer, List, Typography } from '@mui/material';
 import {
   BarChart as BarChartIcon,
   Settings as SettingsIcon,
@@ -142,34 +142,6 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
         flexGrow: Number(isCompact ? 0 : 1),
       }}
     >
-      <Box
-        sx={{
-          alignItems: 'center',
-          display: 'flex',
-          flexDirection: 'column',
-          p: Number(isCompact ? 1 : 2),
-        }}
-      >
-        <Avatar
-          component={RouterLink}
-          src={userInfo.avatar}
-          sx={{
-            cursor: 'pointer',
-            width: 64,
-            height: 64,
-          }}
-          to={`${adminPath}/app/account`}
-        />
-        <Typography color="textPrimary" variant="h5">
-          {!isCompact
-            ? `${user?.lastName || ''} ${user?.firstName || ''}`
-            : `${user?.lastName?.slice(0, 1) || ''}${user?.firstName?.slice(0, 1) || ''}`}
-        </Typography>
-        <Typography color="textSecondary" variant="body2">
-          {user ? user.name : userInfo.jobTitle}
-        </Typography>
-      </Box>
-      <Divider />
       <Box sx={{ p: Number(isCompact ? 0 : 2) }}>
         <List>
           {items.map((item) => (

@@ -3,9 +3,9 @@ import { NavLink } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
-import RefreshIcon from '@material-ui/icons/Refresh';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
-import Tooltip from '@material-ui/core/Tooltip';
+import Tooltip from '@mui/material/Tooltip';
 
 import {
   Box,
@@ -19,7 +19,7 @@ import {
   TablePagination,
   TableRow,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
 
 import { IDevice, IActivationCode } from '@lib/types';
 

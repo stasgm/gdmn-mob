@@ -1,10 +1,10 @@
 import React from 'react';
-import { Button, Box, IconButton, Toolbar, Menu, MenuProps, Icon } from '@material-ui/core';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import MenuItem from '@material-ui/core/MenuItem';
-import ListItemText from '@material-ui/core/ListItemText';
+import { Button, Box, IconButton, Toolbar, Menu, MenuProps, Icon } from '@mui/material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemText from '@mui/material/ListItemText';
 
-import { withStyles } from '@material-ui/styles';
+import { withStyles } from '@mui/styles';
 
 import { IToolBarButton } from '../types';
 interface props {
