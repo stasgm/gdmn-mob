@@ -21,6 +21,8 @@ import {
   getFoundString,
 } from '../utils/fileHelper';
 
+import { checkDeviceLogsFiles } from './errorLogUtils';
+
 import { getDb } from './dao/db';
 
 export const _readDir = async (root: string, excludeFolders: string[] | undefined): Promise<string[]> => {
@@ -58,6 +60,12 @@ export const checkFiles = async (): Promise<void> => {
     } catch (err) {
       log.warn(`Ошибка при удалении старого файла-- ${err}`);
     }
+  }
+
+  try {
+    await checkDeviceLogsFiles();
+  } catch (err) {
+    log.warn(`Ошибка при удалении старого файла логов-- ${err}`);
   }
 };
 

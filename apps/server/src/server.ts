@@ -33,6 +33,7 @@ import router from './routes';
 import { createDb } from './services/dao/db';
 import { checkProcessList, loadProcessListFromDisk } from './services/processList';
 import { checkFiles } from './services/fileUtils';
+import { checkDeviceLogsFiles } from './services/errorLogUtils';
 import { MSEС_IN_MIN, MSEС_IN_DAY } from './utils/constants';
 
 interface IServer {
@@ -44,6 +45,7 @@ interface IServer {
 export type KoaApp = Koa<Koa.DefaultState, Koa.DefaultContext>;
 let timerId: NodeJS.Timer;
 let timerFileId: NodeJS.Timer;
+let timerLogFiles: NodeJS.Timer;
 
 export async function createServer(server: IServer): Promise<KoaApp> {
   const app: KoaApp = new Koa();
