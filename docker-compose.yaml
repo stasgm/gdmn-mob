@@ -1,20 +1,39 @@
 version: "3"
 services:
-  gdmn-mob:
-    image: gdmn-mob/server
+  web-admin:
+    image: kivitri/gdmn-mob.web-admin
+    network_mode: host
+    container_name: web-admin
+    build:
+      context: .
+      dockerfile: ./apps/web-admin/Dockerfile
+      args:
+        - REACT_APP_SECRET_KEY=${REACT_APP_SECRET_KEY}
+        - REACT_APP_SITE_KEY=${REACT_APP_SITE_KEY}
+    environment:
+      - NODE_ENV=production
+    ports:
+     - 3656:3656
+    volumes:
+      - ./ssl:/etc/nginx/ssl:ro
+  server:
+    image: kivitri/gdmn-mob.server
+    network_mode: host
     container_name: server
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile
-      target: server
-    env_file:
-      - .env.production
+      dockerfile: ./apps/server/Dockerfile
+    environment:
+      - NODE_ENV=production
+      - PORT=3654
+      - HTTPS_PORT=3655
+      - FILES_PATH=/var/lib/gdmn-mob_db
     ports:
-      - "3655:3655"
-      - "3654:3654"
+      - 3654:3654
+      - 3655:3655
     volumes:
       - db:/var/lib/gdmn-mob_db
-      - ./apps/server/ssl:/usr/src/gdmn-mob/apps/server/ssl:ro
+      - ./ssl:/gdmn-mob/ssl:ro
 volumes:
   db:
