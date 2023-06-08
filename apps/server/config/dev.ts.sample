@@ -26,5 +26,7 @@ export default {
   /** Максимальный объем файла при обработки сообщений, в мегабайтах */
   MAX_DATA_VOLUME: 100,
   /** Максимальное количество строк в логе устройств */
-  DEVICE_LOG_MAX_LINES: 1000
+  DEVICE_LOG_MAX_LINES: 1000,
+  /** Период проверки файлов, в днях */
+  FILES_CHECK_PERIOD_IN_DAYS: 7,
 };
