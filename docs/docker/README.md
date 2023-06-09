@@ -54,11 +54,11 @@ docker-compose build web-admin
 docker-compose up
 ```
 
-В браузере открываем админку https://server.gdmn.app:3656
+В браузере открываем админку: https://server.gdmn.app:3656
 
-Http cервер запущен по адресу http://server.gdmn.app:3654
+Проверка http cервера: http://server.gdmn.app:3654/api/v1/test
 
-Https сервер запущен по адресу https://server.gdmn.app:3655
+Проверка https сервера: https://server.gdmn.app:3655/api/v1/test
 
 
 # Загрузка образа в Docker hub
