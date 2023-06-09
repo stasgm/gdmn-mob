@@ -1,7 +1,7 @@
 version: "3"
 services:
   web-admin:
-    image: kivitri/gdmn-mob.web-admin
+    image: kivitri/gdmn-mob.web-admin:${TAG}
     network_mode: host
     container_name: web-admin
     build:
