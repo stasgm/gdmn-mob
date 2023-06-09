@@ -38,7 +38,7 @@ RUN cd ./packages/client-config && yarn build
 RUN cd ./apps/web-admin && yarn build-docker
 
 # STAGE 2
-FROM nginx:1.23-alpine-slim
+FROM nginx:1.25-alpine-slim
 
 # Nginx config
 COPY ./apps/web-admin/nginx/nginx.conf /etc/nginx/conf.d/default.conf
