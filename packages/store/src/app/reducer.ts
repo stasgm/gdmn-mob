@@ -8,6 +8,7 @@ export const initialState: Readonly<IAppState> = {
   loading: false,
   showSyncInfo: false,
   autoSync: false,
+  syncRequests: [],
   formParams: {},
   errorLog: [],
   loadingData: false,
@@ -110,6 +111,18 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
 
     case getType(appActions.clearErrorNotice):
       return { ...state, errorNotice: [] };
+
+    case getType(appActions.addSyncRequest):
+      return {
+        ...state,
+        syncRequests: state.syncRequests.filter((req) => req.cmdName !== action.payload.cmdName).concat(action.payload),
+      };
+
+    case getType(appActions.removeSyncRequest):
+      return {
+        ...state,
+        syncRequests: state.syncRequests.filter((req) => req.cmdName !== action.payload),
+      };
 
     default:
       return state;

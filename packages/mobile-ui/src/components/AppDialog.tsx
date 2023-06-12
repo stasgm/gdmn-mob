@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { KeyboardTypeOptions, Text } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { Dialog, Button, TextInput } from 'react-native-paper';
 
@@ -13,6 +13,7 @@ interface IProps {
   errorMessage?: string;
   title: string;
   okDisabled?: boolean;
+  keyboardType?: KeyboardTypeOptions;
 }
 
 const AppDialog = ({
@@ -25,6 +26,7 @@ const AppDialog = ({
   okLabel = 'Ок',
   title,
   okDisabled = false,
+  keyboardType = 'default',
 }: IProps) => {
   const { colors } = useTheme();
 
@@ -48,6 +50,7 @@ const AppDialog = ({
               <TextInput.Icon name="close" size={20} style={{ marginTop: 14 }} onPress={() => onChangeText('')} />
             )
           }
+          keyboardType={keyboardType ? keyboardType : 'default'}
         />
         {!!errorMessage && <Text style={{ color: colors.notification }}>{errorMessage}</Text>}
       </Dialog.Content>

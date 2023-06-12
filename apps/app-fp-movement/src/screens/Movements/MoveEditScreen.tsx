@@ -1,30 +1,28 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Alert, View, StyleSheet, ScrollView, Platform } from 'react-native';
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { Alert, ScrollView, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Divider } from 'react-native-paper';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { RouteProp, useNavigation, useRoute, StackActions, useTheme } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { SelectableInput, Input, SaveButton, SubTitle, AppScreen, RadioGroup, navBackButton } from '@lib/mobile-ui';
+import { SelectableInput, Input, SaveButton, SubTitle, AppScreen, navBackButton } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
 import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks';
 
-import { IDocumentType, IReference, ScreenState } from '@lib/types';
+import { IDocumentType, INamedEntity, IReference, ScreenState } from '@lib/types';
 
 import { MoveStackParamList } from '../../navigation/Root/types';
 import { IMoveFormParam, IMoveDocument } from '../../store/types';
-import { STATUS_LIST } from '../../utils/constants';
 import { getNextDocNumber } from '../../utils/helpers';
+import { IAddressStoreEntity } from '../../store/app/types';
 
 export const MoveEditScreen = () => {
   const id = useRoute<RouteProp<MoveStackParamList, 'MoveEdit'>>().params?.id;
   const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'MoveEdit'>>();
   const dispatch = useDispatch();
-
-  const { colors } = useTheme();
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
@@ -32,7 +30,12 @@ export const MoveEditScreen = () => {
 
   const doc = movements?.find((e) => e.id === id);
 
-  const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data);
+  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
+
+  const userDefaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity;
+  const defaultDepart = departs.find((i) => i.id === userDefaultDepart?.id);
+  const userDefaultSecondDepart = useSelector((state) => state.auth.user?.settings?.secondDepart?.data) as INamedEntity;
+  const defaultSecondDepart = departs.find((i) => i.id === userDefaultSecondDepart?.id);
 
   const movementType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
@@ -77,13 +80,33 @@ export const MoveEditScreen = () => {
           number: newNumber,
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
-          fromDepart: docDocumentSubtype?.id === 'internalMovement' ? defaultDepart : undefined,
-          toDepart: docDocumentSubtype?.id === 'movement' ? defaultDepart : undefined,
+          fromDepart:
+            docDocumentSubtype?.id === 'internalMovement'
+              ? defaultDepart
+              : docDocumentSubtype?.id === 'movement'
+              ? defaultSecondDepart
+              : undefined,
+          toDepart:
+            docDocumentSubtype?.id === 'movement'
+              ? defaultDepart
+              : docDocumentSubtype?.id === 'internalMovement'
+              ? defaultSecondDepart
+              : undefined,
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, doc, defaultDepart, docDocumentSubtype]);
+  }, [dispatch, doc, defaultDepart, defaultSecondDepart, docDocumentSubtype]);
+
+  useEffect(() => {
+    if (docDocumentSubtype?.id === 'cellMovement' && docFromDepart) {
+      dispatch(
+        appActions.setFormParams({
+          toDepart: docFromDepart,
+        }),
+      );
+    }
+  }, [dispatch, docDocumentSubtype?.id, docFromDepart]);
 
   useEffect(() => {
     if (screenState === 'saving') {
@@ -100,10 +123,8 @@ export const MoveEditScreen = () => {
       }
 
       if (
-        !(
-          (docDocumentSubtype?.id === 'internalMovement' && docFromDepart) ||
-          (docDocumentSubtype?.id === 'movement' && docToDepart)
-        )
+        (docDocumentSubtype?.id === 'internalMovement' && !docFromDepart) ||
+        (docDocumentSubtype?.id === 'movement' && !docToDepart)
       ) {
         Alert.alert('Ошибка!', 'Нет подразделения пользователя. Обратитесь к администратору.', [{ text: 'OK' }]);
         setScreenState('idle');
@@ -161,6 +182,7 @@ export const MoveEditScreen = () => {
             comment: docComment && docComment.trim(),
             fromDepart: docFromDepart,
             toDepart: docToDepart,
+
             subtype: docDocumentSubtype,
           },
           lines: doc.lines,
@@ -254,30 +276,24 @@ export const MoveEditScreen = () => {
       return;
     }
 
+    const params: Record<string, string> = {};
+
+    if (docDocumentSubtype?.id === 'cellMovement') {
+      params.isAddressedStore = 'true';
+    }
+
     navigation.navigate('SelectRefItem', {
       refName: 'depart',
       fieldName: 'toDepart',
       value: docToDepart && [docToDepart],
       descrFieldName: 'shcode',
+      clause: params,
     });
   };
-
-  const handleChangeStatus = useCallback(() => {
-    dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
-  }, [dispatch, docStatus]);
 
   const handleChangeNumber = useCallback(
     (text: string) => dispatch(appActions.setFormParams({ number: text })),
     [dispatch],
-  );
-
-  const viewStyle = useMemo(
-    () => [
-      localStyles.switchContainer,
-      localStyles.border,
-      { borderColor: colors.primary, backgroundColor: colors.card },
-    ],
-    [colors.card, colors.primary],
   );
 
   return (
@@ -286,14 +302,6 @@ export const MoveEditScreen = () => {
         <SubTitle>{statusName}</SubTitle>
         <Divider />
         <ScrollView>
-          <View style={viewStyle}>
-            <RadioGroup
-              options={STATUS_LIST}
-              onChange={handleChangeStatus}
-              activeButtonId={STATUS_LIST.find((i) => i.id === docStatus)?.id}
-              directionRow={true}
-            />
-          </View>
           <Input
             label="Номер"
             value={docNumber}
@@ -318,14 +326,14 @@ export const MoveEditScreen = () => {
             label={'Откуда'}
             value={docFromDepart?.name}
             onPress={handleFromDepart}
-            disabled={docDocumentSubtype?.id === 'internalMovement' || !docDocumentSubtype ? true : isBlocked}
+            disabled={!docDocumentSubtype ? true : isBlocked}
           />
 
           <SelectableInput
             label={'Куда'}
-            value={docToDepart?.name}
+            value={docDocumentSubtype?.id === 'cellMovement' ? docFromDepart?.name : docToDepart?.name}
             onPress={handleToDepart}
-            disabled={docDocumentSubtype?.id === 'movement' || !docDocumentSubtype ? true : isBlocked}
+            disabled={!docDocumentSubtype ? true : isBlocked}
           />
           <Input
             label="Комментарий"
@@ -350,17 +358,3 @@ export const MoveEditScreen = () => {
     </AppScreen>
   );
 };
-
-export const localStyles = StyleSheet.create({
-  switchContainer: {
-    margin: 10,
-    paddingLeft: 5,
-  },
-  border: {
-    marginHorizontal: 10,
-    marginVertical: 2,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderRadius: 2,
-  },
-});

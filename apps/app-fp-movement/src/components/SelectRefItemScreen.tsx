@@ -52,7 +52,15 @@ const SelectRefItemScreen = () => {
         return extraPredicate(item, newParams);
       });
     }
-    return refObj?.data?.sort((a, b) => (a[refFieldName] < b[refFieldName] ? -1 : 1));
+    return refObj?.data?.sort((a, b) =>
+      a.sortOrder && b.sortOrder
+        ? (a.sortOrder || 1) < (b.sortOrder || 1)
+          ? -1
+          : 1
+        : a[refFieldName] < b[refFieldName]
+        ? -1
+        : 1,
+    );
   }, [clause, refFieldName, refObj?.data]);
 
   const title = refObj?.description || refObj?.name;
@@ -108,7 +116,7 @@ const SelectRefItemScreen = () => {
         setScreenState('saving');
         dispatch(
           appActions.setFormParams({
-            [fieldName]: { id: item.id, name: item.name, shcode: item.shcode },
+            [fieldName]: { id: item.id, name: item.name, shcode: item.shcode, isAddressStore: item.isAddressStore },
           }),
         );
         navigation.goBack();
