@@ -13,7 +13,12 @@ const ProfileNavigator = () => {
   return (
     <Stack.Navigator initialRouteName="Profile" screenOptions={{ headerShown: true, title: 'Профиль' }}>
       <Stack.Screen key="Profile" name="Profile" component={ProfileScreen} />
-      <Stack.Screen key="SettingsDetails" name="ProfileDetails" component={ProfileDetailsScreen} />
+      <Stack.Screen
+        key="SettingsDetails"
+        name="ProfileDetails"
+        component={ProfileDetailsScreen}
+        options={{ title: 'Настройки пользователя' }}
+      />
     </Stack.Navigator>
   );
 };

@@ -57,19 +57,13 @@ const ProfileDetailsScreen = () => {
     <AppScreen>
       <View style={styles.container}>
         {!!visibleList?.length && (
-          <View>
-            <LargeText style={styles.title}>Настройки пользователя</LargeText>
-            <View style={styles.descriptionContainer}>
-              {visibleList.map(([key, item]) => {
-                return (
-                  <View key={key}>
-                    <Divider />
-                    <DescriptionItem description={item.description} data={item.data}></DescriptionItem>
-                  </View>
-                );
-              })}
-            </View>
-            <Divider />
+          <View style={styles.descriptionContainer}>
+            {visibleList.map(([key, item]) => (
+              <View key={key}>
+                <Divider />
+                <DescriptionItem description={item.description} data={item.data}></DescriptionItem>
+              </View>
+            ))}
           </View>
         )}
       </View>
