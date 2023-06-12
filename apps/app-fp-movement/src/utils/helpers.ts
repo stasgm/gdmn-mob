@@ -78,7 +78,6 @@ export const getCellItem = (str: string) => {
 
 // Формирует модель с ячейками по подразделениям
 export const getCellList = (list: ICellRef[], lines: IMoveLine[]) => {
-  console.log('getCellList');
   const model = list?.reduce((prev: IModelData, cur) => {
     const cellNameItem = getCellItem(cur.name);
     const cellItem: ICell = { ...cellNameItem, tier: cur.tier };
