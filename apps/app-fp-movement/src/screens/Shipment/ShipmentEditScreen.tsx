@@ -6,8 +6,16 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Divider } from 'react-native-paper';
 
 import { docSelectors, documentActions, refSelectors, useSelector, appActions, useDispatch } from '@lib/store';
-import { AppInputScreen, Input, SaveButton, SubTitle, RadioGroup, navBackButton } from '@lib/mobile-ui';
-import { IDepartment, IDocumentType, IReference, ScreenState } from '@lib/types';
+import {
+  AppInputScreen,
+  Input,
+  SaveButton,
+  SubTitle,
+  RadioGroup,
+  navBackButton,
+  SelectableInput,
+} from '@lib/mobile-ui';
+import { IDocumentType, IReference, ScreenState } from '@lib/types';
 
 import { getDateString } from '@lib/mobile-hooks';
 
@@ -37,11 +45,12 @@ const ShipmentEditScreen = () => {
     ?.data.find((t) => t.name === 'shipment');
 
   // Подразделение по умолчанию
-  const depart = useSelector((state) => state.auth.user?.settings?.depart?.data) as IDepartment;
 
-  const { documentDate: docDocumentDate, status: docStatus } = useSelector(
-    (state) => state.app.formParams as IShipmentFormParam,
-  );
+  const {
+    documentDate: docDocumentDate,
+    status: docStatus,
+    fromDepart: docFromDepart,
+  } = useSelector((state) => state.app.formParams as IShipmentFormParam);
 
   useEffect(() => {
     return () => {
@@ -57,7 +66,7 @@ const ShipmentEditScreen = () => {
         appActions.setFormParams({
           documentDate: shipment.documentDate,
           status: shipment.status,
-          depart: shipment.head?.depart,
+          fromDepart: shipment.head?.fromDepart,
         }),
       );
     } else {
@@ -78,7 +87,7 @@ const ShipmentEditScreen = () => {
         return;
       }
 
-      if (!docDocumentDate) {
+      if (!docDocumentDate || !docFromDepart) {
         Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
@@ -97,16 +106,17 @@ const ShipmentEditScreen = () => {
           id,
           status: docStatus || 'DRAFT',
           documentDate: docDocumentDate,
+          head: { ...shipment.head, fromDepart: docFromDepart },
           creationDate: shipment.creationDate || updatedShipmentDate,
           editionDate: updatedShipmentDate,
         };
 
         dispatch(documentActions.updateDocument({ docId: id, document: updatedShipment }));
+        setScreenState('idle');
         navigation.navigate('ShipmentView', { id });
       }
-      setScreenState('idle');
     }
-  }, [shipmentType, docDocumentDate, id, shipment, docStatus, dispatch, navigation, screenState]);
+  }, [shipmentType, docDocumentDate, id, shipment, docStatus, dispatch, navigation, screenState, docFromDepart]);
 
   const renderRight = useCallback(
     () => (
@@ -140,6 +150,19 @@ const ShipmentEditScreen = () => {
     dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
   }, [dispatch, docStatus]);
 
+  const handleDepart = () => {
+    if (isBlocked) {
+      return;
+    }
+
+    navigation.navigate('SelectRefItem', {
+      refName: 'depart',
+      fieldName: 'fromDepart',
+      value: docFromDepart && [docFromDepart],
+      descrFieldName: 'shcode',
+    });
+  };
+
   const viewStyle = useMemo(
     () => [
       localStyles.switchContainer,
@@ -166,7 +189,7 @@ const ShipmentEditScreen = () => {
         <Input label="Дата отгрузки" value={getDateString(onDate || '')} disabled={true} />
         <Input label="Организация" value={contact?.name} disabled={true} />
         <Input label="Магазин" value={outlet?.name} disabled={true} />
-        <Input label="Склад" value={depart?.name} disabled={true} />
+        <SelectableInput label="Склад" value={docFromDepart?.name} disabled={true} onPress={handleDepart} />
       </ScrollView>
     </AppInputScreen>
   );

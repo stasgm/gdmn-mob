@@ -8,12 +8,12 @@ import { useTheme } from '@react-navigation/native';
 import { round } from '@lib/mobile-hooks';
 
 export interface IItem {
-  quantity: number;
+  quantPack?: number;
   weight: number;
   scan?: boolean;
 }
 
-const ViewTotal = ({ weight, quantity, scan = false }: IItem) => {
+const ViewTotal = ({ weight, quantPack, scan = false }: IItem) => {
   const { colors } = useTheme();
 
   return (
@@ -30,18 +30,21 @@ const ViewTotal = ({ weight, quantity, scan = false }: IItem) => {
             <View style={localStyles.groupWidth}>
               <MediumText>Общий вес, кг</MediumText>
             </View>
+
             <View style={localStyles.quantity}>
-              <MediumText>{`${round(quantity, 3)}` || 0}</MediumText>
+              <MediumText>{`${round(weight, 3)}` || 0}</MediumText>
             </View>
           </View>
-          <View style={styles.directionRow}>
-            <View style={localStyles.groupWidth}>
-              <MediumText>Количество позиций</MediumText>
+          {quantPack ? (
+            <View style={styles.directionRow}>
+              <View style={localStyles.groupWidth}>
+                <MediumText>Количество коробок</MediumText>
+              </View>
+              <View style={localStyles.quantity}>
+                <MediumText>{`${round(quantPack, 3)}` || 0}</MediumText>
+              </View>
             </View>
-            <View style={localStyles.quantity}>
-              <MediumText>{weight || 0}</MediumText>
-            </View>
-          </View>
+          ) : null}
         </View>
       </View>
     </View>
