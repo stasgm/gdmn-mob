@@ -1,7 +1,7 @@
 import { IDeviceLog } from '@lib/types';
 import { ActionType, createAction } from 'typesafe-actions';
 
-import { IFormParam, IAppState, IRequestNotice, IErrorNotice } from './types';
+import { IFormParam, IAppState, IRequestNotice, IErrorNotice, ISyncRequest } from './types';
 
 const init = createAction('APP/INIT')();
 
@@ -23,6 +23,9 @@ const addRequestNotice = createAction('APP/ADD_REQUEST_NOTICE')<IRequestNotice>(
 const clearRequestNotice = createAction('APP/CLEAR_REQUEST_NOTICE')();
 const addErrorNotice = createAction('APP/ADD_ERROR_NOTICE')<IErrorNotice>();
 const clearErrorNotice = createAction('APP/CLEAR_ERROR_NOTICE')();
+
+const addSyncRequest = createAction('APP/ADD_SYNC_REQUEST')<ISyncRequest>();
+const removeSyncRequest = createAction('APP/DEL_SYNC_REQUEST')<string>();
 
 /**
  * Для ускорения работы программы мы кэшируем часть данных
@@ -71,6 +74,8 @@ export const appActions = {
   addErrorNotice,
   clearErrorNotice,
   setShowSyncInfo,
+  addSyncRequest,
+  removeSyncRequest,
 };
 
 export type AppActionType = ActionType<typeof appActions>;
