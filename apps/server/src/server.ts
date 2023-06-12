@@ -33,7 +33,6 @@ import router from './routes';
 import { createDb } from './services/dao/db';
 import { checkProcessList, loadProcessListFromDisk } from './services/processList';
 import { checkFiles } from './services/fileUtils';
-import { checkDeviceLogsFiles } from './services/errorLogUtils';
 import { MSEС_IN_MIN, MSEС_IN_DAY } from './utils/constants';
 
 interface IServer {
