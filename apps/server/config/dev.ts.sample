@@ -29,4 +29,6 @@ export default {
   DEVICE_LOG_MAX_LINES: 1000,
   /** Период проверки файлов, в днях */
   FILES_CHECK_PERIOD_IN_DAYS: 7,
+  /** Период хранения файлов, в днях */
+  FILES_SAVING_PERIOD_IN_DAYS: 7,
 };
