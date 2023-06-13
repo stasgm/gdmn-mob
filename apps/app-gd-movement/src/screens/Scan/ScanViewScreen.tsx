@@ -256,8 +256,7 @@ export const ScanViewScreen = () => {
     setScanned(true);
     getScannedObject(brc);
   };
-  // console.log('scann', scanned);
-  console.log('ref?.current', ref?.current);
+
   useEffect(() => {
     if (!scanned && ref?.current) {
       ref?.current &&

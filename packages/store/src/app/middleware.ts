@@ -49,6 +49,8 @@ export const appMiddlewareFactory: PersistedMiddleware =
         case getType(appActions.addErrors):
         case getType(appActions.setSentErrors):
         case getType(appActions.clearErrors):
+        case getType(appActions.addSyncRequest):
+        case getType(appActions.removeSyncRequest):
         case getType(appActions.setSyncDate): {
           const result = next(action);
 

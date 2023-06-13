@@ -31,7 +31,7 @@ import {
 
 import { ActivityIndicator, Caption, Text } from 'react-native-paper';
 
-import { IDocument, IReferences, IUserSettings } from '@lib/types';
+import { IDocument, IReferences, ISettingsOption, IUserSettings } from '@lib/types';
 
 import { sleep, dialCall } from '@lib/mobile-hooks';
 
@@ -48,42 +48,143 @@ import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
 import { messageFpMovement, tempOrders } from './src/store/mock';
 import { FreeShipmentNavigator } from './src/navigation/FreeShipmentNavigator';
 import { ShipmentNavigator } from './src/navigation/ShipmentNavigator';
+import { CellsNavigator } from './src/navigation/CellsNavigator';
+import { InventoryNavigator } from './src/navigation/InventoryNavigator';
+import { ReturnNavigator } from './src/navigation/ReturnNavigator';
+import { LaboratoryNavigator } from './src/navigation/LaboratoryNavigator';
+import { MoveToNavigator } from './src/navigation/MoveToNavigator';
+import { MoveFromNavigator } from './src/navigation/MoveFromNavigator';
+import RemainsNavigator from './src/navigation/RemainsNavigator';
 
 const Root = () => {
+  const { isInit, data: settings } = useSelector((state) => state.settings);
+
+  const isAddressStore = useMemo(() => settings.addressStore?.data || false, [settings.addressStore?.data]);
+
   const navItems: INavItem[] = useMemo(
-    () => [
-      {
-        name: 'Movement',
-        title: 'Перемещение',
-        icon: 'transfer',
-        component: MoveNavigator,
-      },
-      {
-        name: 'Shipment',
-        title: 'Отвес по заявке',
-        icon: 'playlist-check',
-        component: ShipmentNavigator,
-      },
-      {
-        name: 'FreeShipment',
-        title: 'Отвес',
-        icon: 'playlist-plus',
-        component: FreeShipmentNavigator,
-      },
-    ],
-    [],
+    () =>
+      isAddressStore
+        ? [
+            {
+              name: 'InternalMovement',
+              title: 'На хранение',
+              icon: 'store-plus-outline',
+              component: MoveToNavigator,
+            },
+            {
+              name: 'Movement',
+              title: 'С хранения',
+              icon: 'store-minus-outline',
+              component: MoveFromNavigator,
+            },
+            {
+              name: 'BaseMovement',
+              title: 'Перемещение',
+              icon: 'transfer',
+              component: MoveNavigator,
+            },
+            {
+              name: 'Shipment',
+              title: 'Отвес по заявке',
+              icon: 'playlist-check',
+              component: ShipmentNavigator,
+            },
+            {
+              name: 'FreeShipment',
+              title: 'Отвес',
+              icon: 'playlist-plus',
+              component: FreeShipmentNavigator,
+            },
+            {
+              name: 'Cells',
+              title: 'Ячейки',
+              icon: 'table-split-cell',
+              component: CellsNavigator,
+            },
+            {
+              name: 'Remains',
+              title: 'Остатки',
+              icon: 'dolly',
+              component: RemainsNavigator,
+            },
+            {
+              name: 'Return',
+              title: 'Возврат',
+              icon: 'file-restore-outline',
+              component: ReturnNavigator,
+            },
+            {
+              name: 'Inventory',
+              title: 'Инвентаризация',
+              icon: 'file-document-outline',
+              component: InventoryNavigator,
+            },
+
+            {
+              name: 'Labaratory',
+              title: 'Лаборатория',
+              icon: 'file-document-edit-outline',
+              component: LaboratoryNavigator,
+            },
+          ]
+        : [
+            {
+              name: 'Movement',
+              title: 'Перемещение',
+              icon: 'transfer',
+              component: MoveNavigator,
+            },
+            {
+              name: 'Shipment',
+              title: 'Отвес по заявке',
+              icon: 'playlist-check',
+              component: ShipmentNavigator,
+            },
+            {
+              name: 'FreeShipment',
+              title: 'Отвес',
+              icon: 'playlist-plus',
+              component: FreeShipmentNavigator,
+            },
+            {
+              name: 'Remains',
+              title: 'Остатки',
+              icon: 'dolly',
+              component: RemainsNavigator,
+            },
+            {
+              name: 'Return',
+              title: 'Возврат',
+              icon: 'file-restore-outline',
+              component: ReturnNavigator,
+            },
+            {
+              name: 'Inventory',
+              title: 'Инвентаризация',
+              icon: 'file-document-outline',
+              component: InventoryNavigator,
+            },
+
+            {
+              name: 'Labaratory',
+              title: 'Лаборатория',
+              icon: 'file-document-edit-outline',
+              component: LaboratoryNavigator,
+            },
+          ],
+    [isAddressStore],
   );
 
   const dispatch = useDispatch();
 
   //Загружаем в стор дополнительные настройки приложения
-  const isInit = useSelector((state) => state.settings.isInit);
   const authLoading = useSelector((state) => state.auth.loadingData);
   const appDataLoading = appSelectors.selectLoading();
   const isLogged = authSelectors.isLoggedWithCompany();
   const fpLoading = useFpSelector((state) => state.fpMovement.loading);
   const isDemo = useSelector((state) => state.auth.isDemo);
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
+  const getReferences = useSelector((state) => state.settings?.data?.getReferences);
 
   const refDispatch = useRefThunkDispatch();
   const docDispatch = useDocThunkDispatch();
@@ -109,6 +210,12 @@ const Root = () => {
   useEffect(() => {
     if (appSettings && isInit) {
       dispatch(settingsActions.addSettings(appSettings));
+      dispatch(
+        settingsActions.updateOption({
+          optionName: 'getReferences',
+          value: { ...getReferences, data: false } as ISettingsOption,
+        }),
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInit]);

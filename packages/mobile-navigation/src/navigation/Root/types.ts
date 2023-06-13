@@ -1,5 +1,6 @@
 type ProfileStackParamList = {
   Profile: undefined;
+  ProfileDetails: { id: string };
 };
 
 type InformationStackParamList = {
