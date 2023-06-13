@@ -592,7 +592,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
                   }
                 }
                 const currentDate = new Date();
-                const syncRequests = state.app.syncRequests;
+                const syncRequests = state.app.syncRequests || [];
 
                 if (isGetReferences) {
                   const syncReq = syncRequests.find((req) => req.cmdName === 'GET_REF');
