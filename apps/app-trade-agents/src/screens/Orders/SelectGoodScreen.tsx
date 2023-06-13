@@ -2,6 +2,7 @@ import React, { useState, useLayoutEffect, useCallback, useMemo, useEffect } fro
 import { View, Text, StyleSheet, ColorValue, Alert, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
+import { Badge, Checkbox, Chip, Searchbar, useTheme } from 'react-native-paper';
 
 import {
   globalStyles as styles,
@@ -20,8 +21,6 @@ import { generateId, getDateString, keyExtractor, shortenString } from '@lib/mob
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-
-import { Checkbox, Chip, Searchbar, useTheme } from 'react-native-paper';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import {
@@ -63,6 +62,24 @@ const SelectGoodScreen = () => {
   const groups = useMemo(() => refGroup.data.concat(UNKNOWN_GROUP), [refGroup.data]);
   const doc = docSelectors.selectByDocId<IOrderDocument>(docId);
   const contactId = doc?.head.contact.id;
+  const orders = docSelectors.selectByDocType<IOrderDocument>('order');
+  const docsByContact = useMemo(
+    () =>
+      doc
+        ? orders
+            .filter(
+              (o) =>
+                o.head.contact.id === contactId &&
+                o.id !== doc?.id &&
+                new Date(o.documentDate).getTime() < new Date(doc.documentDate).getTime(),
+            )
+            .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime())
+        : [],
+    [contactId, doc, orders],
+  );
+
+  const prevLines = useMemo(() => (docsByContact.length ? docsByContact[0].lines : []), [docsByContact]);
+
   const { parentGroupId } = useSelector((state) => state.app.formParams as IGroupFormParam);
 
   const [filterVisible, setFilterVisible] = useState(false);
@@ -223,20 +240,36 @@ const SelectGoodScreen = () => {
               const colorStyle = { color: item.id === selectedGroupId ? 'white' : colors.text };
               const backColorStyle = { backgroundColor: item.id === selectedGroupId ? colorSelected : colorBack };
               return (
-                <TouchableOpacity
+                <View
                   key={item.id}
-                  style={[localStyles.button, backColorStyle, groupButtonStyle]}
-                  onPress={() => onPress(item)}
+                  style={[localStyles.button, backColorStyle, styles.flexDirectionRow, groupButtonStyle]}
                 >
-                  <Text style={[localStyles.buttonLabel, colorStyle]}>{shortenString(item.name, 60) || item.id}</Text>
-                </TouchableOpacity>
+                  <TouchableOpacity key={item.id} style={[]} onPress={() => onPress(item)}>
+                    <Text style={[localStyles.buttonLabel, colorStyle]}>{shortenString(item.name, 60) || item.id}</Text>
+                  </TouchableOpacity>
+                  <Badge
+                    style={{
+                      position: 'absolute',
+                      right: 2,
+                      top: 2,
+                      backgroundColor: item.name.includes('охл')
+                        ? colors.placeholder
+                        : item.name.includes('зам')
+                        ? 'white'
+                        : 'transparent',
+                    }}
+                    size={10}
+                  >
+                    {item.name.includes('охл') ? 'ОХЛ' : item.name.includes('зам') ? 'ЗАМ' : ''}
+                  </Badge>
+                </View>
               );
             })}
           </View>
         </View>
       );
     },
-    [colors.text, groupButtonStyle],
+    [colors.placeholder, colors.text, groupButtonStyle],
   );
 
   const handlePressGood = useCallback(
@@ -255,6 +288,7 @@ const SelectGoodScreen = () => {
     ({ item }: { item: IGood }) => {
       const lines = doc?.lines?.filter((i) => i.good.id === item.id);
       const isAdded = !!lines?.length;
+      const prevLine = prevLines.filter((i) => i.good.id === item.id);
       const iconStyle = [styles.icon, { backgroundColor: isAdded ? '#06567D' : '#E91E63' }];
 
       const goodStyle = {
@@ -266,10 +300,29 @@ const SelectGoodScreen = () => {
           <TouchableOpacity onPress={() => handlePressGood(isAdded, item)}>
             <View style={[localStyles.goodItem, goodStyle]}>
               <View style={iconStyle}>
-                <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
+                <MaterialCommunityIcons name={'file-document'} size={20} color={'#FFF'} />
               </View>
+              {/* {prevLine.length > 0 ? (
+                <View style={[styles.checkedIcon, { backgroundColor: colors.placeholder, height: 10, width: 10 }]}>
+                  <MaterialCommunityIcons name="check" size={6} color={'#FFF'} />
+                </View>
+              ) : null} */}
               <View style={styles.details}>
                 <MediumText style={styles.textBold}>{item.name || item.id}</MediumText>
+                {prevLine.length > 0 && (
+                  <View style={localStyles.lineView}>
+                    <MediumText style={{ fontSize: 10 }}>Предыдущая заявка: </MediumText>
+                    {prevLine.map((line) => (
+                      <MediumText
+                        key={line.id}
+                        style={{ fontSize: 10 }}
+                        // onPress={() => setSelectedLine(line)}
+                      >
+                        {line.quantity} кг, уп.: {line.package ? line.package.name : 'без упаковки'};
+                      </MediumText>
+                    ))}
+                  </View>
+                )}
                 {isAdded && (
                   <View style={localStyles.lineView}>
                     {lines.map((line) => (
@@ -284,12 +337,17 @@ const SelectGoodScreen = () => {
                   </View>
                 )}
               </View>
+              {/* {prevLine.length > 0 && (
+                <Badge size={15} style={{ backgroundColor: colors.primary }}>
+                  {prevLine[0].quantity}
+                </Badge>
+              )} */}
             </View>
           </TouchableOpacity>
         </View>
       );
     },
-    [colors.primary, doc?.lines, handlePressGood],
+    [colors.primary, doc?.lines, handlePressGood, prevLines],
   );
 
   const handlePressGroup = useCallback(
