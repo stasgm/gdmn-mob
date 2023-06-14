@@ -210,9 +210,6 @@ const ShipmentViewScreen = () => {
       const weight = round(line?.weight * quantity, 3);
 
       const tempLine = tempOrder?.lines?.find((i) => line.good.id === i.good.id);
-      if (!tempLine || !tempOrder) {
-        return;
-      }
 
       if (remainsUse) {
         const good = goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === line.good.shcode);
@@ -223,31 +220,33 @@ const ShipmentViewScreen = () => {
 
             return;
           } else {
-            const newTempLine = { ...tempLine, weight: round(tempLine?.weight + line.weight - weight, 3) };
-            if (newTempLine.weight >= 0) {
-              fpDispatch(
-                fpMovementActions.updateTempOrderLine({
-                  docId: tempOrder?.id,
-                  line: newTempLine,
-                }),
-              );
-            } else {
-              Alert.alert('Данное количество превышает количество в заявке.', 'Добавить позицию?', [
-                {
-                  text: 'Да',
-                  onPress: () => {
-                    fpDispatch(
-                      fpMovementActions.updateTempOrderLine({
-                        docId: tempOrder?.id,
-                        line: newTempLine,
-                      }),
-                    );
+            if (tempLine && tempOrder) {
+              const newTempLine = { ...tempLine, weight: round(tempLine?.weight + line.weight - weight, 3) };
+              if (newTempLine.weight >= 0) {
+                fpDispatch(
+                  fpMovementActions.updateTempOrderLine({
+                    docId: tempOrder?.id,
+                    line: newTempLine,
+                  }),
+                );
+              } else {
+                Alert.alert('Данное количество превышает количество в заявке.', 'Добавить позицию?', [
+                  {
+                    text: 'Да',
+                    onPress: () => {
+                      fpDispatch(
+                        fpMovementActions.updateTempOrderLine({
+                          docId: tempOrder?.id,
+                          line: newTempLine,
+                        }),
+                      );
+                    },
                   },
-                },
-                {
-                  text: 'Отмена',
-                },
-              ]);
+                  {
+                    text: 'Отмена',
+                  },
+                ]);
+              }
             }
 
             if (weight < 1000) {
@@ -268,31 +267,33 @@ const ShipmentViewScreen = () => {
           return;
         }
       } else {
-        const newTempLine = { ...tempLine, weight: round(tempLine?.weight + line.weight - weight, 3) };
-        if (newTempLine.weight >= 0) {
-          fpDispatch(
-            fpMovementActions.updateTempOrderLine({
-              docId: tempOrder?.id,
-              line: newTempLine,
-            }),
-          );
-        } else {
-          Alert.alert('Данное количество превышает количество в заявке.', 'Добавить позицию?', [
-            {
-              text: 'Да',
-              onPress: () => {
-                fpDispatch(
-                  fpMovementActions.updateTempOrderLine({
-                    docId: tempOrder?.id,
-                    line: newTempLine,
-                  }),
-                );
+        if (tempLine && tempOrder) {
+          const newTempLine = { ...tempLine, weight: round(tempLine?.weight + line.weight - weight, 3) };
+          if (newTempLine.weight >= 0) {
+            fpDispatch(
+              fpMovementActions.updateTempOrderLine({
+                docId: tempOrder?.id,
+                line: newTempLine,
+              }),
+            );
+          } else {
+            Alert.alert('Данное количество превышает количество в заявке.', 'Добавить позицию?', [
+              {
+                text: 'Да',
+                onPress: () => {
+                  fpDispatch(
+                    fpMovementActions.updateTempOrderLine({
+                      docId: tempOrder?.id,
+                      line: newTempLine,
+                    }),
+                  );
+                },
               },
-            },
-            {
-              text: 'Отмена',
-            },
-          ]);
+              {
+                text: 'Отмена',
+              },
+            ]);
+          }
         }
 
         if (weight < 1000) {

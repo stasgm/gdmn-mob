@@ -197,7 +197,7 @@ export const getLineGood = (
   goodRemains: IRemGood[],
   remainsUse: boolean,
 ) => {
-  if (remainsUse) {
+  if (remainsUse && goodRemains.length) {
     const good = goodRemains.find((item) => item.good && `0000${item.good.shcode}`.slice(-4) === shcode);
 
     if (good) {
@@ -292,6 +292,8 @@ export const getRemGoodListByContact = (
       //Если по товару нет остатков и если модель не для выбора из справочника тмц, (не из остатков)
       //то добавляем запись с нулевыми значениями цены и остатка
       for (const good of goods) {
+        const goodAdd = linesAddition.find((i) => i.goodId === good.id);
+
         if (remainsByGoodId && remainsByGoodId[good.id]) {
           for (const r of remainsByGoodId[good.id]) {
             //Если isRemains true, showZeroRemains false и "isControlRemains" true, то в модель такие товары не добавляем
@@ -301,6 +303,15 @@ export const getRemGoodListByContact = (
                 remains: r.q,
               });
             }
+          }
+        } else if (remainsByGoodId && goodAdd) {
+          const qSubstr = linesSubtraction?.find((i) => i.goodId === good.id)?.q || 0;
+          const newRemains = goodAdd.q - qSubstr;
+          if (newRemains !== 0) {
+            remGoods.push({
+              good,
+              remains: newRemains,
+            });
           }
         }
       }
@@ -333,5 +344,3 @@ const getRemainsByGoodId = (
     return p;
   }, {});
 };
-
-// export { getRemGoodByContact, getRemGoodListByContact };
