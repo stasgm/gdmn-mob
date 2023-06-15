@@ -24,7 +24,6 @@ import { Snackbar } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
 
 import { mobileRequest, truncate, useSync, generateId } from '@lib/mobile-hooks';
-import { ISettingsOption } from '@lib/types';
 
 export interface IApp {
   items?: INavItem[];
@@ -44,20 +43,10 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
 
   const appState = useRef(AppState.currentState);
   const authDispatch = useAuthThunkDispatch();
-  const dispatch = useDispatch();
 
   useEffect(() => {
     //При запуске приложения записываем настройки в апи
     api.config = { ...api.config, ...config };
-    dispatch(
-      settingsActions.updateOption({
-        optionName: 'serverAddress',
-        value: {
-          ...settings.serverAddress,
-          data: `${config.protocol}${config.server}:${config.port}`,
-        } as ISettingsOption,
-      }),
-    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
