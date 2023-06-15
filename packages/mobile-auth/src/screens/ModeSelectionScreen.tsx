@@ -1,9 +1,8 @@
+import localStyles from './styles';
 import React from 'react';
 import { View, TouchableOpacity, Text } from 'react-native';
 
 import { PrimeButton, AppScreen } from '@lib/mobile-ui';
-
-import localStyles from './styles';
 
 type Props = {
   onSetDemoMode: () => void;
