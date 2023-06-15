@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Divider, IconButton } from 'react-native-paper';
@@ -15,8 +15,21 @@ const SettingsScreen = () => {
   const dispatch = useDispatch();
   const showActionSheet = useActionSheet();
   const data = useSelector((state) => state.settings.data);
+  const config = useSelector((state) => state.auth.config);
 
   const { colors } = useTheme();
+
+  useEffect(() => {
+    dispatch(
+      settingsActions.updateOption({
+        optionName: 'serverAddress',
+        value: {
+          ...data.serverAddress,
+          data: `${config.protocol}${config.server}:${config.port}`,
+        } as ISettingsOption,
+      }),
+    );
+  }, []);
 
   //Если группа не указана, подставляем базовую группу
   const settsData = useMemo(

@@ -1,3 +1,5 @@
+import localStyles from './styles';
+import { AuthStackParamList } from '../navigation/types';
 import React, { useEffect } from 'react';
 import { Alert, Linking, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -14,10 +16,6 @@ import Constants from 'expo-constants';
 import VersionCheck from 'react-native-version-check';
 
 import { AsyncAlert, generateId } from '@lib/mobile-hooks';
-
-import { AuthStackParamList } from '../navigation/types';
-
-import localStyles from './styles';
 
 type Props = {
   settings: IApiConfig | undefined;
@@ -87,9 +85,7 @@ const SplashScreen = (props: Props) => {
     };
 
     checkForUpdates();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dispatch]);
 
   return (
     <>

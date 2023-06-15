@@ -168,7 +168,6 @@ const verifyCode = (code: string): string | undefined => {
  * @param userId ИД пользователя
  */
 const logout = (userId: string) => {
-  console.log('logout', userId);
   // делаем что надо
 };
 

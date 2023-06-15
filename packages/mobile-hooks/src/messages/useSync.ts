@@ -36,7 +36,7 @@ import { generateId, getDateString, isIMessage, isIReferences, isNumeric } from 
 
 import { mobileRequest } from '../mobileRequest';
 
-import { getNextOrder, MULTIPART_ITEM_LIVE_IN_MS } from './helpers';
+import { getNextOrder, MULTIPART_ITEM_LIVE_IN_MS, REPEAT_REQUEST_TIME_IN_MS } from './helpers';
 import { useSaveErrors } from './useSaveErrors';
 
 export const useSync = (onSync?: () => Promise<any>) => {
@@ -125,6 +125,26 @@ export const useSync = (onSync?: () => Promise<any>) => {
         const removeMess = await api.message.removeMessage(appRequest, msg.id, params);
         if (removeMess.type !== 'REMOVE_MESSAGE') {
           addError('useSync: removeMessage', `${message} ${removeMess.message}`, tempErrs, false);
+        } else {
+          //Если ответ пришел, удаляем элемент с данным типом из массива запросов
+          switch (msg.body.type) {
+            case 'REFS': {
+              dispatch(appActions.removeSyncRequest('GET_REF'));
+              break;
+            }
+            case 'DOCS': {
+              dispatch(appActions.removeSyncRequest('GET_DOCUMENTS'));
+              break;
+            }
+            case 'APP_SYSTEM_SETTINGS': {
+              dispatch(appActions.removeSyncRequest('GET_APP_SYSTEM_SETTINGS'));
+              break;
+            }
+            case 'SETTINGS': {
+              dispatch(appActions.removeSyncRequest('GET_USER_SETTINGS'));
+              break;
+            }
+          }
         }
       };
 
@@ -514,9 +534,8 @@ export const useSync = (onSync?: () => Promise<any>) => {
                   companyId: company.id,
                 });
               }
-
+              const state = store.getState() as RootState;
               if (getMessagesResponse.type === 'GET_MESSAGES') {
-                const state = store.getState() as RootState;
                 //Обрабатываем все сборные сообщения
                 for (const [key, value] of Object.entries(state.messages.multipartData as IMultipartData)) {
                   //Если присутствуют идентификаторы последовательностей, с момента последнего сообщения в которых прошло более заданного промежутка (например, 1 час),
@@ -572,70 +591,94 @@ export const useSync = (onSync?: () => Promise<any>) => {
                     }
                   }
                 }
+                const currentDate = new Date();
+                const syncRequests = state.app.syncRequests || [];
 
                 if (isGetReferences) {
-                  //Формируем запрос на получение справочников для следующего раза
-                  const messageGetRef: IMessage['body'] = {
-                    type: 'CMD',
-                    version: refVersion,
-                    payload: {
-                      name: 'GET_REF',
-                    },
-                  };
+                  const syncReq = syncRequests.find((req) => req.cmdName === 'GET_REF');
+                  //Если запрос такого типа не был отправлен или время запроса меньше текущего на час, то отправляем
+                  if (
+                    !syncReq ||
+                    (syncReq?.date &&
+                      currentDate.getTime() - new Date(syncReq.date).getTime() > REPEAT_REQUEST_TIME_IN_MS)
+                  ) {
+                    //Формируем запрос на получение справочников для следующего раза
+                    const messageGetRef: IMessage['body'] = {
+                      type: 'CMD',
+                      version: refVersion,
+                      payload: {
+                        name: 'GET_REF',
+                      },
+                    };
 
-                  addRequestNotice('Запрос справочников');
+                    addRequestNotice('Запрос справочников');
 
-                  //3. Отправляем запрос на получение справочников
-                  const sendMesRefResponse = await api.message.sendMessages(
-                    appRequest,
-                    appSystem,
-                    messageCompany,
-                    consumer,
-                    messageGetRef,
-                    getNextOrder(),
-                    deviceId,
-                  );
-
-                  if (sendMesRefResponse.type !== 'SEND_MESSAGE') {
-                    addError(
-                      'useSync: api.message.sendMessages',
-                      `Запрос на получение справочников не отправлен. ${sendMesRefResponse.message}`,
-                      tempErrs,
+                    //3. Отправляем запрос на получение справочников
+                    const sendMesRefResponse = await api.message.sendMessages(
+                      appRequest,
+                      appSystem,
+                      messageCompany,
+                      consumer,
+                      messageGetRef,
+                      getNextOrder(),
+                      deviceId,
                     );
-                    connectError = isConnectError(sendMesRefResponse.type);
+
+                    if (sendMesRefResponse.type !== 'SEND_MESSAGE') {
+                      addError(
+                        'useSync: api.message.sendMessages',
+                        `Запрос на получение справочников не отправлен. ${sendMesRefResponse.message}`,
+                        tempErrs,
+                      );
+                      connectError = isConnectError(sendMesRefResponse.type);
+                    }
+                    if (sendMesRefResponse.type === 'SEND_MESSAGE') {
+                      dispatch(appActions.addSyncRequest({ cmdName: 'GET_REF', date: currentDate }));
+                    }
                   }
                 }
 
                 if (!connectError) {
-                  addRequestNotice('Запрос документов');
+                  const syncReq = syncRequests.find((req) => req.cmdName === 'GET_DOCUMENTS');
+                  //Если запрос такого типа не был отправлен или время запроса меньше текущего на час, то отправляем
+                  if (
+                    !syncReq ||
+                    (syncReq?.date &&
+                      currentDate.getTime() - new Date(syncReq.date).getTime() > REPEAT_REQUEST_TIME_IN_MS)
+                  ) {
+                    addRequestNotice('Запрос документов');
 
-                  //Формируем запрос на получение документов для следующего раза
-                  const messageGetDoc: IMessage['body'] = {
-                    type: 'CMD',
-                    version: docVersion,
-                    payload: {
-                      name: 'GET_DOCUMENTS',
-                    },
-                  };
+                    //Формируем запрос на получение документов для следующего раза
+                    const messageGetDoc: IMessage['body'] = {
+                      type: 'CMD',
+                      version: docVersion,
+                      payload: {
+                        name: 'GET_DOCUMENTS',
+                      },
+                    };
 
-                  //4. Отправляем запрос на получение документов
-                  const sendMesDocRespone = await api.message.sendMessages(
-                    appRequest,
-                    appSystem,
-                    messageCompany,
-                    consumer,
-                    messageGetDoc,
-                    getNextOrder(),
-                    deviceId,
-                  );
-
-                  if (sendMesDocRespone.type !== 'SEND_MESSAGE') {
-                    addError(
-                      'useSync: api.message.sendMessages',
-                      `Запрос на получение документов не отправлен. ${sendMesDocRespone.message}`,
-                      tempErrs,
+                    //4. Отправляем запрос на получение документов
+                    const sendMesDocRespone = await api.message.sendMessages(
+                      appRequest,
+                      appSystem,
+                      messageCompany,
+                      consumer,
+                      messageGetDoc,
+                      getNextOrder(),
+                      deviceId,
                     );
-                    connectError = isConnectError(sendMesDocRespone.type);
+
+                    if (sendMesDocRespone.type !== 'SEND_MESSAGE') {
+                      addError(
+                        'useSync: api.message.sendMessages',
+                        `Запрос на получение документов не отправлен. ${sendMesDocRespone.message}`,
+                        tempErrs,
+                      );
+                      connectError = isConnectError(sendMesDocRespone.type);
+                    }
+                    if (sendMesDocRespone.type === 'SEND_MESSAGE') {
+                      dispatch(appActions.addSyncRequest({ cmdName: 'GET_DOCUMENTS', date: currentDate }));
+                    }
                   }
                 }
 
@@ -669,68 +712,90 @@ export const useSync = (onSync?: () => Promise<any>) => {
                 }
 
                 if (!connectError) {
-                  addRequestNotice('Запрос настроек пользователя');
+                  const syncReq = syncRequests.find((req) => req.cmdName === 'GET_USER_SETTINGS');
+                  //Если запрос такого типа не был отправлен или время запроса меньше текущего на час, то отправляем
+                  if (
+                    !syncReq ||
+                    (syncReq?.date &&
+                      currentDate.getTime() - new Date(syncReq.date).getTime() > REPEAT_REQUEST_TIME_IN_MS)
+                  ) {
+                    addRequestNotice('Запрос настроек пользователя');
 
-                  //Формируем запрос на получение настроек для юзера
-                  const messageGetUserSettings: IMessage['body'] = {
-                    type: 'CMD',
-                    version: docVersion,
-                    payload: {
-                      name: 'GET_USER_SETTINGS',
-                    },
-                  };
+                    //Формируем запрос на получение настроек для юзера
+                    const messageGetUserSettings: IMessage['body'] = {
+                      type: 'CMD',
+                      version: docVersion,
+                      payload: {
+                        name: 'GET_USER_SETTINGS',
+                      },
+                    };
 
-                  //7. Отправляем запрос на получение настроек пользователя
-                  const sendMesUserSettResponse = await api.message.sendMessages(
-                    appRequest,
-                    appSystem,
-                    messageCompany,
-                    consumer,
-                    messageGetUserSettings,
-                    getNextOrder(),
-                    deviceId,
-                  );
-
-                  if (sendMesUserSettResponse.type !== 'SEND_MESSAGE') {
-                    addError(
-                      'useSync: api.message.sendMessages',
-                      `Запрос на получение настроек пользователя не отправлен. ${sendMesUserSettResponse.message}`,
-                      tempErrs,
+                    //7. Отправляем запрос на получение настроек пользователя
+                    const sendMesUserSettResponse = await api.message.sendMessages(
+                      appRequest,
+                      appSystem,
+                      messageCompany,
+                      consumer,
+                      messageGetUserSettings,
+                      getNextOrder(),
+                      deviceId,
                     );
-                    connectError = isConnectError(sendMesUserSettResponse.type);
+
+                    if (sendMesUserSettResponse.type !== 'SEND_MESSAGE') {
+                      addError(
+                        'useSync: api.message.sendMessages',
+                        `Запрос на получение настроек пользователя не отправлен. ${sendMesUserSettResponse.message}`,
+                        tempErrs,
+                      );
+                      connectError = isConnectError(sendMesUserSettResponse.type);
+                    }
+                    if (sendMesUserSettResponse.type === 'SEND_MESSAGE') {
+                      dispatch(appActions.addSyncRequest({ cmdName: 'GET_USER_SETTINGS', date: currentDate }));
+                    }
                   }
                 }
 
                 if (!connectError) {
-                  addRequestNotice('Запрос настроек подсистемы');
+                  const syncReq = syncRequests.find((req) => req.cmdName === 'GET_APP_SYSTEM_SETTINGS');
+                  //Если запрос такого типа не был отправлен или время запроса меньше текущего на час, то отправляем
+                  if (
+                    !syncReq ||
+                    (syncReq?.date &&
+                      currentDate.getTime() - new Date(syncReq.date).getTime() > REPEAT_REQUEST_TIME_IN_MS)
+                  ) {
+                    addRequestNotice('Запрос настроек подсистемы');
 
-                  //Формируем запрос на получение настроек подсистемы
-                  const messageGetAppSettings: IMessage['body'] = {
-                    type: 'CMD',
-                    version: docVersion,
-                    payload: {
-                      name: 'GET_APP_SYSTEM_SETTINGS',
-                    },
-                  };
+                    //Формируем запрос на получение настроек подсистемы
+                    const messageGetAppSettings: IMessage['body'] = {
+                      type: 'CMD',
+                      version: docVersion,
+                      payload: {
+                        name: 'GET_APP_SYSTEM_SETTINGS',
+                      },
+                    };
 
-                  //8. Отправляем запрос на получение настроек подсистемы
-                  const sendMesAppSettResponse = await api.message.sendMessages(
-                    appRequest,
-                    appSystem,
-                    messageCompany,
-                    consumer,
-                    messageGetAppSettings,
-                    getNextOrder(),
-                    deviceId,
-                  );
-
-                  if (sendMesAppSettResponse.type !== 'SEND_MESSAGE') {
-                    addError(
-                      'useSync: api.message.sendMessages',
-                      `Запрос на получение настроек подсистемы не отправлен. ${sendMesAppSettResponse.message}`,
-                      tempErrs,
+                    //8. Отправляем запрос на получение настроек подсистемы
+                    const sendMesAppSettResponse = await api.message.sendMessages(
+                      appRequest,
+                      appSystem,
+                      messageCompany,
+                      consumer,
+                      messageGetAppSettings,
+                      getNextOrder(),
+                      deviceId,
                     );
-                    connectError = isConnectError(sendMesAppSettResponse.type);
+
+                    if (sendMesAppSettResponse.type !== 'SEND_MESSAGE') {
+                      addError(
+                        'useSync: api.message.sendMessages',
+                        `Запрос на получение настроек подсистемы не отправлен. ${sendMesAppSettResponse.message}`,
+                        tempErrs,
+                      );
+                      connectError = isConnectError(sendMesAppSettResponse.type);
+                    }
+                    if (sendMesAppSettResponse.type === 'SEND_MESSAGE') {
+                      dispatch(appActions.addSyncRequest({ cmdName: 'GET_APP_SYSTEM_SETTINGS', date: currentDate }));
+                    }
                   }
                 }
               } else {

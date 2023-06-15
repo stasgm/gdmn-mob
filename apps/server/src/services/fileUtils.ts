@@ -21,6 +21,8 @@ import {
   getFoundString,
 } from '../utils/fileHelper';
 
+import { checkDeviceLogsFiles } from './errorLogUtils';
+
 import { getDb } from './dao/db';
 
 export const _readDir = async (root: string, excludeFolders: string[] | undefined): Promise<string[]> => {
@@ -52,12 +54,18 @@ export const checkFiles = async (): Promise<void> => {
       // eslint-disable-next-line no-await-in-loop
       const fileStat = await stat(file);
       const fileDate = fileStat.birthtimeMs;
-      if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > config.FILES_CHECK_PERIOD_IN_DAYS) {
+      if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > config.FILES_SAVING_PERIOD_IN_DAYS) {
         unlink(file);
       }
     } catch (err) {
       log.warn(`Ошибка при удалении старого файла-- ${err}`);
     }
+  }
+
+  try {
+    await checkDeviceLogsFiles();
+  } catch (err) {
+    log.warn(`Ошибка при удалении старого файла логов-- ${err}`);
   }
 };
 

@@ -22,7 +22,7 @@ import log from '../utils/logger';
 
 import { getListPart } from '../utils/helpers';
 
-import { BYTES_PER_KB } from '../utils/constants';
+import { BYTES_PER_KB, MSEС_IN_DAY } from '../utils/constants';
 
 import { getDb } from './dao/db';
 
@@ -126,6 +126,34 @@ export const getDeviceLogsFiles = async (): Promise<string[]> => {
     }
   }
   return files;
+};
+
+export const checkDeviceLogsFiles = async (): Promise<void> => {
+  const { devices } = getDb();
+  const files = await getDeviceLogsFiles();
+  for (const file of files) {
+    try {
+      const re = /from_(.+)_dev_(.+)\.json/gi;
+      const match = re.exec(file);
+      if (!match) {
+        log.error(`Invalid deviceLogs file name ${file}`);
+        unlink(file);
+      } else {
+        const device = devices.data.find((el: any) => el.uid === match[2]);
+
+        if (!device) {
+          // eslint-disable-next-line no-await-in-loop
+          const fileStat = await stat(file);
+          const fileDate = fileStat.birthtimeMs;
+          if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > config.FILES_SAVING_PERIOD_IN_DAYS) {
+            unlink(file);
+          }
+        }
+      }
+    } catch (err) {
+      log.warn(`Ошибка при удалении старого файла логов-- ${err}`);
+    }
+  }
 };
 
 const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined> => {
