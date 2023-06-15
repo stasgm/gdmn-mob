@@ -142,11 +142,7 @@ const ScanOrderScreen = () => {
         const shipment = shipments.find((i) => i.head.orderId === order.id);
 
         if (shipment) {
-          navigation.dispatch(
-            StackActions.replace('ShipmentView', {
-              id: shipment.id,
-            }),
-          );
+          setScaner({ state: 'error', message: 'Заявка уже добавлена' });
         } else {
           setScannedObject(order);
           setScaner({ state: 'found' });
@@ -155,7 +151,7 @@ const ScanOrderScreen = () => {
         setScaner({ state: 'error', message: 'Заявка не найдена' });
       }
     },
-    [navigation, orders, shipments],
+    [orders, shipments],
   );
 
   const handleClearScaner = () => setScaner({ state: 'init' });

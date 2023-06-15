@@ -311,6 +311,10 @@ export const FreeShipmentViewScreen = () => {
     ]);
   }, [docDispatch, id]);
 
+  const handleFocus = () => {
+    ref?.current?.focus();
+  };
+
   const hanldeCancelLastScan = useCallback(() => {
     if (lines?.length) {
       if (lines[0].scannedBarcode) {
@@ -324,6 +328,7 @@ export const FreeShipmentViewScreen = () => {
         dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lines[0].id }));
       }
     }
+    handleFocus();
   }, [dispatch, id, lines]);
 
   const [visibleSendDialog, setVisibleSendDialog] = useState(false);
@@ -397,12 +402,10 @@ export const FreeShipmentViewScreen = () => {
         <View style={styles.buttons}>
           {doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />}
           <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
-          {!isScanerReader && (
-            <ScanButton
-              onPress={() => navigation.navigate('ScanGood', { docId: id })}
-              disabled={screenState !== 'idle'}
-            />
-          )}
+          <ScanButton
+            onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('ScanGood', { docId: id }))}
+            disabled={screenState !== 'idle'}
+          />
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
@@ -609,7 +612,7 @@ export const FreeShipmentViewScreen = () => {
         ItemSeparatorComponent={ItemSeparator}
         keyExtractor={keyExtractor}
         extraData={[lines, isBlocked]}
-        keyboardShouldPersistTaps={'handled'}
+        keyboardShouldPersistTaps={'always'}
       />
       {lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
       <AppDialog
@@ -636,7 +639,7 @@ export const FreeShipmentViewScreen = () => {
       <SimpleDialog
         visible={visibleSendDialog}
         title={'Внимание!'}
-        text={'Вы уверены, что хотите отправить документ?'}
+        text={'Сформировано полностью?'}
         onCancel={() => setVisibleSendDialog(false)}
         onOk={handleSendDocument}
         okDisabled={loading}

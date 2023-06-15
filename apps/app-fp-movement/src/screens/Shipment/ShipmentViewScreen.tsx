@@ -354,6 +354,10 @@ const ShipmentViewScreen = () => {
     ]);
   }, [docDispatch, fpDispatch, id, tempOrder]);
 
+  const handleFocus = () => {
+    ref?.current?.focus();
+  };
+
   const hanldeCancelLastScan = useCallback(() => {
     if (shipmentLines?.length) {
       const shipmentLine = shipmentLines?.[0];
@@ -369,6 +373,7 @@ const ShipmentViewScreen = () => {
         );
       }
     }
+    handleFocus();
   }, [dispatch, fpDispatch, id, shipmentLines, tempOrder]);
 
   const actionsMenu = useCallback(() => {
@@ -448,12 +453,11 @@ const ShipmentViewScreen = () => {
             <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
           )}
           <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
-          {!isScanerReader && (
-            <ScanButton
-              onPress={() => navigation.navigate('ScanGood', { docId: id })}
-              disabled={screenState !== 'idle'}
-            />
-          )}
+
+          <ScanButton
+            onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('ScanGood', { docId: id }))}
+            disabled={screenState !== 'idle'}
+          />
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
@@ -786,7 +790,7 @@ const ShipmentViewScreen = () => {
             ItemSeparatorComponent={ItemSeparator}
             keyExtractor={keyExtractor}
             extraData={[shipmentLines, isBlocked]}
-            keyboardShouldPersistTaps={'handled'}
+            keyboardShouldPersistTaps={'always'}
           />
           <ViewTotal quantPack={shipmentLineSum?.quantPack} weight={shipmentLineSum?.weight || 0} />
         </>
@@ -800,7 +804,7 @@ const ShipmentViewScreen = () => {
             ItemSeparatorComponent={ItemSeparator}
             keyExtractor={keyExtractor}
             extraData={[tempOrderLines, isBlocked]}
-            keyboardShouldPersistTaps={'handled'}
+            keyboardShouldPersistTaps={'always'}
           />
           <ViewTotal weight={tempLineSum.weight || 0} />
         </>
@@ -828,7 +832,7 @@ const ShipmentViewScreen = () => {
       <SimpleDialog
         visible={visibleSendDialog}
         title={'Внимание!'}
-        text={'Вы уверены, что хотите отправить документ?'}
+        text={'Сформировано полностью?'}
         onCancel={() => setVisibleSendDialog(false)}
         onOk={handleSendDocument}
         okDisabled={loading}
