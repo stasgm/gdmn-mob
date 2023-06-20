@@ -14,14 +14,14 @@ import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks
 
 import { IDocumentType, INamedEntity, IReference, ScreenState } from '@lib/types';
 
-import { PrihodStackParamList } from '../../navigation/Root/types';
+import { ReceiptStackParamList } from '../../navigation/Root/types';
 import { IMoveFormParam, IMoveDocument } from '../../store/types';
 import { getNextDocNumber } from '../../utils/helpers';
 import { IAddressStoreEntity } from '../../store/app/types';
 
-export const PrihodEditScreen = () => {
-  const id = useRoute<RouteProp<PrihodStackParamList, 'PrihodEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<PrihodStackParamList, 'PrihodEdit'>>();
+export const ReceiptEditScreen = () => {
+  const id = useRoute<RouteProp<ReceiptStackParamList, 'ReceiptEdit'>>().params?.id;
+  const navigation = useNavigation<StackNavigationProp<ReceiptStackParamList, 'ReceiptEdit'>>();
   const dispatch = useDispatch();
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
@@ -133,7 +133,7 @@ export const PrihodEditScreen = () => {
 
         dispatch(documentActions.addDocument(newDoc));
 
-        navigation.dispatch(StackActions.replace('PrihodView', { id: newDoc.id }));
+        navigation.dispatch(StackActions.replace('ReceiptView', { id: newDoc.id }));
       } else {
         if (!doc) {
           setScreenState('idle');
@@ -164,7 +164,7 @@ export const PrihodEditScreen = () => {
         };
         setScreenState('idle');
         dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
-        navigation.navigate('PrihodView', { id });
+        navigation.navigate('ReceiptView', { id });
       }
     }
   }, [

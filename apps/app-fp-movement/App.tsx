@@ -57,7 +57,7 @@ import { MoveFromNavigator } from './src/navigation/MoveFromNavigator';
 import RemainsNavigator from './src/navigation/RemainsNavigator';
 import { CurrShipmentNavigator } from './src/navigation/CurrShipmentNavigator';
 import { CurrFreeShipmentNavigator } from './src/navigation/CurrFreeShipmentNavigator';
-import { PrihodNavigator } from './src/navigation/PrihodNavigator';
+import { ReceiptNavigator } from './src/navigation/ReceiptNavigator';
 
 const Root = () => {
   const { isInit, data: settings } = useSelector((state) => state.settings);
@@ -81,10 +81,10 @@ const Root = () => {
               component: MoveFromNavigator,
             },
             {
-              name: 'Prihod',
+              name: 'Receipt',
               title: 'Приход',
               icon: 'file-document-outline',
-              component: PrihodNavigator,
+              component: ReceiptNavigator,
             },
             {
               name: 'BaseMovement',

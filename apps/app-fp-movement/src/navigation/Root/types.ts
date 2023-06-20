@@ -47,13 +47,13 @@ export type MoveToParamList = RefParamList & {
 
 export type MoveToStackParamList = { MoveToList: undefined } & MoveToParamList;
 
-export type PrihodParamList = RefParamList & {
-  PrihodView: { id: string; docType?: string };
-  PrihodEdit: { id: string; docType?: string } | undefined;
+export type ReceiptParamList = RefParamList & {
+  ReceiptView: { id: string; docType?: string };
+  ReceiptEdit: { id: string; docType?: string } | undefined;
   ScanGood: { docId: string };
 };
 
-export type PrihodStackParamList = { PrihodList: undefined } & PrihodParamList;
+export type ReceiptStackParamList = { ReceiptList: undefined } & ReceiptParamList;
 
 export type ShipmentParamList = RefParamList & {
   ShipmentEdit: { id: string; isShipment: boolean };

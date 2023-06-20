@@ -29,16 +29,16 @@ import { deleteSelectedItems, getDateString, getDelList, keyExtractor, useSendDo
 import { IDelList } from '@lib/mobile-types';
 
 import { IMoveDocument } from '../../store/types';
-import { PrihodStackParamList } from '../../navigation/Root/types';
+import { ReceiptStackParamList } from '../../navigation/Root/types';
 
-export interface PrihodListSectionProps {
+export interface ReceiptListSectionProps {
   title: string;
 }
 
-export type SectionDataProps = SectionListData<IListItemProps, PrihodListSectionProps>[];
+export type SectionDataProps = SectionListData<IListItemProps, ReceiptListSectionProps>[];
 
-export const PrihodListScreen = () => {
-  const navigation = useNavigation<StackNavigationProp<PrihodStackParamList, 'PrihodList'>>();
+export const ReceiptListScreen = () => {
+  const navigation = useNavigation<StackNavigationProp<ReceiptStackParamList, 'ReceiptList'>>();
   const docDispatch = useDocThunkDispatch();
 
   const list = (
@@ -110,7 +110,7 @@ export const PrihodListScreen = () => {
   );
 
   const handleAddDocument = useCallback(() => {
-    navigation.navigate('PrihodEdit');
+    navigation.navigate('ReceiptEdit');
   }, [navigation]);
 
   const handleDeleteDocs = useCallback(() => {
@@ -183,7 +183,7 @@ export const PrihodListScreen = () => {
         onPress={() =>
           isDelList
             ? setDelList(getDelList(delList, item.id, item.status!))
-            : navigation.navigate('PrihodView', { id: item.id })
+            : navigation.navigate('ReceiptView', { id: item.id })
         }
         onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
         checked={!!delList[item.id]}

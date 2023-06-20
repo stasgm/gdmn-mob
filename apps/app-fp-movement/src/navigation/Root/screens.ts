@@ -27,7 +27,7 @@ import {
 } from '../../screens/Remains';
 
 import { SelectRefItemScreen } from '../../components';
-import { PrihodEditScreen, PrihodListScreen, PrihodViewScreen } from '../../screens/Prihod';
+import { ReceiptEditScreen, ReceiptListScreen, ReceiptViewScreen } from '../../screens/Receipt';
 
 export const moveScreens = {
   MoveEdit: { title: 'Перемещение', component: MoveEditScreen },
@@ -66,14 +66,14 @@ export const moveToListScreens = {
 };
 
 export const prihodScreens = {
-  PrihodEdit: { title: 'Приход', component: PrihodEditScreen },
-  PrihodView: { title: '', component: PrihodViewScreen },
+  ReceiptEdit: { title: 'Приход', component: ReceiptEditScreen },
+  ReceiptView: { title: '', component: ReceiptViewScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
   ScanGood: { title: 'Сканер', component: ScanGoodScreen },
 };
 
 export const prihodListScreens = {
-  PrihodList: { title: 'Приходы', component: PrihodListScreen },
+  ReceiptList: { title: 'Приходы', component: ReceiptListScreen },
 };
 
 export const shipmentScreens = {

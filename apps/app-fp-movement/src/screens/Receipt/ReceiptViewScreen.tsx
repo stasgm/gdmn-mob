@@ -29,7 +29,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
 
 import { barcodeSettings, IMoveDocument, IMoveLine, IShipmentDocument, IShipmentLine } from '../../store/types';
-import { PrihodStackParamList } from '../../navigation/Root/types';
+import { ReceiptStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import { getBarcode, getLineGood, getRemGoodListByContact, getTotalLines } from '../../utils/helpers';
@@ -43,18 +43,18 @@ export interface IScanerObject {
   state: 'scan' | 'added' | 'notFound';
 }
 
-export const PrihodViewScreen = () => {
+export const ReceiptViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
-  const navigation = useNavigation<StackNavigationProp<PrihodStackParamList, 'PrihodView'>>();
+  const navigation = useNavigation<StackNavigationProp<ReceiptStackParamList, 'ReceiptView'>>();
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
   const [barcode, setBarcode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const id = useRoute<RouteProp<PrihodStackParamList, 'PrihodView'>>().params?.id;
+  const id = useRoute<RouteProp<ReceiptStackParamList, 'ReceiptView'>>().params?.id;
   const doc = docSelectors.selectByDocId<IMoveDocument>(id);
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
   const loading = useSelector((state) => state.app.loading);
@@ -139,7 +139,7 @@ export const PrihodViewScreen = () => {
   };
 
   const handleEditDocHead = useCallback(() => {
-    navigation.navigate('PrihodEdit', { id });
+    navigation.navigate('ReceiptEdit', { id });
   }, [navigation, id]);
 
   const handleDelete = useCallback(() => {
