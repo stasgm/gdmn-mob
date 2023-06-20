@@ -29,11 +29,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
 
 import { barcodeSettings, IMoveDocument, IMoveLine, IShipmentDocument, IShipmentLine } from '../../store/types';
-import { MoveToStackParamList } from '../../navigation/Root/types';
+import { PrihodStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import { getBarcode, getLineGood, getRemGoodListByContact, getTotalLines } from '../../utils/helpers';
-import { IAddressStoreEntity, IGood, IRemains, IRemGood } from '../../store/app/types';
+import { IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
 
@@ -43,18 +43,18 @@ export interface IScanerObject {
   state: 'scan' | 'added' | 'notFound';
 }
 
-export const MoveToViewScreen = () => {
+export const PrihodViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
-  const navigation = useNavigation<StackNavigationProp<MoveToStackParamList, 'MoveToView'>>();
+  const navigation = useNavigation<StackNavigationProp<PrihodStackParamList, 'PrihodView'>>();
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
   const [barcode, setBarcode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const id = useRoute<RouteProp<MoveToStackParamList, 'MoveToView'>>().params?.id;
+  const id = useRoute<RouteProp<PrihodStackParamList, 'PrihodView'>>().params?.id;
   const doc = docSelectors.selectByDocId<IMoveDocument>(id);
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
   const loading = useSelector((state) => state.app.loading);
@@ -73,7 +73,6 @@ export const MoveToViewScreen = () => {
 
   const goods = refSelectors.selectByName<IGood>('good').data;
   const settings = useSelector((state) => state.settings?.data);
-  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
 
   const goodBarcodeSettings = Object.entries(settings).reduce((prev: barcodeSettings, [idx, item]) => {
     if (item && item.group?.id !== 'base' && typeof item.data === 'number') {
@@ -83,8 +82,6 @@ export const MoveToViewScreen = () => {
   }, {});
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
-
-  const isAddressStore = Boolean(settings.addressStore?.data);
 
   const docList = useSelector((state) => state.documents.list);
 
@@ -142,7 +139,7 @@ export const MoveToViewScreen = () => {
   };
 
   const handleEditDocHead = useCallback(() => {
-    navigation.navigate('MoveToEdit', { id });
+    navigation.navigate('PrihodEdit', { id });
   }, [navigation, id]);
 
   const handleDelete = useCallback(() => {
@@ -184,13 +181,6 @@ export const MoveToViewScreen = () => {
 
   const sendDoc = useSendDocs(doc ? [doc] : []);
 
-  const sendCellRequest = useSendOneRefRequest('Ячейки', { name: 'cell' });
-
-  const handleSendCellRequest = useCallback(async () => {
-    setVisibleDialog(false);
-    await sendCellRequest();
-  }, [sendCellRequest]);
-
   const sendRemainsRequest = useSendOneRefRequest('Остатки', { name: 'remains' });
 
   const handleSendRemainsRequest = useCallback(async () => {
@@ -202,19 +192,12 @@ export const MoveToViewScreen = () => {
     setVisibleSendDialog(false);
     setScreenState('sending');
     await sendDoc();
-    if (isAddressStore) {
-      handleSendCellRequest();
-    }
     handleSendRemainsRequest();
     setScreenState('sent');
-  }, [handleSendCellRequest, handleSendRemainsRequest, isAddressStore, sendDoc]);
+  }, [handleSendRemainsRequest, sendDoc]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
-      {
-        title: 'Отправить запрос на получение справочника ячеек',
-        onPress: handleSendCellRequest,
-      },
       {
         title: 'Ввести штрих-код',
         onPress: handleShowDialog,
@@ -237,7 +220,7 @@ export const MoveToViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleSendCellRequest, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
+  }, [showActionSheet, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
 
   const renderRight = useCallback(
     () =>
@@ -279,43 +262,24 @@ export const MoveToViewScreen = () => {
   //   return sum;
   // }, []);
 
-  const renderItem = useCallback(
-    ({ item }: { item: IMoveLine }) => {
-      return (
-        <ListItemLine
-          key={item.id}
-          readonly={!doc?.head.toDepart?.isAddressStore || isBlocked}
-          onPress={() => navigation.navigate('SelectCell', { docId: id, item, mode: 1 })}
-        >
-          <View style={styles.details}>
-            <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-            <View style={styles.flexDirectionRow}>
-              <MaterialCommunityIcons name="shopping-outline" size={18} />
-              <MediumText> {(item.weight || 0).toString()} кг</MediumText>
-            </View>
-            <View style={styles.flexDirectionRow}>
-              <MediumText>
-                Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
-              </MediumText>
-            </View>
-            {doc?.head.fromDepart?.isAddressStore ? (
-              <View style={styles.flexDirectionRow}>
-                <MediumText>Откуда: {item.fromCell || ''}</MediumText>
-              </View>
-            ) : null}
-            {doc?.head.toDepart?.isAddressStore ? (
-              <View style={styles.flexDirectionRow}>
-                <MediumText>
-                  {doc?.head.fromDepart?.isAddressStore ? 'Куда:' : 'Ячейка №'} {item.toCell || ''}
-                </MediumText>
-              </View>
-            ) : null}
+  const renderItem = useCallback(({ item }: { item: IMoveLine }) => {
+    return (
+      <ListItemLine key={item.id} readonly={true}>
+        <View style={styles.details}>
+          <LargeText style={styles.textBold}>{item.good.name}</LargeText>
+          <View style={styles.flexDirectionRow}>
+            <MaterialCommunityIcons name="shopping-outline" size={18} />
+            <MediumText> {(item.weight || 0).toString()} кг</MediumText>
           </View>
-        </ListItemLine>
-      );
-    },
-    [doc?.head, id, isBlocked, navigation],
-  );
+          <View style={styles.flexDirectionRow}>
+            <MediumText>
+              Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
+            </MediumText>
+          </View>
+        </View>
+      </ListItemLine>
+    );
+  }, []);
 
   const [scanned, setScanned] = useState(false);
 
@@ -358,12 +322,12 @@ export const MoveToViewScreen = () => {
       const lineGood = getLineGood(barc.shcode, barc.weight, goods, goodRemains, remainsUse);
 
       if (!lineGood.good) {
-        handleErrorMessage(visibleDialog, 'Товар не найден');
+        handleErrorMessage(visibleDialog, 'Товар не найден!');
         return;
       }
 
       if (!lineGood.isRightWeight) {
-        handleErrorMessage(visibleDialog, 'Вес товара превышает вес в остатках');
+        handleErrorMessage(visibleDialog, 'Вес товара превышает вес в остатках!');
         return;
       }
 
@@ -386,25 +350,9 @@ export const MoveToViewScreen = () => {
         sortOrder: doc.lines?.length + 1,
       };
 
-      const isFromAddressed = departs.find((i) => i.id === doc.head.fromDepart?.id && i.isAddressStore);
-      const isToAddressed = departs.find((i) => i.id === doc.head.toDepart?.id && i.isAddressStore);
+      dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
 
-      if (
-        doc.head.toDepart?.isAddressStore ||
-        doc.head.fromDepart?.isAddressStore ||
-        isFromAddressed ||
-        isToAddressed
-      ) {
-        if (newLine.quantPack < goodBarcodeSettings.boxNumber) {
-          handleErrorMessage(visibleDialog, `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}!`);
-
-          return;
-        }
-
-        navigation.navigate('SelectCell', { docId: id, item: newLine, mode: 0 });
-      } else {
-        dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
-      }
+      dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
 
       if (visibleDialog) {
         setVisibleDialog(false);
@@ -415,19 +363,7 @@ export const MoveToViewScreen = () => {
       }
     },
 
-    [
-      doc,
-      minBarcodeLength,
-      goodBarcodeSettings,
-      remainsUse,
-      visibleDialog,
-      goodRemains,
-      departs,
-      navigation,
-      id,
-      dispatch,
-      goods,
-    ],
+    [doc, minBarcodeLength, goodBarcodeSettings, remainsUse, visibleDialog, goodRemains, id, dispatch, goods],
   );
 
   const handleSearchBarcode = () => {

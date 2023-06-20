@@ -44,7 +44,7 @@ import {
   IShipmentDocument,
   IShipmentLine,
 } from '../../store/types';
-import { FreeShipmentStackParamList } from '../../navigation/Root/types';
+import { CurrFreeShipmentStackParamList, FreeShipmentStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import { getBarcode, getLineGood, getRemGoodListByContact, getTotalLines } from '../../utils/helpers';
@@ -64,7 +64,9 @@ export const FreeShipmentViewScreen = () => {
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<FreeShipmentStackParamList, 'FreeShipmentView'>>();
 
-  const id = useRoute<RouteProp<FreeShipmentStackParamList, 'FreeShipmentView'>>().params?.id;
+  const navigationCurr = useNavigation<StackNavigationProp<CurrFreeShipmentStackParamList, 'FreeShipmentView'>>();
+
+  const { id, isCurr } = useRoute<RouteProp<FreeShipmentStackParamList, 'FreeShipmentView'>>().params;
   const doc = docSelectors.selectByDocId<IFreeShipmentDocument>(id);
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
 
@@ -283,8 +285,10 @@ export const FreeShipmentViewScreen = () => {
   };
 
   const handleEditDocHead = useCallback(() => {
-    navigation.navigate('FreeShipmentEdit', { id });
-  }, [navigation, id]);
+    isCurr
+      ? navigationCurr.navigate('FreeShipmentEdit', { id, isCurr })
+      : navigation.navigate('FreeShipmentEdit', { id, isCurr });
+  }, [isCurr, navigation, id, navigationCurr]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
@@ -387,8 +391,8 @@ export const FreeShipmentViewScreen = () => {
         document: { ...doc, status: 'READY' },
       }),
     );
-    navigation.goBack();
-  }, [dispatch, id, navigation, doc]);
+    isCurr ? navigationCurr.goBack() : navigation.goBack();
+  }, [doc, dispatch, id, isCurr, navigation, navigationCurr]);
 
   const renderRight = useCallback(
     () =>
@@ -403,21 +407,44 @@ export const FreeShipmentViewScreen = () => {
           {doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />}
           <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
           <ScanButton
-            onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('ScanGood', { docId: id }))}
+            onPress={() =>
+              isScanerReader
+                ? handleFocus()
+                : isCurr
+                ? navigationCurr.navigate('ScanGood', { docId: id })
+                : navigation.navigate('ScanGood', { docId: id })
+            }
             disabled={screenState !== 'idle'}
           />
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [actionsMenu, doc?.status, handleSaveDocument, id, isBlocked, isScanerReader, loading, navigation, screenState],
+    [
+      actionsMenu,
+      doc?.status,
+      handleSaveDocument,
+      id,
+      isBlocked,
+      isCurr,
+      isScanerReader,
+      loading,
+      navigation,
+      navigationCurr,
+      screenState,
+    ],
   );
 
   useLayoutEffect(() => {
-    navigation.setOptions({
-      headerLeft: navBackButton,
-      headerRight: renderRight,
-    });
-  }, [navigation, renderRight]);
+    isCurr
+      ? navigationCurr.setOptions({
+          headerLeft: navBackButton,
+          headerRight: renderRight,
+        })
+      : navigation.setOptions({
+          headerLeft: navBackButton,
+          headerRight: renderRight,
+        });
+  }, [isCurr, navigation, navigationCurr, renderRight]);
 
   const renderItem = useCallback(
     ({ item }: { item: IFreeShipmentLine }) => {
@@ -461,6 +488,10 @@ export const FreeShipmentViewScreen = () => {
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!doc) {
+        return;
+      }
+
+      if (doc?.status !== 'DRAFT') {
         return;
       }
 
@@ -554,9 +585,9 @@ export const FreeShipmentViewScreen = () => {
   useEffect(() => {
     if (screenState === 'sent' || screenState === 'deleted') {
       setScreenState('idle');
-      navigation.goBack();
+      isCurr ? navigationCurr.goBack() : navigation.goBack();
     }
-  }, [navigation, screenState]);
+  }, [isCurr, navigation, navigationCurr, screenState]);
 
   const isFocused = useIsFocused();
   if (!isFocused) {

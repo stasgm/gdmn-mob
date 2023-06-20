@@ -32,7 +32,7 @@ import { FlashList } from '@shopify/flash-list';
 
 import { barcodeSettings, IShipmentDocument, IShipmentLine, ITempLine } from '../../store/types';
 
-import { ShipmentStackParamList } from '../../navigation/Root/types';
+import { CurrShipmentStackParamList, ShipmentStackParamList } from '../../navigation/Root/types';
 
 import { getStatusColor, lineTypes, ONE_SECOND_IN_MS } from '../../utils/constants';
 
@@ -48,8 +48,12 @@ const ShipmentViewScreen = () => {
   const { colors } = useTheme();
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
+
   const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ShipmentView'>>();
-  const id = useRoute<RouteProp<ShipmentStackParamList, 'ShipmentView'>>().params?.id;
+  const navigationCurr = useNavigation<StackNavigationProp<CurrShipmentStackParamList, 'ShipmentView'>>();
+
+  const { id, isShipment } = useRoute<RouteProp<ShipmentStackParamList, 'ShipmentView'>>().params;
+
   const dispatch = useDispatch();
   const fpDispatch = useFpDispatch();
   const settings = useSelector((state) => state.settings?.data);
@@ -324,7 +328,13 @@ const ShipmentViewScreen = () => {
     setQuantPack('');
     // setErrorMessage('');
   };
-  const handleEditShipmentHead = useCallback(() => navigation.navigate('ShipmentEdit', { id }), [navigation, id]);
+  const handleEditShipmentHead = useCallback(
+    () =>
+      isShipment
+        ? navigation.navigate('ShipmentEdit', { id, isShipment })
+        : navigationCurr.navigate('ShipmentEdit', { id, isShipment }),
+    [isShipment, navigation, id, navigationCurr],
+  );
 
   const handleDeleteShipment = useCallback(async () => {
     if (!id) {
@@ -414,8 +424,8 @@ const ShipmentViewScreen = () => {
         document: { ...shipment, status: 'READY' },
       }),
     );
-    navigation.goBack();
-  }, [dispatch, id, navigation, shipment]);
+    isShipment ? navigation.goBack() : navigationCurr.goBack();
+  }, [dispatch, id, isShipment, navigation, navigationCurr, shipment]);
 
   const [visibleSendDialog, setVisibleSendDialog] = useState(false);
 
@@ -455,7 +465,13 @@ const ShipmentViewScreen = () => {
           <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
 
           <ScanButton
-            onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('ScanGood', { docId: id }))}
+            onPress={() =>
+              isScanerReader
+                ? handleFocus()
+                : isShipment
+                ? navigation.navigate('ScanGood', { docId: id, isShipment })
+                : navigationCurr.navigate('ScanGood', { docId: id, isShipment })
+            }
             disabled={screenState !== 'idle'}
           />
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
@@ -467,24 +483,35 @@ const ShipmentViewScreen = () => {
       id,
       isBlocked,
       isScanerReader,
+      isShipment,
       loading,
       navigation,
+      navigationCurr,
       screenState,
       shipment?.status,
     ],
   );
 
   const renderLeft = useCallback(
-    () => <BackButton onPress={() => navigation.navigate('ShipmentList')} />,
-    [navigation],
+    () => (
+      <BackButton
+        onPress={() => (isShipment ? navigation.navigate('ShipmentList') : navigationCurr.navigate('CurrShipmentList'))}
+      />
+    ),
+    [isShipment, navigation, navigationCurr],
   );
 
   useLayoutEffect(() => {
-    navigation.setOptions({
-      headerLeft: renderLeft,
-      headerRight: renderRight,
-    });
-  }, [navigation, renderLeft, renderRight]);
+    isShipment
+      ? navigation.setOptions({
+          headerLeft: renderLeft,
+          headerRight: renderRight,
+        })
+      : navigationCurr.setOptions({
+          headerLeft: renderLeft,
+          headerRight: renderRight,
+        });
+  }, [isShipment, navigation, navigationCurr, renderLeft, renderRight]);
 
   const [scanned, setScanned] = useState(false);
 
@@ -660,9 +687,9 @@ const ShipmentViewScreen = () => {
   useEffect(() => {
     if (screenState === 'sent' || screenState === 'deleted') {
       setScreenState('idle');
-      navigation.goBack();
+      isShipment ? navigation.goBack() : navigationCurr.goBack();
     }
-  }, [navigation, screenState]);
+  }, [isShipment, navigation, navigationCurr, screenState]);
 
   const LineTypes = useCallback(
     () => (

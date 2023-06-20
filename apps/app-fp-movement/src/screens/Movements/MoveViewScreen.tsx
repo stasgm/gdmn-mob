@@ -337,6 +337,10 @@ export const MoveViewScreen = () => {
         return;
       }
 
+      if (doc?.status !== 'DRAFT') {
+        return;
+      }
+
       if (!brc.match(/^-{0,1}\d+$/)) {
         handleErrorMessage(visibleDialog, 'Штрих-код не определён. Повторите сканирование!');
         return;

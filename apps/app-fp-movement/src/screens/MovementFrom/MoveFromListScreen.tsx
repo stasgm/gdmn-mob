@@ -1,8 +1,8 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
-import { ListRenderItem, SectionList, SectionListData, View, StyleSheet } from 'react-native';
+import { ListRenderItem, SectionList, SectionListData, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import { documentActions, refSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
+import { documentActions, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   AddButton,
@@ -16,21 +16,20 @@ import {
   CloseButton,
   EmptyList,
   MediumText,
-  Menu,
   navBackDrawer,
+  SimpleDialog,
+  SendButton,
+  FilterButtons,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@lib/mobile-hooks';
+import { deleteSelectedItems, getDateString, getDelList, keyExtractor, useSendDocs } from '@lib/mobile-hooks';
 
-import { INamedEntity } from '@lib/types';
-
-import { IDelList, IListItem } from '@lib/mobile-types';
+import { IDelList } from '@lib/mobile-types';
 
 import { IMoveDocument } from '../../store/types';
 import { MoveFromStackParamList } from '../../navigation/Root/types';
-import { dateTypes, docDepartTypes, statusTypes } from '../../utils/constants';
 
 export interface MoveFromListSectionProps {
   title: string;
@@ -48,20 +47,12 @@ export const MoveFromListScreen = () => {
     ) as IMoveDocument[]
   ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
+  const loading = useSelector((state) => state.app.loading);
+
   const [delList, setDelList] = useState<IDelList>({});
   const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
 
-  const [date, setDate] = useState(dateTypes[0]);
-
   const [status, setStatus] = useState<Status>('all');
-
-  const documentSubtypes = refSelectors
-    .selectByName<INamedEntity>('documentSubtype')
-    ?.data?.map((i) => ({ id: i.id, value: i.name }));
-
-  const docTypes = useMemo(() => docDepartTypes.concat(documentSubtypes), [documentSubtypes]);
-
-  const [type, setType] = useState(docTypes[0]);
 
   const filteredList: IListItemProps[] = useMemo(() => {
     const res =
@@ -69,19 +60,11 @@ export const MoveFromListScreen = () => {
         ? list
         : status === 'active'
         ? list.filter((e) => e.status !== 'PROCESSED')
-        : status !== 'archive' && status !== 'all'
-        ? list.filter((e) => e.status === status)
+        : status === 'archive'
+        ? list.filter((e) => e.status === 'PROCESSED')
         : [];
 
-    const newRes = type?.id === 'all' ? res : res?.filter((i) => i?.head.subtype.id === type?.id);
-
-    newRes.sort((a, b) =>
-      date.id === 'new'
-        ? new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()
-        : new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
-    );
-
-    return newRes.map(
+    return res.map(
       (i) =>
         ({
           id: i.id,
@@ -102,7 +85,7 @@ export const MoveFromListScreen = () => {
           ),
         } as IListItemProps),
     );
-  }, [status, list, type?.id, date.id]);
+  }, [status, list]);
 
   const sections = useMemo(
     () =>
@@ -126,25 +109,6 @@ export const MoveFromListScreen = () => {
     [filteredList],
   );
 
-  const [visibleType, setVisibleType] = useState(false);
-  const [visibleStatus, setVisibleStatus] = useState(false);
-  const [visibleDate, setVisibleDate] = useState(false);
-
-  const handleApplyType = (option: IListItem) => {
-    setVisibleType(false);
-    setType(option);
-  };
-
-  const handleApplyStatus = (option: any) => {
-    setVisibleStatus(false);
-    setStatus(option.id);
-  };
-
-  const handleApplyDate = (option: IListItem) => {
-    setVisibleDate(false);
-    setDate(option);
-  };
-
   const handleAddDocument = useCallback(() => {
     navigation.navigate('MoveFromEdit');
   }, [navigation]);
@@ -160,10 +124,42 @@ export const MoveFromListScreen = () => {
     deleteSelectedItems(delList, deleteDocs);
   }, [delList, docDispatch]);
 
+  const [visibleSendDialog, setVisibleSendDialog] = useState(false);
+
+  const docsToSend = useMemo(
+    () =>
+      Object.keys(delList).reduce((prev: IMoveDocument[], cur) => {
+        const sendingDoc = list.find((i) => i.id === cur && (i.status === 'DRAFT' || i.status === 'READY'));
+        if (sendingDoc) {
+          prev = [...prev, sendingDoc];
+        }
+        return prev;
+      }, []),
+    [delList, list],
+  );
+
+  const sendDoc = useSendDocs(docsToSend.length ? docsToSend : []);
+
+  const handleSendDocument = useCallback(async () => {
+    setVisibleSendDialog(false);
+    // setScreenState('sending');
+    await sendDoc();
+    setDelList({});
+
+    // setScreenState('sent');
+  }, [sendDoc]);
+
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        {isDelList ? <DeleteButton onPress={handleDeleteDocs} /> : <AddButton onPress={handleAddDocument} />}
+        {isDelList ? (
+          <View style={styles.buttons}>
+            <SendButton onPress={() => setVisibleSendDialog(true)} />
+            <DeleteButton onPress={handleDeleteDocs} />
+          </View>
+        ) : (
+          <AddButton onPress={handleAddDocument} />
+        )}
       </View>
     ),
     [handleAddDocument, handleDeleteDocs, isDelList],
@@ -175,7 +171,7 @@ export const MoveFromListScreen = () => {
     navigation.setOptions({
       headerLeft: isDelList ? renderLeft : navBackDrawer,
       headerRight: renderRight,
-      title: isDelList ? `Выделено документов: ${Object.values(delList).length}` : 'С хранения',
+      title: isDelList ? `${Object.values(delList).length}` : 'С хранения',
     });
   }, [delList, isDelList, navigation, renderLeft, renderRight]);
 
@@ -202,50 +198,7 @@ export const MoveFromListScreen = () => {
 
   return (
     <AppScreen>
-      <View style={[styles.containerCenter, localStyles.container]}>
-        <Menu
-          key={'MenuType'}
-          title="Тип"
-          visible={visibleType}
-          onChange={handleApplyType}
-          onDismiss={() => setVisibleType(false)}
-          onPress={() => setVisibleType(true)}
-          options={docTypes}
-          activeOptionId={type.id}
-          style={[styles.btnTab, styles.firstBtnTab]}
-          menuStyle={localStyles.menu}
-          isActive={type.id !== 'all'}
-          iconName={'chevron-down'}
-        />
-        <Menu
-          key={'MenuStatus'}
-          title="Статус"
-          visible={visibleStatus}
-          onChange={handleApplyStatus}
-          onDismiss={() => setVisibleStatus(false)}
-          onPress={() => setVisibleStatus(true)}
-          options={statusTypes}
-          activeOptionId={status}
-          style={[styles.btnTab]}
-          menuStyle={localStyles.menu}
-          isActive={status !== 'all'}
-          iconName={'chevron-down'}
-        />
-        <Menu
-          key={'MenuDataSort'}
-          title="Дата"
-          visible={visibleDate}
-          onChange={handleApplyDate}
-          onDismiss={() => setVisibleDate(false)}
-          onPress={() => setVisibleDate(true)}
-          options={dateTypes}
-          activeOptionId={date.id}
-          style={[styles.btnTab, styles.lastBtnTab]}
-          menuStyle={localStyles.menu}
-          isActive={date.id !== 'new'}
-          iconName={'chevron-down'}
-        />
-      </View>
+      <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} />
       <SectionList
         sections={sections}
         renderItem={renderItem}
@@ -254,17 +207,14 @@ export const MoveFromListScreen = () => {
         renderSectionHeader={renderSectionHeader}
         ListEmptyComponent={EmptyList}
       />
+      <SimpleDialog
+        visible={visibleSendDialog}
+        title={'Внимание!'}
+        text={'Сформировано полностью?'}
+        onCancel={() => setVisibleSendDialog(false)}
+        onOk={handleSendDocument}
+        okDisabled={loading}
+      />
     </AppScreen>
   );
 };
-
-const localStyles = StyleSheet.create({
-  container: {
-    marginBottom: 5,
-  },
-  menu: {
-    justifyContent: 'center',
-    marginLeft: 6,
-    width: '100%',
-  },
-});

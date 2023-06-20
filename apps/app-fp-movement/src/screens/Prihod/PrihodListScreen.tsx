@@ -6,7 +6,6 @@ import { documentActions, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   AddButton,
-  FilterButtons,
   ItemSeparator,
   Status,
   AppScreen,
@@ -16,9 +15,11 @@ import {
   DeleteButton,
   CloseButton,
   EmptyList,
+  MediumText,
   navBackDrawer,
   SimpleDialog,
   SendButton,
+  FilterButtons,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -27,21 +28,23 @@ import { deleteSelectedItems, getDateString, getDelList, keyExtractor, useSendDo
 
 import { IDelList } from '@lib/mobile-types';
 
-import { IReturnDocument } from '../../store/types';
-import { ReturnStackParamList } from '../../navigation/Root/types';
+import { IMoveDocument } from '../../store/types';
+import { PrihodStackParamList } from '../../navigation/Root/types';
 
-export interface ReturnListSectionProps {
+export interface PrihodListSectionProps {
   title: string;
 }
 
-export type SectionDataProps = SectionListData<IListItemProps, ReturnListSectionProps>[];
+export type SectionDataProps = SectionListData<IListItemProps, PrihodListSectionProps>[];
 
-export const ReturnListScreen = () => {
-  const navigation = useNavigation<StackNavigationProp<ReturnStackParamList, 'ReturnList'>>();
+export const PrihodListScreen = () => {
+  const navigation = useNavigation<StackNavigationProp<PrihodStackParamList, 'PrihodList'>>();
   const docDispatch = useDocThunkDispatch();
 
   const list = (
-    useSelector((state) => state.documents.list)?.filter((i) => i.documentType?.name === 'return') as IReturnDocument[]
+    useSelector((state) => state.documents.list)?.filter(
+      (i) => i.documentType?.name === 'movement' && i.head?.subtype.id === 'prihod',
+    ) as IMoveDocument[]
   ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   const loading = useSelector((state) => state.app.loading);
@@ -65,12 +68,21 @@ export const ReturnListScreen = () => {
       (i) =>
         ({
           id: i.id,
-          title: i.head.fromDepart?.name || '',
+          title: i.head.subtype.name || '',
           documentDate: getDateString(i.documentDate),
           status: i.status,
-          subtitle: `№ ${i.number} на ${getDateString(i.documentDate)}` || '',
+
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
+          addInfo: (
+            <View>
+              <MediumText>Откуда: {i.head.fromDepart?.name || ''}</MediumText>
+              <MediumText>Куда: {i.head.toDepart?.name || ''}</MediumText>
+              <MediumText>
+                № {i.number} на {getDateString(i.documentDate)}
+              </MediumText>
+            </View>
+          ),
         } as IListItemProps),
     );
   }, [status, list]);
@@ -97,6 +109,10 @@ export const ReturnListScreen = () => {
     [filteredList],
   );
 
+  const handleAddDocument = useCallback(() => {
+    navigation.navigate('PrihodEdit');
+  }, [navigation]);
+
   const handleDeleteDocs = useCallback(() => {
     const docIds = Object.keys(delList);
 
@@ -112,7 +128,7 @@ export const ReturnListScreen = () => {
 
   const docsToSend = useMemo(
     () =>
-      Object.keys(delList).reduce((prev: IReturnDocument[], cur) => {
+      Object.keys(delList).reduce((prev: IMoveDocument[], cur) => {
         const sendingDoc = list.find((i) => i.id === cur && (i.status === 'DRAFT' || i.status === 'READY'));
         if (sendingDoc) {
           prev = [...prev, sendingDoc];
@@ -142,11 +158,11 @@ export const ReturnListScreen = () => {
             <DeleteButton onPress={handleDeleteDocs} />
           </View>
         ) : (
-          <AddButton onPress={() => navigation.navigate('ReturnEdit')} />
+          <AddButton onPress={handleAddDocument} />
         )}
       </View>
     ),
-    [handleDeleteDocs, isDelList, navigation],
+    [handleAddDocument, handleDeleteDocs, isDelList],
   );
 
   const renderLeft = useCallback(() => isDelList && <CloseButton onPress={() => setDelList({})} />, [isDelList]);
@@ -155,7 +171,7 @@ export const ReturnListScreen = () => {
     navigation.setOptions({
       headerLeft: isDelList ? renderLeft : navBackDrawer,
       headerRight: renderRight,
-      title: isDelList ? `${Object.values(delList).length}` : 'Возвраты',
+      title: isDelList ? `${Object.values(delList).length}` : 'Приходы',
     });
   }, [delList, isDelList, navigation, renderLeft, renderRight]);
 
@@ -167,7 +183,7 @@ export const ReturnListScreen = () => {
         onPress={() =>
           isDelList
             ? setDelList(getDelList(delList, item.id, item.status!))
-            : navigation.navigate('ReturnView', { id: item.id })
+            : navigation.navigate('PrihodView', { id: item.id })
         }
         onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
         checked={!!delList[item.id]}
@@ -183,6 +199,7 @@ export const ReturnListScreen = () => {
   return (
     <AppScreen>
       <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} />
+
       <SectionList
         sections={sections}
         renderItem={renderItem}

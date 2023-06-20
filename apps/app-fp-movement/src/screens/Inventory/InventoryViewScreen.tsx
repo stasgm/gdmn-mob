@@ -21,7 +21,7 @@ import {
   SimpleDialog,
 } from '@lib/mobile-ui';
 
-import { generateId, getDateString, keyExtractor, useSendDocs, sleep } from '@lib/mobile-hooks';
+import { generateId, getDateString, keyExtractor, useSendDocs, sleep, round } from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
 
@@ -80,6 +80,9 @@ export const InventoryViewScreen = () => {
   const [barcode, setBarcode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
+  const [visibleQuantPackDialog, setVisibleQuantPackDialog] = useState(false);
+  const [quantPack, setQuantPack] = useState('');
+
   const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
 
   const handleShowDialog = () => {
@@ -90,6 +93,73 @@ export const InventoryViewScreen = () => {
     setVisibleDialog(false);
     setBarcode('');
     setErrorMessage('');
+  };
+
+  const handleAddQuantPack = useCallback(
+    (quantity: number) => {
+      const line = lines?.[0];
+      if (!line) {
+        return;
+      }
+
+      const weight = round(line?.weight * quantity, 3);
+
+      if (weight < 1000) {
+        const newLine: IInventoryLine = {
+          ...line,
+          quantPack: quantity,
+          weight,
+          scannedBarcode: line?.barcode,
+        };
+
+        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+      } else {
+        const maxQuantPack = round(Math.floor(999.99 / line?.weight), 3);
+
+        let newQuantity = quantity;
+        let sortOrder = line.sortOrder || lines.length;
+
+        while (newQuantity > 0) {
+          const q = newQuantity > maxQuantPack ? maxQuantPack : newQuantity;
+          const newWeight = round(line?.weight * q, 3);
+
+          const newLine: IInventoryLine = {
+            ...line,
+            quantPack: q,
+            weight: newWeight,
+            scannedBarcode: line?.barcode,
+          };
+
+          if (newQuantity === quantity) {
+            dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+          } else {
+            sortOrder = sortOrder + 1;
+
+            const addedLine = { ...newLine, id: generateId(), sortOrder };
+            dispatch(
+              documentActions.addDocumentLine({
+                docId: id,
+                line: addedLine,
+              }),
+            );
+          }
+          newQuantity = newQuantity - maxQuantPack;
+        }
+      }
+    },
+    [dispatch, id, lines],
+  );
+
+  const handleEditQuantPack = () => {
+    handleAddQuantPack(Number(quantPack));
+    setVisibleQuantPackDialog(false);
+    setQuantPack('');
+  };
+
+  const handleDismissQuantPack = () => {
+    setVisibleQuantPackDialog(false);
+    setQuantPack('');
+    // setErrorMessage('');
   };
 
   const handleEditDocHead = useCallback(() => {
@@ -214,7 +284,11 @@ export const InventoryViewScreen = () => {
   const renderItem = useCallback(
     ({ item }: { item: IInventoryLine }) => {
       return (
-        <ListItemLine key={item.id} readonly={true}>
+        <ListItemLine
+          key={item.id}
+          readonly={doc?.status !== 'DRAFT' || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
+          onPress={() => setVisibleQuantPackDialog(true)}
+        >
           <View style={styles.details}>
             <LargeText style={styles.textBold}>{item.good.name}</LargeText>
             <View style={styles.flexDirectionRow}>
@@ -237,7 +311,7 @@ export const InventoryViewScreen = () => {
         </ListItemLine>
       );
     },
-    [doc?.head.fromDepart?.isAddressStore],
+    [doc?.head.fromDepart?.isAddressStore, doc?.status, lines?.length],
   );
 
   const [scanned, setScanned] = useState(false);
@@ -256,6 +330,10 @@ export const InventoryViewScreen = () => {
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!doc) {
+        return;
+      }
+
+      if (doc?.status !== 'DRAFT') {
         return;
       }
 
@@ -414,6 +492,17 @@ export const InventoryViewScreen = () => {
         onOk={handleSearchBarcode}
         okLabel={'Найти'}
         errorMessage={errorMessage}
+      />
+      <AppDialog
+        title="Количество"
+        visible={visibleQuantPackDialog}
+        text={quantPack}
+        onChangeText={setQuantPack}
+        onCancel={handleDismissQuantPack}
+        onOk={handleEditQuantPack}
+        okLabel={'Ок'}
+        keyboardType="numbers-and-punctuation"
+        // errorMessage={errorMessage}
       />
       <SimpleDialog
         visible={visibleSendDialog}

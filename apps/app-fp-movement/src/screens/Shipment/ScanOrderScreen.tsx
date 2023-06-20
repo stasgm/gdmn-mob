@@ -23,7 +23,7 @@ import { View, Text, StyleSheet } from 'react-native';
 
 import { IScannedObject } from '@lib/client-types';
 
-import { ShipmentStackParamList } from '../../navigation/Root/types';
+import { CurrShipmentStackParamList, ShipmentStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IShipmentDocument, ITempDocument } from '../../store/types';
 
 import { ICodeEntity } from '../../store/app/types';
@@ -34,9 +34,11 @@ import { useSelector as useFpSelector } from '../../store/index';
 import { barCodeTypes } from '../../utils/constants';
 
 const ScanOrderScreen = () => {
-  const docTypeId = useRoute<RouteProp<ShipmentStackParamList, 'ScanOrder'>>().params?.docTypeId;
+  const { docTypeId, isShipment } = useRoute<RouteProp<ShipmentStackParamList, 'ScanOrder'>>().params;
 
   const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ScanOrder'>>();
+  const navigationCurr = useNavigation<StackNavigationProp<CurrShipmentStackParamList, 'ScanOrder'>>();
+
   const settings = useSelector((state) => state.settings?.data);
 
   const dispatch = useDispatch();
@@ -44,10 +46,14 @@ const ScanOrderScreen = () => {
   const isScanerReader = settings.scannerUse?.data;
 
   useLayoutEffect(() => {
-    navigation.setOptions({
-      headerLeft: navBackButton,
-    });
-  }, [navigation]);
+    isShipment
+      ? navigation.setOptions({
+          headerLeft: navBackButton,
+        })
+      : navigationCurr.setOptions({
+          headerLeft: navBackButton,
+        });
+  }, [isShipment, navigation, navigationCurr]);
 
   const orders = docSelectors.selectByDocType<IOrderDocument>('order');
 
@@ -71,11 +77,19 @@ const ScanOrderScreen = () => {
     const shipment = shipments.find((i) => i.head.orderId === scannedObject.id);
 
     if (shipment) {
-      navigation.dispatch(
-        StackActions.replace('ShipmentView', {
-          id: shipment.id,
-        }),
-      );
+      isShipment
+        ? navigation.dispatch(
+            StackActions.replace('ShipmentView', {
+              id: shipment.id,
+              isShipment,
+            }),
+          )
+        : navigationCurr.dispatch(
+            StackActions.replace('ShipmentView', {
+              id: shipment.id,
+              isShipment,
+            }),
+          );
       return;
     }
 
@@ -113,20 +127,46 @@ const ScanOrderScreen = () => {
 
     dispatch(documentActions.addDocument(shipmentDoc));
 
-    if (defaultDepart) {
-      navigation.dispatch(
-        StackActions.replace('ShipmentView', {
-          id: shipmentDoc.id,
-        }),
-      );
+    if (depart) {
+      isShipment
+        ? navigation.dispatch(
+            StackActions.replace('ShipmentView', {
+              id: shipmentDoc.id,
+              isShipment,
+            }),
+          )
+        : navigationCurr.dispatch(
+            StackActions.replace('ShipmentView', {
+              id: shipmentDoc.id,
+              isShipment,
+            }),
+          );
     } else {
-      navigation.dispatch(
-        StackActions.replace('ShipmentEdit', {
-          id: shipmentDoc.id,
-        }),
-      );
+      isShipment
+        ? navigation.dispatch(
+            StackActions.replace('ShipmentEdit', {
+              id: shipmentDoc.id,
+              isShipment,
+            }),
+          )
+        : navigationCurr.dispatch(
+            StackActions.replace('ShipmentEdit', {
+              id: shipmentDoc.id,
+              isShipment,
+            }),
+          );
     }
-  }, [scannedObject, shipments, tempOrders, defaultDepart, shipmentType, dispatch, navigation]);
+  }, [
+    scannedObject,
+    shipments,
+    tempOrders,
+    defaultDepart,
+    shipmentType,
+    dispatch,
+    isShipment,
+    navigation,
+    navigationCurr,
+  ]);
 
   const [scaner, setScaner] = useState<IScannedObject>({ state: 'init' });
 
