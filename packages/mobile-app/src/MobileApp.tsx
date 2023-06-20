@@ -27,13 +27,14 @@ import { mobileRequest, truncate, useSync, generateId } from '@lib/mobile-hooks'
 
 export interface IApp {
   items?: INavItem[];
+  dashboardScreens?: any;
   store?: Store<any, any>;
   onSync?: () => Promise<any>;
   loadingErrors?: string[];
   onClearLoadingErrors?: () => void;
 }
 
-const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
+const AppRoot = ({ items, dashboardScreens, onSync }: Omit<IApp, 'store'>) => {
   const { syncData } = useSync(onSync);
   const settings = useSelector((state) => state.settings?.data);
   const autoSynchPeriod = (settings.autoSynchPeriod?.data as number) || 10;
@@ -86,7 +87,7 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoSynchPeriod, autoSync, loading, isDemo]);
 
-  return <DrawerNavigator items={items} onSyncClick={syncData} />;
+  return <DrawerNavigator items={items} dashboardScreens={dashboardScreens} onSyncClick={syncData} />;
 };
 
 const MobileApp = ({ loadingErrors, onClearLoadingErrors, ...props }: IApp) => {

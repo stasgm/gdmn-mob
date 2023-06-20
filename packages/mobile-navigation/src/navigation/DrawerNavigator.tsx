@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Modal, View, StyleSheet, ScrollView, Alert } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { Modal, View, StyleSheet, ScrollView } from 'react-native';
 
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
@@ -18,6 +18,7 @@ import ReferencesNavigator from './Root/ReferencesNavigator';
 import ProfileNavigator from './Root/ProfileNavigator';
 import InformationNavigator from './Root/InformationNavigator';
 import { DrawerContent } from './drawerContent';
+import DashboardNavigator from './Root/DashboardNavigator';
 
 const Drawer = createDrawerNavigator<RootDrawerParamList>();
 
@@ -50,19 +51,31 @@ const baseNavList: INavItem[] = [
 
 export interface IProps {
   items?: INavItem[];
+  dashboardScreens?: any;
   onSyncClick: () => void;
 }
 
-// const getTimeUntilNextSynch = (lastSyncTime: Date, synchPeriod: number) => {
-//   const nextTime = new Date(lastSyncTime);
-//   nextTime.setMinutes(nextTime.getMinutes() + synchPeriod);
-//   return nextTime.getTime() - new Date().getTime();
-// };
-
-const DrawerNavigator = ({ onSyncClick, items }: IProps) => {
+const DrawerNavigator = ({ onSyncClick, items, dashboardScreens }: IProps) => {
   const { colors } = useTheme();
   const dispatch = useDispatch();
-  const navList: INavItem[] = [...(items || []), ...baseNavList];
+
+  const dashboard: INavItem | undefined = useMemo(() => {
+    if (items && dashboardScreens) {
+      const DashboardComponent = () => <DashboardNavigator dashboardScreens={dashboardScreens} items={items} />;
+      return {
+        name: 'DashboardNav',
+        component: DashboardComponent,
+        icon: 'view-dashboard-outline',
+        title: 'Дашборд',
+      };
+    } else return;
+  }, [dashboardScreens, items]);
+
+  const navList: INavItem[] = useMemo(
+    () => (dashboard ? [dashboard, ...(items || []), ...baseNavList] : [...(items || []), ...baseNavList]),
+    [items, dashboard],
+  );
+
   const {
     requestNotice = [],
     errorNotice = [],
@@ -70,8 +83,7 @@ const DrawerNavigator = ({ onSyncClick, items }: IProps) => {
     showSyncInfo = false,
     loading,
   } = useSelector((state) => state.app);
-  // const settings = useSelector((state) => state.settings?.data);
-  // const synchPeriod = (settings.synchPeriod?.data as number) || 10;
+
   const [errorListVisible, setErrorListVisible] = useState(false);
   const { errorMessage } = useSelector((state) => state.auth);
 
@@ -88,24 +100,9 @@ const DrawerNavigator = ({ onSyncClick, items }: IProps) => {
       onSyncClick();
       return;
     }
-    //Определяем, сколько минут с прошлой синхронизации
-    //и если меньше, чем synchPeriod, то предупреждаем и выходим
-    //иначе - выполняем синхронизацию
-    // const timeUntilNextSynch = getTimeUntilNextSynch(syncDate, synchPeriod);
 
-    // if (timeUntilNextSynch > 0) {
-    //   Alert.alert(
-    //     'Внимание!',
-    //     // eslint-disable-next-line max-len
-    //     `В настоящее время сервер обрабатывает запрос.\nПовторная синхронизация возможна через ${Math.ceil(
-    //       timeUntilNextSynch / 60000,
-    //     )} мин.`,
-    //     [{ text: 'OK' }],
-    //   );
-    // } else {
     dispatch(appActions.setShowSyncInfo(true));
     onSyncClick();
-    // }
   };
 
   const onDismissDialog = () => {

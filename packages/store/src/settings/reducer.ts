@@ -10,7 +10,7 @@ import { SettingsState } from './types';
 export const mainSettingGroup = { id: 'main', name: 'Общие настройки', sortOrder: 1 };
 export const synchSettingGroup = { id: 'synch', name: 'Синхронизация', sortOrder: 2 };
 export const baseSettingGroup = { id: 'base', name: 'Настройки приложения', sortOrder: 3 };
-export const serverSettingGroup = { id: 'server', name: 'Сервер', sortOrder: 4 };
+export const serverSettingGroup = { id: 'server', name: 'Сервер', sortOrder: 0 };
 
 const baseSettings: Settings<IBaseSettings> = {
   serverAddress: {

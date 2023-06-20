@@ -55,6 +55,16 @@ import { LaboratoryNavigator } from './src/navigation/LaboratoryNavigator';
 import { MoveToNavigator } from './src/navigation/MoveToNavigator';
 import { MoveFromNavigator } from './src/navigation/MoveFromNavigator';
 import RemainsNavigator from './src/navigation/RemainsNavigator';
+import {
+  freeShipmentScreens,
+  inventoryScreens,
+  laboratoryScreens,
+  moveFromScreens,
+  moveScreens,
+  moveToScreens,
+  returnScreens,
+  shipmentScreens,
+} from './src/navigation/Root/screens';
 
 const Root = () => {
   const { isInit, data: settings } = useSelector((state) => state.settings);
@@ -66,34 +76,39 @@ const Root = () => {
       isAddressStore
         ? [
             {
-              name: 'InternalMovement',
+              name: 'MoveTo',
               title: 'На хранение',
               icon: 'store-plus-outline',
               component: MoveToNavigator,
+              showInDashboard: true,
             },
             {
-              name: 'Movement',
+              name: 'MoveFrom',
               title: 'С хранения',
               icon: 'store-minus-outline',
               component: MoveFromNavigator,
+              showInDashboard: true,
             },
             {
-              name: 'BaseMovement',
+              name: 'Move',
               title: 'Перемещение',
               icon: 'transfer',
               component: MoveNavigator,
+              showInDashboard: true,
             },
             {
               name: 'Shipment',
               title: 'Отвес по заявке',
               icon: 'playlist-check',
               component: ShipmentNavigator,
+              showInDashboard: true,
             },
             {
               name: 'FreeShipment',
               title: 'Отвес',
               icon: 'playlist-plus',
               component: FreeShipmentNavigator,
+              showInDashboard: true,
             },
             {
               name: 'Cells',
@@ -112,12 +127,14 @@ const Root = () => {
               title: 'Возврат',
               icon: 'file-restore-outline',
               component: ReturnNavigator,
+              showInDashboard: true,
             },
             {
               name: 'Inventory',
               title: 'Инвентаризация',
               icon: 'file-document-outline',
               component: InventoryNavigator,
+              showInDashboard: true,
             },
 
             {
@@ -125,26 +142,30 @@ const Root = () => {
               title: 'Лаборатория',
               icon: 'file-document-edit-outline',
               component: LaboratoryNavigator,
+              showInDashboard: true,
             },
           ]
         : [
             {
-              name: 'Movement',
+              name: 'Move',
               title: 'Перемещение',
               icon: 'transfer',
               component: MoveNavigator,
+              showInDashboard: true,
             },
             {
               name: 'Shipment',
               title: 'Отвес по заявке',
               icon: 'playlist-check',
               component: ShipmentNavigator,
+              showInDashboard: true,
             },
             {
               name: 'FreeShipment',
               title: 'Отвес',
               icon: 'playlist-plus',
               component: FreeShipmentNavigator,
+              showInDashboard: true,
             },
             {
               name: 'Remains',
@@ -157,21 +178,47 @@ const Root = () => {
               title: 'Возврат',
               icon: 'file-restore-outline',
               component: ReturnNavigator,
+              showInDashboard: true,
             },
             {
               name: 'Inventory',
               title: 'Инвентаризация',
               icon: 'file-document-outline',
               component: InventoryNavigator,
+              showInDashboard: true,
             },
-
             {
               name: 'Labaratory',
               title: 'Лаборатория',
               icon: 'file-document-edit-outline',
               component: LaboratoryNavigator,
+              showInDashboard: true,
             },
           ],
+    [isAddressStore],
+  );
+
+  const docScreens = useMemo(
+    () =>
+      isAddressStore
+        ? {
+            ...moveToScreens,
+            ...moveFromScreens,
+            ...moveScreens,
+            ...shipmentScreens,
+            ...freeShipmentScreens,
+            ...returnScreens,
+            ...inventoryScreens,
+            ...laboratoryScreens,
+          }
+        : {
+            ...moveScreens,
+            ...shipmentScreens,
+            ...freeShipmentScreens,
+            ...returnScreens,
+            ...inventoryScreens,
+            ...laboratoryScreens,
+          },
     [isAddressStore],
   );
 
@@ -346,7 +393,12 @@ const Root = () => {
           </Caption>
         </AppScreen>
       ) : (
-        <MobileApp items={navItems} loadingErrors={[fpLoadingError]} onClearLoadingErrors={onClearLoadingErrors} />
+        <MobileApp
+          items={navItems}
+          dashboardScreens={docScreens}
+          loadingErrors={[fpLoadingError]}
+          onClearLoadingErrors={onClearLoadingErrors}
+        />
       )}
     </ErrorBoundary>
   );
