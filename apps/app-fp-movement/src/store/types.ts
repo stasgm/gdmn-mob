@@ -181,6 +181,7 @@ export interface IInventoryLine extends IEntity {
   // fromCell?: string; // номер ячейки
   toCell?: string; // номер ячейки
   quantPack: number; // порядковый номер сканирования в документе
+  scannedBarcode?: string;
 }
 
 export type IInventoryDocument = MandateProps<IDocument<IInventoryHead, IInventoryLine>, 'head' | 'lines'>;

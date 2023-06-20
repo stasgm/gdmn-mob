@@ -27,6 +27,7 @@ import {
 } from '../../screens/Remains';
 
 import { SelectRefItemScreen } from '../../components';
+import { ReceiptEditScreen, ReceiptListScreen, ReceiptViewScreen } from '../../screens/Receipt';
 
 export const moveScreens = {
   MoveEdit: { title: 'Перемещение', component: MoveEditScreen },
@@ -51,6 +52,7 @@ export const moveFromScreens = {
 export const moveFromListScreens = {
   MoveFromList: { title: 'С хранения', component: MoveFromListScreen },
 };
+
 export const moveToScreens = {
   MoveToEdit: { title: 'На хранение', component: MoveToEditScreen },
   MoveToView: { title: '', component: MoveToViewScreen },
@@ -61,6 +63,17 @@ export const moveToScreens = {
 
 export const moveToListScreens = {
   MoveToList: { title: 'На хранение', component: MoveToListScreen },
+};
+
+export const prihodScreens = {
+  ReceiptEdit: { title: 'Приход', component: ReceiptEditScreen },
+  ReceiptView: { title: '', component: ReceiptViewScreen },
+  SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
+  ScanGood: { title: 'Сканер', component: ScanGoodScreen },
+};
+
+export const prihodListScreens = {
+  ReceiptList: { title: 'Приходы', component: ReceiptListScreen },
 };
 
 export const shipmentScreens = {
@@ -75,6 +88,17 @@ export const shipmentListScreens = {
   ShipmentList: { title: 'Отвесы по заявке', component: ShipmentListScreen },
 };
 
+export const currShipmentScreens = {
+  ShipmentEdit: { title: 'Отвес по заявке', component: ShipmentEditScreen },
+  ShipmentView: { title: '', component: ShipmentViewScreen },
+  ScanOrder: { title: 'Сканер заявки', component: ScanOrderScreen },
+  ScanGood: { title: 'Сканер', component: ScanGoodScreen },
+};
+
+export const currShipmentListScreens = {
+  CurrShipmentList: { title: 'Отвесы по заявке', component: ShipmentListScreen },
+};
+
 export const freeShipmentScreens = {
   FreeShipmentEdit: { title: 'Отвес', component: FreeShipmentEditScreen },
   FreeShipmentView: { title: '', component: FreeShipmentViewScreen },
@@ -84,6 +108,17 @@ export const freeShipmentScreens = {
 
 export const freeShipmentListScreens = {
   FreeShipmentList: { title: 'Отвесы', component: FreeShipmentListScreen },
+};
+
+export const currFreeShipmentScreens = {
+  FreeShipmentEdit: { title: 'Отвес', component: FreeShipmentEditScreen },
+  FreeShipmentView: { title: '', component: FreeShipmentViewScreen },
+  SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
+  ScanGood: { title: 'Сканер', component: ScanGoodScreen },
+};
+
+export const currFreeShipmentListScreens = {
+  CurrFreeShipmentList: { title: 'Отвесы', component: FreeShipmentListScreen },
 };
 
 export const inventoryScreens = {

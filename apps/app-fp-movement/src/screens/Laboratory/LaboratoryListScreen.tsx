@@ -17,11 +17,13 @@ import {
   CloseButton,
   EmptyList,
   navBackDrawer,
+  SendButton,
+  SimpleDialog,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@lib/mobile-hooks';
+import { deleteSelectedItems, getDateString, getDelList, keyExtractor, useSendDocs } from '@lib/mobile-hooks';
 
 import { IDelList } from '@lib/mobile-types';
 
@@ -43,6 +45,8 @@ export const LaboratoryListScreen = () => {
       (i) => i.documentType?.name === 'laboratory',
     ) as ILaboratoryDocument[]
   ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
+
+  const loading = useSelector((state) => state.app.loading);
 
   const [delList, setDelList] = useState<IDelList>({});
   const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
@@ -106,11 +110,39 @@ export const LaboratoryListScreen = () => {
     deleteSelectedItems(delList, deleteDocs);
   }, [delList, docDispatch]);
 
+  const [visibleSendDialog, setVisibleSendDialog] = useState(false);
+
+  const docsToSend = useMemo(
+    () =>
+      Object.keys(delList).reduce((prev: ILaboratoryDocument[], cur) => {
+        const sendingDoc = list.find((i) => i.id === cur && (i.status === 'DRAFT' || i.status === 'READY'));
+        if (sendingDoc) {
+          prev = [...prev, sendingDoc];
+        }
+        return prev;
+      }, []),
+    [delList, list],
+  );
+
+  const sendDoc = useSendDocs(docsToSend.length ? docsToSend : []);
+
+  const handleSendDocument = useCallback(async () => {
+    setVisibleSendDialog(false);
+    // setScreenState('sending');
+    await sendDoc();
+    setDelList({});
+
+    // setScreenState('sent');
+  }, [sendDoc]);
+
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
         {isDelList ? (
-          <DeleteButton onPress={handleDeleteDocs} />
+          <View style={styles.buttons}>
+            <SendButton onPress={() => setVisibleSendDialog(true)} />
+            <DeleteButton onPress={handleDeleteDocs} />
+          </View>
         ) : (
           <AddButton onPress={() => navigation.navigate('LaboratoryEdit')} />
         )}
@@ -125,7 +157,7 @@ export const LaboratoryListScreen = () => {
     navigation.setOptions({
       headerLeft: isDelList ? renderLeft : navBackDrawer,
       headerRight: renderRight,
-      title: isDelList ? `Выделено документов: ${Object.values(delList).length}` : 'Документы',
+      title: isDelList ? `${Object.values(delList).length}` : 'Документы',
     });
   }, [delList, isDelList, navigation, renderLeft, renderRight]);
 
@@ -160,6 +192,14 @@ export const LaboratoryListScreen = () => {
         ItemSeparatorComponent={ItemSeparator}
         renderSectionHeader={renderSectionHeader}
         ListEmptyComponent={EmptyList}
+      />
+      <SimpleDialog
+        visible={visibleSendDialog}
+        title={'Внимание!'}
+        text={'Сформировано полностью?'}
+        onCancel={() => setVisibleSendDialog(false)}
+        onOk={handleSendDocument}
+        okDisabled={loading}
       />
     </AppScreen>
   );

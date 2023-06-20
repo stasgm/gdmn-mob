@@ -55,6 +55,9 @@ import { LaboratoryNavigator } from './src/navigation/LaboratoryNavigator';
 import { MoveToNavigator } from './src/navigation/MoveToNavigator';
 import { MoveFromNavigator } from './src/navigation/MoveFromNavigator';
 import RemainsNavigator from './src/navigation/RemainsNavigator';
+import { CurrShipmentNavigator } from './src/navigation/CurrShipmentNavigator';
+import { CurrFreeShipmentNavigator } from './src/navigation/CurrFreeShipmentNavigator';
+import { ReceiptNavigator } from './src/navigation/ReceiptNavigator';
 
 const Root = () => {
   const { isInit, data: settings } = useSelector((state) => state.settings);
@@ -78,6 +81,12 @@ const Root = () => {
               component: MoveFromNavigator,
             },
             {
+              name: 'Receipt',
+              title: 'Приход',
+              icon: 'file-document-outline',
+              component: ReceiptNavigator,
+            },
+            {
               name: 'BaseMovement',
               title: 'Перемещение',
               icon: 'transfer',
@@ -90,10 +99,22 @@ const Root = () => {
               component: ShipmentNavigator,
             },
             {
+              name: 'CurrShipment',
+              title: 'Отвес по заявке $',
+              icon: 'playlist-check',
+              component: CurrShipmentNavigator,
+            },
+            {
               name: 'FreeShipment',
               title: 'Отвес',
               icon: 'playlist-plus',
               component: FreeShipmentNavigator,
+            },
+            {
+              name: 'CurrFreeShipment',
+              title: 'Отвес $',
+              icon: 'playlist-plus',
+              component: CurrFreeShipmentNavigator,
             },
             {
               name: 'Cells',
@@ -116,14 +137,14 @@ const Root = () => {
             {
               name: 'Inventory',
               title: 'Инвентаризация',
-              icon: 'file-document-outline',
+              icon: 'file-check-outline',
               component: InventoryNavigator,
             },
 
             {
               name: 'Labaratory',
               title: 'Лаборатория',
-              icon: 'file-document-edit-outline',
+              icon: 'flask-outline',
               component: LaboratoryNavigator,
             },
           ]

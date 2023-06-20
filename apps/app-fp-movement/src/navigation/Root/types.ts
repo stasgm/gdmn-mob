@@ -47,24 +47,48 @@ export type MoveToParamList = RefParamList & {
 
 export type MoveToStackParamList = { MoveToList: undefined } & MoveToParamList;
 
-export type ShipmentParamList = RefParamList & {
-  TempView: { id: string };
-  ShipmentEdit: { id: string };
-  ShipmentView: { id: string };
-  ScanOrder: { docTypeId: string };
+export type ReceiptParamList = RefParamList & {
+  ReceiptView: { id: string; docType?: string };
+  ReceiptEdit: { id: string; docType?: string } | undefined;
   ScanGood: { docId: string };
+};
+
+export type ReceiptStackParamList = { ReceiptList: undefined } & ReceiptParamList;
+
+export type ShipmentParamList = RefParamList & {
+  ShipmentEdit: { id: string; isShipment: boolean };
+  ShipmentView: { id: string; isShipment: boolean };
+  ScanOrder: { docTypeId: string; isShipment: boolean };
+  ScanGood: { docId: string; isShipment: boolean };
   SelectCell: { docId: string; /*lineId: string;*/ item: IMoveLine; mode?: number; docType?: string };
 };
 
 export type ShipmentStackParamList = { ShipmentList: undefined } & ShipmentParamList;
 
+export type CurrShipmentParamList = RefParamList & {
+  ShipmentEdit: { id: string; isShipment: boolean };
+  ShipmentView: { id: string; isShipment: boolean };
+  ScanOrder: { docTypeId: string; isShipment: boolean };
+  ScanGood: { docId: string; isShipment: boolean };
+};
+
+export type CurrShipmentStackParamList = { CurrShipmentList: undefined } & ShipmentParamList;
+
 export type FreeShipmentParamList = RefParamList & {
-  FreeShipmentView: { id: string; docType?: string };
-  FreeShipmentEdit: { id: string; docType?: string } | undefined; //itemId: string;
+  FreeShipmentView: { id: string; isCurr: boolean };
+  FreeShipmentEdit: { id?: string; isCurr: boolean }; //itemId: string;
   ScanGood: { docId: string; docType?: string };
 };
 
 export type FreeShipmentStackParamList = { FreeShipmentList: undefined } & FreeShipmentParamList;
+
+export type CurrFreeShipmentParamList = RefParamList & {
+  FreeShipmentView: { id: string; isCurr: boolean };
+  FreeShipmentEdit: { id?: string; isCurr: boolean }; //itemId: string;
+  ScanGood: { docId: string; docType?: string };
+};
+
+export type CurrFreeShipmentStackParamList = { CurrFreeShipmentList: undefined } & FreeShipmentParamList;
 
 export type ReturnParamList = RefParamList & {
   ReturnView: { id: string; docType?: string };
