@@ -19,14 +19,16 @@ import { IDocumentType, IReference, ScreenState } from '@lib/types';
 
 import { getDateString } from '@lib/mobile-hooks';
 
-import { ShipmentStackParamList } from '../../navigation/Root/types';
+import { CurrShipmentStackParamList, ShipmentStackParamList } from '../../navigation/Root/types';
 import { IShipmentFormParam, IShipmentDocument } from '../../store/types';
 
 import { STATUS_LIST } from '../../utils/constants';
 
 const ShipmentEditScreen = () => {
-  const id = useRoute<RouteProp<ShipmentStackParamList, 'ShipmentEdit'>>().params?.id;
+  const { id, isShipment } = useRoute<RouteProp<ShipmentStackParamList, 'ShipmentEdit'>>().params;
   const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ShipmentEdit'>>();
+  const navigationCurr = useNavigation<StackNavigationProp<CurrShipmentStackParamList, 'ShipmentEdit'>>();
+
   const dispatch = useDispatch();
 
   const { colors } = useTheme();
@@ -113,10 +115,24 @@ const ShipmentEditScreen = () => {
 
         dispatch(documentActions.updateDocument({ docId: id, document: updatedShipment }));
         setScreenState('idle');
-        navigation.navigate('ShipmentView', { id });
+        isShipment
+          ? navigation.navigate('ShipmentView', { id, isShipment })
+          : navigationCurr.navigate('ShipmentView', { id, isShipment });
       }
     }
-  }, [shipmentType, docDocumentDate, id, shipment, docStatus, dispatch, navigation, screenState, docFromDepart]);
+  }, [
+    shipmentType,
+    docDocumentDate,
+    id,
+    shipment,
+    docStatus,
+    dispatch,
+    navigation,
+    screenState,
+    docFromDepart,
+    isShipment,
+    navigationCurr,
+  ]);
 
   const renderRight = useCallback(
     () => (
@@ -133,11 +149,16 @@ const ShipmentEditScreen = () => {
   );
 
   useLayoutEffect(() => {
-    navigation.setOptions({
-      headerLeft: navBackButton,
-      headerRight: renderRight,
-    });
-  }, [navigation, renderRight]);
+    isShipment
+      ? navigation.setOptions({
+          headerLeft: navBackButton,
+          headerRight: renderRight,
+        })
+      : navigationCurr.setOptions({
+          headerLeft: navBackButton,
+          headerRight: renderRight,
+        });
+  }, [isShipment, navigation, navigationCurr, renderRight]);
 
   const isBlocked = useMemo(() => docStatus !== 'DRAFT', [docStatus]);
 
@@ -155,12 +176,19 @@ const ShipmentEditScreen = () => {
       return;
     }
 
-    navigation.navigate('SelectRefItem', {
-      refName: 'depart',
-      fieldName: 'fromDepart',
-      value: docFromDepart && [docFromDepart],
-      descrFieldName: 'shcode',
-    });
+    isShipment
+      ? navigation.navigate('SelectRefItem', {
+          refName: 'depart',
+          fieldName: 'fromDepart',
+          value: docFromDepart && [docFromDepart],
+          descrFieldName: 'shcode',
+        })
+      : navigationCurr.navigate('SelectRefItem', {
+          refName: 'depart',
+          fieldName: 'fromDepart',
+          value: docFromDepart && [docFromDepart],
+          descrFieldName: 'shcode',
+        });
   };
 
   const viewStyle = useMemo(

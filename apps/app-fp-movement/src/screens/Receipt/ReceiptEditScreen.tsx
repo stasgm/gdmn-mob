@@ -1,54 +1,58 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Alert, View, StyleSheet, ScrollView, Platform } from 'react-native';
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { Alert, ScrollView, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Divider } from 'react-native-paper';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { RouteProp, useNavigation, useRoute, StackActions, useTheme } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { SelectableInput, Input, SaveButton, SubTitle, AppScreen, RadioGroup, navBackButton } from '@lib/mobile-ui';
+import { SelectableInput, Input, SaveButton, SubTitle, AppScreen, navBackButton } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
 import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks';
 
-import { IDocumentType, IReference, ScreenState } from '@lib/types';
+import { IDocumentType, INamedEntity, IReference, ScreenState } from '@lib/types';
 
-import { CurrFreeShipmentStackParamList, FreeShipmentStackParamList } from '../../navigation/Root/types';
-import { IFreeShipmentFormParam, IFreeShipmentDocument } from '../../store/types';
-import { STATUS_LIST } from '../../utils/constants';
+import { ReceiptStackParamList } from '../../navigation/Root/types';
+import { IMoveFormParam, IMoveDocument } from '../../store/types';
 import { getNextDocNumber } from '../../utils/helpers';
+import { IAddressStoreEntity } from '../../store/app/types';
 
-export const FreeShipmentEditScreen = () => {
-  const { id, isCurr } = useRoute<RouteProp<FreeShipmentStackParamList, 'FreeShipmentEdit'>>().params;
-
-  const navigation = useNavigation<StackNavigationProp<FreeShipmentStackParamList, 'FreeShipmentEdit'>>();
-  const navigationCurr = useNavigation<StackNavigationProp<CurrFreeShipmentStackParamList, 'FreeShipmentEdit'>>();
-
+export const ReceiptEditScreen = () => {
+  const id = useRoute<RouteProp<ReceiptStackParamList, 'ReceiptEdit'>>().params?.id;
+  const navigation = useNavigation<StackNavigationProp<ReceiptStackParamList, 'ReceiptEdit'>>();
   const dispatch = useDispatch();
-
-  const { colors } = useTheme();
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
-  const shipments = useFilteredDocList<IFreeShipmentDocument>('freeShipment');
+  const movements = useFilteredDocList<IMoveDocument>('movement');
 
-  const doc = shipments?.find((e) => e.id === id);
+  const doc = movements?.find((e) => e.id === id);
 
-  const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data);
+  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
 
-  const shipmentType = refSelectors
+  const userDefaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity;
+  const defaultDepart = departs.find((i) => i.id === userDefaultDepart?.id);
+
+  const movementType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data.find((t) => (isCurr ? t.name === 'currFreeShipment' : t.name === 'freeShipment'));
+    ?.data.find((t) => t.name === 'movement');
+
+  const movementSubtype = refSelectors
+    .selectByName<IReference<INamedEntity>>('documentSubtype')
+    ?.data.find((t) => t.id === 'prihod');
 
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {
+    documentSubtype: docDocumentSubtype,
     fromDepart: docFromDepart,
+    toDepart: docToDepart,
     documentDate: docDate,
     number: docNumber,
     comment: docComment,
     status: docStatus,
-  } = useSelector((state) => state.app.formParams as IFreeShipmentFormParam);
+  } = useSelector((state) => state.app.formParams as IMoveFormParam);
 
   useEffect(() => {
     return () => {
@@ -67,36 +71,40 @@ export const FreeShipmentEditScreen = () => {
           status: doc.status,
           comment: doc.head.comment,
           fromDepart: doc.head.fromDepart,
+          toDepart: doc.head.toDepart,
+          documentSubtype: doc.head.subtype,
         }),
       );
     } else {
-      const newNumber = getNextDocNumber(shipments);
+      const newNumber = getNextDocNumber(movements);
       dispatch(
         appActions.setFormParams({
           number: newNumber,
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
-          fromDepart: defaultDepart,
+          toDepart: defaultDepart || undefined,
+          documentSubtype: movementSubtype,
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, doc, defaultDepart]);
+  }, [dispatch, doc, defaultDepart, docDocumentSubtype]);
 
   useEffect(() => {
     if (screenState === 'saving') {
-      if (!shipmentType) {
-        Alert.alert('Внимание!', 'Тип документа для заявок не найден.', [{ text: 'OK' }]);
-        setScreenState('idle');
-        return;
-      }
-      if (!docFromDepart) {
-        Alert.alert('Ошибка!', 'Нет подразделения пользователя. Обратитесь к администратору.', [{ text: 'OK' }]);
+      if (!movementType) {
+        Alert.alert('Внимание!', 'Тип документа для приходов не найден.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
       }
 
-      if (!(docNumber && docFromDepart && docDate)) {
+      if (!docDocumentSubtype) {
+        Alert.alert('Ошибка!', 'Не указан тип документа.', [{ text: 'OK' }]);
+        setScreenState('idle');
+        return;
+      }
+
+      if (!(docNumber && docDate && docFromDepart && docToDepart)) {
         Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
@@ -106,15 +114,17 @@ export const FreeShipmentEditScreen = () => {
       const createdDate = new Date().toISOString();
 
       if (!id) {
-        const newDoc: IFreeShipmentDocument = {
+        const newDoc: IMoveDocument = {
           id: docId,
-          documentType: shipmentType,
+          documentType: movementType,
           number: docNumber && docNumber.trim(),
           documentDate: docDate,
           status: 'DRAFT',
           head: {
             comment: docComment && docComment.trim(),
             fromDepart: docFromDepart,
+            toDepart: docToDepart,
+            subtype: docDocumentSubtype,
           },
           lines: [],
           creationDate: createdDate,
@@ -123,9 +133,7 @@ export const FreeShipmentEditScreen = () => {
 
         dispatch(documentActions.addDocument(newDoc));
 
-        isCurr
-          ? navigationCurr.dispatch(StackActions.replace('FreeShipmentView', { id: newDoc.id }))
-          : navigation.dispatch(StackActions.replace('FreeShipmentView', { id: newDoc.id }));
+        navigation.dispatch(StackActions.replace('ReceiptView', { id: newDoc.id }));
       } else {
         if (!doc) {
           setScreenState('idle');
@@ -134,29 +142,29 @@ export const FreeShipmentEditScreen = () => {
 
         const updatedDate = new Date().toISOString();
 
-        const updatedDoc: IFreeShipmentDocument = {
+        const updatedDoc: IMoveDocument = {
           ...doc,
           id,
           number: docNumber && docNumber.trim(),
           status: docStatus || 'DRAFT',
           documentDate: docDate,
-          documentType: shipmentType,
+          documentType: movementType,
           errorMessage: undefined,
           head: {
             ...doc.head,
             comment: docComment && docComment.trim(),
             fromDepart: docFromDepart,
+            toDepart: docToDepart,
+
+            subtype: docDocumentSubtype,
           },
           lines: doc.lines,
           creationDate: doc.creationDate || updatedDate,
           editionDate: updatedDate,
         };
-
-        dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
         setScreenState('idle');
-        isCurr
-          ? navigationCurr.navigate('FreeShipmentView', { id, isCurr })
-          : navigation.navigate('FreeShipmentView', { id, isCurr });
+        dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
+        navigation.navigate('ReceiptView', { id });
       }
     }
   }, [
@@ -164,15 +172,15 @@ export const FreeShipmentEditScreen = () => {
     doc,
     docComment,
     docDate,
+    docDocumentSubtype,
     docFromDepart,
     docNumber,
     docStatus,
+    docToDepart,
     id,
-    isCurr,
+    movementType,
     navigation,
-    navigationCurr,
     screenState,
-    shipmentType,
   ]);
 
   const renderRight = useCallback(
@@ -181,12 +189,11 @@ export const FreeShipmentEditScreen = () => {
   );
 
   useLayoutEffect(() => {
-    const options = {
+    navigation.setOptions({
       headerLeft: navBackButton,
       headerRight: renderRight,
-    };
-    isCurr ? navigationCurr.setOptions(options) : navigation.setOptions(options);
-  }, [isCurr, navigation, navigationCurr, renderRight]);
+    });
+  }, [navigation, renderRight]);
 
   const isBlocked = docStatus !== 'DRAFT';
 
@@ -212,36 +219,50 @@ export const FreeShipmentEditScreen = () => {
     setShowDate(true);
   };
 
-  const handleDepart = () => {
+  const handlePresentSubtype = () => {
     if (isBlocked) {
       return;
     }
 
-    const options = {
+    navigation.navigate('SelectRefItem', {
+      refName: 'documentSubtype',
+      fieldName: 'documentSubtype',
+      value: docDocumentSubtype && [docDocumentSubtype],
+    });
+  };
+
+  const handleFromDepart = () => {
+    if (isBlocked) {
+      return;
+    }
+
+    navigation.navigate('SelectRefItem', {
       refName: 'depart',
       fieldName: 'fromDepart',
       value: docFromDepart && [docFromDepart],
-    };
-
-    isCurr ? navigationCurr.navigate('SelectRefItem', options) : navigation.navigate('SelectRefItem', options);
+      descrFieldName: 'shcode',
+    });
   };
 
-  const handleChangeStatus = useCallback(() => {
-    dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
-  }, [dispatch, docStatus]);
+  const handleToDepart = () => {
+    if (isBlocked) {
+      return;
+    }
+
+    const params: Record<string, string> = {};
+
+    navigation.navigate('SelectRefItem', {
+      refName: 'depart',
+      fieldName: 'toDepart',
+      value: docToDepart && [docToDepart],
+      descrFieldName: 'shcode',
+      clause: params,
+    });
+  };
 
   const handleChangeNumber = useCallback(
     (text: string) => dispatch(appActions.setFormParams({ number: text })),
     [dispatch],
-  );
-
-  const viewStyle = useMemo(
-    () => [
-      localStyles.switchContainer,
-      localStyles.border,
-      { borderColor: colors.primary, backgroundColor: colors.card },
-    ],
-    [colors.card, colors.primary],
   );
 
   return (
@@ -250,14 +271,6 @@ export const FreeShipmentEditScreen = () => {
         <SubTitle>{statusName}</SubTitle>
         <Divider />
         <ScrollView>
-          <View style={viewStyle}>
-            <RadioGroup
-              options={STATUS_LIST}
-              onChange={handleChangeStatus}
-              activeButtonId={STATUS_LIST.find((i) => i.id === docStatus)?.id}
-              directionRow={true}
-            />
-          </View>
           <Input
             label="Номер"
             value={docNumber}
@@ -272,12 +285,25 @@ export const FreeShipmentEditScreen = () => {
             disabled={docStatus !== 'DRAFT'}
           />
           <SelectableInput
-            label={'Подразделение'}
-            value={docFromDepart?.name}
-            onPress={handleDepart}
-            disabled={isBlocked}
+            label={'Тип'}
+            value={docDocumentSubtype?.name}
+            onPress={handlePresentSubtype}
+            disabled={true}
           />
 
+          <SelectableInput
+            label={'Откуда'}
+            value={docFromDepart?.name}
+            onPress={handleFromDepart}
+            disabled={!docDocumentSubtype ? true : isBlocked}
+          />
+
+          <SelectableInput
+            label={'Куда'}
+            value={docToDepart?.name}
+            onPress={handleToDepart}
+            disabled={!docDocumentSubtype ? true : isBlocked}
+          />
           <Input
             label="Комментарий"
             value={docComment}
@@ -301,17 +327,3 @@ export const FreeShipmentEditScreen = () => {
     </AppScreen>
   );
 };
-
-export const localStyles = StyleSheet.create({
-  switchContainer: {
-    margin: 10,
-    paddingLeft: 5,
-  },
-  border: {
-    marginHorizontal: 10,
-    marginVertical: 2,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderRadius: 2,
-  },
-});

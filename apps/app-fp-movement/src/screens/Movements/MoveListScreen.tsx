@@ -18,11 +18,12 @@ import {
   MediumText,
   Menu,
   navBackDrawer,
+  SimpleDialog,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@lib/mobile-hooks';
+import { deleteSelectedItems, getDateString, getDelList, keyExtractor, useSendDocs } from '@lib/mobile-hooks';
 
 import { INamedEntity } from '@lib/types';
 
@@ -45,6 +46,8 @@ export const MoveListScreen = () => {
   const list = (
     useSelector((state) => state.documents.list)?.filter((i) => i.documentType?.name === 'movement') as IMoveDocument[]
   ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
+
+  const loading = useSelector((state) => state.app.loading);
 
   const [delList, setDelList] = useState<IDelList>({});
   const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
@@ -164,7 +167,13 @@ export const MoveListScreen = () => {
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        {isDelList ? <DeleteButton onPress={handleDeleteDocs} /> : <AddButton onPress={handleAddDocument} />}
+        {isDelList ? (
+          <View style={styles.buttons}>
+            <DeleteButton onPress={handleDeleteDocs} />
+          </View>
+        ) : (
+          <AddButton onPress={handleAddDocument} />
+        )}
       </View>
     ),
     [handleAddDocument, handleDeleteDocs, isDelList],
@@ -176,9 +185,34 @@ export const MoveListScreen = () => {
     navigation.setOptions({
       headerLeft: isDelList ? renderLeft : navBackDrawer,
       headerRight: renderRight,
-      title: isDelList ? `Выделено документов: ${Object.values(delList).length}` : 'Перемещение',
+      title: isDelList ? `${Object.values(delList).length}` : 'Перемещение',
     });
   }, [delList, isDelList, navigation, renderLeft, renderRight]);
+
+  const [visibleSendDialog, setVisibleSendDialog] = useState(false);
+
+  const docsToSend = useMemo(
+    () =>
+      Object.keys(delList).reduce((prev: IMoveDocument[], cur) => {
+        const sendingDoc = list.find((i) => i.id === cur && (i.status === 'DRAFT' || i.status === 'READY'));
+        if (sendingDoc) {
+          prev = [...prev, sendingDoc];
+        }
+        return prev;
+      }, []),
+    [delList, list],
+  );
+
+  const sendDoc = useSendDocs(docsToSend.length ? docsToSend : []);
+
+  const handleSendDocument = useCallback(async () => {
+    setVisibleSendDialog(false);
+    // setScreenState('sending');
+    await sendDoc();
+    setDelList({});
+
+    // setScreenState('sent');
+  }, [sendDoc]);
 
   const renderItem: ListRenderItem<IListItemProps> = useCallback(
     ({ item }) => (
@@ -254,6 +288,14 @@ export const MoveListScreen = () => {
         ItemSeparatorComponent={ItemSeparator}
         renderSectionHeader={renderSectionHeader}
         ListEmptyComponent={EmptyList}
+      />
+      <SimpleDialog
+        visible={visibleSendDialog}
+        title={'Внимание!'}
+        text={'Сформировано полностью?'}
+        onCancel={() => setVisibleSendDialog(false)}
+        onOk={handleSendDocument}
+        okDisabled={loading}
       />
     </AppScreen>
   );

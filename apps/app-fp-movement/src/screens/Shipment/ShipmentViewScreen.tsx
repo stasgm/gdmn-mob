@@ -32,7 +32,7 @@ import { FlashList } from '@shopify/flash-list';
 
 import { barcodeSettings, IShipmentDocument, IShipmentLine, ITempLine } from '../../store/types';
 
-import { ShipmentStackParamList } from '../../navigation/Root/types';
+import { CurrShipmentStackParamList, ShipmentStackParamList } from '../../navigation/Root/types';
 
 import { getStatusColor, lineTypes, ONE_SECOND_IN_MS } from '../../utils/constants';
 
@@ -48,8 +48,12 @@ const ShipmentViewScreen = () => {
   const { colors } = useTheme();
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
+
   const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ShipmentView'>>();
-  const id = useRoute<RouteProp<ShipmentStackParamList, 'ShipmentView'>>().params?.id;
+  const navigationCurr = useNavigation<StackNavigationProp<CurrShipmentStackParamList, 'ShipmentView'>>();
+
+  const { id, isShipment } = useRoute<RouteProp<ShipmentStackParamList, 'ShipmentView'>>().params;
+
   const dispatch = useDispatch();
   const fpDispatch = useFpDispatch();
   const settings = useSelector((state) => state.settings?.data);
@@ -210,9 +214,6 @@ const ShipmentViewScreen = () => {
       const weight = round(line?.weight * quantity, 3);
 
       const tempLine = tempOrder?.lines?.find((i) => line.good.id === i.good.id);
-      if (!tempLine || !tempOrder) {
-        return;
-      }
 
       if (remainsUse) {
         const good = goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === line.good.shcode);
@@ -223,31 +224,33 @@ const ShipmentViewScreen = () => {
 
             return;
           } else {
-            const newTempLine = { ...tempLine, weight: round(tempLine?.weight + line.weight - weight, 3) };
-            if (newTempLine.weight >= 0) {
-              fpDispatch(
-                fpMovementActions.updateTempOrderLine({
-                  docId: tempOrder?.id,
-                  line: newTempLine,
-                }),
-              );
-            } else {
-              Alert.alert('Данное количество превышает количество в заявке.', 'Добавить позицию?', [
-                {
-                  text: 'Да',
-                  onPress: () => {
-                    fpDispatch(
-                      fpMovementActions.updateTempOrderLine({
-                        docId: tempOrder?.id,
-                        line: newTempLine,
-                      }),
-                    );
+            if (tempLine && tempOrder) {
+              const newTempLine = { ...tempLine, weight: round(tempLine?.weight + line.weight - weight, 3) };
+              if (newTempLine.weight >= 0) {
+                fpDispatch(
+                  fpMovementActions.updateTempOrderLine({
+                    docId: tempOrder?.id,
+                    line: newTempLine,
+                  }),
+                );
+              } else {
+                Alert.alert('Данное количество превышает количество в заявке.', 'Добавить позицию?', [
+                  {
+                    text: 'Да',
+                    onPress: () => {
+                      fpDispatch(
+                        fpMovementActions.updateTempOrderLine({
+                          docId: tempOrder?.id,
+                          line: newTempLine,
+                        }),
+                      );
+                    },
                   },
-                },
-                {
-                  text: 'Отмена',
-                },
-              ]);
+                  {
+                    text: 'Отмена',
+                  },
+                ]);
+              }
             }
 
             if (weight < 1000) {
@@ -268,31 +271,33 @@ const ShipmentViewScreen = () => {
           return;
         }
       } else {
-        const newTempLine = { ...tempLine, weight: round(tempLine?.weight + line.weight - weight, 3) };
-        if (newTempLine.weight >= 0) {
-          fpDispatch(
-            fpMovementActions.updateTempOrderLine({
-              docId: tempOrder?.id,
-              line: newTempLine,
-            }),
-          );
-        } else {
-          Alert.alert('Данное количество превышает количество в заявке.', 'Добавить позицию?', [
-            {
-              text: 'Да',
-              onPress: () => {
-                fpDispatch(
-                  fpMovementActions.updateTempOrderLine({
-                    docId: tempOrder?.id,
-                    line: newTempLine,
-                  }),
-                );
+        if (tempLine && tempOrder) {
+          const newTempLine = { ...tempLine, weight: round(tempLine?.weight + line.weight - weight, 3) };
+          if (newTempLine.weight >= 0) {
+            fpDispatch(
+              fpMovementActions.updateTempOrderLine({
+                docId: tempOrder?.id,
+                line: newTempLine,
+              }),
+            );
+          } else {
+            Alert.alert('Данное количество превышает количество в заявке.', 'Добавить позицию?', [
+              {
+                text: 'Да',
+                onPress: () => {
+                  fpDispatch(
+                    fpMovementActions.updateTempOrderLine({
+                      docId: tempOrder?.id,
+                      line: newTempLine,
+                    }),
+                  );
+                },
               },
-            },
-            {
-              text: 'Отмена',
-            },
-          ]);
+              {
+                text: 'Отмена',
+              },
+            ]);
+          }
         }
 
         if (weight < 1000) {
@@ -323,7 +328,13 @@ const ShipmentViewScreen = () => {
     setQuantPack('');
     // setErrorMessage('');
   };
-  const handleEditShipmentHead = useCallback(() => navigation.navigate('ShipmentEdit', { id }), [navigation, id]);
+  const handleEditShipmentHead = useCallback(
+    () =>
+      isShipment
+        ? navigation.navigate('ShipmentEdit', { id, isShipment })
+        : navigationCurr.navigate('ShipmentEdit', { id, isShipment }),
+    [isShipment, navigation, id, navigationCurr],
+  );
 
   const handleDeleteShipment = useCallback(async () => {
     if (!id) {
@@ -353,6 +364,10 @@ const ShipmentViewScreen = () => {
     ]);
   }, [docDispatch, fpDispatch, id, tempOrder]);
 
+  const handleFocus = () => {
+    ref?.current?.focus();
+  };
+
   const hanldeCancelLastScan = useCallback(() => {
     if (shipmentLines?.length) {
       const shipmentLine = shipmentLines?.[0];
@@ -368,6 +383,7 @@ const ShipmentViewScreen = () => {
         );
       }
     }
+    handleFocus();
   }, [dispatch, fpDispatch, id, shipmentLines, tempOrder]);
 
   const actionsMenu = useCallback(() => {
@@ -408,8 +424,8 @@ const ShipmentViewScreen = () => {
         document: { ...shipment, status: 'READY' },
       }),
     );
-    navigation.goBack();
-  }, [dispatch, id, navigation, shipment]);
+    isShipment ? navigation.goBack() : navigationCurr.goBack();
+  }, [dispatch, id, isShipment, navigation, navigationCurr, shipment]);
 
   const [visibleSendDialog, setVisibleSendDialog] = useState(false);
 
@@ -447,12 +463,17 @@ const ShipmentViewScreen = () => {
             <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
           )}
           <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
-          {!isScanerReader && (
-            <ScanButton
-              onPress={() => navigation.navigate('ScanGood', { docId: id })}
-              disabled={screenState !== 'idle'}
-            />
-          )}
+
+          <ScanButton
+            onPress={() =>
+              isScanerReader
+                ? handleFocus()
+                : isShipment
+                ? navigation.navigate('ScanGood', { docId: id, isShipment })
+                : navigationCurr.navigate('ScanGood', { docId: id, isShipment })
+            }
+            disabled={screenState !== 'idle'}
+          />
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
@@ -462,24 +483,35 @@ const ShipmentViewScreen = () => {
       id,
       isBlocked,
       isScanerReader,
+      isShipment,
       loading,
       navigation,
+      navigationCurr,
       screenState,
       shipment?.status,
     ],
   );
 
   const renderLeft = useCallback(
-    () => <BackButton onPress={() => navigation.navigate('ShipmentList')} />,
-    [navigation],
+    () => (
+      <BackButton
+        onPress={() => (isShipment ? navigation.navigate('ShipmentList') : navigationCurr.navigate('CurrShipmentList'))}
+      />
+    ),
+    [isShipment, navigation, navigationCurr],
   );
 
   useLayoutEffect(() => {
-    navigation.setOptions({
-      headerLeft: renderLeft,
-      headerRight: renderRight,
-    });
-  }, [navigation, renderLeft, renderRight]);
+    isShipment
+      ? navigation.setOptions({
+          headerLeft: renderLeft,
+          headerRight: renderRight,
+        })
+      : navigationCurr.setOptions({
+          headerLeft: renderLeft,
+          headerRight: renderRight,
+        });
+  }, [isShipment, navigation, navigationCurr, renderLeft, renderRight]);
 
   const [scanned, setScanned] = useState(false);
 
@@ -655,9 +687,9 @@ const ShipmentViewScreen = () => {
   useEffect(() => {
     if (screenState === 'sent' || screenState === 'deleted') {
       setScreenState('idle');
-      navigation.goBack();
+      isShipment ? navigation.goBack() : navigationCurr.goBack();
     }
-  }, [navigation, screenState]);
+  }, [isShipment, navigation, navigationCurr, screenState]);
 
   const LineTypes = useCallback(
     () => (
@@ -785,7 +817,7 @@ const ShipmentViewScreen = () => {
             ItemSeparatorComponent={ItemSeparator}
             keyExtractor={keyExtractor}
             extraData={[shipmentLines, isBlocked]}
-            keyboardShouldPersistTaps={'handled'}
+            keyboardShouldPersistTaps={'always'}
           />
           <ViewTotal quantPack={shipmentLineSum?.quantPack} weight={shipmentLineSum?.weight || 0} />
         </>
@@ -799,7 +831,7 @@ const ShipmentViewScreen = () => {
             ItemSeparatorComponent={ItemSeparator}
             keyExtractor={keyExtractor}
             extraData={[tempOrderLines, isBlocked]}
-            keyboardShouldPersistTaps={'handled'}
+            keyboardShouldPersistTaps={'always'}
           />
           <ViewTotal weight={tempLineSum.weight || 0} />
         </>
@@ -827,7 +859,7 @@ const ShipmentViewScreen = () => {
       <SimpleDialog
         visible={visibleSendDialog}
         title={'Внимание!'}
-        text={'Вы уверены, что хотите отправить документ?'}
+        text={'Сформировано полностью?'}
         onCancel={() => setVisibleSendDialog(false)}
         onOk={handleSendDocument}
         okDisabled={loading}

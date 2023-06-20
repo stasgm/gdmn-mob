@@ -171,11 +171,16 @@ export const MoveViewScreen = () => {
     ]);
   }, [docDispatch, id]);
 
+  const handleFocus = () => {
+    ref?.current?.focus();
+  };
+
   const hanldeCancelLastScan = useCallback(() => {
     const lastId = doc?.lines?.[0]?.id;
     if (lastId) {
       dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
     }
+    handleFocus();
   }, [dispatch, doc?.lines, id]);
 
   const sendDoc = useSendDocs(doc ? [doc] : []);
@@ -240,12 +245,10 @@ export const MoveViewScreen = () => {
       !isBlocked && (
         <View style={styles.buttons}>
           <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
-          {!isScanerReader && (
-            <ScanButton
-              onPress={() => navigation.navigate('ScanGood', { docId: id })}
-              disabled={screenState !== 'idle'}
-            />
-          )}
+          <ScanButton
+            onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('ScanGood', { docId: id }))}
+            disabled={screenState !== 'idle'}
+          />
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
@@ -331,6 +334,10 @@ export const MoveViewScreen = () => {
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!doc) {
+        return;
+      }
+
+      if (doc?.status !== 'DRAFT') {
         return;
       }
 
@@ -510,7 +517,7 @@ export const MoveViewScreen = () => {
         ItemSeparatorComponent={ItemSeparator}
         keyExtractor={keyExtractor}
         extraData={[lines, isBlocked]}
-        keyboardShouldPersistTaps={'handled'}
+        keyboardShouldPersistTaps={'always'}
       />
       {doc?.lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
       <AppDialog

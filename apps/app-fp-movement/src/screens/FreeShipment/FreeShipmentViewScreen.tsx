@@ -44,7 +44,7 @@ import {
   IShipmentDocument,
   IShipmentLine,
 } from '../../store/types';
-import { FreeShipmentStackParamList } from '../../navigation/Root/types';
+import { CurrFreeShipmentStackParamList, FreeShipmentStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import { getBarcode, getLineGood, getRemGoodListByContact, getTotalLines } from '../../utils/helpers';
@@ -64,7 +64,9 @@ export const FreeShipmentViewScreen = () => {
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<FreeShipmentStackParamList, 'FreeShipmentView'>>();
 
-  const id = useRoute<RouteProp<FreeShipmentStackParamList, 'FreeShipmentView'>>().params?.id;
+  const navigationCurr = useNavigation<StackNavigationProp<CurrFreeShipmentStackParamList, 'FreeShipmentView'>>();
+
+  const { id, isCurr } = useRoute<RouteProp<FreeShipmentStackParamList, 'FreeShipmentView'>>().params;
   const doc = docSelectors.selectByDocId<IFreeShipmentDocument>(id);
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
 
@@ -283,8 +285,10 @@ export const FreeShipmentViewScreen = () => {
   };
 
   const handleEditDocHead = useCallback(() => {
-    navigation.navigate('FreeShipmentEdit', { id });
-  }, [navigation, id]);
+    isCurr
+      ? navigationCurr.navigate('FreeShipmentEdit', { id, isCurr })
+      : navigation.navigate('FreeShipmentEdit', { id, isCurr });
+  }, [isCurr, navigation, id, navigationCurr]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
@@ -311,6 +315,10 @@ export const FreeShipmentViewScreen = () => {
     ]);
   }, [docDispatch, id]);
 
+  const handleFocus = () => {
+    ref?.current?.focus();
+  };
+
   const hanldeCancelLastScan = useCallback(() => {
     if (lines?.length) {
       if (lines[0].scannedBarcode) {
@@ -324,6 +332,7 @@ export const FreeShipmentViewScreen = () => {
         dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lines[0].id }));
       }
     }
+    handleFocus();
   }, [dispatch, id, lines]);
 
   const [visibleSendDialog, setVisibleSendDialog] = useState(false);
@@ -382,8 +391,8 @@ export const FreeShipmentViewScreen = () => {
         document: { ...doc, status: 'READY' },
       }),
     );
-    navigation.goBack();
-  }, [dispatch, id, navigation, doc]);
+    isCurr ? navigationCurr.goBack() : navigation.goBack();
+  }, [doc, dispatch, id, isCurr, navigation, navigationCurr]);
 
   const renderRight = useCallback(
     () =>
@@ -397,24 +406,45 @@ export const FreeShipmentViewScreen = () => {
         <View style={styles.buttons}>
           {doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />}
           <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
-          {!isScanerReader && (
-            <ScanButton
-              onPress={() => navigation.navigate('ScanGood', { docId: id })}
-              disabled={screenState !== 'idle'}
-            />
-          )}
+          <ScanButton
+            onPress={() =>
+              isScanerReader
+                ? handleFocus()
+                : isCurr
+                ? navigationCurr.navigate('ScanGood', { docId: id })
+                : navigation.navigate('ScanGood', { docId: id })
+            }
+            disabled={screenState !== 'idle'}
+          />
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [actionsMenu, doc?.status, handleSaveDocument, id, isBlocked, isScanerReader, loading, navigation, screenState],
+    [
+      actionsMenu,
+      doc?.status,
+      handleSaveDocument,
+      id,
+      isBlocked,
+      isCurr,
+      isScanerReader,
+      loading,
+      navigation,
+      navigationCurr,
+      screenState,
+    ],
   );
 
   useLayoutEffect(() => {
-    navigation.setOptions({
-      headerLeft: navBackButton,
-      headerRight: renderRight,
-    });
-  }, [navigation, renderRight]);
+    isCurr
+      ? navigationCurr.setOptions({
+          headerLeft: navBackButton,
+          headerRight: renderRight,
+        })
+      : navigation.setOptions({
+          headerLeft: navBackButton,
+          headerRight: renderRight,
+        });
+  }, [isCurr, navigation, navigationCurr, renderRight]);
 
   const renderItem = useCallback(
     ({ item }: { item: IFreeShipmentLine }) => {
@@ -458,6 +488,10 @@ export const FreeShipmentViewScreen = () => {
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!doc) {
+        return;
+      }
+
+      if (doc?.status !== 'DRAFT') {
         return;
       }
 
@@ -551,9 +585,9 @@ export const FreeShipmentViewScreen = () => {
   useEffect(() => {
     if (screenState === 'sent' || screenState === 'deleted') {
       setScreenState('idle');
-      navigation.goBack();
+      isCurr ? navigationCurr.goBack() : navigation.goBack();
     }
-  }, [navigation, screenState]);
+  }, [isCurr, navigation, navigationCurr, screenState]);
 
   const isFocused = useIsFocused();
   if (!isFocused) {
@@ -609,7 +643,7 @@ export const FreeShipmentViewScreen = () => {
         ItemSeparatorComponent={ItemSeparator}
         keyExtractor={keyExtractor}
         extraData={[lines, isBlocked]}
-        keyboardShouldPersistTaps={'handled'}
+        keyboardShouldPersistTaps={'always'}
       />
       {lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
       <AppDialog
@@ -636,7 +670,7 @@ export const FreeShipmentViewScreen = () => {
       <SimpleDialog
         visible={visibleSendDialog}
         title={'Внимание!'}
-        text={'Вы уверены, что хотите отправить документ?'}
+        text={'Сформировано полностью?'}
         onCancel={() => setVisibleSendDialog(false)}
         onOk={handleSendDocument}
         okDisabled={loading}

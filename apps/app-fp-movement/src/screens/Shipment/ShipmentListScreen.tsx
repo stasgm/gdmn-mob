@@ -1,12 +1,11 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { ListRenderItem, SectionList, SectionListData, View, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 import { documentActions, refSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   ItemSeparator,
-  Status,
   AppScreen,
   SubTitle,
   ScreenListItem,
@@ -17,19 +16,22 @@ import {
   EmptyList,
   MediumText,
   navBackDrawer,
+  SendButton,
+  SimpleDialog,
+  AddButton,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { getDelList, getDateString, keyExtractor, deleteSelectedItems } from '@lib/mobile-hooks';
+import { getDelList, getDateString, keyExtractor, deleteSelectedItems, useSendDocs } from '@lib/mobile-hooks';
 
 import { IDocumentType } from '@lib/types';
 
 import { IDelList, IListItem } from '@lib/mobile-types';
 
 import { IShipmentDocument } from '../../store/types';
-import { ShipmentStackParamList } from '../../navigation/Root/types';
-import { dateTypes, docDepartTypes, statusTypes } from '../../utils/constants';
+import { CurrShipmentStackParamList, ShipmentStackParamList } from '../../navigation/Root/types';
+import { dateTypes, statusTypes } from '../../utils/constants';
 
 export interface ShipmentListSectionProps {
   title: string;
@@ -38,47 +40,42 @@ export interface ShipmentListSectionProps {
 export type SectionDataProps = SectionListData<IListItemProps, ShipmentListSectionProps>[];
 
 export const ShipmentListScreen = () => {
+  const route = useRoute();
+  const isShipmentList = useMemo(() => route.name === 'ShipmentList', [route.name]);
+
   const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ShipmentList'>>();
+  const navigationCurr = useNavigation<StackNavigationProp<CurrShipmentStackParamList, 'CurrShipmentList'>>();
+
   const docDispatch = useDocThunkDispatch();
 
   const docs = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
-  const list = docs?.filter((i) => i.documentType?.name === 'shipment' || i.documentType.name === 'currShipment');
+  const loading = useSelector((state) => state.app.loading);
+
+  const list = docs?.filter((i) =>
+    isShipmentList ? i.documentType?.name === 'shipment' : i.documentType?.name === 'currShipment',
+  );
 
   const [sortDateType, setSortDateType] = useState(dateTypes[0]);
 
-  const [filterStatus, setFilterStatus] = useState<Status>('all');
+  const [filterStatus, setFilterStatus] = useState<IListItem>(
+    statusTypes.find((i) => i.id === 'DRAFT_READY') || statusTypes[0],
+  );
 
-  const documentTypes: IListItem[] = refSelectors
+  const documentType = refSelectors
     .selectByName<IDocumentType>('documentType')
-    ?.data?.filter((i) => i.subtype === 'shipment' && i.name !== 'freeShipment')
-    .map((i) => ({ id: i.name, value: i.description || i.name }));
-
-  const filterDocTypes = useMemo(() => docDepartTypes.concat(documentTypes), [documentTypes]);
-
-  const [filterDocType, setFilterDocType] = useState(filterDocTypes[0]);
-
-  const [visibleDocTypeMenu, setVisibleDocTypeMenu] = useState(false);
+    ?.data?.find((i) => (isShipmentList ? i.name === 'shipment' : i.name === 'currShipment'))?.name;
 
   const filteredList: IListItemProps[] = useMemo(() => {
-    const res =
-      filterStatus === 'all'
-        ? list
-        : filterStatus === 'active'
-        ? list.filter((e) => e.status !== 'PROCESSED')
-        : filterStatus !== 'archive' && filterStatus !== 'all'
-        ? list.filter((e) => e.status === filterStatus)
-        : [];
+    const res = list.filter((e) => ((filterStatus.statuses as []) || []).find((i) => i === e.status));
 
-    const newRes = filterDocType?.id === 'all' ? res : res?.filter((i) => i?.documentType.name === filterDocType?.id);
-
-    newRes.sort((a, b) =>
+    res.sort((a, b) =>
       sortDateType.id === 'new'
         ? new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()
         : new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
     );
 
-    return newRes.map(
+    return res.map(
       (i) =>
         ({
           id: i.id,
@@ -97,7 +94,7 @@ export const ShipmentListScreen = () => {
           ),
         } as IListItemProps),
     );
-  }, [filterStatus, list, filterDocType?.id, sortDateType.id]);
+  }, [filterStatus, list, sortDateType.id]);
 
   const sections = useMemo(
     () =>
@@ -121,18 +118,12 @@ export const ShipmentListScreen = () => {
     [filteredList],
   );
 
-  const [visibleFilterType, setVisibleFilterType] = useState(false);
   const [visibleFilterStatus, setVisibleFilterStatus] = useState(false);
   const [visibleSortDate, setVisibleSortDate] = useState(false);
 
-  const handleApplyFilterType = (option: IListItem) => {
-    setVisibleFilterType(false);
-    setFilterDocType(option);
-  };
-
   const handleApplyFilterStatus = (option: any) => {
     setVisibleFilterStatus(false);
-    setFilterStatus(option.id);
+    setFilterStatus(option);
   };
 
   const handleApplySortDate = (option: IListItem) => {
@@ -154,50 +145,73 @@ export const ShipmentListScreen = () => {
     deleteSelectedItems(delList, deleteDocs);
   }, [delList, docDispatch]);
 
-  const handleAddDocument = useCallback(
-    (item: IListItem) => {
-      setVisibleDocTypeMenu(false);
-      navigation.navigate('ScanOrder', { docTypeId: item.id });
-    },
-    [navigation],
+  const handleAddDocument = useCallback(() => {
+    // (item: IListItem) => {
+    if (!documentType) {
+      return;
+    }
+
+    isShipmentList
+      ? navigation.navigate('ScanOrder', { docTypeId: documentType /*item.id*/, isShipment: isShipmentList })
+      : navigationCurr.navigate('ScanOrder', { docTypeId: documentType /*item.id*/, isShipment: isShipmentList });
+  }, [documentType, isShipmentList, navigation, navigationCurr]);
+
+  const [visibleSendDialog, setVisibleSendDialog] = useState(false);
+
+  const docsToSend = useMemo(
+    () =>
+      Object.keys(delList).reduce((prev: IShipmentDocument[], cur) => {
+        const sendingDoc = docs.find((i) => i.id === cur && (i.status === 'DRAFT' || i.status === 'READY'));
+        if (sendingDoc) {
+          prev = [...prev, sendingDoc];
+        }
+        return prev;
+      }, []),
+    [delList, docs],
   );
+
+  const sendDoc = useSendDocs(docsToSend.length ? docsToSend : []);
+
+  const handleSendDocument = useCallback(async () => {
+    setVisibleSendDialog(false);
+    // setScreenState('sending');
+    await sendDoc();
+    setDelList({});
+
+    // setScreenState('sent');
+  }, [sendDoc]);
 
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
         {isDelList ? (
-          <DeleteButton onPress={handleDeleteDocs} />
-        ) : (
-          <View style={localStyles.menuDocType}>
-            <Menu
-              key={'MenuType'}
-              visible={visibleDocTypeMenu}
-              onChange={handleAddDocument}
-              onDismiss={() => setVisibleDocTypeMenu(false)}
-              onPress={() => setVisibleDocTypeMenu(true)}
-              options={documentTypes}
-              iconName={'plus'}
-              iconSize={30}
-            />
+          <View style={styles.buttons}>
+            <SendButton onPress={() => setVisibleSendDialog(true)} />
+            <DeleteButton onPress={handleDeleteDocs} />
           </View>
+        ) : (
+          <AddButton onPress={handleAddDocument} />
         )}
       </View>
     ),
-    [documentTypes, handleAddDocument, handleDeleteDocs, isDelList, visibleDocTypeMenu],
+    [handleAddDocument, handleDeleteDocs, isDelList],
   );
 
   const renderLeft = useCallback(() => isDelList && <CloseButton onPress={() => setDelList({})} />, [isDelList]);
 
   useLayoutEffect(() => {
-    navigation.setOptions({
-      headerLeft: isDelList ? renderLeft : navBackDrawer,
-      headerRight: renderRight,
-      title:
-        delList && Object.values(delList).length > 0
-          ? `Выделено отвесов: ${Object.values(delList).length}`
-          : 'Отвесы по заявкам',
-    });
-  }, [delList, isDelList, navigation, renderLeft, renderRight]);
+    isShipmentList
+      ? navigation.setOptions({
+          headerLeft: isDelList ? renderLeft : navBackDrawer,
+          headerRight: renderRight,
+          title: delList && Object.values(delList).length > 0 ? `${Object.values(delList).length}` : 'Отвесы',
+        })
+      : navigationCurr.setOptions({
+          headerLeft: isDelList ? renderLeft : navBackDrawer,
+          headerRight: renderRight,
+          title: delList && Object.values(delList).length > 0 ? `${Object.values(delList).length}` : 'Отвесы $',
+        });
+  }, [delList, isDelList, isShipmentList, navigation, navigationCurr, renderLeft, renderRight]);
 
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => (
     <ScreenListItem
@@ -206,7 +220,9 @@ export const ShipmentListScreen = () => {
       onPress={() =>
         isDelList
           ? setDelList(getDelList(delList, item.id, item.status!))
-          : navigation.navigate('ShipmentView', { id: item.id })
+          : isShipmentList
+          ? navigation.navigate('ShipmentView', { id: item.id, isShipment: isShipmentList })
+          : navigationCurr.navigate('ShipmentView', { id: item.id, isShipment: isShipmentList })
       }
       onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
       checked={!!delList[item.id]}
@@ -221,20 +237,6 @@ export const ShipmentListScreen = () => {
     <AppScreen>
       <View style={[styles.containerCenter, styles.marginBottom5]}>
         <Menu
-          key={'MenuType'}
-          title="Тип"
-          visible={visibleFilterType}
-          onChange={handleApplyFilterType}
-          onDismiss={() => setVisibleFilterType(false)}
-          onPress={() => setVisibleFilterType(true)}
-          options={filterDocTypes}
-          activeOptionId={filterDocType?.id}
-          style={[styles.btnTab, styles.firstBtnTab]}
-          menuStyle={localStyles.menu}
-          isActive={filterDocType?.id !== 'all'}
-          iconName={'chevron-down'}
-        />
-        <Menu
           key={'MenuStatus'}
           title="Статус"
           visible={visibleFilterStatus}
@@ -242,10 +244,10 @@ export const ShipmentListScreen = () => {
           onDismiss={() => setVisibleFilterStatus(false)}
           onPress={() => setVisibleFilterStatus(true)}
           options={statusTypes}
-          activeOptionId={filterStatus}
-          style={[styles.btnTab]}
+          activeOptionId={filterStatus.id}
+          style={[styles.btnTab, styles.firstBtnTab]}
           menuStyle={localStyles.menu}
-          isActive={filterStatus !== 'all'}
+          isActive={filterStatus.id !== 'all'}
           iconName={'chevron-down'}
         />
         <Menu
@@ -271,6 +273,14 @@ export const ShipmentListScreen = () => {
         renderSectionHeader={renderSectionHeader}
         ListEmptyComponent={EmptyList}
       />
+      <SimpleDialog
+        visible={visibleSendDialog}
+        title={'Внимание!'}
+        text={'Сформировано полностью?'}
+        onCancel={() => setVisibleSendDialog(false)}
+        onOk={handleSendDocument}
+        okDisabled={loading}
+      />
     </AppScreen>
   );
 };
@@ -280,8 +290,5 @@ const localStyles = StyleSheet.create({
     justifyContent: 'center',
     marginLeft: 6,
     width: '100%',
-  },
-  menuDocType: {
-    marginRight: 6,
   },
 });
