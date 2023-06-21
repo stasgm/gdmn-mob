@@ -27,6 +27,8 @@ const DashboardScreen = ({ items }: { items: INavItem[] }) => {
     navigation.navigate(routeName, params);
   };
 
+  const titleSize = { fontSize: items.length > 8 ? 14 : 16 };
+
   return (
     <AppScreen>
       <View style={styles.container}>
@@ -41,8 +43,8 @@ const DashboardScreen = ({ items }: { items: INavItem[] }) => {
                 handleDocumentPress(item.dashboardScreenName || `${item.name}Edit`, item.dashboardScreenParams)
               }
             >
-              <MaterialCommunityIcons name={item.icon} size={50} color={'#FFF'} />
-              <MediumText style={styles.title}>{item.title}</MediumText>
+              <MaterialCommunityIcons name={item.icon} size={items.length > 8 ? 38 : 50} color={'#FFF'} />
+              <MediumText style={[styles.title, titleSize]}>{item.title}</MediumText>
             </TouchableOpacity>
           ))}
       </View>
@@ -71,6 +73,6 @@ const styles = StyleSheet.create({
     color: '#FFF',
     textTransform: 'uppercase',
     fontWeight: 'bold',
-    fontSize: 16,
+    // fontSize: 16,
   },
 });
