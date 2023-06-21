@@ -121,7 +121,7 @@ const Root = () => {
             {
               name: 'CurrShipment',
               title: 'Отвес по заявке $',
-              icon: 'playlist-check',
+              icon: 'cash-check',
               showInDashboard: true,
               component: CurrShipmentNavigator,
               dashboardScreenName: 'ScanOrder',
@@ -138,7 +138,7 @@ const Root = () => {
             {
               name: 'CurrFreeShipment',
               title: 'Отвес $',
-              icon: 'playlist-plus',
+              icon: 'cash-plus',
               component: CurrFreeShipmentNavigator,
               showInDashboard: true,
               dashboardScreenName: 'FreeShipmentEdit',
@@ -192,6 +192,17 @@ const Root = () => {
               icon: 'playlist-check',
               component: ShipmentNavigator,
               showInDashboard: true,
+              dashboardScreenName: 'ScanOrder',
+              dashboardScreenParams: { isCurr: false },
+            },
+            {
+              name: 'CurrShipment',
+              title: 'Отвес по заявке $',
+              icon: 'cash-check',
+              showInDashboard: true,
+              component: CurrShipmentNavigator,
+              dashboardScreenName: 'ScanOrder',
+              dashboardScreenParams: { isCurr: true },
             },
             {
               name: 'FreeShipment',
@@ -199,6 +210,16 @@ const Root = () => {
               icon: 'playlist-plus',
               component: FreeShipmentNavigator,
               showInDashboard: true,
+              dashboardScreenParams: { isCurr: false },
+            },
+            {
+              name: 'CurrFreeShipment',
+              title: 'Отвес $',
+              icon: 'cash-plus',
+              component: CurrFreeShipmentNavigator,
+              showInDashboard: true,
+              dashboardScreenName: 'FreeShipmentEdit',
+              dashboardScreenParams: { isCurr: true },
             },
             {
               name: 'Remains',
@@ -250,7 +271,9 @@ const Root = () => {
         : {
             ...moveScreens,
             ...shipmentScreens,
+            ...currShipmentScreens,
             ...freeShipmentScreens,
+            ...currFreeShipmentScreens,
             ...returnScreens,
             ...inventoryScreens,
             ...laboratoryScreens,

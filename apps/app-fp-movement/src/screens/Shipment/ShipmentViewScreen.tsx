@@ -30,6 +30,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { FlashList } from '@shopify/flash-list';
 
+import { DashboardStackParamList } from '@lib/mobile-navigation';
+
 import { barcodeSettings, IShipmentDocument, IShipmentLine, ITempLine } from '../../store/types';
 
 import { ShipmentStackParamList } from '../../navigation/Root/types';
@@ -48,9 +50,13 @@ const ShipmentViewScreen = () => {
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
 
-  const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ShipmentView'>>();
+  const navigation =
+    useNavigation<StackNavigationProp<ShipmentStackParamList & DashboardStackParamList, 'ShipmentView'>>();
 
   const { id, isCurr } = useRoute<RouteProp<ShipmentStackParamList, 'ShipmentView'>>().params;
+
+  const state = navigation.getState();
+  const isDashboard = state.routes.some((route) => route.name === 'Dashboard');
 
   const dispatch = useDispatch();
   const fpDispatch = useFpDispatch();
@@ -481,8 +487,8 @@ const ShipmentViewScreen = () => {
   );
 
   const renderLeft = useCallback(
-    () => <BackButton onPress={() => navigation.navigate('ShipmentList')} />,
-    [navigation],
+    () => <BackButton onPress={() => (isDashboard ? navigation.goBack() : navigation.navigate('ShipmentList'))} />,
+    [isDashboard, navigation],
   );
 
   useLayoutEffect(() => {

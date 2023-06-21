@@ -1,4 +1,5 @@
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
+export { DashboardStackParamList } from './Root/types';
 
 export type RootDrawerParamList = {
   References: undefined;

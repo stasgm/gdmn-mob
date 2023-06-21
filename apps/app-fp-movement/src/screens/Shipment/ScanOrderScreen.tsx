@@ -38,7 +38,7 @@ const ScanOrderScreen = () => {
 
   const shipmentType = refSelectors
     .selectByName<IDocumentType>('documentType')
-    ?.data?.find((i) => (isCurr ? i.name === 'shipment' : i.name === 'currShipment'));
+    ?.data?.find((i) => (isCurr ? i.name === 'currShipment' : i.name === 'shipment'));
 
   const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ScanOrder'>>();
 
@@ -57,10 +57,8 @@ const ScanOrderScreen = () => {
   const orders = docSelectors.selectByDocType<IOrderDocument>('order');
 
   const shipments = useSelector((state) =>
-    state.documents?.list.filter((i) => i.documentType?.name === 'shipment' || i.documentType?.name === 'currShipment'),
+    state.documents?.list.filter((i) => i.documentType.name === 'currShipment' || i.documentType.name === 'shipment'),
   ) as IShipmentDocument[];
-
-  // const shipmentType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === docTypeId);
 
   const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as ICodeEntity;
 
@@ -146,6 +144,7 @@ const ScanOrderScreen = () => {
 
       const order = orders.find((item) => item.head.barcode === brc);
       if (order) {
+        console.log('shipments', shipments);
         const shipment = shipments.find((i) => i.head.orderId === order.id);
 
         if (shipment) {

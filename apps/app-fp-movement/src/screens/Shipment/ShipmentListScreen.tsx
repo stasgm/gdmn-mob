@@ -49,7 +49,9 @@ export const ShipmentListScreen = () => {
 
   const loading = useSelector((state) => state.app.loading);
 
-  const list = docs?.filter((i) => (isCurr ? i.documentType?.name === 'isCurr' : i.documentType?.name === 'shipment'));
+  const list = docs?.filter((i) =>
+    isCurr ? i.documentType?.name === 'currShipment' : i.documentType?.name === 'shipment',
+  );
 
   const [sortDateType, setSortDateType] = useState(dateTypes[0]);
 

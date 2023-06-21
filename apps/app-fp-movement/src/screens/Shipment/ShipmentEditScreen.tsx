@@ -43,7 +43,7 @@ const ShipmentEditScreen = () => {
 
   const shipmentType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data.find((t) => t.name === 'shipment');
+    ?.data.find((t) => (isCurr ? t.name === 'currShipment' : t.name === 'shipment'));
 
   // Подразделение по умолчанию
 

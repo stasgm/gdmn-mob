@@ -180,9 +180,9 @@ export const FreeShipmentListScreen = () => {
     navigation.setOptions({
       headerLeft: isDelList ? renderLeft : navBackDrawer,
       headerRight: renderRight,
-      title: isDelList ? `${Object.values(delList).length}` : 'Отвес $',
+      title: isDelList ? `${Object.values(delList).length}` : isCurr ? 'Отвес $' : 'Отвес',
     });
-  }, [delList, isDelList, navigation, renderLeft, renderRight]);
+  }, [delList, isCurr, isDelList, navigation, renderLeft, renderRight]);
 
   const renderItem: ListRenderItem<IListItemProps> = useCallback(
     ({ item }) => (

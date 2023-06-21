@@ -10,7 +10,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { SelectableInput, Input, SaveButton, SubTitle, AppScreen, RadioGroup, navBackButton } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
-import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks';
+import { generateId, getDateString } from '@lib/mobile-hooks';
 
 import { IDocumentType, IReference, ScreenState } from '@lib/types';
 
@@ -28,7 +28,11 @@ export const FreeShipmentEditScreen = () => {
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
-  const shipments = useFilteredDocList<IFreeShipmentDocument>('freeShipment');
+  const shipments = useSelector((state) =>
+    state.documents?.list.filter((i) =>
+      isCurr ? i.documentType.name === 'currFreeShipment' : i.documentType.name === 'freeShipment',
+    ),
+  ) as IFreeShipmentDocument[];
 
   const doc = shipments?.find((e) => e.id === id);
 
