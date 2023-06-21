@@ -28,7 +28,7 @@ import { deleteSelectedItems, getDateString, getDelList, keyExtractor, useSendDo
 
 import { IDelList } from '@lib/mobile-types';
 
-import { IMoveDocument } from '../../store/types';
+import { IReceiptDocument } from '../../store/types';
 import { ReceiptStackParamList } from '../../navigation/Root/types';
 
 export interface ReceiptListSectionProps {
@@ -43,8 +43,8 @@ export const ReceiptListScreen = () => {
 
   const list = (
     useSelector((state) => state.documents.list)?.filter(
-      (i) => i.documentType?.name === 'movement' && i.head?.subtype.id === 'receipt',
-    ) as IMoveDocument[]
+      (i) => i.documentType?.name === 'receipt',
+    ) as IReceiptDocument[]
   ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   const loading = useSelector((state) => state.app.loading);
@@ -68,7 +68,7 @@ export const ReceiptListScreen = () => {
       (i) =>
         ({
           id: i.id,
-          title: i.head.subtype.name || '',
+          title: i.documentType.description || '',
           documentDate: getDateString(i.documentDate),
           status: i.status,
 
@@ -128,7 +128,7 @@ export const ReceiptListScreen = () => {
 
   const docsToSend = useMemo(
     () =>
-      Object.keys(delList).reduce((prev: IMoveDocument[], cur) => {
+      Object.keys(delList).reduce((prev: IReceiptDocument[], cur) => {
         const sendingDoc = list.find((i) => i.id === cur && (i.status === 'DRAFT' || i.status === 'READY'));
         if (sendingDoc) {
           prev = [...prev, sendingDoc];

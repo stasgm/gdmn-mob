@@ -18,6 +18,15 @@ export interface IMoveFormParam extends IFormParam {
   documentSubtype?: INamedEntity;
 }
 
+export interface IReceiptFormParam extends IFormParam {
+  number?: string;
+  documentDate?: string;
+  status?: StatusType;
+  fromDepart?: IAddressStoreEntity;
+  toDepart?: IAddressStoreEntity;
+  comment?: string;
+}
+
 export interface IShipmentFormParam extends IFormParam {
   number?: string;
   documentDate?: string;
@@ -109,6 +118,26 @@ export interface IMoveLine extends IEntity {
 }
 
 export type IMoveDocument = MandateProps<IDocument<IMoveHead, IMoveLine>, 'head' | 'lines'>;
+
+export interface IReceiptHead extends IHead {
+  fromDepart: IAddressStoreEntity;
+  toDepart: IAddressStoreEntity; //Подразделение
+  comment?: string; // Комvентарий
+}
+
+export interface IReceiptLine extends IEntity {
+  good: IGood;
+  weight: number;
+  workDate: string; // Дата производства
+  numReceived: string; // Номер партии
+  quantPack: number; // порядковый номер сканирования в документе
+  barcode?: string; // технологический код
+  sortOrder?: number; // порядок сортировки
+  fromCell?: string; // номер ячейки
+  toCell?: string; // номер ячейки
+}
+
+export type IReceiptDocument = MandateProps<IDocument<IReceiptHead, IReceiptLine>, 'head' | 'lines'>;
 
 export interface IOrderHead extends IHead {
   contact: ICodeEntity; //организация-плательщик
