@@ -41,7 +41,7 @@ export const ReceiptEditScreen = () => {
 
   const movementSubtype = refSelectors
     .selectByName<IReference<INamedEntity>>('documentSubtype')
-    ?.data.find((t) => t.id === 'prihod');
+    ?.data.find((t) => t.id === 'receipt');
 
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {

@@ -9,7 +9,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { DashboardStackParamList } from '../navigation/Root/types';
-import { INavItem } from '../navigation/types';
+import { INavItem, ScreenParams } from '../navigation/types';
 import { dashboardColors } from '../constants';
 
 const DashboardScreen = ({ items }: { items: INavItem[] }) => {
@@ -23,8 +23,8 @@ const DashboardScreen = ({ items }: { items: INavItem[] }) => {
     });
   }, []);
 
-  const handleDocumentPress = (routeName: string) => {
-    navigation.navigate(`${routeName}Edit`);
+  const handleDocumentPress = (routeName: string, params?: ScreenParams) => {
+    navigation.navigate(routeName, params);
   };
 
   return (
@@ -37,7 +37,9 @@ const DashboardScreen = ({ items }: { items: INavItem[] }) => {
             <TouchableOpacity
               key={item.name}
               style={[{ backgroundColor: item.color || dashboardColors[xid] || colors.primary }, styles.item]}
-              onPress={() => handleDocumentPress(item.name)}
+              onPress={() =>
+                handleDocumentPress(item.dashboardScreenName || `${item.name}Edit`, item.dashboardScreenParams)
+              }
             >
               <MaterialCommunityIcons name={item.icon} size={50} color={'#FFF'} />
               <MediumText style={styles.title}>{item.title}</MediumText>

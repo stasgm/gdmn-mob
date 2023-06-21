@@ -43,7 +43,7 @@ export const ReceiptListScreen = () => {
 
   const list = (
     useSelector((state) => state.documents.list)?.filter(
-      (i) => i.documentType?.name === 'movement' && i.head?.subtype.id === 'prihod',
+      (i) => i.documentType?.name === 'movement' && i.head?.subtype.id === 'receipt',
     ) as IMoveDocument[]
   ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
@@ -171,7 +171,7 @@ export const ReceiptListScreen = () => {
     navigation.setOptions({
       headerLeft: isDelList ? renderLeft : navBackDrawer,
       headerRight: renderRight,
-      title: isDelList ? `${Object.values(delList).length}` : 'Приходы',
+      title: isDelList ? `${Object.values(delList).length}` : 'Приход',
     });
   }, [delList, isDelList, navigation, renderLeft, renderRight]);
 

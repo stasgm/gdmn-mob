@@ -59,12 +59,15 @@ import { CurrShipmentNavigator } from './src/navigation/CurrShipmentNavigator';
 import { CurrFreeShipmentNavigator } from './src/navigation/CurrFreeShipmentNavigator';
 import { ReceiptNavigator } from './src/navigation/ReceiptNavigator';
 import {
+  currFreeShipmentScreens,
+  currShipmentScreens,
   freeShipmentScreens,
   inventoryScreens,
   laboratoryScreens,
   moveFromScreens,
   moveScreens,
   moveToScreens,
+  receiptScreens,
   returnScreens,
   shipmentScreens,
 } from './src/navigation/Root/screens';
@@ -112,12 +115,17 @@ const Root = () => {
               icon: 'playlist-check',
               component: ShipmentNavigator,
               showInDashboard: true,
+              dashboardScreenName: 'ScanOrder',
+              dashboardScreenParams: { icCurr: false },
             },
             {
               name: 'CurrShipment',
               title: 'Отвес по заявке $',
               icon: 'playlist-check',
+              showInDashboard: true,
               component: CurrShipmentNavigator,
+              dashboardScreenName: 'ScanOrder',
+              dashboardScreenParams: { icCurr: true },
             },
             {
               name: 'FreeShipment',
@@ -125,12 +133,17 @@ const Root = () => {
               icon: 'playlist-plus',
               component: FreeShipmentNavigator,
               showInDashboard: true,
+              dashboardScreenName: 'ScanOrder',
+              dashboardScreenParams: { icCurr: false },
             },
             {
               name: 'CurrFreeShipment',
               title: 'Отвес $',
               icon: 'playlist-plus',
               component: CurrFreeShipmentNavigator,
+              showInDashboard: true,
+              dashboardScreenName: 'ScanOrder',
+              dashboardScreenParams: { icCurr: true },
             },
             {
               name: 'Cells',
@@ -158,9 +171,8 @@ const Root = () => {
               component: InventoryNavigator,
               showInDashboard: true,
             },
-
             {
-              name: 'Labaratory',
+              name: 'Laboratory',
               title: 'Лаборатория',
               icon: 'flask-outline',
               component: LaboratoryNavigator,
@@ -210,7 +222,7 @@ const Root = () => {
               showInDashboard: true,
             },
             {
-              name: 'Labaratory',
+              name: 'Laboratory',
               title: 'Лаборатория',
               icon: 'file-document-edit-outline',
               component: LaboratoryNavigator,
@@ -226,9 +238,12 @@ const Root = () => {
         ? {
             ...moveToScreens,
             ...moveFromScreens,
+            ...receiptScreens,
             ...moveScreens,
             ...shipmentScreens,
+            ...currShipmentScreens,
             ...freeShipmentScreens,
+            ...currFreeShipmentScreens,
             ...returnScreens,
             ...inventoryScreens,
             ...laboratoryScreens,

@@ -23,7 +23,7 @@ import { View, Text, StyleSheet } from 'react-native';
 
 import { IScannedObject } from '@lib/client-types';
 
-import { CurrShipmentStackParamList, ShipmentStackParamList } from '../../navigation/Root/types';
+import { ShipmentStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IShipmentDocument, ITempDocument } from '../../store/types';
 
 import { ICodeEntity } from '../../store/app/types';
@@ -34,10 +34,13 @@ import { useSelector as useFpSelector } from '../../store/index';
 import { barCodeTypes } from '../../utils/constants';
 
 const ScanOrderScreen = () => {
-  const { docTypeId, isShipment } = useRoute<RouteProp<ShipmentStackParamList, 'ScanOrder'>>().params;
+  const { isCurr } = useRoute<RouteProp<ShipmentStackParamList, 'ScanOrder'>>().params;
+
+  const shipmentType = refSelectors
+    .selectByName<IDocumentType>('documentType')
+    ?.data?.find((i) => (isCurr ? i.name === 'shipment' : i.name === 'currShipment'));
 
   const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ScanOrder'>>();
-  const navigationCurr = useNavigation<StackNavigationProp<CurrShipmentStackParamList, 'ScanOrder'>>();
 
   const settings = useSelector((state) => state.settings?.data);
 
@@ -46,14 +49,10 @@ const ScanOrderScreen = () => {
   const isScanerReader = settings.scannerUse?.data;
 
   useLayoutEffect(() => {
-    isShipment
-      ? navigation.setOptions({
-          headerLeft: navBackButton,
-        })
-      : navigationCurr.setOptions({
-          headerLeft: navBackButton,
-        });
-  }, [isShipment, navigation, navigationCurr]);
+    navigation.setOptions({
+      headerLeft: navBackButton,
+    });
+  }, [navigation]);
 
   const orders = docSelectors.selectByDocType<IOrderDocument>('order');
 
@@ -61,7 +60,7 @@ const ScanOrderScreen = () => {
     state.documents?.list.filter((i) => i.documentType?.name === 'shipment' || i.documentType?.name === 'currShipment'),
   ) as IShipmentDocument[];
 
-  const shipmentType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === docTypeId);
+  // const shipmentType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === docTypeId);
 
   const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as ICodeEntity;
 
@@ -77,20 +76,12 @@ const ScanOrderScreen = () => {
     const shipment = shipments.find((i) => i.head.orderId === scannedObject.id);
 
     if (shipment) {
-      isShipment
-        ? navigation.dispatch(
-            StackActions.replace('ShipmentView', {
-              id: shipment.id,
-              isShipment,
-            }),
-          )
-        : navigationCurr.dispatch(
-            StackActions.replace('ShipmentView', {
-              id: shipment.id,
-              isShipment,
-            }),
-          );
-      return;
+      navigation.dispatch(
+        StackActions.replace('ShipmentView', {
+          id: shipment.id,
+          isCurr,
+        }),
+      );
     }
 
     const tempOrder = tempOrders.find((i) => i.orderId === scannedObject.head.orderId);
@@ -128,45 +119,21 @@ const ScanOrderScreen = () => {
     dispatch(documentActions.addDocument(shipmentDoc));
 
     if (depart) {
-      isShipment
-        ? navigation.dispatch(
-            StackActions.replace('ShipmentView', {
-              id: shipmentDoc.id,
-              isShipment,
-            }),
-          )
-        : navigationCurr.dispatch(
-            StackActions.replace('ShipmentView', {
-              id: shipmentDoc.id,
-              isShipment,
-            }),
-          );
+      navigation.dispatch(
+        StackActions.replace('ShipmentView', {
+          id: shipmentDoc.id,
+          isCurr,
+        }),
+      );
     } else {
-      isShipment
-        ? navigation.dispatch(
-            StackActions.replace('ShipmentEdit', {
-              id: shipmentDoc.id,
-              isShipment,
-            }),
-          )
-        : navigationCurr.dispatch(
-            StackActions.replace('ShipmentEdit', {
-              id: shipmentDoc.id,
-              isShipment,
-            }),
-          );
+      navigation.dispatch(
+        StackActions.replace('ShipmentEdit', {
+          id: shipmentDoc.id,
+          isCurr,
+        }),
+      );
     }
-  }, [
-    scannedObject,
-    shipments,
-    tempOrders,
-    defaultDepart,
-    shipmentType,
-    dispatch,
-    isShipment,
-    navigation,
-    navigationCurr,
-  ]);
+  }, [scannedObject, shipments, tempOrders, defaultDepart, shipmentType, dispatch, navigation, isCurr]);
 
   const [scaner, setScaner] = useState<IScannedObject>({ state: 'init' });
 

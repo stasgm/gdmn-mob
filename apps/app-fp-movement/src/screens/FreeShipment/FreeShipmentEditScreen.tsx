@@ -14,7 +14,7 @@ import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks
 
 import { IDocumentType, IReference, ScreenState } from '@lib/types';
 
-import { CurrFreeShipmentStackParamList, FreeShipmentStackParamList } from '../../navigation/Root/types';
+import { FreeShipmentStackParamList } from '../../navigation/Root/types';
 import { IFreeShipmentFormParam, IFreeShipmentDocument } from '../../store/types';
 import { STATUS_LIST } from '../../utils/constants';
 import { getNextDocNumber } from '../../utils/helpers';
@@ -23,7 +23,6 @@ export const FreeShipmentEditScreen = () => {
   const { id, isCurr } = useRoute<RouteProp<FreeShipmentStackParamList, 'FreeShipmentEdit'>>().params;
 
   const navigation = useNavigation<StackNavigationProp<FreeShipmentStackParamList, 'FreeShipmentEdit'>>();
-  const navigationCurr = useNavigation<StackNavigationProp<CurrFreeShipmentStackParamList, 'FreeShipmentEdit'>>();
 
   const dispatch = useDispatch();
 
@@ -122,10 +121,7 @@ export const FreeShipmentEditScreen = () => {
         };
 
         dispatch(documentActions.addDocument(newDoc));
-
-        isCurr
-          ? navigationCurr.dispatch(StackActions.replace('FreeShipmentView', { id: newDoc.id }))
-          : navigation.dispatch(StackActions.replace('FreeShipmentView', { id: newDoc.id }));
+        navigation.dispatch(StackActions.replace('FreeShipmentView', { id: newDoc.id }));
       } else {
         if (!doc) {
           setScreenState('idle');
@@ -154,9 +150,7 @@ export const FreeShipmentEditScreen = () => {
 
         dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
         setScreenState('idle');
-        isCurr
-          ? navigationCurr.navigate('FreeShipmentView', { id, isCurr })
-          : navigation.navigate('FreeShipmentView', { id, isCurr });
+        navigation.navigate('FreeShipmentView', { id, isCurr });
       }
     }
   }, [
@@ -170,7 +164,6 @@ export const FreeShipmentEditScreen = () => {
     id,
     isCurr,
     navigation,
-    navigationCurr,
     screenState,
     shipmentType,
   ]);
@@ -185,8 +178,8 @@ export const FreeShipmentEditScreen = () => {
       headerLeft: navBackButton,
       headerRight: renderRight,
     };
-    isCurr ? navigationCurr.setOptions(options) : navigation.setOptions(options);
-  }, [isCurr, navigation, navigationCurr, renderRight]);
+    navigation.setOptions(options);
+  }, [isCurr, navigation, renderRight]);
 
   const isBlocked = docStatus !== 'DRAFT';
 
@@ -222,8 +215,7 @@ export const FreeShipmentEditScreen = () => {
       fieldName: 'fromDepart',
       value: docFromDepart && [docFromDepart],
     };
-
-    isCurr ? navigationCurr.navigate('SelectRefItem', options) : navigation.navigate('SelectRefItem', options);
+    navigation.navigate('SelectRefItem', options);
   };
 
   const handleChangeStatus = useCallback(() => {

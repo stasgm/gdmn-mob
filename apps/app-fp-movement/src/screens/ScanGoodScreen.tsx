@@ -99,7 +99,7 @@ const ScanGoodScreen = () => {
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return shipment?.head.fromDepart?.id
+    return shipment?.head.fromDepart?.id && remains
       ? getRemGoodListByContact(goods, remains[shipment?.head.fromDepart?.id], linesAddition, linesSubtraction)
       : [];
   }, [goods, linesAddition, linesSubtraction, remains, shipment?.head.fromDepart?.id]);
