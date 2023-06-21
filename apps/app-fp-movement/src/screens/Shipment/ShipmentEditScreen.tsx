@@ -148,8 +148,9 @@ const ShipmentEditScreen = () => {
     navigation.setOptions({
       headerLeft: navBackButton,
       headerRight: renderRight,
+      title: isCurr ? 'Отвес $' : 'Отвес',
     });
-  }, [navigation, renderRight]);
+  }, [isCurr, navigation, renderRight]);
 
   const isBlocked = useMemo(() => docStatus !== 'DRAFT', [docStatus]);
 

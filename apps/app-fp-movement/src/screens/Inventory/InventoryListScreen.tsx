@@ -46,9 +46,6 @@ export const InventoryListScreen = () => {
     ) as IInventoryDocument[]
   ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
-  const l = useSelector((state) => state.documents.list)?.filter((i) => i.documentType?.name === 'order');
-  console.log('list', l);
-
   const loading = useSelector((state) => state.app.loading);
 
   const [delList, setDelList] = useState<IDelList>({});

@@ -40,13 +40,10 @@ export type SectionDataProps = SectionListData<IListItemProps, ShipmentListSecti
 export const ShipmentListScreen = () => {
   const route = useRoute();
   const isCurr = route.name.toLowerCase().includes('curr');
-
   const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ShipmentList'>>();
-
   const docDispatch = useDocThunkDispatch();
 
   const docs = useSelector((state) => state.documents.list) as IShipmentDocument[];
-
   const loading = useSelector((state) => state.app.loading);
 
   const list = docs?.filter((i) =>
@@ -54,7 +51,6 @@ export const ShipmentListScreen = () => {
   );
 
   const [sortDateType, setSortDateType] = useState(dateTypes[0]);
-
   const [filterStatus, setFilterStatus] = useState<IListItem>(
     statusTypes.find((i) => i.id === 'DRAFT_READY') || statusTypes[0],
   );

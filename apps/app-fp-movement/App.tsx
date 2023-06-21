@@ -251,7 +251,7 @@ const Root = () => {
             {
               name: 'Laboratory',
               title: 'Лаборатория',
-              icon: 'file-document-edit-outline',
+              icon: 'flask-outline',
               component: LaboratoryNavigator,
               showInDashboard: true,
               sortNumber: 70,

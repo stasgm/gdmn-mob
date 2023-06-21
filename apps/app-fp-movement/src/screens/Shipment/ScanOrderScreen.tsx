@@ -144,7 +144,6 @@ const ScanOrderScreen = () => {
 
       const order = orders.find((item) => item.head.barcode === brc);
       if (order) {
-        console.log('shipments', shipments);
         const shipment = shipments.find((i) => i.head.orderId === order.id);
 
         if (shipment) {

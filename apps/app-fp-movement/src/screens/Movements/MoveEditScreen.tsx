@@ -45,7 +45,6 @@ export const MoveEditScreen = () => {
     .selectByName<IReference<INamedEntity>>('documentSubtype')
     ?.data.find((t) => t.id === 'departMovement');
 
-  console.log('movementSubtype', movementSubtype);
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {
     documentSubtype: docDocumentSubtype,

@@ -179,6 +179,7 @@ export const FreeShipmentEditScreen = () => {
     const options = {
       headerLeft: navBackButton,
       headerRight: renderRight,
+      title: isCurr ? 'Отвес $' : 'Отвес',
     };
     navigation.setOptions(options);
   }, [isCurr, navigation, renderRight]);
