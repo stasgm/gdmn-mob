@@ -15,7 +15,7 @@ import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks
 import { IDocumentType, INamedEntity, IReference, ScreenState } from '@lib/types';
 
 import { ReceiptStackParamList } from '../../navigation/Root/types';
-import { IMoveFormParam, IMoveDocument } from '../../store/types';
+import { IReceiptFormParam, IReceiptDocument } from '../../store/types';
 import { getNextDocNumber } from '../../utils/helpers';
 import { IAddressStoreEntity } from '../../store/app/types';
 
@@ -26,7 +26,7 @@ export const ReceiptEditScreen = () => {
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
-  const movements = useFilteredDocList<IMoveDocument>('movement');
+  const movements = useFilteredDocList<IReceiptDocument>('movement');
 
   const doc = movements?.find((e) => e.id === id);
 
@@ -37,22 +37,17 @@ export const ReceiptEditScreen = () => {
 
   const movementType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data.find((t) => t.name === 'movement');
-
-  const movementSubtype = refSelectors
-    .selectByName<IReference<INamedEntity>>('documentSubtype')
-    ?.data.find((t) => t.id === 'prihod');
+    ?.data.find((t) => t.name === 'receipt');
 
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {
-    documentSubtype: docDocumentSubtype,
     fromDepart: docFromDepart,
     toDepart: docToDepart,
     documentDate: docDate,
     number: docNumber,
     comment: docComment,
     status: docStatus,
-  } = useSelector((state) => state.app.formParams as IMoveFormParam);
+  } = useSelector((state) => state.app.formParams as IReceiptFormParam);
 
   useEffect(() => {
     return () => {
@@ -83,23 +78,16 @@ export const ReceiptEditScreen = () => {
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
           toDepart: defaultDepart || undefined,
-          documentSubtype: movementSubtype,
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, doc, defaultDepart, docDocumentSubtype]);
+  }, [dispatch, doc, defaultDepart]);
 
   useEffect(() => {
     if (screenState === 'saving') {
       if (!movementType) {
         Alert.alert('Внимание!', 'Тип документа для приходов не найден.', [{ text: 'OK' }]);
-        setScreenState('idle');
-        return;
-      }
-
-      if (!docDocumentSubtype) {
-        Alert.alert('Ошибка!', 'Не указан тип документа.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
       }
@@ -114,7 +102,7 @@ export const ReceiptEditScreen = () => {
       const createdDate = new Date().toISOString();
 
       if (!id) {
-        const newDoc: IMoveDocument = {
+        const newDoc: IReceiptDocument = {
           id: docId,
           documentType: movementType,
           number: docNumber && docNumber.trim(),
@@ -124,7 +112,6 @@ export const ReceiptEditScreen = () => {
             comment: docComment && docComment.trim(),
             fromDepart: docFromDepart,
             toDepart: docToDepart,
-            subtype: docDocumentSubtype,
           },
           lines: [],
           creationDate: createdDate,
@@ -142,7 +129,7 @@ export const ReceiptEditScreen = () => {
 
         const updatedDate = new Date().toISOString();
 
-        const updatedDoc: IMoveDocument = {
+        const updatedDoc: IReceiptDocument = {
           ...doc,
           id,
           number: docNumber && docNumber.trim(),
@@ -155,8 +142,6 @@ export const ReceiptEditScreen = () => {
             comment: docComment && docComment.trim(),
             fromDepart: docFromDepart,
             toDepart: docToDepart,
-
-            subtype: docDocumentSubtype,
           },
           lines: doc.lines,
           creationDate: doc.creationDate || updatedDate,
@@ -172,7 +157,6 @@ export const ReceiptEditScreen = () => {
     doc,
     docComment,
     docDate,
-    docDocumentSubtype,
     docFromDepart,
     docNumber,
     docStatus,
@@ -217,18 +201,6 @@ export const ReceiptEditScreen = () => {
     }
 
     setShowDate(true);
-  };
-
-  const handlePresentSubtype = () => {
-    if (isBlocked) {
-      return;
-    }
-
-    navigation.navigate('SelectRefItem', {
-      refName: 'documentSubtype',
-      fieldName: 'documentSubtype',
-      value: docDocumentSubtype && [docDocumentSubtype],
-    });
   };
 
   const handleFromDepart = () => {
@@ -285,25 +257,13 @@ export const ReceiptEditScreen = () => {
             disabled={docStatus !== 'DRAFT'}
           />
           <SelectableInput
-            label={'Тип'}
-            value={docDocumentSubtype?.name}
-            onPress={handlePresentSubtype}
-            disabled={true}
-          />
-
-          <SelectableInput
             label={'Откуда'}
             value={docFromDepart?.name}
             onPress={handleFromDepart}
-            disabled={!docDocumentSubtype ? true : isBlocked}
+            disabled={isBlocked}
           />
 
-          <SelectableInput
-            label={'Куда'}
-            value={docToDepart?.name}
-            onPress={handleToDepart}
-            disabled={!docDocumentSubtype ? true : isBlocked}
-          />
+          <SelectableInput label={'Куда'} value={docToDepart?.name} onPress={handleToDepart} disabled={isBlocked} />
           <Input
             label="Комментарий"
             value={docComment}

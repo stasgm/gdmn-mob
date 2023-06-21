@@ -28,7 +28,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { FlashList } from '@shopify/flash-list';
 
-import { barcodeSettings, IMoveDocument, IMoveLine, IShipmentDocument, IShipmentLine } from '../../store/types';
+import { barcodeSettings, IReceiptDocument, IReceiptLine, IShipmentDocument, IShipmentLine } from '../../store/types';
 import { ReceiptStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
@@ -38,7 +38,7 @@ import { IGood, IRemains, IRemGood } from '../../store/app/types';
 import ViewTotal from '../../components/ViewTotal';
 
 export interface IScanerObject {
-  item?: IMoveLine;
+  item?: IReceiptLine;
   barcode: string;
   state: 'scan' | 'added' | 'notFound';
 }
@@ -55,7 +55,7 @@ export const ReceiptViewScreen = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const id = useRoute<RouteProp<ReceiptStackParamList, 'ReceiptView'>>().params?.id;
-  const doc = docSelectors.selectByDocId<IMoveDocument>(id);
+  const doc = docSelectors.selectByDocId<IReceiptDocument>(id);
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
   const loading = useSelector((state) => state.app.loading);
 
@@ -245,7 +245,7 @@ export const ReceiptViewScreen = () => {
   }, [navigation, renderRight]);
 
   //////////////////////// Не удалять //////////////////////////////////
-  // const linesList = doc.lines?.reduce((sum: IMoveLine[], line) => {
+  // const linesList = doc.lines?.reduce((sum: IReceiptLine[], line) => {
   //   if (!sum.length) {
   //     sum.push(line);
   //   }
@@ -253,7 +253,7 @@ export const ReceiptViewScreen = () => {
   //   if (sum.find((i) => i.id !== line.id)) {
   //     const lineSum = sum.find((i) => i.good.id === line.good.id && i.numReceived === line.numReceived);
   //     if (lineSum) {
-  //       const lineTotal: IMoveLine = { ...lineSum, weight: round(lineSum.weight + line.weight) };
+  //       const lineTotal: IReceiptLine = { ...lineSum, weight: round(lineSum.weight + line.weight) };
   //       sum.splice(sum.indexOf(lineSum), 1, lineTotal);
   //     } else {
   //       sum.push(line);
@@ -262,7 +262,7 @@ export const ReceiptViewScreen = () => {
   //   return sum;
   // }, []);
 
-  const renderItem = useCallback(({ item }: { item: IMoveLine }) => {
+  const renderItem = useCallback(({ item }: { item: IReceiptLine }) => {
     return (
       <ListItemLine key={item.id} readonly={true}>
         <View style={styles.details}>
@@ -338,7 +338,7 @@ export const ReceiptViewScreen = () => {
         return;
       }
 
-      const newLine: IMoveLine = {
+      const newLine: IReceiptLine = {
         good: lineGood.good,
         id: generateId(),
         weight: barc.weight,
@@ -423,7 +423,7 @@ export const ReceiptViewScreen = () => {
     <View style={styles.container}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
-        title={doc.head.subtype.name || ''}
+        title={doc.documentType.description || ''}
         onPress={handleEditDocHead}
         disabled={!['DRAFT', 'READY'].includes(doc.status)}
         isBlocked={isBlocked}
