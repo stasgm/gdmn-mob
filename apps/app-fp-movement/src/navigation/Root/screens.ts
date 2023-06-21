@@ -111,14 +111,14 @@ export const freeShipmentListScreens = {
 };
 
 export const currFreeShipmentScreens = {
-  FreeShipmentEdit: { title: 'Отвес', component: FreeShipmentEditScreen },
+  FreeShipmentEdit: { title: 'Отвес $', component: FreeShipmentEditScreen },
   FreeShipmentView: { title: '', component: FreeShipmentViewScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
   ScanGood: { title: 'Сканер', component: ScanGoodScreen },
 };
 
 export const currFreeShipmentListScreens = {
-  CurrFreeShipmentList: { title: 'Отвес', component: FreeShipmentListScreen },
+  CurrFreeShipmentList: { title: 'Отвес $', component: FreeShipmentListScreen },
 };
 
 export const inventoryScreens = {

@@ -116,7 +116,7 @@ const Root = () => {
               component: ShipmentNavigator,
               showInDashboard: true,
               dashboardScreenName: 'ScanOrder',
-              dashboardScreenParams: { icCurr: false },
+              dashboardScreenParams: { isCurr: false },
             },
             {
               name: 'CurrShipment',
@@ -125,7 +125,7 @@ const Root = () => {
               showInDashboard: true,
               component: CurrShipmentNavigator,
               dashboardScreenName: 'ScanOrder',
-              dashboardScreenParams: { icCurr: true },
+              dashboardScreenParams: { isCurr: true },
             },
             {
               name: 'FreeShipment',
@@ -133,8 +133,7 @@ const Root = () => {
               icon: 'playlist-plus',
               component: FreeShipmentNavigator,
               showInDashboard: true,
-              dashboardScreenName: 'ScanOrder',
-              dashboardScreenParams: { icCurr: false },
+              dashboardScreenParams: { isCurr: false },
             },
             {
               name: 'CurrFreeShipment',
@@ -142,8 +141,8 @@ const Root = () => {
               icon: 'playlist-plus',
               component: CurrFreeShipmentNavigator,
               showInDashboard: true,
-              dashboardScreenName: 'ScanOrder',
-              dashboardScreenParams: { icCurr: true },
+              dashboardScreenName: 'FreeShipmentEdit',
+              dashboardScreenParams: { isCurr: true },
             },
             {
               name: 'Cells',

@@ -21,9 +21,7 @@ import { getNextDocNumber } from '../../utils/helpers';
 
 export const FreeShipmentEditScreen = () => {
   const { id, isCurr } = useRoute<RouteProp<FreeShipmentStackParamList, 'FreeShipmentEdit'>>().params;
-
   const navigation = useNavigation<StackNavigationProp<FreeShipmentStackParamList, 'FreeShipmentEdit'>>();
-
   const dispatch = useDispatch();
 
   const { colors } = useTheme();

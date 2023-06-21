@@ -39,10 +39,8 @@ export type SectionDataProps = SectionListData<IListItemProps, FreeShipmentListS
 
 export const FreeShipmentListScreen = () => {
   const route = useRoute();
-  const isCurr = useMemo(() => route.name === 'CurrFreeShipmentList', [route.name]);
-
+  const isCurr = route.name.toLowerCase().includes('curr');
   const navigation = useNavigation<StackNavigationProp<FreeShipmentStackParamList, 'FreeShipmentList'>>();
-
   const docDispatch = useDocThunkDispatch();
 
   const list = (
