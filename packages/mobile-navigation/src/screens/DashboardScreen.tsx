@@ -34,7 +34,7 @@ const DashboardScreen = ({ items }: { items: INavItem[] }) => {
       <View style={styles.container}>
         {items
           .filter((item) => item.showInDashboard)
-          .sort((a, b) => (b.sortNumber || 0) - (a.sortNumber || 0))
+          .sort((a, b) => (a.sortNumber || 0) - (b.sortNumber || 0))
           .map((item, xid) => (
             <TouchableOpacity
               key={item.name}

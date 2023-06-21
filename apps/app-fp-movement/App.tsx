@@ -185,6 +185,7 @@ const Root = () => {
               icon: 'transfer',
               component: MoveNavigator,
               showInDashboard: true,
+              sortNumber: 10,
             },
             {
               name: 'Shipment',
@@ -194,6 +195,7 @@ const Root = () => {
               showInDashboard: true,
               dashboardScreenName: 'ScanOrder',
               dashboardScreenParams: { isCurr: false },
+              sortNumber: 20,
             },
             {
               name: 'CurrShipment',
@@ -203,6 +205,7 @@ const Root = () => {
               component: CurrShipmentNavigator,
               dashboardScreenName: 'ScanOrder',
               dashboardScreenParams: { isCurr: true },
+              sortNumber: 30,
             },
             {
               name: 'FreeShipment',
@@ -211,6 +214,7 @@ const Root = () => {
               component: FreeShipmentNavigator,
               showInDashboard: true,
               dashboardScreenParams: { isCurr: false },
+              sortNumber: 40,
             },
             {
               name: 'CurrFreeShipment',
@@ -220,6 +224,7 @@ const Root = () => {
               showInDashboard: true,
               dashboardScreenName: 'FreeShipmentEdit',
               dashboardScreenParams: { isCurr: true },
+              sortNumber: 50,
             },
             {
               name: 'Remains',
@@ -233,6 +238,7 @@ const Root = () => {
               icon: 'file-restore-outline',
               component: ReturnNavigator,
               showInDashboard: true,
+              sortNumber: 60,
             },
             {
               name: 'Inventory',
@@ -240,6 +246,7 @@ const Root = () => {
               icon: 'file-document-outline',
               component: InventoryNavigator,
               showInDashboard: true,
+              sortNumber: 11,
             },
             {
               name: 'Laboratory',
@@ -247,6 +254,7 @@ const Root = () => {
               icon: 'file-document-edit-outline',
               component: LaboratoryNavigator,
               showInDashboard: true,
+              sortNumber: 70,
             },
           ],
     [isAddressStore],
