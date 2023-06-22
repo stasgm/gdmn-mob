@@ -39,7 +39,7 @@ import { getStatusColor, lineTypes, ONE_SECOND_IN_MS } from '../../utils/constan
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
 import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../../store/index';
 
-import { getBarcode, getLineGood, getRemGoodListByContact, getTotalLines } from '../../utils/helpers';
+import { getBarcode, getLineGood, getRemGoodListByContact } from '../../utils/helpers';
 import ViewTotal from '../../components/ViewTotal';
 
 const keyExtractor = (item: IShipmentLine | ITempLine) => item.id;
@@ -110,43 +110,7 @@ const ShipmentViewScreen = () => {
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
 
-  const docList = useSelector((state) => state.documents.list);
-
-  const docsSubtraction = useMemo(
-    () =>
-      (docList as IShipmentDocument[]).reduce((prev: IShipmentLine[], cur) => {
-        prev =
-          cur.documentType?.name !== 'order' &&
-          cur.documentType?.name !== 'inventory' &&
-          cur.documentType?.name !== 'return' &&
-          cur.status !== 'PROCESSED' &&
-          cur?.head?.fromDepart?.id === shipment?.head.fromDepart?.id
-            ? [...prev, ...cur.lines]
-            : prev;
-
-        return prev;
-      }, []),
-    [shipment?.head.fromDepart?.id, docList],
-  );
-
-  const docsAddition = useMemo(
-    () =>
-      (docList as IShipmentDocument[]).reduce((prev: IShipmentLine[], cur) => {
-        prev =
-          cur.documentType?.name !== 'order' &&
-          cur.documentType?.name !== 'inventory' &&
-          cur.documentType?.name !== 'return' &&
-          cur.status !== 'PROCESSED' &&
-          cur?.head?.toDepart?.id === shipment?.head.fromDepart?.id
-            ? [...prev, ...cur.lines]
-            : prev;
-
-        return prev;
-      }, []),
-    [shipment?.head.fromDepart?.id, docList],
-  );
-  const linesSubtraction = getTotalLines(docsSubtraction);
-  const linesAddition = getTotalLines(docsAddition);
+  const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
   const remainsUse = Boolean(settings.remainsUse?.data);
 
@@ -154,9 +118,9 @@ const ShipmentViewScreen = () => {
 
   const goodRemains = useMemo<IRemGood[]>(() => {
     return shipment?.head.fromDepart?.id
-      ? getRemGoodListByContact(goods, remains[shipment?.head.fromDepart?.id], linesAddition, linesSubtraction)
+      ? getRemGoodListByContact(goods, remains[shipment?.head.fromDepart?.id], docList, shipment?.head.fromDepart?.id)
       : [];
-  }, [goods, linesAddition, linesSubtraction, remains, shipment?.head.fromDepart?.id]);
+  }, [docList, goods, remains, shipment?.head.fromDepart?.id]);
 
   const handleShowDialog = () => {
     setVisibleDialog(true);

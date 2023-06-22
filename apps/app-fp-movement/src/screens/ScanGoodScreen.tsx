@@ -16,7 +16,7 @@ import { ShipmentStackParamList } from '../navigation/Root/types';
 import { IShipmentLine, IShipmentDocument, barcodeSettings } from '../store/types';
 
 import { IAddressStoreEntity, IGood, IRemains, IRemGood } from '../store/app/types';
-import { getBarcode, getLineGood, getRemGoodListByContact, getTotalLines } from '../utils/helpers';
+import { getBarcode, getLineGood, getRemGoodListByContact } from '../utils/helpers';
 import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../store/index';
 
 import { barCodeTypes } from '../utils/constants';
@@ -59,44 +59,7 @@ const ScanGoodScreen = () => {
 
   const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
 
-  const docList = useSelector((state) => state.documents.list);
-
-  const docsSubtraction = useMemo(
-    () =>
-      (docList as IShipmentDocument[]).reduce((prev: IShipmentLine[], cur) => {
-        prev =
-          cur.documentType?.name !== 'order' &&
-          cur.documentType?.name !== 'inventory' &&
-          cur.documentType?.name !== 'return' &&
-          cur.status !== 'PROCESSED' &&
-          cur?.head?.fromDepart?.id === shipment?.head.fromDepart?.id
-            ? [...prev, ...cur.lines]
-            : prev;
-
-        return prev;
-      }, []),
-    [shipment?.head.fromDepart?.id, docList],
-  );
-
-  const docsAddition = useMemo(
-    () =>
-      (docList as IShipmentDocument[]).reduce((prev: IShipmentLine[], cur) => {
-        prev =
-          cur.documentType?.name !== 'order' &&
-          cur.documentType?.name !== 'inventory' &&
-          cur.documentType?.name !== 'return' &&
-          cur.status !== 'PROCESSED' &&
-          cur?.head?.toDepart?.id === shipment?.head.fromDepart?.id
-            ? [...prev, ...cur.lines]
-            : prev;
-
-        return prev;
-      }, []),
-    [shipment?.head.fromDepart?.id, docList],
-  );
-
-  const linesSubtraction = getTotalLines(docsSubtraction);
-  const linesAddition = getTotalLines(docsAddition);
+  const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
   const remainsUse = Boolean(settings.remainsUse?.data);
 
@@ -104,9 +67,9 @@ const ScanGoodScreen = () => {
 
   const goodRemains = useMemo<IRemGood[]>(() => {
     return shipment?.head.fromDepart?.id
-      ? getRemGoodListByContact(goods, remains[shipment?.head.fromDepart?.id], linesAddition, linesSubtraction)
+      ? getRemGoodListByContact(goods, remains[shipment?.head.fromDepart?.id], docList, shipment?.head.fromDepart?.id)
       : [];
-  }, [goods, linesAddition, linesSubtraction, remains, shipment?.head.fromDepart?.id]);
+  }, [docList, goods, remains, shipment?.head.fromDepart?.id]);
 
   const handleGetScannedObject = useCallback(
     (brc: string) => {

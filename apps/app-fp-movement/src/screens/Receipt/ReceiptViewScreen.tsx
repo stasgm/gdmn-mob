@@ -28,11 +28,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { FlashList } from '@shopify/flash-list';
 
-import { barcodeSettings, IReceiptDocument, IReceiptLine, IShipmentDocument, IShipmentLine } from '../../store/types';
+import { barcodeSettings, IReceiptDocument, IReceiptLine, IShipmentDocument } from '../../store/types';
 import { ReceiptStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { getBarcode, getLineGood, getRemGoodListByContact, getTotalLines } from '../../utils/helpers';
+import { getBarcode, getLineGood, getRemGoodListByContact } from '../../utils/helpers';
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
@@ -83,44 +83,7 @@ export const ReceiptViewScreen = () => {
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
 
-  const docList = useSelector((state) => state.documents.list);
-
-  const docsSubtraction = useMemo(
-    () =>
-      (docList as IShipmentDocument[]).reduce((prev: IShipmentLine[], cur) => {
-        prev =
-          cur.documentType?.name !== 'order' &&
-          cur.documentType?.name !== 'inventory' &&
-          cur.documentType?.name !== 'return' &&
-          cur.status !== 'PROCESSED' &&
-          cur?.head?.fromDepart?.id === doc?.head.fromDepart?.id
-            ? [...prev, ...cur.lines]
-            : prev;
-
-        return prev;
-      }, []),
-    [doc?.head.fromDepart?.id, docList],
-  );
-
-  const docsAddition = useMemo(
-    () =>
-      (docList as IShipmentDocument[]).reduce((prev: IShipmentLine[], cur) => {
-        prev =
-          cur.documentType?.name !== 'order' &&
-          cur.documentType?.name !== 'inventory' &&
-          cur.documentType?.name !== 'return' &&
-          cur.status !== 'PROCESSED' &&
-          cur?.head?.toDepart?.id === doc?.head.fromDepart?.id
-            ? [...prev, ...cur.lines]
-            : prev;
-
-        return prev;
-      }, []),
-    [doc?.head.fromDepart?.id, docList],
-  );
-
-  const linesSubtraction = getTotalLines(docsSubtraction);
-  const linesAddition = getTotalLines(docsAddition);
+  const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
   const remainsUse = Boolean(settings.remainsUse?.data);
 
@@ -128,9 +91,9 @@ export const ReceiptViewScreen = () => {
 
   const goodRemains = useMemo<IRemGood[]>(() => {
     return doc?.head.fromDepart?.id
-      ? getRemGoodListByContact(goods, remains[doc?.head.fromDepart?.id], linesAddition, linesSubtraction)
+      ? getRemGoodListByContact(goods, remains[doc?.head.fromDepart?.id], docList, doc?.head.fromDepart?.id)
       : [];
-  }, [doc?.head.fromDepart?.id, goods, linesAddition, linesSubtraction, remains]);
+  }, [doc?.head.fromDepart?.id, docList, goods, remains]);
 
   const handleShowDialog = () => {
     setVisibleDialog(true);
@@ -353,8 +316,6 @@ export const ReceiptViewScreen = () => {
 
         sortOrder: doc.lines?.length + 1,
       };
-
-      dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
 
       dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
 

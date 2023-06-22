@@ -37,17 +37,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { FlashList } from '@shopify/flash-list';
 
-import {
-  barcodeSettings,
-  IFreeShipmentDocument,
-  IFreeShipmentLine,
-  IShipmentDocument,
-  IShipmentLine,
-} from '../../store/types';
+import { barcodeSettings, IFreeShipmentDocument, IFreeShipmentLine, IShipmentDocument } from '../../store/types';
 import { CurrFreeShipmentStackParamList, FreeShipmentStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { getBarcode, getLineGood, getRemGoodListByContact, getTotalLines } from '../../utils/helpers';
+import { getBarcode, getLineGood, getRemGoodListByContact } from '../../utils/helpers';
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
@@ -99,53 +93,17 @@ export const FreeShipmentViewScreen = () => {
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
 
-  const docList = useSelector((state) => state.documents.list);
+  const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
-  const docsSubtraction = useMemo(
-    () =>
-      (docList as IShipmentDocument[]).reduce((prev: IShipmentLine[], cur) => {
-        prev =
-          cur.documentType?.name !== 'order' &&
-          cur.documentType?.name !== 'inventory' &&
-          cur.documentType?.name !== 'return' &&
-          cur.status !== 'PROCESSED' &&
-          cur?.head?.fromDepart?.id === doc?.head.fromDepart?.id
-            ? [...prev, ...cur.lines]
-            : prev;
-
-        return prev;
-      }, []),
-    [doc?.head.fromDepart?.id, docList],
-  );
-
-  const docsAddition = useMemo(
-    () =>
-      (docList as IShipmentDocument[]).reduce((prev: IShipmentLine[], cur) => {
-        prev =
-          cur.documentType?.name !== 'order' &&
-          cur.documentType?.name !== 'inventory' &&
-          cur.documentType?.name !== 'return' &&
-          cur.status !== 'PROCESSED' &&
-          cur?.head?.toDepart?.id === doc?.head.fromDepart?.id
-            ? [...prev, ...cur.lines]
-            : prev;
-
-        return prev;
-      }, []),
-    [doc?.head.fromDepart?.id, docList],
-  );
-
-  const linesSubtraction = getTotalLines(docsSubtraction);
-  const linesAddition = getTotalLines(docsAddition);
   const remainsUse = Boolean(settings.remainsUse?.data);
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
     return doc?.head.fromDepart?.id
-      ? getRemGoodListByContact(goods, remains[doc?.head.fromDepart?.id], linesAddition, linesSubtraction)
+      ? getRemGoodListByContact(goods, remains[doc?.head.fromDepart?.id], docList, doc?.head.fromDepart?.id)
       : [];
-  }, [doc?.head.fromDepart?.id, goods, remains, linesAddition, linesSubtraction]);
+  }, [doc?.head.fromDepart?.id, goods, remains, docList]);
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
