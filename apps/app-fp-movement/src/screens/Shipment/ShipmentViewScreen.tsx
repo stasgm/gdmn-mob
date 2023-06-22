@@ -114,36 +114,37 @@ const ShipmentViewScreen = () => {
 
   const docsSubtraction = useMemo(
     () =>
-      (
-        docList?.filter(
-          (i) =>
-            i.documentType?.name !== 'order' &&
-            i.documentType?.name !== 'inventory' &&
-            i.documentType?.name !== 'return' &&
-            i.status !== 'PROCESSED' &&
-            i?.head?.fromDepart?.id === shipment?.head.fromDepart?.id,
-        ) as IShipmentDocument[]
-      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
+      (docList as IShipmentDocument[]).reduce((prev: IShipmentLine[], cur) => {
+        prev =
+          cur.documentType?.name !== 'order' &&
+          cur.documentType?.name !== 'inventory' &&
+          cur.documentType?.name !== 'return' &&
+          cur.status !== 'PROCESSED' &&
+          cur?.head?.fromDepart?.id === shipment?.head.fromDepart?.id
+            ? [...prev, ...cur.lines]
+            : prev;
 
-    [docList, shipment?.head.fromDepart?.id],
+        return prev;
+      }, []),
+    [shipment?.head.fromDepart?.id, docList],
   );
 
   const docsAddition = useMemo(
     () =>
-      (
-        docList?.filter(
-          (i) =>
-            i.documentType?.name !== 'order' &&
-            i.documentType?.name !== 'inventory' &&
-            i.documentType?.name !== 'return' &&
-            i.status !== 'PROCESSED' &&
-            i?.head?.toDepart?.id === shipment?.head.fromDepart?.id,
-        ) as IShipmentDocument[]
-      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
+      (docList as IShipmentDocument[]).reduce((prev: IShipmentLine[], cur) => {
+        prev =
+          cur.documentType?.name !== 'order' &&
+          cur.documentType?.name !== 'inventory' &&
+          cur.documentType?.name !== 'return' &&
+          cur.status !== 'PROCESSED' &&
+          cur?.head?.toDepart?.id === shipment?.head.fromDepart?.id
+            ? [...prev, ...cur.lines]
+            : prev;
 
-    [docList, shipment?.head.fromDepart?.id],
+        return prev;
+      }, []),
+    [shipment?.head.fromDepart?.id, docList],
   );
-
   const linesSubtraction = getTotalLines(docsSubtraction);
   const linesAddition = getTotalLines(docsAddition);
 
