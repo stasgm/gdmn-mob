@@ -96,3 +96,7 @@ export interface IRemGood {
 export interface IRemains {
   [id: string]: IRemainsData[];
 }
+
+export interface IGoodQuantity {
+  [goodId: string]: number;
+}

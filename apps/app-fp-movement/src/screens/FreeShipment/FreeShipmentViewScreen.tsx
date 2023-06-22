@@ -37,17 +37,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { FlashList } from '@shopify/flash-list';
 
-import {
-  barcodeSettings,
-  IFreeShipmentDocument,
-  IFreeShipmentLine,
-  IShipmentDocument,
-  IShipmentLine,
-} from '../../store/types';
+import { barcodeSettings, IFreeShipmentDocument, IFreeShipmentLine, IShipmentDocument } from '../../store/types';
 import { CurrFreeShipmentStackParamList, FreeShipmentStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { getBarcode, getLineGood, getRemGoodListByContact, getTotalLines } from '../../utils/helpers';
+import { getBarcode, getLineGood, getRemGoodListByContact } from '../../utils/helpers';
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
@@ -63,8 +57,6 @@ export const FreeShipmentViewScreen = () => {
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<FreeShipmentStackParamList, 'FreeShipmentView'>>();
-
-  const navigationCurr = useNavigation<StackNavigationProp<CurrFreeShipmentStackParamList, 'FreeShipmentView'>>();
 
   const { id, isCurr } = useRoute<RouteProp<FreeShipmentStackParamList, 'FreeShipmentView'>>().params;
   const doc = docSelectors.selectByDocId<IFreeShipmentDocument>(id);
@@ -99,49 +91,17 @@ export const FreeShipmentViewScreen = () => {
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
 
-  const docList = useSelector((state) => state.documents.list);
+  const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
-  const docsSubtraction = useMemo(
-    () =>
-      (
-        docList?.filter(
-          (i) =>
-            i.documentType?.name !== 'order' &&
-            i.documentType?.name !== 'inventory' &&
-            i.documentType?.name !== 'return' &&
-            i.status !== 'PROCESSED' &&
-            i?.head?.fromDepart?.id === doc?.head.fromDepart?.id,
-        ) as IShipmentDocument[]
-      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
-    [doc?.head.fromDepart?.id, docList],
-  );
-
-  const docsAddition = useMemo(
-    () =>
-      (
-        docList?.filter(
-          (i) =>
-            i.documentType?.name !== 'order' &&
-            i.documentType?.name !== 'inventory' &&
-            i.documentType?.name !== 'return' &&
-            i.status !== 'PROCESSED' &&
-            i?.head?.toDepart?.id === doc?.head.fromDepart?.id,
-        ) as IShipmentDocument[]
-      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
-    [doc?.head.fromDepart?.id, docList],
-  );
-
-  const linesSubtraction = getTotalLines(docsSubtraction);
-  const linesAddition = getTotalLines(docsAddition);
   const remainsUse = Boolean(settings.remainsUse?.data);
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
     return doc?.head.fromDepart?.id
-      ? getRemGoodListByContact(goods, remains[doc?.head.fromDepart?.id], linesAddition, linesSubtraction)
+      ? getRemGoodListByContact(goods, remains[doc?.head.fromDepart?.id], docList, doc?.head.fromDepart?.id)
       : [];
-  }, [doc?.head.fromDepart?.id, goods, remains, linesAddition, linesSubtraction]);
+  }, [doc?.head.fromDepart?.id, goods, remains, docList]);
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -285,10 +245,8 @@ export const FreeShipmentViewScreen = () => {
   };
 
   const handleEditDocHead = useCallback(() => {
-    isCurr
-      ? navigationCurr.navigate('FreeShipmentEdit', { id, isCurr })
-      : navigation.navigate('FreeShipmentEdit', { id, isCurr });
-  }, [isCurr, navigation, id, navigationCurr]);
+    navigation.navigate('FreeShipmentEdit', { id, isCurr });
+  }, [navigation, id, isCurr]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
@@ -391,8 +349,8 @@ export const FreeShipmentViewScreen = () => {
         document: { ...doc, status: 'READY' },
       }),
     );
-    isCurr ? navigationCurr.goBack() : navigation.goBack();
-  }, [doc, dispatch, id, isCurr, navigation, navigationCurr]);
+    navigation.goBack();
+  }, [doc, dispatch, id, navigation]);
 
   const renderRight = useCallback(
     () =>
@@ -407,44 +365,21 @@ export const FreeShipmentViewScreen = () => {
           {doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />}
           <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
           <ScanButton
-            onPress={() =>
-              isScanerReader
-                ? handleFocus()
-                : isCurr
-                ? navigationCurr.navigate('ScanGood', { docId: id })
-                : navigation.navigate('ScanGood', { docId: id })
-            }
+            onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('ScanGood', { docId: id }))}
             disabled={screenState !== 'idle'}
           />
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [
-      actionsMenu,
-      doc?.status,
-      handleSaveDocument,
-      id,
-      isBlocked,
-      isCurr,
-      isScanerReader,
-      loading,
-      navigation,
-      navigationCurr,
-      screenState,
-    ],
+    [actionsMenu, doc?.status, handleSaveDocument, id, isBlocked, isScanerReader, loading, navigation, screenState],
   );
 
   useLayoutEffect(() => {
-    isCurr
-      ? navigationCurr.setOptions({
-          headerLeft: navBackButton,
-          headerRight: renderRight,
-        })
-      : navigation.setOptions({
-          headerLeft: navBackButton,
-          headerRight: renderRight,
-        });
-  }, [isCurr, navigation, navigationCurr, renderRight]);
+    navigation.setOptions({
+      headerLeft: navBackButton,
+      headerRight: renderRight,
+    });
+  }, [navigation, renderRight]);
 
   const renderItem = useCallback(
     ({ item }: { item: IFreeShipmentLine }) => {
@@ -585,9 +520,9 @@ export const FreeShipmentViewScreen = () => {
   useEffect(() => {
     if (screenState === 'sent' || screenState === 'deleted') {
       setScreenState('idle');
-      isCurr ? navigationCurr.goBack() : navigation.goBack();
+      navigation.goBack();
     }
-  }, [isCurr, navigation, navigationCurr, screenState]);
+  }, [navigation, screenState]);
 
   const isFocused = useIsFocused();
   if (!isFocused) {

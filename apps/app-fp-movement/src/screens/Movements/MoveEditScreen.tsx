@@ -41,6 +41,10 @@ export const MoveEditScreen = () => {
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'movement');
 
+  const movementSubtype = refSelectors
+    .selectByName<IReference<INamedEntity>>('documentSubtype')
+    ?.data.find((t) => t.id === 'departMovement');
+
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {
     documentSubtype: docDocumentSubtype,
@@ -92,11 +96,12 @@ export const MoveEditScreen = () => {
               : docDocumentSubtype?.id === 'internalMovement'
               ? defaultSecondDepart
               : undefined,
+          documentSubtype: movementSubtype ? movementSubtype : undefined,
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, doc, defaultDepart, defaultSecondDepart, docDocumentSubtype]);
+  }, [dispatch, doc, defaultDepart, defaultSecondDepart, docDocumentSubtype, movementSubtype]);
 
   useEffect(() => {
     if (docDocumentSubtype?.id === 'cellMovement' && docFromDepart) {

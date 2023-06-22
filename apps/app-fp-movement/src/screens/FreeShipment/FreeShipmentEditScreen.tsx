@@ -10,28 +10,29 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { SelectableInput, Input, SaveButton, SubTitle, AppScreen, RadioGroup, navBackButton } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
-import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks';
+import { generateId, getDateString } from '@lib/mobile-hooks';
 
 import { IDocumentType, IReference, ScreenState } from '@lib/types';
 
-import { CurrFreeShipmentStackParamList, FreeShipmentStackParamList } from '../../navigation/Root/types';
+import { FreeShipmentStackParamList } from '../../navigation/Root/types';
 import { IFreeShipmentFormParam, IFreeShipmentDocument } from '../../store/types';
 import { STATUS_LIST } from '../../utils/constants';
 import { getNextDocNumber } from '../../utils/helpers';
 
 export const FreeShipmentEditScreen = () => {
   const { id, isCurr } = useRoute<RouteProp<FreeShipmentStackParamList, 'FreeShipmentEdit'>>().params;
-
   const navigation = useNavigation<StackNavigationProp<FreeShipmentStackParamList, 'FreeShipmentEdit'>>();
-  const navigationCurr = useNavigation<StackNavigationProp<CurrFreeShipmentStackParamList, 'FreeShipmentEdit'>>();
-
   const dispatch = useDispatch();
 
   const { colors } = useTheme();
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
-  const shipments = useFilteredDocList<IFreeShipmentDocument>('freeShipment');
+  const shipments = useSelector((state) =>
+    state.documents?.list.filter((i) =>
+      isCurr ? i.documentType.name === 'currFreeShipment' : i.documentType.name === 'freeShipment',
+    ),
+  ) as IFreeShipmentDocument[];
 
   const doc = shipments?.find((e) => e.id === id);
 
@@ -122,10 +123,7 @@ export const FreeShipmentEditScreen = () => {
         };
 
         dispatch(documentActions.addDocument(newDoc));
-
-        isCurr
-          ? navigationCurr.dispatch(StackActions.replace('FreeShipmentView', { id: newDoc.id }))
-          : navigation.dispatch(StackActions.replace('FreeShipmentView', { id: newDoc.id }));
+        navigation.dispatch(StackActions.replace('FreeShipmentView', { id: newDoc.id }));
       } else {
         if (!doc) {
           setScreenState('idle');
@@ -154,9 +152,7 @@ export const FreeShipmentEditScreen = () => {
 
         dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
         setScreenState('idle');
-        isCurr
-          ? navigationCurr.navigate('FreeShipmentView', { id, isCurr })
-          : navigation.navigate('FreeShipmentView', { id, isCurr });
+        navigation.navigate('FreeShipmentView', { id, isCurr });
       }
     }
   }, [
@@ -170,7 +166,6 @@ export const FreeShipmentEditScreen = () => {
     id,
     isCurr,
     navigation,
-    navigationCurr,
     screenState,
     shipmentType,
   ]);
@@ -184,9 +179,10 @@ export const FreeShipmentEditScreen = () => {
     const options = {
       headerLeft: navBackButton,
       headerRight: renderRight,
+      title: isCurr ? 'Отвес $' : 'Отвес',
     };
-    isCurr ? navigationCurr.setOptions(options) : navigation.setOptions(options);
-  }, [isCurr, navigation, navigationCurr, renderRight]);
+    navigation.setOptions(options);
+  }, [isCurr, navigation, renderRight]);
 
   const isBlocked = docStatus !== 'DRAFT';
 
@@ -222,8 +218,7 @@ export const FreeShipmentEditScreen = () => {
       fieldName: 'fromDepart',
       value: docFromDepart && [docFromDepart],
     };
-
-    isCurr ? navigationCurr.navigate('SelectRefItem', options) : navigation.navigate('SelectRefItem', options);
+    navigation.navigate('SelectRefItem', options);
   };
 
   const handleChangeStatus = useCallback(() => {

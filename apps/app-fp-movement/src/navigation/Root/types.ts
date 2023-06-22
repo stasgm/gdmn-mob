@@ -21,7 +21,7 @@ export type MoveParamList = RefParamList & {
   MoveView: { id: string; docType?: string };
   MoveEdit: { id: string; docType?: string } | undefined;
   ScanGood: { docId: string };
-  SelectCell: { docId: string; /*lineId: string;*/ item: IMoveLine; mode: number; docType?: string };
+  SelectCell: { docId: string; item: IMoveLine; mode: number; docType?: string };
   InventoryView: { id: string; docType?: string };
 };
 
@@ -31,7 +31,7 @@ export type MoveFromParamList = RefParamList & {
   MoveFromView: { id: string; docType?: string };
   MoveFromEdit: { id: string; docType?: string } | undefined;
   ScanGood: { docId: string };
-  SelectCell: { docId: string; /*lineId: string;*/ item: IMoveLine; mode: number; docType?: string };
+  SelectCell: { docId: string; item: IMoveLine; mode: number; docType?: string };
   InventoryView: { id: string; docType?: string };
 };
 
@@ -41,7 +41,7 @@ export type MoveToParamList = RefParamList & {
   MoveToView: { id: string; docType?: string };
   MoveToEdit: { id: string; docType?: string } | undefined;
   ScanGood: { docId: string };
-  SelectCell: { docId: string; /*lineId: string;*/ item: IMoveLine; mode: number; docType?: string };
+  SelectCell: { docId: string; item: IMoveLine; mode: number; docType?: string };
   InventoryView: { id: string; docType?: string };
 };
 
@@ -56,27 +56,27 @@ export type ReceiptParamList = RefParamList & {
 export type ReceiptStackParamList = { ReceiptList: undefined } & ReceiptParamList;
 
 export type ShipmentParamList = RefParamList & {
-  ShipmentEdit: { id: string; isShipment: boolean };
-  ShipmentView: { id: string; isShipment: boolean };
-  ScanOrder: { docTypeId: string; isShipment: boolean };
-  ScanGood: { docId: string; isShipment: boolean };
-  SelectCell: { docId: string; /*lineId: string;*/ item: IMoveLine; mode?: number; docType?: string };
+  ShipmentEdit: { id: string; isCurr: boolean };
+  ShipmentView: { id: string; isCurr: boolean };
+  ScanOrder: { isCurr: boolean };
+  ScanGood: { docId: string; isCurr: boolean };
+  SelectCell: { docId: string; item: IMoveLine; mode?: number; docType?: string };
 };
 
 export type ShipmentStackParamList = { ShipmentList: undefined } & ShipmentParamList;
 
 export type CurrShipmentParamList = RefParamList & {
-  ShipmentEdit: { id: string; isShipment: boolean };
-  ShipmentView: { id: string; isShipment: boolean };
-  ScanOrder: { docTypeId: string; isShipment: boolean };
-  ScanGood: { docId: string; isShipment: boolean };
+  ShipmentEdit: { id: string; isCurr: boolean };
+  ShipmentView: { id: string; isCurr: boolean };
+  ScanOrder: { isCurr: boolean };
+  ScanGood: { docId: string; isCurr: boolean };
 };
 
-export type CurrShipmentStackParamList = { CurrShipmentList: undefined } & ShipmentParamList;
+export type CurrShipmentStackParamList = { CurrShipmentList: undefined } & CurrShipmentParamList;
 
 export type FreeShipmentParamList = RefParamList & {
   FreeShipmentView: { id: string; isCurr: boolean };
-  FreeShipmentEdit: { id?: string; isCurr: boolean }; //itemId: string;
+  FreeShipmentEdit: { id?: string; isCurr: boolean };
   ScanGood: { docId: string; docType?: string };
 };
 
@@ -84,7 +84,7 @@ export type FreeShipmentStackParamList = { FreeShipmentList: undefined } & FreeS
 
 export type CurrFreeShipmentParamList = RefParamList & {
   FreeShipmentView: { id: string; isCurr: boolean };
-  FreeShipmentEdit: { id?: string; isCurr: boolean }; //itemId: string;
+  FreeShipmentEdit: { id?: string; isCurr: boolean };
   ScanGood: { docId: string; docType?: string };
 };
 
@@ -92,7 +92,7 @@ export type CurrFreeShipmentStackParamList = { CurrFreeShipmentList: undefined }
 
 export type ReturnParamList = RefParamList & {
   ReturnView: { id: string; docType?: string };
-  ReturnEdit: { id: string; docType?: string } | undefined; //itemId: string;
+  ReturnEdit: { id: string; docType?: string } | undefined;
   ScanGood: { docId: string; docType?: string };
 };
 
@@ -100,7 +100,7 @@ export type ReturnStackParamList = { ReturnList: undefined } & ReturnParamList;
 
 export type LaboratoryParamList = RefParamList & {
   LaboratoryView: { id: string; docType?: string };
-  LaboratoryEdit: { id: string; docType?: string } | undefined; //itemId: string;
+  LaboratoryEdit: { id: string; docType?: string } | undefined;
   ScanGood: { docId: string; docType?: string };
 };
 
@@ -108,9 +108,9 @@ export type LaboratoryStackParamList = { LaboratoryList: undefined } & Laborator
 
 export type InventoryParamList = RefParamList & {
   InventoryView: { id: string; docType?: string };
-  InventoryEdit: { id: string; docType?: string } | undefined; //itemId: string;
+  InventoryEdit: { id: string; docType?: string } | undefined;
   ScanGood: { docId: string; docType?: string };
-  SelectCell: { docId: string; /*lineId: string;*/ item: IInventoryLine; mode?: number; docType?: string };
+  SelectCell: { docId: string; item: IInventoryLine; mode?: number; docType?: string };
 };
 
 export type InventoryStackParamList = { InventoryList: undefined } & InventoryParamList;

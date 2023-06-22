@@ -1,3 +1,8 @@
+type DashboardStackParamList = {
+  Dashboard: undefined;
+  [name: string]: any;
+};
+
 type ProfileStackParamList = {
   Profile: undefined;
   ProfileDetails: { id: string };
@@ -29,4 +34,5 @@ export {
   ReferenceStackParamList,
   SettingsStackParamList,
   TabsStackParams,
+  DashboardStackParamList,
 };

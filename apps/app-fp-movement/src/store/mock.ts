@@ -290,7 +290,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               sortOrder: 2,
             },
             {
-              id: 'prihod',
+              id: 'receipt',
               name: 'Приход',
               sortOrder: 3,
             },

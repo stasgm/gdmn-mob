@@ -28,7 +28,7 @@ import { deleteSelectedItems, getDateString, getDelList, keyExtractor, useSendDo
 import { IDelList, IListItem } from '@lib/mobile-types';
 
 import { IFreeShipmentDocument } from '../../store/types';
-import { CurrFreeShipmentStackParamList, FreeShipmentStackParamList } from '../../navigation/Root/types';
+import { FreeShipmentStackParamList } from '../../navigation/Root/types';
 import { dateTypes, statusTypes } from '../../utils/constants';
 
 export interface FreeShipmentListSectionProps {
@@ -39,11 +39,8 @@ export type SectionDataProps = SectionListData<IListItemProps, FreeShipmentListS
 
 export const FreeShipmentListScreen = () => {
   const route = useRoute();
-  const isCurr = useMemo(() => route.name === 'CurrFreeShipmentList', [route.name]);
-
+  const isCurr = route.name.toLowerCase().includes('curr');
   const navigation = useNavigation<StackNavigationProp<FreeShipmentStackParamList, 'FreeShipmentList'>>();
-  const navigationCurr = useNavigation<StackNavigationProp<CurrFreeShipmentStackParamList, 'CurrFreeShipmentList'>>();
-
   const docDispatch = useDocThunkDispatch();
 
   const list = (
@@ -170,34 +167,22 @@ export const FreeShipmentListScreen = () => {
             <DeleteButton onPress={handleDeleteDocs} />
           </View>
         ) : (
-          <AddButton
-            onPress={() =>
-              isCurr
-                ? navigationCurr.navigate('FreeShipmentEdit', { isCurr })
-                : navigation.navigate('FreeShipmentEdit', { isCurr })
-            }
-          />
+          <AddButton onPress={() => navigation.navigate('FreeShipmentEdit', { isCurr })} />
         )}
       </View>
     ),
-    [handleDeleteDocs, isCurr, isDelList, navigation, navigationCurr],
+    [handleDeleteDocs, isCurr, isDelList, navigation],
   );
 
   const renderLeft = useCallback(() => isDelList && <CloseButton onPress={() => setDelList({})} />, [isDelList]);
 
   useLayoutEffect(() => {
-    isCurr
-      ? navigationCurr.setOptions({
-          headerLeft: isDelList ? renderLeft : navBackDrawer,
-          headerRight: renderRight,
-          title: isDelList ? `${Object.values(delList).length}` : 'Отвесы  $',
-        })
-      : navigation.setOptions({
-          headerLeft: isDelList ? renderLeft : navBackDrawer,
-          headerRight: renderRight,
-          title: isDelList ? `${Object.values(delList).length}` : 'Отвесы',
-        });
-  }, [delList, isCurr, isDelList, navigation, navigationCurr, renderLeft, renderRight]);
+    navigation.setOptions({
+      headerLeft: isDelList ? renderLeft : navBackDrawer,
+      headerRight: renderRight,
+      title: isDelList ? `${Object.values(delList).length}` : isCurr ? 'Отвес $' : 'Отвес',
+    });
+  }, [delList, isCurr, isDelList, navigation, renderLeft, renderRight]);
 
   const renderItem: ListRenderItem<IListItemProps> = useCallback(
     ({ item }) => (
@@ -207,15 +192,13 @@ export const FreeShipmentListScreen = () => {
         onPress={() =>
           isDelList
             ? setDelList(getDelList(delList, item.id, item.status!))
-            : isCurr
-            ? navigationCurr.navigate('FreeShipmentView', { id: item.id, isCurr })
             : navigation.navigate('FreeShipmentView', { id: item.id, isCurr })
         }
         onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
         checked={!!delList[item.id]}
       />
     ),
-    [delList, isCurr, isDelList, navigation, navigationCurr],
+    [delList, isCurr, isDelList, navigation],
   );
 
   const renderSectionHeader = ({ section }: any) => (

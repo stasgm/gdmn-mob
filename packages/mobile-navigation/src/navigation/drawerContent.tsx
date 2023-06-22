@@ -42,7 +42,7 @@ export const DrawerContent = ({ onSync, syncing, ...props }: Props) => {
         <Caption style={[styles.caption, { color: colors.text }]}>{company?.name || ''}</Caption>
       </View>
       <Divider />
-      <DrawerContentScrollView {...props}>
+      <DrawerContentScrollView {...props} contentContainerStyle={styles.contentStyle}>
         <Animated.View
           style={[
             styles.drawerContent,
@@ -122,5 +122,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 12,
     paddingHorizontal: 16,
+  },
+  contentStyle: {
+    paddingTop: 4,
   },
 });

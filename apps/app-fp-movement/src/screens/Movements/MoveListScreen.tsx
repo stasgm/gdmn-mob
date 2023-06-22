@@ -56,9 +56,12 @@ export const MoveListScreen = () => {
 
   const [status, setStatus] = useState<Status>('all');
 
-  const documentSubtypes = refSelectors
-    .selectByName<INamedEntity>('documentSubtype')
-    ?.data?.map((i) => ({ id: i.id, value: i.name }));
+  const documentSubtypeList = refSelectors.selectByName<INamedEntity>('documentSubtype')?.data;
+
+  const documentSubtypes = useMemo(
+    () => documentSubtypeList?.map((i) => ({ id: i.id, value: i.name })) || [],
+    [documentSubtypeList],
+  );
 
   const docTypes = useMemo(() => docDepartTypes.concat(documentSubtypes), [documentSubtypes]);
 
