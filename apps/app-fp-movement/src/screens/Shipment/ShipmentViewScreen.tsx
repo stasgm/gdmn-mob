@@ -55,8 +55,8 @@ const ShipmentViewScreen = () => {
 
   const { id, isCurr } = useRoute<RouteProp<ShipmentStackParamList, 'ShipmentView'>>().params;
 
-  const state = navigation.getState();
-  const isDashboard = state.routes.some((route) => route.name === 'Dashboard');
+  const navState = navigation.getState();
+  const isDashboard = navState.routes.some((route) => route.name === 'Dashboard');
 
   const dispatch = useDispatch();
   const fpDispatch = useFpDispatch();
