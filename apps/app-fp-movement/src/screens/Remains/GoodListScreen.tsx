@@ -51,35 +51,39 @@ const GoodListScreen = () => {
 
   const docsSubtraction = useMemo(
     () =>
-      (
-        docList?.filter(
-          (i) =>
-            i.documentType?.name !== 'order' &&
-            i.documentType?.name !== 'inventory' &&
-            i.documentType?.name !== 'return' &&
-            i.status !== 'PROCESSED' &&
-            i?.head?.fromDepart?.id === id,
-        ) as IShipmentDocument[]
-      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
-    [docList, id],
-  );
+      (docList as IShipmentDocument[]).reduce((prev: IShipmentLine[], cur) => {
+        prev =
+          cur.documentType?.name !== 'order' &&
+          cur.documentType?.name !== 'inventory' &&
+          cur.documentType?.name !== 'return' &&
+          cur.status !== 'PROCESSED' &&
+          cur?.head?.fromDepart?.id === id
+            ? [...prev, ...cur.lines]
+            : prev;
 
-  const linesSubtraction = getTotalLines(docsSubtraction);
+        return prev;
+      }, []),
+    [id, docList],
+  );
 
   const docsAddition = useMemo(
     () =>
-      (
-        docList?.filter(
-          (i) =>
-            i.documentType?.name !== 'order' &&
-            i.documentType?.name !== 'inventory' &&
-            i.documentType?.name !== 'return' &&
-            i.status !== 'PROCESSED' &&
-            i?.head?.toDepart?.id === id,
-        ) as IShipmentDocument[]
-      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
-    [docList, id],
+      (docList as IShipmentDocument[]).reduce((prev: IShipmentLine[], cur) => {
+        prev =
+          cur.documentType?.name !== 'order' &&
+          cur.documentType?.name !== 'inventory' &&
+          cur.documentType?.name !== 'return' &&
+          cur.status !== 'PROCESSED' &&
+          cur?.head?.toDepart?.id === id
+            ? [...prev, ...cur.lines]
+            : prev;
+
+        return prev;
+      }, []),
+    [id, docList],
   );
+
+  const linesSubtraction = getTotalLines(docsSubtraction);
 
   const linesAddition = getTotalLines(docsAddition);
 

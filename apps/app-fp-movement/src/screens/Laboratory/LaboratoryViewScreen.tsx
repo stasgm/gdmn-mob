@@ -82,34 +82,37 @@ export const LaboratoryViewScreen = () => {
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
 
   const docList = useSelector((state) => state.documents.list);
-
   const docsSubtraction = useMemo(
     () =>
-      (
-        docList?.filter(
-          (i) =>
-            i.documentType?.name !== 'order' &&
-            i.documentType?.name !== 'inventory' &&
-            i.documentType?.name !== 'return' &&
-            i.status !== 'PROCESSED' &&
-            i?.head?.fromDepart?.id === doc?.head.fromDepart?.id,
-        ) as IShipmentDocument[]
-      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
+      (docList as IShipmentDocument[]).reduce((prev: IShipmentLine[], cur) => {
+        prev =
+          cur.documentType?.name !== 'order' &&
+          cur.documentType?.name !== 'inventory' &&
+          cur.documentType?.name !== 'return' &&
+          cur.status !== 'PROCESSED' &&
+          cur?.head?.fromDepart?.id === doc?.head.fromDepart?.id
+            ? [...prev, ...cur.lines]
+            : prev;
+
+        return prev;
+      }, []),
     [doc?.head.fromDepart?.id, docList],
   );
 
   const docsAddition = useMemo(
     () =>
-      (
-        docList?.filter(
-          (i) =>
-            i.documentType?.name !== 'order' &&
-            i.documentType?.name !== 'inventory' &&
-            i.documentType?.name !== 'return' &&
-            i.status !== 'PROCESSED' &&
-            i?.head?.toDepart?.id === doc?.head.fromDepart?.id,
-        ) as IShipmentDocument[]
-      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
+      (docList as IShipmentDocument[]).reduce((prev: IShipmentLine[], cur) => {
+        prev =
+          cur.documentType?.name !== 'order' &&
+          cur.documentType?.name !== 'inventory' &&
+          cur.documentType?.name !== 'return' &&
+          cur.status !== 'PROCESSED' &&
+          cur?.head?.toDepart?.id === doc?.head.fromDepart?.id
+            ? [...prev, ...cur.lines]
+            : prev;
+
+        return prev;
+      }, []),
     [doc?.head.fromDepart?.id, docList],
   );
 
