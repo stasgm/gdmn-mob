@@ -21,7 +21,7 @@ const ContactItem = ({ item }: IContactItem) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('CellsView', { id: item?.id });
+        navigation.navigate('CellsView', { contactId: item.id });
       }}
     >
       <View style={[styles.item, localStyles.line]}>

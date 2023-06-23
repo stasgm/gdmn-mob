@@ -1,14 +1,5 @@
 import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  SectionListData,
-  SectionList,
-  ListRenderItem,
-  Alert,
-} from 'react-native';
+import { View, StyleSheet, SectionListData, SectionList, ListRenderItem } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { refSelectors, useSelector } from '@lib/store';
@@ -43,11 +34,12 @@ import { barcodeSettings, ICell, ICellRef, IMoveDocument, IMoveLine } from '../.
 import { CellsStackParamList } from '../../navigation/Root/types';
 
 import { getBarcode, getCellList, getCellListRef } from '../../utils/helpers';
-import { ICellRefList, ICellData, ICodeEntity, IGood } from '../../store/app/types';
+import { ICellRefList, ICodeEntity, IGood } from '../../store/app/types';
 
 import { Group } from '../../components/Group';
 import { InfoDialog } from '../../components/InfoDialog';
-import { cellColors } from '../../utils/constants';
+
+import Cells from './components/Cells';
 
 export interface ICellList extends ICell, ICellRef {
   department?: string;
@@ -70,19 +62,11 @@ export interface IListItemProps {
 
 export type SectionDataProps = SectionListData<IListItemProps, OrderListSectionProps>[];
 
-const NamedRow = ({ item }: { item: string }) => (
-  <View key={item} style={[localStyles.flexColumn, localStyles.height]}>
-    <TouchableOpacity style={localStyles.row}>
-      <Text style={localStyles.buttonLabel}>{item}</Text>
-    </TouchableOpacity>
-  </View>
-);
-
 export const CellsViewScreen = () => {
   const navigation = useNavigation<StackNavigationProp<CellsStackParamList, 'CellsView'>>();
   const { colors } = useTheme();
 
-  const id = useRoute<RouteProp<CellsStackParamList, 'CellsView'>>().params.id;
+  const contactId = useRoute<RouteProp<CellsStackParamList, 'CellsView'>>().params.contactId;
 
   const [visibleInfo, setVisibleInfo] = useState(false);
 
@@ -113,29 +97,28 @@ export const CellsViewScreen = () => {
             i.lines?.find((e: any) => e.fromCell || e.toCell),
         )
         .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()) as IMoveDocument[],
-    //Точно надо сортировка?
     [docList],
   );
 
   const lines = useMemo(
     () =>
       docs
-        .filter((i) => i.head.fromDepart?.id === id || i.head.toDepart?.id === id)
+        .filter((i) => i.head.fromDepart?.id === contactId || i.head.toDepart?.id === contactId)
         .reduce((prev: IMoveLine[], cur) => [...prev, ...cur.lines], []),
-    [docs, id],
+    [docs, contactId],
   );
 
   const goods = refSelectors.selectByName<IGood>('good').data;
 
   const cells = refSelectors.selectByName<ICellRefList>('cell')?.data[0];
 
-  const cellList = useMemo(() => getCellList(cells[id], lines || []), [cells, id, lines]);
+  const cellList = useMemo(() => getCellList(cells[contactId], lines || []), [cells, contactId, lines]);
 
   const cellListRef = getCellListRef(cellList);
 
   const cellListByGroup = useMemo(
     () =>
-      cells[id]
+      cells[contactId]
         .filter((i) => i.defaultGroup?.id)
         .reduce((prev: IListItemProps[], cur) => {
           const gr = prev.find((i) => i.group?.id === cur.defaultGroup?.id);
@@ -153,7 +136,7 @@ export const CellsViewScreen = () => {
 
           return prev;
         }, []),
-    [cells, id],
+    [cells, contactId],
   );
 
   const cellListByGood = useMemo(
@@ -265,9 +248,6 @@ export const CellsViewScreen = () => {
     [goodBarcodeSettings, goods],
   );
 
-  const cellsByRow =
-    selectedChamber && selectedRow ? Object.entries(cellList?.[selectedChamber][selectedRow])?.reverse() : [];
-
   const renderItemSection: ListRenderItem<IListItemProps> = ({ item }) => {
     return (
       <View style={styles.item} key={item.name}>
@@ -300,60 +280,6 @@ export const CellsViewScreen = () => {
     <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
 
-  const handleAlert = (label: string, text: string) => {
-    Alert.alert(label, `Рекомендуется: ${text}`, [{ text: 'OK' }]);
-  };
-
-  const Cell = useCallback(
-    ({ item }: { item: ICellData }) => {
-      const colorStyle = {
-        color:
-          item.disabled || (!item.barcode && !(item.defaultGroup && item.defaultGroup.id))
-            ? colors.backdrop
-            : cellColors.textWhite,
-      };
-      const backColorStyle = {
-        backgroundColor: item.barcode
-          ? cellColors.barcode
-          : item.disabled
-          ? colors.backdrop
-          : item.defaultGroup && item.defaultGroup.id
-          ? cellColors.default
-          : cellColors.free,
-      };
-      const newItem = lines.find((e) => e.barcode === item.barcode) || getScannedObject(item.barcode || '', item.name);
-
-      return (
-        <TouchableOpacity
-          key={item.name}
-          style={[localStyles.buttons, backColorStyle]}
-          onPress={() =>
-            item.defaultGroup?.id && !item.barcode
-              ? handleAlert(item.name, item.defaultGroup.name)
-              : navigation.navigate('GoodLine', {
-                  item: newItem,
-                })
-          }
-          disabled={(!item.barcode && !item.defaultGroup?.id) || item.disabled}
-        >
-          <Text style={[localStyles.buttonLabel, colorStyle]}>{item.cell}</Text>
-        </TouchableOpacity>
-      );
-    },
-    [colors.backdrop, getScannedObject, lines, navigation],
-  );
-
-  const CellsColumn = useCallback(
-    ({ data }: { data: ICellData[] }) => (
-      <View style={styles.flexDirectionRow}>
-        {data?.map((item) => (
-          <Cell key={item.name} item={item} />
-        ))}
-      </View>
-    ),
-    [Cell],
-  );
-
   const searchTypes: IListItem[] = [
     { id: 'good', value: 'товар' },
     { id: 'group', value: 'группа' },
@@ -366,7 +292,7 @@ export const CellsViewScreen = () => {
     return <AppActivityIndicator />;
   }
 
-  if (!id) {
+  if (!contactId) {
     return (
       <View style={[styles.container, styles.alignItemsCenter]}>
         <LargeText>Ячейки по данному подразделению не найдены</LargeText>
@@ -388,7 +314,7 @@ export const CellsViewScreen = () => {
               selectionColor={colors.primary}
             />
           </View>
-          <View style={[localStyles.status]}>
+          <View style={localStyles.status}>
             {searchTypes.map((elem) => (
               <View key={elem.id}>
                 <Checkbox
@@ -445,25 +371,15 @@ export const CellsViewScreen = () => {
                 title="Ряд"
               />
             ) : null}
-            {selectedRow && selectedChamber ? (
-              <View>
-                <Text style={localStyles.cellItem}>Ячейки</Text>
-                <View style={styles.flexDirectionRow}>
-                  <View style={styles.directionColumn}>
-                    {cellsByRow.map(([key, _]) => (
-                      <NamedRow key={key} item={key} />
-                    ))}
-                  </View>
-                  <ScrollView horizontal>
-                    <View style={styles.directionColumn}>
-                      {cellsByRow.map(([key, data]) => (
-                        <CellsColumn key={key} data={data} />
-                      ))}
-                    </View>
-                  </ScrollView>
-                </View>
-              </View>
-            ) : null}
+            {selectedRow && selectedChamber && (
+              <Cells
+                lines={lines}
+                cellList={cellList}
+                getScannedObject={getScannedObject}
+                selectedChamber={selectedChamber}
+                selectedRow={selectedRow}
+              />
+            )}
           </ScrollView>
         </View>
       )}
@@ -476,40 +392,6 @@ const localStyles = StyleSheet.create({
   groupItem: {
     flex: 1,
     marginTop: 2,
-  },
-  flexColumn: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-    marginVertical: 3,
-  },
-  buttons: {
-    padding: 4,
-    borderRadius: 4,
-    margin: 3,
-    textAlign: 'center',
-    height: 50,
-    width: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonLabel: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    opacity: 0.9,
-    lineHeight: 14,
-    textAlignVertical: 'center',
-  },
-  row: {
-    alignItems: 'center',
-    width: 20,
-  },
-  height: {
-    height: 50,
-  },
-  cellItem: {
-    textAlign: 'center',
-    fontWeight: 'bold',
-    marginTop: 4,
   },
   status: {
     marginHorizontal: 5,

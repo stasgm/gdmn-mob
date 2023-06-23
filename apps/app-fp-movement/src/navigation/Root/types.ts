@@ -116,7 +116,7 @@ export type InventoryParamList = RefParamList & {
 export type InventoryStackParamList = { InventoryList: undefined } & InventoryParamList;
 
 export type CellsParamList = RefParamList & {
-  CellsView: { id: string };
+  CellsView: { contactId: string };
   GoodLine: { item: any };
 };
 
