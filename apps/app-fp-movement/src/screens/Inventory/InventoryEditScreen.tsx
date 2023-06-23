@@ -33,11 +33,11 @@ export const InventoryEditScreen = () => {
 
   const doc = shipments?.find((e) => e.id === id);
 
-  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
+  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart')?.data;
 
   const userDefaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity;
 
-  const defaultDepart = departs.find((i) => i.id === userDefaultDepart?.id);
+  const defaultDepart = departs?.find((i) => i.id === userDefaultDepart?.id);
 
   const shipmentType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')

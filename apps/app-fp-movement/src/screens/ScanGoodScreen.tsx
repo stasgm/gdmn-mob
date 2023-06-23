@@ -57,7 +57,7 @@ const ScanGoodScreen = () => {
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
 
-  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
+  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart')?.data;
 
   const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
@@ -191,8 +191,8 @@ const ScanGoodScreen = () => {
         },
       ]);
     } else {
-      const isFromAddressed = departs.find((i) => i.id === shipment?.head.fromDepart?.id && i.isAddressStore);
-      const isToAddressed = departs.find((i) => i.id === shipment?.head.toDepart?.id && i.isAddressStore);
+      const isFromAddressed = departs?.find((i) => i.id === shipment?.head.fromDepart?.id && i.isAddressStore);
+      const isToAddressed = departs?.find((i) => i.id === shipment?.head.toDepart?.id && i.isAddressStore);
       if (
         shipment?.head.toDepart?.isAddressStore ||
         shipment?.head.fromDepart?.isAddressStore ||
