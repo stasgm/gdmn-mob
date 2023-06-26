@@ -226,6 +226,11 @@ export const CellsViewScreen = () => {
   const [selectedChamber, setSelectedChamber] = useState<string>('');
   const [selectedRow, setSelectedRow] = useState<string>('');
 
+  const handleSelectChamber = (item: string) => {
+    setSelectedRow('');
+    setSelectedChamber(item);
+  };
+
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
@@ -266,7 +271,7 @@ export const CellsViewScreen = () => {
   );
 
   const cellsByRow =
-    selectedChamber && selectedRow ? Object.entries(cellList?.[selectedChamber][selectedRow])?.reverse() : [];
+    selectedChamber && selectedRow ? Object.entries(cellList?.[selectedChamber]?.[selectedRow])?.reverse() : [];
 
   const renderItemSection: ListRenderItem<IListItemProps> = ({ item }) => {
     return (
@@ -427,7 +432,7 @@ export const CellsViewScreen = () => {
           <ScrollView>
             <Group
               values={Object.keys(cellList)}
-              onPress={(item) => setSelectedChamber(item)}
+              onPress={(item) => handleSelectChamber(item)}
               selected={selectedChamber}
               colorBack="#d5dce3"
               colorSelected={colors.placeholder}
