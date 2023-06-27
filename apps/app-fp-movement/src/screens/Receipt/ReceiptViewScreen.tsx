@@ -48,6 +48,7 @@ export const ReceiptViewScreen = () => {
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<ReceiptStackParamList, 'ReceiptView'>>();
+  const isFocused = useIsFocused();
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -90,10 +91,10 @@ export const ReceiptViewScreen = () => {
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return doc?.head.fromDepart?.id
-      ? getRemGoodListByContact(goods, remains[doc?.head.fromDepart?.id], docList, doc?.head.fromDepart?.id)
+    return doc?.head?.fromDepart?.id && isFocused
+      ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id], docList, doc.head.fromDepart.id)
       : [];
-  }, [doc?.head.fromDepart?.id, docList, goods, remains]);
+  }, [doc?.head?.fromDepart?.id, docList, goods, isFocused, remains]);
 
   const handleShowDialog = () => {
     setVisibleDialog(true);
@@ -360,7 +361,6 @@ export const ReceiptViewScreen = () => {
     }
   }, [navigation, screenState]);
 
-  const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
   }

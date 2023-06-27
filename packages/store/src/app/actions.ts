@@ -7,6 +7,8 @@ const init = createAction('APP/INIT')();
 
 const setFormParams = createAction('APP/SET_FORM_PARAMS')<IFormParam>();
 const clearFormParams = createAction('APP/CLEAR_FORM_PARAMS')();
+const setScreenFormParams = createAction('APP/SET_SCREEN_FORM_PARAMS')<{ screenName: string; params: IFormParam }>();
+const clearScreenFormParams = createAction('APP/CLEAR_SCREEN_FORM_PARAMS')<string>();
 const setLoading = createAction('APP/SET_LOADING')<boolean>();
 const setAutoSync = createAction('APP/SET_AUTO_SYNC')<boolean>();
 const setLoadedWithError = createAction('APP/SET_LOADED_WITH_ERROR')<boolean>();
@@ -76,6 +78,8 @@ export const appActions = {
   setShowSyncInfo,
   addSyncRequest,
   removeSyncRequest,
+  setScreenFormParams,
+  clearScreenFormParams,
 };
 
 export type AppActionType = ActionType<typeof appActions>;

@@ -14,6 +14,8 @@ import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks
 
 import { IDocumentType, INamedEntity, IReference, ScreenState } from '@lib/types';
 
+import { DashboardStackParamList } from '@lib/mobile-navigation';
+
 import { ReceiptStackParamList } from '../../navigation/Root/types';
 import { IReceiptFormParam, IReceiptDocument } from '../../store/types';
 import { getNextDocNumber } from '../../utils/helpers';
@@ -21,14 +23,19 @@ import { IAddressStoreEntity } from '../../store/app/types';
 
 export const ReceiptEditScreen = () => {
   const id = useRoute<RouteProp<ReceiptStackParamList, 'ReceiptEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<ReceiptStackParamList, 'ReceiptEdit'>>();
+  const navigation =
+    useNavigation<StackNavigationProp<ReceiptStackParamList & DashboardStackParamList, 'ReceiptEdit'>>();
   const dispatch = useDispatch();
+  const navState = navigation.getState();
+  const screenName = navState.routes.some((route) => route.name === 'Dashboard')
+    ? 'ReceiptEditScreenDashboard'
+    : 'ReceiptEditScreen';
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
-  const movements = useFilteredDocList<IReceiptDocument>('movement');
+  const receipts = useFilteredDocList<IReceiptDocument>('receipt');
 
-  const doc = movements?.find((e) => e.id === id);
+  const doc = receipts?.find((e) => e.id === id);
 
   const departs = refSelectors.selectByName<IAddressStoreEntity>('depart')?.data;
 
@@ -39,6 +46,8 @@ export const ReceiptEditScreen = () => {
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'receipt');
 
+  const forms = useSelector((state) => state.app.screenFormParams);
+
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {
     fromDepart: docFromDepart,
@@ -47,11 +56,11 @@ export const ReceiptEditScreen = () => {
     number: docNumber,
     comment: docComment,
     status: docStatus,
-  } = useSelector((state) => state.app.formParams as IReceiptFormParam);
+  } = (forms && forms[screenName] ? forms[screenName] : {}) as IReceiptFormParam;
 
   useEffect(() => {
     return () => {
-      dispatch(appActions.clearFormParams());
+      dispatch(appActions.clearScreenFormParams(screenName));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -60,24 +69,30 @@ export const ReceiptEditScreen = () => {
     // Инициализируем параметры
     if (doc) {
       dispatch(
-        appActions.setFormParams({
-          number: doc.number,
-          documentDate: doc.documentDate,
-          status: doc.status,
-          comment: doc.head.comment,
-          fromDepart: doc.head.fromDepart,
-          toDepart: doc.head.toDepart,
-          documentSubtype: doc.head.subtype,
+        appActions.setScreenFormParams({
+          screenName,
+          params: {
+            number: doc.number,
+            documentDate: doc.documentDate,
+            status: doc.status,
+            comment: doc.head.comment,
+            fromDepart: doc.head.fromDepart,
+            toDepart: doc.head.toDepart,
+            documentSubtype: doc.head.subtype,
+          },
         }),
       );
     } else {
-      const newNumber = getNextDocNumber(movements);
+      const newNumber = getNextDocNumber(receipts);
       dispatch(
-        appActions.setFormParams({
-          number: newNumber,
-          documentDate: new Date().toISOString(),
-          status: 'DRAFT',
-          toDepart: defaultDepart || undefined,
+        appActions.setScreenFormParams({
+          screenName,
+          params: {
+            number: newNumber,
+            documentDate: new Date().toISOString(),
+            status: 'DRAFT',
+            toDepart: defaultDepart || undefined,
+          },
         }),
       );
     }
@@ -191,7 +206,12 @@ export const ReceiptEditScreen = () => {
     setShowDate(false);
 
     if (selectedDate) {
-      dispatch(appActions.setFormParams({ documentDate: selectedDate.toISOString().slice(0, 10) }));
+      dispatch(
+        appActions.setScreenFormParams({
+          screenName,
+          params: { documentDate: selectedDate.toISOString().slice(0, 10) },
+        }),
+      );
     }
   };
 
@@ -209,6 +229,7 @@ export const ReceiptEditScreen = () => {
     }
 
     navigation.navigate('SelectRefItem', {
+      screenName,
       refName: 'depart',
       fieldName: 'fromDepart',
       value: docFromDepart && [docFromDepart],
@@ -224,6 +245,7 @@ export const ReceiptEditScreen = () => {
     const params: Record<string, string> = {};
 
     navigation.navigate('SelectRefItem', {
+      screenName,
       refName: 'depart',
       fieldName: 'toDepart',
       value: docToDepart && [docToDepart],
@@ -233,8 +255,14 @@ export const ReceiptEditScreen = () => {
   };
 
   const handleChangeNumber = useCallback(
-    (text: string) => dispatch(appActions.setFormParams({ number: text })),
-    [dispatch],
+    (text: string) =>
+      dispatch(
+        appActions.setScreenFormParams({
+          screenName,
+          params: { number: text },
+        }),
+      ),
+    [dispatch, screenName],
   );
 
   return (
@@ -268,7 +296,12 @@ export const ReceiptEditScreen = () => {
             label="Комментарий"
             value={docComment}
             onChangeText={(text) => {
-              dispatch(appActions.setFormParams({ comment: text || '' }));
+              dispatch(
+                appActions.setScreenFormParams({
+                  screenName,
+                  params: { comment: text || '' },
+                }),
+              );
             }}
             disabled={isBlocked}
             clearInput={true}

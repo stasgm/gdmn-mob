@@ -3,6 +3,7 @@ import { IReferenceData } from '@lib/types';
 import { IInventoryLine, IMoveLine } from '../../store/types';
 
 export type IRefSelectParams = {
+  screenName: string;
   refName: string;
   fieldName: string;
   value?: IReferenceData[];

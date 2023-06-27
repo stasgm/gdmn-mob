@@ -24,6 +24,7 @@ import { barCodeTypes } from '../utils/constants';
 const ScanGoodScreen = () => {
   const docId = useRoute<RouteProp<ShipmentStackParamList, 'ScanGood'>>().params?.docId;
   const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ScanGood'>>();
+  const isFocused = useIsFocused();
 
   const fpDispatch = useFpDispatch();
   const dispatch = useDispatch();
@@ -66,10 +67,10 @@ const ScanGoodScreen = () => {
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return shipment?.head.fromDepart?.id
-      ? getRemGoodListByContact(goods, remains[shipment?.head.fromDepart?.id], docList, shipment?.head.fromDepart?.id)
+    return shipment?.head?.fromDepart?.id && isFocused
+      ? getRemGoodListByContact(goods, remains[shipment.head.fromDepart.id], docList, shipment.head.fromDepart.id)
       : [];
-  }, [docList, goods, remains, shipment?.head.fromDepart?.id]);
+  }, [docList, goods, isFocused, remains, shipment?.head?.fromDepart?.id]);
 
   const handleGetScannedObject = useCallback(
     (brc: string) => {
@@ -230,7 +231,6 @@ const ScanGoodScreen = () => {
 
   const handleClearScaner = () => setScaner({ state: 'init' });
 
-  const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
   }

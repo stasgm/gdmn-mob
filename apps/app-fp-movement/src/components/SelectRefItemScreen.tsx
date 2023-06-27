@@ -28,6 +28,7 @@ const SelectRefItemScreen = () => {
   const { colors } = useTheme();
 
   const {
+    screenName,
     refName,
     isMulti,
     fieldName,
@@ -108,21 +109,27 @@ const SelectRefItemScreen = () => {
       } else if (checkedItem.find((i) => i.id === item.id)) {
         setCheckedItem([]);
         dispatch(
-          appActions.setFormParams({
-            [fieldName]: undefined,
+          appActions.setScreenFormParams({
+            screenName,
+            params: {
+              [fieldName]: undefined,
+            },
           }),
         );
       } else {
         setScreenState('saving');
         dispatch(
-          appActions.setFormParams({
-            [fieldName]: { id: item.id, name: item.name, shcode: item.shcode, isAddressStore: item.isAddressStore },
+          appActions.setScreenFormParams({
+            screenName,
+            params: {
+              [fieldName]: { id: item.id, name: item.name, shcode: item.shcode, isAddressStore: item.isAddressStore },
+            },
           }),
         );
         navigation.goBack();
       }
     },
-    [isMulti, checkedItem, dispatch, fieldName, navigation],
+    [isMulti, checkedItem, dispatch, fieldName, screenName, navigation],
   );
 
   const renderItem = useCallback(
@@ -152,14 +159,14 @@ const SelectRefItemScreen = () => {
                 Alert.alert('Ошибка!', 'Необходимо выбрать элемент.', [{ text: 'OK' }]);
                 return;
               }
-              dispatch(appActions.setFormParams({ [fieldName]: checkedItem }));
+              dispatch(appActions.setScreenFormParams({ screenName, params: { [fieldName]: checkedItem } }));
               navigation.goBack();
             }}
           />
         )}
       </View>
     ),
-    [checkedItem, dispatch, fieldName, filterVisible, isMulti, navigation],
+    [checkedItem, dispatch, fieldName, filterVisible, isMulti, navigation, screenName],
   );
 
   useLayoutEffect(() => {
