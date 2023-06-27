@@ -30,6 +30,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { FlashList } from '@shopify/flash-list';
 
+import { DashboardStackParamList } from '@lib/mobile-navigation';
+
 import { barcodeSettings, IShipmentDocument, IShipmentLine, ITempLine } from '../../store/types';
 
 import { ShipmentStackParamList } from '../../navigation/Root/types';
@@ -39,17 +41,24 @@ import { getStatusColor, lineTypes, ONE_SECOND_IN_MS } from '../../utils/constan
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
 import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../../store/index';
 
-import { getBarcode, getLineGood, getRemGoodListByContact, getTotalLines } from '../../utils/helpers';
+import { getBarcode, getLineGood, getRemGoodListByContact } from '../../utils/helpers';
 import ViewTotal from '../../components/ViewTotal';
 
 const keyExtractor = (item: IShipmentLine | ITempLine) => item.id;
-
 const ShipmentViewScreen = () => {
   const { colors } = useTheme();
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
-  const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ShipmentView'>>();
-  const id = useRoute<RouteProp<ShipmentStackParamList, 'ShipmentView'>>().params?.id;
+  const isFocused = useIsFocused();
+
+  const navigation =
+    useNavigation<StackNavigationProp<ShipmentStackParamList & DashboardStackParamList, 'ShipmentView'>>();
+
+  const { id, isCurr } = useRoute<RouteProp<ShipmentStackParamList, 'ShipmentView'>>().params;
+
+  const navState = navigation.getState();
+  const isDashboard = navState.routes.some((route) => route.name === 'Dashboard');
+
   const dispatch = useDispatch();
   const fpDispatch = useFpDispatch();
   const settings = useSelector((state) => state.settings?.data);
@@ -106,52 +115,17 @@ const ShipmentViewScreen = () => {
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
 
-  const docList = useSelector((state) => state.documents.list);
-
-  const docsSubtraction = useMemo(
-    () =>
-      (
-        docList?.filter(
-          (i) =>
-            i.documentType?.name !== 'order' &&
-            i.documentType?.name !== 'inventory' &&
-            i.documentType?.name !== 'return' &&
-            i.status !== 'PROCESSED' &&
-            i?.head?.fromDepart?.id === shipment?.head.fromDepart?.id,
-        ) as IShipmentDocument[]
-      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
-
-    [docList, shipment?.head.fromDepart?.id],
-  );
-
-  const docsAddition = useMemo(
-    () =>
-      (
-        docList?.filter(
-          (i) =>
-            i.documentType?.name !== 'order' &&
-            i.documentType?.name !== 'inventory' &&
-            i.documentType?.name !== 'return' &&
-            i.status !== 'PROCESSED' &&
-            i?.head?.toDepart?.id === shipment?.head.fromDepart?.id,
-        ) as IShipmentDocument[]
-      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
-
-    [docList, shipment?.head.fromDepart?.id],
-  );
-
-  const linesSubtraction = getTotalLines(docsSubtraction);
-  const linesAddition = getTotalLines(docsAddition);
+  const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
   const remainsUse = Boolean(settings.remainsUse?.data);
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return shipment?.head.fromDepart?.id
-      ? getRemGoodListByContact(goods, remains[shipment?.head.fromDepart?.id], linesAddition, linesSubtraction)
+    return shipment?.head?.fromDepart?.id && isFocused
+      ? getRemGoodListByContact(goods, remains[shipment.head.fromDepart.id], docList, shipment.head.fromDepart.id)
       : [];
-  }, [goods, linesAddition, linesSubtraction, remains, shipment?.head.fromDepart?.id]);
+  }, [docList, goods, remains, shipment?.head?.fromDepart?.id, isFocused]);
 
   const handleShowDialog = () => {
     setVisibleDialog(true);
@@ -210,9 +184,6 @@ const ShipmentViewScreen = () => {
       const weight = round(line?.weight * quantity, 3);
 
       const tempLine = tempOrder?.lines?.find((i) => line.good.id === i.good.id);
-      if (!tempLine || !tempOrder) {
-        return;
-      }
 
       if (remainsUse) {
         const good = goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === line.good.shcode);
@@ -223,31 +194,33 @@ const ShipmentViewScreen = () => {
 
             return;
           } else {
-            const newTempLine = { ...tempLine, weight: round(tempLine?.weight + line.weight - weight, 3) };
-            if (newTempLine.weight >= 0) {
-              fpDispatch(
-                fpMovementActions.updateTempOrderLine({
-                  docId: tempOrder?.id,
-                  line: newTempLine,
-                }),
-              );
-            } else {
-              Alert.alert('Данное количество превышает количество в заявке.', 'Добавить позицию?', [
-                {
-                  text: 'Да',
-                  onPress: () => {
-                    fpDispatch(
-                      fpMovementActions.updateTempOrderLine({
-                        docId: tempOrder?.id,
-                        line: newTempLine,
-                      }),
-                    );
+            if (tempLine && tempOrder) {
+              const newTempLine = { ...tempLine, weight: round(tempLine?.weight + line.weight - weight, 3) };
+              if (newTempLine.weight >= 0) {
+                fpDispatch(
+                  fpMovementActions.updateTempOrderLine({
+                    docId: tempOrder?.id,
+                    line: newTempLine,
+                  }),
+                );
+              } else {
+                Alert.alert('Данное количество превышает количество в заявке.', 'Добавить позицию?', [
+                  {
+                    text: 'Да',
+                    onPress: () => {
+                      fpDispatch(
+                        fpMovementActions.updateTempOrderLine({
+                          docId: tempOrder?.id,
+                          line: newTempLine,
+                        }),
+                      );
+                    },
                   },
-                },
-                {
-                  text: 'Отмена',
-                },
-              ]);
+                  {
+                    text: 'Отмена',
+                  },
+                ]);
+              }
             }
 
             if (weight < 1000) {
@@ -268,31 +241,33 @@ const ShipmentViewScreen = () => {
           return;
         }
       } else {
-        const newTempLine = { ...tempLine, weight: round(tempLine?.weight + line.weight - weight, 3) };
-        if (newTempLine.weight >= 0) {
-          fpDispatch(
-            fpMovementActions.updateTempOrderLine({
-              docId: tempOrder?.id,
-              line: newTempLine,
-            }),
-          );
-        } else {
-          Alert.alert('Данное количество превышает количество в заявке.', 'Добавить позицию?', [
-            {
-              text: 'Да',
-              onPress: () => {
-                fpDispatch(
-                  fpMovementActions.updateTempOrderLine({
-                    docId: tempOrder?.id,
-                    line: newTempLine,
-                  }),
-                );
+        if (tempLine && tempOrder) {
+          const newTempLine = { ...tempLine, weight: round(tempLine?.weight + line.weight - weight, 3) };
+          if (newTempLine.weight >= 0) {
+            fpDispatch(
+              fpMovementActions.updateTempOrderLine({
+                docId: tempOrder?.id,
+                line: newTempLine,
+              }),
+            );
+          } else {
+            Alert.alert('Данное количество превышает количество в заявке.', 'Добавить позицию?', [
+              {
+                text: 'Да',
+                onPress: () => {
+                  fpDispatch(
+                    fpMovementActions.updateTempOrderLine({
+                      docId: tempOrder?.id,
+                      line: newTempLine,
+                    }),
+                  );
+                },
               },
-            },
-            {
-              text: 'Отмена',
-            },
-          ]);
+              {
+                text: 'Отмена',
+              },
+            ]);
+          }
         }
 
         if (weight < 1000) {
@@ -323,7 +298,10 @@ const ShipmentViewScreen = () => {
     setQuantPack('');
     // setErrorMessage('');
   };
-  const handleEditShipmentHead = useCallback(() => navigation.navigate('ShipmentEdit', { id }), [navigation, id]);
+  const handleEditShipmentHead = useCallback(
+    () => navigation.navigate('ShipmentEdit', { id, isCurr }),
+    [id, isCurr, navigation],
+  );
 
   const handleDeleteShipment = useCallback(async () => {
     if (!id) {
@@ -353,6 +331,10 @@ const ShipmentViewScreen = () => {
     ]);
   }, [docDispatch, fpDispatch, id, tempOrder]);
 
+  const handleFocus = () => {
+    ref?.current?.focus();
+  };
+
   const hanldeCancelLastScan = useCallback(() => {
     if (shipmentLines?.length) {
       const shipmentLine = shipmentLines?.[0];
@@ -368,6 +350,7 @@ const ShipmentViewScreen = () => {
         );
       }
     }
+    handleFocus();
   }, [dispatch, fpDispatch, id, shipmentLines, tempOrder]);
 
   const actionsMenu = useCallback(() => {
@@ -447,12 +430,11 @@ const ShipmentViewScreen = () => {
             <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
           )}
           <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
-          {!isScanerReader && (
-            <ScanButton
-              onPress={() => navigation.navigate('ScanGood', { docId: id })}
-              disabled={screenState !== 'idle'}
-            />
-          )}
+
+          <ScanButton
+            onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('ScanGood', { docId: id, isCurr }))}
+            disabled={screenState !== 'idle'}
+          />
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
@@ -462,6 +444,7 @@ const ShipmentViewScreen = () => {
       id,
       isBlocked,
       isScanerReader,
+      isCurr,
       loading,
       navigation,
       screenState,
@@ -470,8 +453,8 @@ const ShipmentViewScreen = () => {
   );
 
   const renderLeft = useCallback(
-    () => <BackButton onPress={() => navigation.navigate('ShipmentList')} />,
-    [navigation],
+    () => <BackButton onPress={() => (isDashboard ? navigation.goBack() : navigation.navigate('ShipmentList'))} />,
+    [isDashboard, navigation],
   );
 
   useLayoutEffect(() => {
@@ -727,7 +710,6 @@ const ShipmentViewScreen = () => {
     );
   }, []);
 
-  const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
   }
@@ -785,7 +767,7 @@ const ShipmentViewScreen = () => {
             ItemSeparatorComponent={ItemSeparator}
             keyExtractor={keyExtractor}
             extraData={[shipmentLines, isBlocked]}
-            keyboardShouldPersistTaps={'handled'}
+            keyboardShouldPersistTaps={'always'}
           />
           <ViewTotal quantPack={shipmentLineSum?.quantPack} weight={shipmentLineSum?.weight || 0} />
         </>
@@ -799,7 +781,7 @@ const ShipmentViewScreen = () => {
             ItemSeparatorComponent={ItemSeparator}
             keyExtractor={keyExtractor}
             extraData={[tempOrderLines, isBlocked]}
-            keyboardShouldPersistTaps={'handled'}
+            keyboardShouldPersistTaps={'always'}
           />
           <ViewTotal weight={tempLineSum.weight || 0} />
         </>
@@ -827,7 +809,7 @@ const ShipmentViewScreen = () => {
       <SimpleDialog
         visible={visibleSendDialog}
         title={'Внимание!'}
-        text={'Вы уверены, что хотите отправить документ?'}
+        text={'Сформировано полностью?'}
         onCancel={() => setVisibleSendDialog(false)}
         onOk={handleSendDocument}
         okDisabled={loading}

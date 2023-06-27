@@ -55,6 +55,22 @@ import { LaboratoryNavigator } from './src/navigation/LaboratoryNavigator';
 import { MoveToNavigator } from './src/navigation/MoveToNavigator';
 import { MoveFromNavigator } from './src/navigation/MoveFromNavigator';
 import RemainsNavigator from './src/navigation/RemainsNavigator';
+import { CurrShipmentNavigator } from './src/navigation/CurrShipmentNavigator';
+import { CurrFreeShipmentNavigator } from './src/navigation/CurrFreeShipmentNavigator';
+import { ReceiptNavigator } from './src/navigation/ReceiptNavigator';
+import {
+  currFreeShipmentScreens,
+  currShipmentScreens,
+  freeShipmentScreens,
+  inventoryScreens,
+  laboratoryScreens,
+  moveFromScreens,
+  moveScreens,
+  moveToScreens,
+  receiptScreens,
+  returnScreens,
+  shipmentScreens,
+} from './src/navigation/Root/screens';
 
 const Root = () => {
   const { isInit, data: settings } = useSelector((state) => state.settings);
@@ -66,34 +82,67 @@ const Root = () => {
       isAddressStore
         ? [
             {
-              name: 'InternalMovement',
+              name: 'MoveTo',
               title: 'На хранение',
               icon: 'store-plus-outline',
               component: MoveToNavigator,
+              showInDashboard: true,
             },
             {
-              name: 'Movement',
+              name: 'MoveFrom',
               title: 'С хранения',
               icon: 'store-minus-outline',
               component: MoveFromNavigator,
+              showInDashboard: true,
             },
             {
-              name: 'BaseMovement',
+              name: 'Receipt',
+              title: 'Приход',
+              icon: 'file-document-outline',
+              component: ReceiptNavigator,
+              showInDashboard: true,
+            },
+            {
+              name: 'Move',
               title: 'Перемещение',
               icon: 'transfer',
               component: MoveNavigator,
+              showInDashboard: true,
             },
             {
               name: 'Shipment',
               title: 'Отвес по заявке',
               icon: 'playlist-check',
               component: ShipmentNavigator,
+              showInDashboard: true,
+              dashboardScreenName: 'ScanOrder',
+              dashboardScreenParams: { isCurr: false },
+            },
+            {
+              name: 'CurrShipment',
+              title: 'Отвес по заявке $',
+              icon: 'cash-check',
+              showInDashboard: true,
+              component: CurrShipmentNavigator,
+              dashboardScreenName: 'ScanOrder',
+              dashboardScreenParams: { isCurr: true },
             },
             {
               name: 'FreeShipment',
               title: 'Отвес',
               icon: 'playlist-plus',
               component: FreeShipmentNavigator,
+              showInDashboard: true,
+              dashboardScreenParams: { isCurr: false },
+            },
+            {
+              name: 'CurrFreeShipment',
+              title: 'Отвес $',
+              icon: 'cash-plus',
+              component: CurrFreeShipmentNavigator,
+              showInDashboard: true,
+              dashboardScreenName: 'FreeShipmentEdit',
+              dashboardScreenParams: { isCurr: true },
             },
             {
               name: 'Cells',
@@ -112,39 +161,70 @@ const Root = () => {
               title: 'Возврат',
               icon: 'file-restore-outline',
               component: ReturnNavigator,
+              showInDashboard: true,
             },
             {
               name: 'Inventory',
               title: 'Инвентаризация',
-              icon: 'file-document-outline',
+              icon: 'file-check-outline',
               component: InventoryNavigator,
+              showInDashboard: true,
             },
-
             {
-              name: 'Labaratory',
+              name: 'Laboratory',
               title: 'Лаборатория',
-              icon: 'file-document-edit-outline',
+              icon: 'flask-outline',
               component: LaboratoryNavigator,
+              showInDashboard: true,
             },
           ]
         : [
             {
-              name: 'Movement',
+              name: 'Move',
               title: 'Перемещение',
               icon: 'transfer',
               component: MoveNavigator,
+              showInDashboard: true,
+              sortNumber: 10,
             },
             {
               name: 'Shipment',
               title: 'Отвес по заявке',
               icon: 'playlist-check',
               component: ShipmentNavigator,
+              showInDashboard: true,
+              dashboardScreenName: 'ScanOrder',
+              dashboardScreenParams: { isCurr: false },
+              sortNumber: 20,
+            },
+            {
+              name: 'CurrShipment',
+              title: 'Отвес по заявке $',
+              icon: 'cash-check',
+              showInDashboard: true,
+              component: CurrShipmentNavigator,
+              dashboardScreenName: 'ScanOrder',
+              dashboardScreenParams: { isCurr: true },
+              sortNumber: 30,
             },
             {
               name: 'FreeShipment',
               title: 'Отвес',
               icon: 'playlist-plus',
               component: FreeShipmentNavigator,
+              showInDashboard: true,
+              dashboardScreenParams: { isCurr: false },
+              sortNumber: 40,
+            },
+            {
+              name: 'CurrFreeShipment',
+              title: 'Отвес $',
+              icon: 'cash-plus',
+              component: CurrFreeShipmentNavigator,
+              showInDashboard: true,
+              dashboardScreenName: 'FreeShipmentEdit',
+              dashboardScreenParams: { isCurr: true },
+              sortNumber: 50,
             },
             {
               name: 'Remains',
@@ -157,21 +237,55 @@ const Root = () => {
               title: 'Возврат',
               icon: 'file-restore-outline',
               component: ReturnNavigator,
+              showInDashboard: true,
+              sortNumber: 60,
             },
             {
               name: 'Inventory',
               title: 'Инвентаризация',
               icon: 'file-document-outline',
               component: InventoryNavigator,
+              showInDashboard: true,
+              sortNumber: 11,
             },
-
             {
-              name: 'Labaratory',
+              name: 'Laboratory',
               title: 'Лаборатория',
-              icon: 'file-document-edit-outline',
+              icon: 'flask-outline',
               component: LaboratoryNavigator,
+              showInDashboard: true,
+              sortNumber: 70,
             },
           ],
+    [isAddressStore],
+  );
+
+  const docScreens = useMemo(
+    () =>
+      isAddressStore
+        ? {
+            ...moveToScreens,
+            ...moveFromScreens,
+            ...receiptScreens,
+            ...moveScreens,
+            ...shipmentScreens,
+            ...currShipmentScreens,
+            ...freeShipmentScreens,
+            ...currFreeShipmentScreens,
+            ...returnScreens,
+            ...inventoryScreens,
+            ...laboratoryScreens,
+          }
+        : {
+            ...moveScreens,
+            ...shipmentScreens,
+            ...currShipmentScreens,
+            ...freeShipmentScreens,
+            ...currFreeShipmentScreens,
+            ...returnScreens,
+            ...inventoryScreens,
+            ...laboratoryScreens,
+          },
     [isAddressStore],
   );
 
@@ -346,7 +460,12 @@ const Root = () => {
           </Caption>
         </AppScreen>
       ) : (
-        <MobileApp items={navItems} loadingErrors={[fpLoadingError]} onClearLoadingErrors={onClearLoadingErrors} />
+        <MobileApp
+          items={navItems}
+          dashboardScreens={docScreens}
+          loadingErrors={[fpLoadingError]}
+          onClearLoadingErrors={onClearLoadingErrors}
+        />
       )}
     </ErrorBoundary>
   );

@@ -1,3 +1,5 @@
+import localStyles from './styles';
+import { AuthStackParamList } from '../navigation/types';
 import React, { useCallback, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
@@ -10,10 +12,6 @@ import { IApiConfig } from '@lib/client-types';
 import { AppScreen, Input, PrimeButton, ScreenTitle, globalStyles as styles, MediumText } from '@lib/mobile-ui';
 
 import { config as firstConfig } from '@lib/client-config';
-
-import { AuthStackParamList } from '../navigation/types';
-
-import localStyles from './styles';
 
 export type Props = {
   config: IApiConfig | undefined;

@@ -28,26 +28,26 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { FlashList } from '@shopify/flash-list';
 
-import { barcodeSettings, IMoveDocument, IMoveLine, IShipmentDocument } from '../../store/types';
-import { MoveFromStackParamList } from '../../navigation/Root/types';
+import { barcodeSettings, IReceiptDocument, IReceiptLine, IShipmentDocument } from '../../store/types';
+import { ReceiptStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import { getBarcode, getLineGood, getRemGoodListByContact } from '../../utils/helpers';
-import { IAddressStoreEntity, IGood, IRemains, IRemGood } from '../../store/app/types';
+import { IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
 
 export interface IScanerObject {
-  item?: IMoveLine;
+  item?: IReceiptLine;
   barcode: string;
   state: 'scan' | 'added' | 'notFound';
 }
 
-export const MoveFromViewScreen = () => {
+export const ReceiptViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
-  const navigation = useNavigation<StackNavigationProp<MoveFromStackParamList, 'MoveFromView'>>();
+  const navigation = useNavigation<StackNavigationProp<ReceiptStackParamList, 'ReceiptView'>>();
   const isFocused = useIsFocused();
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
@@ -55,8 +55,8 @@ export const MoveFromViewScreen = () => {
   const [barcode, setBarcode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const id = useRoute<RouteProp<MoveFromStackParamList, 'MoveFromView'>>().params?.id;
-  const doc = docSelectors.selectByDocId<IMoveDocument>(id);
+  const id = useRoute<RouteProp<ReceiptStackParamList, 'ReceiptView'>>().params?.id;
+  const doc = docSelectors.selectByDocId<IReceiptDocument>(id);
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
   const loading = useSelector((state) => state.app.loading);
 
@@ -74,7 +74,6 @@ export const MoveFromViewScreen = () => {
 
   const goods = refSelectors.selectByName<IGood>('good').data;
   const settings = useSelector((state) => state.settings?.data);
-  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
 
   const goodBarcodeSettings = Object.entries(settings).reduce((prev: barcodeSettings, [idx, item]) => {
     if (item && item.group?.id !== 'base' && typeof item.data === 'number') {
@@ -84,8 +83,6 @@ export const MoveFromViewScreen = () => {
   }, {});
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
-
-  const isAddressStore = Boolean(settings.addressStore?.data);
 
   const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
@@ -110,7 +107,7 @@ export const MoveFromViewScreen = () => {
   };
 
   const handleEditDocHead = useCallback(() => {
-    navigation.navigate('MoveFromEdit', { id });
+    navigation.navigate('ReceiptEdit', { id });
   }, [navigation, id]);
 
   const handleDelete = useCallback(() => {
@@ -152,13 +149,6 @@ export const MoveFromViewScreen = () => {
 
   const sendDoc = useSendDocs(doc ? [doc] : []);
 
-  const sendCellRequest = useSendOneRefRequest('Ячейки', { name: 'cell' });
-
-  const handleSendCellRequest = useCallback(async () => {
-    setVisibleDialog(false);
-    await sendCellRequest();
-  }, [sendCellRequest]);
-
   const sendRemainsRequest = useSendOneRefRequest('Остатки', { name: 'remains' });
 
   const handleSendRemainsRequest = useCallback(async () => {
@@ -170,19 +160,12 @@ export const MoveFromViewScreen = () => {
     setVisibleSendDialog(false);
     setScreenState('sending');
     await sendDoc();
-    if (isAddressStore) {
-      handleSendCellRequest();
-    }
     handleSendRemainsRequest();
     setScreenState('sent');
-  }, [handleSendCellRequest, handleSendRemainsRequest, isAddressStore, sendDoc]);
+  }, [handleSendRemainsRequest, sendDoc]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
-      {
-        title: 'Отправить запрос на получение справочника ячеек',
-        onPress: handleSendCellRequest,
-      },
       {
         title: 'Ввести штрих-код',
         onPress: handleShowDialog,
@@ -205,7 +188,7 @@ export const MoveFromViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleSendCellRequest, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
+  }, [showActionSheet, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
 
   const renderRight = useCallback(
     () =>
@@ -230,7 +213,7 @@ export const MoveFromViewScreen = () => {
   }, [navigation, renderRight]);
 
   //////////////////////// Не удалять //////////////////////////////////
-  // const linesList = doc.lines?.reduce((sum: IMoveLine[], line) => {
+  // const linesList = doc.lines?.reduce((sum: IReceiptLine[], line) => {
   //   if (!sum.length) {
   //     sum.push(line);
   //   }
@@ -238,7 +221,7 @@ export const MoveFromViewScreen = () => {
   //   if (sum.find((i) => i.id !== line.id)) {
   //     const lineSum = sum.find((i) => i.good.id === line.good.id && i.numReceived === line.numReceived);
   //     if (lineSum) {
-  //       const lineTotal: IMoveLine = { ...lineSum, weight: round(lineSum.weight + line.weight) };
+  //       const lineTotal: IReceiptLine = { ...lineSum, weight: round(lineSum.weight + line.weight) };
   //       sum.splice(sum.indexOf(lineSum), 1, lineTotal);
   //     } else {
   //       sum.push(line);
@@ -247,43 +230,24 @@ export const MoveFromViewScreen = () => {
   //   return sum;
   // }, []);
 
-  const renderItem = useCallback(
-    ({ item }: { item: IMoveLine }) => {
-      return (
-        <ListItemLine
-          key={item.id}
-          readonly={!doc?.head.toDepart?.isAddressStore || isBlocked}
-          onPress={() => navigation.navigate('SelectCell', { docId: id, item, mode: 1 })}
-        >
-          <View style={styles.details}>
-            <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-            <View style={styles.flexDirectionRow}>
-              <MaterialCommunityIcons name="shopping-outline" size={18} />
-              <MediumText> {(item.weight || 0).toString()} кг</MediumText>
-            </View>
-            <View style={styles.flexDirectionRow}>
-              <MediumText>
-                Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
-              </MediumText>
-            </View>
-            {doc?.head.fromDepart?.isAddressStore ? (
-              <View style={styles.flexDirectionRow}>
-                <MediumText>Откуда: {item.fromCell || ''}</MediumText>
-              </View>
-            ) : null}
-            {doc?.head.toDepart?.isAddressStore ? (
-              <View style={styles.flexDirectionRow}>
-                <MediumText>
-                  {doc?.head.fromDepart?.isAddressStore ? 'Куда:' : 'Ячейка №'} {item.toCell || ''}
-                </MediumText>
-              </View>
-            ) : null}
+  const renderItem = useCallback(({ item }: { item: IReceiptLine }) => {
+    return (
+      <ListItemLine key={item.id} readonly={true}>
+        <View style={styles.details}>
+          <LargeText style={styles.textBold}>{item.good.name}</LargeText>
+          <View style={styles.flexDirectionRow}>
+            <MaterialCommunityIcons name="shopping-outline" size={18} />
+            <MediumText> {(item.weight || 0).toString()} кг</MediumText>
           </View>
-        </ListItemLine>
-      );
-    },
-    [doc?.head, id, isBlocked, navigation],
-  );
+          <View style={styles.flexDirectionRow}>
+            <MediumText>
+              Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
+            </MediumText>
+          </View>
+        </View>
+      </ListItemLine>
+    );
+  }, []);
 
   const [scanned, setScanned] = useState(false);
 
@@ -342,7 +306,7 @@ export const MoveFromViewScreen = () => {
         return;
       }
 
-      const newLine: IMoveLine = {
+      const newLine: IReceiptLine = {
         good: lineGood.good,
         id: generateId(),
         weight: barc.weight,
@@ -354,41 +318,7 @@ export const MoveFromViewScreen = () => {
         sortOrder: doc.lines?.length + 1,
       };
 
-      const isFromAddressed = departs.find((i) => i.id === doc.head.fromDepart?.id && i.isAddressStore);
-      const isToAddressed = departs.find((i) => i.id === doc.head.toDepart?.id && i.isAddressStore);
-
-      if (
-        doc.head.toDepart?.isAddressStore ||
-        doc.head.fromDepart?.isAddressStore ||
-        isFromAddressed ||
-        isToAddressed
-      ) {
-        if (newLine.quantPack < goodBarcodeSettings.boxNumber) {
-          handleErrorMessage(visibleDialog, `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}!`);
-          return;
-        }
-        navigation.navigate('SelectCell', { docId: id, item: newLine, mode: 0 });
-      } else {
-        dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
-      }
-
-      if (
-        doc.head.toDepart?.isAddressStore ||
-        doc.head.fromDepart?.isAddressStore ||
-        isFromAddressed ||
-        isToAddressed
-      ) {
-        if (newLine.quantPack < goodBarcodeSettings.boxNumber) {
-          Alert.alert('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}!`, [
-            { text: 'OK' },
-          ]);
-          setScanned(false);
-          return;
-        }
-        navigation.navigate('SelectCell', { docId: id, item: newLine, mode: 0 });
-      } else {
-        dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
-      }
+      dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
 
       if (visibleDialog) {
         setVisibleDialog(false);
@@ -399,19 +329,7 @@ export const MoveFromViewScreen = () => {
       }
     },
 
-    [
-      doc,
-      minBarcodeLength,
-      goodBarcodeSettings,
-      remainsUse,
-      visibleDialog,
-      goodRemains,
-      departs,
-      navigation,
-      id,
-      dispatch,
-      goods,
-    ],
+    [doc, minBarcodeLength, goodBarcodeSettings, remainsUse, visibleDialog, goodRemains, id, dispatch, goods],
   );
 
   const handleSearchBarcode = () => {
@@ -470,7 +388,7 @@ export const MoveFromViewScreen = () => {
     <View style={styles.container}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
-        title={doc.head.subtype.name || ''}
+        title={doc.documentType.description || ''}
         onPress={handleEditDocHead}
         disabled={!['DRAFT', 'READY'].includes(doc.status)}
         isBlocked={isBlocked}

@@ -10,6 +10,7 @@ export const initialState: Readonly<IAppState> = {
   autoSync: false,
   syncRequests: [],
   formParams: {},
+  screenFormParams: {},
   errorLog: [],
   loadingData: false,
   loadingError: '',
@@ -34,6 +35,23 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
       return {
         ...state,
         formParams: {},
+      };
+
+    case getType(appActions.setScreenFormParams):
+      return {
+        ...state,
+        screenFormParams: {
+          ...state.screenFormParams,
+          [action.payload.screenName]: state.screenFormParams
+            ? { ...state.screenFormParams[action.payload.screenName], ...action.payload.params }
+            : action.payload.params,
+        },
+      };
+
+    case getType(appActions.clearScreenFormParams):
+      return {
+        ...state,
+        screenFormParams: { ...state.screenFormParams, [action.payload]: {} },
       };
 
     case getType(appActions.setLoading):

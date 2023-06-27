@@ -17,11 +17,13 @@ import {
   CloseButton,
   EmptyList,
   navBackDrawer,
+  SimpleDialog,
+  SendButton,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@lib/mobile-hooks';
+import { deleteSelectedItems, getDateString, getDelList, keyExtractor, useSendDocs } from '@lib/mobile-hooks';
 
 import { IDelList } from '@lib/mobile-types';
 
@@ -43,6 +45,8 @@ export const InventoryListScreen = () => {
       (i) => i.documentType?.name === 'inventory',
     ) as IInventoryDocument[]
   ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
+
+  const loading = useSelector((state) => state.app.loading);
 
   const [delList, setDelList] = useState<IDelList>({});
   const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
@@ -106,11 +110,36 @@ export const InventoryListScreen = () => {
     deleteSelectedItems(delList, deleteDocs);
   }, [delList, docDispatch]);
 
+  const [visibleSendDialog, setVisibleSendDialog] = useState(false);
+
+  const docsToSend = useMemo(
+    () =>
+      Object.keys(delList).reduce((prev: IInventoryDocument[], cur) => {
+        const sendingDoc = list.find((i) => i.id === cur && (i.status === 'DRAFT' || i.status === 'READY'));
+        if (sendingDoc) {
+          prev = [...prev, sendingDoc];
+        }
+        return prev;
+      }, []),
+    [delList, list],
+  );
+
+  const sendDoc = useSendDocs(docsToSend.length ? docsToSend : []);
+
+  const handleSendDocument = useCallback(async () => {
+    setVisibleSendDialog(false);
+    await sendDoc();
+    setDelList({});
+  }, [sendDoc]);
+
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
         {isDelList ? (
-          <DeleteButton onPress={handleDeleteDocs} />
+          <View style={styles.buttons}>
+            <SendButton onPress={() => setVisibleSendDialog(true)} />
+            <DeleteButton onPress={handleDeleteDocs} />
+          </View>
         ) : (
           <AddButton onPress={() => navigation.navigate('InventoryEdit')} />
         )}
@@ -125,7 +154,7 @@ export const InventoryListScreen = () => {
     navigation.setOptions({
       headerLeft: isDelList ? renderLeft : navBackDrawer,
       headerRight: renderRight,
-      title: isDelList ? `Выделено: ${Object.values(delList).length}` : 'Инвентаризация',
+      title: isDelList ? `${Object.values(delList).length}` : 'Инвентаризация',
     });
   }, [delList, isDelList, navigation, renderLeft, renderRight]);
 
@@ -160,6 +189,14 @@ export const InventoryListScreen = () => {
         ItemSeparatorComponent={ItemSeparator}
         renderSectionHeader={renderSectionHeader}
         ListEmptyComponent={EmptyList}
+      />
+      <SimpleDialog
+        visible={visibleSendDialog}
+        title={'Внимание!'}
+        text={'Сформировано полностью?'}
+        onCancel={() => setVisibleSendDialog(false)}
+        onOk={handleSendDocument}
+        okDisabled={loading}
       />
     </AppScreen>
   );

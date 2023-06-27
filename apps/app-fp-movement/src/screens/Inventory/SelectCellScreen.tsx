@@ -53,6 +53,10 @@ export const SelectCellScreen = () => {
   const [selectedChamber, setSelectedChamber] = useState<string | undefined>('');
   const [selectedRow, setSelectedRow] = useState<string | undefined>('');
 
+  const handleSelectChamber = (chamber: string) => {
+    setSelectedRow('');
+    setSelectedChamber(chamber);
+  };
   const departId = doc?.head.toDepart?.id;
 
   const docList = useSelector((state) => state.documents.list);
@@ -174,7 +178,7 @@ export const SelectCellScreen = () => {
         <ScrollView>
           <Group
             values={Object.keys(cellList)}
-            onPress={(i) => setSelectedChamber(i)}
+            onPress={(i) => handleSelectChamber(i)}
             selected={selectedChamber}
             colorBack="#d5dce3"
             colorSelected={colors.placeholder}

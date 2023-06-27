@@ -1,3 +1,12 @@
+import { AuthStackParamList } from './types';
+import {
+  SplashScreen,
+  SignInScreen,
+  ConfigScreen,
+  ActivationScreen,
+  AppLoadScreen,
+  ModeSelectionScreen,
+} from '../screens';
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useCallback, useEffect } from 'react';
 
@@ -10,17 +19,6 @@ import { mobileRequest } from '@lib/mobile-hooks';
 import Constants from 'expo-constants';
 
 import { device } from '@lib/mock';
-
-import {
-  SplashScreen,
-  SignInScreen,
-  ConfigScreen,
-  ActivationScreen,
-  AppLoadScreen,
-  ModeSelectionScreen,
-} from '../screens';
-
-import { AuthStackParamList } from './types';
 
 const AuthStack = createStackNavigator<AuthStackParamList>();
 

@@ -14,6 +14,8 @@ import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks
 
 import { IDocumentType, INamedEntity, IReference, ScreenState } from '@lib/types';
 
+import { DashboardStackParamList } from '@lib/mobile-navigation';
+
 import { MoveStackParamList } from '../../navigation/Root/types';
 import { IMoveFormParam, IMoveDocument } from '../../store/types';
 import { getNextDocNumber } from '../../utils/helpers';
@@ -21,8 +23,12 @@ import { IAddressStoreEntity } from '../../store/app/types';
 
 export const MoveEditScreen = () => {
   const id = useRoute<RouteProp<MoveStackParamList, 'MoveEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'MoveEdit'>>();
+  const navigation = useNavigation<StackNavigationProp<MoveStackParamList & DashboardStackParamList, 'MoveEdit'>>();
   const dispatch = useDispatch();
+  const navState = navigation.getState();
+  const screenName = navState.routes.some((route) => route.name === 'Dashboard')
+    ? 'MoveEditScreenDashboard'
+    : 'MoveEditScreen';
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
@@ -30,16 +36,22 @@ export const MoveEditScreen = () => {
 
   const doc = movements?.find((e) => e.id === id);
 
-  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
+  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart')?.data;
 
   const userDefaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity;
-  const defaultDepart = departs.find((i) => i.id === userDefaultDepart?.id);
+  const defaultDepart = departs?.find((i) => i.id === userDefaultDepart?.id);
   const userDefaultSecondDepart = useSelector((state) => state.auth.user?.settings?.secondDepart?.data) as INamedEntity;
-  const defaultSecondDepart = departs.find((i) => i.id === userDefaultSecondDepart?.id);
+  const defaultSecondDepart = departs?.find((i) => i.id === userDefaultSecondDepart?.id);
 
   const movementType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'movement');
+
+  const movementSubtype = refSelectors
+    .selectByName<IReference<INamedEntity>>('documentSubtype')
+    ?.data.find((t) => t.id === 'departMovement');
+
+  const forms = useSelector((state) => state.app.screenFormParams);
 
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {
@@ -50,11 +62,11 @@ export const MoveEditScreen = () => {
     number: docNumber,
     comment: docComment,
     status: docStatus,
-  } = useSelector((state) => state.app.formParams as IMoveFormParam);
+  } = (forms && forms[screenName] ? forms[screenName] : {}) as IMoveFormParam;
 
   useEffect(() => {
     return () => {
-      dispatch(appActions.clearFormParams());
+      dispatch(appActions.clearScreenFormParams(screenName));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -63,50 +75,60 @@ export const MoveEditScreen = () => {
     // Инициализируем параметры
     if (doc) {
       dispatch(
-        appActions.setFormParams({
-          number: doc.number,
-          documentDate: doc.documentDate,
-          status: doc.status,
-          comment: doc.head.comment,
-          fromDepart: doc.head.fromDepart,
-          toDepart: doc.head.toDepart,
-          documentSubtype: doc.head.subtype,
+        appActions.setScreenFormParams({
+          screenName,
+          params: {
+            number: doc.number,
+            documentDate: doc.documentDate,
+            status: doc.status,
+            comment: doc.head.comment,
+            fromDepart: doc.head.fromDepart,
+            toDepart: doc.head.toDepart,
+            documentSubtype: doc.head.subtype,
+          },
         }),
       );
     } else {
       const newNumber = getNextDocNumber(movements);
       dispatch(
-        appActions.setFormParams({
-          number: newNumber,
-          documentDate: new Date().toISOString(),
-          status: 'DRAFT',
-          fromDepart:
-            docDocumentSubtype?.id === 'internalMovement'
-              ? defaultDepart
-              : docDocumentSubtype?.id === 'movement'
-              ? defaultSecondDepart
-              : undefined,
-          toDepart:
-            docDocumentSubtype?.id === 'movement'
-              ? defaultDepart
-              : docDocumentSubtype?.id === 'internalMovement'
-              ? defaultSecondDepart
-              : undefined,
+        appActions.setScreenFormParams({
+          screenName,
+          params: {
+            number: newNumber,
+            documentDate: new Date().toISOString(),
+            status: 'DRAFT',
+            fromDepart:
+              docDocumentSubtype?.id === 'internalMovement'
+                ? defaultDepart
+                : docDocumentSubtype?.id === 'movement'
+                ? defaultSecondDepart
+                : undefined,
+            toDepart:
+              docDocumentSubtype?.id === 'movement'
+                ? defaultDepart
+                : docDocumentSubtype?.id === 'internalMovement'
+                ? defaultSecondDepart
+                : undefined,
+            documentSubtype: movementSubtype ? movementSubtype : undefined,
+          },
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, doc, defaultDepart, defaultSecondDepart, docDocumentSubtype]);
+  }, [dispatch, doc, defaultDepart, defaultSecondDepart, docDocumentSubtype, movementSubtype]);
 
   useEffect(() => {
     if (docDocumentSubtype?.id === 'cellMovement' && docFromDepart) {
       dispatch(
-        appActions.setFormParams({
-          toDepart: docFromDepart,
+        appActions.setScreenFormParams({
+          screenName,
+          params: {
+            toDepart: docFromDepart,
+          },
         }),
       );
     }
-  }, [dispatch, docDocumentSubtype?.id, docFromDepart]);
+  }, [dispatch, docDocumentSubtype?.id, docFromDepart, screenName]);
 
   useEffect(() => {
     if (screenState === 'saving') {
@@ -234,7 +256,12 @@ export const MoveEditScreen = () => {
     setShowDate(false);
 
     if (selectedDate) {
-      dispatch(appActions.setFormParams({ documentDate: selectedDate.toISOString().slice(0, 10) }));
+      dispatch(
+        appActions.setScreenFormParams({
+          screenName,
+          params: { documentDate: selectedDate.toISOString().slice(0, 10) },
+        }),
+      );
     }
   };
 
@@ -252,6 +279,7 @@ export const MoveEditScreen = () => {
     }
 
     navigation.navigate('SelectRefItem', {
+      screenName,
       refName: 'documentSubtype',
       fieldName: 'documentSubtype',
       value: docDocumentSubtype && [docDocumentSubtype],
@@ -264,6 +292,7 @@ export const MoveEditScreen = () => {
     }
 
     navigation.navigate('SelectRefItem', {
+      screenName,
       refName: 'depart',
       fieldName: 'fromDepart',
       value: docFromDepart && [docFromDepart],
@@ -283,6 +312,7 @@ export const MoveEditScreen = () => {
     }
 
     navigation.navigate('SelectRefItem', {
+      screenName,
       refName: 'depart',
       fieldName: 'toDepart',
       value: docToDepart && [docToDepart],
@@ -292,8 +322,14 @@ export const MoveEditScreen = () => {
   };
 
   const handleChangeNumber = useCallback(
-    (text: string) => dispatch(appActions.setFormParams({ number: text })),
-    [dispatch],
+    (text: string) =>
+      dispatch(
+        appActions.setScreenFormParams({
+          screenName,
+          params: { number: text },
+        }),
+      ),
+    [dispatch, screenName],
   );
 
   return (
@@ -339,7 +375,12 @@ export const MoveEditScreen = () => {
             label="Комментарий"
             value={docComment}
             onChangeText={(text) => {
-              dispatch(appActions.setFormParams({ comment: text || '' }));
+              dispatch(
+                appActions.setScreenFormParams({
+                  screenName,
+                  params: { comment: text || '' },
+                }),
+              );
             }}
             disabled={isBlocked}
             clearInput={true}

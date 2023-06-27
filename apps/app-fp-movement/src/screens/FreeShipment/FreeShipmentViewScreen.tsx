@@ -37,17 +37,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { FlashList } from '@shopify/flash-list';
 
-import {
-  barcodeSettings,
-  IFreeShipmentDocument,
-  IFreeShipmentLine,
-  IShipmentDocument,
-  IShipmentLine,
-} from '../../store/types';
+import { barcodeSettings, IFreeShipmentDocument, IFreeShipmentLine, IShipmentDocument } from '../../store/types';
 import { FreeShipmentStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { getBarcode, getLineGood, getRemGoodListByContact, getTotalLines } from '../../utils/helpers';
+import { getBarcode, getLineGood, getRemGoodListByContact } from '../../utils/helpers';
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
@@ -63,8 +57,9 @@ export const FreeShipmentViewScreen = () => {
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<FreeShipmentStackParamList, 'FreeShipmentView'>>();
+  const isFocused = useIsFocused();
 
-  const id = useRoute<RouteProp<FreeShipmentStackParamList, 'FreeShipmentView'>>().params?.id;
+  const { id, isCurr } = useRoute<RouteProp<FreeShipmentStackParamList, 'FreeShipmentView'>>().params;
   const doc = docSelectors.selectByDocId<IFreeShipmentDocument>(id);
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
 
@@ -97,49 +92,17 @@ export const FreeShipmentViewScreen = () => {
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
 
-  const docList = useSelector((state) => state.documents.list);
+  const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
-  const docsSubtraction = useMemo(
-    () =>
-      (
-        docList?.filter(
-          (i) =>
-            i.documentType?.name !== 'order' &&
-            i.documentType?.name !== 'inventory' &&
-            i.documentType?.name !== 'return' &&
-            i.status !== 'PROCESSED' &&
-            i?.head?.fromDepart?.id === doc?.head.fromDepart?.id,
-        ) as IShipmentDocument[]
-      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
-    [doc?.head.fromDepart?.id, docList],
-  );
-
-  const docsAddition = useMemo(
-    () =>
-      (
-        docList?.filter(
-          (i) =>
-            i.documentType?.name !== 'order' &&
-            i.documentType?.name !== 'inventory' &&
-            i.documentType?.name !== 'return' &&
-            i.status !== 'PROCESSED' &&
-            i?.head?.toDepart?.id === doc?.head.fromDepart?.id,
-        ) as IShipmentDocument[]
-      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
-    [doc?.head.fromDepart?.id, docList],
-  );
-
-  const linesSubtraction = getTotalLines(docsSubtraction);
-  const linesAddition = getTotalLines(docsAddition);
   const remainsUse = Boolean(settings.remainsUse?.data);
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return doc?.head.fromDepart?.id
-      ? getRemGoodListByContact(goods, remains[doc?.head.fromDepart?.id], linesAddition, linesSubtraction)
+    return doc?.head?.fromDepart?.id && isFocused
+      ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id], docList, doc.head.fromDepart.id)
       : [];
-  }, [doc?.head.fromDepart?.id, goods, remains, linesAddition, linesSubtraction]);
+  }, [doc?.head?.fromDepart?.id, goods, remains, docList, isFocused]);
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -283,8 +246,8 @@ export const FreeShipmentViewScreen = () => {
   };
 
   const handleEditDocHead = useCallback(() => {
-    navigation.navigate('FreeShipmentEdit', { id });
-  }, [navigation, id]);
+    navigation.navigate('FreeShipmentEdit', { id, isCurr });
+  }, [navigation, id, isCurr]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
@@ -311,6 +274,10 @@ export const FreeShipmentViewScreen = () => {
     ]);
   }, [docDispatch, id]);
 
+  const handleFocus = () => {
+    ref?.current?.focus();
+  };
+
   const hanldeCancelLastScan = useCallback(() => {
     if (lines?.length) {
       if (lines[0].scannedBarcode) {
@@ -324,6 +291,7 @@ export const FreeShipmentViewScreen = () => {
         dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lines[0].id }));
       }
     }
+    handleFocus();
   }, [dispatch, id, lines]);
 
   const [visibleSendDialog, setVisibleSendDialog] = useState(false);
@@ -383,7 +351,7 @@ export const FreeShipmentViewScreen = () => {
       }),
     );
     navigation.goBack();
-  }, [dispatch, id, navigation, doc]);
+  }, [doc, dispatch, id, navigation]);
 
   const renderRight = useCallback(
     () =>
@@ -397,12 +365,10 @@ export const FreeShipmentViewScreen = () => {
         <View style={styles.buttons}>
           {doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />}
           <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
-          {!isScanerReader && (
-            <ScanButton
-              onPress={() => navigation.navigate('ScanGood', { docId: id })}
-              disabled={screenState !== 'idle'}
-            />
-          )}
+          <ScanButton
+            onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('ScanGood', { docId: id }))}
+            disabled={screenState !== 'idle'}
+          />
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
@@ -458,6 +424,10 @@ export const FreeShipmentViewScreen = () => {
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!doc) {
+        return;
+      }
+
+      if (doc?.status !== 'DRAFT') {
         return;
       }
 
@@ -555,7 +525,6 @@ export const FreeShipmentViewScreen = () => {
     }
   }, [navigation, screenState]);
 
-  const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
   }
@@ -609,7 +578,7 @@ export const FreeShipmentViewScreen = () => {
         ItemSeparatorComponent={ItemSeparator}
         keyExtractor={keyExtractor}
         extraData={[lines, isBlocked]}
-        keyboardShouldPersistTaps={'handled'}
+        keyboardShouldPersistTaps={'always'}
       />
       {lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
       <AppDialog
@@ -636,7 +605,7 @@ export const FreeShipmentViewScreen = () => {
       <SimpleDialog
         visible={visibleSendDialog}
         title={'Внимание!'}
-        text={'Вы уверены, что хотите отправить документ?'}
+        text={'Сформировано полностью?'}
         onCancel={() => setVisibleSendDialog(false)}
         onOk={handleSendDocument}
         okDisabled={loading}

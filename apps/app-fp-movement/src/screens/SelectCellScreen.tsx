@@ -79,10 +79,7 @@ export const SelectCellScreen = () => {
     [departId, docList, docType],
   );
 
-  const lines = docs.reduce((prev: IMoveLine[], cur) => {
-    prev = [...prev, ...cur.lines];
-    return prev;
-  }, []);
+  const lines = docs.reduce((prev: IMoveLine[], cur) => [...prev, ...cur.lines], []);
 
   const cellList = useMemo(() => getCellList(cells[departId || ''] || [], lines || []), [cells, departId, lines]);
 

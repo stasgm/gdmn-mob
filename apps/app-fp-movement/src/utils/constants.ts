@@ -49,26 +49,37 @@ export const statusTypes: IListItem[] = [
   {
     id: 'all',
     value: 'Все',
+    statuses: ['DRAFT', 'READY', 'SENT', 'PROCESSED'],
   },
   {
     id: 'active',
     value: 'Активные',
+    statuses: ['DRAFT', 'READY', 'SENT'],
   },
   {
     id: 'DRAFT',
     value: 'Черновик',
+    statuses: ['DRAFT'],
   },
   {
     id: 'READY',
     value: 'Готово',
+    statuses: ['READY'],
   },
   {
     id: 'SENT',
     value: 'Отправлено',
+    statuses: ['SENT'],
   },
   {
     id: 'PROCESSED',
     value: 'Обработано',
+    statuses: ['PROCESSED'],
+  },
+  {
+    id: 'DRAFT_READY',
+    value: 'Черновик и Готов',
+    statuses: ['DRAFT', 'READY'],
   },
 ];
 
@@ -88,8 +99,8 @@ export const STATUS_LIST: IListItem[] = [
   { id: 'READY', value: 'Готов' },
 ];
 
-const goodGroup = { id: 'goodScan', name: 'Код товара', sortOrder: 2, description: 'Количество символов' };
-const orderGroup = { id: 'orderScan', name: 'Код заявки', sortOrder: 3, description: 'Количество символов' };
+const goodGroup = { id: 'goodScan', name: 'Код товара', sortOrder: 21, description: 'Количество символов' };
+const orderGroup = { id: 'orderScan', name: 'Код заявки', sortOrder: 22, description: 'Количество символов' };
 
 export const appSettings: Settings = {
   scannerUse: {

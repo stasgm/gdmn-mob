@@ -19,14 +19,22 @@ import { IDocumentType, IReference, ScreenState } from '@lib/types';
 
 import { getDateString } from '@lib/mobile-hooks';
 
+import { DashboardStackParamList } from '@lib/mobile-navigation';
+
 import { ShipmentStackParamList } from '../../navigation/Root/types';
 import { IShipmentFormParam, IShipmentDocument } from '../../store/types';
 
 import { STATUS_LIST } from '../../utils/constants';
 
 const ShipmentEditScreen = () => {
-  const id = useRoute<RouteProp<ShipmentStackParamList, 'ShipmentEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ShipmentEdit'>>();
+  const { id, isCurr } = useRoute<RouteProp<ShipmentStackParamList, 'ShipmentEdit'>>().params;
+  const navigation =
+    useNavigation<StackNavigationProp<ShipmentStackParamList & DashboardStackParamList, 'ShipmentEdit'>>();
+  const navState = navigation.getState();
+  const screenName = navState.routes.some((route) => route.name === 'Dashboard')
+    ? 'ShipmentEditScreenDashboard'
+    : 'ShipmentEditScreen';
+
   const dispatch = useDispatch();
 
   const { colors } = useTheme();
@@ -42,19 +50,19 @@ const ShipmentEditScreen = () => {
 
   const shipmentType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data.find((t) => t.name === 'shipment');
+    ?.data.find((t) => (isCurr ? t.name === 'currShipment' : t.name === 'shipment'));
 
-  // Подразделение по умолчанию
+  const forms = useSelector((state) => state.app.screenFormParams);
 
   const {
     documentDate: docDocumentDate,
     status: docStatus,
     fromDepart: docFromDepart,
-  } = useSelector((state) => state.app.formParams as IShipmentFormParam);
+  } = (forms && forms[screenName] ? forms[screenName] : {}) as IShipmentFormParam;
 
   useEffect(() => {
     return () => {
-      dispatch(appActions.clearFormParams());
+      dispatch(appActions.clearScreenFormParams(screenName));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -63,21 +71,27 @@ const ShipmentEditScreen = () => {
     // Инициализируем параметры
     if (shipment) {
       dispatch(
-        appActions.setFormParams({
-          documentDate: shipment.documentDate,
-          status: shipment.status,
-          fromDepart: shipment.head?.fromDepart,
+        appActions.setScreenFormParams({
+          screenName,
+          params: {
+            documentDate: shipment.documentDate,
+            status: shipment.status,
+            fromDepart: shipment.head?.fromDepart,
+          },
         }),
       );
     } else {
       dispatch(
-        appActions.setFormParams({
-          documentDate: new Date().toISOString(),
-          status: 'DRAFT',
+        appActions.setScreenFormParams({
+          screenName,
+          params: {
+            documentDate: new Date().toISOString(),
+            status: 'DRAFT',
+          },
         }),
       );
     }
-  }, [dispatch, shipment]);
+  }, [dispatch, screenName, shipment]);
 
   useEffect(() => {
     if (screenState === 'saving') {
@@ -113,10 +127,21 @@ const ShipmentEditScreen = () => {
 
         dispatch(documentActions.updateDocument({ docId: id, document: updatedShipment }));
         setScreenState('idle');
-        navigation.navigate('ShipmentView', { id });
+        navigation.navigate('ShipmentView', { id, isCurr });
       }
     }
-  }, [shipmentType, docDocumentDate, id, shipment, docStatus, dispatch, navigation, screenState, docFromDepart]);
+  }, [
+    shipmentType,
+    docDocumentDate,
+    id,
+    shipment,
+    docStatus,
+    dispatch,
+    navigation,
+    screenState,
+    docFromDepart,
+    isCurr,
+  ]);
 
   const renderRight = useCallback(
     () => (
@@ -136,8 +161,9 @@ const ShipmentEditScreen = () => {
     navigation.setOptions({
       headerLeft: navBackButton,
       headerRight: renderRight,
+      title: isCurr ? 'Отвес $' : 'Отвес',
     });
-  }, [navigation, renderRight]);
+  }, [isCurr, navigation, renderRight]);
 
   const isBlocked = useMemo(() => docStatus !== 'DRAFT', [docStatus]);
 
@@ -147,8 +173,13 @@ const ShipmentEditScreen = () => {
   );
 
   const handleChangeStatus = useCallback(() => {
-    dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
-  }, [dispatch, docStatus]);
+    dispatch(
+      appActions.setScreenFormParams({
+        screenName,
+        params: { status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' },
+      }),
+    );
+  }, [dispatch, docStatus, screenName]);
 
   const handleDepart = () => {
     if (isBlocked) {
@@ -156,6 +187,7 @@ const ShipmentEditScreen = () => {
     }
 
     navigation.navigate('SelectRefItem', {
+      screenName,
       refName: 'depart',
       fieldName: 'fromDepart',
       value: docFromDepart && [docFromDepart],

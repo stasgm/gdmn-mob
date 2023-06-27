@@ -14,6 +14,8 @@ import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks
 
 import { IDocumentType, INamedEntity, IReference, ScreenState } from '@lib/types';
 
+import { DashboardStackParamList } from '@lib/mobile-navigation';
+
 import { InventoryStackParamList } from '../../navigation/Root/types';
 import { IInventoryFormParam, IInventoryDocument } from '../../store/types';
 import { STATUS_LIST } from '../../utils/constants';
@@ -22,8 +24,13 @@ import { IAddressStoreEntity } from '../../store/app/types';
 
 export const InventoryEditScreen = () => {
   const id = useRoute<RouteProp<InventoryStackParamList, 'InventoryEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'InventoryEdit'>>();
+  const navigation =
+    useNavigation<StackNavigationProp<InventoryStackParamList & DashboardStackParamList, 'InventoryEdit'>>();
   const dispatch = useDispatch();
+  const navState = navigation.getState();
+  const screenName = navState.routes.some((route) => route.name === 'Dashboard')
+    ? 'InventoryEditScreenDashboard'
+    : 'InventoryEditScreen';
 
   const { colors } = useTheme();
 
@@ -33,15 +40,17 @@ export const InventoryEditScreen = () => {
 
   const doc = shipments?.find((e) => e.id === id);
 
-  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
+  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart')?.data;
 
   const userDefaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity;
 
-  const defaultDepart = departs.find((i) => i.id === userDefaultDepart?.id);
+  const defaultDepart = departs?.find((i) => i.id === userDefaultDepart?.id);
 
   const shipmentType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'inventory');
+
+  const forms = useSelector((state) => state.app.screenFormParams);
 
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {
@@ -50,11 +59,11 @@ export const InventoryEditScreen = () => {
     number: docNumber,
     comment: docComment,
     status: docStatus,
-  } = useSelector((state) => state.app.formParams as IInventoryFormParam);
+  } = (forms && forms[screenName] ? forms[screenName] : {}) as IInventoryFormParam;
 
   useEffect(() => {
     return () => {
-      dispatch(appActions.clearFormParams());
+      dispatch(appActions.clearScreenFormParams(screenName));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -63,24 +72,30 @@ export const InventoryEditScreen = () => {
     // Инициализируем параметры
     if (doc) {
       dispatch(
-        appActions.setFormParams({
-          number: doc.number,
-          documentDate: doc.documentDate,
-          status: doc.status,
-          comment: doc.head.comment,
-          fromDepart: doc.head.fromDepart,
-          outlet: doc.head.outlet,
-          contact: doc.head.contact,
+        appActions.setScreenFormParams({
+          screenName,
+          params: {
+            number: doc.number,
+            documentDate: doc.documentDate,
+            status: doc.status,
+            comment: doc.head.comment,
+            fromDepart: doc.head.fromDepart,
+            outlet: doc.head.outlet,
+            contact: doc.head.contact,
+          },
         }),
       );
     } else {
       const newNumber = getNextDocNumber(shipments);
       dispatch(
-        appActions.setFormParams({
-          number: newNumber,
-          documentDate: new Date().toISOString(),
-          status: 'DRAFT',
-          fromDepart: defaultDepart,
+        appActions.setScreenFormParams({
+          screenName,
+          params: {
+            number: newNumber,
+            documentDate: new Date().toISOString(),
+            status: 'DRAFT',
+            fromDepart: defaultDepart,
+          },
         }),
       );
     }
@@ -197,7 +212,12 @@ export const InventoryEditScreen = () => {
     setShowDate(false);
 
     if (selectedDate) {
-      dispatch(appActions.setFormParams({ documentDate: selectedDate.toISOString().slice(0, 10) }));
+      dispatch(
+        appActions.setScreenFormParams({
+          screenName,
+          params: { documentDate: selectedDate.toISOString().slice(0, 10) },
+        }),
+      );
     }
   };
 
@@ -215,6 +235,7 @@ export const InventoryEditScreen = () => {
     }
 
     navigation.navigate('SelectRefItem', {
+      screenName,
       refName: 'depart',
       fieldName: 'fromDepart',
       value: docFromDepart && [docFromDepart],
@@ -222,12 +243,23 @@ export const InventoryEditScreen = () => {
   };
 
   const handleChangeStatus = useCallback(() => {
-    dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
-  }, [dispatch, docStatus]);
+    dispatch(
+      appActions.setScreenFormParams({
+        screenName,
+        params: { status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' },
+      }),
+    );
+  }, [dispatch, docStatus, screenName]);
 
   const handleChangeNumber = useCallback(
-    (text: string) => dispatch(appActions.setFormParams({ number: text })),
-    [dispatch],
+    (text: string) =>
+      dispatch(
+        appActions.setScreenFormParams({
+          screenName,
+          params: { number: text },
+        }),
+      ),
+    [dispatch, screenName],
   );
 
   const viewStyle = useMemo(
@@ -276,7 +308,12 @@ export const InventoryEditScreen = () => {
             label="Комментарий"
             value={docComment}
             onChangeText={(text) => {
-              dispatch(appActions.setFormParams({ comment: text || '' }));
+              dispatch(
+                appActions.setScreenFormParams({
+                  screenName,
+                  params: { comment: text || '' },
+                }),
+              );
             }}
             disabled={isBlocked}
             clearInput={true}

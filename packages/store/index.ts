@@ -1,6 +1,6 @@
 export { configureStore, useDispatch, useThunkDispatch, useSelector, AppDispatch, RootState, useAppStore } from './src';
 export { PersistedMiddleware, SaveDataToDisk, LoadDataFromDisk, AppStorage } from './src/types';
-export { IFormParam, IRequestNotice, IErrorNotice } from './src/app/types';
+export { IFormParam, IRequestNotice, IErrorNotice, IScreenFormParams } from './src/app/types';
 export { IMultipartData, IMultipartItem } from './src/messages/types';
 export { default as authActions } from './src/auth';
 export { useAuthThunkDispatch } from './src/auth';

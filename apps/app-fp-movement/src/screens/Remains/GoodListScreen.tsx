@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } fro
 import { View, StyleSheet } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
 import { Searchbar } from 'react-native-paper';
-import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import {
   AppScreen,
   ItemSeparator,
@@ -25,9 +25,9 @@ import { FlashList } from '@shopify/flash-list';
 import { RemainsStackParamList } from '../../navigation/Root/types';
 
 import { IEmployee, IGood, IRemains, IRemGood } from '../../store/app/types';
-import { getRemGoodListByContact, getTotalLines } from '../../utils/helpers';
+import { getRemGoodListByContact } from '../../utils/helpers';
 
-import { IShipmentDocument, IShipmentLine } from '../../store/types';
+import { IShipmentDocument } from '../../store/types';
 
 import GoodItem from './components/GoodItem';
 
@@ -41,54 +41,19 @@ const keyExtractor = (item: IRemGood) => String(item.good.id);
 const GoodListScreen = () => {
   const { id } = useRoute<RouteProp<RemainsStackParamList, 'GoodList'>>().params;
   const references = useSelector((state) => state.references.list) as IReferences;
+  const isFocused = useIsFocused();
 
   const contacts = Object.entries(references).find((item) => item[1].data.find((i) => i.id === id))?.[1].data as
     | IDepartment[]
     | IEmployee[];
   const contact = contacts?.find((i) => i.id === id);
 
-  const docList = useSelector((state) => state.documents.list);
-
-  const docsSubtraction = useMemo(
-    () =>
-      (
-        docList?.filter(
-          (i) =>
-            i.documentType?.name !== 'order' &&
-            i.documentType?.name !== 'inventory' &&
-            i.documentType?.name !== 'return' &&
-            i.status !== 'PROCESSED' &&
-            i?.head?.fromDepart?.id === id,
-        ) as IShipmentDocument[]
-      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
-    [docList, id],
-  );
-
-  const linesSubtraction = getTotalLines(docsSubtraction);
-
-  const docsAddition = useMemo(
-    () =>
-      (
-        docList?.filter(
-          (i) =>
-            i.documentType?.name !== 'order' &&
-            i.documentType?.name !== 'inventory' &&
-            i.documentType?.name !== 'return' &&
-            i.status !== 'PROCESSED' &&
-            i?.head?.toDepart?.id === id,
-        ) as IShipmentDocument[]
-      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
-    [docList, id],
-  );
-
-  const linesAddition = getTotalLines(docsAddition);
-
+  const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
-
   const goods = refSelectors.selectByName<IGood>('good')?.data;
 
   const [goodRemains] = useState<IRemGood[]>(() =>
-    contact?.id ? getRemGoodListByContact(goods, remains[contact.id], linesAddition, linesSubtraction) : [],
+    contact?.id && isFocused ? getRemGoodListByContact(goods, remains[contact.id], docList, id) : [],
   );
 
   const [searchQuery, setSearchQuery] = useState('');

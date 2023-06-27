@@ -29,17 +29,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { FlashList } from '@shopify/flash-list';
 
-import {
-  barcodeSettings,
-  ILaboratoryDocument,
-  ILaboratoryLine,
-  IShipmentDocument,
-  IShipmentLine,
-} from '../../store/types';
+import { barcodeSettings, ILaboratoryDocument, ILaboratoryLine, IShipmentDocument } from '../../store/types';
 import { LaboratoryStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { getBarcode, getLineGood, getRemGoodListByContact, getTotalLines } from '../../utils/helpers';
+import { getBarcode, getLineGood, getRemGoodListByContact } from '../../utils/helpers';
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
@@ -55,6 +49,7 @@ export const LaboratoryViewScreen = () => {
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<LaboratoryStackParamList, 'LaboratoryView'>>();
+  const isFocused = useIsFocused();
 
   const id = useRoute<RouteProp<LaboratoryStackParamList, 'LaboratoryView'>>().params?.id;
   const doc = docSelectors.selectByDocId<ILaboratoryDocument>(id);
@@ -81,50 +76,17 @@ export const LaboratoryViewScreen = () => {
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
 
-  const docList = useSelector((state) => state.documents.list);
-
-  const docsSubtraction = useMemo(
-    () =>
-      (
-        docList?.filter(
-          (i) =>
-            i.documentType?.name !== 'order' &&
-            i.documentType?.name !== 'inventory' &&
-            i.documentType?.name !== 'return' &&
-            i.status !== 'PROCESSED' &&
-            i?.head?.fromDepart?.id === doc?.head.fromDepart?.id,
-        ) as IShipmentDocument[]
-      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
-    [doc?.head.fromDepart?.id, docList],
-  );
-
-  const docsAddition = useMemo(
-    () =>
-      (
-        docList?.filter(
-          (i) =>
-            i.documentType?.name !== 'order' &&
-            i.documentType?.name !== 'inventory' &&
-            i.documentType?.name !== 'return' &&
-            i.status !== 'PROCESSED' &&
-            i?.head?.toDepart?.id === doc?.head.fromDepart?.id,
-        ) as IShipmentDocument[]
-      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
-    [doc?.head.fromDepart?.id, docList],
-  );
-
-  const linesSubtraction = getTotalLines(docsSubtraction);
-  const linesAddition = getTotalLines(docsAddition);
+  const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
   const remainsUse = Boolean(settings.remainsUse?.data);
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return doc?.head.fromDepart?.id
-      ? getRemGoodListByContact(goods, remains[doc?.head.fromDepart?.id], linesAddition, linesSubtraction)
+    return doc?.head?.fromDepart?.id && isFocused
+      ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id], docList, doc.head.fromDepart.id)
       : [];
-  }, [doc?.head.fromDepart?.id, goods, linesAddition, linesSubtraction, remains]);
+  }, [doc?.head?.fromDepart?.id, docList, goods, isFocused, remains]);
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -229,6 +191,10 @@ export const LaboratoryViewScreen = () => {
     ]);
   }, [docDispatch, id]);
 
+  const handleFocus = () => {
+    ref?.current?.focus();
+  };
+
   const hanldeCancelLastScan = useCallback(() => {
     if (lines?.length) {
       if (lines[0].scannedBarcode) {
@@ -242,6 +208,7 @@ export const LaboratoryViewScreen = () => {
         dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lines[0].id }));
       }
     }
+    handleFocus();
   }, [dispatch, id, lines]);
 
   const [visibleSendDialog, setVisibleSendDialog] = useState(false);
@@ -315,12 +282,10 @@ export const LaboratoryViewScreen = () => {
         <View style={styles.buttons}>
           {doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />}
           <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
-          {!isScanerReader && (
-            <ScanButton
-              onPress={() => navigation.navigate('ScanGood', { docId: id })}
-              disabled={screenState !== 'idle'}
-            />
-          )}
+          <ScanButton
+            onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('ScanGood', { docId: id }))}
+            disabled={screenState !== 'idle'}
+          />
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
@@ -376,6 +341,10 @@ export const LaboratoryViewScreen = () => {
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!doc) {
+        return;
+      }
+
+      if (doc?.status !== 'DRAFT') {
         return;
       }
 
@@ -461,7 +430,6 @@ export const LaboratoryViewScreen = () => {
     }
   }, [navigation, screenState]);
 
-  const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
   }
@@ -515,7 +483,7 @@ export const LaboratoryViewScreen = () => {
         ItemSeparatorComponent={ItemSeparator}
         keyExtractor={keyExtractor}
         extraData={[lines, isBlocked]}
-        keyboardShouldPersistTaps={'handled'}
+        keyboardShouldPersistTaps={'always'}
       />
       {lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
       <AppDialog

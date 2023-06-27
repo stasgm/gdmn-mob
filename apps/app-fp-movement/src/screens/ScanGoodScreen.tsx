@@ -16,7 +16,7 @@ import { ShipmentStackParamList } from '../navigation/Root/types';
 import { IShipmentLine, IShipmentDocument, barcodeSettings } from '../store/types';
 
 import { IAddressStoreEntity, IGood, IRemains, IRemGood } from '../store/app/types';
-import { getBarcode, getLineGood, getRemGoodListByContact, getTotalLines } from '../utils/helpers';
+import { getBarcode, getLineGood, getRemGoodListByContact } from '../utils/helpers';
 import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../store/index';
 
 import { barCodeTypes } from '../utils/constants';
@@ -24,6 +24,7 @@ import { barCodeTypes } from '../utils/constants';
 const ScanGoodScreen = () => {
   const docId = useRoute<RouteProp<ShipmentStackParamList, 'ScanGood'>>().params?.docId;
   const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ScanGood'>>();
+  const isFocused = useIsFocused();
 
   const fpDispatch = useFpDispatch();
   const dispatch = useDispatch();
@@ -57,52 +58,19 @@ const ScanGoodScreen = () => {
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
 
-  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
+  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart')?.data;
 
-  const docList = useSelector((state) => state.documents.list);
-
-  const docsSubtraction = useMemo(
-    () =>
-      (
-        docList?.filter(
-          (i) =>
-            i.documentType?.name !== 'order' &&
-            i.documentType?.name !== 'inventory' &&
-            i.documentType?.name !== 'return' &&
-            i.status !== 'PROCESSED' &&
-            i?.head?.fromDepart?.id === shipment?.head.fromDepart?.id,
-        ) as IShipmentDocument[]
-      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
-    [shipment?.head.fromDepart?.id, docList],
-  );
-
-  const docsAddition = useMemo(
-    () =>
-      (
-        docList?.filter(
-          (i) =>
-            i.documentType?.name !== 'order' &&
-            i.documentType?.name !== 'inventory' &&
-            i.documentType?.name !== 'return' &&
-            i.status !== 'PROCESSED' &&
-            i?.head?.toDepart?.id === shipment?.head.fromDepart?.id,
-        ) as IShipmentDocument[]
-      ).reduce((prev: IShipmentLine[], cur) => [...prev, ...cur.lines], []),
-    [shipment?.head.fromDepart?.id, docList],
-  );
-
-  const linesSubtraction = getTotalLines(docsSubtraction);
-  const linesAddition = getTotalLines(docsAddition);
+  const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
   const remainsUse = Boolean(settings.remainsUse?.data);
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return shipment?.head.fromDepart?.id
-      ? getRemGoodListByContact(goods, remains[shipment?.head.fromDepart?.id], linesAddition, linesSubtraction)
+    return shipment?.head?.fromDepart?.id && isFocused
+      ? getRemGoodListByContact(goods, remains[shipment.head.fromDepart.id], docList, shipment.head.fromDepart.id)
       : [];
-  }, [goods, linesAddition, linesSubtraction, remains, shipment?.head.fromDepart?.id]);
+  }, [docList, goods, isFocused, remains, shipment?.head?.fromDepart?.id]);
 
   const handleGetScannedObject = useCallback(
     (brc: string) => {
@@ -120,42 +88,6 @@ const ScanGoodScreen = () => {
       }
 
       const barc = getBarcode(brc, goodBarcodeSettings);
-
-      // let lineGood: IGood;
-
-      // if (remainsUse && shipment?.documentType.name !== 'return' && shipment?.documentType.name !== 'inventory') {
-      //   const good = goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === barc.shcode);
-
-      //   if (!good) {
-      //     setScaner({ state: 'error', message: 'Товар не найден' });
-      //     return;
-      //   }
-      //   const isRightWeight = good.remains >= barc.weight;
-
-      //   if (!isRightWeight) {
-      //     setScaner({ state: 'error', message: 'Вес товара превышает вес в остатках' });
-      //     return;
-      //   }
-      //   lineGood = {
-      //     id: good.good.id,
-      //     name: good.good.name,
-      //     shcode: good.good.shcode,
-      //     isCattle: good.good.isCattle,
-      //   };
-      // } else {
-      //   const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
-      //   if (!good) {
-      //     setScaner({ state: 'error', message: 'Товар не найден' });
-      //     return;
-      //   }
-
-      //   lineGood = {
-      //     id: good.id,
-      //     name: good.name,
-      //     shcode: good.shcode,
-      //     isCattle: good.isCattle,
-      //   };
-      // }
 
       const lineGood = getLineGood(
         barc.shcode,
@@ -260,8 +192,8 @@ const ScanGoodScreen = () => {
         },
       ]);
     } else {
-      const isFromAddressed = departs.find((i) => i.id === shipment?.head.fromDepart?.id && i.isAddressStore);
-      const isToAddressed = departs.find((i) => i.id === shipment?.head.toDepart?.id && i.isAddressStore);
+      const isFromAddressed = departs?.find((i) => i.id === shipment?.head.fromDepart?.id && i.isAddressStore);
+      const isToAddressed = departs?.find((i) => i.id === shipment?.head.toDepart?.id && i.isAddressStore);
       if (
         shipment?.head.toDepart?.isAddressStore ||
         shipment?.head.fromDepart?.isAddressStore ||
@@ -299,7 +231,6 @@ const ScanGoodScreen = () => {
 
   const handleClearScaner = () => setScaner({ state: 'init' });
 
-  const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
   }
