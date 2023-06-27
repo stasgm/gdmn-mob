@@ -4,12 +4,17 @@ export interface IFormParam {
   [fieldName: string]: unknown;
 }
 
+export interface IScreenFormParams {
+  [screenName: string]: IFormParam;
+}
+
 export interface IAppState {
   loading: boolean;
   showSyncInfo: boolean;
   autoSync: boolean;
   errorLog: IDeviceLog[];
   formParams?: IFormParam;
+  screenFormParams?: IScreenFormParams;
   syncDate?: Date;
   syncRequests: ISyncRequest[];
   requestNotice: IRequestNotice[];

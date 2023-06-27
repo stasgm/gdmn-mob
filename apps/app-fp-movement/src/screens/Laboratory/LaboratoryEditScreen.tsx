@@ -14,6 +14,8 @@ import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks
 
 import { IDocumentType, IReference, ScreenState } from '@lib/types';
 
+import { DashboardStackParamList } from '@lib/mobile-navigation';
+
 import { LaboratoryStackParamList } from '../../navigation/Root/types';
 import { ILaboratoryFormParam, ILaboratoryDocument } from '../../store/types';
 import { STATUS_LIST } from '../../utils/constants';
@@ -21,8 +23,13 @@ import { getNextDocNumber } from '../../utils/helpers';
 
 export const LaboratoryEditScreen = () => {
   const id = useRoute<RouteProp<LaboratoryStackParamList, 'LaboratoryEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<LaboratoryStackParamList, 'LaboratoryEdit'>>();
+  const navigation =
+    useNavigation<StackNavigationProp<LaboratoryStackParamList & DashboardStackParamList, 'LaboratoryEdit'>>();
   const dispatch = useDispatch();
+  const navState = navigation.getState();
+  const screenName = navState.routes.some((route) => route.name === 'Dashboard')
+    ? 'LaboratoryEditScreenDashboard'
+    : 'LaboratoryEditScreen';
 
   const { colors } = useTheme();
 
@@ -39,17 +46,19 @@ export const LaboratoryEditScreen = () => {
     ?.data.find((t) => t.name === 'laboratory');
 
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
+  const forms = useSelector((state) => state.app.screenFormParams);
+
   const {
     fromDepart: docFromDepart,
     documentDate: docDate,
     number: docNumber,
     comment: docComment,
     status: docStatus,
-  } = useSelector((state) => state.app.formParams as ILaboratoryFormParam);
+  } = (forms && forms[screenName] ? forms[screenName] : {}) as ILaboratoryFormParam;
 
   useEffect(() => {
     return () => {
-      dispatch(appActions.clearFormParams());
+      dispatch(appActions.clearScreenFormParams(screenName));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -58,22 +67,28 @@ export const LaboratoryEditScreen = () => {
     // Инициализируем параметры
     if (doc) {
       dispatch(
-        appActions.setFormParams({
-          number: doc.number,
-          documentDate: doc.documentDate,
-          status: doc.status,
-          comment: doc.head.comment,
-          fromDepart: doc.head.fromDepart,
+        appActions.setScreenFormParams({
+          screenName,
+          params: {
+            number: doc.number,
+            documentDate: doc.documentDate,
+            status: doc.status,
+            comment: doc.head.comment,
+            fromDepart: doc.head.fromDepart,
+          },
         }),
       );
     } else {
       const newNumber = getNextDocNumber(shipments);
       dispatch(
-        appActions.setFormParams({
-          number: newNumber,
-          documentDate: new Date().toISOString(),
-          status: 'DRAFT',
-          fromDepart: defaultDepart,
+        appActions.setScreenFormParams({
+          screenName,
+          params: {
+            number: newNumber,
+            documentDate: new Date().toISOString(),
+            status: 'DRAFT',
+            fromDepart: defaultDepart,
+          },
         }),
       );
     }
@@ -190,7 +205,12 @@ export const LaboratoryEditScreen = () => {
     setShowDate(false);
 
     if (selectedDate) {
-      dispatch(appActions.setFormParams({ documentDate: selectedDate.toISOString().slice(0, 10) }));
+      dispatch(
+        appActions.setScreenFormParams({
+          screenName,
+          params: { documentDate: selectedDate.toISOString().slice(0, 10) },
+        }),
+      );
     }
   };
 
@@ -208,6 +228,7 @@ export const LaboratoryEditScreen = () => {
     }
 
     navigation.navigate('SelectRefItem', {
+      screenName,
       refName: 'depart',
       fieldName: 'fromDepart',
       value: docFromDepart && [docFromDepart],
@@ -215,12 +236,23 @@ export const LaboratoryEditScreen = () => {
   };
 
   const handleChangeStatus = useCallback(() => {
-    dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
-  }, [dispatch, docStatus]);
+    dispatch(
+      appActions.setScreenFormParams({
+        screenName,
+        params: { status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' },
+      }),
+    );
+  }, [dispatch, docStatus, screenName]);
 
   const handleChangeNumber = useCallback(
-    (text: string) => dispatch(appActions.setFormParams({ number: text })),
-    [dispatch],
+    (text: string) =>
+      dispatch(
+        appActions.setScreenFormParams({
+          screenName,
+          params: { number: text },
+        }),
+      ),
+    [dispatch, screenName],
   );
 
   const viewStyle = useMemo(
@@ -270,7 +302,12 @@ export const LaboratoryEditScreen = () => {
             label="Комментарий"
             value={docComment}
             onChangeText={(text) => {
-              dispatch(appActions.setFormParams({ comment: text || '' }));
+              dispatch(
+                appActions.setScreenFormParams({
+                  screenName,
+                  params: { comment: text || '' },
+                }),
+              );
             }}
             disabled={isBlocked}
             clearInput={true}

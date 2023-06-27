@@ -57,6 +57,7 @@ export const FreeShipmentViewScreen = () => {
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<FreeShipmentStackParamList, 'FreeShipmentView'>>();
+  const isFocused = useIsFocused();
 
   const { id, isCurr } = useRoute<RouteProp<FreeShipmentStackParamList, 'FreeShipmentView'>>().params;
   const doc = docSelectors.selectByDocId<IFreeShipmentDocument>(id);
@@ -98,10 +99,10 @@ export const FreeShipmentViewScreen = () => {
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return doc?.head.fromDepart?.id
-      ? getRemGoodListByContact(goods, remains[doc?.head.fromDepart?.id], docList, doc?.head.fromDepart?.id)
+    return doc?.head?.fromDepart?.id && isFocused
+      ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id], docList, doc.head.fromDepart.id)
       : [];
-  }, [doc?.head.fromDepart?.id, goods, remains, docList]);
+  }, [doc?.head?.fromDepart?.id, goods, remains, docList, isFocused]);
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -524,7 +525,6 @@ export const FreeShipmentViewScreen = () => {
     }
   }, [navigation, screenState]);
 
-  const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
   }

@@ -128,11 +128,8 @@ export const LaboratoryListScreen = () => {
 
   const handleSendDocument = useCallback(async () => {
     setVisibleSendDialog(false);
-    // setScreenState('sending');
     await sendDoc();
     setDelList({});
-
-    // setScreenState('sent');
   }, [sendDoc]);
 
   const renderRight = useCallback(

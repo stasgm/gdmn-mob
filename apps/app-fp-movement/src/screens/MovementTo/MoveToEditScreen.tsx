@@ -14,6 +14,8 @@ import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks
 
 import { IDocumentType, INamedEntity, IReference, ScreenState } from '@lib/types';
 
+import { DashboardStackParamList } from '@lib/mobile-navigation';
+
 import { MoveToStackParamList } from '../../navigation/Root/types';
 import { IMoveFormParam, IMoveDocument } from '../../store/types';
 import { getNextDocNumber } from '../../utils/helpers';
@@ -21,8 +23,12 @@ import { IAddressStoreEntity } from '../../store/app/types';
 
 export const MoveToEditScreen = () => {
   const id = useRoute<RouteProp<MoveToStackParamList, 'MoveToEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<MoveToStackParamList, 'MoveToEdit'>>();
+  const navigation = useNavigation<StackNavigationProp<MoveToStackParamList & DashboardStackParamList, 'MoveToEdit'>>();
   const dispatch = useDispatch();
+  const navState = navigation.getState();
+  const screenName = navState.routes.some((route) => route.name === 'Dashboard')
+    ? 'MoveToEditScreenDashboard'
+    : 'MoveToEditScreen';
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
@@ -45,6 +51,8 @@ export const MoveToEditScreen = () => {
     .selectByName<IReference<INamedEntity>>('documentSubtype')
     ?.data.find((t) => t.id === 'internalMovement');
 
+  const forms = useSelector((state) => state.app.screenFormParams);
+
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {
     documentSubtype: docDocumentSubtype,
@@ -54,7 +62,7 @@ export const MoveToEditScreen = () => {
     number: docNumber,
     comment: docComment,
     status: docStatus,
-  } = useSelector((state) => state.app.formParams as IMoveFormParam);
+  } = (forms && forms[screenName] ? forms[screenName] : {}) as IMoveFormParam;
 
   useEffect(() => {
     return () => {
@@ -67,26 +75,32 @@ export const MoveToEditScreen = () => {
     // Инициализируем параметры
     if (doc) {
       dispatch(
-        appActions.setFormParams({
-          number: doc.number,
-          documentDate: doc.documentDate,
-          status: doc.status,
-          comment: doc.head.comment,
-          fromDepart: doc.head.fromDepart,
-          toDepart: doc.head.toDepart,
-          documentSubtype: doc.head.subtype,
+        appActions.setScreenFormParams({
+          screenName,
+          params: {
+            number: doc.number,
+            documentDate: doc.documentDate,
+            status: doc.status,
+            comment: doc.head.comment,
+            fromDepart: doc.head.fromDepart,
+            toDepart: doc.head.toDepart,
+            documentSubtype: doc.head.subtype,
+          },
         }),
       );
     } else {
       const newNumber = getNextDocNumber(movements);
       dispatch(
-        appActions.setFormParams({
-          number: newNumber,
-          documentDate: new Date().toISOString(),
-          status: 'DRAFT',
-          fromDepart: defaultDepart || undefined,
-          toDepart: defaultSecondDepart || undefined,
-          documentSubtype: movementSubtype || undefined,
+        appActions.setScreenFormParams({
+          screenName,
+          params: {
+            number: newNumber,
+            documentDate: new Date().toISOString(),
+            status: 'DRAFT',
+            fromDepart: defaultDepart || undefined,
+            toDepart: defaultSecondDepart || undefined,
+            documentSubtype: movementSubtype || undefined,
+          },
         }),
       );
     }
@@ -210,7 +224,12 @@ export const MoveToEditScreen = () => {
     setShowDate(false);
 
     if (selectedDate) {
-      dispatch(appActions.setFormParams({ documentDate: selectedDate.toISOString().slice(0, 10) }));
+      dispatch(
+        appActions.setScreenFormParams({
+          screenName,
+          params: { documentDate: selectedDate.toISOString().slice(0, 10) },
+        }),
+      );
     }
   };
 
@@ -228,6 +247,7 @@ export const MoveToEditScreen = () => {
     }
 
     navigation.navigate('SelectRefItem', {
+      screenName,
       refName: 'documentSubtype',
       fieldName: 'documentSubtype',
       value: docDocumentSubtype && [docDocumentSubtype],
@@ -240,6 +260,7 @@ export const MoveToEditScreen = () => {
     }
 
     navigation.navigate('SelectRefItem', {
+      screenName,
       refName: 'depart',
       fieldName: 'fromDepart',
       value: docFromDepart && [docFromDepart],
@@ -255,6 +276,7 @@ export const MoveToEditScreen = () => {
     const params: Record<string, string> = {};
 
     navigation.navigate('SelectRefItem', {
+      screenName,
       refName: 'depart',
       fieldName: 'toDepart',
       value: docToDepart && [docToDepart],
@@ -264,8 +286,14 @@ export const MoveToEditScreen = () => {
   };
 
   const handleChangeNumber = useCallback(
-    (text: string) => dispatch(appActions.setFormParams({ number: text })),
-    [dispatch],
+    (text: string) =>
+      dispatch(
+        appActions.setScreenFormParams({
+          screenName,
+          params: { number: text },
+        }),
+      ),
+    [dispatch, screenName],
   );
 
   return (
@@ -311,7 +339,12 @@ export const MoveToEditScreen = () => {
             label="Комментарий"
             value={docComment}
             onChangeText={(text) => {
-              dispatch(appActions.setFormParams({ comment: text || '' }));
+              dispatch(
+                appActions.setScreenFormParams({
+                  screenName,
+                  params: { comment: text || '' },
+                }),
+              );
             }}
             disabled={isBlocked}
             clearInput={true}

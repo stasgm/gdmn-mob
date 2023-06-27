@@ -49,6 +49,7 @@ const ShipmentViewScreen = () => {
   const { colors } = useTheme();
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
+  const isFocused = useIsFocused();
 
   const navigation =
     useNavigation<StackNavigationProp<ShipmentStackParamList & DashboardStackParamList, 'ShipmentView'>>();
@@ -121,10 +122,10 @@ const ShipmentViewScreen = () => {
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return shipment?.head.fromDepart?.id
-      ? getRemGoodListByContact(goods, remains[shipment?.head.fromDepart?.id], docList, shipment?.head.fromDepart?.id)
+    return shipment?.head?.fromDepart?.id && isFocused
+      ? getRemGoodListByContact(goods, remains[shipment.head.fromDepart.id], docList, shipment.head.fromDepart.id)
       : [];
-  }, [docList, goods, remains, shipment?.head.fromDepart?.id]);
+  }, [docList, goods, remains, shipment?.head?.fromDepart?.id, isFocused]);
 
   const handleShowDialog = () => {
     setVisibleDialog(true);
@@ -709,7 +710,6 @@ const ShipmentViewScreen = () => {
     );
   }, []);
 
-  const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
   }

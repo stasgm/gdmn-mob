@@ -49,6 +49,7 @@ export const LaboratoryViewScreen = () => {
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<LaboratoryStackParamList, 'LaboratoryView'>>();
+  const isFocused = useIsFocused();
 
   const id = useRoute<RouteProp<LaboratoryStackParamList, 'LaboratoryView'>>().params?.id;
   const doc = docSelectors.selectByDocId<ILaboratoryDocument>(id);
@@ -82,10 +83,10 @@ export const LaboratoryViewScreen = () => {
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return doc?.head.fromDepart?.id
-      ? getRemGoodListByContact(goods, remains[doc?.head.fromDepart?.id], docList, doc?.head.fromDepart?.id)
+    return doc?.head?.fromDepart?.id && isFocused
+      ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id], docList, doc.head.fromDepart.id)
       : [];
-  }, [doc?.head.fromDepart?.id, docList, goods, remains]);
+  }, [doc?.head?.fromDepart?.id, docList, goods, isFocused, remains]);
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -429,7 +430,6 @@ export const LaboratoryViewScreen = () => {
     }
   }, [navigation, screenState]);
 
-  const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
   }
