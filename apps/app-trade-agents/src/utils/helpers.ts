@@ -79,6 +79,7 @@ const getGroupModelByContact = (
   goods: IGood[],
   goodMatrix: IMatrixData[],
   isMatrix: boolean,
+  prevLines: IOrderLine[] = [],
   filterText?: string,
 ) => {
   log('getGroupModelByContact', 'Начало построения модели матрицы');
@@ -91,7 +92,10 @@ const getGroupModelByContact = (
   //         'groupId2':{ group: {id: '22', name: 'Группа2', parent: {id: '2', name: 'Группа родительская2'}}, goods: []}}}
   const matrixByGroup =
     isMatrix && goodMatrix
-      ? goodMatrix.reduce((p: IMGroupData<IMGroup>, { goodId, priceFsn, priceFso, priceFsnSklad, priceFsoSklad }) => {
+      ? (prevLines.length
+          ? goodMatrix.filter((g) => prevLines.some((p) => p.good.id === g.goodId))
+          : goodMatrix
+        ).reduce((p: IMGroupData<IMGroup>, { goodId, priceFsn, priceFso, priceFsnSklad, priceFsoSklad }) => {
           const good = goods?.find((g) => g.id === goodId);
           const group = groups?.find((gr) => gr.id === good?.goodgroup.id);
           if (good && group && (!filterTextUpper || group.name.toUpperCase().includes(filterTextUpper))) {
@@ -106,21 +110,24 @@ const getGroupModelByContact = (
           }
           return p;
         }, {})
-      : goods.reduce((p: IMGroupData<IMGroup>, good: IGood) => {
-          if (!p[good.goodgroup.id]) {
-            const group = groups.find((gr) => gr.id === good.goodgroup.id);
-            if (group && (!filterTextUpper || group.name.toUpperCase().includes(filterTextUpper))) {
-              p[good.goodgroup.id] = {
-                group: group.parent?.id ? group : ({ ...group, parent: UNKNOWN_GROUP } as IGoodGroup),
-                goods: [good],
-              };
+      : (prevLines.length ? goods.filter((g) => prevLines.some((p) => p.good.id === g.id)) : goods).reduce(
+          (p: IMGroupData<IMGroup>, good: IGood) => {
+            if (!p[good.goodgroup.id]) {
+              const group = groups.find((gr) => gr.id === good.goodgroup.id);
+              if (group && (!filterTextUpper || group.name.toUpperCase().includes(filterTextUpper))) {
+                p[good.goodgroup.id] = {
+                  group: group.parent?.id ? group : ({ ...group, parent: UNKNOWN_GROUP } as IGoodGroup),
+                  goods: [good],
+                };
+              }
+            } else {
+              p[good.goodgroup.id].goods?.push(good);
             }
-          } else {
-            p[good.goodgroup.id].goods?.push(good);
-          }
 
-          return p;
-        }, {});
+            return p;
+          },
+          {},
+        );
 
   const parents: IMGroupModel = {};
   const mGroups = Object.values(matrixByGroup);

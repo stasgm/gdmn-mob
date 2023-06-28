@@ -25,9 +25,15 @@ export interface IGood extends INamedEntity {
   scale: number; //количество единиц в месте
 }
 
+export interface IGoodGroupDecoration {
+  name: string;
+  color: string;
+}
+
 //Группы товаров
 export interface IGoodGroup extends INamedEntity {
   parent?: INamedEntity;
+  decoration?: IGoodGroupDecoration;
 }
 
 //* Model *//
