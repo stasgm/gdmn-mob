@@ -2,7 +2,7 @@ import React, { useState, useLayoutEffect, useCallback, useMemo, useEffect } fro
 import { View, Text, StyleSheet, ColorValue, Alert, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
-import { Badge, Checkbox, Chip, Searchbar, useTheme } from 'react-native-paper';
+import { Badge, Chip, Divider, Searchbar, useTheme } from 'react-native-paper';
 
 import {
   globalStyles as styles,
@@ -13,6 +13,7 @@ import {
   ItemSeparator,
   AppActivityIndicator,
   AppScreen,
+  Switch,
 } from '@lib/mobile-ui';
 import { appActions, docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 
@@ -43,9 +44,12 @@ const SelectGoodScreen = () => {
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGood'>>().params;
   const dispatch = useDispatch();
 
-  const isUseNetPrice = useSelector((state) => state.settings.data?.isUseNetPrice?.data) as boolean;
+  const settings = useSelector((state) => state.settings.data);
+  const isUseNetPrice = settings?.isUseNetPrice?.data as boolean;
+  const isShowPrevOrderLines = settings?.isShowPrevOrderLines?.data as boolean;
 
   const [isUseMatrix, setIsUseMatrix] = useState(isUseNetPrice);
+  const [isShowPrev, setIsShowPrev] = useState(false);
 
   const syncDate = useSelector((state) => state.app.syncDate);
   const isDemo = useSelector((state) => state.auth.isDemo);
@@ -62,23 +66,24 @@ const SelectGoodScreen = () => {
   const groups = useMemo(() => refGroup.data.concat(UNKNOWN_GROUP), [refGroup.data]);
   const doc = docSelectors.selectByDocId<IOrderDocument>(docId);
   const contactId = doc?.head.contact.id;
-  const orders = docSelectors.selectByDocType<IOrderDocument>('order');
-  const docsByContact = useMemo(
+  const docs = useSelector((state) => state.documents.list) as IOrderDocument[];
+  const prevOrderByContact = useMemo(
     () =>
-      doc
-        ? orders
+      doc && isShowPrevOrderLines
+        ? docs
             .filter(
               (o) =>
+                o.documentType.name === 'order' &&
                 o.head.contact.id === contactId &&
-                o.id !== doc?.id &&
+                o.id !== doc.id &&
                 new Date(o.documentDate).getTime() < new Date(doc.documentDate).getTime(),
             )
             .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime())
         : [],
-    [contactId, doc, orders],
+    [contactId, doc, isShowPrevOrderLines, docs],
   );
 
-  const prevLines = useMemo(() => (docsByContact.length ? docsByContact[0].lines : []), [docsByContact]);
+  const prevLines = useMemo(() => (prevOrderByContact.length ? prevOrderByContact[0].lines : []), [prevOrderByContact]);
 
   const { parentGroupId } = useSelector((state) => state.app.formParams as IGroupFormParam);
 
@@ -93,12 +98,13 @@ const SelectGoodScreen = () => {
     [windowWidth],
   );
 
-  const model = useMemo(() => {
-    if (contactId) {
-      return getGroupModelByContact(groups, goods, goodMatrix[contactId], isUseMatrix) as IMGroupModel;
-    }
-    return {};
-  }, [groups, goods, goodMatrix, contactId, isUseMatrix]);
+  const model = useMemo(
+    () =>
+      (contactId
+        ? getGroupModelByContact(groups, goods, goodMatrix[contactId], isUseMatrix, isShowPrev ? prevLines : [])
+        : {}) as IMGroupModel,
+    [contactId, groups, goods, goodMatrix, isUseMatrix, isShowPrev, prevLines],
+  );
 
   const firstLevelGroups = useMemo(() => Object.values(model).map((item) => item.parent), [model]);
 
@@ -125,12 +131,14 @@ const SelectGoodScreen = () => {
 
   const goodsByContact = useMemo(() => {
     if (contactId) {
-      return getGoodMatrixByContact(goods, goodMatrix[contactId], isUseMatrix, undefined, searchQuery)?.sort((a, b) =>
-        a.name < b.name ? -1 : 1,
+      const goodList = getGoodMatrixByContact(goods, goodMatrix[contactId], isUseMatrix, undefined, searchQuery);
+      return (isShowPrev ? goodList?.filter((g) => prevLines.some((p) => p.good.id === g.id)) : goodList)?.sort(
+        (a, b) => (a.name < b.name ? -1 : 1),
       );
+    } else {
+      return [];
     }
-    return [];
-  }, [contactId, goodMatrix, goods, isUseMatrix, searchQuery]);
+  }, [contactId, goodMatrix, goods, isShowPrev, isUseMatrix, prevLines, searchQuery]);
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
@@ -239,29 +247,20 @@ const SelectGoodScreen = () => {
             {values.map((item) => {
               const colorStyle = { color: item.id === selectedGroupId ? 'white' : colors.text };
               const backColorStyle = { backgroundColor: item.id === selectedGroupId ? colorSelected : colorBack };
+              const badgeColor = { backgroundColor: item.decoration?.color ? item.decoration.color : 'transparent' };
               return (
                 <View
                   key={item.id}
                   style={[localStyles.button, backColorStyle, styles.flexDirectionRow, groupButtonStyle]}
                 >
-                  <TouchableOpacity key={item.id} style={[]} onPress={() => onPress(item)}>
+                  <TouchableOpacity key={item.id} onPress={() => onPress(item)}>
                     <Text style={[localStyles.buttonLabel, colorStyle]}>{shortenString(item.name, 60) || item.id}</Text>
                   </TouchableOpacity>
-                  <Badge
-                    style={{
-                      position: 'absolute',
-                      right: 2,
-                      top: 2,
-                      backgroundColor: item.name.includes('охл')
-                        ? colors.placeholder
-                        : item.name.includes('зам')
-                        ? 'white'
-                        : 'transparent',
-                    }}
-                    size={10}
-                  >
-                    {item.name.includes('охл') ? 'ОХЛ' : item.name.includes('зам') ? 'ЗАМ' : ''}
-                  </Badge>
+                  {item.decoration?.name && (
+                    <Badge style={[localStyles.badge, badgeColor]} size={10}>
+                      {item.decoration.name.toUpperCase()}
+                    </Badge>
+                  )}
                 </View>
               );
             })}
@@ -269,7 +268,7 @@ const SelectGoodScreen = () => {
         </View>
       );
     },
-    [colors.placeholder, colors.text, groupButtonStyle],
+    [colors.text, groupButtonStyle],
   );
 
   const handlePressGood = useCallback(
@@ -302,27 +301,8 @@ const SelectGoodScreen = () => {
               <View style={iconStyle}>
                 <MaterialCommunityIcons name={'file-document'} size={20} color={'#FFF'} />
               </View>
-              {/* {prevLine.length > 0 ? (
-                <View style={[styles.checkedIcon, { backgroundColor: colors.placeholder, height: 10, width: 10 }]}>
-                  <MaterialCommunityIcons name="check" size={6} color={'#FFF'} />
-                </View>
-              ) : null} */}
               <View style={styles.details}>
                 <MediumText style={styles.textBold}>{item.name || item.id}</MediumText>
-                {prevLine.length > 0 && (
-                  <View style={localStyles.lineView}>
-                    <MediumText style={{ fontSize: 10 }}>Предыдущая заявка: </MediumText>
-                    {prevLine.map((line) => (
-                      <MediumText
-                        key={line.id}
-                        style={{ fontSize: 10 }}
-                        // onPress={() => setSelectedLine(line)}
-                      >
-                        {line.quantity} кг, уп.: {line.package ? line.package.name : 'без упаковки'};
-                      </MediumText>
-                    ))}
-                  </View>
-                )}
                 {isAdded && (
                   <View style={localStyles.lineView}>
                     {lines.map((line) => (
@@ -336,18 +316,23 @@ const SelectGoodScreen = () => {
                     ))}
                   </View>
                 )}
+                {!!prevLine.length && (
+                  <View style={localStyles.lineView}>
+                    <MaterialCommunityIcons name={'page-previous-outline'} size={14} color={colors.placeholder} />
+                    {prevLine.map((line) => (
+                      <MediumText key={line.id} style={localStyles.prevText}>
+                        {` ${line.quantity} кг, уп.: ${line.package ? line.package.name : 'без упаковки'};`}
+                      </MediumText>
+                    ))}
+                  </View>
+                )}
               </View>
-              {/* {prevLine.length > 0 && (
-                <Badge size={15} style={{ backgroundColor: colors.primary }}>
-                  {prevLine[0].quantity}
-                </Badge>
-              )} */}
             </View>
           </TouchableOpacity>
         </View>
       );
     },
-    [colors.primary, doc?.lines, handlePressGood, prevLines],
+    [colors.placeholder, colors.primary, doc?.lines, handlePressGood, prevLines],
   );
 
   const handlePressGroup = useCallback(
@@ -421,20 +406,27 @@ const SelectGoodScreen = () => {
               selectionColor={colors.primary}
             />
           </View>
+
           <ItemSeparator />
         </View>
       )}
-      {!filterVisible && contactId && goodMatrix[contactId] ? (
-        <Checkbox.Item
-          color={colors.primary}
-          uncheckedColor={colors.primary}
-          status={isUseMatrix ? 'checked' : 'unchecked'}
-          onPress={() => setIsUseMatrix(!isUseMatrix)}
-          label="Использовать матрицы"
-          position="leading"
-          style={localStyles.checkBox}
-        />
-      ) : null}
+      {!filterVisible && (
+        <View>
+          {contactId && goodMatrix[contactId] && (
+            <View style={localStyles.switch}>
+              <MediumText>Использовать матрицы</MediumText>
+              <Switch value={isUseMatrix} onValueChange={() => setIsUseMatrix(!isUseMatrix)} />
+            </View>
+          )}
+          {contactId && goodMatrix[contactId] && isShowPrevOrderLines && <Divider />}
+          {isShowPrevOrderLines && !!prevLines.length && (
+            <View style={localStyles.switch}>
+              <MediumText>Предыдущая заявка</MediumText>
+              <Switch value={isShowPrev} onValueChange={() => setIsShowPrev(!isShowPrev)} />
+            </View>
+          )}
+        </View>
+      )}
       <FlashList
         data={filterVisible ? goodsByContact : goodModel}
         renderItem={renderGood}
@@ -481,7 +473,12 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
-  lineView: { display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginTop: 6 },
+  lineView: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 6,
+  },
   lineChip: {
     margin: 2,
   },
@@ -502,5 +499,19 @@ const localStyles = StyleSheet.create({
     textAlignVertical: 'center',
     height: 70,
   },
-  checkBox: { marginLeft: -20, width: 250 },
+  prevText: {
+    fontSize: 10,
+  },
+  badge: {
+    position: 'absolute',
+    right: 2,
+    top: 2,
+  },
+  switch: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingHorizontal: 12,
+    fontSize: 20,
+    justifyContent: 'space-between',
+  },
 });
