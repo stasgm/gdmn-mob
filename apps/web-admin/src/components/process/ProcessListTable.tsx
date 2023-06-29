@@ -14,7 +14,7 @@ import {
   TablePagination,
   TableRow,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
 
 import { IProcess, ICompany } from '@lib/types';
 

@@ -1,4 +1,4 @@
-import { Box, Card, TextField, InputAdornment, IconButton } from '@material-ui/core';
+import { Box, Card, TextField, InputAdornment, IconButton } from '@mui/material';
 
 import { Search as SearchIcon, X as ClearIcon } from 'react-feather';
 
