@@ -127,9 +127,10 @@ export async function createServer(server: IServer): Promise<KoaApp> {
       }),
     )
     .use(router.routes())
-    // .use(historyApiFallback({ index: '/admin/index.html' }))
-    // .use(serve({ rootDir: 'admin', rootPath: '/admin' }))
     .use(router.allowedMethods());
+  if (process.env.PUBLIC_PATH === '/admin/') {
+    app.use(historyApiFallback({ index: '/admin/index.html' })).use(serve({ rootDir: 'admin', rootPath: '/admin' }));
+  }
 
   return app;
 }
