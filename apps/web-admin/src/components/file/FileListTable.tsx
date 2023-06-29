@@ -14,7 +14,7 @@ import {
   TablePagination,
   TableRow,
   TextField,
-} from '@material-ui/core';
+} from '@mui/material';
 
 import { IFileSystem } from '@lib/types';
 

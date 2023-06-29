@@ -1,9 +1,9 @@
 import { Helmet } from 'react-helmet';
-import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText } from '@material-ui/core';
+import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
-import CachedIcon from '@material-ui/icons/Cached';
-import FilterIcon from '@material-ui/icons/FilterAltOutlined';
-import DeleteIcon from '@material-ui/icons/DeleteOutline';
+import CachedIcon from '@mui/icons-material/Cached';
+import FilterIcon from '@mui/icons-material/FilterAltOutlined';
+import DeleteIcon from '@mui/icons-material/DeleteOutline';
 
 import { IDeviceLogFiles } from '@lib/types';
 

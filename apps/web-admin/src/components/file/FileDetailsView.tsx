@@ -1,5 +1,5 @@
 import { IFileSystem } from '@lib/types';
-import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@material-ui/core';
+import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@mui/material';
 import { NavLink } from 'react-router-dom';
 
 import { adminPath } from '../../utils/constants';

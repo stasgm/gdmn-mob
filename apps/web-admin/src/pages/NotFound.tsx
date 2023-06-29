@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet';
-import { Box, Container, Typography } from '@material-ui/core';
+import { Box, Container, Typography } from '@mui/material';
 
 const NotFound = () => (
   <>

@@ -1,7 +1,7 @@
-import { Avatar, Box, Card, CardContent, Grid, Typography } from '@material-ui/core';
-import { useTheme } from '@material-ui/core/styles';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import PeopleIcon from '@material-ui/icons/PeopleOutlined';
+import { Avatar, Box, Card, CardContent, Grid, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import PeopleIcon from '@mui/icons-material/PeopleOutlined';
 
 interface IProps {
   value: number;

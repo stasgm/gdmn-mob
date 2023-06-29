@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { AppBar, Badge, Box, IconButton, Toolbar } from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
-import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
-import LogoutIcon from '@material-ui/icons/ExitToAppOutlined';
+import { AppBar, Badge, Box, IconButton, Toolbar } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import NotificationsIcon from '@mui/icons-material/NotificationsOutlined';
+import LogoutIcon from '@mui/icons-material/ExitToAppOutlined';
 
 import { authActions, useAuthThunkDispatch } from '@lib/store';
 

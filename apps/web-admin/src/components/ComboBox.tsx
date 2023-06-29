@@ -1,4 +1,4 @@
-import { TextField, createFilterOptions, Autocomplete } from '@material-ui/core';
+import { TextField, createFilterOptions, Autocomplete } from '@mui/material';
 
 import { INamedEntity } from '@lib/types';
 

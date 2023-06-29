@@ -17,8 +17,8 @@ import {
   TableSortLabel,
   TextField,
   Typography,
-} from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 
 import { IHeadCells } from '../types';
 import { deviceStates, adminPath } from '../utils/constants';

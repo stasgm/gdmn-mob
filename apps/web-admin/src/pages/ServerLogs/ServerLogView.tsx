@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Box, CardHeader, IconButton, CircularProgress, Grid, Typography } from '@material-ui/core';
-import CachedIcon from '@material-ui/icons/Cached';
+import { Box, CardHeader, IconButton, CircularProgress, Grid, Typography } from '@mui/material';
+import CachedIcon from '@mui/icons-material/Cached';
 
 import { useNavigate, useParams } from 'react-router-dom';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { useSelector, useDispatch } from '../../store';
 import { IToolBarButton } from '../../types';
