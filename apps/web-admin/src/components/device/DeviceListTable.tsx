@@ -184,6 +184,8 @@ const DeviceListTable = ({
               </Box>
             </Box>
           </TableCell>
+          <TableCell>{device.company?.name || ''}</TableCell>
+
           <TableCell>{new Date(device.creationDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
           <TableCell>{new Date(device.editionDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
         </TableRow>
@@ -223,6 +225,7 @@ const DeviceListTable = ({
                 <TableCell>Номер</TableCell>
                 <TableCell>Состояние</TableCell>
                 <TableCell>Код активации</TableCell>
+                <TableCell>Компания</TableCell>
                 <TableCell>Дата создания</TableCell>
                 <TableCell>Дата редактирования</TableCell>
               </TableRow>
