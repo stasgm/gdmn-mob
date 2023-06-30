@@ -49,6 +49,7 @@
     "@types/react-test-renderer": "^18.0.0",
     "expo": "^47.0.13",
     "expo-asset": "~8.7.0",
+    "expo-av": "~13.0.3",
     "expo-barcode-scanner": "~12.1.0",
     "expo-camera": "~13.1.0",
     "expo-constants": "~14.0.2",

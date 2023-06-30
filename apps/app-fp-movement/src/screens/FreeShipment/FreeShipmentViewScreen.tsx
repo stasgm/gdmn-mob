@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { View, Alert, TextInput } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   MenuButton,
@@ -45,6 +46,7 @@ import { getBarcode, getLineGood, getRemGoodListByContact } from '../../utils/he
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
+import { AlertWithSound } from '../../components/AlertWithSound';
 
 export interface IScanerObject {
   item?: IFreeShipmentLine;
@@ -408,14 +410,14 @@ export const FreeShipmentViewScreen = () => {
     [doc?.status, lines?.length],
   );
 
-  const handleErrorMessage = (visible: boolean, text: string) => {
+  const handleErrorMessage = useCallback((visible: boolean, text: string) => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      Alert.alert('Внимание!', `${text}!`, [{ text: 'OK' }]);
+      AlertWithSound({ text });
       setScanned(false);
     }
-  };
+  }, []);
 
   const [scanned, setScanned] = useState(false);
 
@@ -493,7 +495,19 @@ export const FreeShipmentViewScreen = () => {
       setScanned(false);
     },
 
-    [doc, minBarcodeLength, goodBarcodeSettings, goods, goodRemains, remainsUse, isCattle, dispatch, id, visibleDialog],
+    [
+      doc,
+      minBarcodeLength,
+      goodBarcodeSettings,
+      goods,
+      goodRemains,
+      remainsUse,
+      isCattle,
+      dispatch,
+      id,
+      handleErrorMessage,
+      visibleDialog,
+    ],
   );
 
   const handleSearchBarcode = () => {

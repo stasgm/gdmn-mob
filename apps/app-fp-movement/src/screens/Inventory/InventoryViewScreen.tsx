@@ -29,6 +29,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { FlashList } from '@shopify/flash-list';
 
+import { Audio } from 'expo-av';
+
 import { barcodeSettings, IInventoryDocument, IInventoryLine } from '../../store/types';
 import { InventoryStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
@@ -37,6 +39,7 @@ import { getBarcode } from '../../utils/helpers';
 import { IAddressStoreEntity, IGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
+import { AlertWithSound } from '../../components/AlertWithSound';
 
 export interface IScanerObject {
   item?: IInventoryLine;
@@ -84,6 +87,12 @@ export const InventoryViewScreen = () => {
   const [quantPack, setQuantPack] = useState('');
 
   const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
+
+  const handlePlaySound = async () => {
+    const { sound: sound3 } = await Audio.Sound.createAsync(require('../../../assets/error.wav'));
+
+    await sound3.playAsync();
+  };
 
   const handleShowDialog = () => {
     setVisibleDialog(true);
@@ -318,14 +327,15 @@ export const InventoryViewScreen = () => {
 
   const ref = useRef<TextInput>(null);
 
-  const handleErrorMessage = (visible: boolean, text: string) => {
+  const handleErrorMessage = useCallback((visible: boolean, text: string) => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      Alert.alert('Внимание!', `${text}!`, [{ text: 'OK' }]);
+      AlertWithSound({ text });
       setScanned(false);
     }
-  };
+    handlePlaySound();
+  }, []);
 
   const getScannedObject = useCallback(
     (brc: string) => {
@@ -394,7 +404,18 @@ export const InventoryViewScreen = () => {
       }
     },
 
-    [doc, minBarcodeLength, goodBarcodeSettings, goods, departs, dispatch, id, visibleDialog, navigation],
+    [
+      doc,
+      minBarcodeLength,
+      goodBarcodeSettings,
+      goods,
+      departs,
+      visibleDialog,
+      handleErrorMessage,
+      navigation,
+      id,
+      dispatch,
+    ],
   );
 
   const handleSearchBarcode = () => {

@@ -43,6 +43,7 @@ import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDi
 
 import { getBarcode, getLineGood, getRemGoodListByContact } from '../../utils/helpers';
 import ViewTotal from '../../components/ViewTotal';
+import { AlertWithSound } from '../../components/AlertWithSound';
 
 const keyExtractor = (item: IShipmentLine | ITempLine) => item.id;
 const ShipmentViewScreen = () => {
@@ -468,14 +469,20 @@ const ShipmentViewScreen = () => {
 
   const ref = useRef<TextInput>(null);
 
-  const handleErrorMessage = (visible: boolean, text: string) => {
+  // const handlePlaySound = async () => {
+  //   const { sound } = await Audio.Sound.createAsync(require('../../../assets/error.mp3'));
+  //   await sound.playAsync();
+  // };
+
+  const handleErrorMessage = useCallback((visible: boolean, text: string) => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      Alert.alert('Внимание!', `${text}!`, [{ text: 'OK' }]);
+      AlertWithSound({ text });
       setScanned(false);
     }
-  };
+    // handlePlaySound();
+  }, []);
 
   const getScannedObject = useCallback(
     (brc: string) => {
@@ -605,6 +612,7 @@ const ShipmentViewScreen = () => {
       isCattle,
       shipmentLines,
       tempOrder,
+      handleErrorMessage,
       visibleDialog,
       fpDispatch,
       dispatch,
