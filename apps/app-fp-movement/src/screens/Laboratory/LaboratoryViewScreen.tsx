@@ -34,11 +34,10 @@ import { barcodeSettings, ILaboratoryDocument, ILaboratoryLine, IShipmentDocumen
 import { LaboratoryStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { getBarcode, getLineGood, getRemGoodListByContact } from '../../utils/helpers';
+import { alertWithSound, getBarcode, getLineGood, getRemGoodListByContact } from '../../utils/helpers';
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
-import { AlertWithSound } from '../../components/AlertWithSound';
 
 export interface IScanerObject {
   item?: ILaboratoryLine;
@@ -335,7 +334,7 @@ export const LaboratoryViewScreen = () => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      AlertWithSound({ text });
+      alertWithSound(text);
       setScanned(false);
     }
   }, []);

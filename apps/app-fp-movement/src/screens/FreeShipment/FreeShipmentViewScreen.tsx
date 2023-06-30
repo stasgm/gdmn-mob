@@ -42,11 +42,10 @@ import { barcodeSettings, IFreeShipmentDocument, IFreeShipmentLine, IShipmentDoc
 import { FreeShipmentStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { getBarcode, getLineGood, getRemGoodListByContact } from '../../utils/helpers';
+import { alertWithSound, getBarcode, getLineGood, getRemGoodListByContact } from '../../utils/helpers';
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
-import { AlertWithSound } from '../../components/AlertWithSound';
 
 export interface IScanerObject {
   item?: IFreeShipmentLine;
@@ -414,7 +413,7 @@ export const FreeShipmentViewScreen = () => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      AlertWithSound({ text });
+      alertWithSound(text);
       setScanned(false);
     }
   }, []);

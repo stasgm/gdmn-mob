@@ -33,11 +33,10 @@ import { barcodeSettings, IMoveDocument, IMoveLine, IShipmentDocument } from '..
 import { MoveFromStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { getBarcode, getLineGood, getRemGoodListByContact } from '../../utils/helpers';
+import { alertWithSound, getBarcode, getLineGood, getRemGoodListByContact } from '../../utils/helpers';
 import { IAddressStoreEntity, IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
-import { AlertWithSound } from '../../components/AlertWithSound';
 
 export interface IScanerObject {
   item?: IMoveLine;
@@ -295,7 +294,7 @@ export const MoveFromViewScreen = () => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      AlertWithSound({ text });
+      alertWithSound(text);
       setScanned(false);
     }
   }, []);

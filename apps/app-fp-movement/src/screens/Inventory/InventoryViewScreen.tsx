@@ -29,17 +29,14 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { FlashList } from '@shopify/flash-list';
 
-import { Audio } from 'expo-av';
-
 import { barcodeSettings, IInventoryDocument, IInventoryLine } from '../../store/types';
 import { InventoryStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { getBarcode } from '../../utils/helpers';
+import { alertWithSound, getBarcode } from '../../utils/helpers';
 import { IAddressStoreEntity, IGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
-import { AlertWithSound } from '../../components/AlertWithSound';
 
 export interface IScanerObject {
   item?: IInventoryLine;
@@ -87,12 +84,6 @@ export const InventoryViewScreen = () => {
   const [quantPack, setQuantPack] = useState('');
 
   const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
-
-  const handlePlaySound = async () => {
-    const { sound: sound3 } = await Audio.Sound.createAsync(require('../../../assets/error.wav'));
-
-    await sound3.playAsync();
-  };
 
   const handleShowDialog = () => {
     setVisibleDialog(true);
@@ -331,10 +322,9 @@ export const InventoryViewScreen = () => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      AlertWithSound({ text });
+      alertWithSound(text);
       setScanned(false);
     }
-    handlePlaySound();
   }, []);
 
   const getScannedObject = useCallback(

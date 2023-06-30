@@ -34,11 +34,10 @@ import { barcodeSettings, IReturnDocument, IReturnLine } from '../../store/types
 import { ReturnStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { getBarcode } from '../../utils/helpers';
+import { alertWithSound, getBarcode } from '../../utils/helpers';
 import { IGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
-import { AlertWithSound } from '../../components/AlertWithSound';
 
 export interface IScanerObject {
   item?: IReturnLine;
@@ -247,7 +246,7 @@ export const ReturnViewScreen = () => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      AlertWithSound({ text });
+      alertWithSound(text);
       setScanned(false);
     }
   }, []);
