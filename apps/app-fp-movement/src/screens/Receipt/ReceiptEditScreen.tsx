@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { Alert, ScrollView, Platform } from 'react-native';
+import { ScrollView, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Divider } from 'react-native-paper';
 
@@ -18,7 +18,7 @@ import { DashboardStackParamList } from '@lib/mobile-navigation';
 
 import { ReceiptStackParamList } from '../../navigation/Root/types';
 import { IReceiptFormParam, IReceiptDocument } from '../../store/types';
-import { getNextDocNumber } from '../../utils/helpers';
+import { alertWithSound, getNextDocNumber } from '../../utils/helpers';
 import { IAddressStoreEntity } from '../../store/app/types';
 
 export const ReceiptEditScreen = () => {
@@ -102,13 +102,13 @@ export const ReceiptEditScreen = () => {
   useEffect(() => {
     if (screenState === 'saving') {
       if (!movementType) {
-        Alert.alert('Внимание!', 'Тип документа для приходов не найден.', [{ text: 'OK' }]);
+        alertWithSound('Внимание!', 'Тип документа для приходов не найден.');
         setScreenState('idle');
         return;
       }
 
       if (!(docNumber && docDate && docFromDepart && docToDepart)) {
-        Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
+        alertWithSound('Ошибка!', 'Не все поля заполнены.');
         setScreenState('idle');
         return;
       }

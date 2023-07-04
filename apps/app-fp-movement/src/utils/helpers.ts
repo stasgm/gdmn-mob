@@ -316,12 +316,31 @@ const getRemainsByGoodId = (remains: IRemainsData[], linesQuantity: IGoodQuantit
   }, {});
 };
 
-export const alertWithSound = (text: string) => {
+export const alertWithSound = (label: string, text: string) => {
   const playSound = async () => {
     const { sound } = await Audio.Sound.createAsync(require('../../assets/error.wav'));
     await sound.playAsync();
   };
 
   playSound();
-  Alert.alert('Внимание!', `${text}!`, [{ text: 'OK' }]);
+  Alert.alert(label, text, [{ text: 'OK' }]);
+};
+
+export const alertWithSoundMulti = (label: string, text: string, onOk: () => void) => {
+  const playSound = async () => {
+    const { sound } = await Audio.Sound.createAsync(require('../../assets/error.wav'));
+    await sound.playAsync();
+  };
+
+  playSound();
+
+  Alert.alert(`${label}`, `${text}`, [
+    {
+      text: 'Да',
+      onPress: () => onOk(),
+    },
+    {
+      text: 'Отмена',
+    },
+  ]);
 };

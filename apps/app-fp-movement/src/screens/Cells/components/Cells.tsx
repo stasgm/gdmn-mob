@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useMemo } from 'react';
-import { TouchableOpacity, View, StyleSheet, Text, Alert, ScrollView } from 'react-native';
+import { TouchableOpacity, View, StyleSheet, Text, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { globalStyles as styles } from '@lib/mobile-ui';
 
@@ -13,6 +13,7 @@ import { CellsStackParamList } from '../../../navigation/Root/types';
 import { ICellData, IEmployee, IModelData } from '../../../store/app/types';
 import { cellColors } from '../../../utils/constants';
 import { IMoveLine } from '../../../store/types';
+import { alertWithSound } from '../../../utils/helpers';
 
 export interface IContactItem {
   item: IDepartment | IEmployee;
@@ -27,7 +28,7 @@ const NamedRow = ({ item }: { item: string }) => (
 );
 
 const handleAlert = (label: string, text: string) => {
-  Alert.alert(label, `Рекомендуется: ${text}`, [{ text: 'OK' }]);
+  alertWithSound(label, `Рекомендуется: ${text}`);
 };
 
 const Cells = ({

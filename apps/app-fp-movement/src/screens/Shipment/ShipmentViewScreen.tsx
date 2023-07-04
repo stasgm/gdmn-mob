@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Alert, View, TouchableHighlight, TextInput } from 'react-native';
+import { View, TouchableHighlight, TextInput } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -41,7 +41,13 @@ import { getStatusColor, lineTypes, ONE_SECOND_IN_MS } from '../../utils/constan
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
 import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../../store/index';
 
-import { alertWithSound, getBarcode, getLineGood, getRemGoodListByContact } from '../../utils/helpers';
+import {
+  alertWithSound,
+  alertWithSoundMulti,
+  getBarcode,
+  getLineGood,
+  getRemGoodListByContact,
+} from '../../utils/helpers';
 import ViewTotal from '../../components/ViewTotal';
 
 const keyExtractor = (item: IShipmentLine | ITempLine) => item.id;
@@ -190,7 +196,7 @@ const ShipmentViewScreen = () => {
 
         if (good) {
           if (good.remains + line.weight < weight) {
-            Alert.alert('Внимание!', 'Вес товара превышает вес в остатках!', [{ text: 'OK' }]);
+            alertWithSound('Внимание!', 'Вес товара превышает вес в остатках!');
 
             return;
           } else {
@@ -204,22 +210,14 @@ const ShipmentViewScreen = () => {
                   }),
                 );
               } else {
-                Alert.alert('Данное количество превышает количество в заявке.', 'Добавить позицию?', [
-                  {
-                    text: 'Да',
-                    onPress: () => {
-                      fpDispatch(
-                        fpMovementActions.updateTempOrderLine({
-                          docId: tempOrder?.id,
-                          line: newTempLine,
-                        }),
-                      );
-                    },
-                  },
-                  {
-                    text: 'Отмена',
-                  },
-                ]);
+                alertWithSoundMulti('Данное количество превышает количество в заявке.', 'Добавить позицию?', () => {
+                  fpDispatch(
+                    fpMovementActions.updateTempOrderLine({
+                      docId: tempOrder?.id,
+                      line: newTempLine,
+                    }),
+                  );
+                });
               }
             }
 
@@ -237,7 +235,7 @@ const ShipmentViewScreen = () => {
             }
           }
         } else {
-          Alert.alert('Ошибка!', 'Товар не найден', [{ text: 'OK' }]);
+          alertWithSound('Ошибка!', 'Товар не найден');
           return;
         }
       } else {
@@ -251,22 +249,14 @@ const ShipmentViewScreen = () => {
               }),
             );
           } else {
-            Alert.alert('Данное количество превышает количество в заявке.', 'Добавить позицию?', [
-              {
-                text: 'Да',
-                onPress: () => {
-                  fpDispatch(
-                    fpMovementActions.updateTempOrderLine({
-                      docId: tempOrder?.id,
-                      line: newTempLine,
-                    }),
-                  );
-                },
-              },
-              {
-                text: 'Отмена',
-              },
-            ]);
+            alertWithSoundMulti('Данное количество превышает количество в заявке.', 'Добавить позицию?', () => {
+              fpDispatch(
+                fpMovementActions.updateTempOrderLine({
+                  docId: tempOrder?.id,
+                  line: newTempLine,
+                }),
+              );
+            });
           }
         }
 
@@ -308,28 +298,17 @@ const ShipmentViewScreen = () => {
       return;
     }
 
-    Alert.alert('Вы уверены, что хотите удалить документ?', '', [
-      {
-        text: 'Да',
-        onPress: async () => {
-          setScreenState('deleting');
-          await sleep(1);
-          const res = await docDispatch(documentActions.removeDocument(id));
-          if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
-            if (tempOrder) {
-              fpDispatch(fpMovementActions.removeTempOrder(tempOrder?.id));
-            }
-            setScreenState('deleted');
-          } else {
-            setScreenState('idle');
-          }
-        },
-      },
-      {
-        text: 'Отмена',
-      },
-    ]);
-  }, [docDispatch, fpDispatch, id, tempOrder]);
+    alertWithSoundMulti('Вы уверены, что хотите удалить документ?', '', async () => {
+      setScreenState('deleting');
+      await sleep(1);
+      const res = await docDispatch(documentActions.removeDocument(id));
+      if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
+        setScreenState('deleted');
+      } else {
+        setScreenState('idle');
+      }
+    });
+  }, [docDispatch, id]);
 
   const handleFocus = () => {
     ref?.current?.focus();
@@ -477,7 +456,7 @@ const ShipmentViewScreen = () => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      alertWithSound(text);
+      alertWithSound('Внимание!', text);
       setScanned(false);
     }
     // handlePlaySound();
@@ -566,36 +545,20 @@ const ShipmentViewScreen = () => {
           );
           dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
         } else {
-          Alert.alert('Данное количество превышает количество в заявке.', 'Добавить позицию?', [
-            {
-              text: 'Да',
-              onPress: () => {
-                dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
-                fpDispatch(
-                  fpMovementActions.updateTempOrderLine({
-                    docId: tempOrder?.id,
-                    line: newTempLine,
-                  }),
-                );
-              },
-            },
-            {
-              text: 'Отмена',
-            },
-          ]);
+          alertWithSoundMulti('Данное количество превышает количество в заявке.', 'Добавить позицию?', () => {
+            dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+            fpDispatch(
+              fpMovementActions.updateTempOrderLine({
+                docId: tempOrder?.id,
+                line: newTempLine,
+              }),
+            );
+          });
         }
       } else {
-        Alert.alert('Данный товар отсутствует в позициях заявки.', 'Добавить позицию?', [
-          {
-            text: 'Да',
-            onPress: () => {
-              dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
-            },
-          },
-          {
-            text: 'Отмена',
-          },
-        ]);
+        alertWithSoundMulti('Данный товар отсутствует в позициях заявки.', 'Добавить позицию?', () => {
+          dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+        });
       }
 
       setScanned(false);

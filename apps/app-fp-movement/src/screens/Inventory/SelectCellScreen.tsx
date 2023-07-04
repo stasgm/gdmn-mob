@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Alert, Pressable } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Pressable } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
@@ -19,7 +19,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { ICell, ICellRef, IInventoryLine, IMoveDocument, IMoveLine } from '../../store/types';
 import { InventoryStackParamList } from '../../navigation/Root/types';
 
-import { getCellItem, getCellList, getCellListRef } from '../../utils/helpers';
+import { alertWithSound, getCellItem, getCellList, getCellListRef } from '../../utils/helpers';
 import { ICellRefList, ICellData } from '../../store/app/types';
 import { Group } from '../../components/Group';
 import { cellColors } from '../../utils/constants';
@@ -91,11 +91,7 @@ export const SelectCellScreen = () => {
       setSelectedRow(getCellItem(cell.name).row);
       setToCell(item);
     } else {
-      Alert.alert('Ошибка!', 'Для данный товар не находится в ячейке', [
-        {
-          text: 'ОК',
-        },
-      ]);
+      alertWithSound('Ошибка!', 'Для данный товар не находится в ячейке');
     }
   }, [cell, item, mode]);
 

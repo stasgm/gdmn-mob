@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Alert, Pressable } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Pressable } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
@@ -19,7 +19,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { ICell, ICellName, ICellRef, IInventoryLine, IMoveDocument, IMoveLine } from '../store/types';
 import { MoveStackParamList } from '../navigation/Root/types';
 
-import { getCellItem, getCellList } from '../utils/helpers';
+import { alertWithSound, getCellItem, getCellList } from '../utils/helpers';
 import { ICellRefList, ICellData } from '../store/app/types';
 import { Group } from '../components/Group';
 import { cellColors } from '../utils/constants';
@@ -145,11 +145,7 @@ export const SelectCellScreen = () => {
                 setFromCell({ ...item, fromCell: newCell });
               }
             } else {
-              Alert.alert('Ошибка выбора ячейки!', 'Данная ячейка занята другим товаром, выберите другую ячейку.', [
-                {
-                  text: 'ОК',
-                },
-              ]);
+              alertWithSound('Ошибка выбора ячейки!', 'Данная ячейка занята другим товаром, выберите другую ячейку.');
             }
           } else {
             const newLine: IMoveLine = { ...fromCell, toCell: newCell };

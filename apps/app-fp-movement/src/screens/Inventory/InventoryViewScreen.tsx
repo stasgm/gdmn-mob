@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, Alert, TextInput } from 'react-native';
+import { View, TextInput } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
@@ -33,7 +33,7 @@ import { barcodeSettings, IInventoryDocument, IInventoryLine } from '../../store
 import { InventoryStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { alertWithSound, getBarcode } from '../../utils/helpers';
+import { alertWithSound, alertWithSoundMulti, getBarcode } from '../../utils/helpers';
 import { IAddressStoreEntity, IGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
@@ -171,24 +171,16 @@ export const InventoryViewScreen = () => {
       return;
     }
 
-    Alert.alert('Вы уверены, что хотите удалить документ?', '', [
-      {
-        text: 'Да',
-        onPress: async () => {
-          setScreenState('deleting');
-          await sleep(1);
-          const res = await docDispatch(documentActions.removeDocument(id));
-          if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
-            setScreenState('deleted');
-          } else {
-            setScreenState('idle');
-          }
-        },
-      },
-      {
-        text: 'Отмена',
-      },
-    ]);
+    alertWithSoundMulti('Вы уверены, что хотите удалить документ?', '', async () => {
+      setScreenState('deleting');
+      await sleep(1);
+      const res = await docDispatch(documentActions.removeDocument(id));
+      if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
+        setScreenState('deleted');
+      } else {
+        setScreenState('idle');
+      }
+    });
   }, [docDispatch, id]);
 
   const handleFocus = () => {
@@ -322,7 +314,7 @@ export const InventoryViewScreen = () => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      alertWithSound(text);
+      alertWithSound('Внимание!', text);
       setScanned(false);
     }
   }, []);
