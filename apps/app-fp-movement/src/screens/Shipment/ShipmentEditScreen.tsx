@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Alert, View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -25,6 +25,7 @@ import { ShipmentStackParamList } from '../../navigation/Root/types';
 import { IShipmentFormParam, IShipmentDocument } from '../../store/types';
 
 import { STATUS_LIST } from '../../utils/constants';
+import { alertWithSound } from '../../utils/helpers';
 
 const ShipmentEditScreen = () => {
   const { id, isCurr } = useRoute<RouteProp<ShipmentStackParamList, 'ShipmentEdit'>>().params;
@@ -96,13 +97,13 @@ const ShipmentEditScreen = () => {
   useEffect(() => {
     if (screenState === 'saving') {
       if (!shipmentType) {
-        Alert.alert('Ошибка!', 'Тип документа для заявок не найден', [{ text: 'OK' }]);
+        alertWithSound('Ошибка!', 'Тип документа для заявок не найден');
         setScreenState('idle');
         return;
       }
 
       if (!docDocumentDate || !docFromDepart) {
-        Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
+        alertWithSound('Ошибка!', 'Не все поля заполнены.');
         setScreenState('idle');
         return;
       }

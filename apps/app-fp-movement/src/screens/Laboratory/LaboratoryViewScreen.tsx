@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, Alert, TextInput } from 'react-native';
+import { View, TextInput } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   MenuButton,
@@ -33,7 +34,13 @@ import { barcodeSettings, ILaboratoryDocument, ILaboratoryLine, IShipmentDocumen
 import { LaboratoryStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { getBarcode, getLineGood, getRemGoodListByContact } from '../../utils/helpers';
+import {
+  alertWithSound,
+  alertWithSoundMulti,
+  getBarcode,
+  getLineGood,
+  getRemGoodListByContact,
+} from '../../utils/helpers';
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
@@ -118,7 +125,7 @@ export const LaboratoryViewScreen = () => {
 
         if (good) {
           if (good.remains < newWeight - line.weight) {
-            Alert.alert('Внимание!', 'Вес товара превышает вес в остатках!', [{ text: 'OK' }]);
+            alertWithSound('Внимание!', 'Вес товара превышает вес в остатках!');
 
             return;
           } else if (newWeight < 1000 || newWeight <= line.weight) {
@@ -130,7 +137,7 @@ export const LaboratoryViewScreen = () => {
             dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
           }
         } else {
-          Alert.alert('Ошибка!', 'Товар не найден', [{ text: 'OK' }]);
+          alertWithSound('Ошибка!', 'Товар не найден');
           return;
         }
       } else {
@@ -142,7 +149,7 @@ export const LaboratoryViewScreen = () => {
 
           dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
         } else {
-          Alert.alert('Ошибка!', 'Неверный вес', [{ text: 'OK' }]);
+          alertWithSound('Ошибка!', 'Неверный вес');
           return;
         }
       }
@@ -171,24 +178,16 @@ export const LaboratoryViewScreen = () => {
       return;
     }
 
-    Alert.alert('Вы уверены, что хотите удалить документ?', '', [
-      {
-        text: 'Да',
-        onPress: async () => {
-          setScreenState('deleting');
-          await sleep(1);
-          const res = await docDispatch(documentActions.removeDocument(id));
-          if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
-            setScreenState('deleted');
-          } else {
-            setScreenState('idle');
-          }
-        },
-      },
-      {
-        text: 'Отмена',
-      },
-    ]);
+    alertWithSoundMulti('Вы уверены, что хотите удалить документ?', '', async () => {
+      setScreenState('deleting');
+      await sleep(1);
+      const res = await docDispatch(documentActions.removeDocument(id));
+      if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
+        setScreenState('deleted');
+      } else {
+        setScreenState('idle');
+      }
+    });
   }, [docDispatch, id]);
 
   const handleFocus = () => {
@@ -329,14 +328,14 @@ export const LaboratoryViewScreen = () => {
 
   const ref = useRef<TextInput>(null);
 
-  const handleErrorMessage = (visible: boolean, text: string) => {
+  const handleErrorMessage = useCallback((visible: boolean, text: string) => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      Alert.alert('Внимание!', `${text}!`, [{ text: 'OK' }]);
+      alertWithSound('Внимание!', text);
       setScanned(false);
     }
-  };
+  }, []);
 
   const getScannedObject = useCallback(
     (brc: string) => {
@@ -398,7 +397,18 @@ export const LaboratoryViewScreen = () => {
       setScanned(false);
     },
 
-    [doc, minBarcodeLength, goodBarcodeSettings, remainsUse, visibleDialog, goodRemains, dispatch, id, goods],
+    [
+      doc,
+      minBarcodeLength,
+      goodBarcodeSettings,
+      goods,
+      goodRemains,
+      remainsUse,
+      dispatch,
+      id,
+      handleErrorMessage,
+      visibleDialog,
+    ],
   );
 
   const handleSearchBarcode = () => {

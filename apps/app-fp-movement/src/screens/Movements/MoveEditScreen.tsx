@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { Alert, ScrollView, Platform } from 'react-native';
+import { ScrollView, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Divider } from 'react-native-paper';
 
@@ -18,7 +18,7 @@ import { DashboardStackParamList } from '@lib/mobile-navigation';
 
 import { MoveStackParamList } from '../../navigation/Root/types';
 import { IMoveFormParam, IMoveDocument } from '../../store/types';
-import { getNextDocNumber } from '../../utils/helpers';
+import { alertWithSound, getNextDocNumber } from '../../utils/helpers';
 import { IAddressStoreEntity } from '../../store/app/types';
 
 export const MoveEditScreen = () => {
@@ -133,13 +133,13 @@ export const MoveEditScreen = () => {
   useEffect(() => {
     if (screenState === 'saving') {
       if (!movementType) {
-        Alert.alert('Внимание!', 'Тип документа для перемещений не найден.', [{ text: 'OK' }]);
+        alertWithSound('Внимание!', 'Тип документа для перемещений не найден.');
         setScreenState('idle');
         return;
       }
 
       if (!docDocumentSubtype) {
-        Alert.alert('Ошибка!', 'Не указан тип документа.', [{ text: 'OK' }]);
+        alertWithSound('Ошибка!', 'Не указан тип документа.');
         setScreenState('idle');
         return;
       }
@@ -148,13 +148,13 @@ export const MoveEditScreen = () => {
         (docDocumentSubtype?.id === 'internalMovement' && !docFromDepart) ||
         (docDocumentSubtype?.id === 'movement' && !docToDepart)
       ) {
-        Alert.alert('Ошибка!', 'Нет подразделения пользователя. Обратитесь к администратору.', [{ text: 'OK' }]);
+        alertWithSound('Ошибка!', 'Нет подразделения пользователя. Обратитесь к администратору.');
         setScreenState('idle');
         return;
       }
 
       if (!(docNumber && docDate && docFromDepart && docToDepart)) {
-        Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
+        alertWithSound('Ошибка!', 'Не все поля заполнены.');
         setScreenState('idle');
         return;
       }

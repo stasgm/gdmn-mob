@@ -1,5 +1,9 @@
 import { isNumeric, log, round } from '@lib/mobile-hooks';
 
+import { Alert } from 'react-native';
+
+import { Audio } from 'expo-av';
+
 import {
   IMoveDocument,
   IFreeShipmentDocument,
@@ -10,7 +14,6 @@ import {
   IMoveLine,
   ICellName,
   IInventoryDocument,
-  // IShipmentLine,
 } from '../store/types';
 import {
   IBarcode,
@@ -18,7 +21,6 @@ import {
   IGood,
   IGoodQuantity,
   IMGoodData,
-  // IMGoodRemain,
   IModelData,
   IModelRem,
   IRemGood,
@@ -312,4 +314,33 @@ const getRemainsByGoodId = (remains: IRemainsData[], linesQuantity: IGoodQuantit
     }
     return p;
   }, {});
+};
+
+export const alertWithSound = (label: string, text: string) => {
+  const playSound = async () => {
+    const { sound } = await Audio.Sound.createAsync(require('../../assets/error.wav'));
+    await sound.playAsync();
+  };
+
+  playSound();
+  Alert.alert(label, text, [{ text: 'OK' }]);
+};
+
+export const alertWithSoundMulti = (label: string, text: string, onOk: () => void) => {
+  const playSound = async () => {
+    const { sound } = await Audio.Sound.createAsync(require('../../assets/error.wav'));
+    await sound.playAsync();
+  };
+
+  playSound();
+
+  Alert.alert(`${label}`, `${text}`, [
+    {
+      text: 'Да',
+      onPress: () => onOk(),
+    },
+    {
+      text: 'Отмена',
+    },
+  ]);
 };

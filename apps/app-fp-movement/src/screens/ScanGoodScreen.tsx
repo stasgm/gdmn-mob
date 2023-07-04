@@ -1,5 +1,5 @@
 import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
-import { Text, Alert, View, StyleSheet } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 
 import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigation/native';
 
@@ -16,7 +16,13 @@ import { ShipmentStackParamList } from '../navigation/Root/types';
 import { IShipmentLine, IShipmentDocument, barcodeSettings } from '../store/types';
 
 import { IAddressStoreEntity, IGood, IRemains, IRemGood } from '../store/app/types';
-import { getBarcode, getLineGood, getRemGoodListByContact } from '../utils/helpers';
+import {
+  alertWithSound,
+  alertWithSoundMulti,
+  getBarcode,
+  getLineGood,
+  getRemGoodListByContact,
+} from '../utils/helpers';
 import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../store/index';
 
 import { barCodeTypes } from '../utils/constants';
@@ -159,38 +165,22 @@ const ScanGoodScreen = () => {
         dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
         setScaner({ state: 'init' });
       } else {
-        Alert.alert('Данное количество превышает количество в заявке', 'Добавить позицию?', [
-          {
-            text: 'Да',
-            onPress: () => {
-              dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
-              fpDispatch(
-                fpMovementActions.updateTempOrderLine({
-                  docId: tempOrder?.id,
-                  line: newTempLine,
-                }),
-              );
-              setScaner({ state: 'init' });
-            },
-          },
-          {
-            text: 'Отмена',
-          },
-        ]);
+        alertWithSoundMulti('Данное количество превышает количество в заявке', 'Добавить позицию?', () => {
+          dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
+          fpDispatch(
+            fpMovementActions.updateTempOrderLine({
+              docId: tempOrder?.id,
+              line: newTempLine,
+            }),
+          );
+          setScaner({ state: 'init' });
+        });
       }
     } else if (shipment?.documentType.name === 'shipment' || shipment?.documentType.name === 'currShipment') {
-      Alert.alert('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', [
-        {
-          text: 'Да',
-          onPress: () => {
-            dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
-            setScaner({ state: 'init' });
-          },
-        },
-        {
-          text: 'Отмена',
-        },
-      ]);
+      alertWithSoundMulti('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', () => {
+        dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
+        setScaner({ state: 'init' });
+      });
     } else {
       const isFromAddressed = departs?.find((i) => i.id === shipment?.head.fromDepart?.id && i.isAddressStore);
       const isToAddressed = departs?.find((i) => i.id === shipment?.head.toDepart?.id && i.isAddressStore);
@@ -201,9 +191,7 @@ const ScanGoodScreen = () => {
         isToAddressed
       ) {
         if (scannedObject.quantPack < goodBarcodeSettings.boxNumber) {
-          Alert.alert('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}!`, [
-            { text: 'OK' },
-          ]);
+          alertWithSound('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}!`);
           setScaner({ state: 'init' });
           return;
         }

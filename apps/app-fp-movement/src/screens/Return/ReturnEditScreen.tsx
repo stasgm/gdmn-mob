@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Alert, View, StyleSheet, ScrollView, Platform } from 'react-native';
+import { View, StyleSheet, ScrollView, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Divider } from 'react-native-paper';
 
@@ -19,7 +19,7 @@ import { DashboardStackParamList } from '@lib/mobile-navigation';
 import { ReturnStackParamList } from '../../navigation/Root/types';
 import { IReturnFormParam, IReturnDocument } from '../../store/types';
 import { STATUS_LIST } from '../../utils/constants';
-import { getNextDocNumber } from '../../utils/helpers';
+import { alertWithSound, getNextDocNumber } from '../../utils/helpers';
 
 export const ReturnEditScreen = () => {
   const id = useRoute<RouteProp<ReturnStackParamList, 'ReturnEdit'>>().params?.id;
@@ -96,18 +96,18 @@ export const ReturnEditScreen = () => {
   useEffect(() => {
     if (screenState === 'saving') {
       if (!shipmentType) {
-        Alert.alert('Внимание!', 'Тип документа для возвратов не найден.', [{ text: 'OK' }]);
+        alertWithSound('Внимание!', 'Тип документа для возвратов не найден.');
         setScreenState('idle');
         return;
       }
       if (!docFromDepart) {
-        Alert.alert('Ошибка!', 'Нет подразделения пользователя. Обратитесь к администратору.', [{ text: 'OK' }]);
+        alertWithSound('Ошибка!', 'Нет подразделения пользователя. Обратитесь к администратору.');
         setScreenState('idle');
         return;
       }
 
       if (!(docNumber && docFromDepart && docDate)) {
-        Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
+        alertWithSound('Ошибка!', 'Не все поля заполнены.');
         setScreenState('idle');
         return;
       }
