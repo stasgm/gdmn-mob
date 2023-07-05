@@ -28,7 +28,7 @@
     "@lib/mock": "*",
     "@lib/types": "*",
     "@redux-devtools/extension": "^3.2.5",
-    "@types/node": "^18.11.19",
+    "@types/node": "^18.15.0",
     "@types/redux-actions": "^2.6.2",
     "@types/redux-logger": "3.0.9",
     "redux": "4.2.1",
@@ -40,7 +40,7 @@
   "devDependencies": {
     "@config/eslint-config": "*",
     "@config/prettier-config": "*",
-    "lint-staged": "^13.0.3",
-    "typescript": "~4.8.4"
+    "lint-staged": "^13.1.2",
+    "typescript": "^4.9.4"
   }
 }

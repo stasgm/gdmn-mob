@@ -21,7 +21,7 @@
   "dependencies": {
     "@expo/react-native-action-sheet": "^4.0.1",
     "@expo/vector-icons": "^13.0.0",
-    "@expo/webpack-config": "^0.17.3",
+    "@expo/webpack-config": "^18.0.1",
     "@lib/client-api": "*",
     "@lib/mobile-auth": "*",
     "@lib/mobile-hooks": "*",
@@ -29,24 +29,23 @@
     "@lib/mobile-ui": "*",
     "@lib/store": "*",
     "@react-native-community/masked-view": "0.1.11",
-    "@react-navigation/native": "^6.1.3",
-    "@types/node": "^18.11.19",
-    "@types/react": "~18.0.25",
-    "@types/react-native": "0.70.8",
+    "@react-navigation/native": "^6.1.6",
+    "@types/node": "^18.15.0",
+    "@types/react": "~18.0.27",
     "nanoid": "^3.3.4",
-    "react": "18.1.0",
-    "react-native": "0.70.5",
-    "react-native-get-random-values": "^1.8.0",
+    "react": "18.2.0",
+    "react-native": "0.71.8",
+    "react-native-get-random-values": "~1.8.0",
     "react-native-paper": "^4.12.5",
-    "react-native-reanimated": "~2.12.0",
+    "react-native-reanimated": "~2.14.4",
     "react-redux": "^8.0.5",
-    "typescript": "~4.8.4"
+    "typescript": "^4.9.4"
   },
   "devDependencies": {
     "@config/eslint-config": "*",
     "@config/eslint-config-react": "*",
     "@config/eslint-config-react-native": "*",
     "@config/prettier-config": "*",
-    "lint-staged": "^13.0.3"
+    "lint-staged": "^13.1.2"
   }
 }
