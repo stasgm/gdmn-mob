@@ -1,7 +1,13 @@
 import { IEntity, INamedEntity } from '@lib/types';
 
+import { ICellRef } from '../types';
+
 export interface ICodeEntity extends INamedEntity {
   shcode: string;
+}
+
+export interface IAddressStoreEntity extends INamedEntity {
+  isAddressStore?: boolean;
 }
 
 export type FpMovementState = {
@@ -14,9 +20,8 @@ export type FpMovementState = {
 
 // Товары
 export interface IGood extends ICodeEntity {
-  valueName?: string; // Наименование ед. изм.
-  invWeight?: number; // Вес единицы товара
-  scale?: number; //количество единиц в месте
+  goodGroupId?: string;
+  isCattle?: number;
 }
 
 export interface IEmployee extends INamedEntity {
@@ -44,4 +49,54 @@ export interface ITempLine extends IEntity {
   good: IGood; // товар
   weight: number; //вес
   packagekey?: INamedEntity; // Вид упаковки
+}
+
+export interface IModelData {
+  [id: string]: IChamberData;
+}
+
+export interface IChamberData {
+  [id: string]: IRowData;
+}
+
+export interface IRowData {
+  [id: string]: ICellData[];
+}
+
+export interface ICellRefList {
+  [id: string]: ICellRef[];
+}
+
+export interface ICellData extends ICellRef {
+  cell: string;
+}
+
+export interface IMGoodData<T = unknown> {
+  [id: string]: T;
+}
+
+export interface IMGoodRemain {
+  good: IGood;
+  remains?: IModelRem[];
+}
+export interface IRemainsData {
+  goodId: string;
+  q: number;
+}
+
+export interface IModelRem {
+  q: number;
+}
+
+export interface IRemGood {
+  good: IGood;
+  remains: number;
+}
+
+export interface IRemains {
+  [id: string]: IRemainsData[];
+}
+
+export interface IGoodQuantity {
+  [goodId: string]: number;
 }

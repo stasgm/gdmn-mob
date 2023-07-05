@@ -1,5 +1,5 @@
 import { NavLink as RouterLink, matchPath, useLocation } from 'react-router-dom';
-import { Button, ListItem } from '@material-ui/core';
+import { Button, ListItem } from '@mui/material';
 
 interface IProps {
   href: string;

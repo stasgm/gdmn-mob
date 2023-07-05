@@ -1,16 +1,8 @@
 import React, { useState, useLayoutEffect, useCallback, useMemo, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ColorValue,
-  Alert,
-  FlatList,
-  useWindowDimensions,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, ColorValue, Alert, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
+import { Badge, Chip, Divider, Searchbar, useTheme } from 'react-native-paper';
 
 import {
   globalStyles as styles,
@@ -21,6 +13,7 @@ import {
   ItemSeparator,
   AppActivityIndicator,
   AppScreen,
+  Switch,
 } from '@lib/mobile-ui';
 import { appActions, docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 
@@ -29,10 +22,6 @@ import { generateId, getDateString, keyExtractor, shortenString } from '@lib/mob
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-
-import { Chip, Searchbar, useTheme } from 'react-native-paper';
-
-import { TouchableOpacity as TouchableOpacityGesture } from 'react-native-gesture-handler';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import {
@@ -55,7 +44,12 @@ const SelectGoodScreen = () => {
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGood'>>().params;
   const dispatch = useDispatch();
 
-  const isUseNetPrice = useSelector((state) => state.settings.data?.isUseNetPrice?.data) as boolean;
+  const settings = useSelector((state) => state.settings.data);
+  const isUseNetPrice = settings?.isUseNetPrice?.data as boolean;
+  const isShowPrevOrderLines = settings?.isShowPrevOrderLines?.data as boolean;
+
+  const [isUseMatrix, setIsUseMatrix] = useState(isUseNetPrice);
+  const [isShowPrev, setIsShowPrev] = useState(false);
 
   const syncDate = useSelector((state) => state.app.syncDate);
   const isDemo = useSelector((state) => state.auth.isDemo);
@@ -72,6 +66,25 @@ const SelectGoodScreen = () => {
   const groups = useMemo(() => refGroup.data.concat(UNKNOWN_GROUP), [refGroup.data]);
   const doc = docSelectors.selectByDocId<IOrderDocument>(docId);
   const contactId = doc?.head.contact.id;
+  const docs = useSelector((state) => state.documents.list) as IOrderDocument[];
+  const prevOrderByContact = useMemo(
+    () =>
+      doc && isShowPrevOrderLines
+        ? docs
+            .filter(
+              (o) =>
+                o.documentType.name === 'order' &&
+                o.head.contact.id === contactId &&
+                o.id !== doc.id &&
+                new Date(o.documentDate).getTime() < new Date(doc.documentDate).getTime(),
+            )
+            .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime())
+        : [],
+    [contactId, doc, isShowPrevOrderLines, docs],
+  );
+
+  const prevLines = useMemo(() => (prevOrderByContact.length ? prevOrderByContact[0].lines : []), [prevOrderByContact]);
+
   const { parentGroupId } = useSelector((state) => state.app.formParams as IGroupFormParam);
 
   const [filterVisible, setFilterVisible] = useState(false);
@@ -85,12 +98,13 @@ const SelectGoodScreen = () => {
     [windowWidth],
   );
 
-  const model = useMemo(() => {
-    if (contactId) {
-      return getGroupModelByContact(groups, goods, goodMatrix[contactId], isUseNetPrice) as IMGroupModel;
-    }
-    return {};
-  }, [groups, goods, goodMatrix, contactId, isUseNetPrice]);
+  const model = useMemo(
+    () =>
+      (contactId
+        ? getGroupModelByContact(groups, goods, goodMatrix[contactId], isUseMatrix, isShowPrev ? prevLines : [])
+        : {}) as IMGroupModel,
+    [contactId, groups, goods, goodMatrix, isUseMatrix, isShowPrev, prevLines],
+  );
 
   const firstLevelGroups = useMemo(() => Object.values(model).map((item) => item.parent), [model]);
 
@@ -117,24 +131,20 @@ const SelectGoodScreen = () => {
 
   const goodsByContact = useMemo(() => {
     if (contactId) {
-      return getGoodMatrixByContact(goods, goodMatrix[contactId], isUseNetPrice, undefined, searchQuery)?.sort((a, b) =>
-        a.name < b.name ? -1 : 1,
+      const goodList = getGoodMatrixByContact(goods, goodMatrix[contactId], isUseMatrix, undefined, searchQuery);
+      return (isShowPrev ? goodList?.filter((g) => prevLines.some((p) => p.good.id === g.id)) : goodList)?.sort(
+        (a, b) => (a.name < b.name ? -1 : 1),
       );
+    } else {
+      return [];
     }
-    return [];
-  }, [contactId, goodMatrix, goods, isUseNetPrice, searchQuery]);
+  }, [contactId, goodMatrix, goods, isShowPrev, isUseMatrix, prevLines, searchQuery]);
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
       setSearchQuery('');
     }
   }, [filterVisible, searchQuery]);
-
-  useEffect(() => {
-    if ((filterVisible ? goodsByContact : goodModel).length) {
-      refListGood.current?.scrollToIndex({ index: 0, animated: true });
-    }
-  }, [filterVisible, goodModel, goodsByContact]);
 
   const [selectedLine, setSelectedLine] = useState<IOrderLine | undefined>(undefined);
   const [selectedGood, setSelectedGood] = useState<IGood | undefined>(undefined);
@@ -237,14 +247,21 @@ const SelectGoodScreen = () => {
             {values.map((item) => {
               const colorStyle = { color: item.id === selectedGroupId ? 'white' : colors.text };
               const backColorStyle = { backgroundColor: item.id === selectedGroupId ? colorSelected : colorBack };
+              const badgeColor = { backgroundColor: item.decoration?.color ? item.decoration.color : 'transparent' };
               return (
-                <TouchableOpacity
+                <View
                   key={item.id}
-                  style={[localStyles.button, backColorStyle, groupButtonStyle]}
-                  onPress={() => onPress(item)}
+                  style={[localStyles.button, backColorStyle, styles.flexDirectionRow, groupButtonStyle]}
                 >
-                  <Text style={[localStyles.buttonLabel, colorStyle]}>{shortenString(item.name, 60) || item.id}</Text>
-                </TouchableOpacity>
+                  <TouchableOpacity key={item.id} onPress={() => onPress(item)}>
+                    <Text style={[localStyles.buttonLabel, colorStyle]}>{shortenString(item.name, 60) || item.id}</Text>
+                  </TouchableOpacity>
+                  {item.decoration?.name && (
+                    <Badge style={[localStyles.badge, badgeColor]} size={10}>
+                      {item.decoration.name.toUpperCase()}
+                    </Badge>
+                  )}
+                </View>
               );
             })}
           </View>
@@ -254,10 +271,23 @@ const SelectGoodScreen = () => {
     [colors.text, groupButtonStyle],
   );
 
+  const handlePressGood = useCallback(
+    (isAdded: boolean, item: IGood) => {
+      if (isAdded) {
+        setSelectedGood(item);
+      } else {
+        const newLine = { mode: 0, docId, item: { id: generateId(), good: item, quantity: 0 } };
+        setOrderLine(newLine);
+      }
+    },
+    [docId],
+  );
+
   const renderGood = useCallback(
     ({ item }: { item: IGood }) => {
       const lines = doc?.lines?.filter((i) => i.good.id === item.id);
       const isAdded = !!lines?.length;
+      const prevLine = prevLines.filter((i) => i.good.id === item.id);
       const iconStyle = [styles.icon, { backgroundColor: isAdded ? '#06567D' : '#E91E63' }];
 
       const goodStyle = {
@@ -266,19 +296,10 @@ const SelectGoodScreen = () => {
 
       return (
         <View key={item.id}>
-          <TouchableOpacityGesture
-            onPress={() => {
-              if (isAdded) {
-                setSelectedGood(item);
-              } else {
-                const newLine = { mode: 0, docId, item: { id: generateId(), good: item, quantity: 0 } };
-                setOrderLine(newLine);
-              }
-            }}
-          >
+          <TouchableOpacity onPress={() => handlePressGood(isAdded, item)}>
             <View style={[localStyles.goodItem, goodStyle]}>
               <View style={iconStyle}>
-                <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
+                <MaterialCommunityIcons name={'file-document'} size={20} color={'#FFF'} />
               </View>
               <View style={styles.details}>
                 <MediumText style={styles.textBold}>{item.name || item.id}</MediumText>
@@ -295,16 +316,24 @@ const SelectGoodScreen = () => {
                     ))}
                   </View>
                 )}
+                {!!prevLine.length && (
+                  <View style={localStyles.lineView}>
+                    <MaterialCommunityIcons name={'page-previous-outline'} size={14} color={colors.placeholder} />
+                    {prevLine.map((line) => (
+                      <MediumText key={line.id} style={localStyles.prevText}>
+                        {` ${line.quantity} кг, уп.: ${line.package ? line.package.name : 'без упаковки'};`}
+                      </MediumText>
+                    ))}
+                  </View>
+                )}
               </View>
             </View>
-          </TouchableOpacityGesture>
+          </TouchableOpacity>
         </View>
       );
     },
-    [colors.primary, doc?.lines, docId],
+    [colors.placeholder, colors.primary, doc?.lines, handlePressGood, prevLines],
   );
-
-  const refListGood = React.useRef<FlatList<IGood>>(null);
 
   const handlePressGroup = useCallback(
     (paramName: string, item: IGoodGroup, setFunc: any) => {
@@ -350,6 +379,11 @@ const SelectGoodScreen = () => {
     ],
   );
 
+  const hadndleDismiss = () => {
+    setOrderLine(undefined);
+    hadndleDismissDialog();
+  };
+
   const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
@@ -357,7 +391,7 @@ const SelectGoodScreen = () => {
 
   return (
     <AppScreen style={localStyles.container}>
-      {!!orderLine && <OrderLineEdit orderLine={orderLine} onDismiss={() => setOrderLine(undefined)} />}
+      {!!orderLine && <OrderLineEdit orderLine={orderLine} onDismiss={hadndleDismiss} />}
       {filterVisible && (
         <View>
           <View style={styles.flexDirectionRow}>
@@ -365,9 +399,6 @@ const SelectGoodScreen = () => {
               placeholder="Поиск"
               onChangeText={(text) => {
                 setSearchQuery(text);
-                if (text === '' && goodsByContact.length) {
-                  refListGood?.current?.scrollToIndex({ index: 0, animated: true });
-                }
               }}
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
@@ -375,7 +406,25 @@ const SelectGoodScreen = () => {
               selectionColor={colors.primary}
             />
           </View>
+
           <ItemSeparator />
+        </View>
+      )}
+      {!filterVisible && (
+        <View>
+          {contactId && goodMatrix[contactId] && (
+            <View style={localStyles.switch}>
+              <MediumText>Использовать матрицы</MediumText>
+              <Switch value={isUseMatrix} onValueChange={() => setIsUseMatrix(!isUseMatrix)} />
+            </View>
+          )}
+          {contactId && goodMatrix[contactId] && isShowPrevOrderLines && <Divider />}
+          {isShowPrevOrderLines && !!prevLines.length && (
+            <View style={localStyles.switch}>
+              <MediumText>Предыдущая заявка</MediumText>
+              <Switch value={isShowPrev} onValueChange={() => setIsShowPrev(!isShowPrev)} />
+            </View>
+          )}
         </View>
       )}
       <FlashList
@@ -386,6 +435,7 @@ const SelectGoodScreen = () => {
         ItemSeparatorComponent={ItemSeparator}
         keyExtractor={keyExtractor}
         extraData={[doc?.lines, docId]}
+        keyboardShouldPersistTaps={'handled'}
       />
       {(selectedLine || selectedGood) && (
         <OrderLineDialog
@@ -423,7 +473,12 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
-  lineView: { display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginTop: 6 },
+  lineView: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 6,
+  },
   lineChip: {
     margin: 2,
   },
@@ -443,5 +498,20 @@ const localStyles = StyleSheet.create({
     lineHeight: 14,
     textAlignVertical: 'center',
     height: 70,
+  },
+  prevText: {
+    fontSize: 10,
+  },
+  badge: {
+    position: 'absolute',
+    right: 2,
+    top: 2,
+  },
+  switch: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingHorizontal: 12,
+    fontSize: 20,
+    justifyContent: 'space-between',
   },
 });

@@ -1,13 +1,13 @@
 export default {
   server: {
-    protocol: 'http://',
-    name: 'localhost',
-    port: 3651,
+    protocol: 'https://', // Протокол сервера
+    name: 'server.gdmn.app', // Имя сервера
+    port: 3655, // Порт сервера
   },
-  timeout: 10000,
-  apiPath: 'api',
-  version: 'v1',
+  timeout: 600000, // Время ожидания запроса (в миллисекундах)
+  apiPath: 'api', // Путь к API на сервере
+  version: 'v1', // Версия API
   debug: {
-    useMockup: false,
+    useMockup: false, // Использование имитации данных для отладки
   },
 };

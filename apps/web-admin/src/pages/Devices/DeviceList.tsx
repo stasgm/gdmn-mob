@@ -1,10 +1,10 @@
 import { Helmet } from 'react-helmet';
-import { Box, Container } from '@material-ui/core';
+import { Box, Container } from '@mui/material';
 import { useNavigate } from 'react-router';
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import CachedIcon from '@material-ui/icons/Cached';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import CachedIcon from '@mui/icons-material/Cached';
 
 import { authActions, useAuthThunkDispatch } from '@lib/store';
 
@@ -56,7 +56,7 @@ const DeviceList = () => {
   };
 
   const handleSearchClick = () => {
-    dispatch(deviceActions.setPageParam({ filterText: pageParamLocal?.filterText }));
+    dispatch(deviceActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
     fetchDevices(pageParamLocal?.filterText);
   };
 
@@ -67,7 +67,7 @@ const DeviceList = () => {
   };
 
   const handleClearSearch = () => {
-    dispatch(deviceActions.setPageParam({ filterText: undefined }));
+    dispatch(deviceActions.setPageParam({ filterText: undefined, page: 0 }));
     setPageParamLocal({ filterText: undefined });
     fetchDevices();
   };

@@ -7,10 +7,22 @@ import { actions, SettingsActionType } from './actions';
 
 import { SettingsState } from './types';
 
-export const baseSettingGroup = { id: 'base', name: 'Настройки приложения', sortOrder: 1 };
-export const synchSettingGroup = { id: 'synch', name: 'Синхронизация', sortOrder: 0 };
+export const mainSettingGroup = { id: 'main', name: 'Общие настройки', sortOrder: 1 };
+export const synchSettingGroup = { id: 'synch', name: 'Синхронизация', sortOrder: 2 };
+export const baseSettingGroup = { id: 'base', name: 'Настройки приложения', sortOrder: 3 };
+export const serverSettingGroup = { id: 'server', name: 'Сервер', sortOrder: 0 };
 
 const baseSettings: Settings<IBaseSettings> = {
+  serverAddress: {
+    id: 'serverAddress',
+    description: 'Адрес',
+    data: 'https://',
+    type: 'string',
+    sortOrder: 1,
+    visible: true,
+    group: serverSettingGroup,
+    readonly: true,
+  },
   autoSync: {
     id: 'autoSync',
     sortOrder: 1,
@@ -47,7 +59,7 @@ const baseSettings: Settings<IBaseSettings> = {
     type: 'boolean',
     sortOrder: 1,
     visible: true,
-    group: baseSettingGroup,
+    group: mainSettingGroup,
   },
   refLoadType: {
     id: 'refLoadType',
@@ -56,7 +68,7 @@ const baseSettings: Settings<IBaseSettings> = {
     type: 'boolean',
     sortOrder: 2,
     visible: false,
-    group: baseSettingGroup,
+    group: mainSettingGroup,
   },
   cleanDocTime: {
     id: 'cleanDocTime',
@@ -65,7 +77,7 @@ const baseSettings: Settings<IBaseSettings> = {
     type: 'number',
     sortOrder: 3,
     visible: true,
-    group: baseSettingGroup,
+    group: mainSettingGroup,
   },
 };
 

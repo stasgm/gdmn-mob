@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Snackbar, Alert } from '@material-ui/core';
+import { Snackbar, Alert } from '@mui/material';
 
 interface props {
   visible?: boolean;

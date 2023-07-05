@@ -8,7 +8,9 @@ export const initialState: Readonly<IAppState> = {
   loading: false,
   showSyncInfo: false,
   autoSync: false,
+  syncRequests: [],
   formParams: {},
+  screenFormParams: {},
   errorLog: [],
   loadingData: false,
   loadingError: '',
@@ -33,6 +35,23 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
       return {
         ...state,
         formParams: {},
+      };
+
+    case getType(appActions.setScreenFormParams):
+      return {
+        ...state,
+        screenFormParams: {
+          ...state.screenFormParams,
+          [action.payload.screenName]: state.screenFormParams
+            ? { ...state.screenFormParams[action.payload.screenName], ...action.payload.params }
+            : action.payload.params,
+        },
+      };
+
+    case getType(appActions.clearScreenFormParams):
+      return {
+        ...state,
+        screenFormParams: { ...state.screenFormParams, [action.payload]: {} },
       };
 
     case getType(appActions.setLoading):
@@ -110,6 +129,21 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
 
     case getType(appActions.clearErrorNotice):
       return { ...state, errorNotice: [] };
+
+    case getType(appActions.addSyncRequest): {
+      return {
+        ...state,
+        syncRequests: state.syncRequests
+          ? state.syncRequests.filter((req) => req.cmdName !== action.payload.cmdName).concat(action.payload)
+          : [action.payload],
+      };
+    }
+
+    case getType(appActions.removeSyncRequest):
+      return {
+        ...state,
+        syncRequests: state.syncRequests ? state.syncRequests.filter((req) => req.cmdName !== action.payload) : [],
+      };
 
     default:
       return state;

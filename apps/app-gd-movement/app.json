@@ -2,7 +2,7 @@
   "expo": {
     "name": "GDMN Склад",
     "slug": "gdmn-gd-movement",
-    "version": "1.3.2",
+    "version": "1.4.1",
     "githubUrl": "https://github.com/stasgm/gdmn-mob",
     "orientation": "default",
     "icon": "./assets/icon.png",
@@ -26,13 +26,14 @@
     "android": {
       "package": "com.gsbelarus.gdmovement",
       "permissions": ["CAMERA", "VIBRATE"],
-      "versionCode": 15
+      "versionCode": 22
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "androidStatusBar": {
       "translucent": false
-    }
+    },
+    "plugins": ["react-native-keyevent-expo-config-plugin"]
   }
 }

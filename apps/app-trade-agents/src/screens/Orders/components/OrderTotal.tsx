@@ -83,7 +83,7 @@ const OrderTotal = ({ order, isGroupVisible = false, onPress }: IItem) => {
                   </DataTable.Row>
                   <DataTable.Row style={[localStyles.row, localStyles.borderBottomColor]}>
                     <DataTable.Cell textStyle={textStyle} numeric>
-                      {round(item.quantity, 3)}
+                      {formatValue({ type: 'number' }, round(item.quantity, 3))}
                     </DataTable.Cell>
                     <DataTable.Cell textStyle={textStyle} numeric>
                       {formatValue({ type: 'number', decimals: 2 }, round(item.sum, 2))}
@@ -102,7 +102,7 @@ const OrderTotal = ({ order, isGroupVisible = false, onPress }: IItem) => {
           </DataTable.Row>
           <DataTable.Row style={[localStyles.borderColor, localStyles.total, localStyles.paddingBottom]}>
             <DataTable.Cell textStyle={textBoldStyle} numeric>
-              {round(total?.quantity, 3)}
+              {formatValue({ type: 'number' }, round(total?.quantity, 3))}
             </DataTable.Cell>
             <DataTable.Cell textStyle={textBoldStyle} numeric>
               {formatValue({ type: 'number', decimals: 2 }, round(total?.sum, 2))}

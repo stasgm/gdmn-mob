@@ -43,12 +43,16 @@ export interface IOrderListFormParam extends IFormParam {
 }
 
 export interface IReportListFormParam extends IFormParam {
+  report: IListItem;
   filterReportContact?: IReferenceData;
   filterReportOutlet?: IReferenceData;
-  filterReportDateBegin?: string;
-  filterReportDateEnd?: string;
-  filterReportGood?: IReferenceData;
-  filterStatusList: IListItem[];
+  filterReportDB?: string;
+  filterReportDE?: string;
+  filterReportOnDB?: string;
+  filterReportOnDE?: string;
+  filterReportGroup?: IReferenceData[];
+  filterReportGood?: IReferenceData[];
+  filterReportStatusList: IListItem[];
 }
 
 export interface IReportItem {
@@ -56,6 +60,23 @@ export interface IReportItem {
   onDate: string;
   totalList?: IReportTotalLine[];
   outlet: INamedEntity;
+}
+
+export interface IReportItemByGroup {
+  group: INamedEntity;
+  quantity: number;
+}
+
+export interface IReportItemByGood {
+  good: INamedEntity;
+  quantity: number;
+}
+
+export interface IReportItemByGoods {
+  type: 'parent' | 'group' | 'good';
+  name: string;
+  n?: string;
+  quantity?: number;
 }
 
 export interface IReportTotalLine {
@@ -163,7 +184,14 @@ export interface IRouteLine extends IEntity {
   ordNumber: number; // порядковый номер
   comment?: string;
   visited: boolean;
-  /* result?: typeVisit; -это убрать в визиты */
+}
+
+export interface IRouteLineItem extends IEntity {
+  outletName: string;
+  ordNumber: number;
+  address: string;
+  dateEnd: string;
+  status: number;
 }
 
 export interface IRouteTotalLine {

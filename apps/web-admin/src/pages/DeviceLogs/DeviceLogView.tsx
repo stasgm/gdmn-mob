@@ -9,11 +9,11 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-} from '@material-ui/core';
-import CachedIcon from '@material-ui/icons/Cached';
-import DeleteIcon from '@material-ui/icons/Delete';
+} from '@mui/material';
+import CachedIcon from '@mui/icons-material/Cached';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate, useParams } from 'react-router-dom';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { IDeviceLog } from '@lib/types';
 

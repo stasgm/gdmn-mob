@@ -1,0 +1,15 @@
+**/.vscode/
+**/node_modules/
+
+**/docker-compose*
+**/Dockerfile*
+**/.dockerignore
+**/.git
+**/.gitignore
+
+**/*tests*
+
+**/.prettierrc
+**/dist
+
+**/readme.md

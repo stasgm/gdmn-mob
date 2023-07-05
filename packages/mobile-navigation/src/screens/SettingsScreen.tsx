@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Divider, IconButton } from 'react-native-paper';
@@ -15,36 +15,50 @@ const SettingsScreen = () => {
   const dispatch = useDispatch();
   const showActionSheet = useActionSheet();
   const data = useSelector((state) => state.settings.data);
+  const config = useSelector((state) => state.auth.config);
 
   const { colors } = useTheme();
 
+  useEffect(() => {
+    dispatch(
+      settingsActions.updateOption({
+        optionName: 'serverAddress',
+        value: {
+          ...data.serverAddress,
+          data: `${config.protocol}${config.server}:${config.port}`,
+        } as ISettingsOption,
+      }),
+    );
+  }, []);
+
+  //Если группа не указана, подставляем базовую группу
   const settsData = useMemo(
     () =>
-      Object.entries(data).reduce((prev: Settings, cur: [string, ISettingsOption<SettingValue> | undefined]) => {
-        if (cur[1]) {
-          const newCur = cur[1]?.group ? cur[1] : { ...cur[1], group: baseSettingGroup };
-          prev[cur[0]] = newCur;
-        }
-        return prev;
-      }, {}),
+      Object.entries(data).reduce(
+        (prev: Settings, [idx, value]: [string, ISettingsOption<SettingValue> | undefined]) => {
+          if (value) {
+            const newCur = value?.group ? value : { ...value, group: baseSettingGroup };
+            prev[idx] = newCur;
+          }
+          return prev;
+        },
+        {},
+      ),
     [data],
   );
 
   //Массив уникальных групп настроек
   const parents = useMemo(
     () =>
-      Object.entries(settsData).reduce(
-        (prev: INamedEntity[], cur: [string, ISettingsOption<SettingValue> | undefined]) => {
-          const obj = cur[1];
-
-          if (obj?.group === undefined || prev.find((gr) => gr.id === obj?.group?.id)) {
+      Object.values(settsData)
+        .sort((itema, itemb) => (itema?.group?.sortOrder || 0) - (itemb?.group?.sortOrder || 0))
+        .reduce((prev: INamedEntity[], value: ISettingsOption<SettingValue>) => {
+          if (value?.group === undefined || prev.find((gr) => gr.id === value?.group?.id)) {
             return prev;
           }
 
-          return [...prev, obj.group];
-        },
-        [],
-      ),
+          return [...prev, value.group];
+        }, []),
     [settsData],
   );
 
@@ -77,40 +91,20 @@ const SettingsScreen = () => {
     });
   }, [navigation, actionsMenu]);
 
-  const handleCheckSettings = (optionName: string, value: ISettingsOption) => {
-    if (optionName === 'scannerUse') {
-      const screenKeyboard = Object.values(settsData).find((i) => i?.id === 'screenKeyboard');
-
-      if (screenKeyboard) {
-        dispatch(
-          settingsActions.updateOption({
-            optionName: 'screenKeyboard',
-            value: { ...screenKeyboard, readonly: !value.data, data: true },
-          }),
-        );
-      }
-    }
-  };
-
   return (
     <AppScreen>
-      <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={[{ padding: 5, flexDirection: 'column' }]}>
+      <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={localStyles.scrollView}>
         <View>
           {parents.map((group, groupKey) => {
-            const list = Object.entries(settsData)
-              .filter(([_, item]) => item?.visible && item.group?.id === group.id)
-              .sort(([, itema], [, itemb]) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0));
+            const list = Object.values(settsData)
+              .filter((item) => item?.visible && item.group?.id === group.id)
+              .sort((itema, itemb) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0));
             return (
               <View key={groupKey}>
                 {group.id === 'base' ? (
-                  <SettingsGroup
-                    key={groupKey}
-                    list={list}
-                    onValueChange={handleUpdate}
-                    onCheckSettings={handleCheckSettings}
-                  />
+                  <SettingsGroup key={groupKey} list={list} onValueChange={handleUpdate} />
                 ) : (
-                  <View key={groupKey} style={localStyles.group}>
+                  <View key={groupKey}>
                     <Divider />
                     <TouchableOpacity
                       onPress={() => {
@@ -149,7 +143,8 @@ const localStyles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  group: {
-    paddingTop: 6,
+  scrollView: {
+    padding: 5,
+    flexDirection: 'column',
   },
 });

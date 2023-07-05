@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
-import { Box, Card, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@material-ui/core';
+import { Box, Card, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@mui/material';
 import { IDeviceLog } from '@lib/types';
 
 interface IProps {
@@ -56,7 +56,7 @@ const DeviceLogTable = ({ deviceLog = [], limitRows = 0 }: IProps) => {
   return (
     <Card>
       <PerfectScrollbar>
-        <Box sx={{ p: 1, overflowX: 'auto' }}>
+        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight: window.innerHeight - 268 }}>
           <Table>
             <TableHead>
               <TableRow>

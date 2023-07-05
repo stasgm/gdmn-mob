@@ -1,14 +1,12 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
-import { ListRenderItem, SectionList, SectionListData, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { ListRenderItem, SectionList, SectionListData, View, StyleSheet } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 import { documentActions, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   AddButton,
-  FilterButtons,
   ItemSeparator,
-  Status,
   AppScreen,
   SubTitle,
   ScreenListItem,
@@ -17,16 +15,21 @@ import {
   CloseButton,
   EmptyList,
   navBackDrawer,
+  SendButton,
+  SimpleDialog,
+  Menu,
+  MediumText,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@lib/mobile-hooks';
+import { deleteSelectedItems, getDateString, getDelList, keyExtractor, useSendDocs } from '@lib/mobile-hooks';
 
-import { IDelList } from '@lib/mobile-types';
+import { IDelList, IListItem } from '@lib/mobile-types';
 
 import { IFreeShipmentDocument } from '../../store/types';
 import { FreeShipmentStackParamList } from '../../navigation/Root/types';
+import { dateTypes, statusTypes } from '../../utils/constants';
 
 export interface FreeShipmentListSectionProps {
   title: string;
@@ -35,43 +38,55 @@ export interface FreeShipmentListSectionProps {
 export type SectionDataProps = SectionListData<IListItemProps, FreeShipmentListSectionProps>[];
 
 export const FreeShipmentListScreen = () => {
+  const route = useRoute();
+  const isCurr = route.name.toLowerCase().includes('curr');
   const navigation = useNavigation<StackNavigationProp<FreeShipmentStackParamList, 'FreeShipmentList'>>();
   const docDispatch = useDocThunkDispatch();
 
   const list = (
-    useSelector((state) => state.documents.list)?.filter(
-      (i) => i.documentType?.name === 'freeShipment',
+    useSelector((state) => state.documents.list)?.filter((i) =>
+      isCurr ? i.documentType?.name === 'currFreeShipment' : i.documentType?.name === 'freeShipment',
     ) as IFreeShipmentDocument[]
   ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
+
+  const loading = useSelector((state) => state.app.loading);
 
   const [delList, setDelList] = useState<IDelList>({});
   const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
 
-  const [status, setStatus] = useState<Status>('all');
+  const [sortDateType, setSortDateType] = useState(dateTypes[0]);
+
+  const [status, setStatus] = useState<IListItem>(statusTypes.find((i) => i.id === 'DRAFT_READY') || statusTypes[0]);
 
   const filteredList: IListItemProps[] = useMemo(() => {
-    const res =
-      status === 'all'
-        ? list
-        : status === 'active'
-        ? list.filter((e) => e.status !== 'PROCESSED')
-        : status === 'archive'
-        ? list.filter((e) => e.status === 'PROCESSED')
-        : [];
+    const res = list.filter((e) => ((status.statuses as []) || []).find((i) => i === e.status));
+
+    res.sort((a, b) =>
+      sortDateType.id === 'new'
+        ? new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()
+        : new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
+    );
 
     return res.map(
       (i) =>
         ({
           id: i.id,
-          title: i.head.depart.name || '',
+          title: i.documentType.description || '',
           documentDate: getDateString(i.documentDate),
           status: i.status,
-          subtitle: `№ ${i.number} на ${getDateString(i.documentDate)}` || '',
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
+          addInfo: (
+            <View>
+              <MediumText>{i.head.fromDepart?.name || ''}</MediumText>
+              <MediumText>
+                № {i.number} на {getDateString(i.documentDate)}
+              </MediumText>
+            </View>
+          ),
         } as IListItemProps),
     );
-  }, [status, list]);
+  }, [list, status, sortDateType.id]);
 
   const sections = useMemo(
     () =>
@@ -95,6 +110,19 @@ export const FreeShipmentListScreen = () => {
     [filteredList],
   );
 
+  const [visibleStatus, setVisibleStatus] = useState(false);
+  const [visibleSortDate, setVisibleSortDate] = useState(false);
+
+  const handleApplyStatus = (option: any) => {
+    setVisibleStatus(false);
+    setStatus(option);
+  };
+
+  const handleApplySortDate = (option: IListItem) => {
+    setVisibleSortDate(false);
+    setSortDateType(option);
+  };
+
   const handleDeleteDocs = useCallback(() => {
     const docIds = Object.keys(delList);
 
@@ -106,17 +134,44 @@ export const FreeShipmentListScreen = () => {
     deleteSelectedItems(delList, deleteDocs);
   }, [delList, docDispatch]);
 
+  const [visibleSendDialog, setVisibleSendDialog] = useState(false);
+
+  const docsToSend = useMemo(
+    () =>
+      Object.keys(delList).reduce((prev: IFreeShipmentDocument[], cur) => {
+        const sendingDoc = list.find((i) => i.id === cur && (i.status === 'DRAFT' || i.status === 'READY'));
+        if (sendingDoc) {
+          prev = [...prev, sendingDoc];
+        }
+        return prev;
+      }, []),
+    [delList, list],
+  );
+
+  const sendDoc = useSendDocs(docsToSend.length ? docsToSend : []);
+
+  const handleSendDocument = useCallback(async () => {
+    setVisibleSendDialog(false);
+    // setScreenState('sending');
+    await sendDoc();
+    setDelList({});
+
+    // setScreenState('sent');
+  }, [sendDoc]);
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
         {isDelList ? (
-          <DeleteButton onPress={handleDeleteDocs} />
+          <View style={styles.buttons}>
+            <SendButton onPress={() => setVisibleSendDialog(true)} />
+            <DeleteButton onPress={handleDeleteDocs} />
+          </View>
         ) : (
-          <AddButton onPress={() => navigation.navigate('FreeShipmentEdit')} />
+          <AddButton onPress={() => navigation.navigate('FreeShipmentEdit', { isCurr })} />
         )}
       </View>
     ),
-    [handleDeleteDocs, isDelList, navigation],
+    [handleDeleteDocs, isCurr, isDelList, navigation],
   );
 
   const renderLeft = useCallback(() => isDelList && <CloseButton onPress={() => setDelList({})} />, [isDelList]);
@@ -125,9 +180,9 @@ export const FreeShipmentListScreen = () => {
     navigation.setOptions({
       headerLeft: isDelList ? renderLeft : navBackDrawer,
       headerRight: renderRight,
-      title: isDelList ? `Выделено отвесов: ${Object.values(delList).length}` : 'Отвесы',
+      title: isDelList ? `${Object.values(delList).length}` : isCurr ? 'Отвес $' : 'Отвес',
     });
-  }, [delList, isDelList, navigation, renderLeft, renderRight]);
+  }, [delList, isCurr, isDelList, navigation, renderLeft, renderRight]);
 
   const renderItem: ListRenderItem<IListItemProps> = useCallback(
     ({ item }) => (
@@ -137,13 +192,13 @@ export const FreeShipmentListScreen = () => {
         onPress={() =>
           isDelList
             ? setDelList(getDelList(delList, item.id, item.status!))
-            : navigation.navigate('FreeShipmentView', { id: item.id })
+            : navigation.navigate('FreeShipmentView', { id: item.id, isCurr })
         }
         onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
         checked={!!delList[item.id]}
       />
     ),
-    [delList, isDelList, navigation],
+    [delList, isCurr, isDelList, navigation],
   );
 
   const renderSectionHeader = ({ section }: any) => (
@@ -152,7 +207,36 @@ export const FreeShipmentListScreen = () => {
 
   return (
     <AppScreen>
-      <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} />
+      <View style={[styles.containerCenter, styles.marginBottom5]}>
+        <Menu
+          key={'MenuStatus'}
+          title="Статус"
+          visible={visibleStatus}
+          onChange={handleApplyStatus}
+          onDismiss={() => setVisibleStatus(false)}
+          onPress={() => setVisibleStatus(true)}
+          options={statusTypes}
+          activeOptionId={status.id}
+          style={[styles.btnTab, styles.firstBtnTab]}
+          menuStyle={localStyles.menu}
+          isActive={status.id !== 'all'}
+          iconName={'chevron-down'}
+        />
+        <Menu
+          key={'MenuDataSort'}
+          title="Дата"
+          visible={visibleSortDate}
+          onChange={handleApplySortDate}
+          onDismiss={() => setVisibleSortDate(false)}
+          onPress={() => setVisibleSortDate(true)}
+          options={dateTypes}
+          activeOptionId={sortDateType.id}
+          style={[styles.btnTab, styles.lastBtnTab]}
+          menuStyle={localStyles.menu}
+          isActive={sortDateType.id !== 'new'}
+          iconName={'chevron-down'}
+        />
+      </View>
       <SectionList
         sections={sections}
         renderItem={renderItem}
@@ -161,6 +245,22 @@ export const FreeShipmentListScreen = () => {
         renderSectionHeader={renderSectionHeader}
         ListEmptyComponent={EmptyList}
       />
+      <SimpleDialog
+        visible={visibleSendDialog}
+        title={'Внимание!'}
+        text={'Сформировано полностью?'}
+        onCancel={() => setVisibleSendDialog(false)}
+        onOk={handleSendDocument}
+        okDisabled={loading}
+      />
     </AppScreen>
   );
 };
+
+const localStyles = StyleSheet.create({
+  menu: {
+    justifyContent: 'center',
+    marginLeft: 6,
+    width: '100%',
+  },
+});

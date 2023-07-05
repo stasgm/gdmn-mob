@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect } from 'react';
-import { Alert, View, StyleSheet } from 'react-native';
-import { Avatar, Divider } from 'react-native-paper';
+import { Alert, View, StyleSheet, TouchableOpacity } from 'react-native';
+import { Avatar, Divider, IconButton } from 'react-native-paper';
 import { useNavigation, useTheme } from '@react-navigation/native';
 
 import {
@@ -11,9 +11,7 @@ import {
   referenceActions,
   appActions,
   useAuthThunkDispatch,
-  useDocThunkDispatch,
   useSettingThunkDispatch,
-  settingsActions,
 } from '@lib/store';
 
 import {
@@ -31,6 +29,10 @@ import {
 import api from '@lib/client-api';
 import { mobileRequest } from '@lib/mobile-hooks';
 
+import { StackNavigationProp } from '@react-navigation/stack';
+
+import { ProfileStackParamList } from '../navigation/Root/types';
+
 const ProfileScreen = () => {
   const { colors } = useTheme();
 
@@ -41,7 +43,7 @@ const ProfileScreen = () => {
   const dispatch = useDispatch();
   const authDispatch = useAuthThunkDispatch();
   const settingsDispatch = useSettingThunkDispatch();
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<ProfileStackParamList, 'Profile'>>();
   const showActionSheet = useActionSheet();
 
   const handleClearData = () => {
@@ -173,21 +175,20 @@ const ProfileScreen = () => {
         </View>
         <Divider />
         {!!visibleList?.length && (
-          <View>
-            <LargeText style={styles.title}>Настройки пользователя</LargeText>
-            <View style={styles.descriptionContainer}>
-              {visibleList.map(([key, item]) => {
-                return (
-                  <View key={key}>
-                    <Divider />
-                    <DescriptionItem description={item.description} data={item.data}></DescriptionItem>
-                  </View>
-                );
-              })}
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('ProfileDetails', { id: '123' });
+            }}
+          >
+            <View style={styles.settingsContainer}>
+              <View style={styles.settingsDetails}>
+                <MediumText>Настройки пользователя</MediumText>
+              </View>
+              <IconButton icon="chevron-right" color={colors.text} />
             </View>
-            <Divider />
-          </View>
+          </TouchableOpacity>
         )}
+        <Divider />
         <View>
           <PrimeButton outlined onPress={handleLogout} disabled={loading} loadIcon={loading}>
             {isDemo ? 'Выйти из демо режима' : 'Сменить пользователя'}
@@ -217,21 +218,11 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 10,
   },
-  deviceInfo: {
-    flex: 1,
-    justifyContent: 'center',
-  },
   profileContainer: {
     alignItems: 'center',
     flexDirection: 'row',
     height: 50,
     marginVertical: 10,
-  },
-  descriptionContainer: {
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    marginVertical: 5,
-    width: '100%',
   },
   profileIcon: {
     justifyContent: 'space-around',
@@ -241,10 +232,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
-  title: {
+  settingsDetails: {
+    marginVertical: 5,
+    paddingHorizontal: 12,
+    height: 32,
+    justifyContent: 'center',
+  },
+  settingsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    fontSize: 18,
-    textAlign: 'center',
-    margin: 10,
   },
 });

@@ -1,4 +1,4 @@
-import { TextField, createFilterOptions, Autocomplete } from '@material-ui/core';
+import { TextField, createFilterOptions, Autocomplete } from '@mui/material';
 
 import { INamedEntity } from '@lib/types';
 
@@ -13,6 +13,7 @@ interface IProps {
   filterOptions?: any;
   isOptionEqualToValue?: any;
   required?: boolean;
+  disabled?: boolean;
 }
 
 const ComboBox = ({
@@ -26,10 +27,12 @@ const ComboBox = ({
   filterOptions = filterOptionsDefault,
   isOptionEqualToValue = isOptionEqualToValueDefault,
   required = false,
+  disabled = false,
 }: IProps) => {
   return (
     <Autocomplete
       {...field}
+      disabled={disabled}
       options={options}
       getOptionLabel={getOptionLabel}
       isOptionEqualToValue={isOptionEqualToValue}

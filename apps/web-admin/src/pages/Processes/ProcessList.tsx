@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
-import { Box, Container } from '@material-ui/core';
+import { Box, Container } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
-import CachedIcon from '@material-ui/icons/Cached';
+import CachedIcon from '@mui/icons-material/Cached';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
@@ -49,7 +49,7 @@ const ProcessList = () => {
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.setPageParam({ filterText: pageParamLocal?.filterText }));
+    dispatch(actions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
     fetchProcesses(pageParamLocal?.filterText);
   };
 
@@ -59,7 +59,7 @@ const ProcessList = () => {
   };
 
   const handleClearSearch = () => {
-    dispatch(actions.setPageParam({ filterText: undefined }));
+    dispatch(actions.setPageParam({ filterText: undefined, page: 0 }));
     setPageParamLocal({ filterText: undefined });
     fetchProcesses();
   };

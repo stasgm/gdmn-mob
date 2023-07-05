@@ -1,4 +1,4 @@
-import { Box, CircularProgress, CardHeader } from '@material-ui/core';
+import { Box, CircularProgress, CardHeader } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IUser, NewUser } from '@lib/types';
 import { useEffect } from 'react';

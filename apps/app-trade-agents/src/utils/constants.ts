@@ -1,5 +1,5 @@
 import { IListItem } from '@lib/mobile-types';
-import { baseSettingGroup } from '@lib/store';
+import { mainSettingGroup } from '@lib/store';
 import { INamedEntity, Settings, StatusType } from '@lib/types';
 
 export const ONE_SECOND_IN_MS = 1000;
@@ -49,7 +49,16 @@ export const appSettings: Settings = {
     type: 'boolean',
     sortOrder: 3,
     visible: true,
-    group: baseSettingGroup,
+    group: mainSettingGroup,
+  },
+  isShowPrevOrderLines: {
+    id: 'isShowPrevOrderLines',
+    description: 'Показывать предыдущую заявку',
+    data: false,
+    type: 'boolean',
+    sortOrder: 4,
+    visible: true,
+    group: mainSettingGroup,
   },
 };
 
@@ -98,3 +107,10 @@ export const statusTypes: IListItem[] = [
 ];
 
 export const noPackage: INamedEntity = { id: 'noPackage', name: 'Без упаковки' };
+
+export const reports: IListItem[] = [
+  { id: 'byContact', value: 'В разрезе даты отгрузки и ТО' },
+  { id: 'byGroup', value: 'В разрезе групп' },
+  { id: 'byGood', value: 'В разрезе товаров' },
+  // { id: 'sellBill', value: 'Накладные' },
+];

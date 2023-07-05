@@ -29,7 +29,7 @@ const localStyles = StyleSheet.create({
     fontSize: 18,
   },
   textWidth: {
-    width: '86%',
+    marginHorizontal: 10,
   },
 });
 

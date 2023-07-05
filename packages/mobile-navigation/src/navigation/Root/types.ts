@@ -1,24 +1,11 @@
-import { ViewStyle } from 'react-native';
-
-type DocumentsStackParamList = {
-  TabsNavigator: undefined;
-};
-
-type DocumentsTabsStackParamsList = {
-  DocumentList: { type: string } | undefined;
-  DocumentView: {
-    id: string;
-    view?: { componentItem?: ({ item }: { item: any }) => JSX.Element; titles?: string[]; styleHeader?: ViewStyle };
-  };
-};
-
-type MessagesStackParamList = {
-  MessageList: undefined;
-  MessageView: { id: string };
+type DashboardStackParamList = {
+  Dashboard: undefined;
+  [name: string]: any;
 };
 
 type ProfileStackParamList = {
   Profile: undefined;
+  ProfileDetails: { id: string };
 };
 
 type InformationStackParamList = {
@@ -42,12 +29,10 @@ type TabsStackParams = {
 };
 
 export {
-  DocumentsTabsStackParamsList,
-  DocumentsStackParamList,
-  MessagesStackParamList,
   ProfileStackParamList,
   InformationStackParamList,
   ReferenceStackParamList,
   SettingsStackParamList,
   TabsStackParams,
+  DashboardStackParamList,
 };

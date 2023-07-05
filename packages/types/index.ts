@@ -8,3 +8,4 @@ export * from './src/settings';
 export * from './src/processes';
 export * from './src/deviceLog';
 export * from './src/files';
+export * from './src/serverLog';

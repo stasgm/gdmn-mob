@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useMemo } from 'react';
-import { FlatList, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { AppActivityIndicator, ItemSeparator, navBackButton, SubTitle } from '@lib/mobile-ui';
@@ -9,6 +9,8 @@ import { refSelectors } from '@lib/store';
 import { IRefMetadata } from '@lib/types';
 
 import { keyExtractorByIndex } from '@lib/mobile-hooks';
+
+import { FlashList } from '@shopify/flash-list';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
 import { IGoodMatrix, IMatrixData } from '../../store/types';
@@ -75,13 +77,15 @@ const GoodLineScreen = () => {
 
   return (
     <>
-      <SubTitle style={[styles.title]}>{matrixItem?.name}</SubTitle>
-      <View style={[styles.content]}>
-        <FlatList
+      <SubTitle style={styles.title}>{matrixItem?.name}</SubTitle>
+      <View style={styles.content}>
+        <FlashList
           data={refData}
           keyExtractor={keyExtractorByIndex}
           renderItem={renderItem}
           ItemSeparatorComponent={ItemSeparator}
+          estimatedItemSize={60}
+          keyboardShouldPersistTaps={'handled'}
         />
         <ItemSeparator />
       </View>

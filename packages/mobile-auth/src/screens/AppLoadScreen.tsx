@@ -1,10 +1,9 @@
+import localStyles from './styles';
 import { Text, View } from 'react-native';
 import { INamedEntity } from '@lib/types';
 import { ScreenTitle, AppScreen, PrimeButton, globalStyles as styles, RoundButton } from '@lib/mobile-ui';
 
 import { useEffect } from 'react';
-
-import localStyles from './styles';
 
 type Props = {
   company?: INamedEntity;

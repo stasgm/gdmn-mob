@@ -1,5 +1,15 @@
 import React, { useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, Linking, TouchableOpacity, Platform, StyleProp, TextStyle } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Linking,
+  TouchableOpacity,
+  Platform,
+  StyleProp,
+  TextStyle,
+  ScrollView,
+} from 'react-native';
 import { Avatar, Divider } from 'react-native-paper';
 import { useNavigation, useTheme } from '@react-navigation/native';
 
@@ -115,16 +125,19 @@ const InformationScreen = () => {
 
   return (
     <AppScreen>
-      <View style={localStyles.container}>
-        <Text style={styles.title}>Приложение {Constants.manifest?.extra?.name}</Text>
-        {appList.map((item) => (
-          <ProfileItem key={item.id} item={item} />
-        ))}
-        <Text style={styles.title}>О разработчике</Text>
-        {developList.map((item) => (
-          <ProfileItem key={item.id} item={item} />
-        ))}
-      </View>
+      <ScrollView>
+        <View style={localStyles.container}>
+          <Text style={styles.title}>Приложение {Constants.manifest?.extra?.name}</Text>
+          {appList.map((item) => (
+            <ProfileItem key={item.id} item={item} />
+          ))}
+          <Text style={styles.title}>О разработчике</Text>
+          {developList.map((item) => (
+            <ProfileItem key={item.id} item={item} />
+          ))}
+        </View>
+      </ScrollView>
+      <MediumText style={localStyles.copyright}>Copyright © 2023 OOO Ampersant</MediumText>
     </AppScreen>
   );
 };
@@ -133,7 +146,6 @@ export default InformationScreen;
 
 const localStyles = StyleSheet.create({
   container: {
-    flex: 1,
     margin: 10,
   },
   deviceInfo: {
@@ -143,14 +155,7 @@ const localStyles = StyleSheet.create({
   profileContainer: {
     alignItems: 'center',
     flexDirection: 'row',
-    height: 50,
     marginVertical: 10,
-  },
-  descriptionContainer: {
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    marginVertical: 5,
-    width: '100%',
   },
   profileIcon: {
     justifyContent: 'space-around',
@@ -167,15 +172,8 @@ const localStyles = StyleSheet.create({
     textAlign: 'center',
     margin: 10,
   },
-  dialogTitle: {
-    fontSize: 18,
-    lineHeight: 18,
-    fontWeight: '500',
-  },
-  dialog: {
-    height: 380,
-  },
-  content: {
-    height: 240,
+  copyright: {
+    textAlign: 'center',
+    fontSize: 12,
   },
 });

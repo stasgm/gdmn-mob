@@ -2,7 +2,7 @@ import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
-import { Box, Button, Container, Link, TextField, Typography, CircularProgress } from '@material-ui/core';
+import { Box, Button, Container, Link, TextField, Typography, CircularProgress } from '@mui/material';
 import { IUserCredentials } from '@lib/types';
 
 import { useEffect, useRef, useState } from 'react';

@@ -1,11 +1,11 @@
 import { Helmet } from 'react-helmet';
-import { Box, Container } from '@material-ui/core';
+import { Box, Container } from '@mui/material';
 import { useNavigate } from 'react-router';
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import CachedIcon from '@material-ui/icons/Cached';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import CachedIcon from '@mui/icons-material/Cached';
 import { ICompany } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
@@ -46,7 +46,7 @@ const CompanyList = () => {
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.companyActions.setPageParam({ filterText: pageParamLocal?.filterText }));
+    dispatch(actions.companyActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
 
     fetchCompanies(pageParamLocal?.filterText);
   };
@@ -58,7 +58,7 @@ const CompanyList = () => {
   };
 
   const handleClearSearch = () => {
-    dispatch(actions.companyActions.setPageParam({ filterText: undefined }));
+    dispatch(actions.companyActions.setPageParam({ filterText: undefined, page: 0 }));
     setPageParamLocal({ filterText: undefined });
     fetchCompanies();
   };
@@ -144,6 +144,7 @@ const CompanyList = () => {
                 path={'/app/companies/'}
                 onSetPageParams={handleSetPageParams}
                 pageParams={pageParams}
+                style={{ overflowY: 'auto', maxHeight: window.innerHeight - 268 }}
               />
             </Box>
           )}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, ReactNode } from 'react';
-import { View, TouchableOpacity, Vibration, Text } from 'react-native';
+import { View, TouchableOpacity, Vibration, Text, Alert } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import { Camera, FlashMode, AutoFocus, WhiteBalance } from 'expo-camera';
 
@@ -24,9 +24,9 @@ const ONE_SECOND_IN_MS = 1000;
 interface IProps {
   scaner: IScannedObject;
   onSave?: () => void;
-  onGetScannedObject: (brc: string) => void;
+  onGetScannedObject: (brc: string, typeOk?: boolean) => void;
   onClearScannedObject: () => void;
-  barCodeTypes: string[];
+  barCodeTypes?: string[];
   children?: ReactNode;
   onSearch?: () => void;
   isLeftButton?: boolean;
@@ -38,7 +38,7 @@ const ScanBarcode = ({
   onSave,
   onGetScannedObject,
   onClearScannedObject,
-  barCodeTypes,
+  barCodeTypes = [],
   children,
   onSearch,
   isLeftButton,
@@ -72,10 +72,10 @@ const ScanBarcode = ({
     }
   }, [scaner, visibleDialog]);
 
-  const handleBarCodeScanned = (data: string) => {
+  const handleBarCodeScanned = (data: string, typeOk?: boolean) => {
     const brc = data.replace(']C1', '');
     setBarcode(brc);
-    onGetScannedObject(brc);
+    onGetScannedObject(brc, typeOk);
   };
 
   const handleHideDialog = () => {
@@ -129,10 +129,12 @@ const ScanBarcode = ({
       <Camera
         key={`${scaner.state}`}
         flashMode={flashMode ? FlashMode.torch : FlashMode.off}
-        barCodeScannerSettings={barCodeTypes ? { barCodeTypes } : undefined}
+        barCodeScannerSettings={barCodeTypes.length ? { barCodeTypes } : undefined}
         autoFocus={AutoFocus.on}
         whiteBalance={WhiteBalance.auto}
-        onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
+        onBarCodeScanned={({ data, type }: { data: string; type: string }) =>
+          !scanned && handleBarCodeScanned(data, barCodeTypes.length ? barCodeTypes.indexOf(type) >= 0 : true)
+        }
         style={cameraStyle}
       >
         <View style={styles.header}>

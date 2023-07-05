@@ -1,9 +1,9 @@
 import { Helmet } from 'react-helmet';
-import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText } from '@material-ui/core';
+import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import CachedIcon from '@material-ui/icons/Cached';
-import FilterIcon from '@material-ui/icons/FilterAltOutlined';
-import DeleteIcon from '@material-ui/icons/DeleteOutline';
+import CachedIcon from '@mui/icons-material/Cached';
+import FilterIcon from '@mui/icons-material/FilterAltOutlined';
+import DeleteIcon from '@mui/icons-material/DeleteOutline';
 
 import { IFileSystem } from '@lib/types';
 
@@ -54,7 +54,7 @@ const FileList = () => {
   }, [fetchFiles, pageParams?.filesFilters]);
 
   const handleSearchClick = () => {
-    dispatch(actions.fileSystemActions.setPageParam({ filterText: pageParamLocal?.filterText }));
+    dispatch(actions.fileSystemActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
     fetchFiles(pageParamLocal?.filesFilters ? pageParamLocal?.filesFilters : undefined, pageParamLocal?.filterText);
   };
 
@@ -143,7 +143,7 @@ const FileList = () => {
   const handleFilter = useCallback(() => {
     if (filterVisible) {
       setFilterVisible(false);
-      dispatch(actions.fileSystemActions.setPageParam({ filesFilters: undefined }));
+      dispatch(actions.fileSystemActions.setPageParam({ filesFilters: undefined, page: 0 }));
     } else {
       setFilterVisible(true);
     }
@@ -164,6 +164,7 @@ const FileList = () => {
     dispatch(actions.fileSystemActions.setPageParam({ filterText: undefined }));
     setPageParamLocal({ filterText: undefined });
     fetchFiles(pageParamLocal?.filesFilters || undefined);
+    dispatch(actions.fileSystemActions.setPageParam({ page: 0 }));
   };
 
   const buttons: IToolBarButton[] = [

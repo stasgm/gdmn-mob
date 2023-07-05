@@ -1,9 +1,9 @@
 import { Helmet } from 'react-helmet';
-import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText } from '@material-ui/core';
+import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
-import CachedIcon from '@material-ui/icons/Cached';
-import FilterIcon from '@material-ui/icons/FilterAltOutlined';
-import DeleteIcon from '@material-ui/icons/DeleteOutline';
+import CachedIcon from '@mui/icons-material/Cached';
+import FilterIcon from '@mui/icons-material/FilterAltOutlined';
+import DeleteIcon from '@mui/icons-material/DeleteOutline';
 
 import { IDeviceLogFiles } from '@lib/types';
 
@@ -45,7 +45,7 @@ const DeviceLogFilesList = () => {
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.deviceLogActions.setPageParam({ filterText: pageParamLocal?.filterText }));
+    dispatch(actions.deviceLogActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
     fetchDeviceLogFiles(pageParams?.logFilters ? pageParams?.logFilters : undefined, pageParamLocal?.filterText);
   };
 
@@ -71,7 +71,7 @@ const DeviceLogFilesList = () => {
   const handleFilter = useCallback(() => {
     if (filterVisible) {
       setFilterVisible(false);
-      dispatch(actions.deviceLogActions.setPageParam({ logFilters: undefined }));
+      dispatch(actions.deviceLogActions.setPageParam({ logFilters: undefined, page: 0 }));
     } else {
       setFilterVisible(true);
     }
@@ -137,7 +137,7 @@ const DeviceLogFilesList = () => {
   }, [dispatch, selectedDeviceLogFileIds]);
 
   const handleClearSearch = () => {
-    dispatch(actions.deviceLogActions.setPageParam({ filterText: undefined }));
+    dispatch(actions.deviceLogActions.setPageParam({ filterText: undefined, page: 0 }));
     setPageParamLocal({ filterText: undefined });
     fetchDeviceLogFiles(pageParamLocal?.logFilters || undefined);
   };

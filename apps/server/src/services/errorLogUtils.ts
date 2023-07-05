@@ -22,7 +22,7 @@ import log from '../utils/logger';
 
 import { getListPart } from '../utils/helpers';
 
-import { BYTES_PER_KB } from '../utils/constants';
+import { BYTES_PER_KB, MSEС_IN_DAY } from '../utils/constants';
 
 import { getDb } from './dao/db';
 
@@ -67,7 +67,7 @@ export const saveDeviceLogFile = async (
   }
 };
 
-const getListFiles = async (root: string): Promise<string[]> => {
+export const getListFiles = async (root: string): Promise<string[]> => {
   let newFiles: string[] = [];
   if (!(await checkFileExists(root))) {
     log.error(`Robust-protocol.errorDirectory: Ошибка чтения директории - ${root}`);
@@ -128,6 +128,34 @@ export const getDeviceLogsFiles = async (): Promise<string[]> => {
   return files;
 };
 
+export const checkDeviceLogsFiles = async (): Promise<void> => {
+  const { devices } = getDb();
+  const files = await getDeviceLogsFiles();
+  for (const file of files) {
+    try {
+      const re = /from_(.+)_dev_(.+)\.json/gi;
+      const match = re.exec(file);
+      if (!match) {
+        log.error(`Invalid deviceLogs file name ${file}`);
+        unlink(file);
+      } else {
+        const device = devices.data.find((el: any) => el.uid === match[2]);
+
+        if (!device) {
+          // eslint-disable-next-line no-await-in-loop
+          const fileStat = await stat(file);
+          const fileDate = fileStat.birthtimeMs;
+          if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > config.FILES_SAVING_PERIOD_IN_DAYS) {
+            unlink(file);
+          }
+        }
+      }
+    } catch (err) {
+      log.warn(`Ошибка при удалении старого файла логов-- ${err}`);
+    }
+  }
+};
+
 const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined> => {
   const { devices, companies, users } = getDb();
   if (arr.length !== 4) {
@@ -180,6 +208,7 @@ const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined
     const fileStat = await stat(fullFileName);
     const fileSize = fileStat.size / BYTES_PER_KB;
     const fileDate = fileStat.birthtime.toString();
+    const fileModifiedDate = fileStat.mtime.toString();
 
     const alias = fullFileName2alias(fullFileName);
     if (!alias) {
@@ -194,9 +223,10 @@ const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined
       device: { id: match[2], name: deviceName },
       date: fileDate,
       size: fileSize,
+      mdate: fileModifiedDate,
     };
   } catch (err) {
-    console.error(`Ошибка чтения статистики файла-- ${err}`);
+    log.error(`Ошибка чтения статистики файла-- ${err}`);
     return undefined;
   }
 };

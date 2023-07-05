@@ -7,6 +7,7 @@ import { AppInventoryState } from './types';
 
 export const initialState: Readonly<AppInventoryState> = {
   model: {},
+  unknownGoods: [],
   loading: false,
   loadingData: false,
   errorMessage: '',
@@ -51,6 +52,28 @@ const reducer: Reducer<AppInventoryState, AppInventoryActionType> = (
       return {
         ...state,
         loadingError: action.payload,
+      };
+
+    case getType(actions.addUnknownGood):
+      return {
+        ...state,
+        unknownGoods: state.unknownGoods
+          .filter((item) => item.good.id !== action.payload.id)
+          .concat({ good: action.payload, createdDate: new Date() }),
+      };
+
+    case getType(actions.removeOldGood):
+      return {
+        ...state,
+        unknownGoods: state.unknownGoods.filter(
+          (item) => new Date(item.createdDate).getTime() > action.payload.getTime(),
+        ),
+      };
+
+    case getType(actions.removeUnknownGood):
+      return {
+        ...state,
+        unknownGoods: state.unknownGoods.filter((item) => item.good.id !== action.payload),
       };
 
     default:

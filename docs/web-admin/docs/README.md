@@ -8,43 +8,46 @@
 
 ## 1. Регистрация пользователя
 
-<img src="img/1.Register/1.Main.jpg" alt="drawing" height="400"/>
+<img src="img/1.Register/1.Main2.png" alt="drawing" width="800"/>
 
 При первом подключении необходимо пройти регистрацию. Для этого необходимо нажать на **Зарегистрироваться**​.
 
 По нажатию переходим на страницу регистрации.
 
-<img src="img/1.Register/1.SignUpWindow.jpg" alt="drawing" height="400"/>
+<img src="img/1.Register/1.SignUpWindow2.png" alt="drawing" width="800"/>
 
-Для регистрации необходимо заполнить поля **Учетная запись** и **Пароль**, **Повторите Пароль** и нажать на кнопку **Зарегистрироваться**. Поле **Email** является необязательным, его можно будет заполнить при редактировании пользователя.
+Для регистрации необходимо заполнить поля **Учетная запись** и **Пароль**, **Повторите Пароль** и нажать на кнопку **Зарегистрироваться**. Поле **Email** является необязательным, его можно будет заполнить при редактировании пользователя впоследствии.
 
-![alt text](img/1.Register/1.SignUpSuperadmin.jpg)​
+<img src="img/1.Register/1.SignUpSuperadmin2.png" alt="drawing" width="800"/>
 
 Так как это первая регистрация, то пользователь автоматически становится суперадминистратором.
 
-Далее регистрируем администратора компании.
+Далее выходим из учётной записи суперадминистратора и регистрируем администратора компании.
 
-![alt text](img/1.Register/1.SignUpAdmin.jpg)​
+<img src="img/1.Register/1.SignUpAdmin2.png" alt="drawing" width="800"/>
 
 ## 2. Вход в учетную запись
 
 Для входа в систему администрирования вводим имя пользователя и пароль администратора.
 
-![alt text](img/2.Login/2.SignInAdmin.jpg)​
+<img src="img/2.Login/2.SignInAdmin2.png" alt="drawing" width="800"/>
 
 После нажатия на кнопку **Войти** попадаем на главную страницу.
 
-![alt text](img/2.Login/2.Dashboard.png)​
+<img src="img/2.Login/2.Dashboard.png" alt="drawing" width="800"/>
+
 
 В центральной части страницы представлена информация о количестве компаний, пользователей и устройств.
 
-![alt text](img/2.Login/2.DashboardInfo.png)​
+<img src="img/2.Login/2.DashboardInfo.png" alt="drawing" width="600"/>
+
 
 ### 2.1. Панель навигации
 
 В верхней части страницы расположена панель навигации.
 
-![alt text](img/2.Login/2.1.Navbar.png)​
+<img src="img/2.Login/2.1.Navbar.png" alt="drawing" width="800"/>
+
 
 В левом углу расположен логотип​, по нажатию на который можно вернуться на главную страницу из любого другого.
 В правом углу расположены две кнопки. По нажатию на первую кнопку можно посмотреть оповещения. Нажатие на вторую кнопку обеспечивает выход из учетной записи пользователя и возвращение на страницу входа в учетную запись.
@@ -53,7 +56,8 @@
 
 В левой части страницы расположена боковая панель.
 
-![alt text](img/2.Login/2.2.Sidebar.png)​
+<img src="img/2.Login/2.2.Sidebar.png" alt="drawing" height="400"/>
+
 
 По нажатию на иконку < можно скрыть боковую панель. Для ее открытия необходимо нажать на иконку >.
 
@@ -77,35 +81,38 @@
 
 Рассмотрим подробно каждый пункт бокового меню. Начнем с пункта **Компании**.
 
-![alt text](img/3.Companies/3.Company.png)
+<img src="img/3.Companies/3.Company.png" alt="drawing" width="800"/>
 
 В первую очередь администратору необходимо создать компанию, в которую будут входить пользователи мобильных устройств.
 
 Так как компания еще не добавлена, таблица является пустой.
 
-![alt text](img/3.Companies/3.CompanyEmpty.png)
+<img src="img/3.Companies/3.CompanyEmpty.png" alt="drawing" width="600"/>
 
 В правом верхнем углу расположены две кнопки, предназначенные для добавления и обновления информации.
 
-![alt text](img/3.Companies/3.Buttons.png)
+<img src="img/3.Companies/3.Buttons.png" alt="drawing" width="200"/>
 
 В зависимости от размера окна кнопки могут менять вид. При уменьшении окна браузера до среднего сразмера кнопки принимают вид иконок без текста.
 
-![alt text](img/3.Companies/3.Icons.png)
+<img src="img/3.Companies/3.Icons.png" alt="drawing" width="100"/>
+
 
 При уменьшении окна браузера до маленького размера кнопки исчезают полностью, на их месте появляется иконка меню " **⋮** ". При нажатии на нее появляются обе кнопки.
 
-![alt text](img/3.Companies/3.IconButtons.png)
+<img src="img/3.Companies/3.IconButtons.png" alt="drawing" width="100"/>
+
 
 ### 3.1. Добавление компании
 
 Нажмем на кнопку **Добавить** для добавления компании.
 
-![alt text](img/3.Companies/3.1.Add.jpg)
+<img src="img/3.Companies/3.1.AddCompany2.png" alt="drawing" width="800"/>
 
 Поле **Наименование компании** является обязательным для заполнения.
 
-![alt text](img/3.Companies/3.1.AddCompany.png)
+<img src="img/3.Companies/3.1.AddCompany.png" alt="drawing" height="200"/>
+
 
 При нажатии на кнопку **Сохранить** данные сохраняются, и компания отображается в таблице.
 
@@ -113,33 +120,36 @@
 
 После сохранения попадаем на страницу со списком компаний.
 
-![alt text](img/3.Companies/3.1.CompanyTable.png)
+<img src="img/3.Companies/3.1.CompanyTable.png" alt="drawing" width="800"/>
+
 
 Теперь в таблице отображаются данные по компании Company – **Наименование**, **Администратор**, **Дата создания** и **Дата редактирования**.
 
 При повторной попытке создания компании в левом нижнем углу отобразится сообщение об ошибке, так как у администратора может быть только одна компания.
 
-![alt text](img/3.Companies/3.1.Error.png)
+<img src="img/3.Companies/3.1.Error.png" alt="drawing" height="50"/>
 
-![alt text](img/3.Companies/3.1.ErrorWindow.png)
+<img src="img/3.Companies/3.1.ErrorWindow.png" alt="drawing" width="800"/>
+
 
 В таблицах предусмотрена сортировка. Подробно она будет рассмотрена на странице **Пользователи**.
 
 Также можно выбрать, сколько строк будет отображено в таблице на странице.
 
-![alt text](img/3.Companies/3.1.Rows.png)
+<img src="img/3.Companies/3.1.Rows.png" alt="drawing" height="180"/>
 
 По умолчанию отображается 10 строк.
 
-![alt text](img/3.Companies/3.1.RowsPerPage.png)
+<img src="img/3.Companies/3.1.RowsPerPage.png" alt="drawing" height="50"/>
+
 
 ### 3.2. Просмотр информации о выбранной компании
 
 Перейдем на страницу просмотра данных по компании, щелкнув мышью по наименованию компании.
 
-![alt text](img/3.Companies/3.2.CompanyView.png)
+<img src="img/3.Companies/3.2.CompanyView.png" alt="drawing" width="800"/>
 
-На странице представлена Общая информация о компании, а также информация о пользователях данной компании.
+На странице представлена общая информация о компании, а также информация о пользователях данной компании.
 
 В левом верхнем углу расположена кнопка **←​ Назад**​ для возвращения на предыдущую страницу. Возвращение происходит при нажатии на стрелку.
 
@@ -151,24 +161,24 @@
 
 Для изменения данных компании нажмем на кнопку **Редактировать**.
 
-![alt text](img/3.Companies/3.3.Edit.png)
+<img src="img/3.Companies/3.3.Edit.png" alt="drawing" width="600"/>
 
+<img src="img/3.Companies/3.3.EditAppSystem.png" alt="drawing" width="600"/>
 
-![alt text](img/3.Companies/3.3.EditAppSystem.png)
 
 Так как при добавлении компании мы не указывали город, то поле **Город** является пустым.
 
 Добавим город и сохраним.
 
-![alt text](img/3.Companies/3.3.EditCity.png)
+<img src="img/3.Companies/3.3.EditCity.png" alt="drawing" width="600"/>
 
 Новые данные уже отображены в **Общей информации**.
 
-![alt text](img/3.Companies/3.3.Info.png)
+<img src="img/3.Companies/3.3.Info.png" alt="drawing" width="800"/>
 
 На странице **Компании** также можно просмотреть всех пользователей данной компании.
 
-![alt text](img/3.Companies/3.3.CompanyUsers.png)
+<img src="img/3.Companies/3.3.CompanyUsers.png" alt="drawing" width="800"/>
 
 На данный момент существует только один пользователь – администратор. При нажатии на имя пользователя попадем на страницу просмотра информации по выбранному пользователю. Данная страница будет подробно рассмотренa при работе с пользователями. Вернуться на страницу компании можно, нажав на стрелку **←​ Назад** в левом верхнем углу.
 
@@ -187,7 +197,7 @@
 
 Рассмотрим пункт меню **Пользователи**.
 
-![alt text](img/4.Users/4.Users.png)
+<img src="img/4.Users/4.Users.png" alt="drawing" width="800"/>
 
 Теперь администратору необходимо создать пользователя.
 
@@ -199,42 +209,40 @@
 
  Число обычных пользователей не ограничено.
 
-![alt text](img/4.Users/4.UsersTable.png)
+ <img src="img/4.Users/4.UsersTable.png" alt="drawing" width="1000"/>
 
 ### 4.1. Добавление пользователя
 
 Перейдем к добавлению пользователя по нажатию на кнопку **Добавить**.
 
+<img src="img/4.Users/4.1.AddERP.png" alt="drawing" width="800"/>
 
-![alt text](img/4.Users/4.1.AddERP.png)
-![alt text](img/4.Users/4.1.UserERPAppSystem.png)
-![alt text](img/4.Users/4.1.AddUserERP.png)
-![alt text](img/4.Users/4.1.UserERPTable.png)
+<img src="img/4.Users/4.1.UserERPAppSystem.png" alt="drawing" width="800"/>
 
+<img src="img/4.Users/4.1.AddUserERP.png" alt="drawing" width="1000"/>
 
-
+<img src="img/4.Users/4.1.UserERPTable.png" alt="drawing" width="1000"/>
 
 Поля **Пользователь**, **Пароль** и **Повторите Пароль**  и **Пользователь ERP** являются обязательными для заполнения, поля **Имя**, **Фамилия**, **Телефон**, **Email** необязательны.
 
 После образования пользователя ERP, снова нажимаем на кнопку **Добавить**, чтобы создать обычного пользователя.
 
-![alt text](img/4.Users/4.1.Add.png)
-
-![alt text](img/4.Users/4.1.UserUserERP.png)
+<img src="img/4.Users/4.1.Add.png" alt="drawing" width="800"/>
+<img src="img/4.Users/4.1.UserUserERP.png" alt="drawing" width="800"/>
 
 Заполним поля и сохраним.
 
-![alt text](img/4.Users/4.1.AddUser.png)
+<img src="img/4.Users/4.1.AddUser.png" alt="drawing" width="800"/>
 
 Новый пользователь отобразиться в таблице.
 
-![alt text](img/4.Users/4.1.UserTable.png)
+<img src="img/4.Users/4.1.UserTable.png" alt="drawing" width="800"/>
 
 ### 4.2. Просмотр информации о пользователе
 
 Перейдем на страницу просмотра информации о пользователе. Для этого нажмем на имя пользователя.
 
-![alt text](img/4.Users/4.2.View.png)
+<img src="img/4.Users/4.2.View.png" alt="drawing" width="800"/>
 
 Верхняя панель такая же, как и на странице просмотра компаний.
 
@@ -244,29 +252,29 @@
 
 По нажатию на кнопку **Редактировать**, на странице просмотра информации о пользователе, зайдем на страницу редактирования пользователя.
 
-![alt text](img/4.Users/4.3.Edit.png)
+<img src="img/4.Users/4.3.Edit.png" alt="drawing" width="800"/>
 
 Для смены пароля необходимо нажать на кнопку **Сменить пароль**. По нажатию появляется поле для ввода пароля. Так как оно является обязательным, то нужно либо ввести новый пароль, либо нажать кнопку **Отмена** и вернуться на страницу просмотра информации о пользователе.
 
-![alt text](img/4.Users/4.3.Password.png)
+<img src="img/4.Users/4.3.Password.png" alt="drawing" width="800"/>
 
 Заполним поля **Имя** и **Фамилия** нажмем **Сохранить**.
 
-![alt text](img/4.Users/4.3.EditUser.png)
+<img src="img/4.Users/4.3.EditUser.png" alt="drawing" width="800"/>
 
 Новые изменения отображены в Общей информации.
 
-![alt text](img/4.Users/4.3.UserInfo.png)
+<img src="img/4.Users/4.3.UserInfo.png" alt="drawing" height="400"/>
 
 Вернемся на страницу **Пользователи**.
 
-![alt text](img/4.Users/4.3.Table.png)
+<img src="img/4.Users/4.3.Table.png" alt="drawing" width="800"/>
 
 ### 4.4. Удаление пользователя
 
 Зайдем снова в пользователя User. При нажатии на кнопку **Удалить** появится диалоговое окно с подтверждением удаления.
 
-![alt text](img/4.Users/4.4.Delete.png)
+<img src="img/4.Users/4.4.Delete.png" alt="drawing" height="100"/>
 
 При нажатии на кнопку **Удалить** пользователь и привязанные к нему устройства будут удалены.
 
@@ -278,7 +286,7 @@
 
 В поле поиска введем текст и нажмем клавишу Enter. В таблице отобразятся записи, если хоть в каком-нибудь из полей найдется совпадение по искомому тексту:
 
-![alt text](img/4.Users/4.5.SearchTable.png)
+<img src="img/4.Users/4.5.SearchTable.png" alt="drawing" width="800"/>
 
 Для очищения поля необходимо нажать на крестик либо клавишу Backspace и подтвердить нажатием клавиши Enter.
 
@@ -290,33 +298,35 @@
 
 Произведем сортировку по колонке **Пользователь**.
 
-![alt text](img/4.Users/4.6.SortUp.png)
+<img src="img/4.Users/4.6.SortUp.png" alt="drawing" width="800"/>
 
 При сортировке в алфавитном порядке (по возрастанию) в выбранной колонке появляется ↑, в обратном алфавитном порядке (по убыванию) – ↓.
 
-![alt text](img/4.Users/4.6.SortDown.png)
+<img src="img/4.Users/4.6.SortDown.png" alt="drawing" width="800"/>
 
 ## 5. Устройства
 
 Переходим в пункт меню Устройства.
 
-![alt text](img/5.Devices/5.Device.png)
+<img src="img/5.Devices/5.Device.png" alt="drawing" width="800"/>
 
 Теперь администратору необходимо создать мобильное устройство, которое далее будет привязано к пользователю. Число устройств не ограничено.
 
-![alt text](img/5.Devices/5.Table.png)
+<img src="img/5.Devices/5.Table.png" alt="drawing" width="800"/>
 
 ### 5.1. Добавление устройства
 
 Нажав на кнопку **Добавить** создадим устройство.
 
-![alt text](img/5.Devices/5.1.Add.png)
+<img src="img/5.Devices/5.1.Add.png" alt="drawing" width="600"/>
+
 
 Поля **Наименование устройства** и **Статус** являются обязательными для заполнения. Поля **Код активации** и **Номер** будут заполнятся далее.
 
 **Статус** может быть выбран один из четырех предложенных.
 
-![alt text](img/5.Devices/5.1.State.png)
+<img src="img/5.Devices/5.1.State.png" alt="drawing" width="600"/>
+
 
 <!-- - «Не зарегистрировано» – статус, который устройство получает при создании.
 
@@ -336,36 +346,36 @@
 
 Добавим устройство, предназначенное для пользователя ERP.
 
-![alt text](img/5.Devices/5.1.AddDeviceERP.png)
+<img src="img/5.Devices/5.1.AddDeviceERP.png" alt="drawing" width="600"/>
 
 После сохранения, новое устройство отобразилось в таблице.
 
-![alt text](img/5.Devices/5.1.TableERP.png)
-
+<img src="img/5.Devices/5.1.TableERP.png" alt="drawing" width="800"/>
 
 Теперь добавим устройство для обычного пользователя, нажав снова на кнопку **Добавить** на странице **Устройства** .
 
-![alt text](img/5.Devices/5.1.AddDevice.png)
+<img src="img/5.Devices/5.1.AddDevice.png" alt="drawing" width="600"/>
+
 
 Новое устройство отобразилось в таблице.
 
-![alt text](img/5.Devices/5.1.Table.png)
+<img src="img/5.Devices/5.1.Table.png" alt="drawing" width="800"/>
 
 ### 5.2. Просмотр и редактирование информации об устройстве
 
 По нажатию на наименование устройства (в таблице устройств), преходим на страницу просмотра устройства, где представлена Общая информация об устройстве, а также Информация о пользователях, к которым привязано данное устройство.
 
-![alt text](img/5.Devices/5.2.View.png)
+<img src="img/5.Devices/5.2.View.png" alt="drawing" width="800"/>
 
 На странице редактирования устройства можно изменить наименование устройства и его статус.
 
-![alt text](img/5.Devices/5.2.Edit.png)
+<img src="img/5.Devices/5.2.Edit.png" alt="drawing" width="600"/>
 
 ### 5.3. Удаление устройства
 
 При нажатии на кнопку **Удалить** появится диалоговое окно с подтверждением удаления.
 
-![alt text](img/5.Devices/5.3.Delete.png)
+<img src="img/5.Devices/5.3.Delete.png" alt="drawing" width="400"/>
 
 При нажатии на кнопку **Удалить** в данном диалоговом окне устройство и связь данного устройства с пользователями (будет рассмотрено ниже) будут удалены.
 
@@ -377,68 +387,64 @@
 
 Для этого вернемся в раздел **Пользователи**
 
-![alt text](img/4.Users/4.3.Table.png)
+<img src="img/4.Users/4.3.Table.png" alt="drawing" width="900"/>
 
 и зайдем на страницу просмотра пользователя gdmn. 
 
-![alt text](img/4.Users/4.5.Table.png)
+<img src="img/4.Users/4.5.Table.png" alt="drawing" width="800"/>
 
 В **Устройствах пользователя** нажмем на кнопку **Добавить**.
 
-![alt text](img/5.Devices/5.4.1AddERP.png)
+<img src="img/5.Devices/5.4.1AddERP.png" alt="drawing" width="600"/>
 
 Поле **Пользователь** заполняется автоматически, его изменить нельзя. В поле **Устройство** выберем нужное.
 
-![alt text](img/5.Devices/5.4.1.DeviceERPName.png)
-
+<img src="img/5.Devices/5.4.1.DeviceERPName.png" alt="drawing" width="400"/>
 
 По умолчанию статус устройства - **Не зарегистрировано**.
 
-![alt text](img/5.Devices/5.4.1.AddDeviceERP.png)
+<img src="img/5.Devices/5.4.1.AddDeviceERP.png" alt="drawing" width="600"/>
+
 
 Нажимаем на сохранить, и таким образом создается привязанное устройство.
 
-![alt text](img/5.Devices/5.4.1.UserERPDevices.png)
-
+<img src="img/5.Devices/5.4.1.UserERPDevices.png" alt="drawing" width="800"/>
 
 Теперь создадим устройство для пользователя User. Снова возращаемся в раздел **Пользователи**. Выбираем нажатием пользователя User, переходим на страницу просмотра пользователя, в Устройствах пользователя нажимаем на кнопку Добавить и выбираем Android.
 
-
-![alt text](img/5.Devices/5.4.1.AddDevice.png)
+<img src="img/5.Devices/5.4.1.AddDevice.png" alt="drawing" width="600"/>
 
 Нажимаем на сохранить.
 
-![alt text](img/5.Devices/5.4.1.UserDevices.png)
-
-
+<img src="img/5.Devices/5.4.1.UserDevices.png" alt="drawing" width="800"/>
 
 В данной таблице сортировка возможна по всем полям.
 
 #### 5.4.2. Просмотр привязанного устройства
 
-![alt text](img/5.Devices/5.4.2.BeforeView.png)
+<img src="img/5.Devices/5.4.2.BeforeView.png" alt="drawing" width="800"/>
 
 Зайдем на страницу просмотра данного устройства Android. 
 
-![alt text](img/5.Devices/5.4.2.View.png)
+<img src="img/5.Devices/5.4.2.View.png" alt="drawing" width="800"/>
 
 На данной странице отображена общая информация по привязанному устройству.
 
 #### 5.4.3. Редактирование привязанного устройства
 
-![alt text](img/5.Devices/5.4.3.Edit.png)
+<img src="img/5.Devices/5.4.3.Edit.png" alt="drawing" width="600"/>
 
 Если устройство активируют в мобильном приложении, то статус изменится на **Активно**. Статус можно изменить на **Заблокировано**, в этом случае оно становится заблокированным для привязанного пользователя, и пользователь не имеет доступ к устройству до тех пор, пока не сменится статус.
 
 Зайдем на страницу **Устройства** и выберем устройство Android. В таблице **Пользователи устройства** появился пользователь данного устройства User.
 
-![alt text](img/5.Devices/5.4.3.DeviceUsers.png)
+<img src="img/5.Devices/5.4.3.DeviceUsers.png" alt="drawing" width="800"/>
 
 #### 5.4.4. Удаление привязанного устройства
 
 Вернемся на страницу **Пользователи** и зайдем в пользователя User и в его привязанное устройство Android. При нажатии на кнопку **Удалить** появится диалоговое окно с подтверждением удаления.
 
-![alt text](img/5.Devices/5.4.4.Delete.png)
+<img src="img/5.Devices/5.4.4.Delete.png" alt="drawing" width="400"/>
 
 При нажатии на кнопку **Удалить** в данном диалоговом окне привязанное устройство будет удалено.
 
@@ -447,12 +453,13 @@
 Для регистрации мобильного устройства пользователя Администратору необходимо сгенерировать код активации.
 Чтобы создать его перейдем на страницу **Устройства**. В таблице в колонке **Код активации** нажмем на иконку **⟳**.
 
-![alt text](img/5.Devices/5.5.CreateCode.png)
+<img src="img/5.Devices/5.4.2.BeforeView.png" alt="drawing" width="800"/>
+
+<img src="img/5.Devices/5.5.CreateCode.png" alt="drawing" width="150"/>
 
 При нажатия генерируется код, а состояние автоматически поменяется с **Не зарегистрировано** на **Не активно**.
 
-![alt text](img/5.Devices/5.5.Code.png)
-![alt text](img/5.Devices/5.5.StateCode.png)
+<img src="img/5.Devices/5.5.Code.png" alt="drawing" width="150"/> <img src="img/5.Devices/5.5.StateCode.png" alt="drawing" width="150"/>
 
 Уникальный номер присваивается устройству во время активации кода в мобильном приложении.
 
@@ -462,23 +469,23 @@
 
 Для создания нажмем на иконку **⟳** в колонке **Номер**.
 
-![alt text](img/5.Devices/5.5.CreateUid.png)
+<img src="img/5.Devices/5.5.CreateUid.png" alt="drawing" width="150"/>
 
 После нажатия состояние автоматически меняется с **Не активно** на **Активно**.
 
-![alt text](img/5.Devices/5.5.Uid.png)
+<img src="img/5.Devices/5.5.Uid.png" alt="drawing" width="300"/>
 
 Номер также отображается в общей информации.
 
-![alt text](img/5.Devices/5.5.InfoUid.png)
+<img src="img/5.Devices/5.5.InfoUid.png" alt="drawing" width="300"/>
 
 При получении нового кода состояние снова меняется на **Не активно**.
 
-![alt text](img/5.Devices/5.5.InfoCode.png)
+<img src="img/5.Devices/5.5.InfoCode.png" alt="drawing" width="300"/>
 
 Все данные отображаются в таблице.
 
-![alt text](img/5.Devices/5.5.Table.png)
+<img src="img/5.Devices/5.5.Table.png" alt="drawing" width="800"/>
 
 ## 6. Процессы
 
@@ -502,25 +509,26 @@
 Процесс в определенной подсистеме компании может быть только один. При существующем процессе новый процесс по данной подсистеме не будет запущен. 
  В конфиге указывается период проверки процессов в минутах.
 
-![alt text](img/7.Process/7.ProcessFailed.png)
-![alt text](img/7.Process/7.ProcessView.png)
-![alt text](img/7.Process/7.ProcessFails.png)
+ <img src="img/7.Process/7.ProcessFailed.png" alt="drawing" width="800"/>
+
+<img src="img/7.Process/7.ProcessView.png" alt="drawing" width="800"/>
+
+
+<img src="img/7.Process/7.ProcessFails.png" alt="drawing" width="800"/>
+
 
 ### 6.1. Удаление процесса
 
 Зайдем в текущий процесс. При нажатии на кнопку **Удалить** появится диалоговое окно с подтверждением удаления.
 
-![alt text](img/7.Process/7.ProcessDelete.png)
+<img src="img/7.Process/7.ProcessDelete.png" alt="drawing" width="400"/>
 
 При нажатии на кнопку **Удалить** в данном диалоговом окне процесс будет удален.
-
-
-
 
 ## 7. Профиль
 
 Теперь рассмотрим последний пункт – Профиль.
 
-![alt text](img/6.Account/6.Profile.png)
+<img src="img/6.Account/6.Profile.png" alt="drawing" width="800"/>
 
 Данная страница содержит информацию по текущей учетной записи. Здесь можно просмотреть и отредактировать данные Администратора.

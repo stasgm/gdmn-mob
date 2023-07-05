@@ -34,9 +34,14 @@ import { useSelector as useFpSelector } from '../../store/index';
 import { barCodeTypes } from '../../utils/constants';
 
 const ScanOrderScreen = () => {
-  const docTypeId = useRoute<RouteProp<ShipmentStackParamList, 'ScanOrder'>>().params?.docTypeId;
+  const { isCurr } = useRoute<RouteProp<ShipmentStackParamList, 'ScanOrder'>>().params;
+
+  const shipmentType = refSelectors
+    .selectByName<IDocumentType>('documentType')
+    ?.data?.find((i) => (isCurr ? i.name === 'currShipment' : i.name === 'shipment'));
 
   const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ScanOrder'>>();
+
   const settings = useSelector((state) => state.settings?.data);
 
   const dispatch = useDispatch();
@@ -52,12 +57,10 @@ const ScanOrderScreen = () => {
   const orders = docSelectors.selectByDocType<IOrderDocument>('order');
 
   const shipments = useSelector((state) =>
-    state.documents?.list.filter((i) => i.documentType?.name === 'shipment' || i.documentType?.name === 'currShipment'),
+    state.documents?.list.filter((i) => i.documentType.name === 'currShipment' || i.documentType.name === 'shipment'),
   ) as IShipmentDocument[];
 
-  const shipmentType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === docTypeId);
-
-  const depart = useSelector((state) => state.auth.user?.settings?.depart?.data) as ICodeEntity;
+  const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as ICodeEntity;
 
   const tempOrders = useFpSelector((state) => state.fpMovement.list);
 
@@ -74,9 +77,9 @@ const ScanOrderScreen = () => {
       navigation.dispatch(
         StackActions.replace('ShipmentView', {
           id: shipment.id,
+          isCurr,
         }),
       );
-      return;
     }
 
     const tempOrder = tempOrders.find((i) => i.orderId === scannedObject.head.orderId);
@@ -90,6 +93,8 @@ const ScanOrderScreen = () => {
       dispatch(fpActions.addTempOrder(newTempOrder));
     }
 
+    const depart = defaultDepart || scannedObject.head.depart;
+
     const shipmentDoc: IShipmentDocument = {
       id: generateId(),
       documentType: shipmentType!,
@@ -99,7 +104,7 @@ const ScanOrderScreen = () => {
       head: {
         barcode: scannedObject.head.barcode,
         contact: scannedObject.head.contact,
-        depart: depart,
+        fromDepart: depart,
         outlet: scannedObject.head.outlet,
         onDate: scannedObject.head.onDate,
         orderId: scannedObject.id,
@@ -111,12 +116,22 @@ const ScanOrderScreen = () => {
 
     dispatch(documentActions.addDocument(shipmentDoc));
 
-    navigation.dispatch(
-      StackActions.replace('ShipmentView', {
-        id: shipmentDoc.id,
-      }),
-    );
-  }, [scannedObject, shipments, tempOrders, shipmentType, depart, dispatch, navigation]);
+    if (depart) {
+      navigation.dispatch(
+        StackActions.replace('ShipmentView', {
+          id: shipmentDoc.id,
+          isCurr,
+        }),
+      );
+    } else {
+      navigation.dispatch(
+        StackActions.replace('ShipmentEdit', {
+          id: shipmentDoc.id,
+          isCurr,
+        }),
+      );
+    }
+  }, [scannedObject, shipments, tempOrders, defaultDepart, shipmentType, dispatch, navigation, isCurr]);
 
   const [scaner, setScaner] = useState<IScannedObject>({ state: 'init' });
 
@@ -132,11 +147,7 @@ const ScanOrderScreen = () => {
         const shipment = shipments.find((i) => i.head.orderId === order.id);
 
         if (shipment) {
-          navigation.dispatch(
-            StackActions.replace('ShipmentView', {
-              id: shipment.id,
-            }),
-          );
+          setScaner({ state: 'error', message: 'Заявка уже добавлена' });
         } else {
           setScannedObject(order);
           setScaner({ state: 'found' });
@@ -145,7 +156,7 @@ const ScanOrderScreen = () => {
         setScaner({ state: 'error', message: 'Заявка не найдена' });
       }
     },
-    [navigation, orders, shipments],
+    [orders, shipments],
   );
 
   const handleClearScaner = () => setScaner({ state: 'init' });

@@ -1,7 +1,7 @@
 {
   "name": "@lib/mobile-hooks",
   "version": "1.0.0",
-  "description": "common mobile navigation package",
+  "description": "mobile hooks package",
   "license": "MIT",
   "main": "index.ts",
   "scripts": {

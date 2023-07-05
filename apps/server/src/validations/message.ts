@@ -53,6 +53,7 @@ const getMessages: Config = {
       .keys({
         companyId: Joi.string().required().error(new InvalidParameterException('Не указана организация')),
         appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана подсистема')),
+        limitFiles: Joi.string().optional(),
       })
       .options({
         allowUnknown: true,

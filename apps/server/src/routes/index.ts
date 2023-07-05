@@ -12,14 +12,13 @@ import Process from './process.router';
 import AppSystem from './appSystem.router';
 import DeviceLog from './deviceLog.router';
 import File from './file.router';
+import ServerLog from './serverLog.router';
 
 const rootRouter = new Router();
 
 rootRouter.prefix('/api/:version');
 
 rootRouter.param('version', (version, ctx, next) => {
-  console.log('router_version', version);
-
   ctx.query.version = version;
 
   return next();
@@ -37,6 +36,7 @@ rootRouter
   .use(Process.middleware())
   .use(AppSystem.middleware())
   .use(File.middleware())
-  .use(DeviceLog.middleware());
+  .use(DeviceLog.middleware())
+  .use(ServerLog.middleware());
 
 export default rootRouter;

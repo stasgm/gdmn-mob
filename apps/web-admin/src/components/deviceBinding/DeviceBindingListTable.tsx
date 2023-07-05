@@ -16,10 +16,10 @@ import {
   TableRow,
   Tooltip,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
 import { IDeviceBinding, IActivationCode, IDevice } from '@lib/types';
 
-import RefreshIcon from '@material-ui/icons/Refresh';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 import { deviceStates, adminPath } from '../../utils/constants';
 

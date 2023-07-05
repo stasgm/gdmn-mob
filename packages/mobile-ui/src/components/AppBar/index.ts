@@ -7,6 +7,7 @@ export { default as SearchButton } from './SearchButton';
 export { default as FilterButton } from './FilterButton';
 export { default as SendButton } from './SendButton';
 export { default as SaveDocument } from './SaveDocument';
+export { default as InfoButton } from './InfoButton';
 export { ScanButton } from './ScanButton';
 export { DeleteButton } from './DeleteButton';
 export { CloseButton } from './CloseButton';

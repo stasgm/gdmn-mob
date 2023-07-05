@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { experimentalStyled } from '@material-ui/core';
+import { experimentalStyled } from '@mui/material';
 
 import { useDispatch } from '@lib/store';
 
