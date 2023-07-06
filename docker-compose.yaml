@@ -1,7 +1,7 @@
 version: "3"
 services:
   web-admin:
-    image: kivitri/gdmn-mob.web-admin:${TAG}
+    image: gsbelarus/gdmn-mob.web-admin:${TAG}
     network_mode: host
     container_name: web-admin
     build:
@@ -13,11 +13,11 @@ services:
     environment:
       - NODE_ENV=production
     ports:
-     - 3656:3656
+     - ${WEB_ADMIN_PORT}:${WEB_ADMIN_PORT}
     volumes:
       - ./ssl:/etc/nginx/ssl:ro
   server:
-    image: kivitri/gdmn-mob.server
+    image: gsbelarus/gdmn-mob.server
     network_mode: host
     container_name: server
     restart: always
@@ -26,12 +26,12 @@ services:
       dockerfile: ./apps/server/Dockerfile
     environment:
       - NODE_ENV=production
-      - PORT=3654
-      - HTTPS_PORT=3655
+      - PORT=${PORT}
+      - HTTPS_PORT=${HTTPS_PORT}
       - FILES_PATH=/var/lib/gdmn-mob_db
     ports:
-      - 3654:3654
-      - 3655:3655
+      - ${PORT}:${PORT}
+      - ${HTTPS_PORT}:${HTTPS_PORT}
     volumes:
       - db:/var/lib/gdmn-mob_db
       - ./ssl:/gdmn-mob/ssl:ro

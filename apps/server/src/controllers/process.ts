@@ -21,7 +21,7 @@ export const addProcess = async (ctx: Context) => {
   created(
     ctx,
     processService.addOne({ appSystemId, companyId, consumerId, producerIds, maxDataVolume, maxFiles, deviceId }),
-    'addProcess',
+    `addProcess consumerId=${consumerId}`,
   );
 };
 
@@ -31,7 +31,11 @@ export const addProcess = async (ctx: Context) => {
  * @returns
  */
 export const updateProcess = async (ctx: Context) =>
-  ok(ctx, processService.updateById(ctx.params.id, (ctx.request.body as UpdateProcess).files), 'updateProcess');
+  ok(
+    ctx,
+    processService.updateById(ctx.params.id, (ctx.request.body as UpdateProcess).files),
+    `updateProcess id=${ctx.params.id}`,
+  );
 
 /**
  * API 3
@@ -46,7 +50,7 @@ export const prepareProcess = async (ctx: Context) => {
       producerId: ctx.state.user.id,
       processedFiles: (ctx.request.body as PrepareProcess).processedFiles,
     }),
-    'prepareProcess',
+    `prepareProcess id=${ctx.params.id}`,
   );
 };
 
@@ -56,16 +60,20 @@ export const prepareProcess = async (ctx: Context) => {
  * @returns
  */
 export const completeProcess = async (ctx: Context) =>
-  ok(ctx, processService.completeById(ctx.params.id), 'completeProcess');
+  ok(ctx, processService.completeById(ctx.params.id), `completeProcess id=${ctx.params.id}`);
 
 export const cancelProcess = async (ctx: Context) =>
-  ok(ctx, processService.cancelById(ctx.params.id, (ctx.request.body as CancelProcess).errorMessage), 'cancelProcess');
+  ok(
+    ctx,
+    processService.cancelById(ctx.params.id, (ctx.request.body as CancelProcess).errorMessage),
+    `cancelProcess id=${ctx.params.id}`,
+  );
 
 export const interruptProcess = async (ctx: Context) =>
   ok(
     ctx,
     processService.interruptById(ctx.params.id, (ctx.request.body as InterruptProcess).errorMessage),
-    'interruptProcess',
+    `interruptProcess id=${ctx.params.id}`,
   );
 
 export const getProcesses = async (ctx: Context) => {
@@ -95,4 +103,5 @@ export const getProcesses = async (ctx: Context) => {
   ok(ctx, processService.findMany(params), 'getProcesses');
 };
 
-export const deleteProcess = async (ctx: Context) => ok(ctx, processService.deleteOne(ctx.params.id), 'deleteProcess');
+export const deleteProcess = async (ctx: Context) =>
+  ok(ctx, processService.deleteOne(ctx.params.id), `deleteProcess id=${ctx.params.id}`);
