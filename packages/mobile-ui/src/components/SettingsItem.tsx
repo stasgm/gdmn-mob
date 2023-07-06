@@ -86,6 +86,7 @@ const SettingsItem = ({ label, value, disabled = false, onValueChange, onEndEdit
               onChangeText={(text) => onValueChange(text)}
               keyboardType={'default'}
               clearInput={true}
+              disabled={disabled}
             />
           )}
         </View>

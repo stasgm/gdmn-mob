@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import fs, { readdir, access } from 'fs/promises';
+import fs, { readdir, access, stat } from 'fs/promises';
 
 import { constants } from 'fs';
 
@@ -10,6 +10,10 @@ import { IFileMessageInfo, IAppSystemParams } from '@lib/types';
 import { DataNotFoundException } from '../../exceptions/datanotfound.exception';
 
 import { generateId } from '../helpers';
+
+import config from '../../../config';
+
+import { BYTES_PER_MB } from '../constants';
 
 import { CollectionItem } from './CollectionItem';
 
@@ -90,18 +94,35 @@ class CollectionMessage<T extends CollectionItem> {
   /**
    * Returns every entry in the collection.
    */
-  public async readByConsumerId(params: IAppSystemParams, consumerId: string, deviceId: string): Promise<Array<T>> {
-    const filesInfoArr: IFileMessageInfo[] | undefined = await this._readDir(params);
+  public async readByConsumerId(
+    params: IAppSystemParams,
+    consumerId: string,
+    deviceId: string,
+    maxDataVolume?: number,
+    maxFiles?: number,
+  ): Promise<Array<T>> {
+    const filesInfoArr: IFileMessageInfo[] | undefined = await this._readDir(params, true);
 
     if (!filesInfoArr) return [];
 
     const fileInfo = filesInfoArr.filter((item) => item.consumerId === consumerId && item.deviceId === deviceId);
 
-    const pr = fileInfo.map(async (item) => {
-      return await this._get(await this._Obj2FullFileName(params, item));
-    });
+    const pr = fileInfo.map(async (item) => await this._get(await this._Obj2FullFileName(params, item)));
 
-    return Promise.all(pr);
+    const files = await Promise.all(pr);
+    const sortedFiles = files.sort((a, b) => a.head.order - b.head.order);
+
+    const limitDataVolume = maxDataVolume || config.MAX_DATA_VOLUME;
+    const limitFiles = maxFiles || sortedFiles.length;
+
+    let c = 0;
+    let dataVolume = sortedFiles.length > 0 ? fileInfo.find((i) => i.id === sortedFiles[0].id)?.size || 0 : 0;
+
+    for (; c < sortedFiles.length && c < limitFiles && dataVolume <= limitDataVolume; c++) {
+      dataVolume += fileInfo.find((i) => i.id === sortedFiles[c].id)?.size || 0;
+    }
+
+    return sortedFiles.slice(0, c);
   }
 
   /**
@@ -164,10 +185,21 @@ class CollectionMessage<T extends CollectionItem> {
     return fs.unlink(fileName);
   }
 
-  private async _readDir(params: IAppSystemParams): Promise<IFileMessageInfo[]> {
+  private async _readDir(params: IAppSystemParams, withSize = false): Promise<IFileMessageInfo[]> {
     try {
       const filePath = await this.getPathMessages(params);
-      return (await readdir(filePath)).map(messageFileName2params);
+      const fileNames = await readdir(filePath);
+
+      const fileParams = [];
+      for (const fileName of fileNames) {
+        fileParams.push({
+          ...messageFileName2params(fileName),
+          // eslint-disable-next-line no-await-in-loop
+          size: withSize ? await this._getFileSizeInMB(path.join(filePath, fileName)) : undefined,
+        });
+      }
+
+      return fileParams;
     } catch (err) {
       throw new Error(`Ошибка чтения папки ${this.collectionPath} - ${err}`);
     }
@@ -179,6 +211,15 @@ class CollectionMessage<T extends CollectionItem> {
       return true;
     } catch {
       return false;
+    }
+  }
+
+  private async _getFileSizeInMB(fileName: string): Promise<number> {
+    try {
+      const fileStat = await stat(fileName);
+      return fileStat.size / BYTES_PER_MB;
+    } catch (err) {
+      throw new Error(`Ошибка получения размера файла ${fileName} - ${err}`);
     }
   }
 }

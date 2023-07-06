@@ -31,7 +31,7 @@ import {
 
 import { ActivityIndicator, Caption, Text } from 'react-native-paper';
 
-import { IDocument, IReferences, IUserSettings } from '@lib/types';
+import { IDocument, IReferences, ISettingsOption, IUserSettings } from '@lib/types';
 
 import { sleep, dialCall } from '@lib/mobile-hooks';
 
@@ -48,42 +48,257 @@ import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
 import { messageFpMovement, tempOrders } from './src/store/mock';
 import { FreeShipmentNavigator } from './src/navigation/FreeShipmentNavigator';
 import { ShipmentNavigator } from './src/navigation/ShipmentNavigator';
+import { CellsNavigator } from './src/navigation/CellsNavigator';
+import { InventoryNavigator } from './src/navigation/InventoryNavigator';
+import { ReturnNavigator } from './src/navigation/ReturnNavigator';
+import { LaboratoryNavigator } from './src/navigation/LaboratoryNavigator';
+import { MoveToNavigator } from './src/navigation/MoveToNavigator';
+import { MoveFromNavigator } from './src/navigation/MoveFromNavigator';
+import RemainsNavigator from './src/navigation/RemainsNavigator';
+import { CurrShipmentNavigator } from './src/navigation/CurrShipmentNavigator';
+import { CurrFreeShipmentNavigator } from './src/navigation/CurrFreeShipmentNavigator';
+import { ReceiptNavigator } from './src/navigation/ReceiptNavigator';
+import {
+  currFreeShipmentScreens,
+  currShipmentScreens,
+  freeShipmentScreens,
+  inventoryScreens,
+  laboratoryScreens,
+  moveFromScreens,
+  moveScreens,
+  moveToScreens,
+  receiptScreens,
+  returnScreens,
+  shipmentScreens,
+} from './src/navigation/Root/screens';
 
 const Root = () => {
+  const { isInit, data: settings } = useSelector((state) => state.settings);
+
+  const isAddressStore = useMemo(() => settings.addressStore?.data || false, [settings.addressStore?.data]);
+
   const navItems: INavItem[] = useMemo(
-    () => [
-      {
-        name: 'Movement',
-        title: 'Перемещение',
-        icon: 'transfer',
-        component: MoveNavigator,
-      },
-      {
-        name: 'Shipment',
-        title: 'Отвес по заявке',
-        icon: 'playlist-check',
-        component: ShipmentNavigator,
-      },
-      {
-        name: 'FreeShipment',
-        title: 'Отвес',
-        icon: 'playlist-plus',
-        component: FreeShipmentNavigator,
-      },
-    ],
-    [],
+    () =>
+      isAddressStore
+        ? [
+            {
+              name: 'MoveTo',
+              title: 'На хранение',
+              icon: 'store-plus-outline',
+              component: MoveToNavigator,
+              showInDashboard: true,
+            },
+            {
+              name: 'MoveFrom',
+              title: 'С хранения',
+              icon: 'store-minus-outline',
+              component: MoveFromNavigator,
+              showInDashboard: true,
+            },
+            {
+              name: 'Receipt',
+              title: 'Приход',
+              icon: 'file-document-outline',
+              component: ReceiptNavigator,
+              showInDashboard: true,
+            },
+            {
+              name: 'Move',
+              title: 'Перемещение',
+              icon: 'transfer',
+              component: MoveNavigator,
+              showInDashboard: true,
+            },
+            {
+              name: 'Shipment',
+              title: 'Отвес по заявке',
+              icon: 'playlist-check',
+              component: ShipmentNavigator,
+              showInDashboard: true,
+              dashboardScreenName: 'ScanOrder',
+              dashboardScreenParams: { isCurr: false },
+            },
+            {
+              name: 'CurrShipment',
+              title: 'Отвес по заявке $',
+              icon: 'cash-check',
+              showInDashboard: true,
+              component: CurrShipmentNavigator,
+              dashboardScreenName: 'ScanOrder',
+              dashboardScreenParams: { isCurr: true },
+            },
+            {
+              name: 'FreeShipment',
+              title: 'Отвес',
+              icon: 'playlist-plus',
+              component: FreeShipmentNavigator,
+              showInDashboard: true,
+              dashboardScreenParams: { isCurr: false },
+            },
+            {
+              name: 'CurrFreeShipment',
+              title: 'Отвес $',
+              icon: 'cash-plus',
+              component: CurrFreeShipmentNavigator,
+              showInDashboard: true,
+              dashboardScreenName: 'FreeShipmentEdit',
+              dashboardScreenParams: { isCurr: true },
+            },
+            {
+              name: 'Cells',
+              title: 'Ячейки',
+              icon: 'table-split-cell',
+              component: CellsNavigator,
+            },
+            {
+              name: 'Remains',
+              title: 'Остатки',
+              icon: 'dolly',
+              component: RemainsNavigator,
+            },
+            {
+              name: 'Return',
+              title: 'Возврат',
+              icon: 'file-restore-outline',
+              component: ReturnNavigator,
+              showInDashboard: true,
+            },
+            {
+              name: 'Inventory',
+              title: 'Инвентаризация',
+              icon: 'file-check-outline',
+              component: InventoryNavigator,
+              showInDashboard: true,
+            },
+            {
+              name: 'Laboratory',
+              title: 'Лаборатория',
+              icon: 'flask-outline',
+              component: LaboratoryNavigator,
+              showInDashboard: true,
+            },
+          ]
+        : [
+            {
+              name: 'Move',
+              title: 'Перемещение',
+              icon: 'transfer',
+              component: MoveNavigator,
+              showInDashboard: true,
+              sortNumber: 10,
+            },
+            {
+              name: 'Shipment',
+              title: 'Отвес по заявке',
+              icon: 'playlist-check',
+              component: ShipmentNavigator,
+              showInDashboard: true,
+              dashboardScreenName: 'ScanOrder',
+              dashboardScreenParams: { isCurr: false },
+              sortNumber: 20,
+            },
+            {
+              name: 'CurrShipment',
+              title: 'Отвес по заявке $',
+              icon: 'cash-check',
+              showInDashboard: true,
+              component: CurrShipmentNavigator,
+              dashboardScreenName: 'ScanOrder',
+              dashboardScreenParams: { isCurr: true },
+              sortNumber: 30,
+            },
+            {
+              name: 'FreeShipment',
+              title: 'Отвес',
+              icon: 'playlist-plus',
+              component: FreeShipmentNavigator,
+              showInDashboard: true,
+              dashboardScreenParams: { isCurr: false },
+              sortNumber: 40,
+            },
+            {
+              name: 'CurrFreeShipment',
+              title: 'Отвес $',
+              icon: 'cash-plus',
+              component: CurrFreeShipmentNavigator,
+              showInDashboard: true,
+              dashboardScreenName: 'FreeShipmentEdit',
+              dashboardScreenParams: { isCurr: true },
+              sortNumber: 50,
+            },
+            {
+              name: 'Remains',
+              title: 'Остатки',
+              icon: 'dolly',
+              component: RemainsNavigator,
+            },
+            {
+              name: 'Return',
+              title: 'Возврат',
+              icon: 'file-restore-outline',
+              component: ReturnNavigator,
+              showInDashboard: true,
+              sortNumber: 60,
+            },
+            {
+              name: 'Inventory',
+              title: 'Инвентаризация',
+              icon: 'file-document-outline',
+              component: InventoryNavigator,
+              showInDashboard: true,
+              sortNumber: 11,
+            },
+            {
+              name: 'Laboratory',
+              title: 'Лаборатория',
+              icon: 'flask-outline',
+              component: LaboratoryNavigator,
+              showInDashboard: true,
+              sortNumber: 70,
+            },
+          ],
+    [isAddressStore],
+  );
+
+  const docScreens = useMemo(
+    () =>
+      isAddressStore
+        ? {
+            ...moveToScreens,
+            ...moveFromScreens,
+            ...receiptScreens,
+            ...moveScreens,
+            ...shipmentScreens,
+            ...currShipmentScreens,
+            ...freeShipmentScreens,
+            ...currFreeShipmentScreens,
+            ...returnScreens,
+            ...inventoryScreens,
+            ...laboratoryScreens,
+          }
+        : {
+            ...moveScreens,
+            ...shipmentScreens,
+            ...currShipmentScreens,
+            ...freeShipmentScreens,
+            ...currFreeShipmentScreens,
+            ...returnScreens,
+            ...inventoryScreens,
+            ...laboratoryScreens,
+          },
+    [isAddressStore],
   );
 
   const dispatch = useDispatch();
 
   //Загружаем в стор дополнительные настройки приложения
-  const isInit = useSelector((state) => state.settings.isInit);
   const authLoading = useSelector((state) => state.auth.loadingData);
   const appDataLoading = appSelectors.selectLoading();
   const isLogged = authSelectors.isLoggedWithCompany();
   const fpLoading = useFpSelector((state) => state.fpMovement.loading);
   const isDemo = useSelector((state) => state.auth.isDemo);
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
+  const getReferences = useSelector((state) => state.settings?.data?.getReferences);
 
   const refDispatch = useRefThunkDispatch();
   const docDispatch = useDocThunkDispatch();
@@ -109,6 +324,12 @@ const Root = () => {
   useEffect(() => {
     if (appSettings && isInit) {
       dispatch(settingsActions.addSettings(appSettings));
+      dispatch(
+        settingsActions.updateOption({
+          optionName: 'getReferences',
+          value: { ...getReferences, data: false } as ISettingsOption,
+        }),
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInit]);
@@ -239,7 +460,12 @@ const Root = () => {
           </Caption>
         </AppScreen>
       ) : (
-        <MobileApp items={navItems} loadingErrors={[fpLoadingError]} onClearLoadingErrors={onClearLoadingErrors} />
+        <MobileApp
+          items={navItems}
+          dashboardScreens={docScreens}
+          loadingErrors={[fpLoadingError]}
+          onClearLoadingErrors={onClearLoadingErrors}
+        />
       )}
     </ErrorBoundary>
   );

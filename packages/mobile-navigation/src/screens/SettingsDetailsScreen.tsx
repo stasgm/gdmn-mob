@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useState } from 'react';
-import { Alert } from 'react-native';
+import { Alert, StyleSheet } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { settingsActions, useDispatch, useSelector } from '@lib/store';
@@ -76,7 +76,7 @@ const SettingsDetailsScreen = () => {
 
   return (
     <AppScreen>
-      <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={[{ padding: 5, flexDirection: 'column' }]}>
+      <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={localStyles.scrollView}>
         <SettingsGroup
           key={key}
           list={list}
@@ -90,3 +90,10 @@ const SettingsDetailsScreen = () => {
 };
 
 export default SettingsDetailsScreen;
+
+const localStyles = StyleSheet.create({
+  scrollView: {
+    padding: 5,
+    flexDirection: 'column',
+  },
+});

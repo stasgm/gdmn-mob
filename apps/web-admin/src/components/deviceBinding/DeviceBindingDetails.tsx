@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@material-ui/core';
+import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@mui/material';
 
 import { IDeviceBinding, INamedEntity } from '@lib/types';
 import { Field, FormikProvider, useFormik } from 'formik';

@@ -1,3 +1,5 @@
+import localStyles from './styles';
+import { GDMN_SECURITY_POLICY } from '../constants';
 import React, { useCallback, useState } from 'react';
 import { View, Keyboard, Linking } from 'react-native';
 
@@ -12,11 +14,6 @@ import {
   RoundButton,
   ScreenTitle,
 } from '@lib/mobile-ui';
-import { IconButton } from 'react-native-paper';
-
-import localStyles from './styles';
-// import api from '@lib/client-api';
-// import { user as mockUser } from '@lib/mock';
 
 /*
   Порядок работы:
@@ -39,8 +36,6 @@ const SignInScreen = (props: Props) => {
   const { error, loading, status } = useSelector((state) => state.auth);
 
   const [credential, setCredentials] = useState<IUserCredentials>({ name: '', password: '' });
-
-  const [lo, setLo] = useState(false);
 
   const [visiblePassword, setVisiblePassword] = useState(false);
 
@@ -73,14 +68,11 @@ const SignInScreen = (props: Props) => {
           onIconPress={() => (visiblePassword ? setVisiblePassword(false) : setVisiblePassword(true))}
         />
         <View style={[styles.flexDirectionRow, styles.alignItemsCenter]}>
-          <IconButton icon={lo ? 'checkbox-outline' : 'checkbox-blank-outline'} onPress={() => setLo(!lo)} />
           <View style={[styles.directionColumn, localStyles.textWidth]}>
             <MediumText>
               {'Продолжая, Вы подтверждаете, что согласны с '}
               <MediumText
-                onPress={() =>
-                  Linking.openURL('https://gsbelarus.com/gs/wiki/index.php/GedeminWiki:Политика_конфиденциальности')
-                }
+                onPress={() => Linking.openURL(GDMN_SECURITY_POLICY)}
                 selectable={true}
                 style={styles.textDecorationLine}
               >
@@ -89,12 +81,7 @@ const SignInScreen = (props: Props) => {
             </MediumText>
           </View>
         </View>
-
-        <PrimeButton
-          disabled={loading || !credential.name || !credential.password || !lo}
-          icon="login"
-          onPress={handleLogIn}
-        >
+        <PrimeButton disabled={loading || !credential.name || !credential.password} icon="login" onPress={handleLogIn}>
           Войти
         </PrimeButton>
       </AppInputScreen>

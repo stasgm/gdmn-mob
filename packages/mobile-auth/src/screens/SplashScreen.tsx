@@ -1,3 +1,5 @@
+import localStyles from './styles';
+import { AuthStackParamList } from '../navigation/types';
 import React from 'react';
 import { View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -7,10 +9,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { globalStyles as styles, PrimeButton, RoundButton, AppScreen, ScreenTitle } from '@lib/mobile-ui';
 import { IApiConfig } from '@lib/client-types';
 import { useSelector } from '@lib/store';
-
-import { AuthStackParamList } from '../navigation/types';
-
-import localStyles from './styles';
 
 type Props = {
   settings: IApiConfig | undefined;

@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
-import { useRoutes } from 'react-router-dom';
-import { ThemeProvider } from '@material-ui/core/styles';
+import { useEffect, useState } from 'react';
+import { useNavigate, useRoutes } from 'react-router-dom';
+import { ThemeProvider } from '@mui/material/styles';
 import { hot } from 'react-hot-loader/root';
 import { Provider } from 'react-redux';
+import { createBrowserHistory } from 'history';
 
-import { appActions, authSelectors, useDispatch, useAuthThunkDispatch } from '@lib/store';
+import { appActions, authSelectors, useDispatch } from '@lib/store';
 
 import { store } from './store';
 
@@ -16,22 +17,31 @@ import useClearPageParams from './utils/useClearPageParams';
 
 const Router = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const browserHistory = createBrowserHistory();
+
   const isLogged = authSelectors.isLogged();
 
+  const [history, setHistory] = useState('');
+  const [loadingData, setLoadingData] = useState(false);
+
   useEffect(() => {
+    //Если пользователь logged, но идет загрузка данных из локального хранилища,
+    //то переходим на страницу, которая была перед обновлением страницы
+    if (isLogged && loadingData) {
+      navigate(history);
+      setLoadingData(false);
+    }
+  }, [history, isLogged, loadingData, navigate]);
+
+  useEffect(() => {
+    setLoadingData(true);
+    setHistory(browserHistory.location.pathname);
     dispatch(appActions.loadGlobalDataFromDisc());
-    //TODO Костыль, добавить экшн для проверки состояния сессии
-    // const f = async () => {
-    //   if (isLogged) {
-    //     await authDispatch(authActions.getDeviceByUid(webRequest(dispatch, authActions), ''));
-    //   }
-    // };
-    // f();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useClearPageParams();
-
   return useRoutes(routes(isLogged));
 };
 

@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet';
-import { Box, Container, Typography, Grid } from '@material-ui/core';
+import { Box, Container, Typography, Grid } from '@mui/material';
 
 import { useEffect } from 'react';
 

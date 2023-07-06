@@ -14,7 +14,7 @@ import {
   TablePagination,
   TableRow,
   TextField,
-} from '@material-ui/core';
+} from '@mui/material';
 
 import { IDeviceLogFiles } from '@lib/types';
 

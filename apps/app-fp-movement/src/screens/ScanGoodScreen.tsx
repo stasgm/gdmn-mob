@@ -1,5 +1,5 @@
 import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
-import { Text, Alert, View, StyleSheet } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 
 import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigation/native';
 
@@ -15,8 +15,14 @@ import { IScannedObject } from '@lib/client-types';
 import { ShipmentStackParamList } from '../navigation/Root/types';
 import { IShipmentLine, IShipmentDocument, barcodeSettings } from '../store/types';
 
-import { IGood } from '../store/app/types';
-import { getBarcode } from '../utils/helpers';
+import { IAddressStoreEntity, IGood, IRemains, IRemGood } from '../store/app/types';
+import {
+  alertWithSound,
+  alertWithSoundMulti,
+  getBarcode,
+  getLineGood,
+  getRemGoodListByContact,
+} from '../utils/helpers';
 import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../store/index';
 
 import { barCodeTypes } from '../utils/constants';
@@ -24,6 +30,7 @@ import { barCodeTypes } from '../utils/constants';
 const ScanGoodScreen = () => {
   const docId = useRoute<RouteProp<ShipmentStackParamList, 'ScanGood'>>().params?.docId;
   const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ScanGood'>>();
+  const isFocused = useIsFocused();
 
   const fpDispatch = useFpDispatch();
   const dispatch = useDispatch();
@@ -55,7 +62,21 @@ const ScanGoodScreen = () => {
 
   const tempOrder = useFpSelector((state) => state.fpMovement.list).find((i) => i.orderId === shipment?.head?.orderId);
 
-  const minBarcodeLength = settings.minBarcodeLength?.data || 0;
+  const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
+
+  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart')?.data;
+
+  const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
+
+  const remainsUse = Boolean(settings.remainsUse?.data);
+
+  const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
+
+  const goodRemains = useMemo<IRemGood[]>(() => {
+    return shipment?.head?.fromDepart?.id && isFocused
+      ? getRemGoodListByContact(goods, remains[shipment.head.fromDepart.id], docList, shipment.head.fromDepart.id)
+      : [];
+  }, [docList, goods, isFocused, remains, shipment?.head?.fromDepart?.id]);
 
   const handleGetScannedObject = useCallback(
     (brc: string) => {
@@ -74,10 +95,21 @@ const ScanGoodScreen = () => {
 
       const barc = getBarcode(brc, goodBarcodeSettings);
 
-      const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
+      const lineGood = getLineGood(
+        barc.shcode,
+        barc.weight,
+        goods,
+        goodRemains,
+        remainsUse && shipment?.documentType.name !== 'return' && shipment?.documentType.name !== 'inventory',
+      );
 
-      if (!good) {
+      if (!lineGood.good) {
         setScaner({ state: 'error', message: 'Товар не найден' });
+        return;
+      }
+
+      if (!lineGood.isRightWeight) {
+        setScaner({ state: 'error', message: 'Вес товара превышает вес в остатках' });
         return;
       }
 
@@ -89,7 +121,7 @@ const ScanGoodScreen = () => {
       }
 
       setScannedObject({
-        good: { id: good.id, name: good.name, shcode: good.shcode },
+        good: lineGood.good,
         id: generateId(),
         weight: barc.weight,
         barcode: barc.barcode,
@@ -102,7 +134,7 @@ const ScanGoodScreen = () => {
       setScaner({ state: 'found' });
     },
 
-    [goodBarcodeSettings, goods, minBarcodeLength, shipmentLines],
+    [goodBarcodeSettings, goodRemains, goods, minBarcodeLength, remainsUse, shipment?.documentType.name, shipmentLines],
   );
 
   const handleSaveScannedItem = useCallback(() => {
@@ -133,47 +165,60 @@ const ScanGoodScreen = () => {
         dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
         setScaner({ state: 'init' });
       } else {
-        Alert.alert('Данное количество превышает количество в заявке', 'Добавить позицию?', [
-          {
-            text: 'Да',
-            onPress: () => {
-              dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
-              fpDispatch(
-                fpMovementActions.updateTempOrderLine({
-                  docId: tempOrder?.id,
-                  line: newTempLine,
-                }),
-              );
-              setScaner({ state: 'init' });
-            },
-          },
-          {
-            text: 'Отмена',
-          },
-        ]);
+        alertWithSoundMulti('Данное количество превышает количество в заявке', 'Добавить позицию?', () => {
+          dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
+          fpDispatch(
+            fpMovementActions.updateTempOrderLine({
+              docId: tempOrder?.id,
+              line: newTempLine,
+            }),
+          );
+          setScaner({ state: 'init' });
+        });
       }
     } else if (shipment?.documentType.name === 'shipment' || shipment?.documentType.name === 'currShipment') {
-      Alert.alert('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', [
-        {
-          text: 'Да',
-          onPress: () => {
-            dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
-            setScaner({ state: 'init' });
-          },
-        },
-        {
-          text: 'Отмена',
-        },
-      ]);
+      alertWithSoundMulti('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', () => {
+        dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
+        setScaner({ state: 'init' });
+      });
     } else {
-      dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
+      const isFromAddressed = departs?.find((i) => i.id === shipment?.head.fromDepart?.id && i.isAddressStore);
+      const isToAddressed = departs?.find((i) => i.id === shipment?.head.toDepart?.id && i.isAddressStore);
+      if (
+        shipment?.head.toDepart?.isAddressStore ||
+        shipment?.head.fromDepart?.isAddressStore ||
+        isFromAddressed ||
+        isToAddressed
+      ) {
+        if (scannedObject.quantPack < goodBarcodeSettings.boxNumber) {
+          alertWithSound('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}!`);
+          setScaner({ state: 'init' });
+          return;
+        }
+        navigation.navigate('SelectCell', { docId, item: scannedObject, mode: 0 });
+      } else {
+        dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
+      }
       setScaner({ state: 'init' });
     }
-  }, [scannedObject, tempOrder, shipment?.documentType.name, fpDispatch, dispatch, docId]);
+  }, [
+    scannedObject,
+    tempOrder,
+    shipment?.documentType.name,
+    shipment?.head.toDepart?.isAddressStore,
+    shipment?.head.toDepart?.id,
+    shipment?.head.fromDepart?.isAddressStore,
+    shipment?.head.fromDepart?.id,
+    fpDispatch,
+    dispatch,
+    docId,
+    departs,
+    goodBarcodeSettings.boxNumber,
+    navigation,
+  ]);
 
   const handleClearScaner = () => setScaner({ state: 'init' });
 
-  const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
   }

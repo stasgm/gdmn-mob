@@ -1,4 +1,4 @@
-import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@material-ui/core';
+import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@mui/material';
 
 interface IProps {
   file: any;
@@ -10,7 +10,7 @@ const FileContentView = ({ file }: IProps) => {
       <CardHeader title="Общая информация" />
       <Divider />
       <CardContent>
-        <Grid sx={{ overflowX: 'scroll' }}>
+        <Grid sx={{ overflowX: 'auto', overflowY: 'auto' }}>
           <Grid container>
             <Grid item>
               <pre>

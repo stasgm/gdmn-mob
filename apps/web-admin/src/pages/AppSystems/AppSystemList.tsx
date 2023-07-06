@@ -1,8 +1,8 @@
 import { Helmet } from 'react-helmet';
-import { Box, Container } from '@material-ui/core';
+import { Box, Container } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
-import CachedIcon from '@material-ui/icons/Cached';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import CachedIcon from '@mui/icons-material/Cached';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 import { useNavigate } from 'react-router';
 

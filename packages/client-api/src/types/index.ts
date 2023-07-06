@@ -12,6 +12,7 @@ import * as process from './process';
 import * as appSystem from './appSystem';
 import * as deviceLog from './deviceLog';
 import * as file from './file';
+import * as serverLog from './serverLog';
 
 export {
   auth,
@@ -27,4 +28,5 @@ export {
   AxiosError,
   deviceLog,
   file,
+  serverLog,
 };

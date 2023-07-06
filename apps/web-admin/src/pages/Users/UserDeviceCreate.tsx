@@ -1,4 +1,4 @@
-import { Box, CardHeader, CircularProgress } from '@material-ui/core';
+import { Box, CardHeader, CircularProgress } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IDeviceBinding, NewDeviceBinding } from '@lib/types';
 import { useEffect } from 'react';

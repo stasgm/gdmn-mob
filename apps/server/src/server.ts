@@ -18,7 +18,7 @@ import { historyApiFallback } from 'koa2-connect-history-api-fallback';
 
 import { IUser } from '@lib/types';
 
-import dotenv from 'dotenv';
+import { RotatingFileStream, createStream } from 'rotating-file-stream';
 
 import koaConfig from '../config/koa';
 
@@ -90,7 +90,12 @@ export async function createServer(server: IServer): Promise<KoaApp> {
     fs.mkdirSync(logPath);
   }
 
-  const accessLogStream: fs.WriteStream = fs.createWriteStream(config.LOG_ACCESS_PATH, { flags: 'a' });
+  const accessLogStream: RotatingFileStream = createStream('access.log', {
+    size: '20M',
+    maxFiles: 1,
+    path: logPath,
+    initialRotation: true,
+  });
 
   app
     .use(errorHandler)
@@ -99,7 +104,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
       helmet.contentSecurityPolicy({
         directives: {
           defaultSrc: ['*'],
-          styleSrc: ["'unsafe-inline'"],
+          styleSrc: ["'unsafe-inline'", 'https://fonts.googleapis.com'],
           imgSrc: ['*', 'data:'],
         },
       }),
@@ -122,9 +127,10 @@ export async function createServer(server: IServer): Promise<KoaApp> {
       }),
     )
     .use(router.routes())
-    .use(historyApiFallback({ index: '/admin/index.html' }))
-    .use(serve({ rootDir: 'admin', rootPath: '/admin' }))
     .use(router.allowedMethods());
+  if (process.env.PUBLIC_PATH === '/admin/') {
+    app.use(historyApiFallback({ index: '/admin/index.html' })).use(serve({ rootDir: 'admin', rootPath: '/admin' }));
+  }
 
   return app;
 }
@@ -142,26 +148,34 @@ export const startServer = (app: KoaApp) => {
 
   const httpServer = http.createServer(koaCallback);
 
-  httpServer.listen(config.PORT, () => log.info(`>>> HTTP server is running at http://localhost:${config.PORT}`));
+  httpServer.listen(config.PORT, config.HOST, () =>
+    log.info(`>>> HTTP server is running at http://${config.HOST}:${config.PORT}`),
+  );
 
   /**
    * HTTPS сервер с платным сертификатом
    */
 
-  const cert = fs.readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.crt'));
-  const key = fs.readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.key'));
+  try {
+    const cert = fs.readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.crt'));
+    const key = fs.readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.key'));
 
-  const ca = fs
-    .readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.ca-bundle'), { encoding: 'utf8' })
-    .split('-----END CERTIFICATE-----\r\n')
-    .map((cert) => cert + '-----END CERTIFICATE-----\r\n')
-    .pop();
+    const ca = fs
+      .readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.ca-bundle'), { encoding: 'utf8' })
+      .split('-----END CERTIFICATE-----\r\n')
+      .map((cert) => cert + '-----END CERTIFICATE-----\r\n')
+      .pop();
 
-  if (!ca) {
-    throw new Error('No CA file or file is invalid');
+    if (!ca) {
+      throw new Error('No CA file or file is invalid');
+    }
+
+    https
+      .createServer({ cert, ca, key }, koaCallback)
+      .listen(config.HTTPS_PORT, config.HOST, () =>
+        log.info(`>>> HTTPS server is running at https://${config.HOST}:${config.HTTPS_PORT}`),
+      );
+  } catch (err) {
+    log.warn('HTTPS server is not running. No SSL files');
   }
-
-  https
-    .createServer({ cert, ca, key }, koaCallback)
-    .listen(config.HTTPS_PORT, () => log.info(`>>> HTTPS server is running at https://localhost:${config.HTTPS_PORT}`));
 };

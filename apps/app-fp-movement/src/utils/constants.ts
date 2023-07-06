@@ -7,59 +7,6 @@ import { IGood } from '../store/app/types';
 
 const statusColors = ['#E91E63', '#06567D', '#80B12C', '#FFA700'] as const;
 
-export const ONE_SECOND_IN_MS = 1000;
-
-export const contactTypes: IListItem[] = [
-  { id: 'department', value: 'Подразделение' },
-  { id: 'contact', value: 'Организация' },
-  { id: 'employee', value: 'Сотрудник' },
-];
-
-export const docDepartTypes: IListItem[] = [{ id: 'all', value: 'Все' }];
-
-export const statusTypes: IListItem[] = [
-  {
-    id: 'all',
-    value: 'Все',
-  },
-  {
-    id: 'active',
-    value: 'Активные',
-  },
-  {
-    id: 'DRAFT',
-    value: 'Черновик',
-  },
-  {
-    id: 'READY',
-    value: 'Готово',
-  },
-  {
-    id: 'SENT',
-    value: 'Отправлено',
-  },
-  {
-    id: 'PROCESSED',
-    value: 'Обработано',
-  },
-];
-
-export const dateTypes: IListItem[] = [
-  {
-    id: 'new',
-    value: 'Сначала новые',
-  },
-  {
-    id: 'old',
-    value: 'Сначала старые',
-  },
-];
-
-export const STATUS_LIST: IListItem[] = [
-  { id: 'DRAFT', value: 'Черновик' },
-  { id: 'READY', value: 'Готов' },
-];
-
 export const getStatusColor = (status: StatusType) => {
   let statusColor: (typeof statusColors)[number];
 
@@ -88,14 +35,96 @@ export const getStatusColor = (status: StatusType) => {
   return statusColor;
 };
 
-const goodGroup = { id: 'goodScan', name: 'Код товара', sortOrder: 2, description: 'Количество символов' };
-const orderGroup = { id: 'orderScan', name: 'Код заявки', sortOrder: 3, description: 'Количество символов' };
+export const ONE_SECOND_IN_MS = 1000;
+
+export const contactTypes: IListItem[] = [
+  { id: 'department', value: 'Подразделение' },
+  { id: 'contact', value: 'Организация' },
+  { id: 'employee', value: 'Сотрудник' },
+];
+
+export const docDepartTypes: IListItem[] = [{ id: 'all', value: 'Все' }];
+
+export const statusTypes: IListItem[] = [
+  {
+    id: 'all',
+    value: 'Все',
+    statuses: ['DRAFT', 'READY', 'SENT', 'PROCESSED'],
+  },
+  {
+    id: 'active',
+    value: 'Активные',
+    statuses: ['DRAFT', 'READY', 'SENT'],
+  },
+  {
+    id: 'DRAFT',
+    value: 'Черновик',
+    statuses: ['DRAFT'],
+  },
+  {
+    id: 'READY',
+    value: 'Готово',
+    statuses: ['READY'],
+  },
+  {
+    id: 'SENT',
+    value: 'Отправлено',
+    statuses: ['SENT'],
+  },
+  {
+    id: 'PROCESSED',
+    value: 'Обработано',
+    statuses: ['PROCESSED'],
+  },
+  {
+    id: 'DRAFT_READY',
+    value: 'Черновик и Готов',
+    statuses: ['DRAFT', 'READY'],
+  },
+];
+
+export const dateTypes: IListItem[] = [
+  {
+    id: 'new',
+    value: 'Сначала новые',
+  },
+  {
+    id: 'old',
+    value: 'Сначала старые',
+  },
+];
+
+export const STATUS_LIST: IListItem[] = [
+  { id: 'DRAFT', value: 'Черновик' },
+  { id: 'READY', value: 'Готов' },
+];
+
+const goodGroup = { id: 'goodScan', name: 'Код товара', sortOrder: 21, description: 'Количество символов' };
+const orderGroup = { id: 'orderScan', name: 'Код заявки', sortOrder: 22, description: 'Количество символов' };
 
 export const appSettings: Settings = {
   scannerUse: {
     id: 'scannerUse',
     sortOrder: 3,
     description: 'Использовать сканер',
+    data: true,
+    type: 'boolean',
+    visible: true,
+    group: mainSettingGroup,
+  },
+  addressStore: {
+    id: 'addressStore',
+    sortOrder: 4,
+    description: 'Адресное хранение',
+    data: false,
+    type: 'boolean',
+    visible: true,
+    group: mainSettingGroup,
+  },
+  remainsUse: {
+    id: 'remainsUse',
+    sortOrder: 5,
+    description: 'Использовать остатки',
     data: true,
     type: 'boolean',
     visible: true,
@@ -178,6 +207,24 @@ export const appSettings: Settings = {
     sortOrder: 14,
     description: 'Номер партии',
     data: 6,
+    type: 'number',
+    visible: true,
+    group: goodGroup,
+  },
+  boxNumber: {
+    id: 'boxNumber',
+    sortOrder: 15,
+    description: 'Количество коробок',
+    data: 35,
+    type: 'number',
+    visible: true,
+    group: goodGroup,
+  },
+  boxWeight: {
+    id: 'boxWeight',
+    sortOrder: 16,
+    description: 'Мин. вес поддона, кг',
+    data: 25,
     type: 'number',
     visible: true,
     group: goodGroup,
@@ -266,3 +313,10 @@ export const barCodeTypes = [
   BarCodeScanner.Constants.BarCodeType.ean13,
   BarCodeScanner.Constants.BarCodeType.ean8,
 ];
+
+export const cellColors = {
+  default: '#5aa176',
+  barcode: '#226182',
+  free: '#d5dce3',
+  textWhite: 'white',
+};

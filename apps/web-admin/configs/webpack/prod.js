@@ -5,7 +5,7 @@ const config = require('../config.json');
 const webpack = require('webpack');
 const commonConfig = require('./common');
 
-require('dotenv').config({ path: './.env' });
+require('dotenv').config();
 
 module.exports = merge(commonConfig, {
   mode: 'production',
@@ -13,7 +13,7 @@ module.exports = merge(commonConfig, {
   output: {
     path: getRootRelativePath(config.webpack.buildPath),
     filename: 'js/bundle.[contenthash].min.js',
-    publicPath: '/admin/',
+    publicPath: process.env.PUBLIC_PATH || '/',
     assetModuleFilename: 'assets/images/[name][ext]'
   },
   devtool: 'source-map',

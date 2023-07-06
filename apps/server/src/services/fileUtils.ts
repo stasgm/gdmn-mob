@@ -21,6 +21,8 @@ import {
   getFoundString,
 } from '../utils/fileHelper';
 
+import { checkDeviceLogsFiles } from './errorLogUtils';
+
 import { getDb } from './dao/db';
 
 export const _readDir = async (root: string, excludeFolders: string[] | undefined): Promise<string[]> => {
@@ -52,12 +54,18 @@ export const checkFiles = async (): Promise<void> => {
       // eslint-disable-next-line no-await-in-loop
       const fileStat = await stat(file);
       const fileDate = fileStat.birthtimeMs;
-      if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > config.FILES_CHECK_PERIOD_IN_DAYS) {
+      if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > config.FILES_SAVING_PERIOD_IN_DAYS) {
         unlink(file);
       }
     } catch (err) {
       log.warn(`Ошибка при удалении старого файла-- ${err}`);
     }
+  }
+
+  try {
+    await checkDeviceLogsFiles();
+  } catch (err) {
+    log.warn(`Ошибка при удалении старого файла логов-- ${err}`);
   }
 };
 
@@ -142,38 +150,43 @@ const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => 
   }
   const nameWithoutExt = path.basename(root, ext);
   const subPath = path.dirname(root);
-  const fileStat = await stat(root);
-  const fileSize = fileStat.size / BYTES_PER_KB;
-  const fileDate = fileStat.birthtime.toString();
-  const fileModifiedDate = fileStat.mtime.toString();
+  try {
+    const fileStat = await stat(root);
+    const fileSize = fileStat.size / BYTES_PER_KB;
+    const fileDate = fileStat.birthtime.toString();
+    const fileModifiedDate = fileStat.mtime.toString();
 
-  const alias = fullFileName2alias(root);
+    const alias = fullFileName2alias(root);
 
-  const fileInfo = await splitFileMessage(root);
-  if (fileInfo) {
+    const fileInfo = await splitFileMessage(root);
+    if (fileInfo) {
+      return {
+        id: alias ?? nameWithoutExt,
+        date: fileDate,
+        size: fileSize,
+        fileName: name,
+        path: subPath,
+        company: fileInfo.company,
+        appSystem: fileInfo.appSystem,
+        producer: fileInfo.producer,
+        consumer: fileInfo.consumer,
+        device: fileInfo.device,
+        mdate: fileModifiedDate,
+      };
+    }
+
     return {
       id: alias ?? nameWithoutExt,
       date: fileDate,
       size: fileSize,
       fileName: name,
       path: subPath,
-      company: fileInfo.company,
-      appSystem: fileInfo.appSystem,
-      producer: fileInfo.producer,
-      consumer: fileInfo.consumer,
-      device: fileInfo.device,
       mdate: fileModifiedDate,
     };
+  } catch (err) {
+    log.error(`Invalid filename ${root}`);
+    return undefined;
   }
-
-  return {
-    id: alias ?? nameWithoutExt,
-    date: fileDate,
-    size: fileSize,
-    fileName: name,
-    path: subPath,
-    mdate: fileModifiedDate,
-  };
 };
 
 export const readListFiles = async (params: Record<string, string | number>): Promise<IFileSystem[]> => {

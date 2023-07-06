@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "app:server": "lerna run --scope=@apps/server start --stream",
+    "app:server-dev": "lerna run --scope=@apps/server dev --stream",
     "app:test": "lerna run --scope=@apps/expo-app-1 start --stream",
     "app:web": "lerna run --scope=@apps/web-admin start --stream",
     "expo:app": "lerna run --scope=@apps/app start --stream",
@@ -24,6 +25,7 @@
     "build:lib": "lerna run --scope=@lib/* build --stream",
     "build:server": "lerna run --scope=@apps/server build --stream",
     "build:web-admin": "lerna run --scope=@apps/web-admin build --stream",
+    "build:web-admin-prod": "lerna run --scope=@apps/web-admin build-prod-docker --stream",
     "build:web-admin-linux": "lerna run --scope=@apps/web-admin build-linux --stream",
     "clean": "lerna clean",
     "clean:all": "yarn clean:node-modules && yarn clean:expo-cache && yarn clean:dist",
@@ -32,8 +34,11 @@
     "clean:expo-cache": "rimraf apps/*/.expo packages/*/.expo",
     "update": "yarn upgrade-interactive --latest",
     "lint-staged-project": "lerna run --scope=@lib/* --scope=@apps/* --concurrency 1 --stream precommit --since HEAD --exclude-dependents",
-    "postinstall": "husky install",
-    "prepare": "husky install"
+    "docker-compose: build&up": "sudo docker-compose up --remove-orphans --build",
+    "docker-compose: build": "sudo docker-compose build",
+    "docker-compose: up": "sudo docker-compose up --remove-orphans",
+    "postinstall": "node -e \"process.env.NODE_ENV != 'production' && process.exit(1)\" || husky install",
+    "prepare": "node -e \"process.env.NODE_ENV != 'production' && process.exit(1)\" || husky install"
   },
   "lint-staged": {
     "package.json": [
@@ -47,12 +52,12 @@
     "@config/prettier-config": "*",
     "concurrently": "^7.6.0",
     "husky": "^8.0.3",
-    "lerna": "^6.4.1",
     "lint-staged": "^13.0.3",
     "patch-package": "^6.5.1",
     "rimraf": "^3.0.2",
     "sort-package-json": "2.4.1",
-    "typescript": "~4.8.4"
+    "typescript": "~4.8.4",
+    "lerna": "^7.0.1"
   },
   "prettier": "@config/prettier-config"
 }

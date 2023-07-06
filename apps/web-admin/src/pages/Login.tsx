@@ -1,7 +1,7 @@
 import { Link as RouterLink } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { useFormik } from 'formik';
-import { Box, Button, Container, Link, TextField, Typography, CircularProgress } from '@material-ui/core';
+import { Box, Button, Container, Link, TextField, Typography, CircularProgress } from '@mui/material';
 import * as yup from 'yup';
 
 import { IUserCredentials } from '@lib/types';

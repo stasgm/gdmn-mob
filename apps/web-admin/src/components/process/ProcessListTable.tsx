@@ -14,7 +14,7 @@ import {
   TablePagination,
   TableRow,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
 
 import { IProcess, ICompany } from '@lib/types';
 
@@ -157,7 +157,7 @@ const ProcessListTable = ({
   return (
     <Card>
       <PerfectScrollbar>
-        <Box sx={{ p: 1, overflowX: 'auto' }}>
+        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight: window.innerHeight - 268 }}>
           <Table>
             <TableHead>
               <TableRow>

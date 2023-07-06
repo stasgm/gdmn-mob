@@ -3,9 +3,9 @@ import { NavLink } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
-import RefreshIcon from '@material-ui/icons/Refresh';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
-import Tooltip from '@material-ui/core/Tooltip';
+import Tooltip from '@mui/material/Tooltip';
 
 import {
   Box,
@@ -19,7 +19,7 @@ import {
   TablePagination,
   TableRow,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
 
 import { IDevice, IActivationCode } from '@lib/types';
 
@@ -184,6 +184,8 @@ const DeviceListTable = ({
               </Box>
             </Box>
           </TableCell>
+          <TableCell>{device.company?.name || ''}</TableCell>
+
           <TableCell>{new Date(device.creationDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
           <TableCell>{new Date(device.editionDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
         </TableRow>
@@ -207,7 +209,7 @@ const DeviceListTable = ({
   return (
     <Card>
       <PerfectScrollbar>
-        <Box sx={{ p: 1, overflowX: 'auto' }}>
+        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight: window.innerHeight - 268 }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -223,6 +225,7 @@ const DeviceListTable = ({
                 <TableCell>Номер</TableCell>
                 <TableCell>Состояние</TableCell>
                 <TableCell>Код активации</TableCell>
+                <TableCell>Компания</TableCell>
                 <TableCell>Дата создания</TableCell>
                 <TableCell>Дата редактирования</TableCell>
               </TableRow>

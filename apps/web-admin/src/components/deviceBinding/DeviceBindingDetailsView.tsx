@@ -1,4 +1,4 @@
-import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@material-ui/core';
+import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@mui/material';
 
 import { IDeviceBinding } from '@lib/types';
 

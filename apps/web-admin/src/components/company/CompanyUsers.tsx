@@ -1,4 +1,4 @@
-import { Box, Container } from '@material-ui/core';
+import { Box, Container } from '@mui/material';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { IUser } from '@lib/types';
 

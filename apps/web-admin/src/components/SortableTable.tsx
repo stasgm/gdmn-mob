@@ -16,8 +16,8 @@ import {
   TableRow,
   TableSortLabel,
   Typography,
-} from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 
 import { IHeadCells, IPageParam } from '../types';
 import { deviceStates, adminPath } from '../utils/constants';
@@ -34,6 +34,7 @@ interface IProps<T extends { id: string }> {
   path?: string;
   onSetPageParams?: (pageParams: IPageParam) => void;
   pageParams?: IPageParam | undefined;
+  style?: any;
 }
 
 function SortableTable<T extends { id: string }>({
@@ -42,6 +43,7 @@ function SortableTable<T extends { id: string }>({
   path,
   onSetPageParams,
   pageParams,
+  style = {},
   ...rest
 }: IProps<T>) {
   const [selectedItemIds, setSelectedItemIds] = useState<any>([]);
@@ -200,10 +202,12 @@ function SortableTable<T extends { id: string }>({
     );
   };
 
+  const tableStyle = { ...style, p: 1, overflowX: 'auto' };
+
   return (
     <Card {...rest}>
       <PerfectScrollbar>
-        <Box sx={{ p: 1, overflowX: 'auto' }}>
+        <Box sx={tableStyle}>
           <Table>
             <TableHead>
               <TableRow>

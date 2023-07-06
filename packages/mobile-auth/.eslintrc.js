@@ -15,4 +15,14 @@ module.exports = {
       },
     },
   },
+  rules: {
+    'import/first': 'error',
+    'import/order': [
+      'error',
+      {
+        groups: ['index', 'sibling', 'parent', 'internal', 'external', 'builtin', 'object', 'type'],
+      },
+    ],
+    'import/newline-after-import': 'error',
+  },
 };

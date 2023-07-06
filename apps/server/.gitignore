@@ -42,9 +42,7 @@ yarn-error.log*
 /admin/assets/**
 /admin/index.html
 
-/ssl/**/*.key
-/ssl/**/*.ca-bundle
-/ssl/**/*.crt
+ssl/
 
 .env.development
 .env.production

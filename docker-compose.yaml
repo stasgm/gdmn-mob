@@ -1,20 +1,36 @@
 version: "3"
 services:
-  gdmn-mob:
-    image: gdmn-mob/server
+  web-admin:
+    image: gsbelarus/gdmn-mob.web-admin:${TAG}
+    container_name: web-admin
+    restart: always
+    build:
+      context: .
+      dockerfile: ./apps/web-admin/Dockerfile
+      args:
+        - REACT_APP_SECRET_KEY=${REACT_APP_SECRET_KEY}
+        - REACT_APP_SITE_KEY=${REACT_APP_SITE_KEY}
+    environment:
+      - NODE_ENV=production
+    ports:
+     - ${WEB_ADMIN_PORT}:443
+    volumes:
+      - ./ssl:/etc/nginx/ssl:ro
+  server:
+    image: gsbelarus/gdmn-mob.server
     container_name: server
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile
-      target: server
-    env_file:
-      - .env.production
+      dockerfile: ./apps/server/Dockerfile
+    environment:
+      - NODE_ENV=production
+      - FILES_PATH=/var/lib/gdmn-mob_db
     ports:
-      - "3655:3655"
-      - "3654:3654"
+      - ${PORT}:${PORT}
+      - ${HTTPS_PORT}:${HTTPS_PORT}
     volumes:
       - db:/var/lib/gdmn-mob_db
-      - ./apps/server/ssl:/usr/src/gdmn-mob/apps/server/ssl:ro
+      - ./ssl:/gdmn-mob/ssl:ro
 volumes:
   db:

@@ -1,5 +1,5 @@
-import { Box, Button } from '@material-ui/core';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import { Box, Button } from '@mui/material';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 
 interface IProps {
   compact: boolean;

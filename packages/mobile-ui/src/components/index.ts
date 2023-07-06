@@ -12,6 +12,7 @@ export {
   SendButton,
   SaveDocument,
   FilterButton,
+  InfoButton,
 } from './AppBar';
 export { BottomSheet } from './BottomSheet';
 export { ItemSeparator } from './ItemSeparator';

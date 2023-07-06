@@ -32,6 +32,7 @@
     "@types/node": "^18.11.19",
     "@types/react": "~18.0.25",
     "@types/react-native": "0.70.8",
+    "@types/react-native-version-check": "^3.4.5",
     "expo-constants": "~14.0.2",
     "react": "18.1.0",
     "react-native": "0.70.8",
