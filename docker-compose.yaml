@@ -2,8 +2,8 @@ version: "3"
 services:
   web-admin:
     image: gsbelarus/gdmn-mob.web-admin:${TAG}
-    network_mode: host
     container_name: web-admin
+    restart: always
     build:
       context: .
       dockerfile: ./apps/web-admin/Dockerfile
@@ -13,12 +13,11 @@ services:
     environment:
       - NODE_ENV=production
     ports:
-     - ${WEB_ADMIN_PORT}:${WEB_ADMIN_PORT}
+     - ${WEB_ADMIN_PORT}:443
     volumes:
       - ./ssl:/etc/nginx/ssl:ro
   server:
     image: gsbelarus/gdmn-mob.server
-    network_mode: host
     container_name: server
     restart: always
     build:
@@ -26,8 +25,6 @@ services:
       dockerfile: ./apps/server/Dockerfile
     environment:
       - NODE_ENV=production
-      - PORT=${PORT}
-      - HTTPS_PORT=${HTTPS_PORT}
       - FILES_PATH=/var/lib/gdmn-mob_db
     ports:
       - ${PORT}:${PORT}

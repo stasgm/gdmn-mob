@@ -148,7 +148,9 @@ export const startServer = (app: KoaApp) => {
 
   const httpServer = http.createServer(koaCallback);
 
-  httpServer.listen(config.PORT, () => log.info(`>>> HTTP server is running at http://localhost:${config.PORT}`));
+  httpServer.listen(config.PORT, config.HOST, () =>
+    log.info(`>>> HTTP server is running at http://${config.HOST}:${config.PORT}`),
+  );
 
   /**
    * HTTPS сервер с платным сертификатом
@@ -170,8 +172,8 @@ export const startServer = (app: KoaApp) => {
 
     https
       .createServer({ cert, ca, key }, koaCallback)
-      .listen(config.HTTPS_PORT, () =>
-        log.info(`>>> HTTPS server is running at https://localhost:${config.HTTPS_PORT}`),
+      .listen(config.HTTPS_PORT, config.HOST, () =>
+        log.info(`>>> HTTPS server is running at https://${config.HOST}:${config.HTTPS_PORT}`),
       );
   } catch (err) {
     log.warn('HTTPS server is not running. No SSL files');
