@@ -79,7 +79,7 @@
     "@config/prettier-config": "*",
     "@expo/config": "^8.0.2",
     "@expo/webpack-config": "^18.0.1",
-    "@types/node": "^18.15.0",
+    "@types/node": "^20.3.3",
     "@types/react": "~18.0.27",
     "@types/react-redux": "^7.1.25",
     "@types/redux": "^3.6.31",
