@@ -21,7 +21,7 @@ const FileDetailsView = ({ list }: IProps) => {
               </Typography>
             </Grid>
             <Grid item md={10} xs={6}>
-              <Typography variant="h4" gutterBottom>
+              <Typography variant="subtitle1" gutterBottom>
                 {list.fileName}
               </Typography>
             </Grid>
@@ -31,7 +31,7 @@ const FileDetailsView = ({ list }: IProps) => {
               </Typography>
             </Grid>
             <Grid item md={10} xs={6}>
-              <Typography variant="h4" gutterBottom>
+              <Typography variant="subtitle1" gutterBottom>
                 {list.path}
               </Typography>
             </Grid>
@@ -45,7 +45,7 @@ const FileDetailsView = ({ list }: IProps) => {
                 </Grid>
                 <Grid item md={10} xs={6}>
                   <NavLink to={`${adminPath}/app/companies/${list.company?.id}`} key={list.company?.id}>
-                    <Typography color="textPrimary" variant="h4" key={list.company?.id} gutterBottom>
+                    <Typography color="textPrimary" variant="subtitle1" key={list.company?.id} gutterBottom>
                       {list.company?.name || ''}
                     </Typography>
                   </NavLink>
@@ -61,7 +61,7 @@ const FileDetailsView = ({ list }: IProps) => {
                   </Typography>
                 </Grid>
                 <Grid item md={10} xs={6}>
-                  <Typography variant="h4" gutterBottom>
+                  <Typography variant="subtitle1" gutterBottom>
                     {list.appSystem?.name}
                   </Typography>
                 </Grid>
@@ -76,7 +76,7 @@ const FileDetailsView = ({ list }: IProps) => {
                   </Typography>
                 </Grid>
                 <Grid item md={10} xs={6}>
-                  <Typography variant="h4" gutterBottom>
+                  <Typography variant="subtitle1" gutterBottom>
                     {list.device?.name}
                   </Typography>
                 </Grid>
@@ -87,7 +87,7 @@ const FileDetailsView = ({ list }: IProps) => {
                   </Typography>
                 </Grid>
                 <Grid item md={10} xs={6}>
-                  <Typography variant="h4" gutterBottom>
+                  <Typography variant="subtitle1" gutterBottom>
                     {list.device?.id}
                   </Typography>
                 </Grid>
@@ -101,7 +101,7 @@ const FileDetailsView = ({ list }: IProps) => {
                   </Typography>
                 </Grid>
                 <Grid item md={10} xs={6}>
-                  <Typography variant="h4" gutterBottom>
+                  <Typography variant="subtitle1" gutterBottom>
                     {list.producer?.name}
                   </Typography>
                 </Grid>
@@ -116,7 +116,7 @@ const FileDetailsView = ({ list }: IProps) => {
                   </Typography>
                 </Grid>
                 <Grid item md={10} xs={6}>
-                  <Typography variant="h4" gutterBottom>
+                  <Typography variant="subtitle1" gutterBottom>
                     {list.consumer.name}
                   </Typography>
                 </Grid>
@@ -129,7 +129,7 @@ const FileDetailsView = ({ list }: IProps) => {
               </Typography>
             </Grid>
             <Grid item md={10} xs={6}>
-              <Typography variant="h4" gutterBottom>
+              <Typography variant="subtitle1" gutterBottom>
                 {new Date(list.date || '').toLocaleString('ru', { hour12: false })}
               </Typography>
             </Grid>
@@ -140,7 +140,7 @@ const FileDetailsView = ({ list }: IProps) => {
               </Typography>
             </Grid>
             <Grid item md={10} xs={6}>
-              <Typography variant="h4" gutterBottom>
+              <Typography variant="subtitle1" gutterBottom>
                 {Math.ceil(list.size).toString()} кб
               </Typography>
             </Grid>

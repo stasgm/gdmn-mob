@@ -45,18 +45,18 @@ const DetailsView = ({ details }: IProps) => {
                 <Grid item md={10} xs={6}>
                   {Array.isArray(item.value) ? (
                     item.value.map((i) => (
-                      <Typography variant="h4" gutterBottom key={item.id}>
+                      <Typography variant="subtitle1" gutterBottom key={item.id}>
                         {getFieldValue(i)}
                       </Typography>
                     ))
                   ) : item.link ? (
                     <NavLink to={item.link}>
-                      <Typography variant="h4" color="textPrimary" gutterBottom>
+                      <Typography variant="subtitle1" color="textPrimary" gutterBottom>
                         {getFieldValue(item.value)}
                       </Typography>
                     </NavLink>
                   ) : (
-                    <Typography variant="h4" gutterBottom>
+                    <Typography variant="subtitle1" gutterBottom>
                       {getFieldValue(item.value)}
                     </Typography>
                   )}
