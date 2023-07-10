@@ -6,8 +6,11 @@ WORKDIR /usr/src/app
 ARG REACT_APP_SECRET_KEY=${REACT_APP_SECRET_KEY}
 ARG REACT_APP_SITE_KEY=${REACT_APP_SECRET_KEY}
 
+
 ENV REACT_APP_SECRET_KEY=${REACT_APP_SECRET_KEY}
 ENV REACT_APP_SITE_KEY=${REACT_APP_SITE_KEY}
+
+ARG PROTOCOL
 
 # building react app
 # copy the package.json to install dependencies
@@ -41,13 +44,17 @@ RUN cd ./apps/web-admin && yarn build-docker
 FROM nginx:1.25-alpine-slim
 
 # Nginx config
-COPY ./apps/web-admin/nginx/nginx.conf /etc/nginx/conf.d/default.conf
+RUN if [ "$PROTOCOL" = "http" ]; then \
+      cp ./apps/web-admin/nginx/nginx.http.conf /etc/nginx/conf.d/default.conf && \
+      EXPOSE 80;\
+    elif [ "$PROTOCOL" = "https" ]; then \
+      cp ./apps/web-admin/nginx/nginx.https.conf /etc/nginx/conf.d/default.conf && \
+      EXPOSE 443;\
+    fi
 
 # Remove default nginx index page
 RUN rm -rf /usr/share/nginx/html/*
 # Copy build from the stage 1
 COPY --from=builder /usr/src/app/apps/web-admin/dist /usr/share/nginx/html
-
-EXPOSE 443
 
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
