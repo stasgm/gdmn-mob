@@ -10,8 +10,6 @@ ARG REACT_APP_SITE_KEY=${REACT_APP_SECRET_KEY}
 ENV REACT_APP_SECRET_KEY=${REACT_APP_SECRET_KEY}
 ENV REACT_APP_SITE_KEY=${REACT_APP_SITE_KEY}
 
-ARG PROTOCOL
-
 # building react app
 # copy the package.json to install dependencies
 COPY package.json yarn.lock tsconfig.base.json tsconfig.json ./
@@ -44,10 +42,10 @@ RUN cd ./apps/web-admin && yarn build-docker
 FROM nginx:1.25-alpine-slim
 
 # Nginx config
-RUN if [ "$PROTOCOL" = "http" ]; then \
+RUN if [ "$ADMIN_CONTAINER_PORT" = 80 ]; then \
       cp ./apps/web-admin/nginx/nginx.http.conf /etc/nginx/conf.d/default.conf && \
       EXPOSE 80;\
-    elif [ "$PROTOCOL" = "https" ]; then \
+    elif [ "$ADMIN_CONTAINER_PORT" = 443 ]; then \
       cp ./apps/web-admin/nginx/nginx.https.conf /etc/nginx/conf.d/default.conf && \
       EXPOSE 443;\
     fi
