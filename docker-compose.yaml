@@ -9,7 +9,7 @@ services:
     environment:
       - NODE_ENV=production
     ports:
-     - ${WEB_ADMIN_PORT}:443
+     - ${ADMIN_HOST_PORT}:${ADMIN_CONTAINER_PORT}
     volumes:
       - ./ssl:/etc/nginx/ssl:ro
   server:
