@@ -10,9 +10,6 @@ ARG REACT_APP_SITE_KEY=${REACT_APP_SECRET_KEY}
 ENV REACT_APP_SECRET_KEY=${REACT_APP_SECRET_KEY}
 ENV REACT_APP_SITE_KEY=${REACT_APP_SITE_KEY}
 
-ARG ADMIN_CONTAINER_PORT
-RUN echo "ADMIN_CONTAINER_PORT: $ADMIN_CONTAINER_PORT"
-
 # building react app
 # copy the package.json to install dependencies
 COPY package.json yarn.lock tsconfig.base.json tsconfig.json ./

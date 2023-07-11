@@ -7,10 +7,6 @@ services:
     build:
       context: .
       dockerfile: ./apps/web-admin/Dockerfile
-      args:
-        - REACT_APP_SECRET_KEY=${REACT_APP_SECRET_KEY}
-        - REACT_APP_SITE_KEY=${REACT_APP_SITE_KEY}
-        - ADMIN_CONTAINER_PORT=${ADMIN_CONTAINER_PORT}
     env_file:
       - .env
     environment:
