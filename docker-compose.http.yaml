@@ -1,0 +1,31 @@
+version: "3"
+services:
+  web-admin:
+    image: gsbelarus/gdmn-mob.web-admin.${CLIENT_ENV}
+    container_name: web-admin
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    ports:
+     - ${ADMIN_HOST_PORT}:${ADMIN_CONTAINER_PORT}
+    expose:
+     - ${ADMIN_CONTAINER_PORT}
+  server:
+    image: gsbelarus/gdmn-mob.server
+    container_name: server
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - FILES_PATH=/var/lib/gdmn-mob_db
+    ports:
+      - ${PORT}:${PORT}
+      - ${HTTPS_PORT}:${HTTPS_PORT}
+    volumes:
+      - db:/var/lib/gdmn-mob_db
+      - ./ssl:/gdmn-mob/ssl:ro
+volumes:
+  db:
