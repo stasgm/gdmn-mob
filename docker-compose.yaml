@@ -10,6 +10,8 @@ services:
       - NODE_ENV=production
     ports:
      - ${ADMIN_HOST_PORT}:${ADMIN_CONTAINER_PORT}
+    expose:
+     - ${ADMIN_CONTAINER_PORT}
     volumes:
       - ./ssl:/etc/nginx/ssl:ro
   server:

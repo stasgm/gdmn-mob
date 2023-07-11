@@ -10,6 +10,9 @@ ARG REACT_APP_SITE_KEY=${REACT_APP_SECRET_KEY}
 ENV REACT_APP_SECRET_KEY=${REACT_APP_SECRET_KEY}
 ENV REACT_APP_SITE_KEY=${REACT_APP_SITE_KEY}
 
+ARG ADMIN_CONTAINER_PORT
+RUN echo "ADMIN_CONTAINER_PORT: $ADMIN_CONTAINER_PORT"
+
 # building react app
 # copy the package.json to install dependencies
 COPY package.json yarn.lock tsconfig.base.json tsconfig.json ./
@@ -41,14 +44,9 @@ RUN cd ./apps/web-admin && yarn build-docker
 # STAGE 2
 FROM nginx:1.25-alpine-slim
 
-# Nginx config
-RUN if [ "$ADMIN_CONTAINER_PORT" = 80 ]; then \
-      cp ./apps/web-admin/nginx/nginx.http.conf /etc/nginx/conf.d/default.conf && \
-      EXPOSE 80;\
-    elif [ "$ADMIN_CONTAINER_PORT" = 443 ]; then \
-      cp ./apps/web-admin/nginx/nginx.https.conf /etc/nginx/conf.d/default.conf && \
-      EXPOSE 443;\
-    fi
+COPY ./apps/web-admin/nginx /etc/nginx/conf.d
+
+RUN if [[ "$ADMIN_CONTAINER_PORT" = "80" ]] ; then cp /etc/nginx/conf.d/nginx.http.conf /etc/nginx/conf.d/default.conf ; else cp /etc/nginx/conf.d/nginx.https.conf /etc/nginx/conf.d/default.conf ; fi
 
 # Remove default nginx index page
 RUN rm -rf /usr/share/nginx/html/*
