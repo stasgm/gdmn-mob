@@ -22,7 +22,15 @@ import {
   SimpleDialog,
 } from '@lib/mobile-ui';
 
-import { sleep, generateId, getDateString, round, useSendDocs, useSendOneRefRequest } from '@lib/mobile-hooks';
+import {
+  sleep,
+  generateId,
+  getDateString,
+  round,
+  useSendDocs,
+  useSendOneRefRequest,
+  isNumeric,
+} from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
 
@@ -62,6 +70,7 @@ const ShipmentViewScreen = () => {
 
   const { id, isCurr } = useRoute<RouteProp<ShipmentStackParamList, 'ShipmentView'>>().params;
 
+  console.log('isCurr', isCurr);
   const navState = navigation.getState();
   const isDashboard = navState.routes.some((route) => route.name === 'Dashboard');
 
@@ -180,6 +189,24 @@ const ShipmentViewScreen = () => {
     [dispatch, id, shipmentLines?.length],
   );
 
+  const handleAddLine = useCallback(
+    (weight: number, quantity: number, line: IShipmentLine) => {
+      if (weight < 1000) {
+        const newLine: IShipmentLine = {
+          ...line,
+          quantPack: quantity,
+          weight,
+          scannedBarcode: line?.barcode,
+        };
+
+        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+      } else {
+        addQuantPack(quantity, line);
+      }
+    },
+    [addQuantPack, dispatch, id],
+  );
+
   const handleAddQuantPack = useCallback(
     (quantity: number) => {
       const line = shipmentLines?.[0];
@@ -209,6 +236,7 @@ const ShipmentViewScreen = () => {
                     line: newTempLine,
                   }),
                 );
+                handleAddLine(weight, quantity, line);
               } else {
                 alertWithSoundMulti('Данное количество превышает количество в заявке.', 'Добавить позицию?', () => {
                   fpDispatch(
@@ -217,21 +245,12 @@ const ShipmentViewScreen = () => {
                       line: newTempLine,
                     }),
                   );
+
+                  handleAddLine(weight, quantity, line);
                 });
               }
-            }
-
-            if (weight < 1000) {
-              const newLine: IShipmentLine = {
-                ...line,
-                quantPack: quantity,
-                weight,
-                scannedBarcode: line?.barcode,
-              };
-
-              dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
             } else {
-              addQuantPack(quantity, line);
+              handleAddLine(weight, quantity, line);
             }
           }
         } else {
@@ -260,24 +279,18 @@ const ShipmentViewScreen = () => {
           }
         }
 
-        if (weight < 1000) {
-          const newLine: IShipmentLine = {
-            ...line,
-            quantPack: quantity,
-            weight,
-            scannedBarcode: line?.barcode,
-          };
-
-          dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-        } else {
-          addQuantPack(quantity, line);
-        }
+        handleAddLine(weight, quantity, line);
       }
     },
-    [shipmentLines, remainsUse, goodRemains, tempOrder, fpDispatch, dispatch, id, addQuantPack],
+    [shipmentLines, tempOrder, remainsUse, goodRemains, fpDispatch, handleAddLine],
   );
 
   const handleEditQuantPack = () => {
+    if (!isNumeric(quantPack)) {
+      alertWithSound('Ошибка!', 'Неправильное количество.');
+      return;
+    }
+
     handleAddQuantPack(Number(quantPack));
     setVisibleQuantPackDialog(false);
     setQuantPack('');
@@ -432,8 +445,14 @@ const ShipmentViewScreen = () => {
   );
 
   const renderLeft = useCallback(
-    () => <BackButton onPress={() => (isDashboard ? navigation.goBack() : navigation.navigate('ShipmentList'))} />,
-    [isDashboard, navigation],
+    () => (
+      <BackButton
+        onPress={() =>
+          isDashboard ? navigation.goBack() : navigation.navigate(isCurr ? 'CurrShipmentList' : 'ShipmentList')
+        }
+      />
+    ),
+    [isCurr, isDashboard, navigation],
   );
 
   useLayoutEffect(() => {
@@ -446,11 +465,6 @@ const ShipmentViewScreen = () => {
   const [scanned, setScanned] = useState(false);
 
   const ref = useRef<TextInput>(null);
-
-  // const handlePlaySound = async () => {
-  //   const { sound } = await Audio.Sound.createAsync(require('../../../assets/error.mp3'));
-  //   await sound.playAsync();
-  // };
 
   const handleErrorMessage = useCallback((visible: boolean, text: string) => {
     if (visible) {
@@ -753,7 +767,7 @@ const ShipmentViewScreen = () => {
             extraData={[tempOrderLines, isBlocked]}
             keyboardShouldPersistTaps={'always'}
           />
-          <ViewTotal weight={tempLineSum.weight || 0} />
+          <ViewTotal weight={tempLineSum?.weight || 0} />
         </>
       )}
       <AppDialog
