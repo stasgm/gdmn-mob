@@ -44,10 +44,6 @@ RUN cd ./apps/web-admin && yarn build-docker
 # STAGE 2
 FROM nginx:1.25-alpine-slim
 
-COPY ./apps/web-admin/nginx /etc/nginx/conf.d
-
-RUN if [[ "$ADMIN_CONTAINER_PORT" = "80" ]] ; then cp /etc/nginx/conf.d/nginx.http.conf /etc/nginx/conf.d/default.conf ; else cp /etc/nginx/conf.d/nginx.https.conf /etc/nginx/conf.d/default.conf ; fi
-
 # Remove default nginx index page
 RUN rm -rf /usr/share/nginx/html/*
 # Copy build from the stage 1
