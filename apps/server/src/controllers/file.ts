@@ -96,15 +96,21 @@ const removeFile = async (ctx: ParameterizedContext): Promise<void> => {
 const removeManyFiles = async (ctx: ParameterizedContext): Promise<void> => {
   const { action } = ctx.query;
 
-  if (!action || action !== 'delete') {
+  if (!action || (action !== 'delete' && action !== 'move')) {
     notOk(ctx as Context);
     return;
   }
-  const { ids } = ctx.request.body as IFileIds;
+  const { ids, folderName } = ctx.request.body as IFileIds;
 
-  await fileService.deleteMany(ids);
+  if (action === 'move' && !folderName) {
+    notOk(ctx as Context);
+    return;
+  }
 
-  ok(ctx as Context, undefined, 'removeManyFiles: files are successfully  deleted');
+  action === 'move' ? await fileService.moveMany(ids, folderName!) : await fileService.deleteMany(ids);
+  const actionName = action === 'move' ? 'moved' : 'deleted';
+
+  ok(ctx as Context, undefined, `removeManyFiles: files are successfully  ${actionName}`);
 };
 
 const updateFile = async (ctx: ParameterizedContext): Promise<void> => {
@@ -117,4 +123,13 @@ const updateFile = async (ctx: ParameterizedContext): Promise<void> => {
   ok(ctx as Context, updatedFile, `updateFile: file '${id}' is successfully updated`);
 };
 
-export { getFiles, getFile, removeFile, updateFile, removeManyFiles };
+const getFolders = async (ctx: ParameterizedContext): Promise<void> => {
+  const { companyId, appSystemId } = ctx.request.query;
+  const folderlist = await fileService.getFolders({
+    companyId: companyId as string,
+    appSystemId: appSystemId as string,
+  });
+
+  ok(ctx as Context, folderlist, 'getfolders: folders is successfully  received');
+};
+export { getFiles, getFile, removeFile, updateFile, removeManyFiles, getFolders };
