@@ -126,7 +126,7 @@ export const inventoryScreens = {
   InventoryView: { title: '', component: InventoryViewScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
   ScanGood: { title: 'Сканер', component: ScanGoodScreen },
-  SelectCell: { title: 'Выбор ячейки', component: InvSelectCellScreen },
+  InventorySelectCell: { title: 'Выбор ячейки', component: InvSelectCellScreen },
 };
 
 export const inventoryListScreens = {

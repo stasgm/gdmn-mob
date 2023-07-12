@@ -97,7 +97,7 @@ const ShipmentEditScreen = () => {
   useEffect(() => {
     if (screenState === 'saving') {
       if (!shipmentType) {
-        alertWithSound('Ошибка!', 'Тип документа для заявок не найден');
+        alertWithSound('Ошибка!', 'Тип документа для заявок не найден.');
         setScreenState('idle');
         return;
       }

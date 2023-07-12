@@ -336,11 +336,11 @@ export const alertWithSoundMulti = (label: string, text: string, onOk: () => voi
 
   Alert.alert(`${label}`, `${text}`, [
     {
-      text: 'Да',
-      onPress: () => onOk(),
+      text: 'Отмена',
     },
     {
-      text: 'Отмена',
+      text: 'Да',
+      onPress: () => onOk(),
     },
   ]);
 };

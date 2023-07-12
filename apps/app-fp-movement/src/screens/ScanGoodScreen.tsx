@@ -191,7 +191,7 @@ const ScanGoodScreen = () => {
         isToAddressed
       ) {
         if (scannedObject.quantPack < goodBarcodeSettings.boxNumber) {
-          alertWithSound('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}!`);
+          alertWithSound('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}.`);
           setScaner({ state: 'init' });
           return;
         }
