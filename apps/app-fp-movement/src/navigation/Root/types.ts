@@ -89,7 +89,7 @@ export type CurrFreeShipmentParamList = RefParamList & {
   ScanGood: { docId: string; docType?: string };
 };
 
-export type CurrFreeShipmentStackParamList = { CurrFreeShipmentList: undefined } & FreeShipmentParamList;
+export type CurrFreeShipmentStackParamList = { CurrFreeShipmentList: undefined } & CurrFreeShipmentParamList;
 
 export type ReturnParamList = RefParamList & {
   ReturnView: { id: string; docType?: string };

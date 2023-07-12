@@ -1535,7 +1535,117 @@ export const messageFpMovement: IMessage<MessageType>[] = [
           description: 'Остатки ТМЦ',
           data: [
             {
-              '147023737': [
+              '176424776': [
+                {
+                  goodId: '147048739',
+                  q: 1200,
+                },
+                {
+                  goodId: '857817085',
+                  q: 15.615,
+                },
+                {
+                  goodId: '147067788',
+                  q: 0.5833,
+                },
+                {
+                  goodId: '153359486',
+                  q: 912,
+                },
+                {
+                  goodId: '111852486',
+                  q: 10,
+                },
+                {
+                  goodId: '147067789',
+                  q: 715.225,
+                },
+                {
+                  goodId: '147067790',
+                  q: 2,
+                },
+                {
+                  goodId: '147067791',
+                  q: 1788,
+                },
+                {
+                  goodId: '147067792',
+                  q: 1200,
+                },
+                {
+                  goodId: '147067793',
+                  q: 1.015,
+                },
+                {
+                  goodId: '147067794',
+                  q: 437.377,
+                },
+                {
+                  goodId: '147067795',
+                  q: 528.68,
+                },
+                {
+                  goodId: '153359485',
+                  q: 1500,
+                },
+                {
+                  goodId: '153367898',
+                  q: 492,
+                },
+                {
+                  goodId: '157381934',
+                  q: 200,
+                },
+                {
+                  goodId: '172067346',
+                  q: 480,
+                },
+                {
+                  goodId: '185970902',
+                  q: 2400,
+                },
+                {
+                  goodId: '147066836',
+                  q: 120,
+                },
+                {
+                  goodId: '147066837',
+                  q: 3348,
+                },
+                {
+                  goodId: '147066838',
+                  q: 32.91,
+                },
+                {
+                  goodId: '147066840',
+                  q: 3180,
+                },
+                {
+                  goodId: '147067756',
+                  q: 1680,
+                },
+                {
+                  goodId: '955211845',
+                  q: 122.241,
+                },
+                {
+                  goodId: '955211846',
+                  q: 0.799,
+                },
+                {
+                  goodId: '807686298',
+                  q: 366.33,
+                },
+                {
+                  goodId: '807686299',
+                  q: 334.495,
+                },
+                {
+                  goodId: '807686297',
+                  q: 150.192,
+                },
+              ],
+              '176459265': [
                 {
                   goodId: '147048739',
                   q: 1200,
@@ -1849,7 +1959,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               name: 'ОАО "МаркетКомпани"',
               shcode: '',
             },
-            depart: {
+            fromDepart: {
               id: '176459265',
               name: 'Подразделение №0',
             },
@@ -1948,7 +2058,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               name: 'ООО "ЕдаЭксперт"',
               shcode: '',
             },
-            depart: {
+            fromDepart: {
               id: '176459265',
               name: 'Подразделение №0',
             },
@@ -2048,7 +2158,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               name: 'ООО "ПродуктМаг"',
               shcode: '',
             },
-            depart: {
+            fromDepart: {
               id: '176459265',
               name: 'Подразделение №0',
             },
@@ -2148,7 +2258,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               name: 'ООО "ЕдаЭксперт"',
               shcode: '',
             },
-            depart: {
+            fromDepart: {
               id: '176459265',
               name: 'Подразделение №0',
             },
@@ -2701,7 +2811,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
           creationDate: new Date().toISOString(),
           status: 'DRAFT',
           head: {
-            depart: {
+            fromDepart: {
               id: '176459265',
               name: 'Подразделение №0',
             },
@@ -2788,7 +2898,181 @@ export const messageFpMovement: IMessage<MessageType>[] = [
             subtype: 'shipment',
           },
           head: {
-            depart: {
+            fromDepart: {
+              id: '176459265',
+              name: 'Подразделение №0',
+            },
+          },
+          editionDate: new Date().toISOString(),
+        },
+        {
+          id: 'd1602fwdfy',
+          documentType: {
+            id: '147856307',
+            name: 'currFreeShipment',
+            description: 'Реализация ГП',
+            subtype: 'shipment',
+          },
+          number: '1',
+          documentDate: new Date().toISOString(),
+          lines: [
+            {
+              good: {
+                id: '147035339',
+                name: 'Колбаски балканские',
+                shcode: '1577',
+              },
+              id: 'd084114ec8',
+              weight: 5,
+              barcode: '00500014072218071577006564',
+              workDate: '2022-07-13T21:00:00.000Z',
+              numReceived: '564',
+              sortOrder: 2,
+            },
+            {
+              good: {
+                id: '1572500927',
+                name: 'Ветчина вар. Любительская',
+                shcode: '1549',
+              },
+              id: '12953d9f9f',
+              weight: 5,
+              barcode: '00500014072216481549006565',
+              workDate: '2022-07-13T21:00:00.000Z',
+              numReceived: '565',
+              sortOrder: 1,
+            },
+            {
+              good: {
+                id: '807686298',
+                name: 'Сосиски докторские',
+                shcode: '1575',
+              },
+              id: 'd084114ec9',
+              weight: 5,
+              barcode: '00500014072218071575006564',
+              workDate: '2022-07-13T21:00:00.000Z',
+              numReceived: '564',
+              sortOrder: 5,
+            },
+            {
+              good: {
+                id: '147035338',
+                name: 'Колбаски баварские',
+                shcode: '1550',
+              },
+              id: '12952d9f9f',
+              weight: 5,
+              barcode: '00500014072216481550006565',
+              workDate: '2022-07-13T21:00:00.000Z',
+              numReceived: '565',
+              sortOrder: 3,
+            },
+            {
+              good: {
+                id: '857817086',
+                name: 'Колбаса вареная молочная',
+                shcode: '1545',
+              },
+              id: 'd084114ec7',
+              weight: 5,
+              barcode: '00500014072218071545006564',
+              workDate: '2022-07-13T21:00:00.000Z',
+              numReceived: '564',
+              sortOrder: 4,
+            },
+          ],
+          creationDate: new Date().toISOString(),
+          status: 'DRAFT',
+          head: {
+            fromDepart: {
+              id: '176459265',
+              name: 'Подразделение №0',
+            },
+          },
+          editionDate: new Date().toISOString(),
+        },
+        {
+          id: 'f19247da83',
+          number: '2',
+          documentDate: new Date().toISOString(),
+          lines: [
+            {
+              good: {
+                id: '807686298',
+                name: 'Сосиски докторские',
+                shcode: '1575',
+              },
+              id: 'd084114ec3',
+              weight: 8,
+              barcode: '00800014072218071575006160722',
+              workDate: '2022-07-15T21:00:00.000Z',
+              numReceived: '160722',
+              sortOrder: 2,
+            },
+            {
+              good: {
+                id: '807686299',
+                name: 'Сосиски сливочные',
+                shcode: '1576',
+              },
+              id: '12951d9f9n',
+              weight: 9,
+              barcode: '00900014072216481576006160722',
+              workDate: '2022-07-15T21:00:00.000Z',
+              numReceived: '160722',
+              sortOrder: 1,
+            },
+            {
+              good: {
+                id: '955211847',
+                name: 'Колб. изд. "Колбаса Столичная"',
+                shcode: '1546',
+              },
+              id: 'd084114ec4',
+              weight: 9,
+              barcode: '009000314072218071546006160722',
+              workDate: '2022-07-15T21:00:00.000Z',
+              numReceived: '160722',
+              sortOrder: 4,
+            },
+            {
+              good: {
+                id: '955211846',
+                name: 'Колб. изд. "Колбаса Сливочная"',
+                shcode: '1547',
+              },
+              id: 'd084114ec5',
+              weight: 7,
+              barcode: '00700014072218071547006160722',
+              workDate: '2022-07-15T21:00:00.000Z',
+              numReceived: '160722',
+              sortOrder: 3,
+            },
+            {
+              good: {
+                id: '955211845',
+                name: 'Колб. изд. "Колбаса Мортаделла"',
+                shcode: '1544',
+              },
+              id: '12951d9f9x',
+              weight: 10,
+              barcode: '01000014072216481544006160722',
+              workDate: '2022-07-15T21:00:00.000Z',
+              numReceived: '160722',
+              sortOrder: 5,
+            },
+          ],
+          creationDate: new Date().toISOString(),
+          status: 'DRAFT',
+          documentType: {
+            id: '147856307',
+            name: 'currFreeShipment',
+            description: 'Реализация ГП',
+            subtype: 'shipment',
+          },
+          head: {
+            fromDepart: {
               id: '176459265',
               name: 'Подразделение №0',
             },
