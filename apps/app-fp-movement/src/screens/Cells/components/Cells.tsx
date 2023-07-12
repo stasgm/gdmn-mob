@@ -28,7 +28,7 @@ const NamedRow = ({ item }: { item: string }) => (
 );
 
 const handleAlert = (label: string, text: string) => {
-  alertWithSound(label, `Рекомендуется: ${text}`);
+  alertWithSound(label, `Рекомендуется: ${text}.`);
 };
 
 const Cells = ({
@@ -46,8 +46,6 @@ const Cells = ({
 }) => {
   const navigation = useNavigation<StackNavigationProp<CellsStackParamList, 'ContactList'>>();
   const { colors } = useTheme();
-
-  console.log('cells');
 
   const Cell = useCallback(
     ({ item }: { item: ICellData }) => {

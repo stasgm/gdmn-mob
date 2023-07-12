@@ -314,7 +314,7 @@ export const InventoryViewScreen = () => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      alertWithSound('Внимание!', text);
+      alertWithSound('Внимание!', `${text}.`);
       setScanned(false);
     }
   }, []);
@@ -372,7 +372,12 @@ export const InventoryViewScreen = () => {
       const isToAddressed = departs.find((i) => i.id === doc.head.fromDepart?.id && i.isAddressStore);
 
       if (doc.head.fromDepart?.isAddressStore || isToAddressed) {
-        navigation.navigate('SelectCell', { docId: id, item: newLine, mode: 0, docType: doc.documentType.name });
+        navigation.navigate('InventorySelectCell', {
+          docId: id,
+          item: newLine,
+          mode: 0,
+          docType: doc.documentType.name,
+        });
       } else {
         dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
       }
