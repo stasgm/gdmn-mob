@@ -23,9 +23,7 @@ services:
       - FILES_PATH=/var/lib/gdmn-mob_db
     ports:
       - ${PORT}:${PORT}
-      - ${HTTPS_PORT}:${HTTPS_PORT}
     volumes:
       - db:/var/lib/gdmn-mob_db
-      - ./ssl:/gdmn-mob/ssl:ro
 volumes:
   db:
