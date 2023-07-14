@@ -125,7 +125,7 @@ export const LaboratoryViewScreen = () => {
 
         if (good) {
           if (good.remains < newWeight - line.weight) {
-            alertWithSound('Внимание!', 'Вес товара превышает вес в остатках!');
+            alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.');
 
             return;
           } else if (newWeight < 1000 || newWeight <= line.weight) {
@@ -137,7 +137,7 @@ export const LaboratoryViewScreen = () => {
             dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
           }
         } else {
-          alertWithSound('Ошибка!', 'Товар не найден');
+          alertWithSound('Ошибка!', 'Товар не найден.');
           return;
         }
       } else {
@@ -149,7 +149,7 @@ export const LaboratoryViewScreen = () => {
 
           dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
         } else {
-          alertWithSound('Ошибка!', 'Неверный вес');
+          alertWithSound('Ошибка!', 'Неверный вес.');
           return;
         }
       }
@@ -332,7 +332,7 @@ export const LaboratoryViewScreen = () => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      alertWithSound('Внимание!', text);
+      alertWithSound('Внимание!', `${text}.`);
       setScanned(false);
     }
   }, []);

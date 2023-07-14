@@ -143,7 +143,7 @@ export const FreeShipmentViewScreen = () => {
 
         if (good) {
           if (good.remains < weight - line.weight) {
-            alertWithSound('Внимание!', 'Вес товара превышает вес в остатках!');
+            alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.');
 
             return;
           } else if (weight < 1000) {
@@ -189,7 +189,7 @@ export const FreeShipmentViewScreen = () => {
             }
           }
         } else {
-          alertWithSound('Ошибка!', 'Товар не найден');
+          alertWithSound('Ошибка!', 'Товар не найден.');
 
           return;
         }
@@ -412,7 +412,7 @@ export const FreeShipmentViewScreen = () => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      alertWithSound('Внимание!', text);
+      alertWithSound('Внимание!', `${text}.`);
       setScanned(false);
     }
   }, []);

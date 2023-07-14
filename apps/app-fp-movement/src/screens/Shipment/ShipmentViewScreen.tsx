@@ -70,7 +70,6 @@ const ShipmentViewScreen = () => {
 
   const { id, isCurr } = useRoute<RouteProp<ShipmentStackParamList, 'ShipmentView'>>().params;
 
-  console.log('isCurr', isCurr);
   const navState = navigation.getState();
   const isDashboard = navState.routes.some((route) => route.name === 'Dashboard');
 
@@ -223,7 +222,7 @@ const ShipmentViewScreen = () => {
 
         if (good) {
           if (good.remains + line.weight < weight) {
-            alertWithSound('Внимание!', 'Вес товара превышает вес в остатках!');
+            alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.');
 
             return;
           } else {
@@ -254,7 +253,7 @@ const ShipmentViewScreen = () => {
             }
           }
         } else {
-          alertWithSound('Ошибка!', 'Товар не найден');
+          alertWithSound('Ошибка!', 'Товар не найден.');
           return;
         }
       } else {
@@ -470,7 +469,7 @@ const ShipmentViewScreen = () => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      alertWithSound('Внимание!', text);
+      alertWithSound('Внимание!', `${text}.`);
       setScanned(false);
     }
     // handlePlaySound();
