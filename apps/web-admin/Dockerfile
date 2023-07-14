@@ -48,6 +48,6 @@ RUN rm -rf /usr/share/nginx/html/*
 # Copy build from the stage 1
 COPY --from=builder /usr/src/app/apps/web-admin/dist /usr/share/nginx/html
 
-EXPOSE 3656
+EXPOSE 443
 
 ENTRYPOINT ["nginx", "-g", "daemon off;"]

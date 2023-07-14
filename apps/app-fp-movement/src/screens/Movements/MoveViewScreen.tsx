@@ -292,7 +292,7 @@ export const MoveViewScreen = () => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      alertWithSound('Внимание!', text);
+      alertWithSound('Внимание!', `${text}.`);
       setScanned(false);
     }
   }, []);

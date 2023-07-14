@@ -206,7 +206,13 @@ export const getLineGood = (
       const isRightWeight = good.remains >= weight;
 
       return {
-        good: { id: good.good.id, name: good.good.name, shcode: good.good.shcode, isCattle: good.good.isCattle },
+        good: {
+          id: good.good.id,
+          name: good.good.name,
+          shcode: good.good.shcode,
+          isCattle: good.good.isCattle,
+          goodGroupId: good.good.goodGroupId,
+        },
         isRightWeight,
       };
     } else {
@@ -215,7 +221,9 @@ export const getLineGood = (
   } else {
     const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === shcode);
     return {
-      good: good ? { id: good.id, name: good.name, shcode: good.shcode, isCattle: good.isCattle } : undefined,
+      good: good
+        ? { id: good.id, name: good.name, shcode: good.shcode, isCattle: good.isCattle, goodGroupId: good.goodGroupId }
+        : undefined,
       isRightWeight: true,
     };
   }
@@ -336,11 +344,11 @@ export const alertWithSoundMulti = (label: string, text: string, onOk: () => voi
 
   Alert.alert(`${label}`, `${text}`, [
     {
-      text: 'Да',
-      onPress: () => onOk(),
+      text: 'Отмена',
     },
     {
-      text: 'Отмена',
+      text: 'Да',
+      onPress: () => onOk(),
     },
   ]);
 };
