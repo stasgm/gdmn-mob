@@ -119,21 +119,22 @@ const Login = () => {
               variant="outlined"
               disabled={loading}
             />
-            <Box
-              sx={{
-                // mb: 2,
-                marginTop: 1,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <Reaptcha
-                sitekey={process.env.REACT_APP_SITE_KEY}
-                ref={captchaRef}
-                onVerify={(token) => setCaptchaToken(token)}
-              />
-            </Box>
+            {process.env.REACT_APP_SITE_KEY && (
+              <Box
+                sx={{
+                  marginTop: 1,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <Reaptcha
+                  sitekey={process.env.REACT_APP_SITE_KEY}
+                  ref={captchaRef}
+                  onVerify={(token) => setCaptchaToken(token)}
+                />
+              </Box>
+            )}
             <Box sx={{ py: 2 }}>
               <Button
                 color="primary"
