@@ -115,8 +115,8 @@ const MobileApp = ({ loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
   useEffect(() => {
     if (!isLoggedWithCompany) {
       const checkForUpdates = async () => {
-        const packageName = Constants.manifest?.android?.package || '';
-        const currentVersion = Constants.manifest?.version;
+        const packageName = Constants.expoConfig?.android?.package || '';
+        const currentVersion = Constants.expoConfig?.version;
 
         const storeVersion = await VersionCheck.getLatestVersion({
           packageName,
@@ -124,7 +124,7 @@ const MobileApp = ({ loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
 
         if (storeVersion !== currentVersion) {
           const installerPackageName = await getInstallReferrerAsync();
-          const appName = Constants.manifest?.name || '';
+          const appName = Constants.expoConfig?.name || '';
 
           if (installerPackageName.includes('utm_source=google-play')) {
             const googlePlayUrl = await VersionCheck.getPlayStoreUrl({

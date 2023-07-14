@@ -191,7 +191,6 @@ const DrawerNavigator = ({ onSyncClick, items, dashboardScreens }: IProps) => {
         </Snackbar>
       </Modal>
       <Drawer.Navigator
-        useLegacyImplementation
         screenOptions={{
           drawerActiveBackgroundColor: colors.primary,
           drawerActiveTintColor: '#ffffff',
