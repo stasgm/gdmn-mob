@@ -100,7 +100,7 @@
     "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^4.10.0",
     "webpack-merge": "^5.8.0",
-    "yup": "^0.32.11"
+    "yup": "^1.2.0"
   },
   "devDependencies": {
     "@config/eslint-config": "*",
