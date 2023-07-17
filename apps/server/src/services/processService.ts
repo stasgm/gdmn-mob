@@ -45,7 +45,8 @@ export const addOne = (params: AddProcess): IAddProcessResponse => {
     throw new DataNotFoundException('Компания не найдена');
   }
 
-  if (!users.findById(consumerId)) {
+  const consumer = users.findById(consumerId);
+  if (!consumer) {
     throw new DataNotFoundException('Получатель не найден');
   }
 
@@ -54,7 +55,7 @@ export const addOne = (params: AddProcess): IAddProcessResponse => {
 
   //Если процесс существует, то возвращаем status = BUSY
   if (process) {
-    log.warn(`Robust-protocol.addProcess: процесс ${process.id} занят`);
+    log.warn(`Robust-protocol.addProcess: для получателя ${consumer.name} процесс ${process.id} занят`);
     return { status: 'BUSY', processId: process.id };
   }
 

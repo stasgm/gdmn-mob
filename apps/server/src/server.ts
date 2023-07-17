@@ -65,14 +65,14 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   //Каждый запрос содержит cookies, по которому passport опознаёт пользователя, и достаёт его данные из сессии.
   //passport сохраняет пользовательские данные
   passport.serializeUser((user: unknown, done) => {
-    log.info('serializeUser', user);
+    // log.info('serializeUser', user);
     done(null, (user as IUser).id);
   });
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   //passport достаёт пользовательские данные из сессии
   passport.deserializeUser((id: string, done) => {
     try {
-      log.info('deserializeUser', id);
+      // log.info('deserializeUser', id);
       const user = userService.findOne(id);
       done(null, user);
     } catch (err) {
@@ -148,7 +148,9 @@ export const startServer = (app: KoaApp) => {
 
   const httpServer = http.createServer(koaCallback);
 
-  httpServer.listen(config.PORT, () => log.info(`>>> HTTP server is running at http://localhost:${config.PORT}`));
+  httpServer.listen(config.PORT, config.HOST, () =>
+    log.info(`>>> HTTP server is running at http://${config.HOST}:${config.PORT}`),
+  );
 
   /**
    * HTTPS сервер с платным сертификатом
@@ -170,8 +172,8 @@ export const startServer = (app: KoaApp) => {
 
     https
       .createServer({ cert, ca, key }, koaCallback)
-      .listen(config.HTTPS_PORT, () =>
-        log.info(`>>> HTTPS server is running at https://localhost:${config.HTTPS_PORT}`),
+      .listen(config.HTTPS_PORT, config.HOST, () =>
+        log.info(`>>> HTTPS server is running at https://${config.HOST}:${config.HTTPS_PORT}`),
       );
   } catch (err) {
     log.warn('HTTPS server is not running. No SSL files');
