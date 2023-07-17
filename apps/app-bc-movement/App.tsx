@@ -24,7 +24,7 @@ import {
   AppFallback,
 } from '@lib/mobile-ui';
 
-import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
+import { ActivityIndicator, Caption, useTheme, MD2Theme } from 'react-native-paper';
 
 import { sleep } from '@lib/mobile-hooks';
 
@@ -50,7 +50,7 @@ const Root = () => {
   );
 
   const dispatch = useDispatch();
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   const isInit = useSelector((state) => state.settings.isInit);
   const authLoading = useSelector((state) => state.auth.loadingData);

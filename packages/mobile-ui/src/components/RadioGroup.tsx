@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableHighlight } from 'react-native';
-import { useTheme } from 'react-native-paper';
+import { MD2Theme, useTheme } from 'react-native-paper';
 import { IListItem } from '@lib/mobile-types';
 
 type Props = {
@@ -53,7 +53,7 @@ interface ICircleProps {
 }
 
 const Circle = ({ active }: ICircleProps) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   return (
     <View style={[localStyles.radioCircle, { borderColor: colors.primary }]}>

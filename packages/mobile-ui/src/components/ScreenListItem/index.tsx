@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 import { TouchableOpacity, View, StyleSheet } from 'react-native';
-import { useTheme } from 'react-native-paper';
+import { MD2Theme, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusType } from '@lib/types';
 
@@ -39,7 +39,7 @@ const ScreenListItem = ({
   checked,
   addInfo,
 }: IListItemProps) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   return (
     <TouchableOpacity onPress={onPress} onLongPress={onLongPress}>

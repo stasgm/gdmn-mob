@@ -1,8 +1,18 @@
 import React, { useState, useLayoutEffect, useCallback, useMemo, useEffect } from 'react';
-import { View, Text, StyleSheet, ColorValue, Alert, useWindowDimensions, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ColorValue,
+  Alert,
+  useWindowDimensions,
+  TouchableOpacity,
+  StyleProp,
+  ViewStyle,
+} from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
-import { Badge, Chip, Divider, Searchbar, useTheme } from 'react-native-paper';
+import { Badge, Chip, Divider, MD2Theme, Searchbar, useTheme } from 'react-native-paper';
 
 import {
   globalStyles as styles,
@@ -91,7 +101,7 @@ const SelectGoodScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const windowWidth = useWindowDimensions().width;
-  const groupButtonStyle = useMemo(
+  const groupButtonStyle: StyleProp<ViewStyle> = useMemo(
     () => ({
       width: windowWidth > 550 ? '23%' : '31%',
     }),
@@ -225,7 +235,7 @@ const SelectGoodScreen = () => {
     setSelectedGood(undefined);
   };
 
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   const Group = useCallback(
     ({

@@ -44,7 +44,7 @@ import {
 
 import { IDocumentType, INamedEntity, ScreenState } from '@lib/types';
 
-import { Divider, useTheme } from 'react-native-paper';
+import { Divider, MD2Theme, useTheme } from 'react-native-paper';
 
 import { IDelList } from '@lib/mobile-types';
 
@@ -76,7 +76,7 @@ const VisitScreen = () => {
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'Visit'>>();
   const { routeId, id } = useRoute<RouteProp<RoutesStackParamList, 'Visit'>>().params;
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   const visit = docSelectors.selectByDocType<IVisitDocument>('visit')?.find((e) => e.head.routeLineId === id);
   const dateBegin = visit ? new Date(visit?.head.dateBegin) : undefined;

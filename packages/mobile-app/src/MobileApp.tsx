@@ -77,9 +77,12 @@ const AppRoot = ({ items, dashboardScreens, onSync }: Omit<IApp, 'store'>) => {
       return;
     }
 
-    timeOutRef.current = setTimeout(() => {
-      syncData();
-    }, autoSynchPeriod * 60 * 1000);
+    timeOutRef.current = setTimeout(
+      () => {
+        syncData();
+      },
+      autoSynchPeriod * 60 * 1000,
+    );
 
     return () => {
       if (timeOutRef.current) {

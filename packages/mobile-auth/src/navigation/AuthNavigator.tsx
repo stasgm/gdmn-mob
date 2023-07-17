@@ -83,7 +83,7 @@ const AuthNavigator = () => {
             mobileRequest(authDispatch, authActions),
             config.deviceId,
             user.erpUser.id,
-            Constants.manifest?.extra?.slug,
+            Constants.expoConfig?.extra?.slug,
           ),
         );
       }
@@ -106,7 +106,7 @@ const AuthNavigator = () => {
   const login = useCallback(
     async (credentials: IUserCredentials) => {
       const res = await authDispatch(
-        authActions.login(mobileRequest(authDispatch, authActions), credentials, Constants.manifest?.extra?.slug),
+        authActions.login(mobileRequest(authDispatch, authActions), credentials, Constants.expoConfig?.extra?.slug),
       );
       if (config?.deviceId && res.type === 'AUTH/LOGIN_SUCCESS') {
         await authDispatch(
@@ -114,7 +114,7 @@ const AuthNavigator = () => {
             mobileRequest(authDispatch, authActions),
             config.deviceId,
             res.payload?.erpUser?.id,
-            Constants.manifest?.extra?.slug,
+            Constants.expoConfig?.extra?.slug,
           ),
         );
       }

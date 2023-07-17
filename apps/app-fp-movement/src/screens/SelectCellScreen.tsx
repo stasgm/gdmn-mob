@@ -12,7 +12,7 @@ import {
   InfoButton,
 } from '@lib/mobile-ui';
 
-import { useTheme } from 'react-native-paper';
+import { MD2Theme, useTheme } from 'react-native-paper';
 
 import { ScrollView } from 'react-native-gesture-handler';
 
@@ -40,7 +40,7 @@ const NamedRow = ({ item }: { item: string }) => (
 export const SelectCellScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'SelectCell'>>();
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   const [visibleDialog, setVisibleDialog] = useState(false);
   const { docId, item, mode, docType } = useRoute<RouteProp<MoveStackParamList, 'SelectCell'>>().params;

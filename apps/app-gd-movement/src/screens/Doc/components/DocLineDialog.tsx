@@ -1,6 +1,6 @@
 import { ItemSeparator, LargeText } from '@lib/mobile-ui';
 import React from 'react';
-import { Button, Dialog, useTheme } from 'react-native-paper';
+import { Button, Dialog, MD2Theme, useTheme } from 'react-native-paper';
 import { StyleSheet } from 'react-native';
 
 import { IMovementLine } from '../../../store/types';
@@ -24,7 +24,7 @@ export const DocLineDialog = ({
   onAddLine,
   onDeleteLine,
 }: IProps) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
   const labelStyle = { color: colors.primary };
 
   return (

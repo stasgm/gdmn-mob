@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleProp, Text, TouchableHighlight, View, ViewStyle, StyleSheet } from 'react-native';
-import { useTheme } from 'react-native-paper';
+import { MD2Theme, useTheme } from 'react-native-paper';
 
 import styles from '../styles/global';
 
@@ -33,7 +33,7 @@ interface IProps {
 export type Status = 'all' | 'active' | 'archive';
 
 const FilterButtons = ({ status, onPress, style }: IProps) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   return (
     <View style={[styles.containerCenter, localStyles.container, style]}>

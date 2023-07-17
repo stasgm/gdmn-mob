@@ -56,14 +56,14 @@ const InformationScreen = () => {
       id: 'version',
       icon: 'cog-outline',
       title: 'Версия',
-      text: `${Constants.manifest?.extra?.appVesion}-${Constants.manifest?.extra?.buildVersion || 0}`,
+      text: `${Constants.expoConfig?.extra?.appVesion}-${Constants.expoConfig?.extra?.buildVersion || 0}`,
     },
     {
       id: 'doc',
       icon: 'file-document-edit-outline',
       title: 'Документация',
-      text: Constants.manifest?.extra?.name,
-      onPress: () => Linking.openURL(Constants.manifest?.extra?.documentationUrl),
+      text: Constants.expoConfig?.extra?.name,
+      onPress: () => Linking.openURL(Constants.expoConfig?.extra?.documentationUrl),
       style: { textDecorationLine: 'underline' },
     },
     {
@@ -127,7 +127,7 @@ const InformationScreen = () => {
     <AppScreen>
       <ScrollView>
         <View style={localStyles.container}>
-          <Text style={styles.title}>Приложение {Constants.manifest?.extra?.name}</Text>
+          <Text style={styles.title}>Приложение {Constants.expoConfig?.extra?.name}</Text>
           {appList.map((item) => (
             <ProfileItem key={item.id} item={item} />
           ))}

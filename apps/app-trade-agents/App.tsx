@@ -229,7 +229,7 @@ const Root = () => {
   ) : infoWindow === 3 ? (
     <AppScreen>
       <Text style={styles.textInfo}>{'Подробную информацию об использовании приложения вы найдете в '}</Text>
-      <TouchableOpacity onPress={() => Linking.openURL(Constants.manifest?.extra?.documentationUrl)}>
+      <TouchableOpacity onPress={() => Linking.openURL(Constants.expoConfig?.extra?.documentationUrl)}>
         <Text style={[styles.textInfo, styles.textDecorationLine]}>{'документации.'}</Text>
       </TouchableOpacity>
       <Text style={styles.textInfo}>
