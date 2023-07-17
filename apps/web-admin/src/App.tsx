@@ -45,31 +45,24 @@ const Router = () => {
 
     const fetchData = async () => {
       try {
-        const response = await fetch('/env/');
-        const data = await response.json();
-        console.log('serverConfig', data);
-        // Здесь вы можете обработать полученные данные
+        const response = await fetch('/api/env');
+        const config = await response.json();
+        console.log('serverConfig', config);
+
+        dispatch(
+          authActions.setConfig({
+            ...config,
+            protocol: config.protocol,
+            port: getNumber(config.port, 1111),
+            server: config.server,
+          }),
+        );
       } catch (error) {
         console.error('Ошибка при выполнении запроса:', error);
       }
     };
 
     fetchData();
-
-    // console.log('process.env.SERVER_PORT', process.env.SERVER_PORT, {
-    //   ...config,
-    //   // protocol: process.env.SERVER_PORT ? 'http://' : 'https://',
-    //   port: getNumber(process.env.SERVER_PORT, config.port),
-    // });
-    // if (process.env.SERVER_PORT || process.env.SERVER_HTTPS_PORT) {
-    //   const newConfig = {
-    //     ...config,
-    //     protocol: process.env.SERVER_PORT ? 'http://' : 'https://',
-    //     port: getNumber(process.env.SERVER_PORT || process.env.SERVER_HTTPS_PORT, config.port),
-    //     server: process.env.SERVER_NAME || config.server,
-    //   };
-    //   dispatch(authActions.setConfig(newConfig));
-    // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

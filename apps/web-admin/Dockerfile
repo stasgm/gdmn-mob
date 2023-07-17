@@ -1,11 +1,22 @@
 # STAGE 1
+FROM node:18.13.0-slim AS serverBuilder
+
+WORKDIR /koa
+
+# copy the package.json to install dependencies
+COPY ./apps/web-admin/koa/package.json ./
+COPY ./apps/web-admin/koa/server.js ./
+
+# Install the dependencies
+RUN yarn install
+
+# STAGE 2
 FROM node:18.13.0-slim AS builder
 
-WORKDIR /usr/src/app
+WORKDIR /admin-build
 
 ARG REACT_APP_SECRET_KEY=${REACT_APP_SECRET_KEY}
 ARG REACT_APP_SITE_KEY=${REACT_APP_SECRET_KEY}
-
 
 ENV REACT_APP_SECRET_KEY=${REACT_APP_SECRET_KEY}
 ENV REACT_APP_SITE_KEY=${REACT_APP_SITE_KEY}
@@ -27,6 +38,14 @@ COPY ./packages/store ./packages/store
 
 COPY ./apps/web-admin ./apps/web-admin
 
+#COPY ./apps/web-admin/package.json ./apps/web-admin/
+#COPY ./apps/web-admin/tsconfig*.json ./apps/web-admin/
+#COPY ./apps/web-admin/.babelrc ./apps/web-admin/
+
+#COPY ./apps/web-admin/src ./apps/web-admin/src
+#COPY ./apps/web-admin/configs ./apps/web-admin/configs
+#COPY ./apps/web-admin/assets ./apps/web-admin/assets
+
 # Install the dependencies
 RUN yarn install --production=true --immutable --immutable-cache --check-cache && yarn cache clean
 
@@ -38,12 +57,17 @@ RUN cd ./packages/client-config && yarn build
 
 RUN cd ./apps/web-admin && yarn build-docker
 
-# STAGE 2
-FROM nginx:1.25-alpine-slim
+# STAGE 3
+FROM node:18.13.0-alpine3.17 AS release
+# Create app directory
+WORKDIR /app
 
-# Remove default nginx index page
-RUN rm -rf /usr/share/nginx/html/*
 # Copy build from the stage 1
-COPY --from=builder /usr/src/app/apps/web-admin/dist /usr/share/nginx/html
+COPY --from=serverBuilder /koa/node_modules ./node_modules
 
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+COPY --from=serverBuilder /koa/server.js ./
+
+# Copy build from the stage 2
+COPY --from=builder /admin-build/apps/web-admin/dist ./admin
+
+ENTRYPOINT node server.js
