@@ -24,7 +24,7 @@ RUN cd ./apps/server && yarn build
 # # ------ Stage 2 (release) ------
 FROM node:18.13.0-alpine3.17 AS release
 # Create app directory
-WORKDIR /gdmn-mob
+WORKDIR /server
 # Copy dist files
 COPY --from=builder /usr/src/gdmn-mob/apps/server/dist ./dist
 COPY --from=builder /usr/src/gdmn-mob/node_modules ./node_modules

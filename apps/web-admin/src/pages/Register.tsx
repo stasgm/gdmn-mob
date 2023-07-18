@@ -18,10 +18,9 @@ import { webRequest } from '../store/webRequest';
 
 const Register = () => {
   const navigate = useNavigate();
-
-  const { error, loading, status } = useSelector((state) => state.auth);
-
   const dispatch = useAuthThunkDispatch();
+  const { error, loading, status, config } = useSelector((state) => state.auth);
+  const withCaptcha = config.server === 'server.gdmn.app';
 
   const handleSubmit = async (values: IUserCredentials) => {
     const res = await dispatch(authActions.signup(webRequest(dispatch, authActions), values));
@@ -162,24 +161,6 @@ const Register = () => {
               value={formik.values.verifyPassword}
               variant="outlined"
             />
-            {/* <Box
-              sx={{
-                alignItems: 'center',
-                display: 'flex',
-                ml: -1,
-              }}
-            >
-              <Checkbox checked={formik.formik.values.policy} name="policy" onChange={formik.handleChange} />
-              <Typography color="textSecondary" variant="body1">
-                I have read the{' '}
-                <Link color="primary" component={RouterLink} to="#" underline="always" variant="h6">
-                  Terms and Conditions
-                </Link>
-              </Typography>
-            </Box>
-            {Boolean(formik.touched.policy && formik.errors.policy) && (
-              <FormHelperText error>{formik.errors.policy}</FormHelperText>
-            )} */}
             <Box style={{ color: 'GrayText' }}>
               Пароль должен содержать не менее восьми знаков, включать буквы (заглавные и строчные), цифры и специальные
               символы
@@ -187,7 +168,7 @@ const Register = () => {
             {formik.values.password !== formik.values.verifyPassword && formik.values.verifyPassword && (
               <Box style={{ color: 'red' }}>Пароли не совпадают</Box>
             )}
-            {process.env.REACT_APP_SITE_KEY && (
+            {withCaptcha && !!process.env.REACT_APP_SITE_KEY && (
               <Box
                 sx={{
                   marginTop: 1,
@@ -212,7 +193,7 @@ const Register = () => {
                   !!formik.errors.name ||
                   !!formik.errors.verifyPassword ||
                   formik.values.password !== formik.values.verifyPassword ||
-                  (!captchaToken && Boolean(process.env.REACT_APP_SITE_KEY)) ||
+                  (!captchaToken && withCaptcha) ||
                   !validPassword.test(formik.values.password)
                 }
                 fullWidth

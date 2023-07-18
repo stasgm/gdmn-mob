@@ -22,9 +22,10 @@ const Login = () => {
   const dispatch = useDispatch();
   const authDispatch = useAuthThunkDispatch();
 
-  const { error, loading, status, errorMessage } = useSelector((state) => state.auth);
+  const { error, loading, status, errorMessage, config } = useSelector((state) => state.auth);
   const [captchaToken, setCaptchaToken] = useState('');
   const captchaRef = useRef(null);
+  const withCaptcha = config.server === 'server.gdmn.app';
   const formik = useFormik<IUserCredentials>({
     enableReinitialize: true,
     initialValues: {
@@ -78,7 +79,6 @@ const Login = () => {
               GDMN-MOBILE
             </Typography>
           </Box>
-
           <form onSubmit={formik.handleSubmit}>
             <Box sx={{ mb: 2, display: 'flex', alignItems: 'flex-end' }}>
               <Typography color="textPrimary" variant="h4">
@@ -119,7 +119,7 @@ const Login = () => {
               variant="outlined"
               disabled={loading}
             />
-            {process.env.REACT_APP_SITE_KEY && (
+            {withCaptcha && !!process.env.REACT_APP_SITE_KEY && (
               <Box
                 sx={{
                   marginTop: 1,
@@ -138,12 +138,7 @@ const Login = () => {
             <Box sx={{ py: 2 }}>
               <Button
                 color="primary"
-                disabled={
-                  loading ||
-                  !!formik.errors.password ||
-                  !!formik.errors.name ||
-                  (!captchaToken && Boolean(process.env.REACT_APP_SITE_KEY))
-                }
+                disabled={loading || !!formik.errors.password || !!formik.errors.name || (!captchaToken && withCaptcha)}
                 fullWidth
                 size="large"
                 type="submit"

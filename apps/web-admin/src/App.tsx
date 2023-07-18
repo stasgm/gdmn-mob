@@ -43,26 +43,26 @@ const Router = () => {
     setHistory(browserHistory.location.pathname);
     dispatch(appActions.loadGlobalDataFromDisc());
 
-    const fetchData = async () => {
+    const fetchEnv = async () => {
       try {
+        //Получаем переменные среды, содержащие настройки сервера
         const response = await fetch('/api/env');
-        const config = await response.json();
-        console.log('serverConfig', config);
-
+        const envs = await response.json();
+        //Перезаписываем конфиг для апи
         dispatch(
           authActions.setConfig({
             ...config,
-            protocol: config.protocol,
-            port: getNumber(config.port, 1111),
-            server: config.server,
+            protocol: envs.protocol,
+            port: getNumber(envs.port, config.port),
+            server: envs.host,
           }),
         );
       } catch (error) {
-        console.error('Ошибка при выполнении запроса:', error);
+        // console.error('Ошибка при выполнении запроса:', error);
       }
     };
 
-    fetchData();
+    fetchEnv();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
