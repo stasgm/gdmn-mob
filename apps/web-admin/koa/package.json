@@ -1,7 +1,7 @@
 {
-  "name": "express-server",
+  "name": "koa-server",
   "version": "1.0.0",
-  "description": "My Express.js Application",
+  "description": "My Koa Application",
   "main": "server.js",
   "dependencies": {
     "koa": "^2.14.2",
