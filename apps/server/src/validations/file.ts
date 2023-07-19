@@ -44,7 +44,8 @@ const deleteFiles: Config = {
     type: 'json',
     body: Joi.object({
       ids: Joi.array().items(Joi.string()).required(),
-    }).error(new InvalidParameterException('Некорректный формат списка удаляемых файлов')),
+      folderName: Joi.string(),
+    }).error(new InvalidParameterException('Некорректный формат списка  файлов')),
   },
 };
 

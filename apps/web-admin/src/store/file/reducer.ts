@@ -7,6 +7,7 @@ import { FileSystemActionType, fileSystemActions } from './actions';
 const initialState: Readonly<IFileSystemState> = {
   list: [],
   file: undefined,
+  folders: [],
   loading: false,
   errorMessage: '',
   pageParams: undefined,
@@ -21,7 +22,7 @@ const reducer: Reducer<IFileSystemState, FileSystemActionType> = (state = initia
       return { ...state, errorMessage: '' };
 
     case getType(fileSystemActions.setError):
-      return { ...state, errorMessage: 'Файл уже существует' };
+      return { ...state, errorMessage: action.payload };
 
     case getType(fileSystemActions.fetchFilesAsync.request):
       return { ...state, loading: true, list: [], errorMessage: '' };
@@ -104,6 +105,36 @@ const reducer: Reducer<IFileSystemState, FileSystemActionType> = (state = initia
 
     case getType(fileSystemActions.removeFilesAsync.failure):
       return { ...state, loading: false, errorMessage: action.payload || 'error' };
+
+    case getType(fileSystemActions.moveFilesAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
+
+    case getType(fileSystemActions.moveFilesAsync.success):
+      return {
+        ...state,
+        loading: false,
+        folders: [],
+      };
+
+    case getType(fileSystemActions.moveFilesAsync.failure):
+      return { ...state, loading: false, errorMessage: action.payload || 'error' };
+
+    case getType(fileSystemActions.fetchFoldersAsync.request):
+      return { ...state, loading: true, folders: [], errorMessage: '' };
+
+    case getType(fileSystemActions.fetchFoldersAsync.success):
+      return {
+        ...state,
+        folders: action.payload,
+        loading: false,
+      };
+
+    case getType(fileSystemActions.fetchFoldersAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
+      };
 
     case getType(fileSystemActions.setPageParam):
       return {

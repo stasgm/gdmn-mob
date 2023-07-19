@@ -147,6 +147,7 @@ const Register = () => {
               type="password"
               value={formik.values.password}
               variant="outlined"
+              autoComplete="new-password"
             />
             <TextField
               error={Boolean(formik.touched.verifyPassword && formik.errors.verifyPassword)}
@@ -161,6 +162,7 @@ const Register = () => {
               type="password"
               value={formik.values.verifyPassword}
               variant="outlined"
+              autoComplete="new-password"
             />
             {/* <Box
               sx={{

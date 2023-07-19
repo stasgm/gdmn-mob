@@ -118,6 +118,7 @@ const Login = () => {
               value={formik.values.password}
               variant="outlined"
               disabled={loading}
+              autoComplete="new-password"
             />
             <Box
               sx={{

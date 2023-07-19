@@ -5,7 +5,7 @@ import { IFilePageParam } from '../../types';
 
 const init = createAction('FILE/INIT')();
 const clearError = createAction('FILE/CLEAR_ERROR')();
-const setError = createAction('FILE/SET_ERROR')();
+const setError = createAction('FILE/SET_ERROR')<string>();
 
 const fetchFilesAsync = createAsyncAction('FILE/FETCH__FILES', 'FILE/FETCH_FILES_SUCCESS', 'FILE/FETCH_FILES_FAILURE')<
   string | undefined,
@@ -37,6 +37,18 @@ const removeFilesAsync = createAsyncAction('FILE/REMOVE_MANY', 'FILE/REMOVE_MANY
   string
 >();
 
+const moveFilesAsync = createAsyncAction('FILE/MOVE_MANY', 'FILE/MOVE_MANY_SUCCESS', 'FILE/MOVE_MANY_FAILURE')<
+  string | undefined,
+  string[],
+  string
+>();
+
+const fetchFoldersAsync = createAsyncAction('FILE/GET_FOLDERS', 'FILE/GET_FOLDERS_SUCCESS', 'FILE/GET_FOLDERS_FAILURE')<
+  string | undefined,
+  string[],
+  string
+>();
+
 const setPageParam = createAction('FILE/SET_PARAM')<IFilePageParam | undefined>();
 const clearPageParams = createAction('FILE/CLEAR_PARAMS')();
 
@@ -46,6 +58,8 @@ export const fileSystemActions = {
   updateFileAsync,
   removeFileAsync,
   removeFilesAsync,
+  moveFilesAsync,
+  fetchFoldersAsync,
   clearPageParams,
   setPageParam,
   clearError,

@@ -363,6 +363,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                     type="password"
                     disabled={loading}
                     value={(formik.values as NewUser | IUserCredentials).password.trim()}
+                    autoComplete="new-password"
                   />
                 </Grid>
                 <Grid item md={6} xs={12} display={open ? 'block' : 'none'}>
@@ -381,6 +382,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                     type="password"
                     disabled={loading}
                     value={(formik.values as NewUser | IUserCredentials).verifyPassword?.trim()}
+                    autoComplete="new-password"
                   />
                 </Grid>
                 {passwordCondition && (

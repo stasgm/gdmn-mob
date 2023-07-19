@@ -40,6 +40,7 @@ const AppSystemDetails = ({ appSystem, loading, onSubmit, onCancel }: IProps) =>
                     error={formik.touched.name && Boolean(formik.errors.name)}
                     fullWidth
                     label="Наименование"
+                    id="name"
                     name="name"
                     required
                     variant="outlined"
@@ -55,6 +56,7 @@ const AppSystemDetails = ({ appSystem, loading, onSubmit, onCancel }: IProps) =>
                     error={formik.touched.description && Boolean(formik.errors.description)}
                     fullWidth
                     label="Описание"
+                    id="description"
                     name="description"
                     variant="outlined"
                     onBlur={formik.handleBlur}

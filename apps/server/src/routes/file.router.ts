@@ -5,11 +5,12 @@ import { permissionMiddleware } from '../middleware/permissionRequired';
 import { roleBasedParamsMiddlware } from '../middleware/roleBasedParams';
 import { fileValidation } from '../validations';
 import { deviceMiddleware } from '../middleware/deviceRequired';
-import { getFiles, getFile, removeFile, updateFile, removeManyFiles } from '../controllers/file';
+import { getFiles, getFile, removeFile, updateFile, removeManyFiles, getFolders } from '../controllers/file';
 
 const file = route();
 
 file.prefix('/files');
+file.get('/folders', authMiddleware, getFolders);
 file.get('/:id', fileValidation.getFile, authMiddleware, deviceMiddleware, getFile);
 file.get('/', authMiddleware, deviceMiddleware, getFiles);
 file.patch(

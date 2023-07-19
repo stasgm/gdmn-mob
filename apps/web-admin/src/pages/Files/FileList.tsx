@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import CachedIcon from '@mui/icons-material/Cached';
 import FilterIcon from '@mui/icons-material/FilterAltOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
+import DriveFileMoveOutlinedIcon from '@mui/icons-material/DriveFileMoveOutlined';
 
 import { IFileSystem } from '@lib/types';
 
@@ -14,16 +15,24 @@ import CircularProgressWithContent from '../../components/CircularProgressWidthC
 import SnackBar from '../../components/SnackBar';
 import actions from '../../store/file';
 import FileListTable from '../../components/file/FileListTable';
+import RadioGroup from '../../components/RadioGoup';
 
 const FileList = () => {
   const dispatch = useDispatch();
 
-  const { list, loading, errorMessage, pageParams } = useSelector((state) => state.files);
+  const { list, loading, errorMessage, pageParams, folders } = useSelector((state) => state.files);
 
   const sortedList = useMemo(() => list.sort((a, b) => (a.path < b.path ? -1 : 1)), [list]);
   const fetchFiles = useCallback(
     (filesFilters?: IFileFilter, filterText?: string, fromRecord?: number, toRecord?: number) => {
       dispatch(actions.fetchFiles(filesFilters, filterText, fromRecord, toRecord));
+    },
+    [dispatch],
+  );
+
+  const fetchFolders = useCallback(
+    (companyId: string, appSystemId: string) => {
+      dispatch(actions.fetchFolders(companyId, appSystemId));
     },
     [dispatch],
   );
@@ -167,6 +176,56 @@ const FileList = () => {
     dispatch(actions.fileSystemActions.setPageParam({ page: 0 }));
   };
 
+  const [openFolder, setOpenFolder] = useState(false);
+
+  const handleGetFolders = () => {
+    for (const file of selectedFileIds) {
+      const inaccessibleFile = selectedFileIds.find((i) => !i.appSystem?.id || !i.company?.id);
+
+      if (inaccessibleFile) {
+        dispatch(actions.fileSystemActions.setError('Выбранные файлы недоступны для перемещения'));
+
+        return;
+      }
+      const differentId = selectedFileIds.find(
+        (i) => i.appSystem?.id !== file.appSystem?.id || i.company?.id !== file.company?.id,
+      );
+
+      if (differentId) {
+        dispatch(actions.fileSystemActions.setError('Выбранные файлы относятся к разным подсистемам или компаниям'));
+
+        return;
+      }
+    }
+
+    setOpenFolder(true);
+
+    const appSystemId = selectedFileIds[0].appSystem?.id;
+    const companyId = selectedFileIds[0].company?.id;
+
+    if (appSystemId && companyId) {
+      fetchFolders(companyId, appSystemId);
+    }
+  };
+
+  const handleCloseMovingDialog = () => {
+    setOpenFolder(false);
+  };
+
+  const handleMoveFiles = () => {
+    setOpenFolder(false);
+    if (selectedFolder && selectedFileIds.length) {
+      const ids = selectedFileIds.map((i) => {
+        return i.id;
+      });
+      dispatch(actions.moveFiles(ids, selectedFolder));
+      dispatch(actions.fetchFiles());
+      handleClearSearch();
+    }
+  };
+
+  const [selectedFolder, setSelectedFolder] = useState<string | undefined>(undefined);
+
   const buttons: IToolBarButton[] = [
     {
       name: 'Обновить',
@@ -179,6 +238,13 @@ const FileList = () => {
       sx: { mx: 1 },
       onClick: handleFilter,
       icon: <FilterIcon />,
+    },
+
+    {
+      name: 'Переместить',
+      sx: { mx: 1 },
+      onClick: handleGetFolders,
+      icon: <DriveFileMoveOutlinedIcon />,
     },
     {
       name: 'Удалить',
@@ -208,6 +274,17 @@ const FileList = () => {
           </DialogActions>
         </Dialog>
       </Box>
+      <RadioGroup
+        contentText="Выберите нужную папку:"
+        checked={selectedFolder || undefined}
+        isOpen={openFolder}
+        okLabel="Переместить"
+        onCancel={handleCloseMovingDialog}
+        onChange={(folder) => setSelectedFolder(folder)}
+        onClose={handleCloseMovingDialog}
+        onOk={handleMoveFiles}
+        values={folders}
+      />
       <Box
         sx={{
           backgroundColor: 'background.default',

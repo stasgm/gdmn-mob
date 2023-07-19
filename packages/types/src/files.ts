@@ -32,4 +32,5 @@ export interface IFileSearchOptions {
 
 export interface IFileIds {
   ids: string[];
+  folderName?: string;
 }
