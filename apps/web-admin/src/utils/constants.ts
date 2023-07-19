@@ -6,5 +6,6 @@ const deviceStates = {
 };
 
 const adminPath = '/admin';
+const hostName = 'server.gdmn.app';
 
-export { deviceStates, adminPath };
+export { deviceStates, adminPath, hostName };

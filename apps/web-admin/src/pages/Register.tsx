@@ -13,14 +13,14 @@ import Reaptcha from 'reaptcha';
 
 import Logo from '../components/Logo';
 
-import { adminPath } from '../utils/constants';
+import { adminPath, hostName } from '../utils/constants';
 import { webRequest } from '../store/webRequest';
 
 const Register = () => {
   const navigate = useNavigate();
   const dispatch = useAuthThunkDispatch();
   const { error, loading, status, config } = useSelector((state) => state.auth);
-  const withCaptcha = config.server === 'server.gdmn.app';
+  const withCaptcha = config.server === hostName;
 
   const handleSubmit = async (values: IUserCredentials) => {
     const res = await dispatch(authActions.signup(webRequest(dispatch, authActions), values));

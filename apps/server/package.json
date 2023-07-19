@@ -5,7 +5,7 @@
   "description": "Microservice for web & molb application",
   "scripts": {
     "build": "yarn clean-dist && tsc",
-    "dev": "cross-env NODE_ENV=development nodemon src/index.ts",
+    "dev": "cross-env NODE_ENV=development PUBLIC_PATH=/admin/ nodemon src/index.ts",
     "dev:start-js": "yarn build && cross-env NODE_ENV=development PUBLIC_PATH=/admin/ node ./dist/src/index.js",
     "start": "cross-env PUBLIC_PATH=/admin/ node ./dist/src/index.js",
     "clean-dist": "rimraf ./dist",

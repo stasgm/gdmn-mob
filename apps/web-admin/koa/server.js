@@ -1,3 +1,5 @@
+import { hostName } from '../src/utils/constants';
+
 const http = require('http');
 const https = require('https');
 const path = require('path');
@@ -18,10 +20,10 @@ const ADMIN_CONTAINER_PORT = process.env.ADMIN_CONTAINER_PORT || 3000;
 const env = Router();
 env.prefix('/env');
 env.get('/', (ctx) => {
-  if (process.env.HOST === 'server.gdmn.app') {
+  if (process.env.HOST === hostName) {
     ctx.body = {
       protocol: 'https://',
-      host: 'server.gdmn.app',
+      host: hostName,
       port: process.env.HTTPS_PORT,
     };
     ctx.status = 200;
@@ -45,7 +47,7 @@ app
 
 const koaCallback = app.callback();
 
-if (process.env.HOST === 'server.gdmn.app') {
+if (process.env.HOST === hostName) {
   /**
    * HTTPS сервер с платным сертификатом
    */
