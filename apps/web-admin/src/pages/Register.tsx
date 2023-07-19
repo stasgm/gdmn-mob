@@ -60,7 +60,7 @@ const Register = () => {
   const [captchaToken, setCaptchaToken] = useState('');
   const captchaRef = useRef(null);
 
-  const validPassword = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/);
+  const validPassword = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?([^\w\s]|[_])).{8,}$/);
 
   return (
     <>

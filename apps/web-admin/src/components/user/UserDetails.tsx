@@ -104,7 +104,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
     userERP ? setUserERP(false) : setUserERP(true);
   };
 
-  const validPassword = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/);
+  const validPassword = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?([^\w\s]|[_])).{8,}$/);
 
   const passwordCondition =
     !validPassword.test((formik.values as NewUser | IUserCredentials).password) &&
