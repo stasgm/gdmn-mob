@@ -26,4 +26,9 @@ interface IBaseSettings {
   [name: string]: SettingValue;
 }
 
-export { Settings, ISettingsOption, IBaseSettings };
+interface IServerConfig {
+  protocol: string;
+  port: number;
+}
+
+export { Settings, ISettingsOption, IBaseSettings, IServerConfig };
