@@ -7,7 +7,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "yarn clean-dist && tsc",
-    "clean-dist": "rimraf dist/*",
+    "clean-dist": "rimraf --glob dist/*",
     "prettier:check": "prettier --check \"**/*.ts*\"",
     "prettier:fix": "prettier --write \"**/*.ts*\"",
     "lint": "eslint \"**/*.ts*\"",
