@@ -15,6 +15,7 @@ import {
 import CachedIcon from '@mui/icons-material/Cached';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import DriveFileMoveOutlinedIcon from '@mui/icons-material/DriveFileMoveOutlined';
 
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -31,6 +32,7 @@ import FileContentView from '../../components/file/FileContentView';
 import fileActions from '../../store/file';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import { adminPath } from '../../utils/constants';
+import RadioGroup from '../../components/RadioGoup';
 
 export type Params = {
   id: string;
@@ -42,7 +44,7 @@ const FileView = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading, errorMessage, file, list, pageParams } = useSelector((state) => state.files);
+  const { loading, errorMessage, file, list, pageParams, folders } = useSelector((state) => state.files);
 
   const fetchFile = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
@@ -58,7 +60,21 @@ const FileView = () => {
 
   const process = fileSelectors.fileById(id);
 
+  const fetchFolders = useCallback(() => {
+    if (process && process.company && process.appSystem) {
+      dispatch(fileActions.fetchFolders(process.company.id, process.appSystem.id));
+    }
+  }, [dispatch, process]);
+
   const [open, setOpen] = useState(false);
+  const [openFolder, setOpenFolder] = useState(false);
+
+  const handleGetFolders = () => {
+    if (file.appSystem?.id && file.company?.id) {
+      setOpenFolder(true);
+      fetchFolders();
+    }
+  };
 
   const handleCancel = () => {
     navigate(-1);
@@ -91,6 +107,20 @@ const FileView = () => {
   const handleClose = () => {
     setOpen(false);
   };
+
+  const handleCloseMovingDialog = () => {
+    setOpenFolder(false);
+  };
+
+  const handleMoveFiles = () => {
+    setOpenFolder(false);
+    if (selectedFolder && process?.id) {
+      dispatch(fileActions.moveFiles([process?.id], selectedFolder));
+    }
+    handleCancel();
+  };
+
+  const [selectedFolder, setSelectedFolder] = useState<string | undefined>(undefined);
 
   const handleClearError = () => {
     dispatch(fileActions.fileSystemActions.clearError());
@@ -129,6 +159,14 @@ const FileView = () => {
       icon: <EditIcon />,
     },
     {
+      name: 'Переместить',
+      sx: { marginRight: 1 },
+      color: 'secondary',
+      variant: 'contained',
+      onClick: handleGetFolders,
+      icon: <DriveFileMoveOutlinedIcon />,
+    },
+    {
       name: 'Удалить',
       disabled: true,
       color: 'secondary',
@@ -155,6 +193,17 @@ const FileView = () => {
           </DialogActions>
         </Dialog>
       </Box>
+      <RadioGroup
+        contentText="Выберите нужную папку:"
+        checked={selectedFolder || undefined}
+        isOpen={openFolder}
+        okLabel="Переместить"
+        onCancel={handleCloseMovingDialog}
+        onChange={(folder) => setSelectedFolder(folder)}
+        onClose={handleCloseMovingDialog}
+        onOk={handleMoveFiles}
+        values={folders}
+      />
       <Box
         sx={{
           p: 3,
