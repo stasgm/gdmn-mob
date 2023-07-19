@@ -10,6 +10,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 import ComboBox from '../ComboBox';
 import { useSelector } from '../../store';
+import { validPassword } from '../../utils/constants';
 
 interface IProps {
   loading: boolean;
@@ -103,8 +104,6 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
   const handleUserERP = () => {
     userERP ? setUserERP(false) : setUserERP(true);
   };
-
-  const validPassword = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/);
 
   const passwordCondition =
     !validPassword.test((formik.values as NewUser | IUserCredentials).password) &&

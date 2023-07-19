@@ -13,7 +13,7 @@ import Reaptcha from 'reaptcha';
 
 import Logo from '../components/Logo';
 
-import { adminPath, hostName } from '../utils/constants';
+import { adminPath, hostName, validPassword } from '../utils/constants';
 import { webRequest } from '../store/webRequest';
 
 const Register = () => {
@@ -58,8 +58,6 @@ const Register = () => {
 
   const [captchaToken, setCaptchaToken] = useState('');
   const captchaRef = useRef(null);
-
-  const validPassword = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/);
 
   return (
     <>

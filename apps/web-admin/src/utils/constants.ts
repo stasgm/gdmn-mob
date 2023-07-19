@@ -6,6 +6,9 @@ const deviceStates = {
 };
 
 const adminPath = '/admin';
+
 const hostName = 'server.gdmn.app';
 
-export { deviceStates, adminPath, hostName };
+const validPassword = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?([^\w\s]|[_])).{8,}$/);
+
+export { deviceStates, adminPath, hostName, validPassword };
