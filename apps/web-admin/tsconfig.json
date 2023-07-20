@@ -6,6 +6,6 @@
     "sourceMap": true,
     "outDir": "dist"
   },
-  "include": ["src/**/*.ts*", ".eslintrc.js"],
+  "include": ["src/**/*.ts*", ".eslintrc.js", "koa/server.js"],
   "exclude": ["node_modules", "dist", "configs"]
 }

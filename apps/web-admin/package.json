@@ -21,7 +21,8 @@
     "lint": "eslint \"**/*.ts*\"",
     "lint:fix": "eslint --fix \"**/*.ts*\"",
     "precommit": "lint-staged",
-    "test": "jest --coverage --watchAll --config=configs/jest.json"
+    "test": "jest --coverage --watchAll --config=configs/jest.json",
+    "start-server": "cross-env PORT=3654 HOST=192.168.0.109 ADMIN_CONTAINER_PORT=80 && node server.js"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

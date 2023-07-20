@@ -6,10 +6,6 @@ import log from '../utils/logger';
 export const ok = <T>(ctx: Context, data?: T, logMessage?: string, logData?: boolean) => {
   ctx.statusMessage = 'success result';
   ctx.status = 200;
-  // ctx.body = {
-  //   result: true,
-  //   data,
-  // };
   ctx.body = {
     result: true,
     type: 'SUCCESS',
@@ -27,10 +23,6 @@ export const ok = <T>(ctx: Context, data?: T, logMessage?: string, logData?: boo
 
 export const created = (ctx: Context, data?: any, logMessage?: string, logData?: boolean) => {
   ctx.status = 201;
-  // ctx.body = {
-  //   result: true,
-  //   data,
-  // };
   ctx.body = {
     result: true,
     type: 'SUCCESS',
@@ -48,7 +40,6 @@ export const created = (ctx: Context, data?: any, logMessage?: string, logData?:
 
 export const notOk = (ctx: Context) => {
   ctx.status = 400;
-  // ctx.body = { result: false };
   ctx.body = {
     result: false,
     type: 'FAILURE',

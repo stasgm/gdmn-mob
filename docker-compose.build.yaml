@@ -4,20 +4,27 @@ services:
     image: gsbelarus/gdmn-mob.web-admin
     container_name: web-admin
     restart: always
+    build:
+      context: .
+      dockerfile: ./apps/web-admin/Dockerfile
+      args:
+        - REACT_APP_SECRET_KEY=${REACT_APP_SECRET_KEY}
+        - REACT_APP_SITE_KEY=${REACT_APP_SITE_KEY}
     env_file:
       - .env
     environment:
       - NODE_ENV=production
     ports:
      - ${ADMIN_HOST_PORT}:${ADMIN_CONTAINER_PORT}
-    expose:
-     - ${ADMIN_CONTAINER_PORT}
     volumes:
       - ./ssl:/web-admin/ssl:ro
   server:
     image: gsbelarus/gdmn-mob.server
     container_name: server
     restart: always
+    build:
+      context: .
+      dockerfile: ./apps/server/Dockerfile
     env_file:
       - .env
     environment:

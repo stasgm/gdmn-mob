@@ -147,6 +147,65 @@ class File extends BaseRequest {
       message: response2Log(res) || 'Файлы не удален',
     } as error.IServerError;
   };
+
+  moveFiles = async (customRequest: CustomRequest, fileIds: string[], folderName: string) => {
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
+
+      return {
+        type: 'MOVE_FILES',
+      } as types.IMoveFilesResponse;
+    }
+
+    const body: Partial<IFileIds> = { ids: fileIds, folderName: folderName };
+
+    const res = await customRequest<void>({
+      api: this.api.axios,
+      method: 'POST',
+      url: '/files/?action=move',
+      data: body,
+    });
+
+    if (res.type === 'SUCCESS') {
+      return {
+        type: 'MOVE_FILES',
+      } as types.IMoveFilesResponse;
+    }
+
+    return {
+      type: res.type,
+      message: response2Log(res) || 'Файлы не перемещены',
+    } as error.IServerError;
+  };
+
+  getFolders = async (customRequest: CustomRequest, params?: Record<string, string | number>) => {
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
+
+      return {
+        type: 'GET_FOLDERS',
+      } as types.IGetFoldersResponse;
+    }
+
+    const res = await customRequest<string[]>({
+      api: this.api.axios,
+      method: 'GET',
+      url: '/files/folders',
+      params,
+    });
+
+    if (res.type === 'SUCCESS') {
+      return {
+        type: 'GET_FOLDERS',
+        folders: res?.data || [],
+      } as types.IGetFoldersResponse;
+    }
+
+    return {
+      type: res.type,
+      message: response2Log(res) || 'Данные о папках не получены',
+    } as error.IServerError;
+  };
 }
 
 export default File;

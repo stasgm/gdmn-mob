@@ -9,7 +9,7 @@ const config = process.env.NODE_ENV === 'production' ? prod : dev;
 export default {
   ...config,
   /** Хост для сервера **/
-  HOST: process.env.HOST || config.HOST,
+  // HOST: process.env.HOST || config.HOST,
   /** Порт для сервера */
   PORT: getNumber(process.env.PORT, config.PORT),
   /** Https порт для сервера */
