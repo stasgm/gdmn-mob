@@ -97,25 +97,15 @@ export const MoveEditScreen = () => {
             number: newNumber,
             documentDate: new Date().toISOString(),
             status: 'DRAFT',
-            fromDepart:
-              docDocumentSubtype?.id === 'internalMovement'
-                ? defaultDepart
-                : docDocumentSubtype?.id === 'movement'
-                ? defaultSecondDepart
-                : undefined,
-            toDepart:
-              docDocumentSubtype?.id === 'movement'
-                ? defaultDepart
-                : docDocumentSubtype?.id === 'internalMovement'
-                ? defaultSecondDepart
-                : undefined,
-            documentSubtype: movementSubtype ? movementSubtype : undefined,
+            fromDepart: undefined,
+            toDepart: undefined,
+            documentSubtype: movementSubtype || undefined,
           },
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, doc, defaultDepart, defaultSecondDepart, docDocumentSubtype, movementSubtype]);
+  }, [dispatch, doc, defaultDepart, defaultSecondDepart, movementSubtype]);
 
   useEffect(() => {
     if (docDocumentSubtype?.id === 'cellMovement' && docFromDepart) {
@@ -127,8 +117,29 @@ export const MoveEditScreen = () => {
           },
         }),
       );
+    } else if (docDocumentSubtype?.id === 'internalMovement') {
+      dispatch(
+        appActions.setScreenFormParams({
+          screenName,
+          params: {
+            fromDepart: defaultDepart,
+            toDepart: defaultSecondDepart,
+          },
+        }),
+      );
+    } else if (docDocumentSubtype?.id === 'movement') {
+      dispatch(
+        appActions.setScreenFormParams({
+          screenName,
+          params: {
+            fromDepart: defaultSecondDepart,
+
+            toDepart: defaultDepart,
+          },
+        }),
+      );
     }
-  }, [dispatch, docDocumentSubtype?.id, docFromDepart, screenName]);
+  }, [defaultDepart, defaultSecondDepart, dispatch, docDocumentSubtype?.id, docFromDepart, screenName]);
 
   useEffect(() => {
     if (screenState === 'saving') {
