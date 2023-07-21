@@ -120,6 +120,14 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
       };
 
     case getType(actions.addSettings): {
+      const baseSetts = Object.entries(state.data).reduce((setts: Settings, [field, newSet]) => {
+        const oldRef = baseSettings[field];
+        if (oldRef) {
+          setts[field] = newSet;
+        }
+        return setts;
+      }, {});
+
       const newSetts = Object.entries(action.payload).reduce((setts: Settings, [field, newSet]) => {
         const oldRef = state.data[field];
         setts[field] = oldRef ? oldRef : newSet;
@@ -129,7 +137,7 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
       return {
         ...state,
         isInit: false,
-        data: { ...state.data, ...newSetts },
+        data: { ...baseSetts, ...newSetts },
       };
     }
 

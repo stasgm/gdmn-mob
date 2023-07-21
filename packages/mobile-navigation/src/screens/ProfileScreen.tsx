@@ -11,7 +11,6 @@ import {
   referenceActions,
   appActions,
   useAuthThunkDispatch,
-  useSettingThunkDispatch,
 } from '@lib/store';
 
 import {
@@ -42,7 +41,6 @@ const ProfileScreen = () => {
 
   const dispatch = useDispatch();
   const authDispatch = useAuthThunkDispatch();
-  const settingsDispatch = useSettingThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<ProfileStackParamList, 'Profile'>>();
   const showActionSheet = useActionSheet();
 
