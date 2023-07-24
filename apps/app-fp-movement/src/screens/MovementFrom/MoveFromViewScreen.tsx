@@ -292,7 +292,7 @@ export const MoveFromViewScreen = () => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      alertWithSound('Внимание!', text);
+      alertWithSound('Внимание!', `${text}.`);
       setScanned(false);
     }
   }, []);
@@ -378,7 +378,7 @@ export const MoveFromViewScreen = () => {
         isToAddressed
       ) {
         if (newLine.quantPack < goodBarcodeSettings.boxNumber) {
-          alertWithSound('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}!`);
+          alertWithSound('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}.`);
           setScanned(false);
           return;
         }

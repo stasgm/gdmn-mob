@@ -54,7 +54,4 @@ module.exports = {
   performance: {
     hints: false,
   },
-  // experiments: {
-  //   asset: true
-  // },
 };

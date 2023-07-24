@@ -23,9 +23,6 @@ const Dashboard = () => {
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
     const loadData = async () => {
-      // await dispatch(companyActions.fetchCompanies());
-      // await dispatch(userActions.fetchUsers());
-      // await dispatch(deviceActions.fetchDevices());
       const resp = await dispatch(companyActions.fetchCompanies());
       if (resp.type === 'COMPANY/FETCH_COMPANIES_SUCCESS') {
         const resp = await dispatch(userActions.fetchUsers());

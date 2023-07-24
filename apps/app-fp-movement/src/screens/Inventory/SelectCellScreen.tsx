@@ -39,11 +39,11 @@ const NamedRow = ({ item }: { item: string }) => (
 
 export const SelectCellScreen = () => {
   const dispatch = useDispatch();
-  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'SelectCell'>>();
+  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'InventorySelectCell'>>();
   const { colors } = useTheme();
 
   const [visibleDialog, setVisibleDialog] = useState(false);
-  const { docId, item, mode } = useRoute<RouteProp<InventoryStackParamList, 'SelectCell'>>().params;
+  const { docId, item, mode } = useRoute<RouteProp<InventoryStackParamList, 'InventorySelectCell'>>().params;
 
   const doc = docSelectors.selectByDocId<IMoveDocument>(docId);
 
@@ -91,7 +91,7 @@ export const SelectCellScreen = () => {
       setSelectedRow(getCellItem(cell.name).row);
       setToCell(item);
     } else {
-      alertWithSound('Ошибка!', 'Для данный товар не находится в ячейке');
+      alertWithSound('Ошибка!', 'Данный товар не находится в ячейке.');
     }
   }, [cell, item, mode]);
 

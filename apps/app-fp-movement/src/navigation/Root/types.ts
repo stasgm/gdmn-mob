@@ -89,7 +89,7 @@ export type CurrFreeShipmentParamList = RefParamList & {
   ScanGood: { docId: string; docType?: string };
 };
 
-export type CurrFreeShipmentStackParamList = { CurrFreeShipmentList: undefined } & FreeShipmentParamList;
+export type CurrFreeShipmentStackParamList = { CurrFreeShipmentList: undefined } & CurrFreeShipmentParamList;
 
 export type ReturnParamList = RefParamList & {
   ReturnView: { id: string; docType?: string };
@@ -111,7 +111,7 @@ export type InventoryParamList = RefParamList & {
   InventoryView: { id: string; docType?: string };
   InventoryEdit: { id: string; docType?: string } | undefined;
   ScanGood: { docId: string; docType?: string };
-  SelectCell: { docId: string; item: IInventoryLine; mode?: number; docType?: string };
+  InventorySelectCell: { docId: string; item: IInventoryLine; mode?: number; docType?: string };
 };
 
 export type InventoryStackParamList = { InventoryList: undefined } & InventoryParamList;
