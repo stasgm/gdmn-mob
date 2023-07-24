@@ -128,7 +128,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
     )
     .use(router.routes())
     .use(router.allowedMethods());
-  if (process.env.PUBLIC_PATH === '/admin/') {
+  if (process.env.IS_ADMIN_ENABLED === 'true') {
     app.use(historyApiFallback({ index: '/admin/index.html' })).use(serve({ rootDir: 'admin', rootPath: '/admin' }));
   }
 
@@ -148,8 +148,8 @@ export const startServer = (app: KoaApp) => {
 
   const httpServer = http.createServer(koaCallback);
 
-  httpServer.listen(config.PORT, config.HOST, () =>
-    log.info(`>>> HTTP server is running at http://${config.HOST}:${config.PORT}`),
+  httpServer.listen(config.PORT, config.LOCALHOST, () =>
+    log.info(`>>> HTTP server is running at http://${config.LOCALHOST}:${config.PORT}`),
   );
 
   /**
@@ -172,8 +172,8 @@ export const startServer = (app: KoaApp) => {
 
     https
       .createServer({ cert, ca, key }, koaCallback)
-      .listen(config.HTTPS_PORT, config.HOST, () =>
-        log.info(`>>> HTTPS server is running at https://${config.HOST}:${config.HTTPS_PORT}`),
+      .listen(config.HTTPS_PORT, config.LOCALHOST, () =>
+        log.info(`>>> HTTPS server is running at https://${config.LOCALHOST}:${config.HTTPS_PORT}`),
       );
   } catch (err) {
     log.warn('HTTPS server is not running. No SSL files');
