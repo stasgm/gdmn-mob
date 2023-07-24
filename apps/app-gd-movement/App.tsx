@@ -103,7 +103,6 @@ const Root = () => {
 
   useEffect(() => {
     if (appSettings && isInit) {
-      dispatch(settingsActions.addSettings(appSettings));
       dispatch(
         settingsActions.updateOption({
           optionName: 'getReferences',
@@ -126,6 +125,18 @@ const Root = () => {
   }, [dispatch, isLogged]);
 
   const [loading, setLoading] = useState(true);
+  const [addSettings, setAddSettings] = useState('INIT');
+
+  useEffect(() => {
+    if (appDataLoading) {
+      if (addSettings === 'INIT') {
+        setAddSettings('ADDING');
+      }
+    } else if (addSettings === 'ADDING') {
+      dispatch(settingsActions.addSettings(appSettings));
+      setAddSettings('ADDED');
+    }
+  }, [addSettings, appDataLoading, dispatch]);
 
   useEffect(() => {
     //Для отрисовки при первом подключении
