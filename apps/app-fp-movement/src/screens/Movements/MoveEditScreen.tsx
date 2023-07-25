@@ -312,7 +312,7 @@ export const MoveEditScreen = () => {
 
     const params: Record<string, string> = {};
 
-    if (docDocumentSubtype?.id === 'cellMovement') {
+    if (docDocumentSubtype?.id === 'cellMovement' || docDocumentSubtype?.id === 'movement') {
       params.isAddressStore = 'true';
     }
 
@@ -334,8 +334,8 @@ export const MoveEditScreen = () => {
 
     const params: Record<string, string> = {};
 
-    if (docDocumentSubtype?.id === 'cellMovement') {
-      params.isAddressedStore = 'true';
+    if (docDocumentSubtype?.id === 'cellMovement' || docDocumentSubtype?.id === 'internalMovement') {
+      params.isAddressStore = 'true';
     }
 
     navigation.navigate('SelectRefItem', {
@@ -345,6 +345,7 @@ export const MoveEditScreen = () => {
       value: docToDepart && [docToDepart],
       descrFieldName: 'shcode',
       clause: params,
+      clauseType: 'boolean',
     });
   };
 
