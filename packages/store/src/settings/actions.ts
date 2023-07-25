@@ -14,14 +14,7 @@ const setLoading = createAction('SETTINGS/SET_LOADING')<boolean>();
 const setLoadingData = createAction('SETTINGS/SET_LOADING_DATA')<boolean>();
 const setLoadingError = createAction('SETTINGS/SET_LOADING_ERROR')<string>();
 
-const addSettingsAsync = createAsyncAction('SETTINGS/ADD', 'SETTINGS/ADD_SUCCESS', 'SETTINGS/ADD_FAILURE')<
-  undefined,
-  Settings,
-  string
->();
-
 export const actions = {
-  addSettingsAsync,
   updateOption,
   addSettings,
   deleteOption,

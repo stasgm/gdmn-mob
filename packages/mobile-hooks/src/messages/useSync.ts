@@ -11,7 +11,6 @@ import {
   useDocThunkDispatch,
   useRefThunkDispatch,
   useSelector,
-  useSettingThunkDispatch,
   messageActions,
   useAppStore,
   IMultipartData,
@@ -43,7 +42,6 @@ export const useSync = (onSync?: () => Promise<any>) => {
   const docDispatch = useDocThunkDispatch();
   const refDispatch = useRefThunkDispatch();
   const authDispatch = useAuthThunkDispatch();
-  const settDispatch = useSettingThunkDispatch();
   const dispatch = useDispatch();
 
   const addError = useCallback(
@@ -345,7 +343,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
                   syncPeriod = isNumeric(value.data) ? (Number(value.data) || 600) / 60 : undefined;
 
                   if (syncPeriod) {
-                    settDispatch(
+                    dispatch(
                       settingsActions.updateOption({
                         optionName,
                         value: {
@@ -362,7 +360,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
                     );
                   }
                 } else {
-                  settDispatch(
+                  dispatch(
                     settingsActions.updateOption({
                       optionName,
                       value: {
@@ -376,7 +374,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
             }
 
             if (autoSynchPeriod && syncPeriod && autoSynchPeriod < syncPeriod) {
-              settDispatch(
+              dispatch(
                 settingsActions.updateOption({
                   optionName: 'autoSynchPeriod',
                   value: {
@@ -409,7 +407,6 @@ export const useSync = (onSync?: () => Promise<any>) => {
       params,
       refDispatch,
       refLoadType,
-      settDispatch,
       settings,
     ],
   );
