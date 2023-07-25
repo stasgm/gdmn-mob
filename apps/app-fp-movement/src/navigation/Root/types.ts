@@ -8,6 +8,7 @@ export type IRefSelectParams = {
   fieldName: string;
   value?: IReferenceData[];
   clause?: Record<string, string>;
+  clauseType?: string;
   isMulti?: boolean;
   docType?: string;
   refFieldName?: string;
