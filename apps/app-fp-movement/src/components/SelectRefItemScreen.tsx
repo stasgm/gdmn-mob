@@ -53,14 +53,8 @@ const SelectRefItemScreen = () => {
         return extraPredicate(item, newParams);
       });
     }
-    return refObj?.data?.sort((a, b) =>
-      a.sortOrder && b.sortOrder
-        ? (a.sortOrder || 1) < (b.sortOrder || 1)
-          ? -1
-          : 1
-        : a[refFieldName] < b[refFieldName]
-        ? -1
-        : 1,
+    return refObj?.data?.sort(
+      (a, b) => (a.sortOrder || 1) - (b.sortOrder || 1) || a[refFieldName].localeCompare(b[refFieldName]),
     );
   }, [clause, refFieldName, refObj?.data]);
 

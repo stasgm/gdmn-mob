@@ -133,7 +133,7 @@ export const SelectCellScreen = () => {
       return (
         <Pressable
           key={i.name}
-          style={[localStyles.buttons, backColorStyle]}
+          style={({ pressed }) => [localStyles.buttons, backColorStyle, pressed && { backgroundColor: colors.accent }]}
           onPress={() => handleSaveLine(i)}
           disabled={i.barcode !== item.barcode || Boolean(i.disabled)}
         >
@@ -141,7 +141,7 @@ export const SelectCellScreen = () => {
         </Pressable>
       );
     },
-    [colors.backdrop, handleSaveLine, item.barcode, toCell],
+    [colors.accent, colors.backdrop, handleSaveLine, item.barcode, toCell],
   );
 
   const CellsColumn = useCallback(
