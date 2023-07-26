@@ -230,8 +230,7 @@ export const SelectCellScreen = () => {
       return (
         <Pressable
           key={i.name}
-          style={[localStyles.buttons, backColorStyle]}
-          // style={({ pressed }) => [localStyles.buttons, backColorStyle, pressed && { backgroundColor: colors.accent }]}
+          style={({ pressed }) => [localStyles.buttons, backColorStyle, pressed && { backgroundColor: colors.accent }]}
           onPress={() => handleSaveLine(i)}
           disabled={
             (doc?.head.fromDepart?.isAddressStore && !fromCell ? !i.barcode : Boolean(i.barcode)) || Boolean(i.disabled)
@@ -242,7 +241,7 @@ export const SelectCellScreen = () => {
       );
     },
     [
-      // colors.accent,
+      colors.accent,
       colors.backdrop,
       colors.error,
       defaultCell,
