@@ -55,7 +55,7 @@ const baseSettings: Settings<IBaseSettings> = {
   getReferences: {
     id: 'getReferences',
     description: 'Запрашивать справочники',
-    data: true,
+    data: false,
     type: 'boolean',
     sortOrder: 1,
     visible: true,

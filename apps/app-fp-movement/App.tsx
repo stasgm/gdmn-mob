@@ -31,7 +31,7 @@ import {
 
 import { ActivityIndicator, Caption, Text } from 'react-native-paper';
 
-import { IDocument, IReferences, ISettingsOption, IUserSettings } from '@lib/types';
+import { IDocument, IReferences, IUserSettings } from '@lib/types';
 
 import { sleep, dialCall } from '@lib/mobile-hooks';
 
@@ -298,7 +298,6 @@ const Root = () => {
   const fpLoading = useFpSelector((state) => state.fpMovement.loading);
   const isDemo = useSelector((state) => state.auth.isDemo);
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
-  const getReferences = useSelector((state) => state.settings?.data?.getReferences);
 
   const refDispatch = useRefThunkDispatch();
   const docDispatch = useDocThunkDispatch();
@@ -322,13 +321,10 @@ const Root = () => {
   }, [authDispatch, docDispatch, refDispatch]);
 
   useEffect(() => {
+    //isInit - true при открытии приложения или при ручном сбросе настроек
+    //До загрузки данных пользователя устанавливаем настройки по умолчанию
     if (appSettings && isInit) {
-      dispatch(
-        settingsActions.updateOption({
-          optionName: 'getReferences',
-          value: { ...getReferences, data: false } as ISettingsOption,
-        }),
-      );
+      dispatch(settingsActions.addSettings(appSettings));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInit]);
@@ -348,6 +344,8 @@ const Root = () => {
   const [addSettings, setAddSettings] = useState('INIT');
 
   useEffect(() => {
+    //После загрузки данных пользователя устанавливаем настройки поверх настроек по умолчанию и загруженных из памяти
+    //Необходимо при добавлении новых параметров
     if (appDataLoading) {
       if (addSettings === 'INIT') {
         setAddSettings('ADDING');

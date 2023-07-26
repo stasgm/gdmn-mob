@@ -30,7 +30,7 @@ import {
 
 import { ActivityIndicator, Caption, Text } from 'react-native-paper';
 
-import { IDocument, IReferences, ISettingsOption } from '@lib/types';
+import { IDocument, IReferences } from '@lib/types';
 
 import { TouchableOpacity, Linking, View } from 'react-native';
 
@@ -78,7 +78,6 @@ const Root = () => {
 
   //Загружаем в стор дополнительные настройки приложения
   const isInit = useSelector((state) => state.settings.isInit);
-  const getReferences = useSelector((state) => state.settings?.data?.getReferences);
   const authLoading = useSelector((state) => state.auth.loadingData);
   const appDataLoading = appSelectors.selectLoading();
   const isLogged = authSelectors.isLoggedWithCompany();
@@ -102,13 +101,10 @@ const Root = () => {
   }, [docDispatch, refDispatch]);
 
   useEffect(() => {
+    //isInit - true при открытии приложения или при ручном сбросе настроек
+    //До загрузки данных пользователя устанавливаем настройки по умолчанию
     if (appSettings && isInit) {
-      dispatch(
-        settingsActions.updateOption({
-          optionName: 'getReferences',
-          value: { ...getReferences, data: false } as ISettingsOption,
-        }),
-      );
+      dispatch(settingsActions.addSettings(appSettings));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInit]);
@@ -128,6 +124,8 @@ const Root = () => {
   const [addSettings, setAddSettings] = useState('INIT');
 
   useEffect(() => {
+    //После загрузки данных пользователя устанавливаем настройки поверх настроек по умолчанию и загруженных из памяти
+    //Необходимо при добавлении новых параметров
     if (appDataLoading) {
       if (addSettings === 'INIT') {
         setAddSettings('ADDING');
