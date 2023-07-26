@@ -67,7 +67,7 @@ const SettingsScreen = () => {
   };
 
   const handleReset = useCallback(() => {
-    dispatch(settingsActions.init());
+    dispatch(settingsActions.initData());
   }, [dispatch]);
 
   const actionsMenu = useCallback(() => {

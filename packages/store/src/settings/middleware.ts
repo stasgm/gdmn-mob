@@ -46,10 +46,12 @@ export const settingMiddlewareFactory: PersistedMiddleware =
     if (store.getState().auth.user?.id) {
       switch (action.type) {
         case getType(actions.init):
+        case getType(actions.initData):
         case getType(actions.updateOption):
         case getType(actions.addSettings):
         case getType(actions.deleteOption):
-        case getType(actions.deleteAllSettings): {
+        case getType(actions.deleteAllSettings):
+        case getType(actions.setUserSettingsAsync.success): {
           const result = next(action);
           save('settings', store.getState().settings, store.getState().auth.user?.id).catch((err) => {
             if (err instanceof Error) {

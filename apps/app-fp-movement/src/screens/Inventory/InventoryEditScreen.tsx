@@ -42,7 +42,7 @@ export const InventoryEditScreen = () => {
 
   const departs = refSelectors.selectByName<IAddressStoreEntity>('depart')?.data;
 
-  const userDefaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity;
+  const userDefaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as INamedEntity;
 
   const defaultDepart = departs?.find((i) => i.id === userDefaultDepart?.id);
 

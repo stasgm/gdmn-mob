@@ -95,7 +95,7 @@ const VisitScreen = () => {
   const debtTextStyle = [{ color: saldoDebt > 0 ? colors.error : colors.text }];
 
   const orderType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'order');
-  const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity | undefined;
+  const defaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as INamedEntity | undefined;
 
   const orderList = docSelectors.selectByDocType<IOrderDocument>('order');
   const loading = useSelector((state) => state.app.loading);

@@ -14,12 +14,6 @@ export const errorHandler = async (ctx: Context, next: Next) => {
     await next();
   } catch (error: any) {
     if (error instanceof ApplicationException) {
-      // const result: IResponse<string> = {
-      //   result: false,
-      //   error: error.message || 'Неизвестная внутренняя ошибка',
-      //   data: error.name || 'InnerErrorException',
-      //   status: error.status || 500,
-      // };
       const result: FailureResponse = {
         result: false,
         type: 'FAILURE',
@@ -34,11 +28,6 @@ export const errorHandler = async (ctx: Context, next: Next) => {
     } else {
       const errorMsg = error instanceof Error && error.message ? error.message : `Неизвестная ошибка: ${error}`;
       ctx.status = 500;
-      // ctx.body = {
-      //   result: false,
-      //   error: errorMsg,
-      //   data: 'InnerErrorException',
-      // };
       ctx.body = {
         result: false,
         type: 'FAILURE',

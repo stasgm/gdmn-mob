@@ -63,8 +63,7 @@ export const authMiddlewareFactory: PersistedMiddleware =
       case getType(actions.logoutUserAsync.success):
       case getType(actions.logoutUserAsync.failure):
       case getType(actions.getDeviceByUidAsync.success):
-      case getType(actions.loginUserAsync.success):
-      case getType(actions.setUserSettingsAsync.success): {
+      case getType(actions.loginUserAsync.success): {
         const result = next(action);
         save('auth', store.getState().auth).catch((err) => {
           if (err instanceof Error) {
