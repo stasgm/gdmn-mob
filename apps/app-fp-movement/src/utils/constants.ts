@@ -103,15 +103,6 @@ const goodGroup = { id: 'goodScan', name: 'Код товара', sortOrder: 21, 
 const orderGroup = { id: 'orderScan', name: 'Код заявки', sortOrder: 22, description: 'Количество символов' };
 
 export const appSettings: Settings = {
-  getReferences: {
-    id: 'getReferences',
-    description: 'Запрашивать справочники',
-    data: true,
-    type: 'boolean',
-    sortOrder: 1,
-    visible: true,
-    group: mainSettingGroup,
-  },
   scannerUse: {
     id: 'scannerUse',
     sortOrder: 3,

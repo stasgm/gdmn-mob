@@ -321,7 +321,7 @@ const Root = () => {
   }, [authDispatch, docDispatch, refDispatch]);
 
   useEffect(() => {
-    //isInit - true при открытии приложения
+    //isInit - true при открытии приложения или при ручном сбросе настроек
     //До загрузки данных пользователя устанавливаем настройки по умолчанию
     if (appSettings && isInit) {
       dispatch(settingsActions.addSettings(appSettings));
@@ -345,7 +345,7 @@ const Root = () => {
 
   useEffect(() => {
     //После загрузки данных пользователя устанавливаем настройки поверх настроек по умолчанию и загруженных из памяти
-    //Такое необходимо при добавлении новых параметров
+    //Необходимо при добавлении новых параметров
     if (appDataLoading) {
       if (addSettings === 'INIT') {
         setAddSettings('ADDING');
