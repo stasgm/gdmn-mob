@@ -145,6 +145,20 @@ export const MoveEditScreen = () => {
   }, [dispatch, docDocumentSubtype?.id, docFromDepart, screenName]);
 
   useEffect(() => {
+    if (docDocumentSubtype?.id === 'cellMovement' && !docFromDepart) {
+      dispatch(
+        appActions.setScreenFormParams({
+          screenName,
+          params: {
+            fromDepart: defaultSecondDepart,
+            toDepart: defaultSecondDepart,
+          },
+        }),
+      );
+    }
+  }, [defaultSecondDepart, dispatch, docDocumentSubtype?.id, docFromDepart, screenName]);
+
+  useEffect(() => {
     if (screenState === 'saving') {
       if (!movementType) {
         alertWithSound('Внимание!', 'Тип документа для перемещений не найден.');
@@ -312,7 +326,7 @@ export const MoveEditScreen = () => {
 
     const params: Record<string, string> = {};
 
-    if (docDocumentSubtype?.id === 'cellMovement') {
+    if (docDocumentSubtype?.id === 'cellMovement' || docDocumentSubtype?.id === 'movement') {
       params.isAddressStore = 'true';
     }
 
@@ -334,8 +348,8 @@ export const MoveEditScreen = () => {
 
     const params: Record<string, string> = {};
 
-    if (docDocumentSubtype?.id === 'cellMovement') {
-      params.isAddressedStore = 'true';
+    if (docDocumentSubtype?.id === 'cellMovement' || docDocumentSubtype?.id === 'internalMovement') {
+      params.isAddressStore = 'true';
     }
 
     navigation.navigate('SelectRefItem', {
@@ -345,6 +359,7 @@ export const MoveEditScreen = () => {
       value: docToDepart && [docToDepart],
       descrFieldName: 'shcode',
       clause: params,
+      clauseType: 'boolean',
     });
   };
 

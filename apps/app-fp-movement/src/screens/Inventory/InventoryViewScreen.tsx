@@ -29,6 +29,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { FlashList } from '@shopify/flash-list';
 
+import { DashboardStackParamList } from '@lib/mobile-navigation';
+
 import { barcodeSettings, IInventoryDocument, IInventoryLine } from '../../store/types';
 import { InventoryStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
@@ -48,7 +50,8 @@ export const InventoryViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
-  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'InventoryView'>>();
+  const navigation =
+    useNavigation<StackNavigationProp<InventoryStackParamList & DashboardStackParamList, 'InventoryView'>>();
 
   const id = useRoute<RouteProp<InventoryStackParamList, 'InventoryView'>>().params?.id;
   const doc = docSelectors.selectByDocId<IInventoryDocument>(id);

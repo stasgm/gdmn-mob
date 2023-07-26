@@ -16,6 +16,8 @@ import { useTheme } from 'react-native-paper';
 
 import { ScrollView } from 'react-native-gesture-handler';
 
+import { DashboardStackParamList } from '@lib/mobile-navigation';
+
 import { ICell, ICellRef, IInventoryDocument, IInventoryLine, IMoveDocument, IMoveLine } from '../../store/types';
 import { InventoryStackParamList } from '../../navigation/Root/types';
 
@@ -39,7 +41,8 @@ const NamedRow = ({ item }: { item: string }) => (
 
 export const SelectCellScreen = () => {
   const dispatch = useDispatch();
-  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'InventorySelectCell'>>();
+  const navigation =
+    useNavigation<StackNavigationProp<InventoryStackParamList & DashboardStackParamList, 'InventorySelectCell'>>();
   const { colors } = useTheme();
 
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -133,7 +136,7 @@ export const SelectCellScreen = () => {
       return (
         <Pressable
           key={i.name}
-          style={[localStyles.buttons, backColorStyle]}
+          style={({ pressed }) => [localStyles.buttons, backColorStyle, pressed && { backgroundColor: colors.accent }]}
           onPress={() => handleSaveLine(i)}
           disabled={i.barcode !== item.barcode || Boolean(i.disabled)}
         >
@@ -141,7 +144,7 @@ export const SelectCellScreen = () => {
         </Pressable>
       );
     },
-    [colors.backdrop, handleSaveLine, item.barcode, toCell],
+    [colors.accent, colors.backdrop, handleSaveLine, item.barcode, toCell],
   );
 
   const CellsColumn = useCallback(

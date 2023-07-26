@@ -362,9 +362,8 @@ export const MoveToViewScreen = () => {
         isFromAddressed ||
         isToAddressed
       ) {
-        if (newLine.quantPack < goodBarcodeSettings.boxNumber) {
-          handleErrorMessage(visibleDialog, `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}!`);
-
+        if (goodBarcodeSettings.boxWeight >= newLine.weight) {
+          handleErrorMessage(visibleDialog, `Вес поддона не может быть меньше ${goodBarcodeSettings.boxWeight}!`);
           return;
         }
 

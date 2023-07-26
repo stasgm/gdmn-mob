@@ -260,12 +260,16 @@ export const MoveFromEditScreen = () => {
       return;
     }
 
+    const params: Record<string, string> = { isAddressStore: 'true' };
+
     navigation.navigate('SelectRefItem', {
       screenName,
       refName: 'depart',
       fieldName: 'fromDepart',
       value: docFromDepart && [docFromDepart],
       descrFieldName: 'shcode',
+      clause: params,
+      clauseType: 'boolean',
     });
   };
 

@@ -377,9 +377,8 @@ export const MoveFromViewScreen = () => {
         isFromAddressed ||
         isToAddressed
       ) {
-        if (newLine.quantPack < goodBarcodeSettings.boxNumber) {
-          alertWithSound('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}.`);
-          setScanned(false);
+        if (goodBarcodeSettings.boxWeight >= newLine.weight) {
+          handleErrorMessage(visibleDialog, `Вес поддона не может быть меньше ${goodBarcodeSettings.boxWeight}!`);
           return;
         }
         navigation.navigate('SelectCell', { docId: id, item: newLine, mode: 0 });
