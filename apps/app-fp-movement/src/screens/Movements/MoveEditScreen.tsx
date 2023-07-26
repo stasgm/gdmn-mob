@@ -145,6 +145,20 @@ export const MoveEditScreen = () => {
   }, [dispatch, docDocumentSubtype?.id, docFromDepart, screenName]);
 
   useEffect(() => {
+    if (docDocumentSubtype?.id === 'cellMovement' && !docFromDepart) {
+      dispatch(
+        appActions.setScreenFormParams({
+          screenName,
+          params: {
+            fromDepart: defaultSecondDepart,
+            toDepart: defaultSecondDepart,
+          },
+        }),
+      );
+    }
+  }, [defaultSecondDepart, dispatch, docDocumentSubtype?.id, docFromDepart, screenName]);
+
+  useEffect(() => {
     if (screenState === 'saving') {
       if (!movementType) {
         alertWithSound('Внимание!', 'Тип документа для перемещений не найден.');

@@ -16,6 +16,8 @@ import { useTheme } from 'react-native-paper';
 
 import { ScrollView } from 'react-native-gesture-handler';
 
+import { DashboardStackParamList } from '@lib/mobile-navigation';
+
 import { ICell, ICellName, ICellRef, IInventoryLine, IMoveDocument, IMoveLine } from '../store/types';
 import { MoveStackParamList } from '../navigation/Root/types';
 
@@ -39,7 +41,7 @@ const NamedRow = ({ item }: { item: string }) => (
 
 export const SelectCellScreen = () => {
   const dispatch = useDispatch();
-  const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'SelectCell'>>();
+  const navigation = useNavigation<StackNavigationProp<MoveStackParamList & DashboardStackParamList, 'SelectCell'>>();
   const { colors } = useTheme();
 
   const [visibleDialog, setVisibleDialog] = useState(false);
