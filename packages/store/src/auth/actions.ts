@@ -1,5 +1,5 @@
 import { IApiConfig } from '@lib/client-types';
-import { IDevice, IUser, ICompany, DeviceState, IUserSettings, INamedEntity } from '@lib/types';
+import { IDevice, IUser, ICompany, INamedEntity } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
 import { AuthState, ConnectionStatus } from './types';
@@ -67,12 +67,6 @@ const getDeviceStatusAsync = createAsyncAction(
   'AUTH/GET_DEVICE_STATUS_FAILURE',
 )<string, ConnectionStatus, string>();
 
-const setUserSettingsAsync = createAsyncAction(
-  'AUTH/SET_USER_SETTINGS',
-  'AUTH/SET_USER_SETTINGS_SUCCESS',
-  'AUTH/SET_USER_SETTINGS_FAILURE',
-)<string, IUserSettings, string>();
-
 const setDemoModeAsync = createAsyncAction(
   'AUTH/SET_DEMOMODE',
   'AUTH/SET_DEMOMODE_SUCCESS',
@@ -92,7 +86,6 @@ export const actions = {
   signupAsync,
   activateDeviceAsync,
   getDeviceStatusAsync,
-  setUserSettingsAsync,
   setConnectionStatus,
   getCompanyAsync,
   setDemoModeAsync,

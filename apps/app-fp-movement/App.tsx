@@ -9,12 +9,10 @@ import { StatusBar } from 'expo-status-bar';
 import {
   appActions,
   appSelectors,
-  authActions,
   authSelectors,
   documentActions,
   referenceActions,
   settingsActions,
-  useAuthThunkDispatch,
   useDispatch,
   useDocThunkDispatch,
   useRefThunkDispatch,
@@ -38,6 +36,8 @@ import { sleep, dialCall } from '@lib/mobile-hooks';
 import { TouchableOpacity, Linking, ScrollView, View } from 'react-native';
 
 import Constants from 'expo-constants';
+
+import { useSettingsThunkDispatch } from '@lib/store/src/settings/actions.async';
 
 import { MoveNavigator } from './src/navigation/MoveNavigator';
 
@@ -301,7 +301,7 @@ const Root = () => {
 
   const refDispatch = useRefThunkDispatch();
   const docDispatch = useDocThunkDispatch();
-  const authDispatch = useAuthThunkDispatch();
+  const settingsDispatch = useSettingsThunkDispatch();
 
   const getMessages = useCallback(async () => {
     await sleep(ONE_SECOND_IN_MS);
@@ -313,12 +313,12 @@ const Root = () => {
     await docDispatch(
       documentActions.setDocuments(messageFpMovement.find((m) => m.body.type === 'DOCS')?.body.payload as IDocument[]),
     );
-    await authDispatch(
-      authActions.setUserSettings(
+    await settingsDispatch(
+      settingsActions.setUserSettings(
         messageFpMovement.find((m) => m.body.type === 'SETTINGS')?.body.payload as IUserSettings,
       ),
     );
-  }, [authDispatch, docDispatch, refDispatch]);
+  }, [docDispatch, refDispatch, settingsDispatch]);
 
   useEffect(() => {
     //isInit - true при открытии приложения или при ручном сбросе настроек
