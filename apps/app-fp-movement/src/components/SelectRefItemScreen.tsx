@@ -53,13 +53,17 @@ const SelectRefItemScreen = () => {
             if (
               typeof clause[i] !== 'object' &&
               typeof item[i] !== 'object' &&
-              (clauseType === 'boolean' ? Boolean(item[i]) === Boolean(clause[i]) : item[i] === clause[i])
+              (clauseType === 'boolean' ? Boolean(item[i]) === (clause[i] === 'true') : item[i] === clause[i])
             ) {
             }
           }
         });
 
-        isAddressStoreFound = newParams.isAddressStore ? Boolean((item as IAddressStoreEntity).isAddressStore) : true;
+        isAddressStoreFound = newParams.isAddressStore
+          ? newParams.isAddressStore === 'true'
+            ? Boolean((item as IAddressStoreEntity).isAddressStore)
+            : !(item as IAddressStoreEntity).isAddressStore
+          : true;
         delete newParams.isAddressStore;
 
         return isAddressStoreFound && extraPredicate(item, newParams);

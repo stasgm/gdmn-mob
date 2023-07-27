@@ -21,7 +21,15 @@ import {
   SimpleDialog,
 } from '@lib/mobile-ui';
 
-import { generateId, getDateString, keyExtractor, useSendDocs, sleep, useSendOneRefRequest } from '@lib/mobile-hooks';
+import {
+  generateId,
+  getDateString,
+  keyExtractor,
+  useSendDocs,
+  sleep,
+  useSendOneRefRequest,
+  round,
+} from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
 
@@ -37,10 +45,11 @@ import {
   alertWithSound,
   alertWithSoundMulti,
   getBarcode,
+  getBarcodeString,
   getLineGood,
   getRemGoodListByContact,
 } from '../../utils/helpers';
-import { IGood, IRemains, IRemGood } from '../../store/app/types';
+import { IBarcode, IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
 
@@ -111,6 +120,166 @@ export const ReceiptViewScreen = () => {
     setVisibleDialog(false);
     setBarcode('');
     setErrorMessage('');
+  };
+
+  const [visibleQuantPackDialog, setVisibleQuantPackDialog] = useState(false);
+  const [quantPack, setQuantPack] = useState('');
+
+  const handleAddQuantPack = useCallback(
+    (quantity: number) => {
+      const line = lines?.[0];
+      if (!line) {
+        return;
+      }
+
+      const lineBarcode: IBarcode = {
+        barcode: line.barcode || '',
+        numReceived: line.numReceived,
+        quantPack: line.quantPack,
+        shcode: line.good.shcode,
+        weight: line.weight,
+        workDate: line.workDate,
+        time: line.time,
+      };
+
+      if (line?.weight >= goodBarcodeSettings?.boxWeight) {
+        const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: quantity });
+        const newLine: IReceiptLine = {
+          ...line,
+          quantPack: quantity,
+          scannedBarcode: line?.barcode,
+          barcode: newBarcode,
+        };
+        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+      } else {
+        const weight = round(line?.weight * quantity, 3);
+
+        if (remainsUse) {
+          const good = goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === line.good.shcode);
+
+          if (good) {
+            if (good.remains < weight - line.weight) {
+              alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.');
+
+              return;
+            } else if (weight < 1000) {
+              const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: quantity, weight });
+
+              const newLine: IReceiptLine = {
+                ...line,
+                quantPack: quantity,
+                weight,
+                scannedBarcode: line?.barcode,
+                barcode: newBarcode,
+              };
+
+              dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+            } else {
+              const maxQuantPack = round(Math.floor(999.99 / line?.weight), 3);
+
+              let newQuantity = quantity;
+              let sortOrder = line.sortOrder || lines.length;
+
+              while (newQuantity > 0) {
+                const q = newQuantity > maxQuantPack ? maxQuantPack : newQuantity;
+                const newWeight = round(line?.weight * q, 3);
+
+                const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: q, weight: newWeight });
+
+                const newLine: IReceiptLine = {
+                  ...line,
+                  quantPack: q,
+                  weight: newWeight,
+                  scannedBarcode: line?.barcode,
+                  barcode: newBarcode,
+                };
+
+                if (newQuantity === quantity) {
+                  dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+                } else {
+                  sortOrder = sortOrder + 1;
+
+                  const addedLine = { ...newLine, id: generateId(), sortOrder };
+                  dispatch(
+                    documentActions.addDocumentLine({
+                      docId: id,
+                      line: addedLine,
+                    }),
+                  );
+                }
+                newQuantity = newQuantity - maxQuantPack;
+              }
+            }
+          } else {
+            alertWithSound('Ошибка!', 'Товар не найден.');
+
+            return;
+          }
+        } else {
+          if (weight < 1000) {
+            const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: quantity, weight });
+
+            const newLine: IReceiptLine = {
+              ...line,
+              quantPack: quantity,
+              weight,
+              scannedBarcode: line?.barcode,
+              barcode: newBarcode,
+            };
+
+            dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+          } else {
+            const maxQuantPack = round(Math.floor(999.99 / line?.weight), 3);
+
+            let newQuantity = quantity;
+            let sortOrder = line.sortOrder || lines.length;
+
+            while (newQuantity > 0) {
+              const q = newQuantity > maxQuantPack ? maxQuantPack : newQuantity;
+              const newWeight = round(line?.weight * q, 3);
+
+              const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: q, weight: newWeight });
+
+              const newLine: IReceiptLine = {
+                ...line,
+                quantPack: q,
+                weight: newWeight,
+                scannedBarcode: line?.barcode,
+                barcode: newBarcode,
+              };
+
+              if (newQuantity === quantity) {
+                dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+              } else {
+                sortOrder = sortOrder + 1;
+
+                const addedLine = { ...newLine, id: generateId(), sortOrder };
+                dispatch(
+                  documentActions.addDocumentLine({
+                    docId: id,
+                    line: addedLine,
+                  }),
+                );
+              }
+              newQuantity = newQuantity - maxQuantPack;
+            }
+          }
+        }
+      }
+    },
+    [dispatch, goodBarcodeSettings?.boxWeight, goodRemains, id, lines, remainsUse],
+  );
+
+  const handleEditQuantPack = () => {
+    handleAddQuantPack(Number(quantPack));
+    setVisibleQuantPackDialog(false);
+    setQuantPack('');
+  };
+
+  const handleDismissQuantPack = () => {
+    setVisibleQuantPackDialog(false);
+    setQuantPack('');
+    // setErrorMessage('');
   };
 
   const handleEditDocHead = useCallback(() => {
@@ -229,24 +398,31 @@ export const ReceiptViewScreen = () => {
   //   return sum;
   // }, []);
 
-  const renderItem = useCallback(({ item }: { item: IReceiptLine }) => {
-    return (
-      <ListItemLine key={item.id} readonly={true}>
-        <View style={styles.details}>
-          <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-          <View style={styles.flexDirectionRow}>
-            <MaterialCommunityIcons name="shopping-outline" size={18} />
-            <MediumText> {(item.weight || 0).toString()} кг</MediumText>
+  const renderItem = useCallback(
+    ({ item }: { item: IReceiptLine }) => {
+      return (
+        <ListItemLine
+          key={item.id}
+          readonly={doc?.status !== 'DRAFT' || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
+          onPress={() => setVisibleQuantPackDialog(true)}
+        >
+          <View style={styles.details}>
+            <LargeText style={styles.textBold}>{item.good.name}</LargeText>
+            <View style={styles.flexDirectionRow}>
+              <MaterialCommunityIcons name="shopping-outline" size={18} />
+              <MediumText> {(item.weight || 0).toString()} кг</MediumText>
+            </View>
+            <View style={styles.flexDirectionRow}>
+              <MediumText>
+                Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
+              </MediumText>
+            </View>
           </View>
-          <View style={styles.flexDirectionRow}>
-            <MediumText>
-              Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
-            </MediumText>
-          </View>
-        </View>
-      </ListItemLine>
-    );
-  }, []);
+        </ListItemLine>
+      );
+    },
+    [doc?.status, lines?.length],
+  );
 
   const [scanned, setScanned] = useState(false);
 
@@ -311,9 +487,9 @@ export const ReceiptViewScreen = () => {
         weight: barc.weight,
         barcode: barc.barcode,
         workDate: barc.workDate,
+        time: barc.time,
         numReceived: barc.numReceived,
         quantPack: barc.quantPack,
-
         sortOrder: doc.lines?.length + 1,
       };
 
@@ -441,6 +617,17 @@ export const ReceiptViewScreen = () => {
         onOk={handleSearchBarcode}
         okLabel={'Найти'}
         errorMessage={errorMessage}
+      />
+      <AppDialog
+        title="Количество"
+        visible={visibleQuantPackDialog}
+        text={quantPack}
+        onChangeText={setQuantPack}
+        onCancel={handleDismissQuantPack}
+        onOk={handleEditQuantPack}
+        okLabel={'Ок'}
+        keyboardType="numbers-and-punctuation"
+        // errorMessage={errorMessage}
       />
       <SimpleDialog
         visible={visibleSendDialog}

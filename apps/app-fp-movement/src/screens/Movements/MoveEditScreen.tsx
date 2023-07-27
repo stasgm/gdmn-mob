@@ -319,7 +319,7 @@ export const MoveEditScreen = () => {
     });
   };
 
-  const handleFromDepart = () => {
+  const handleFromDepart = useCallback(() => {
     if (isBlocked) {
       return;
     }
@@ -328,6 +328,9 @@ export const MoveEditScreen = () => {
 
     if (docDocumentSubtype?.id === 'cellMovement' || docDocumentSubtype?.id === 'movement') {
       params.isAddressStore = 'true';
+    }
+    if (docDocumentSubtype?.id === 'departMovement') {
+      params.isAddressStore = 'false';
     }
 
     navigation.navigate('SelectRefItem', {
@@ -339,9 +342,9 @@ export const MoveEditScreen = () => {
       clause: params,
       clauseType: 'boolean',
     });
-  };
+  }, [docDocumentSubtype?.id, docFromDepart, isBlocked, navigation, screenName]);
 
-  const handleToDepart = () => {
+  const handleToDepart = useCallback(() => {
     if (isBlocked) {
       return;
     }
@@ -350,6 +353,9 @@ export const MoveEditScreen = () => {
 
     if (docDocumentSubtype?.id === 'cellMovement' || docDocumentSubtype?.id === 'internalMovement') {
       params.isAddressStore = 'true';
+    }
+    if (docDocumentSubtype?.id === 'departMovement') {
+      params.isAddressStore = 'false';
     }
 
     navigation.navigate('SelectRefItem', {
@@ -361,7 +367,7 @@ export const MoveEditScreen = () => {
       clause: params,
       clauseType: 'boolean',
     });
-  };
+  }, [docDocumentSubtype?.id, docToDepart, isBlocked, navigation, screenName]);
 
   const handleChangeNumber = useCallback(
     (text: string) =>
