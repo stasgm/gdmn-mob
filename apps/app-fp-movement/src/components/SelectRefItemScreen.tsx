@@ -21,6 +21,7 @@ import { IReferenceData, ScreenState } from '@lib/types';
 
 import { useDispatch } from '../store';
 import { RefParamList } from '../navigation/Root/types';
+import { IAddressStoreEntity } from '../store/app/types';
 
 const SelectRefItemScreen = () => {
   const navigation = useNavigation();
@@ -34,29 +35,40 @@ const SelectRefItemScreen = () => {
     fieldName,
     value,
     clause,
+    clauseType,
     refFieldName = 'name' || 'shcode',
     descrFieldName,
   } = useRoute<RouteProp<RefParamList, 'SelectRefItem'>>().params;
 
   const refObj = refSelectors.selectByName<IReferenceData>(refName);
+
   const list = useMemo(() => {
     if (clause && refObj?.data) {
       return refObj?.data.filter((item) => {
         const newParams = Object.assign({}, clause);
+        let isAddressStoreFound = true;
 
         Object.keys(clause).forEach((i) => {
           if (i in item) {
-            if (typeof clause[i] !== 'object' && typeof item[i] !== 'object' && item[i] === clause[i]) {
+            if (
+              typeof clause[i] !== 'object' &&
+              typeof item[i] !== 'object' &&
+              (clauseType === 'boolean' ? Boolean(item[i]) === Boolean(clause[i]) : item[i] === clause[i])
+            ) {
             }
           }
         });
-        return extraPredicate(item, newParams);
+
+        isAddressStoreFound = newParams.isAddressStore ? Boolean((item as IAddressStoreEntity).isAddressStore) : true;
+        delete newParams.isAddressStore;
+
+        return isAddressStoreFound && extraPredicate(item, newParams);
       });
     }
     return refObj?.data?.sort(
       (a, b) => (a.sortOrder || 1) - (b.sortOrder || 1) || a[refFieldName].localeCompare(b[refFieldName]),
     );
-  }, [clause, refFieldName, refObj?.data]);
+  }, [clause, clauseType, refFieldName, refObj?.data]);
 
   const title = refObj?.description || refObj?.name;
 

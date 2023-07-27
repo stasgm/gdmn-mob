@@ -273,7 +273,7 @@ export const MoveToEditScreen = () => {
       return;
     }
 
-    const params: Record<string, string> = {};
+    const params: Record<string, string> = { isAddressStore: 'true' };
 
     navigation.navigate('SelectRefItem', {
       screenName,
@@ -282,6 +282,7 @@ export const MoveToEditScreen = () => {
       value: docToDepart && [docToDepart],
       descrFieldName: 'shcode',
       clause: params,
+      clauseType: 'boolean',
     });
   };
 
