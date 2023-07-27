@@ -38,9 +38,9 @@ export const MoveEditScreen = () => {
 
   const departs = refSelectors.selectByName<IAddressStoreEntity>('depart')?.data;
 
-  const userDefaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity;
+  const userDefaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as INamedEntity;
   const defaultDepart = departs?.find((i) => i.id === userDefaultDepart?.id);
-  const userDefaultSecondDepart = useSelector((state) => state.auth.user?.settings?.secondDepart?.data) as INamedEntity;
+  const userDefaultSecondDepart = useSelector((state) => state.settings?.userData?.secondDepart?.data) as INamedEntity;
   const defaultSecondDepart = departs?.find((i) => i.id === userDefaultSecondDepart?.id);
 
   const movementType = refSelectors
@@ -108,16 +108,7 @@ export const MoveEditScreen = () => {
   }, [dispatch, doc, defaultDepart, defaultSecondDepart, movementSubtype]);
 
   useEffect(() => {
-    if (docDocumentSubtype?.id === 'cellMovement' && docFromDepart) {
-      dispatch(
-        appActions.setScreenFormParams({
-          screenName,
-          params: {
-            toDepart: docFromDepart,
-          },
-        }),
-      );
-    } else if (docDocumentSubtype?.id === 'internalMovement') {
+    if (docDocumentSubtype?.id === 'internalMovement') {
       dispatch(
         appActions.setScreenFormParams({
           screenName,
@@ -133,13 +124,39 @@ export const MoveEditScreen = () => {
           screenName,
           params: {
             fromDepart: defaultSecondDepart,
-
             toDepart: defaultDepart,
           },
         }),
       );
     }
-  }, [defaultDepart, defaultSecondDepart, dispatch, docDocumentSubtype?.id, docFromDepart, screenName]);
+  }, [defaultDepart, defaultSecondDepart, dispatch, docDocumentSubtype?.id, screenName]);
+
+  useEffect(() => {
+    if (docDocumentSubtype?.id === 'cellMovement' && docFromDepart) {
+      dispatch(
+        appActions.setScreenFormParams({
+          screenName,
+          params: {
+            toDepart: docFromDepart,
+          },
+        }),
+      );
+    }
+  }, [dispatch, docDocumentSubtype?.id, docFromDepart, screenName]);
+
+  useEffect(() => {
+    if (docDocumentSubtype?.id === 'cellMovement' && !docFromDepart) {
+      dispatch(
+        appActions.setScreenFormParams({
+          screenName,
+          params: {
+            fromDepart: defaultSecondDepart,
+            toDepart: defaultSecondDepart,
+          },
+        }),
+      );
+    }
+  }, [defaultSecondDepart, dispatch, docDocumentSubtype?.id, docFromDepart, screenName]);
 
   useEffect(() => {
     if (screenState === 'saving') {
@@ -164,6 +181,11 @@ export const MoveEditScreen = () => {
         return;
       }
 
+      if (docDocumentSubtype?.id === 'cellMovement' && !docFromDepart?.isAddressStore) {
+        alertWithSound('Ошибка!', 'Подразделение должно быть адресного типа.');
+        setScreenState('idle');
+        return;
+      }
       if (!(docNumber && docDate && docFromDepart && docToDepart)) {
         alertWithSound('Ошибка!', 'Не все поля заполнены.');
         setScreenState('idle');
@@ -302,12 +324,20 @@ export const MoveEditScreen = () => {
       return;
     }
 
+    const params: Record<string, string> = {};
+
+    if (docDocumentSubtype?.id === 'cellMovement' || docDocumentSubtype?.id === 'movement') {
+      params.isAddressStore = 'true';
+    }
+
     navigation.navigate('SelectRefItem', {
       screenName,
       refName: 'depart',
       fieldName: 'fromDepart',
       value: docFromDepart && [docFromDepart],
       descrFieldName: 'shcode',
+      clause: params,
+      clauseType: 'boolean',
     });
   };
 
@@ -318,8 +348,8 @@ export const MoveEditScreen = () => {
 
     const params: Record<string, string> = {};
 
-    if (docDocumentSubtype?.id === 'cellMovement') {
-      params.isAddressedStore = 'true';
+    if (docDocumentSubtype?.id === 'cellMovement' || docDocumentSubtype?.id === 'internalMovement') {
+      params.isAddressStore = 'true';
     }
 
     navigation.navigate('SelectRefItem', {
@@ -329,6 +359,7 @@ export const MoveEditScreen = () => {
       value: docToDepart && [docToDepart],
       descrFieldName: 'shcode',
       clause: params,
+      clauseType: 'boolean',
     });
   };
 
@@ -380,7 +411,7 @@ export const MoveEditScreen = () => {
             label={'Куда'}
             value={docDocumentSubtype?.id === 'cellMovement' ? docFromDepart?.name : docToDepart?.name}
             onPress={handleToDepart}
-            disabled={!docDocumentSubtype ? true : isBlocked}
+            disabled={docDocumentSubtype?.id === 'cellMovement' ? true : !docDocumentSubtype ? true : isBlocked}
           />
           <Input
             label="Комментарий"

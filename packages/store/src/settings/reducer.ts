@@ -55,7 +55,7 @@ const baseSettings: Settings<IBaseSettings> = {
   getReferences: {
     id: 'getReferences',
     description: 'Запрашивать справочники',
-    data: true,
+    data: false,
     type: 'boolean',
     sortOrder: 1,
     visible: true,
@@ -83,6 +83,7 @@ const baseSettings: Settings<IBaseSettings> = {
 
 export const initialState: Readonly<SettingsState> = {
   data: baseSettings,
+  userData: {},
   loading: false,
   loadingData: false,
   loadingError: '',
@@ -94,6 +95,9 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
   switch (action.type) {
     case getType(actions.init):
       return initialState;
+
+    case getType(actions.initData):
+      return { ...state, data: baseSettings, isInit: true };
 
     case getType(actions.setLoading):
       return { ...state, loading: action.payload };
@@ -152,6 +156,20 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
 
     case getType(actions.clearError):
       return { ...state, errorMessage: '' };
+
+    case getType(actions.setUserSettingsAsync.request):
+      return {
+        ...state,
+        loading: true,
+        errorMessage: '',
+      };
+
+    case getType(actions.setUserSettingsAsync.success): {
+      return { ...state, userData: action.payload, loading: false, errorMessage: '' };
+    }
+
+    case getType(actions.setUserSettingsAsync.failure):
+      return { ...state, loading: false, errorMessage: '' };
 
     default:
       return state;

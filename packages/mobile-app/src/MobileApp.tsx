@@ -124,53 +124,65 @@ const MobileApp = ({ loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
       const checkForUpdates = async () => {
         const packageName = Constants.manifest?.android?.package || '';
         const currentVersion = Constants.manifest?.version;
+        try {
+          const storeVersion = await VersionCheck.getLatestVersion({
+            packageName,
+          });
 
-        const storeVersion = await VersionCheck.getLatestVersion({
-          packageName,
-        });
+          if (currentVersion && storeVersion && storeVersion > currentVersion) {
+            const installerPackageName = await getInstallReferrerAsync();
+            const appName = Constants.manifest?.name || '';
 
-        if (storeVersion !== currentVersion) {
-          const installerPackageName = await getInstallReferrerAsync();
-          const appName = Constants.manifest?.name || '';
+            if (installerPackageName.includes('utm_source=google-play')) {
+              const googlePlayUrl = await VersionCheck.getPlayStoreUrl({
+                packageName,
+              });
 
-          if (installerPackageName.includes('utm_source=google-play')) {
-            const googlePlayUrl = await VersionCheck.getPlayStoreUrl({
-              packageName,
-            });
+              const response = await AsyncAlert(
+                appName,
+                `Доступна новая версия приложения v${storeVersion}!\n\n Обновить из Google Play?`,
+              );
 
-            const response = await AsyncAlert(
-              appName,
-              `Доступна новая версия приложения v${storeVersion}!\n\n Обновить из Google Play?`,
-            );
-
-            if (response === 'YES') {
-              try {
-                await Linking.openURL(googlePlayUrl);
-              } catch (err) {
-                dispatch(
-                  appActions.addErrors([
-                    {
-                      id: generateId(),
-                      name: 'update app: openURL',
-                      date: new Date().toISOString(),
-                      message: `Невозможно перейти по ссылке ${googlePlayUrl}. ${JSON.stringify(err)}}`,
-                    },
-                  ]),
-                );
-                Alert.alert(
-                  'Внимание!',
-                  `Невозможно перейти по ссылке ${googlePlayUrl}.\n\nПопробуйте обновить ${appName} из приложения Google Play.`,
-                  [{ text: 'OK' }],
-                );
+              if (response === 'YES') {
+                try {
+                  await Linking.openURL(googlePlayUrl);
+                } catch (err) {
+                  dispatch(
+                    appActions.addErrors([
+                      {
+                        id: generateId(),
+                        name: 'update app: openURL',
+                        date: new Date().toISOString(),
+                        message: `Невозможно перейти по ссылке ${googlePlayUrl}. ${JSON.stringify(err)}}`,
+                      },
+                    ]),
+                  );
+                  Alert.alert(
+                    'Внимание!',
+                    `Невозможно перейти по ссылке ${googlePlayUrl}.\n\nПопробуйте обновить ${appName} из приложения Google Play.`,
+                    [{ text: 'OK' }],
+                  );
+                }
               }
+            } else {
+              Alert.alert(
+                appName,
+                `Доступна новая версия приложения v${storeVersion}!\n\nВ зависимости от того, как вы устанавливали приложение, для обновления перейдите в Google Play, Huawei AppGallery или скачайте новый APK файл с сайта компании.`,
+                [{ text: 'OK' }],
+              );
             }
-          } else {
-            Alert.alert(
-              appName,
-              `Доступна новая версия приложения v${storeVersion}!\n\nВ зависимости от того, как вы устанавливали приложение, для обновления перейдите в Google Play, Huawei AppGallery или скачайте новый APK файл с сайта компании.`,
-              [{ text: 'OK' }],
-            );
           }
+        } catch (err) {
+          dispatch(
+            appActions.addErrors([
+              {
+                id: generateId(),
+                name: 'checkForUpdates',
+                date: new Date().toISOString(),
+                message: `Не удалось проверить версию приложения в Google Play: ${err}`,
+              },
+            ]),
+          );
         }
       };
 
