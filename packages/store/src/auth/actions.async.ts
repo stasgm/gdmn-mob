@@ -1,5 +1,5 @@
 import api, { CustomRequest, isConnectError } from '@lib/client-api';
-import { IUserCredentials, IUserSettings } from '@lib/types';
+import { IUserCredentials } from '@lib/types';
 
 import { ActionType } from 'typesafe-actions';
 
@@ -171,24 +171,6 @@ const logout = (
   };
 };
 
-const setUserSettings = (
-  settings: IUserSettings,
-): AppThunk<
-  Promise<ActionType<typeof actions.setUserSettingsAsync>>,
-  AuthState,
-  ActionType<typeof actions.setUserSettingsAsync>
-> => {
-  return async (dispatch) => {
-    dispatch(actions.setUserSettingsAsync.request(''));
-
-    try {
-      return dispatch(actions.setUserSettingsAsync.success(settings));
-    } catch {
-      return dispatch(actions.setUserSettingsAsync.failure('Ошибка записи настроек пользователя'));
-    }
-  };
-};
-
 const getDeviceStatus = (
   customRequest: CustomRequest,
   uid?: string,
@@ -264,7 +246,6 @@ export default {
   disconnect,
   getDeviceStatus,
   useAuthThunkDispatch,
-  setUserSettings,
   getCompany,
   setDemoMode,
 };

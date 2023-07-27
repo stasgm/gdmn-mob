@@ -31,6 +31,8 @@ import {
 
 import { useCallback, useMemo } from 'react';
 
+import { useSettingsThunkDispatch } from '@lib/store/src/settings/actions.async';
+
 import { generateId, getDateString, isIMessage, isIReferences, isNumeric } from '../utils';
 
 import { mobileRequest } from '../mobileRequest';
@@ -42,6 +44,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
   const docDispatch = useDocThunkDispatch();
   const refDispatch = useRefThunkDispatch();
   const authDispatch = useAuthThunkDispatch();
+  const settingsDispatch = useSettingsThunkDispatch();
   const dispatch = useDispatch();
 
   const addError = useCallback(
@@ -300,8 +303,8 @@ export const useSync = (onSync?: () => Promise<any>) => {
 
           addRequestNotice('Сохранение настроек пользователя');
 
-          const setUserSettingsResponse = await authDispatch(
-            authActions.setUserSettings(msg.body.payload as IUserSettings),
+          const setUserSettingsResponse = await settingsDispatch(
+            settingsActions.setUserSettings(msg.body.payload as IUserSettings),
           );
 
           //Если удачно сохранились настройки, удаляем сообщение в json
@@ -400,7 +403,6 @@ export const useSync = (onSync?: () => Promise<any>) => {
       addError,
       addRequestNotice,
       appRequest,
-      authDispatch,
       autoSynchPeriod,
       dispatch,
       docDispatch,
@@ -408,6 +410,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
       refDispatch,
       refLoadType,
       settings,
+      settingsDispatch,
     ],
   );
 

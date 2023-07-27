@@ -38,9 +38,9 @@ export const MoveToEditScreen = () => {
 
   const departs = refSelectors.selectByName<IAddressStoreEntity>('depart')?.data;
 
-  const userDefaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity;
+  const userDefaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as INamedEntity;
   const defaultDepart = departs?.find((i) => i.id === userDefaultDepart?.id);
-  const userDefaultSecondDepart = useSelector((state) => state.auth.user?.settings?.secondDepart?.data) as INamedEntity;
+  const userDefaultSecondDepart = useSelector((state) => state.settings?.userData?.secondDepart?.data) as INamedEntity;
   const defaultSecondDepart = departs?.find((i) => i.id === userDefaultSecondDepart?.id);
 
   const movementType = refSelectors

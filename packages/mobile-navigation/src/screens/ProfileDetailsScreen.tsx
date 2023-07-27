@@ -3,16 +3,14 @@ import { Alert, View, StyleSheet } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 
-import { authActions, useSelector, useAuthThunkDispatch } from '@lib/store';
+import { useSelector, settingsActions } from '@lib/store';
 
-import { MenuButton, DescriptionItem, AppScreen, useActionSheet, LargeText, navBackButton } from '@lib/mobile-ui';
+import { MenuButton, DescriptionItem, AppScreen, useActionSheet, navBackButton } from '@lib/mobile-ui';
+import { useSettingsThunkDispatch } from '@lib/store/src/settings/actions.async';
 
 const ProfileDetailsScreen = () => {
-  const { user } = useSelector((state) => state.auth);
-
-  const userSettings = user?.settings;
-
-  const authDispatch = useAuthThunkDispatch();
+  const userSettings = useSelector((state) => state.settings.userData);
+  const settingsDispatch = useSettingsThunkDispatch();
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
 
@@ -21,7 +19,7 @@ const ProfileDetailsScreen = () => {
       {
         text: 'Да',
         onPress: () => {
-          authDispatch(authActions.setUserSettings({}));
+          settingsDispatch(settingsActions.setUserSettings({}));
         },
       },
       {
