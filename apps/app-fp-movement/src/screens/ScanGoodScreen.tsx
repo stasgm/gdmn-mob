@@ -161,6 +161,7 @@ const ScanGoodScreen = () => {
         weight: barc.weight,
         barcode: barc.barcode,
         workDate: barc.workDate,
+        time: barc.time,
         numReceived: barc.numReceived,
         quantPack: barc.quantPack,
         sortOrder: (shipmentLines?.length || 0) + 1,
