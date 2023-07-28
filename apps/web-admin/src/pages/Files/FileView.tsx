@@ -70,7 +70,7 @@ const FileView = () => {
   const [openFolder, setOpenFolder] = useState(false);
 
   const handleGetFolders = () => {
-    if (file.appSystem?.id && file.company?.id) {
+    if (process?.appSystem?.id && process?.company?.id) {
       setOpenFolder(true);
       fetchFolders();
     }

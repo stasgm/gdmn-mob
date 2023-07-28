@@ -179,6 +179,12 @@ const FileList = () => {
   const [openFolder, setOpenFolder] = useState(false);
 
   const handleGetFolders = () => {
+    if (!selectedFileIds.length) {
+      dispatch(actions.fileSystemActions.setError('Файлы не выбраны'));
+
+      return;
+    }
+
     for (const file of selectedFileIds) {
       const inaccessibleFile = selectedFileIds.find((i) => !i.appSystem?.id || !i.company?.id);
 
