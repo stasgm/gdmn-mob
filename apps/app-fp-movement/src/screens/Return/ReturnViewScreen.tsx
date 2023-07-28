@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, TextInput } from 'react-native';
+import { View, TextInput, Keyboard } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -81,6 +81,10 @@ export const ReturnViewScreen = () => {
   const [barcode, setBarcode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
+  const handleFocus = () => {
+    ref?.current?.focus();
+  };
+
   const handleShowDialog = () => {
     setVisibleDialog(true);
   };
@@ -89,6 +93,8 @@ export const ReturnViewScreen = () => {
     setVisibleDialog(false);
     setBarcode('');
     setErrorMessage('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const [visibleQuantPackDialog, setVisibleQuantPackDialog] = useState(false);
@@ -180,13 +186,17 @@ export const ReturnViewScreen = () => {
     handleAddQuantPack(Number(quantPack));
     setVisibleQuantPackDialog(false);
     setQuantPack('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const handleDismissQuantPack = () => {
     setVisibleQuantPackDialog(false);
     setQuantPack('');
-    // setErrorMessage('');
+    Keyboard.dismiss();
+    handleFocus();
   };
+
   const handleEditDocHead = useCallback(() => {
     navigation.navigate('ReturnEdit', { id });
   }, [navigation, id]);
@@ -207,10 +217,6 @@ export const ReturnViewScreen = () => {
       }
     });
   }, [docDispatch, id]);
-
-  const handleFocus = () => {
-    ref?.current?.focus();
-  };
 
   const hanldeCancelLastScan = useCallback(() => {
     if (lines?.length) {
@@ -406,6 +412,7 @@ export const ReturnViewScreen = () => {
       } else {
         setScanned(false);
       }
+      handleFocus();
     },
 
     [doc, minBarcodeLength, goodBarcodeSettings, goods, dispatch, id, visibleDialog, handleErrorMessage],

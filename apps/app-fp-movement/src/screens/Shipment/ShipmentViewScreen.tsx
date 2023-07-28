@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, TouchableHighlight, TextInput } from 'react-native';
+import { View, TouchableHighlight, TextInput, Keyboard } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -146,10 +146,16 @@ const ShipmentViewScreen = () => {
     setVisibleDialog(true);
   };
 
+  const handleFocus = () => {
+    ref?.current?.focus();
+  };
+
   const handleDismissBarcode = () => {
     setVisibleDialog(false);
     setBarcode('');
     setErrorMessage('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const addQuantPack = useCallback(
@@ -327,13 +333,17 @@ const ShipmentViewScreen = () => {
     handleAddQuantPack(Number(quantPack));
     setVisibleQuantPackDialog(false);
     setQuantPack('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const handleDismissQuantPack = () => {
     setVisibleQuantPackDialog(false);
     setQuantPack('');
-    // setErrorMessage('');
+    Keyboard.dismiss();
+    handleFocus();
   };
+
   const handleEditShipmentHead = useCallback(
     () => navigation.navigate('ShipmentEdit', { id, isCurr }),
     [id, isCurr, navigation],
@@ -355,10 +365,6 @@ const ShipmentViewScreen = () => {
       }
     });
   }, [docDispatch, id]);
-
-  const handleFocus = () => {
-    ref?.current?.focus();
-  };
 
   const hanldeCancelLastScan = useCallback(() => {
     if (shipmentLines?.length) {
@@ -610,6 +616,7 @@ const ShipmentViewScreen = () => {
       }
 
       setScanned(false);
+      handleFocus();
     },
 
     [
