@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, TextInput } from 'react-native';
+import { View, TextInput, Keyboard } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -112,6 +112,10 @@ export const ReceiptViewScreen = () => {
       : [];
   }, [doc?.head?.fromDepart?.id, docList, goods, isFocused, remains]);
 
+  const handleFocus = () => {
+    ref?.current?.focus();
+  };
+
   const handleShowDialog = () => {
     setVisibleDialog(true);
   };
@@ -120,6 +124,8 @@ export const ReceiptViewScreen = () => {
     setVisibleDialog(false);
     setBarcode('');
     setErrorMessage('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const [visibleQuantPackDialog, setVisibleQuantPackDialog] = useState(false);
@@ -274,12 +280,15 @@ export const ReceiptViewScreen = () => {
     handleAddQuantPack(Number(quantPack));
     setVisibleQuantPackDialog(false);
     setQuantPack('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const handleDismissQuantPack = () => {
     setVisibleQuantPackDialog(false);
     setQuantPack('');
-    // setErrorMessage('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const handleEditDocHead = useCallback(() => {
@@ -302,10 +311,6 @@ export const ReceiptViewScreen = () => {
       }
     });
   }, [docDispatch, id]);
-
-  const handleFocus = () => {
-    ref?.current?.focus();
-  };
 
   const hanldeCancelLastScan = useCallback(() => {
     const lastId = doc?.lines?.[0]?.id;
@@ -502,6 +507,7 @@ export const ReceiptViewScreen = () => {
       } else {
         setScanned(false);
       }
+      handleFocus();
     },
 
     [
@@ -601,7 +607,7 @@ export const ReceiptViewScreen = () => {
       <FlashList
         data={lines}
         renderItem={renderItem}
-        estimatedItemSize={60}
+        estimatedItemSize={90}
         ItemSeparatorComponent={ItemSeparator}
         keyExtractor={keyExtractor}
         extraData={[lines, isBlocked]}

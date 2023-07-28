@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, TextInput } from 'react-native';
+import { View, TextInput, Keyboard } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -120,6 +120,10 @@ export const FreeShipmentViewScreen = () => {
   const [visibleQuantPackDialog, setVisibleQuantPackDialog] = useState(false);
   const [quantPack, setQuantPack] = useState('');
 
+  const handleFocus = () => {
+    ref?.current?.focus();
+  };
+
   const handleShowDialog = () => {
     setVisibleDialog(true);
   };
@@ -128,6 +132,8 @@ export const FreeShipmentViewScreen = () => {
     setVisibleDialog(false);
     setBarcode('');
     setErrorMessage('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const handleAddQuantPack = useCallback(
@@ -279,12 +285,15 @@ export const FreeShipmentViewScreen = () => {
     handleAddQuantPack(Number(quantPack));
     setVisibleQuantPackDialog(false);
     setQuantPack('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const handleDismissQuantPack = () => {
     setVisibleQuantPackDialog(false);
     setQuantPack('');
-    // setErrorMessage('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const handleEditDocHead = useCallback(() => {
@@ -306,11 +315,8 @@ export const FreeShipmentViewScreen = () => {
         setScreenState('idle');
       }
     });
+    handleFocus();
   }, [docDispatch, id]);
-
-  const handleFocus = () => {
-    ref?.current?.focus();
-  };
 
   const hanldeCancelLastScan = useCallback(() => {
     if (lines?.length) {
@@ -449,6 +455,7 @@ export const FreeShipmentViewScreen = () => {
       alertWithSound('Внимание!', `${text}.`);
       setScanned(false);
     }
+    handleFocus();
   }, []);
 
   const [scanned, setScanned] = useState(false);
@@ -526,6 +533,7 @@ export const FreeShipmentViewScreen = () => {
       dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
 
       setScanned(false);
+      handleFocus();
     },
 
     [
