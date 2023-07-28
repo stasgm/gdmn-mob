@@ -176,7 +176,7 @@ export const MoveViewScreen = () => {
       } else {
         const weight = round(line?.weight * quantity, 3);
 
-        if (remainsUse) {
+        if (remainsUse && goodRemains.length) {
           const good = goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === line.good.shcode);
 
           if (good) {

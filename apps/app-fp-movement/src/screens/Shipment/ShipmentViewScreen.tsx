@@ -240,7 +240,7 @@ const ShipmentViewScreen = () => {
 
         const tempLine = tempOrder?.lines?.find((i) => line.good.id === i.good.id);
 
-        if (remainsUse) {
+        if (remainsUse && goodRemains.length) {
           const good = goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === line.good.shcode);
 
           if (good) {
