@@ -130,16 +130,20 @@
 
 По нажатию на иконку меню **⋮**, расположенную в правом верхнем углу, можно вернуться к начальным настройкам, выбрав пункт **Установить настройки по умолчанию**.
 
-<img src="img/8.Settings/8.BaseSettings.jpg" alt="drawing" height="400"/> <img src="img/8.Settings/8.SettingsShcode.jpg" alt="drawing" height="400"/>
-<img src="img/8.Settings/8.SettingsOrderCode.jpg" alt="drawing" height="400"/><img src="img/8.Settings/8.SettingsMenu.jpg" alt="drawing" height="400"/>
+<img src="img/2.Settings/2.Settings.jpg" alt="drawing" height="400"/> 
+<img src="img/2.Settings/2.SettingsMenu.jpg" alt="drawing" height="400"/>
+
+<img src="img/2.Settings/2.BaseSettings.jpg" alt="drawing" height="400"/> 
+<img src="img/2.Settings/2.SettingsShcode.jpg" alt="drawing" height="400"/>
+<img src="img/2.Settings/2.SettingsOrderCode.jpg" alt="drawing" height="400"/>
 
 ## 3. Загрузка данных
 
-Чтобы загрузить данные, предназначенные для пользователя, следует нажать на кнопку синхронизации данных <img src="img/1.Connection/1.Sync.jpg" alt="drawing" height="30"/> в нижней части бокового меню.
+Чтобы загрузить данные, предназначенные для пользователя, следует нажать на кнопку синхронизации данных <img src="img/3.Sync/3.Sync.jpg" alt="drawing" height="30"/> в нижней части бокового меню.
 
 Открыть боковое меню можно нажатием на иконку меню **≡**, находящуюся в верхнем углу приложения слева, или смахнув пальцем вправо с левого края устройства.
 
-<img src="img/1.Connection/1.Docs.jpg" alt="drawing" height="400"/> <img src="img/1.Connection/1.Sidebar.jpg" alt="drawing" height="400"/> <img src="img/1.Connection/1.SyncSuccess.jpg" alt="drawing" height="400"/>
+<img src="img/3.Sync/3.Dashbord.jpg" alt="drawing" height="400"/> <img src="img/3.Sync/3.Sidebar.jpg" alt="drawing" height="400"/> <img src="img/3.Sync/3.SyncSuccess.jpg" alt="drawing" height="400"/>
 
 После загрузки данных в приложении должны появится справочники и все необходимые документы.
 
@@ -147,17 +151,17 @@
 
 На кнопке **_Синхронизировать_** отобразится дата и время последней синхронизации.
 
-<img src="img/1.Connection/1.Sidebar.jpg" alt="drawing" height="400"/>
+<img src="img/3.Sync/3.Sidebar.jpg" alt="drawing" height="400"/>
 
 ## 4. Справочники
 
 На экране **Справочники** можно просмотреть данные, загруженные в приложение для работы.
 
-<img src="img/2.References/2.References.jpg" alt="drawing" height="400"/> <img src="img/2.References/2.Goods.jpg" alt="drawing" height="400"/> <img src="img/2.References/2.GoodPosition.jpg" alt="drawing" height="400"/>
+<img src="img/4.References/4.References.jpg" alt="drawing" height="400"/> <img src="img/4.References/4.Goods.jpg" alt="drawing" height="400"/> <img src="img/4.References/4.GoodPosition.jpg" alt="drawing" height="400"/>
 
 Пример справочника подразделения:
 
-<img src="img/2.References/2.Contacts.jpg" alt="drawing" height="400"/> <img src="img/2.References/2.ContactPosition.jpg" alt="drawing" height="400"/>
+<img src="img/4.References/4.Contacts.jpg" alt="drawing" height="400"/> <img src="img/4.References/4.ContactPosition.jpg" alt="drawing" height="400"/>
 
 Чтобы найти справочник по наименованию можно воспользоваться строкой поиска в правом верхнем углу экрана.
 
@@ -172,27 +176,43 @@
 
 Остатки представляют собой список товаров с ценами и количеством остатка в разрезе подразделения/организации/сотрудника на текущую дату.
 
+
 При добавлении позиции в документ, который работает с остатками, список товаров будет ограничен только теми товарами, по которым осуществлялось складское движение по конкретному подразделению/организации/сотруднику.
 
 Выберем подразделение. На экране отображены остатки товаров для данного подразделения. По нажатию на конкретный товар можно просмотреть его цены и остаток.
 
-Чтобы найти найти необходимую информацию по наименованию можно воспользоваться строкой поиска, нажав на иконку Поиск <img src="img/5.Remains/5.Search.jpg" alt="drawing" height="25"/> в правом верхнем углу экрана.
-Также можно воспользоваться фильтром <img src="img/5.Remains/5.Filter.jpg" alt="drawing" height="25"/>, который сортирует товары по двум категориям **_Все_** и **_Ненулевые_**.
+ <img src="img/5.Remains/5.Departs.jpg" alt="drawing" height="400"/>
+ <img src="img/5.Remains/5.Remains.jpg" alt="drawing" height="400"/>
+ <img src="img/5.Remains/5.RemainsInfo.jpg" alt="drawing" height="400"/>
 
+Чтобы найти найти необходимую информацию по наименованию можно воспользоваться строкой поиска, нажав на иконку Поиск <img src="img/5.Remains/5.Search.jpg" alt="drawing" height="20"/> в правом верхнем углу экрана.
+Также можно воспользоваться фильтром <img src="img/5.Remains/5.IconFilter.jpg" alt="drawing" height="20"/>, который сортирует товары по двум категориям **_Все_** и **_Ненулевые_**.
+
+ <img src="img/5.Remains/5.Remains.jpg" alt="drawing" height="400"/>
+ <img src="img/5.Remains/5.Filter.jpg" alt="drawing" height="400"/>
 
 ## 6. Ячейки
 
 В данном пункте можно посмотреть ячейки в разрезе подразделений на текущую дату.
 
+ <img src="img/6.Cells/6.Departs.jpg" alt="drawing" height="400"/>
+
 Выберем подразделение. На экране отображены ячейки для данного подразделения. По нажатию на ячейку можно посмотреть, какой товар лежит в данной ячейке или для какой группы предназначена данная ячейка.
 
+ <img src="img/6.Cells/6.Cells.jpg" alt="drawing" height="400"/>
+ <img src="img/6.Cells/6.CellGood.jpg" alt="drawing" height="400"/>
+ <img src="img/6.Cells/6.RecommendedGroup.jpg" alt="drawing" height="400"/>
+
 Чтобы найти необходимую информацию ячейкам можно воспользоваться строкой поиска, нажав на иконку Поиск <img src="img/6.Cells/6.Search.jpg" alt="drawing" height="25"/> в правом верхнем углу экрана. Если выбран тип поиска **_Товар_**, то поиск осуществляется по наименованию или коду товара, или же по номеру ячейки. Если выбран тип поиска **_Группа_**, то поиск осуществляется по названию группы или по номеру ячейки.
+
+ <img src="img/6.Cells/6.GoodSearch.jpg" alt="drawing" height="400"/>
+ <img src="img/6.Cells/6.GroupSearch.jpg" alt="drawing" height="400"/>
 
 По нажатию на иконку **i** появляется окошко с информацией по цвету ячеек.
 
  <img src="img/6.Cells/6.CellInfo.jpg" alt="drawing" height="400"/>
 
-## 5. Перемещение
+## 7. Перемещение
 
 ### Cоздание документа
 
