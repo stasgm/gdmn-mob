@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, TextInput } from 'react-native';
+import { View, TextInput, Keyboard } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -22,7 +22,7 @@ import {
   SimpleDialog,
 } from '@lib/mobile-ui';
 
-import { generateId, getDateString, keyExtractor, useSendDocs, sleep } from '@lib/mobile-hooks';
+import { generateId, getDateString, keyExtractor, useSendDocs, sleep, round } from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
 
@@ -34,8 +34,8 @@ import { barcodeSettings, IReturnDocument, IReturnLine } from '../../store/types
 import { ReturnStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { alertWithSound, alertWithSoundMulti, getBarcode } from '../../utils/helpers';
-import { IGood } from '../../store/app/types';
+import { alertWithSound, alertWithSoundMulti, getBarcode, getBarcodeString } from '../../utils/helpers';
+import { IBarcode, IGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
 
@@ -81,6 +81,10 @@ export const ReturnViewScreen = () => {
   const [barcode, setBarcode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
+  const handleFocus = () => {
+    ref?.current?.focus();
+  };
+
   const handleShowDialog = () => {
     setVisibleDialog(true);
   };
@@ -89,6 +93,108 @@ export const ReturnViewScreen = () => {
     setVisibleDialog(false);
     setBarcode('');
     setErrorMessage('');
+    Keyboard.dismiss();
+    handleFocus();
+  };
+
+  const [visibleQuantPackDialog, setVisibleQuantPackDialog] = useState(false);
+  const [quantPack, setQuantPack] = useState('');
+
+  const handleAddQuantPack = useCallback(
+    (quantity: number) => {
+      const line = lines?.[0];
+      if (!line) {
+        return;
+      }
+
+      const lineBarcode: IBarcode = {
+        barcode: line.barcode || '',
+        numReceived: line.numReceived,
+        quantPack: line.quantPack,
+        shcode: line.good.shcode,
+        weight: line.weight,
+        workDate: line.workDate,
+        time: line.time,
+      };
+
+      if (line?.weight >= goodBarcodeSettings?.boxWeight) {
+        const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: quantity });
+        const newLine: IReturnLine = {
+          ...line,
+          quantPack: quantity,
+          scannedBarcode: line?.barcode,
+          barcode: newBarcode,
+        };
+        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+      } else {
+        const weight = round(line?.weight * quantity, 3);
+
+        if (weight < 1000) {
+          const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: quantity, weight });
+
+          const newLine: IReturnLine = {
+            ...line,
+            quantPack: quantity,
+            weight,
+            scannedBarcode: line?.barcode,
+            barcode: newBarcode,
+          };
+
+          dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+        } else {
+          const maxQuantPack = round(Math.floor(999.99 / line?.weight), 3);
+
+          let newQuantity = quantity;
+          let sortOrder = line.sortOrder || lines.length;
+
+          while (newQuantity > 0) {
+            const q = newQuantity > maxQuantPack ? maxQuantPack : newQuantity;
+            const newWeight = round(line?.weight * q, 3);
+
+            const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: q, weight: newWeight });
+
+            const newLine: IReturnLine = {
+              ...line,
+              quantPack: q,
+              weight: newWeight,
+              scannedBarcode: line?.barcode,
+              barcode: newBarcode,
+            };
+
+            if (newQuantity === quantity) {
+              dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+            } else {
+              sortOrder = sortOrder + 1;
+
+              const addedLine = { ...newLine, id: generateId(), sortOrder };
+              dispatch(
+                documentActions.addDocumentLine({
+                  docId: id,
+                  line: addedLine,
+                }),
+              );
+            }
+            newQuantity = newQuantity - maxQuantPack;
+          }
+        }
+      }
+    },
+    [dispatch, goodBarcodeSettings?.boxWeight, id, lines],
+  );
+
+  const handleEditQuantPack = () => {
+    handleAddQuantPack(Number(quantPack));
+    setVisibleQuantPackDialog(false);
+    setQuantPack('');
+    Keyboard.dismiss();
+    handleFocus();
+  };
+
+  const handleDismissQuantPack = () => {
+    setVisibleQuantPackDialog(false);
+    setQuantPack('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const handleEditDocHead = useCallback(() => {
@@ -111,10 +217,6 @@ export const ReturnViewScreen = () => {
       }
     });
   }, [docDispatch, id]);
-
-  const handleFocus = () => {
-    ref?.current?.focus();
-  };
 
   const hanldeCancelLastScan = useCallback(() => {
     if (lines?.length) {
@@ -211,24 +313,31 @@ export const ReturnViewScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  const renderItem = useCallback(({ item }: { item: IReturnLine }) => {
-    return (
-      <ListItemLine key={item.id} readonly={true}>
-        <View style={styles.details}>
-          <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-          <View style={styles.flexDirectionRow}>
-            <MaterialCommunityIcons name="shopping-outline" size={18} />
-            <MediumText> {(item.weight || 0).toString()} кг</MediumText>
+  const renderItem = useCallback(
+    ({ item }: { item: IReturnLine }) => {
+      return (
+        <ListItemLine
+          key={item.id}
+          readonly={doc?.status !== 'DRAFT' || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
+          onPress={() => setVisibleQuantPackDialog(true)}
+        >
+          <View style={styles.details}>
+            <LargeText style={styles.textBold}>{item.good.name}</LargeText>
+            <View style={styles.flexDirectionRow}>
+              <MaterialCommunityIcons name="shopping-outline" size={18} />
+              <MediumText> {(item.weight || 0).toString()} кг</MediumText>
+            </View>
+            <View style={styles.flexDirectionRow}>
+              <MediumText>
+                Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
+              </MediumText>
+            </View>
           </View>
-          <View style={styles.flexDirectionRow}>
-            <MediumText>
-              Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
-            </MediumText>
-          </View>
-        </View>
-      </ListItemLine>
-    );
-  }, []);
+        </ListItemLine>
+      );
+    },
+    [doc?.status, lines?.length],
+  );
 
   const [scanned, setScanned] = useState(false);
 
@@ -288,6 +397,7 @@ export const ReturnViewScreen = () => {
         weight: barc.weight,
         barcode: barc.barcode,
         workDate: barc.workDate,
+        time: barc.time,
         numReceived: barc.numReceived,
         sortOrder: doc?.lines?.length + 1,
         quantPack: barc.quantPack,
@@ -302,6 +412,7 @@ export const ReturnViewScreen = () => {
       } else {
         setScanned(false);
       }
+      handleFocus();
     },
 
     [doc, minBarcodeLength, goodBarcodeSettings, goods, dispatch, id, visibleDialog, handleErrorMessage],
@@ -402,6 +513,17 @@ export const ReturnViewScreen = () => {
         onOk={handleSearchBarcode}
         okLabel={'Найти'}
         errorMessage={errorMessage}
+      />
+      <AppDialog
+        title="Количество"
+        visible={visibleQuantPackDialog}
+        text={quantPack}
+        onChangeText={setQuantPack}
+        onCancel={handleDismissQuantPack}
+        onOk={handleEditQuantPack}
+        okLabel={'Ок'}
+        keyboardType="numbers-and-punctuation"
+        // errorMessage={errorMessage}
       />
       <SimpleDialog
         visible={visibleSendDialog}

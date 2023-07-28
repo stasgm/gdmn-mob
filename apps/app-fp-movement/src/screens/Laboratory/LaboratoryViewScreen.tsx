@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, TextInput } from 'react-native';
+import { View, TextInput, Keyboard } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -103,6 +103,10 @@ export const LaboratoryViewScreen = () => {
   const [visibleWeightDialog, setVisibleWeightDialog] = useState(false);
   const [weight, setWeight] = useState('');
 
+  const handleFocus = () => {
+    ref?.current?.focus();
+  };
+
   const handleShowDialog = () => {
     setVisibleDialog(true);
   };
@@ -111,6 +115,8 @@ export const LaboratoryViewScreen = () => {
     setVisibleDialog(false);
     setBarcode('');
     setErrorMessage('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const handleUpdateWeight = useCallback(
@@ -120,7 +126,7 @@ export const LaboratoryViewScreen = () => {
         return;
       }
 
-      if (remainsUse) {
+      if (remainsUse && goodRemains.length) {
         const good = goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === line.good.shcode);
 
         if (good) {
@@ -161,12 +167,15 @@ export const LaboratoryViewScreen = () => {
     handleUpdateWeight(Number(weight));
     setVisibleWeightDialog(false);
     setWeight('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const handleDismissQuantPack = () => {
     setVisibleWeightDialog(false);
     setWeight('');
-    // setErrorMessage('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const handleEditDocHead = useCallback(() => {
@@ -189,10 +198,6 @@ export const LaboratoryViewScreen = () => {
       }
     });
   }, [docDispatch, id]);
-
-  const handleFocus = () => {
-    ref?.current?.focus();
-  };
 
   const hanldeCancelLastScan = useCallback(() => {
     if (lines?.length) {
@@ -387,6 +392,7 @@ export const LaboratoryViewScreen = () => {
         weight: barc.weight,
         barcode: barc.barcode,
         workDate: barc.workDate,
+        time: barc.time,
         numReceived: barc.numReceived,
         sortOrder: doc?.lines?.length + 1,
         quantPack: barc.quantPack,
@@ -395,6 +401,7 @@ export const LaboratoryViewScreen = () => {
       dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
 
       setScanned(false);
+      handleFocus();
     },
 
     [

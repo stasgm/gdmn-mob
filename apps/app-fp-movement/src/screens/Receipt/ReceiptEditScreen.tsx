@@ -227,6 +227,7 @@ export const ReceiptEditScreen = () => {
     if (isBlocked) {
       return;
     }
+    const params: Record<string, string> = { isAddressStore: 'false' };
 
     navigation.navigate('SelectRefItem', {
       screenName,
@@ -234,6 +235,8 @@ export const ReceiptEditScreen = () => {
       fieldName: 'fromDepart',
       value: docFromDepart && [docFromDepart],
       descrFieldName: 'shcode',
+      clause: params,
+      clauseType: 'boolean',
     });
   };
 
@@ -242,12 +245,16 @@ export const ReceiptEditScreen = () => {
       return;
     }
 
+    const params: Record<string, string> = { isAddressStore: 'false' };
+
     navigation.navigate('SelectRefItem', {
       screenName,
       refName: 'depart',
       fieldName: 'toDepart',
       value: docToDepart && [docToDepart],
       descrFieldName: 'shcode',
+      clause: params,
+      clauseType: 'boolean',
     });
   };
 

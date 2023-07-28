@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, TouchableHighlight, TextInput } from 'react-native';
+import { View, TouchableHighlight, TextInput, Keyboard } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -46,13 +46,14 @@ import { ShipmentStackParamList } from '../../navigation/Root/types';
 
 import { getStatusColor, lineTypes, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { IGood, IRemains, IRemGood } from '../../store/app/types';
+import { IBarcode, IGood, IRemains, IRemGood } from '../../store/app/types';
 import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../../store/index';
 
 import {
   alertWithSound,
   alertWithSoundMulti,
   getBarcode,
+  getBarcodeString,
   getLineGood,
   getRemGoodListByContact,
 } from '../../utils/helpers';
@@ -145,10 +146,16 @@ const ShipmentViewScreen = () => {
     setVisibleDialog(true);
   };
 
+  const handleFocus = () => {
+    ref?.current?.focus();
+  };
+
   const handleDismissBarcode = () => {
     setVisibleDialog(false);
     setBarcode('');
     setErrorMessage('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const addQuantPack = useCallback(
@@ -189,13 +196,16 @@ const ShipmentViewScreen = () => {
   );
 
   const handleAddLine = useCallback(
-    (weight: number, quantity: number, line: IShipmentLine) => {
+    (weight: number, quantity: number, line: IShipmentLine, lineBarcode: IBarcode) => {
       if (weight < 1000) {
+        const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: quantity });
+
         const newLine: IShipmentLine = {
           ...line,
           quantPack: quantity,
           weight,
           scannedBarcode: line?.barcode,
+          barcode: newBarcode,
         };
 
         dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
@@ -212,76 +222,106 @@ const ShipmentViewScreen = () => {
       if (!line) {
         return;
       }
+      const lineBarcode: IBarcode = {
+        barcode: line.barcode || '',
+        numReceived: line.numReceived,
+        quantPack: line.quantPack,
+        shcode: line.good.shcode,
+        weight: line.weight,
+        workDate: line.workDate,
+        time: line.time,
+      };
 
-      const weight = round(line?.weight * quantity, 3);
+      if (line?.weight >= goodBarcodeSettings?.boxWeight) {
+        const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: quantity });
+        const newLine: IShipmentLine = {
+          ...line,
+          quantPack: quantity,
+          scannedBarcode: line?.barcode,
+          barcode: newBarcode,
+        };
+        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+      } else {
+        const weight = round(line?.weight * quantity, 3);
 
-      const tempLine = tempOrder?.lines?.find((i) => line.good.id === i.good.id);
+        const tempLine = tempOrder?.lines?.find((i) => line.good.id === i.good.id);
 
-      if (remainsUse) {
-        const good = goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === line.good.shcode);
+        if (remainsUse && goodRemains.length) {
+          const good = goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === line.good.shcode);
 
-        if (good) {
-          if (good.remains + line.weight < weight) {
-            alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.');
+          if (good) {
+            if (good.remains + line.weight < weight) {
+              alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.');
 
-            return;
-          } else {
-            if (tempLine && tempOrder) {
-              const newTempLine = { ...tempLine, weight: round(tempLine?.weight + line.weight - weight, 3) };
-              if (newTempLine.weight >= 0) {
-                fpDispatch(
-                  fpMovementActions.updateTempOrderLine({
-                    docId: tempOrder?.id,
-                    line: newTempLine,
-                  }),
-                );
-                handleAddLine(weight, quantity, line);
-              } else {
-                alertWithSoundMulti('Данное количество превышает количество в заявке.', 'Добавить позицию?', () => {
+              return;
+            } else {
+              if (tempLine && tempOrder) {
+                const newTempLine = { ...tempLine, weight: round(tempLine?.weight + line.weight - weight, 3) };
+                if (newTempLine.weight >= 0) {
                   fpDispatch(
                     fpMovementActions.updateTempOrderLine({
                       docId: tempOrder?.id,
                       line: newTempLine,
                     }),
                   );
+                  handleAddLine(weight, quantity, line, lineBarcode);
+                } else {
+                  alertWithSoundMulti('Данное количество превышает количество в заявке.', 'Добавить позицию?', () => {
+                    fpDispatch(
+                      fpMovementActions.updateTempOrderLine({
+                        docId: tempOrder?.id,
+                        line: newTempLine,
+                      }),
+                    );
 
-                  handleAddLine(weight, quantity, line);
-                });
+                    handleAddLine(weight, quantity, line, lineBarcode);
+                  });
+                }
+              } else {
+                handleAddLine(weight, quantity, line, lineBarcode);
               }
-            } else {
-              handleAddLine(weight, quantity, line);
             }
+          } else {
+            alertWithSound('Ошибка!', 'Товар не найден.');
+            return;
           }
         } else {
-          alertWithSound('Ошибка!', 'Товар не найден.');
-          return;
-        }
-      } else {
-        if (tempLine && tempOrder) {
-          const newTempLine = { ...tempLine, weight: round(tempLine?.weight + line.weight - weight, 3) };
-          if (newTempLine.weight >= 0) {
-            fpDispatch(
-              fpMovementActions.updateTempOrderLine({
-                docId: tempOrder?.id,
-                line: newTempLine,
-              }),
-            );
-          } else {
-            alertWithSoundMulti('Данное количество превышает количество в заявке.', 'Добавить позицию?', () => {
+          if (tempLine && tempOrder) {
+            const newTempLine = { ...tempLine, weight: round(tempLine?.weight + line.weight - weight, 3) };
+            if (newTempLine.weight >= 0) {
               fpDispatch(
                 fpMovementActions.updateTempOrderLine({
                   docId: tempOrder?.id,
                   line: newTempLine,
                 }),
               );
-            });
+            } else {
+              alertWithSoundMulti('Данное количество превышает количество в заявке.', 'Добавить позицию?', () => {
+                fpDispatch(
+                  fpMovementActions.updateTempOrderLine({
+                    docId: tempOrder?.id,
+                    line: newTempLine,
+                  }),
+                );
+              });
+            }
           }
-        }
 
-        handleAddLine(weight, quantity, line);
+          handleAddLine(weight, quantity, line, lineBarcode);
+        }
       }
     },
-    [shipmentLines, tempOrder, remainsUse, goodRemains, fpDispatch, handleAddLine],
+    [
+      shipmentLines,
+      goodBarcodeSettings?.boxWeight,
+      dispatch,
+      id,
+      tempOrder,
+      remainsUse,
+      goodRemains,
+      fpDispatch,
+      handleAddLine,
+    ],
   );
 
   const handleEditQuantPack = () => {
@@ -293,13 +333,17 @@ const ShipmentViewScreen = () => {
     handleAddQuantPack(Number(quantPack));
     setVisibleQuantPackDialog(false);
     setQuantPack('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const handleDismissQuantPack = () => {
     setVisibleQuantPackDialog(false);
     setQuantPack('');
-    // setErrorMessage('');
+    Keyboard.dismiss();
+    handleFocus();
   };
+
   const handleEditShipmentHead = useCallback(
     () => navigation.navigate('ShipmentEdit', { id, isCurr }),
     [id, isCurr, navigation],
@@ -321,10 +365,6 @@ const ShipmentViewScreen = () => {
       }
     });
   }, [docDispatch, id]);
-
-  const handleFocus = () => {
-    ref?.current?.focus();
-  };
 
   const hanldeCancelLastScan = useCallback(() => {
     if (shipmentLines?.length) {
@@ -535,6 +575,7 @@ const ShipmentViewScreen = () => {
         barcode: barc.barcode,
         workDate: barc.workDate,
         numReceived: barc.numReceived,
+        time: barc.time,
         quantPack: barc.quantPack,
         sortOrder: (shipmentLines?.length || 0) + 1,
       };
@@ -575,6 +616,7 @@ const ShipmentViewScreen = () => {
       }
 
       setScanned(false);
+      handleFocus();
     },
 
     [
