@@ -53,4 +53,5 @@
 2. [Инструкция по GDMN Отдел снабжения](https://github.com/stasgm/gdmn-mob/blob/dev/docs/gdmn-appl-request/docs/README.md)
 3. [Инструкция по GDMN Торговые агенты](https://github.com/stasgm/gdmn-mob/blob/dev/docs/gdmn-app-trade-agents/docs/README.md)
 4. [Инструкция по GDMN Склад](https://github.com/stasgm/gdmn-mob/blob/dev/docs/gdmn-gd-movement/docs/README.md)
-5. [Инструкция по докеру](https://github.com/stasgm/gdmn-mob/blob/dev/docs/gdmn-gd-movement/docs/docker/README.md)
+5. [Инструкция по GDMN Отгрузка](https://github.com/stasgm/gdmn-mob/blob/dev/docs/gdmn-fp-movement/docs/README.md)
+6. [Инструкция по докеру](https://github.com/stasgm/gdmn-mob/blob/dev/docs/gdmn-gd-movement/docs/docker/README.md)

@@ -43,6 +43,8 @@ export const MoveEditScreen = () => {
   const userDefaultSecondDepart = useSelector((state) => state.settings?.userData?.secondDepart?.data) as INamedEntity;
   const defaultSecondDepart = departs?.find((i) => i.id === userDefaultSecondDepart?.id);
 
+  const isAddressStore = useSelector((state) => state.settings?.data?.addressStore?.data);
+
   const movementType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'movement');
@@ -326,11 +328,12 @@ export const MoveEditScreen = () => {
 
     const params: Record<string, string> = {};
 
-    if (docDocumentSubtype?.id === 'cellMovement' || docDocumentSubtype?.id === 'movement') {
-      params.isAddressStore = 'true';
-    }
-    if (docDocumentSubtype?.id === 'departMovement') {
-      params.isAddressStore = 'false';
+    if (isAddressStore) {
+      if (docDocumentSubtype?.id === 'cellMovement' || docDocumentSubtype?.id === 'movement') {
+        params.isAddressStore = 'true';
+      } else if (docDocumentSubtype?.id === 'departMovement') {
+        params.isAddressStore = 'false';
+      }
     }
 
     navigation.navigate('SelectRefItem', {
@@ -342,7 +345,7 @@ export const MoveEditScreen = () => {
       clause: params,
       clauseType: 'boolean',
     });
-  }, [docDocumentSubtype?.id, docFromDepart, isBlocked, navigation, screenName]);
+  }, [docDocumentSubtype?.id, docFromDepart, isAddressStore, isBlocked, navigation, screenName]);
 
   const handleToDepart = useCallback(() => {
     if (isBlocked) {
@@ -350,12 +353,12 @@ export const MoveEditScreen = () => {
     }
 
     const params: Record<string, string> = {};
-
-    if (docDocumentSubtype?.id === 'cellMovement' || docDocumentSubtype?.id === 'internalMovement') {
-      params.isAddressStore = 'true';
-    }
-    if (docDocumentSubtype?.id === 'departMovement') {
-      params.isAddressStore = 'false';
+    if (isAddressStore) {
+      if (docDocumentSubtype?.id === 'cellMovement' || docDocumentSubtype?.id === 'internalMovement') {
+        params.isAddressStore = 'true';
+      } else if (docDocumentSubtype?.id === 'departMovement') {
+        params.isAddressStore = 'false';
+      }
     }
 
     navigation.navigate('SelectRefItem', {
@@ -367,7 +370,7 @@ export const MoveEditScreen = () => {
       clause: params,
       clauseType: 'boolean',
     });
-  }, [docDocumentSubtype?.id, docToDepart, isBlocked, navigation, screenName]);
+  }, [docDocumentSubtype?.id, docToDepart, isAddressStore, isBlocked, navigation, screenName]);
 
   const handleChangeNumber = useCallback(
     (text: string) =>
