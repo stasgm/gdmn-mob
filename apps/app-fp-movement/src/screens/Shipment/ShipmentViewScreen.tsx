@@ -137,7 +137,7 @@ const ShipmentViewScreen = () => {
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return shipment?.head?.fromDepart?.id && isFocused
+    return shipment?.head?.fromDepart?.id && isFocused && remains
       ? getRemGoodListByContact(goods, remains[shipment.head.fromDepart.id], docList, shipment.head.fromDepart.id)
       : [];
   }, [docList, goods, remains, shipment?.head?.fromDepart?.id, isFocused]);
