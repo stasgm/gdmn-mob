@@ -367,7 +367,10 @@ export const ReceiptViewScreen = () => {
     () =>
       !isBlocked && (
         <View style={styles.buttons}>
-          <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
+          <SendButton
+            onPress={() => setVisibleSendDialog(true)}
+            disabled={screenState !== 'idle' || loading || !lines?.length}
+          />
           <ScanButton
             onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('ScanGood', { docId: id }))}
             disabled={screenState !== 'idle'}
@@ -375,7 +378,7 @@ export const ReceiptViewScreen = () => {
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [actionsMenu, id, isBlocked, isScanerReader, loading, navigation, screenState],
+    [actionsMenu, id, isBlocked, isScanerReader, lines?.length, loading, navigation, screenState],
   );
 
   useLayoutEffect(() => {

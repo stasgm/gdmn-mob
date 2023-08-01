@@ -278,14 +278,20 @@ export const LaboratoryViewScreen = () => {
     () =>
       isBlocked ? (
         doc?.status === 'READY' ? (
-          <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
+          <SendButton
+            onPress={() => setVisibleSendDialog(true)}
+            disabled={screenState !== 'idle' || loading || !lines?.length}
+          />
         ) : (
           doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
         )
       ) : (
         <View style={styles.buttons}>
           {doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />}
-          <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
+          <SendButton
+            onPress={() => setVisibleSendDialog(true)}
+            disabled={screenState !== 'idle' || loading || !lines?.length}
+          />
           <ScanButton
             onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('ScanGood', { docId: id }))}
             disabled={screenState !== 'idle'}
@@ -293,7 +299,18 @@ export const LaboratoryViewScreen = () => {
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [actionsMenu, doc?.status, handleSaveDocument, id, isBlocked, isScanerReader, loading, navigation, screenState],
+    [
+      actionsMenu,
+      doc?.status,
+      handleSaveDocument,
+      id,
+      isBlocked,
+      isScanerReader,
+      lines?.length,
+      loading,
+      navigation,
+      screenState,
+    ],
   );
 
   useLayoutEffect(() => {
@@ -400,7 +417,14 @@ export const LaboratoryViewScreen = () => {
 
       dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
 
-      setScanned(false);
+      if (visibleDialog) {
+        setVisibleDialog(false);
+        setErrorMessage('');
+        setBarcode('');
+      } else {
+        setScanned(false);
+      }
+
       handleFocus();
     },
 
