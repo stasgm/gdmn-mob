@@ -512,7 +512,6 @@ const ShipmentViewScreen = () => {
       alertWithSound('Внимание!', `${text}.`);
       setScanned(false);
     }
-    // handlePlaySound();
   }, []);
 
   const getScannedObject = useCallback(
