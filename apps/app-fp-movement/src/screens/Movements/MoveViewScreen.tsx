@@ -110,7 +110,7 @@ export const MoveViewScreen = () => {
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return doc?.head?.fromDepart?.id && isFocused && remains
+    return doc?.head?.fromDepart?.id && isFocused && remains && remains
       ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id], docList, doc.head.fromDepart.id)
       : [];
   }, [doc?.head?.fromDepart?.id, docList, goods, isFocused, remains]);
