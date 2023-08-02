@@ -194,8 +194,7 @@
 Чтобы найти необходимую информацию по наименованию можно воспользоваться строкой поиска, нажав на иконку Поиск <img src="img/5.Remains/5.Search.jpg" alt="drawing" height="20"/> в правом верхнем углу экрана.
 Также можно воспользоваться фильтром <img src="img/5.Remains/5.IconFilter.jpg" alt="drawing" height="20"/>, который показывает товары **_Все_** или **_Ненулевые_**.
 
- <img src="img/5.Remains/5.Remains.jpg" alt="drawing" height="400"/>
- <img src="img/5.Remains/5.Filter.jpg" alt="drawing" height="400"/>
+<img src="img/5.Remains/5.Remains.jpg" alt="drawing" height="400"/> <img src="img/5.Remains/5.Filter.jpg" alt="drawing" height="400"/>
 
 ## 6. Ячейки
 
@@ -203,7 +202,7 @@
 
  <img src="img/6.Cells/6.Departs.jpg" alt="drawing" height="400"/>
 
-Экран отображает ячейки по выбранному подразделению. По нажатию на ячейку можно посмотреть, какой товар лежит в данной ячейке или для какой группы она предназначена.
+Экран отображает ячейки по выбранному подразделению. По нажатию на ячейку можно просмотреть, какой товар лежит в данной ячейке или для какой группы она предназначена.
 
  <img src="img/6.Cells/6.Cells.jpg" alt="drawing" height="400"/> <img src="img/6.Cells/6.CellGood.jpg" alt="drawing" height="400"/> <img src="img/6.Cells/6.RecommendedGroup.jpg" alt="drawing" height="400"/>
 
@@ -294,8 +293,7 @@
 
 Если отсканированный штрихкод не найден в справочнике, то на экране появится сообщение, что отсканированный товар не найден в справочнике и будет предложено пересканировать:
 
-<img src="img/10.Scanner/10.ScanSuccess.jpg" alt="drawing" height="400"/>
-<img src="img/10.Scanner/10.ScanUnknown.jpg" alt="drawing" height="400"/>
+<img src="img/10.Scanner/10.ScanSuccess.jpg" alt="drawing" height="400"/> <img src="img/10.Scanner/10.ScanUnknown.jpg" alt="drawing" height="400"/>
 
 В случае, если штрихкод по каким-то причинам поврежден и не считывется, его можно ввести вручную, нажав иконку
 <img src="img/10.Scanner/10.ScanHand.jpg" alt="drawing" height="22"/> в верхнем правом углу экрана сканирования. На экране появится диалоговое окно для ввода штрихкода вручную.
@@ -508,9 +506,7 @@
 Если код по каким-то причинам не считывается, его можно ввести вручную, нажав иконку
 <img src="img/10.Scanner/10.ScanHand.jpg" alt="drawing" height="22"/> в верхнем правом углу экрана сканирования.
 
-<img src="img/6.Shipment/6.MenuTypes.jpg" alt="drawing" height="400"/>
-<img src="img/6.Shipment/6.SuccessCodeOrder.jpg" alt="drawing" height="400"/>
-<img src="img/6.Shipment/6.UnknownCodeOrder.jpg" alt="drawing" height="400"/>
+<img src="img/6.Shipment/6.MenuTypes.jpg" alt="drawing" height="400"/> <img src="img/6.Shipment/6.SuccessCodeOrder.jpg" alt="drawing" height="400"/> <img src="img/6.Shipment/6.UnknownCodeOrder.jpg" alt="drawing" height="400"/>
 
 Отвес готов для сканирования товаров. Он содержит шапку с данными о клиенте и дате отгрузки и две вкладки для позиций: **Заявлено** и **Отвешено**.
 
@@ -520,10 +516,7 @@
 
 Изначально во вкладке **Заявлено** находятся все позиции с заявленным количеством. В процессе сканирования заявленное количество уменьшается на отсканированное количество. Во вкладке **Отвешено** добавляются отсканированнные позиции. Если отканировано количество большее, чем заявлено или отсканирован товар, которого не было в изначальной заявке, программа запросит подтверждения данного действия либо отклонения.
 
-<img src="img/6.Shipment/6.ShipmentDetailView.jpg" alt="drawing" height="400"/>
-<img src="img/6.Shipment/6.OrderSheet.jpg" alt="drawing" height="400"/>
-<img src="img/6.Shipment/6.ShipmentSheet.jpg" alt="drawing" height="400"/>
-<img src="img/6.Shipment/6.EditOrderSheet.jpg" alt="drawing" height="400"/>
+<img src="img/6.Shipment/6.ShipmentDetailView.jpg" alt="drawing" height="400"/> <img src="img/6.Shipment/6.OrderSheet.jpg" alt="drawing" height="400"/> <img src="img/6.Shipment/6.ShipmentSheet.jpg" alt="drawing" height="400"/> <img src="img/6.Shipment/6.EditOrderSheet.jpg" alt="drawing" height="400"/>
 
 Когда добавлено все количество товара по заявке, позиция из закладки "Заявлено" удаляется.
 
@@ -647,7 +640,6 @@
 |  <img src="img/1.Connection/1.Sync.jpg" alt="drawing" height="27"/>   | синхронизация  |
 | <img src="img/1.Connection/1.IconAutoTransl.jpg" alt="drawing" height="22"/> | перевод документа из статуса **Черновик** в статус **Готов к отправке** |
 |<img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>   | отправка документа |
-|<img src="img/6.Maps/6.Icon.jpg" alt="drawing" height="22"/>| смена маршрута
 |<img src="img/1.Connection/7.IconFiltr.jpg" alt="drawing" height="20"/>      | фильтр |
 | " **≡** "   | меню документа |
 |" **✓** "  | сохранить  |
