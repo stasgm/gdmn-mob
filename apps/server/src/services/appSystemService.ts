@@ -4,7 +4,7 @@ import { ConflictException, DataNotFoundException } from '../exceptions';
 
 import { extraPredicate, getListPart } from '../utils/helpers';
 
-import { appSystem, appSystems as mockAppSystems } from './data/appSystems';
+import { appSystems as mockAppSystems } from './data/appSystems';
 
 import { getDb } from './dao/db';
 

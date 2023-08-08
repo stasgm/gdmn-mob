@@ -162,7 +162,7 @@ const AppSystemListTable = ({
                 <TableCell padding="checkbox">
                   <Checkbox
                     checked={selectedAppSystemIds.length === appSystems.length}
-                    color = "primary"
+                    color= "primary"
                     indeterminate={selectedAppSystemIds.length > 0 && selectedAppSystemIds.length < appSystems.length}
                     onChange={handleSelectAll}
                   />
