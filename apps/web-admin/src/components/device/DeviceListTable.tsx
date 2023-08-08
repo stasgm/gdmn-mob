@@ -155,7 +155,6 @@ const DeviceListTable = ({
               </NavLink>
             </Box>
           </TableCell>
-
           <TableCell style={{ padding: '0 16px' }}>
             <Box
               sx={{
@@ -170,7 +169,6 @@ const DeviceListTable = ({
               </NavLink>
             </Box>
           </TableCell>
-
           <TableCell>
             <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
               <Box>
