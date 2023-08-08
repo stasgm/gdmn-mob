@@ -130,6 +130,7 @@ const AppSystemListTable = ({
               </NavLink>
             </Box>
           </TableCell>
+          <TableCell>{appSystem.id}</TableCell>
           <TableCell>{appSystem.description}</TableCell>
           <TableCell>{new Date(appSystem.creationDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
           <TableCell>{new Date(appSystem.editionDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
@@ -161,12 +162,13 @@ const AppSystemListTable = ({
                 <TableCell padding="checkbox">
                   <Checkbox
                     checked={selectedAppSystemIds.length === appSystems.length}
-                    color="primary"
+                    color = "primary"
                     indeterminate={selectedAppSystemIds.length > 0 && selectedAppSystemIds.length < appSystems.length}
                     onChange={handleSelectAll}
                   />
                 </TableCell>
                 <TableCell>Наименование</TableCell>
+                <TableCell>ID</TableCell>
                 <TableCell>Описание</TableCell>
                 <TableCell>Дата создания</TableCell>
                 <TableCell>Дата редактирования</TableCell>

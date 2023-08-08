@@ -155,6 +155,22 @@ const DeviceListTable = ({
               </NavLink>
             </Box>
           </TableCell>
+
+          <TableCell style={{ padding: '0 16px' }}>
+            <Box
+              sx={{
+                alignItems: 'center',
+                display: 'flex',
+              }}
+            >
+              <NavLink to={`${adminPath}/app/devices/${device.id}`}>
+                <Typography color="textPrimary" variant="body1" key={device.id}>
+                  {device.id}
+                </Typography>
+              </NavLink>
+            </Box>
+          </TableCell>
+
           <TableCell>
             <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
               <Box>
@@ -222,6 +238,7 @@ const DeviceListTable = ({
                   />
                 </TableCell>
                 <TableCell>Наименование</TableCell>
+                <TableCell>ID</TableCell>
                 <TableCell>Номер</TableCell>
                 <TableCell>Состояние</TableCell>
                 <TableCell>Код активации</TableCell>
