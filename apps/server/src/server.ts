@@ -163,12 +163,26 @@ export const startServer = (app: KoaApp) => {
     const ca = fs
       .readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.ca-bundle'), { encoding: 'utf8' })
       .split('-----END CERTIFICATE-----\r\n')
+      .filter((cert) => cert.trim() !== '')
+      .map((cert) => cert + '-----END CERTIFICATE-----\r\n');
+
+    if (!ca) {
+        throw new Error('No CA file or file is invalid');
+    } else {
+        console.log(`CA file is valid. Number of certificates: ${ca.length}...`);
+    }
+
+/*
+    const ca = fs
+      .readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.ca-bundle'), { encoding: 'utf8' })
+      .split('-----END CERTIFICATE-----\r\n')
       .map((cert) => cert + '-----END CERTIFICATE-----\r\n')
       .pop();
 
     if (!ca) {
       throw new Error('No CA file or file is invalid');
     }
+*/    
 
     https
       .createServer({ cert, ca, key }, koaCallback)
