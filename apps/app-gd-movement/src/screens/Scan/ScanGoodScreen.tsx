@@ -1,16 +1,18 @@
-import React, { useCallback, useLayoutEffect, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 
 import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigation/native';
 
 import { AppActivityIndicator, globalStyles, LargeText, MediumText, navBackButton, ScanBarcode } from '@lib/mobile-ui';
-import { docSelectors, useDispatch, documentActions } from '@lib/store';
+import { docSelectors, useDispatch, documentActions, useSelector, appActions } from '@lib/store';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { IScannedObject } from '@lib/client-types';
 
 import { generateId } from '@lib/mobile-hooks';
+
+import { INamedEntity } from '@lib/types';
 
 import { ScanStackParamList } from '../../navigation/Root/types';
 import { IScanLine, IScanDocument } from '../../store/types';
@@ -24,6 +26,13 @@ const ScanGoodScreen = () => {
   const [scaner, setScaner] = useState<IScannedObject>({ state: 'init' });
   const [scannedObject, setScannedObject] = useState<IScanLine>();
 
+  useEffect(() => {
+    return () => {
+      dispatch(appActions.clearFormParams());
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackButton,
@@ -32,11 +41,41 @@ const ScanGoodScreen = () => {
 
   const doc = docSelectors.selectByDocId<IScanDocument>(docId);
 
-  const handleGetScannedObject = useCallback((brc: string) => {
-    setScannedObject({ id: generateId(), barcode: brc });
+  const handleGetScannedObject = useCallback(
+    (brc: string) => {
+      if (doc?.lines?.find((l) => l.barcode === brc)) {
+        setScaner({
+          state: 'error',
+          message: 'Баркод  уже добавлен',
+        });
+        return;
+      }
 
-    setScaner({ state: 'found' });
-  }, []);
+      setScannedObject({ id: generateId(), barcode: brc });
+
+      setScaner({ state: 'found' });
+    },
+    [doc?.lines],
+  );
+
+  const [currentLineId, setCurrentLineId] = useState('');
+  const good = useSelector((state) => state.app.formParams?.good) as INamedEntity | undefined;
+
+  useEffect(() => {
+    if (doc?.head.isBindGood && currentLineId) {
+      const currentLine = doc.lines?.find((l) => l.id === currentLineId);
+      if (currentLine && currentLine.good?.id !== good?.id) {
+        dispatch(
+          documentActions.updateDocumentLine({
+            docId: doc.id,
+            line: { ...currentLine, good } as IScanLine,
+          }),
+        );
+        setCurrentLineId('');
+        dispatch(appActions.setFormParams({ good: undefined }));
+      }
+    }
+  }, [currentLineId, dispatch, doc, good]);
 
   const handleSaveScannedItem = useCallback(() => {
     if (!scannedObject) {
@@ -47,12 +86,20 @@ const ScanGoodScreen = () => {
       return;
     }
 
-    const line: IScanLine = { ...scannedObject, sortOrder: doc?.lines?.length + 1 };
+    const line: IScanLine = { ...scannedObject, sortOrder: doc.lines?.length + 1 };
 
     dispatch(documentActions.addDocumentLine({ docId, line }));
 
+    if (doc.head.isBindGood) {
+      setCurrentLineId(line.id);
+      navigation.navigate('SelectRefItem', {
+        refName: 'good',
+        fieldName: 'good',
+      });
+    }
+
     setScaner({ state: 'init' });
-  }, [scannedObject, doc, dispatch, docId]);
+  }, [scannedObject, doc, dispatch, docId, navigation]);
 
   const handleClearScaner = () => setScaner({ state: 'init' });
 

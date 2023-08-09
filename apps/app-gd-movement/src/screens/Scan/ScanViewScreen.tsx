@@ -4,7 +4,7 @@ import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigat
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { docSelectors, documentActions, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
+import { appActions, docSelectors, documentActions, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   MenuButton,
   useActionSheet,
@@ -35,7 +35,7 @@ import {
   keyExtractor,
 } from '@lib/mobile-hooks';
 
-import { ScreenState } from '@lib/types';
+import { INamedEntity, ScreenState } from '@lib/types';
 
 import { FlashList } from '@shopify/flash-list';
 
@@ -60,6 +60,13 @@ export const ScanViewScreen = () => {
   const isBlocked = doc?.status !== 'DRAFT';
 
   const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
+
+  useEffect(() => {
+    return () => {
+      dispatch(appActions.clearFormParams());
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleEditDocHead = useCallback(() => {
     navigation.navigate('ScanEdit', { id });
@@ -216,14 +223,15 @@ export const ScanViewScreen = () => {
   const renderItem = ({ item, index }: { item: IScanLine; index: number }) => (
     <ListItemLine
       {...item}
-      onPress={() => (isDelList ? setDelList(getDelLineList(delList, item.id)) : undefined)}
-      onLongPress={() => setDelList(getDelLineList(delList, item.id))}
+      onPress={() => {
+        isDelList && setDelList(getDelLineList(delList, item.id));
+      }}
+      onLongPress={() => !isBlocked && setDelList(getDelLineList(delList, item.id))}
       checked={delList.includes(item.id)}
-      readonly={true}
     >
       <View style={styles.details}>
         <LargeText style={styles.textBold}>
-          Сканирование {(lines?.length ? lines?.length - index : 1 + index)?.toString()}
+          {doc?.head.isBindGood ? item.good?.name : `Сканирование ${lines?.length ? lines.length - index : 1 + index}`}
         </LargeText>
         <MediumText>{shortenString(item.barcode, 30)}</MediumText>
       </View>
@@ -236,9 +244,38 @@ export const ScanViewScreen = () => {
 
   const [key, setKey] = useState(1);
 
+  const [currentLineId, setCurrentLineId] = useState('');
+  const good = useSelector((state) => state.app.formParams?.good) as INamedEntity | undefined;
+
+  useEffect(() => {
+    if (doc?.head.isBindGood && currentLineId) {
+      const currentLine = doc.lines?.find((l) => l.id === currentLineId);
+      if (currentLine && currentLine.good?.id !== good?.id) {
+        dispatch(
+          documentActions.updateDocumentLine({
+            docId: doc.id,
+            line: { ...currentLine, good } as IScanLine,
+          }),
+        );
+        setCurrentLineId('');
+        dispatch(appActions.setFormParams({ good: undefined }));
+      }
+    }
+  }, [currentLineId, dispatch, doc, good]);
+
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!doc) {
+        return;
+      }
+
+      if (doc.lines?.find((l) => l.barcode === brc)) {
+        Alert.alert('Внимание!', 'Баркод  уже добавлен', [
+          {
+            text: 'ОК',
+          },
+        ]);
+
         return;
       }
 
@@ -246,9 +283,16 @@ export const ScanViewScreen = () => {
       dispatch(documentActions.addDocumentLine({ docId: id, line }));
 
       setScanned(false);
-    },
 
-    [dispatch, doc, id],
+      if (doc.head.isBindGood) {
+        setCurrentLineId(line.id);
+        navigation.navigate('SelectRefItem', {
+          refName: 'good',
+          fieldName: 'good',
+        });
+      }
+    },
+    [dispatch, doc, id, navigation],
   );
 
   const setScan = (brc: string) => {
@@ -303,14 +347,17 @@ export const ScanViewScreen = () => {
       <View style={styles.container}>
         <InfoBlock
           colorLabel={getStatusColor(doc?.status || 'DRAFT')}
-          title={doc?.head?.department?.name || ''}
+          title={doc.head.isBindGood ? 'Привязка штрихкодов к ТМЦ' : 'Сканирование'}
           onPress={handleEditDocHead}
           disabled={isDelList || !['DRAFT', 'READY'].includes(doc.status)}
         >
-          <View style={styles.rowCenter}>
-            <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
-            {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
-          </View>
+          <>
+            {!!doc.head.department && <MediumText>{doc.head.department.name}</MediumText>}
+            <View style={styles.rowCenter}>
+              <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
+              {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
+            </View>
+          </>
         </InfoBlock>
         <TextInput
           style={styles.scanInput}
@@ -328,6 +375,7 @@ export const ScanViewScreen = () => {
           ItemSeparatorComponent={ItemSeparator}
           keyboardShouldPersistTaps="handled"
           keyExtractor={keyExtractor}
+          extraData={[lines, delList, isBlocked]}
         />
         <SimpleDialog
           visible={visibleSendDialog}
