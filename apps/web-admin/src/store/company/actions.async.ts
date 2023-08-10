@@ -10,6 +10,8 @@ import { AppState } from '../';
 import { webRequest } from '../webRequest';
 
 import { companyActions, CompanyActionType } from './actions';
+import appSystem from '../appSystem';
+import AppSystems from '../../pages/AppSystems/routes';
 
 export type AppThunk = ThunkAction<Promise<CompanyActionType>, AppState, null, CompanyActionType>;
 
@@ -27,12 +29,12 @@ const fetchCompanyById = (id: string): AppThunk => {
   };
 };
 
-const fetchCompanies = (filterText?: string, fromRecord?: number, toRecord?: number): AppThunk => {
+const fetchCompanies = (appSystemId?: string, filterText?: string, fromRecord?: number, toRecord?: number): AppThunk => {
   return async (dispatch) => {
     dispatch(companyActions.fetchCompaniesAsync.request(''));
 
     const params: Record<string, string | number> = {};
-
+    if (appSystemId) params.appSystemId = appSystemId;
     if (filterText) params.filterText = filterText;
     if (fromRecord) params.fromRecord = fromRecord;
     if (toRecord) params.toRecord = toRecord;

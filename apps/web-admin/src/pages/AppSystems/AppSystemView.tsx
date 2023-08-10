@@ -29,6 +29,11 @@ import actions from '../../store/appSystem';
 import { adminPath } from '../../utils/constants';
 import DetailsView from '../../components/DetailsView';
 
+import AppSystemCompany from '../../components/appSystem/AppSystemCompany';
+import company from '../../store/company';
+import { string } from 'yup';
+import { IAppSystem, IMessage, INamedEntity, MessageType } from '@lib/types';
+
 export type Params = {
   id: string;
 };
@@ -54,7 +59,8 @@ const AppSystemView = () => {
         : [],
     [appSystem],
   );
-
+  
+  const nameAppSystem = appSystem;
   const handleCancel = () => {
     navigate(-1);
   };
@@ -185,6 +191,10 @@ const AppSystemView = () => {
         >
           <DetailsView details={appSystemDetails} />
         </Box>
+      </Box>
+      <Box>
+        <CardHeader title={'Компании с подсистеммой ' + appSystem.name} sx={{ mx: 2 }} />
+        <AppSystemCompany appSystem ={appSystem}/>
       </Box>
     </>
   );
