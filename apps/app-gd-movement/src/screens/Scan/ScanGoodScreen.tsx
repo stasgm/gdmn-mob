@@ -43,7 +43,7 @@ const ScanGoodScreen = () => {
 
   const handleGetScannedObject = useCallback(
     (brc: string) => {
-      if (doc?.lines?.find((l) => l.barcode === brc)) {
+      if (doc?.head.isBindGood && doc?.lines?.find((l) => l.barcode === brc)) {
         setScaner({
           state: 'error',
           message: 'Баркод  уже добавлен',
@@ -55,7 +55,7 @@ const ScanGoodScreen = () => {
 
       setScaner({ state: 'found' });
     },
-    [doc?.lines],
+    [doc?.head.isBindGood, doc?.lines],
   );
 
   const [currentLineId, setCurrentLineId] = useState('');

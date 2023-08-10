@@ -529,7 +529,7 @@ export const MoveViewScreen = () => {
       const lineGood = getLineGood(barc.shcode, barc.weight, goods, goodRemains, remainsUse);
 
       if (!lineGood.good) {
-        handleErrorMessage(visibleDialog, 'Товар не найден');
+        handleErrorMessage(visibleDialog, 'Товар не найден!');
         return;
       }
 
@@ -541,7 +541,7 @@ export const MoveViewScreen = () => {
       const line = doc.lines?.find((i) => i.barcode === barc.barcode);
 
       if (line) {
-        handleErrorMessage(visibleDialog, 'Данный штрих-код уже добавлен');
+        handleErrorMessage(visibleDialog, 'Данный штрих-код уже добавлен!');
         return;
       }
 

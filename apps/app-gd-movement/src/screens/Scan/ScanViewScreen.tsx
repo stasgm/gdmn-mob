@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, TextInput, Alert } from 'react-native';
+import { View, TextInput, Alert, useWindowDimensions } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -68,6 +68,12 @@ export const ScanViewScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const ref = useRef<TextInput>(null);
+
+  const handleFocus = () => {
+    ref?.current?.focus();
+  };
+
   const handleEditDocHead = useCallback(() => {
     navigation.navigate('ScanEdit', { id });
   }, [navigation, id]);
@@ -93,6 +99,7 @@ export const ScanViewScreen = () => {
       },
       {
         text: 'Отмена',
+        onPress: () => handleFocus(),
       },
     ]);
   }, [docDispatch, id]);
@@ -128,6 +135,7 @@ export const ScanViewScreen = () => {
     if (lastId) {
       dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
     }
+    handleFocus();
   }, [dispatch, doc?.lines, id]);
 
   const sendDoc = useSendDocs(doc ? [doc] : []);
@@ -159,6 +167,7 @@ export const ScanViewScreen = () => {
       {
         title: 'Отмена',
         type: 'cancel',
+        onPress: handleFocus,
       },
     ]);
   }, [showActionSheet, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
@@ -181,12 +190,12 @@ export const ScanViewScreen = () => {
                 <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
               )}
               <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
-              {!isScanerReader && (
-                <ScanButton
-                  onPress={() => navigation.navigate('ScanGood', { docId: id })}
-                  disabled={screenState !== 'idle'}
-                />
-              )}
+              {/* {!isScanerReader && ( */}
+              <ScanButton
+                onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('ScanGood', { docId: id }))}
+                disabled={screenState !== 'idle'}
+              />
+              {/* )} */}
               <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
             </>
           )}
@@ -212,13 +221,21 @@ export const ScanViewScreen = () => {
     [isBlocked, isDelList, setDelList],
   );
 
+  const windowWidth = useWindowDimensions().width;
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: isDelList ? renderLeft : navBackButton,
       headerRight: renderRight,
-      title: isDelList ? `Выделено позиций: ${delList.length}` : 'Документ',
+      title: isDelList
+        ? windowWidth > 320
+          ? `Выделено позиций: ${delList.length}`
+          : `Позиций: ${delList.length}`
+        : windowWidth > 320
+        ? 'Документ'
+        : '',
     });
-  }, [delList.length, isDelList, navigation, renderLeft, renderRight]);
+  }, [delList.length, isDelList, navigation, renderLeft, renderRight, windowWidth]);
 
   const renderItem = ({ item, index }: { item: IScanLine; index: number }) => (
     <ListItemLine
@@ -230,17 +247,19 @@ export const ScanViewScreen = () => {
       checked={delList.includes(item.id)}
     >
       <View style={styles.details}>
-        <LargeText style={styles.textBold}>
-          {doc?.head.isBindGood ? item.good?.name : `Сканирование ${lines?.length ? lines.length - index : 1 + index}`}
-        </LargeText>
+        {(doc?.head.isBindGood && item.good) || !doc?.head.isBindGood ? (
+          <LargeText style={styles.textBold}>
+            {doc?.head.isBindGood
+              ? item.good?.name
+              : `Сканирование ${lines?.length ? lines.length - index : 1 + index}`}
+          </LargeText>
+        ) : null}
         <MediumText>{shortenString(item.barcode, 30)}</MediumText>
       </View>
     </ListItemLine>
   );
 
   const [scanned, setScanned] = useState(false);
-
-  const ref = useRef<TextInput>(null);
 
   const [key, setKey] = useState(1);
 
@@ -269,13 +288,14 @@ export const ScanViewScreen = () => {
         return;
       }
 
-      if (doc.lines?.find((l) => l.barcode === brc)) {
+      if (doc.head.isBindGood && doc.lines?.find((l) => l.barcode === brc)) {
         Alert.alert('Внимание!', 'Баркод  уже добавлен', [
           {
             text: 'ОК',
           },
         ]);
-
+        setScanned(false);
+        handleFocus();
         return;
       }
 
@@ -291,6 +311,7 @@ export const ScanViewScreen = () => {
           fieldName: 'good',
         });
       }
+      handleFocus();
     },
     [dispatch, doc, id, navigation],
   );

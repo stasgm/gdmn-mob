@@ -370,7 +370,7 @@ export const LaboratoryViewScreen = () => {
       const lineGood = getLineGood(barc.shcode, barc.weight, goods, goodRemains, remainsUse);
 
       if (!lineGood.good) {
-        handleErrorMessage(visibleDialog, 'Товар не найден');
+        handleErrorMessage(visibleDialog, 'Товар не найден!');
         return;
       }
 
@@ -382,7 +382,7 @@ export const LaboratoryViewScreen = () => {
       const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
 
       if (line) {
-        handleErrorMessage(visibleDialog, 'Товар уже добавлен');
+        handleErrorMessage(visibleDialog, 'Товар уже добавлен!');
         return;
       }
 

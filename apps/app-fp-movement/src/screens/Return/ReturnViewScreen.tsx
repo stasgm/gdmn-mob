@@ -380,14 +380,14 @@ export const ReturnViewScreen = () => {
       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
       if (!good) {
-        handleErrorMessage(visibleDialog, 'Товар не найден');
+        handleErrorMessage(visibleDialog, 'Товар не найден!');
         return;
       }
 
       const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
 
       if (line) {
-        handleErrorMessage(visibleDialog, 'Данный штрих-код уже добавлен');
+        handleErrorMessage(visibleDialog, 'Данный штрих-код уже добавлен!');
         return;
       }
 
