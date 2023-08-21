@@ -219,22 +219,26 @@ export const getLineGood = (
   goodRemains: IRemGood[],
   remainsUse: boolean,
 ) => {
-  if (remainsUse && goodRemains.length) {
-    const good = goodRemains.find((item) => item.good && `0000${item.good.shcode}`.slice(-4) === shcode);
+  if (remainsUse) {
+    if (goodRemains.length) {
+      const good = goodRemains.find((item) => item.good && `0000${item.good.shcode}`.slice(-4) === shcode);
 
-    if (good) {
-      const isRightWeight = good.remains >= weight;
+      if (good) {
+        const isRightWeight = good.remains >= weight;
 
-      return {
-        good: {
-          id: good.good.id,
-          name: good.good.name,
-          shcode: good.good.shcode,
-          isCattle: good.good.isCattle,
-          goodGroupId: good.good.goodGroupId,
-        },
-        isRightWeight,
-      };
+        return {
+          good: {
+            id: good.good.id,
+            name: good.good.name,
+            shcode: good.good.shcode,
+            isCattle: good.good.isCattle,
+            goodGroupId: good.good.goodGroupId,
+          },
+          isRightWeight,
+        };
+      } else {
+        return { good: undefined, isRightWeight: false };
+      }
     } else {
       return { good: undefined, isRightWeight: false };
     }
