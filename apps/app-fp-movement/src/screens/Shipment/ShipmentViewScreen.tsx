@@ -449,7 +449,10 @@ const ShipmentViewScreen = () => {
     () =>
       isBlocked ? (
         shipment?.status === 'READY' ? (
-          <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
+          <SendButton
+            onPress={() => setVisibleSendDialog(true)}
+            disabled={screenState !== 'idle' || loading || !shipmentLines?.length}
+          />
         ) : (
           shipment?.status === 'DRAFT' && (
             <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
@@ -460,7 +463,10 @@ const ShipmentViewScreen = () => {
           {shipment?.status === 'DRAFT' && (
             <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
           )}
-          <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
+          <SendButton
+            onPress={() => setVisibleSendDialog(true)}
+            disabled={screenState !== 'idle' || loading || !shipmentLines?.length}
+          />
 
           <ScanButton
             onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('ScanGood', { docId: id, isCurr }))}
@@ -470,16 +476,17 @@ const ShipmentViewScreen = () => {
         </View>
       ),
     [
-      actionsMenu,
-      handleSaveDocument,
-      id,
       isBlocked,
-      isScanerReader,
-      isCurr,
-      loading,
-      navigation,
-      screenState,
       shipment?.status,
+      screenState,
+      loading,
+      shipmentLines?.length,
+      handleSaveDocument,
+      actionsMenu,
+      isScanerReader,
+      navigation,
+      id,
+      isCurr,
     ],
   );
 
@@ -614,7 +621,14 @@ const ShipmentViewScreen = () => {
         });
       }
 
-      setScanned(false);
+      if (visibleDialog) {
+        setVisibleDialog(false);
+        setErrorMessage('');
+        setBarcode('');
+      } else {
+        setScanned(false);
+      }
+
       handleFocus();
     },
 
