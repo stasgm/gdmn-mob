@@ -34,6 +34,7 @@ export interface IUser extends INamedEntity, IExternalSystemProps {
   settings?: IUserSettings;
   externalId?: string;
   disabled?: boolean;
+  accessCode?: string;
 }
 
 export type n = Omit<IUser, 'id' | 'name'>;
@@ -75,6 +76,10 @@ export interface IActivationCode extends IEntity {
 }
 
 export type NewActivationCode = Pick<IActivationCode, 'code'>;
+
+export type NewAccessCode = {
+  code: string;
+};
 
 // Типы для хранения данных в бд
 export interface IDBUser extends Omit<IUser, 'creator' | 'company' | 'erpUser' | 'appSystem'> {
