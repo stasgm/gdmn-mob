@@ -544,18 +544,18 @@ const ShipmentViewScreen = () => {
       const lineGood = getLineGood(barc.shcode, barc.weight, goods, goodRemains, remainsUse);
 
       if (!lineGood.good) {
-        handleErrorMessage(visibleDialog, 'Товар не найден');
+        handleErrorMessage(visibleDialog, 'Товар не найден!');
         return;
       }
 
       const isGoodCattle = lineGood.good.isCattle;
 
       if (isCattle === 1 && !isGoodCattle) {
-        handleErrorMessage(visibleDialog, 'Товар не относится к группе КРС');
+        handleErrorMessage(visibleDialog, 'Товар не относится к группе КРС!');
 
         return;
       } else if (isCattle === 0 && isGoodCattle) {
-        handleErrorMessage(visibleDialog, 'Товар относится к группе КРС');
+        handleErrorMessage(visibleDialog, 'Товар относится к группе КРС!');
 
         return;
       }
@@ -568,7 +568,7 @@ const ShipmentViewScreen = () => {
       const line = shipmentLines?.find((i) => i.barcode === barc.barcode);
 
       if (line) {
-        handleErrorMessage(visibleDialog, 'Данный штрих-код уже добавлен');
+        handleErrorMessage(visibleDialog, 'Данный штрих-код уже добавлен!');
         return;
       }
 
