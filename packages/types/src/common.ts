@@ -15,6 +15,7 @@ export interface ISortEntity extends INamedEntity {
 
 export interface ISettingsGroup extends ISortEntity {
   description?: string;
+  checkSettingsCode?: boolean;
 }
 
 export interface IExternalSystemProps {

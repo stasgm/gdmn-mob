@@ -225,6 +225,15 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
     case getType(actions.getCompanyAsync.failure):
       return { ...state, loading: false, status: action.payload, error: true };
 
+    case getType(actions.checkAccessCodeAsync.request):
+      return { ...state, error: false, loading: true };
+
+    case getType(actions.checkAccessCodeAsync.success):
+      return { ...state, error: false, loading: false };
+
+    case getType(actions.checkAccessCodeAsync.failure):
+      return { ...state, error: true, loading: false };
+
     default:
       return state;
   }

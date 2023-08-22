@@ -99,7 +99,13 @@ export const STATUS_LIST: IListItem[] = [
   { id: 'READY', value: 'Готов' },
 ];
 
-const goodGroup = { id: 'goodScan', name: 'Код товара', sortOrder: 21, description: 'Количество символов' };
+const goodGroup = {
+  id: 'goodScan',
+  name: 'Код товара',
+  sortOrder: 21,
+  description: 'Количество символов',
+  checkSettingsCode: true,
+};
 const orderGroup = { id: 'orderScan', name: 'Код заявки', sortOrder: 22, description: 'Количество символов' };
 
 export const appSettings: Settings = {

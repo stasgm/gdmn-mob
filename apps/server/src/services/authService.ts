@@ -198,25 +198,4 @@ const checkAccessCode = (adminId: string, code: string): boolean => {
   return accessCode ? code === accessCode : true;
 };
 
-/**
- * Создает новый код для устройства
- * @param deviceId ИД устройства
- * @returns Созданный объект кода
- */
-const genAccessCode = (adminId: string): string => {
-  const { users } = getDb();
-
-  const user = users.findById(adminId);
-
-  if (!user) {
-    throw new DataNotFoundException('Устройство не найдено');
-  }
-
-  const code = `${Math.floor(1000 + Math.random() * 9000)}`;
-
-  users.update({ ...user, accessCode: code });
-
-  return code;
-};
-
-export { authenticate, validateAuthCreds, signup, verifyCode, logout, getDeviceStatus, checkAccessCode, genAccessCode };
+export { authenticate, validateAuthCreds, signup, verifyCode, logout, getDeviceStatus, checkAccessCode };

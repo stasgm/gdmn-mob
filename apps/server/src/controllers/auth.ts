@@ -79,11 +79,3 @@ export const checkAccessCode = async (ctx: ParameterizedContext, next: Next): Pr
 
   ok(ctx as Context, uid, 'checkAccessCode: ok');
 };
-
-export const getAccessCode = async (ctx: ParameterizedContext): Promise<void> => {
-  const { adminId } = ctx.params;
-
-  const code = authService.genAccessCode(adminId);
-
-  created(ctx as Context, code, 'getAccessCode: activation code generated successfully');
-};

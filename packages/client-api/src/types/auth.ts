@@ -10,7 +10,6 @@ export interface IAuthQueryResponse {
     | 'GET_CODE'
     | 'VERIFY_CODE'
     | 'GET_DEVICE_STATUS'
-    | 'GET_ACCESS_CODE'
     | 'VERIFY_ACCESS_CODE';
 }
 
@@ -48,14 +47,9 @@ export interface IVerifyCodeResponse extends IAuthQueryResponse {
   uid: string;
 }
 
-export interface ICreateAccessCodeResponse extends IAuthQueryResponse {
-  type: 'GET_ACCESS_CODE';
-  code: string;
-}
-
 export interface IVerifyAccessCodeResponse extends IAuthQueryResponse {
   type: 'VERIFY_ACCESS_CODE';
-  code: string;
+  check: boolean;
 }
 
 export interface IDeviceStatusResponse extends IAuthQueryResponse {
@@ -72,5 +66,4 @@ export type QueryResponse =
   | IVerifyCodeResponse
   | IUserNotAuthResponse
   | IDeviceStatusResponse
-  | ICreateAccessCodeResponse
   | IVerifyAccessCodeResponse;

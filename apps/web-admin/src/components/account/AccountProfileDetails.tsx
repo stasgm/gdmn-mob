@@ -23,6 +23,11 @@ const AccountProfileDetails = ({ user, loading, onSubmit }: IProps) => {
     },
   });
 
+  const handleCreateCode = () => {
+    const code = `${Math.floor(1000 + Math.random() * 9000)}`;
+    formik.setValues({ ...formik.values, accessCode: code });
+  };
+
   return (
     <>
       <Card>
@@ -62,7 +67,7 @@ const AccountProfileDetails = ({ user, loading, onSubmit }: IProps) => {
                       />
                     </Box>
                     <Tooltip title="Сгенерировать код">
-                      <Button /*onClick={() => (code, device.id)}*/>
+                      <Button onClick={handleCreateCode}>
                         <RefreshIcon />
                       </Button>
                     </Tooltip>
