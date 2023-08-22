@@ -106,7 +106,13 @@ const goodGroup = {
   description: 'Количество символов',
   checkSettingsCode: true,
 };
-const orderGroup = { id: 'orderScan', name: 'Код заявки', sortOrder: 22, description: 'Количество символов' };
+const orderGroup = {
+  id: 'orderScan',
+  name: 'Код заявки',
+  sortOrder: 22,
+  description: 'Количество символов',
+  checkSettingsCode: true,
+};
 
 export const appSettings: Settings = {
   scannerUse: {

@@ -48,7 +48,6 @@ const checkAccessCode: Config = {
     type: 'json',
     body: Joi.object({
       code: Joi.string().required().error(new InvalidParameterException('Не указан код доступа')),
-      // adminId: Joi.string().required().error(new InvalidParameterException('Не указан администратор')),
     }),
   },
 };
