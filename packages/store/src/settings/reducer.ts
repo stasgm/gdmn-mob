@@ -134,7 +134,7 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
 
       const newSetts = Object.entries(action.payload).reduce((setts: Settings, [field, newSet]) => {
         const oldRef = state.data[field];
-        setts[field] = oldRef ? oldRef : newSet;
+        setts[field] = oldRef ? { ...newSet, data: oldRef.data } : newSet;
         return setts;
       }, {});
 
