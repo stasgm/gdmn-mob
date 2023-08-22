@@ -1,6 +1,6 @@
 import { ParameterizedContext, Next, Context } from 'koa';
 
-import { IUser, IUserCredentials, NewActivationCode } from '@lib/types';
+import { IUser, IUserCredentials, NewAccessCode, NewActivationCode } from '@lib/types';
 
 import { authService } from '../services';
 import { created, ok } from '../utils/apiHelpers';
@@ -70,4 +70,12 @@ export const getDeviceStatus = async (ctx: ParameterizedContext, next: Next): Pr
   const deviceStatus = authService.getDeviceStatus(uid);
 
   ok(ctx as Context, deviceStatus, `getDeviceStatus device '${uid}': ok`);
+};
+
+export const checkAccessCode = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
+  const { code } = ctx.request.body as NewAccessCode;
+
+  const uid = authService.checkAccessCode(ctx.state.user.creator.id, code);
+
+  ok(ctx as Context, uid, 'checkAccessCode: ok');
 };

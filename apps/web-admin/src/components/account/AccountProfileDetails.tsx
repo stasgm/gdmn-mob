@@ -1,7 +1,9 @@
-import { Box, Button, Card, CardContent, CardHeader, Divider, Grid, TextField } from '@mui/material';
+import { Box, Button, Card, CardContent, CardHeader, Divider, Grid, TextField, Tooltip } from '@mui/material';
 import { IUser } from '@lib/types';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 interface IProps {
   user: IUser;
@@ -21,6 +23,11 @@ const AccountProfileDetails = ({ user, loading, onSubmit }: IProps) => {
     },
   });
 
+  const handleCreateCode = () => {
+    const code = `${Math.floor(1000 + Math.random() * 9000)}`;
+    formik.setValues({ ...formik.values, accessCode: code });
+  };
+
   return (
     <>
       <Card>
@@ -30,7 +37,7 @@ const AccountProfileDetails = ({ user, loading, onSubmit }: IProps) => {
           <Card sx={{ p: 1 }}>
             <CardContent>
               <Grid container spacing={3}>
-                <Grid item md={12} xs={12}>
+                <Grid item md={6} xs={12}>
                   <TextField
                     error={formik.touched.name && Boolean(formik.errors.name)}
                     fullWidth
@@ -43,6 +50,28 @@ const AccountProfileDetails = ({ user, loading, onSubmit }: IProps) => {
                     variant="outlined"
                     disabled={loading}
                   />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <Grid container>
+                    <Box style={{ flexGrow: 1 }}>
+                      <TextField
+                        error={formik.touched.accessCode && Boolean(formik.errors.accessCode)}
+                        fullWidth
+                        label="Код доступа"
+                        name="accessCode"
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        value={formik.values.accessCode}
+                        variant="outlined"
+                        disabled={loading}
+                      />
+                    </Box>
+                    <Tooltip title="Сгенерировать код">
+                      <Button onClick={handleCreateCode}>
+                        <RefreshIcon />
+                      </Button>
+                    </Tooltip>
+                  </Grid>
                 </Grid>
                 <Grid item md={6} xs={12}>
                   <TextField
@@ -96,6 +125,7 @@ const AccountProfileDetails = ({ user, loading, onSubmit }: IProps) => {
                     disabled={loading}
                   />
                 </Grid>
+
                 {/* <Grid item md={6} xs={12}>
                   <TextField
                     fullWidth

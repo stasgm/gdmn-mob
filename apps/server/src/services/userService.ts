@@ -57,6 +57,7 @@ const addOne = (userData: NewUser): IUser => {
     disabled: userData.disabled,
     creationDate: new Date().toISOString(),
     editionDate: new Date().toISOString(),
+    accessCode: userData.accessCode,
   });
 
   return makeUser(user);
@@ -140,6 +141,7 @@ const updateOne = (id: string, userData: Partial<IUser & { password: string }>):
     disabled: userData.disabled === undefined ? oldUser.disabled : userData.disabled,
     creationDate: oldUser.creationDate,
     editionDate: new Date().toISOString(),
+    accessCode: userData.accessCode === undefined ? oldUser.accessCode : userData.accessCode,
   });
 
   const updatedUser = users.findById(id);
@@ -363,6 +365,7 @@ export const makeUser = (user: IDBUser): IUser => {
     appSystem: user.appSystemId ? appSystems.getNamedItem(user.appSystemId) : undefined,
     erpUser: user.erpUserId ? users.getNamedItem(user.erpUserId) : undefined,
     disabled: user.disabled,
+    accessCode: user.accessCode,
   };
 };
 
