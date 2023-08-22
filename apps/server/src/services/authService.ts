@@ -3,7 +3,7 @@ import koaPassport from 'koa-passport';
 import { VerifyFunction } from 'passport-local';
 import { compare } from 'bcrypt';
 
-import { IUser, NewUser, IUserCredentials, DeviceState, IDBUser } from '@lib/types';
+import { IUser, NewUser, IUserCredentials, DeviceState, IDBUser, NewAccessCode } from '@lib/types';
 
 import { DataNotFoundException, UnauthorizedException } from '../exceptions';
 
@@ -198,4 +198,25 @@ const checkAccessCode = (adminId: string, code: string): boolean => {
   return accessCode ? code === accessCode : true;
 };
 
-export { authenticate, validateAuthCreds, signup, verifyCode, logout, getDeviceStatus, checkAccessCode };
+/**
+ * Создает новый код для устройства
+ * @param deviceId ИД устройства
+ * @returns Созданный объект кода
+ */
+const genAccessCode = (adminId: string): string => {
+  const { users } = getDb();
+
+  const user = users.findById(adminId);
+
+  if (!user) {
+    throw new DataNotFoundException('Устройство не найдено');
+  }
+
+  const code = `${Math.floor(1000 + Math.random() * 9000)}`;
+
+  users.update({ ...user, accessCode: code });
+
+  return code;
+};
+
+export { authenticate, validateAuthCreds, signup, verifyCode, logout, getDeviceStatus, checkAccessCode, genAccessCode };

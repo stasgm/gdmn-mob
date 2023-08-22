@@ -1,9 +1,9 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { Alert, StyleSheet } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { settingsActions, useDispatch, useSelector } from '@lib/store';
-import { AppScreen, SettingsGroup, navBackButton } from '@lib/mobile-ui';
+import { AppDialog, AppScreen, SettingsGroup, navBackButton } from '@lib/mobile-ui';
 import { ISettingsOption } from '@lib/types';
 
 import { SettingsStackParamList } from '../navigation/Root/types';
@@ -25,8 +25,39 @@ const SettingsDetailsScreen = () => {
   //Для перерисовки
   const [key, setKey] = useState(1);
 
+  const [visibleDialog, setVisibleDialog] = useState(false);
+  const [accsessCode, setAccessCode] = useState('');
+  // const [verifyCode, setVerifyCode] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleDismissDialog = () => {
+    setVisibleDialog(false);
+    setAccessCode('');
+    setErrorMessage('');
+  };
+
+  const codd = '1234';
+
+  const [updateOption, setUpdateOption] = useState<any>(undefined);
+
   const handleUpdate = (optionName: string, value: ISettingsOption) => {
-    dispatch(settingsActions.updateOption({ optionName, value }));
+    if (value.checkSettingsCode) {
+      setVisibleDialog(true);
+      setUpdateOption({ optionName, value });
+    } else {
+      dispatch(settingsActions.updateOption({ optionName, value }));
+    }
+  };
+
+  const handleVerifyCode = () => {
+    if (accsessCode === codd) {
+      dispatch(settingsActions.updateOption(updateOption));
+      setAccessCode('');
+      setVisibleDialog(false);
+      setErrorMessage('');
+    } else {
+      setErrorMessage('Неправильный код!');
+    }
   };
 
   const handleCheckSettings = (optionName: string, value: ISettingsOption) => {
@@ -85,6 +116,16 @@ const SettingsDetailsScreen = () => {
           onCheckSettings={handleCheckSettings}
         />
       </KeyboardAwareScrollView>
+      <AppDialog
+        title="Введите пароль"
+        visible={visibleDialog}
+        text={accsessCode}
+        onChangeText={setAccessCode}
+        onCancel={handleDismissDialog}
+        onOk={handleVerifyCode}
+        okLabel={'Ок'}
+        errorMessage={errorMessage}
+      />
     </AppScreen>
   );
 };

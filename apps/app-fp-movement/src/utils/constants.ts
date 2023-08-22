@@ -129,6 +129,7 @@ export const appSettings: Settings = {
     type: 'boolean',
     visible: true,
     group: mainSettingGroup,
+    checkSettingsCode: true,
   },
   minBarcodeLength: {
     id: 'minBarcodeLength',

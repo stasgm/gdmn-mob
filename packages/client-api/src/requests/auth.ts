@@ -1,4 +1,4 @@
-import { DeviceState, IUser, IUserCredentials } from '@lib/types';
+import { DeviceState, IUser, IUserCredentials, NewAccessCode } from '@lib/types';
 import { user as mockUser } from '@lib/mock';
 
 import { error, auth as types } from '../types';
@@ -177,6 +177,71 @@ class Auth extends BaseRequest {
     return {
       type: res.type,
       message: response2Log(res) || 'Статус устройства не получен',
+    } as error.IServerError;
+  };
+
+  verifyAccessCode = async (customRequest: CustomRequest, adminId: string, code: string) => {
+    const body = { adminId, code };
+
+    const res = await customRequest<string>({
+      api: this.api.axios,
+      method: 'POST',
+      url: '/auth/user',
+      data: body,
+    });
+
+    if (res.type === 'SUCCESS') {
+      return {
+        type: 'VERIFY_ACCESS_CODE',
+        code: res.data,
+      } as types.IVerifyAccessCodeResponse;
+    }
+
+    return {
+      type: res.type,
+      message: response2Log(res) || 'Код активации не проверен',
+    } as error.IServerError;
+  };
+
+  createAccessCode = async (
+    customRequest: CustomRequest,
+    adminId: string,
+  ): Promise<types.ICreateAccessCodeResponse | error.IServerError> => {
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
+
+      // const c = mockActivationCodes.find((a) => a.device.id === deviceId) || {
+      //   code: '4444',
+      //   device: { id: deviceId, name: 'iPhone' },
+      //   id: '169',
+      //   date: '2021-07-07T07:25:25.265Z',
+      // };
+
+      // return {
+      //   type: 'CREATE_CODE',
+      //   code: {
+      //     ...c,
+      //     code: '5555',
+      //   },
+      // };
+    }
+
+    const res = await customRequest<string>({
+      api: this.api.axios,
+      method: 'GET',
+      url: `/users/${adminId}`,
+    });
+
+    if (res.type === 'SUCCESS') {
+      return {
+        type: 'GET_ACCESS_CODE',
+        code: res.data,
+      } as types.ICreateAccessCodeResponse;
+    }
+
+    return {
+      type: res.type,
+      message: response2Log(res) || 'Код активации не создан',
     } as error.IServerError;
   };
 }
