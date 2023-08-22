@@ -122,9 +122,7 @@ const validateAuthCreds: VerifyFunction = async (name: string, password: string,
  * @returns uid Уникальный номер устройства или undefined
  */
 const verifyCode = (code: string): string | undefined => {
-  const devices = getDb().devices;
-  const codes = getDb().codes;
-  const deviceBindings = getDb().deviceBindings;
+  const { devices, codes, deviceBindings } = getDb();
 
   const codeObj = codes.data.find((i) => i.code === code);
 
@@ -186,4 +184,18 @@ const getDeviceStatus = (uid: string): DeviceState => {
   return device.state;
 };
 
-export { authenticate, validateAuthCreds, signup, verifyCode, logout, getDeviceStatus };
+/**
+ * Проверка кода доступа
+ * @param adminId ИД администратора
+ * @param code Код
+ * @returns
+ */
+const checkAccessCode = (adminId: string, code: string): boolean => {
+  const users = getDb().users;
+
+  const accessCode = users.data.find((i) => i.id === adminId)?.accessCode;
+
+  return accessCode ? code === accessCode : true;
+};
+
+export { authenticate, validateAuthCreds, signup, verifyCode, logout, getDeviceStatus, checkAccessCode };
