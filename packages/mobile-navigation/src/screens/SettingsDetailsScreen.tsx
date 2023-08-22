@@ -37,6 +37,7 @@ const SettingsDetailsScreen = () => {
     setVisibleDialog(false);
     setAccessCode('');
     setErrorMessage('');
+    setIsChecked(false);
   };
 
   const [isChecked, setIsChecked] = useState(false);
@@ -66,11 +67,8 @@ const SettingsDetailsScreen = () => {
   const handleVerifyCode = async () => {
     const res = await authDispatch(authActions.checkAccessCode(mobileRequest(authDispatch, authActions), accsessCode));
 
-    console.log('res', res);
-
     if (res.type === 'AUTH/VERIFY_ACCESS_CODE_SUCCESS') {
       if (res.payload) {
-        console.log('typeof updateOption?.value?.data', typeof updateOption?.value?.data);
         if (typeof updateOption?.value?.data === 'number') {
           setIsChecked(true);
         } else {
