@@ -9,7 +9,6 @@ import { ISettingsOption } from '@lib/types';
 import { mobileRequest } from '@lib/mobile-hooks';
 
 import { SettingsStackParamList } from '../navigation/Root/types';
-
 const SettingsDetailsScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -33,34 +32,29 @@ const SettingsDetailsScreen = () => {
   const [accsessCode, setAccessCode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
+  const [updateOption, setUpdateOption] = useState<any>(undefined);
+
   const handleDismissDialog = () => {
     setVisibleDialog(false);
     setAccessCode('');
     setErrorMessage('');
-    setIsChecked(false);
-  };
-
-  const [isChecked, setIsChecked] = useState(false);
-  const [updateOption, setUpdateOption] = useState<any>(undefined);
-
-  const handleUpdate = (optionName: string, value: ISettingsOption) => {
-    const isNumber = typeof value.data === 'number';
-    const needCheck = value.group?.checkSettingsCode || value.checkSettingsCode;
-
-    if (needCheck && (!isNumber || (isNumber && (!isChecked || (isChecked && optionName !== updateOption.name))))) {
-      setVisibleDialog(true);
-      setUpdateOption({ optionName, value });
-    } else {
-      dispatch(settingsActions.updateOption({ optionName, value }));
+    if (updateOption) {
+      dispatch(
+        settingsActions.updateOption({
+          optionName: updateOption.optionName,
+          value: data[updateOption.optionName],
+        }),
+      );
+      setKey(key + 1);
     }
   };
 
-  const handleOnFocus = (optionName: string, value: ISettingsOption) => {
-    if (typeof value.data === 'number' && !isChecked) {
-      if (value.group?.checkSettingsCode || value.checkSettingsCode) {
-        setVisibleDialog(true);
-        setUpdateOption({ optionName, value });
-      }
+  const handleUpdate = (optionName: string, value: ISettingsOption) => {
+    setUpdateOption({ optionName, value });
+    if (value.group?.checkSettingsCode || value.checkSettingsCode) {
+      setVisibleDialog(true);
+    } else {
+      dispatch(settingsActions.updateOption({ optionName, value }));
     }
   };
 
@@ -69,12 +63,7 @@ const SettingsDetailsScreen = () => {
 
     if (res.type === 'AUTH/VERIFY_ACCESS_CODE_SUCCESS') {
       if (res.payload) {
-        if (typeof updateOption?.value?.data === 'number') {
-          setIsChecked(true);
-        } else {
-          dispatch(settingsActions.updateOption(updateOption));
-        }
-
+        dispatch(settingsActions.updateOption(updateOption));
         setAccessCode('');
         setVisibleDialog(false);
         setErrorMessage('');
@@ -140,8 +129,6 @@ const SettingsDetailsScreen = () => {
           groupDescription={groupDescription}
           onValueChange={handleUpdate}
           onCheckSettings={handleCheckSettings}
-          onFocus={handleOnFocus}
-          isChecked={isChecked}
         />
       </KeyboardAwareScrollView>
       <AppDialog

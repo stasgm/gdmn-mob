@@ -14,19 +14,9 @@ type Props = {
   disabled?: boolean;
   onValueChange: (newValue: SettingValue) => void;
   onEndEditing: (newValue: SettingValue) => void;
-  onFocus: (newValue: SettingValue) => void;
-  isChecked?: boolean;
 };
 
-const SettingsItem = ({
-  label,
-  value,
-  disabled = false,
-  onValueChange,
-  onEndEditing,
-  onFocus,
-  isChecked = false,
-}: Props) => {
+const SettingsItem = ({ label, value, disabled = false, onValueChange, onEndEditing }: Props) => {
   const [itemValue, setItemValue] = useState(value);
 
   const handleChangeText = (text: string) => {
@@ -88,7 +78,6 @@ const SettingsItem = ({
                 onValueChange(Number(itemValue));
                 onEndEditing(Number(itemValue));
               }}
-              onFocus={() => !isChecked && onFocus(Number(itemValue))}
             />
           ) : (
             <Input

@@ -12,18 +12,9 @@ type Props = {
   list: ISettingsOption[];
   onValueChange: (optionName: string, value: ISettingsOption) => void;
   onCheckSettings?: (optionName: string, value: ISettingsOption) => void;
-  onFocus?: (optionName: string, value: ISettingsOption) => void;
-  isChecked?: boolean;
 };
 
-const SettingsGroup = ({
-  groupDescription,
-  list,
-  onValueChange,
-  onCheckSettings,
-  onFocus,
-  isChecked = false,
-}: Props) => {
+const SettingsGroup = ({ groupDescription, list, onValueChange, onCheckSettings }: Props) => {
   //Массив уникальных подгрупп группы настройки
   const parents = useMemo(
     () =>
@@ -56,8 +47,6 @@ const SettingsGroup = ({
                   disabled={item.readonly}
                   onValueChange={(newValue) => onValueChange(item.id, { ...item, data: newValue })}
                   onEndEditing={(newValue) => onCheckSettings && onCheckSettings(item.id, { ...item, data: newValue })}
-                  onFocus={(newValue) => onFocus && onFocus(item.id, { ...item, data: newValue })}
-                  isChecked={isChecked}
                 />
               </View>
             );
@@ -79,8 +68,6 @@ const SettingsGroup = ({
                       disabled={s.readonly}
                       onValueChange={(newValue) => onValueChange(s.id, { ...s, data: newValue })}
                       onEndEditing={(newValue) => onCheckSettings && onCheckSettings(s.id, { ...s, data: newValue })}
-                      onFocus={(newValue) => onFocus && onFocus(s.id, { ...s, data: newValue })}
-                      isChecked={isChecked}
                     />
                   </View>
                 ))}
