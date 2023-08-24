@@ -10,14 +10,6 @@ export interface IUserSetting {
   description: string;
 }
 
-export interface IAppSystemSettings {
-  [name: string]: IAppSystemSetting;
-}
-
-export interface IAppSystemSetting {
-  data: string | number | INamedEntity;
-}
-
 // Типы для передачи и хранения данных на клиенте
 export interface IUser extends INamedEntity, IExternalSystemProps {
   alias?: string;

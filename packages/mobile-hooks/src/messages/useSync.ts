@@ -20,13 +20,13 @@ import {
 import api, { isConnectError } from '@lib/client-api';
 import {
   BodyType,
-  IAppSystemSettings,
   IDeviceLog,
   IDocument,
   IMessage,
   IReferences,
   ISettingsOption,
   IUserSettings,
+  Settings,
 } from '@lib/types';
 
 import { useCallback, useMemo } from 'react';
@@ -336,7 +336,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
           try {
             addRequestNotice('Сохранение настроек подсистемы');
 
-            const appSetts = Object.entries(msg.body.payload as IAppSystemSettings);
+            const appSetts = Object.entries(msg.body.payload as Settings);
 
             let syncPeriod;
 
@@ -368,7 +368,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
                       optionName,
                       value: {
                         ...settings[optionName],
-                        data: value.data,
+                        ...value,
                       } as ISettingsOption,
                     }),
                   );
@@ -561,7 +561,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
                     //сообщения из последовательности сливается в одно большое сообщение (т.е. данные/массивы сливаются в один поток).
                     if (isAll) {
                       const newPayload = sortedMessages.reduce((prev: IReferences, cur) => {
-                        for (const [refName, refData] of Object.entries(cur.body.payload)) {
+                        for (const [refName, refData] of Object.entries(cur.body.payload as IReferences)) {
                           const data = prev[refName]?.data || [];
                           prev[refName] = prev[refName]
                             ? { ...prev[refName], data: [...data, ...refData.data] }
