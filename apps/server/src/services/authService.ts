@@ -61,7 +61,7 @@ const authenticate = async (ctx: Context, next: Next) => {
       throw new UnauthorizedException('Связанное устройство заблокировано');
     }
 
-    if (deviceBinding.state === 'NON-ACTIVATED' || deviceBinding.state === 'NON-REGISTERED') {
+    if (deviceBinding.state !== 'ACTIVE') {
       throw new UnauthorizedException('Связанное устройство не активировано');
     }
   }
