@@ -5,6 +5,8 @@ import * as yup from 'yup';
 
 import RefreshIcon from '@mui/icons-material/Refresh';
 
+import { getCode } from '../../utils/helpers';
+
 interface IProps {
   user: IUser;
   loading: boolean;
@@ -24,7 +26,7 @@ const AccountProfileDetails = ({ user, loading, onSubmit }: IProps) => {
   });
 
   const handleCreateCode = () => {
-    const code = `${Math.floor(1000 + Math.random() * 9000)}`;
+    const code = getCode();
     formik.setValues({ ...formik.values, accessCode: code });
   };
 

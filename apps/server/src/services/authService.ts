@@ -60,6 +60,10 @@ const authenticate = async (ctx: Context, next: Next) => {
     if (deviceBinding.state === 'BLOCKED') {
       throw new UnauthorizedException('Связанное устройство заблокировано');
     }
+
+    if (deviceBinding.state === 'NON-ACTIVATED' || deviceBinding.state === 'NON-REGISTERED') {
+      throw new UnauthorizedException('Связанное устройство не активировано');
+    }
   }
 
   return koaPassport.authenticate('local', async (err: Error, usr: IUser) => {
