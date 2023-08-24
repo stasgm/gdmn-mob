@@ -6,7 +6,7 @@ import { useLocation } from 'react-router-dom';
 
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import CachedIcon from '@mui/icons-material/Cached';
-import { ICompany } from '@lib/types';
+import { ICompany, IAppSystem } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
@@ -14,11 +14,8 @@ import actions from '../../store/company';
 import CircularProgressWithContent from '../CircularProgressWidthContent';
 import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
 import SortableTable from '../SortableTable';
-import AppSystem from '@lib/client-api/dist/src/requests/appSystem';
-import { IUser } from '@lib/types';
-import { string } from 'yup';
-import { IAppSystem } from '@lib/types';
-import { Filter } from 'react-feather';
+
+import selectors from '../../store/company/selectors';
 
 interface IProps {
   appSystem: IAppSystem;
@@ -29,13 +26,15 @@ const AppSystemCompany = ({ appSystem }: IProps) => {
   const location = useLocation();
 
   const dispatch: AppDispatch = useDispatch();
-  const { list, loading, errorMessage, pageParams } = useSelector((state) => state.companies);
+  const { loading, errorMessage, pageParams } = useSelector((state) => state.companies);
   const { user: authUser } = useSelector((state) => state.auth);
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
+  const company = selectors.companyByAppSystem(appSystem.id);
+  const list = selectors.companyByAppSystem(appSystem.id);
 
   const fetchCompanies = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(actions.fetchCompanies(appSystem.id, filterText, fromRecord, toRecord));
+      dispatch(actions.fetchCompanies(filterText, fromRecord, toRecord));
     },
     [dispatch],
   );
@@ -119,7 +118,6 @@ const AppSystemCompany = ({ appSystem }: IProps) => {
     { id: 'admin', label: 'Администратор', sortEnable: true },
     { id: 'creationDate', label: 'Дата создания', sortEnable: true },
     { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },
-    
   ];
 
   return (

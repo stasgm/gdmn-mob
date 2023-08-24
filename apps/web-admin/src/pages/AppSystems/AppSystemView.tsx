@@ -17,6 +17,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
+import { string } from 'yup';
+import { IAppSystem, IMessage, INamedEntity, MessageType } from '@lib/types';
+
 import { useSelector, useDispatch } from '../../store';
 import { ILinkedEntity, IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
@@ -31,8 +34,6 @@ import DetailsView from '../../components/DetailsView';
 
 import AppSystemCompany from '../../components/appSystem/AppSystemCompany';
 import company from '../../store/company';
-import { string } from 'yup';
-import { IAppSystem, IMessage, INamedEntity, MessageType } from '@lib/types';
 
 export type Params = {
   id: string;
@@ -59,7 +60,7 @@ const AppSystemView = () => {
         : [],
     [appSystem],
   );
-  
+
   const nameAppSystem = appSystem;
   const handleCancel = () => {
     navigate(-1);
@@ -194,7 +195,7 @@ const AppSystemView = () => {
       </Box>
       <Box>
         <CardHeader title={'Компании с подсистеммой ' + appSystem.name} sx={{ mx: 2 }} />
-        <AppSystemCompany appSystem ={appSystem}/>
+        <AppSystemCompany appSystem={appSystem} />
       </Box>
     </>
   );
