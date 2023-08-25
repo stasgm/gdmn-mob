@@ -61,7 +61,7 @@ const ScanOrderScreen = () => {
       state.documents?.list.filter((i) => i.documentType.name === 'currShipment' || i.documentType.name === 'shipment'),
   ) as IShipmentDocument[];
 
-  const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as ICodeEntity;
+  const defaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as ICodeEntity;
 
   const tempOrders = useFpSelector((state) => state.fpMovement.list);
 

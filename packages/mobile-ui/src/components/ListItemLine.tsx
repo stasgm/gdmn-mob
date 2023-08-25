@@ -21,7 +21,7 @@ export const ListItemLine = ({ checked = false, readonly = false, onPress, onLon
             <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
           </View>
           {checked ? (
-            <View style={[styles.checkedIcon]}>
+            <View style={styles.checkedIcon}>
               <MaterialCommunityIcons name="check" size={11} color={'#FFF'} />
             </View>
           ) : null}

@@ -39,7 +39,7 @@ export const ReceiptEditScreen = () => {
 
   const departs = refSelectors.selectByName<IAddressStoreEntity>('depart')?.data;
 
-  const userDefaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity;
+  const userDefaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as INamedEntity;
   const defaultDepart = departs?.find((i) => i.id === userDefaultDepart?.id);
 
   const movementType = refSelectors
@@ -227,6 +227,7 @@ export const ReceiptEditScreen = () => {
     if (isBlocked) {
       return;
     }
+    const params: Record<string, string> = { isAddressStore: 'false' };
 
     navigation.navigate('SelectRefItem', {
       screenName,
@@ -234,6 +235,8 @@ export const ReceiptEditScreen = () => {
       fieldName: 'fromDepart',
       value: docFromDepart && [docFromDepart],
       descrFieldName: 'shcode',
+      clause: params,
+      clauseType: 'boolean',
     });
   };
 
@@ -242,7 +245,7 @@ export const ReceiptEditScreen = () => {
       return;
     }
 
-    const params: Record<string, string> = {};
+    const params: Record<string, string> = { isAddressStore: 'false' };
 
     navigation.navigate('SelectRefItem', {
       screenName,
@@ -251,6 +254,7 @@ export const ReceiptEditScreen = () => {
       value: docToDepart && [docToDepart],
       descrFieldName: 'shcode',
       clause: params,
+      clauseType: 'boolean',
     });
   };
 

@@ -12,7 +12,21 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { IScannedObject } from '@lib/client-types';
 
-import { ShipmentStackParamList } from '../navigation/Root/types';
+import { DashboardStackParamList } from '@lib/mobile-navigation';
+
+import {
+  CurrFreeShipmentParamList,
+  CurrShipmentParamList,
+  FreeShipmentParamList,
+  InventoryStackParamList,
+  LaboratoryStackParamList,
+  MoveFromStackParamList,
+  MoveStackParamList,
+  MoveToStackParamList,
+  ReceiptStackParamList,
+  ReturnStackParamList,
+  ShipmentStackParamList,
+} from '../navigation/Root/types';
 import { IShipmentLine, IShipmentDocument, barcodeSettings } from '../store/types';
 
 import { IAddressStoreEntity, IGood, IRemains, IRemGood } from '../store/app/types';
@@ -29,7 +43,28 @@ import { barCodeTypes } from '../utils/constants';
 
 const ScanGoodScreen = () => {
   const docId = useRoute<RouteProp<ShipmentStackParamList, 'ScanGood'>>().params?.docId;
-  const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ScanGood'>>();
+  const navigation =
+    useNavigation<
+      StackNavigationProp<
+        ShipmentStackParamList &
+          MoveFromStackParamList &
+          MoveStackParamList &
+          MoveToStackParamList &
+          CurrShipmentParamList &
+          FreeShipmentParamList &
+          CurrFreeShipmentParamList &
+          ReceiptStackParamList &
+          ReturnStackParamList &
+          LaboratoryStackParamList &
+          InventoryStackParamList &
+          DashboardStackParamList,
+        'ScanGood'
+      >
+    >();
+  const navState = navigation.getState();
+
+  const isInventory = navState.routes.some((route) => route.name === 'InventoryView');
+
   const isFocused = useIsFocused();
 
   const fpDispatch = useFpDispatch();
@@ -73,7 +108,7 @@ const ScanGoodScreen = () => {
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return shipment?.head?.fromDepart?.id && isFocused
+    return shipment?.head?.fromDepart?.id && isFocused && remains
       ? getRemGoodListByContact(goods, remains[shipment.head.fromDepart.id], docList, shipment.head.fromDepart.id)
       : [];
   }, [docList, goods, isFocused, remains, shipment?.head?.fromDepart?.id]);
@@ -126,6 +161,7 @@ const ScanGoodScreen = () => {
         weight: barc.weight,
         barcode: barc.barcode,
         workDate: barc.workDate,
+        time: barc.time,
         numReceived: barc.numReceived,
         quantPack: barc.quantPack,
         sortOrder: (shipmentLines?.length || 0) + 1,
@@ -195,7 +231,10 @@ const ScanGoodScreen = () => {
           setScaner({ state: 'init' });
           return;
         }
-        navigation.navigate('SelectCell', { docId, item: scannedObject, mode: 0 });
+
+        isInventory
+          ? navigation.navigate('InventorySelectCell', { docId, item: scannedObject, mode: 0 })
+          : navigation.navigate('SelectCell', { docId, item: scannedObject, mode: 0 });
       } else {
         dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
       }
@@ -214,6 +253,7 @@ const ScanGoodScreen = () => {
     docId,
     departs,
     goodBarcodeSettings.boxNumber,
+    isInventory,
     navigation,
   ]);
 

@@ -1,5 +1,5 @@
 import api, { CustomRequest, isConnectError } from '@lib/client-api';
-import { IUserCredentials, IUserSettings } from '@lib/types';
+import { IUserCredentials } from '@lib/types';
 
 import { ActionType } from 'typesafe-actions';
 
@@ -171,24 +171,6 @@ const logout = (
   };
 };
 
-const setUserSettings = (
-  settings: IUserSettings,
-): AppThunk<
-  Promise<ActionType<typeof actions.setUserSettingsAsync>>,
-  AuthState,
-  ActionType<typeof actions.setUserSettingsAsync>
-> => {
-  return async (dispatch) => {
-    dispatch(actions.setUserSettingsAsync.request(''));
-
-    try {
-      return dispatch(actions.setUserSettingsAsync.success(settings));
-    } catch {
-      return dispatch(actions.setUserSettingsAsync.failure('Ошибка записи настроек пользователя'));
-    }
-  };
-};
-
 const getDeviceStatus = (
   customRequest: CustomRequest,
   uid?: string,
@@ -255,6 +237,27 @@ const setDemoMode = (): AppThunk<
   };
 };
 
+const checkAccessCode = (
+  customRequest: CustomRequest,
+  code: string,
+): AppThunk<
+  Promise<ActionType<typeof actions.checkAccessCodeAsync>>,
+  AuthState,
+  ActionType<typeof actions.checkAccessCodeAsync>
+> => {
+  return async (dispatch) => {
+    dispatch(actions.checkAccessCodeAsync.request(''));
+
+    const response = await api.auth.verifyAccessCode(customRequest, code);
+
+    if (response.type === 'VERIFY_ACCESS_CODE') {
+      return dispatch(actions.checkAccessCodeAsync.success(response.check));
+    }
+
+    return dispatch(actions.checkAccessCodeAsync.failure(response.message));
+  };
+};
+
 export default {
   getDeviceByUid,
   activateDevice,
@@ -264,7 +267,7 @@ export default {
   disconnect,
   getDeviceStatus,
   useAuthThunkDispatch,
-  setUserSettings,
   getCompany,
   setDemoMode,
+  checkAccessCode,
 };

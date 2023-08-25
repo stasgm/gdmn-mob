@@ -1,6 +1,6 @@
 import localStyles from './styles';
 import React from 'react';
-import { View, TouchableOpacity, Text } from 'react-native';
+import { View, TouchableOpacity, Text, useWindowDimensions } from 'react-native';
 
 import { PrimeButton, AppScreen } from '@lib/mobile-ui';
 
@@ -11,6 +11,7 @@ type Props = {
 
 const ModeSelectionScreen = (props: Props) => {
   const { onSetDemoMode, onSetServerMode } = props;
+  const windowWidth = useWindowDimensions().width;
 
   return (
     <>
@@ -21,7 +22,9 @@ const ModeSelectionScreen = (props: Props) => {
           </PrimeButton>
         </View>
         <TouchableOpacity onPress={onSetServerMode} style={localStyles.serverMode}>
-          <Text style={localStyles.serverModeText}>Подключиться к серверу компании »</Text>
+          <Text style={localStyles.serverModeText}>{`Подключиться к серверу ${
+            windowWidth > 320 ? 'компании' : ''
+          } »`}</Text>
         </TouchableOpacity>
       </AppScreen>
     </>

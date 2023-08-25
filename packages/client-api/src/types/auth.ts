@@ -9,7 +9,8 @@ export interface IAuthQueryResponse {
     | 'USER_NOT_AUTHENTICATED'
     | 'GET_CODE'
     | 'VERIFY_CODE'
-    | 'GET_DEVICE_STATUS';
+    | 'GET_DEVICE_STATUS'
+    | 'VERIFY_ACCESS_CODE';
 }
 
 export interface ISignUpResponse extends IAuthQueryResponse {
@@ -46,6 +47,11 @@ export interface IVerifyCodeResponse extends IAuthQueryResponse {
   uid: string;
 }
 
+export interface IVerifyAccessCodeResponse extends IAuthQueryResponse {
+  type: 'VERIFY_ACCESS_CODE';
+  check: boolean;
+}
+
 export interface IDeviceStatusResponse extends IAuthQueryResponse {
   type: 'GET_DEVICE_STATUS';
   status: DeviceState;
@@ -59,4 +65,5 @@ export type QueryResponse =
   | ICreateCodeResponse
   | IVerifyCodeResponse
   | IUserNotAuthResponse
-  | IDeviceStatusResponse;
+  | IDeviceStatusResponse
+  | IVerifyAccessCodeResponse;

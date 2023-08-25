@@ -3468,11 +3468,19 @@ export const messageFpMovement: IMessage<MessageType>[] = [
       version: 1,
       payload: {
         depart: {
-          description: 'Склад по умолчанию',
+          description: 'Подразделение отгрузки',
           visible: true,
           data: {
             id: '176459265',
             name: 'Подразделение №0',
+          },
+        },
+        secondDepart: {
+          description: 'Подразделение хранения',
+          visible: true,
+          data: {
+            id: '147030695',
+            name: 'Подразделение №4',
           },
         },
       },

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, TextInput } from 'react-native';
+import { View, TextInput, Keyboard } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -90,7 +90,7 @@ export const LaboratoryViewScreen = () => {
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return doc?.head?.fromDepart?.id && isFocused
+    return doc?.head?.fromDepart?.id && isFocused && remains
       ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id], docList, doc.head.fromDepart.id)
       : [];
   }, [doc?.head?.fromDepart?.id, docList, goods, isFocused, remains]);
@@ -103,6 +103,10 @@ export const LaboratoryViewScreen = () => {
   const [visibleWeightDialog, setVisibleWeightDialog] = useState(false);
   const [weight, setWeight] = useState('');
 
+  const handleFocus = () => {
+    ref?.current?.focus();
+  };
+
   const handleShowDialog = () => {
     setVisibleDialog(true);
   };
@@ -111,6 +115,8 @@ export const LaboratoryViewScreen = () => {
     setVisibleDialog(false);
     setBarcode('');
     setErrorMessage('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const handleUpdateWeight = useCallback(
@@ -120,7 +126,7 @@ export const LaboratoryViewScreen = () => {
         return;
       }
 
-      if (remainsUse) {
+      if (remainsUse && goodRemains.length) {
         const good = goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === line.good.shcode);
 
         if (good) {
@@ -161,12 +167,15 @@ export const LaboratoryViewScreen = () => {
     handleUpdateWeight(Number(weight));
     setVisibleWeightDialog(false);
     setWeight('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const handleDismissQuantPack = () => {
     setVisibleWeightDialog(false);
     setWeight('');
-    // setErrorMessage('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const handleEditDocHead = useCallback(() => {
@@ -189,10 +198,6 @@ export const LaboratoryViewScreen = () => {
       }
     });
   }, [docDispatch, id]);
-
-  const handleFocus = () => {
-    ref?.current?.focus();
-  };
 
   const hanldeCancelLastScan = useCallback(() => {
     if (lines?.length) {
@@ -273,14 +278,20 @@ export const LaboratoryViewScreen = () => {
     () =>
       isBlocked ? (
         doc?.status === 'READY' ? (
-          <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
+          <SendButton
+            onPress={() => setVisibleSendDialog(true)}
+            disabled={screenState !== 'idle' || loading || !lines?.length}
+          />
         ) : (
           doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
         )
       ) : (
         <View style={styles.buttons}>
           {doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />}
-          <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
+          <SendButton
+            onPress={() => setVisibleSendDialog(true)}
+            disabled={screenState !== 'idle' || loading || !lines?.length}
+          />
           <ScanButton
             onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('ScanGood', { docId: id }))}
             disabled={screenState !== 'idle'}
@@ -288,7 +299,18 @@ export const LaboratoryViewScreen = () => {
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [actionsMenu, doc?.status, handleSaveDocument, id, isBlocked, isScanerReader, loading, navigation, screenState],
+    [
+      actionsMenu,
+      doc?.status,
+      handleSaveDocument,
+      id,
+      isBlocked,
+      isScanerReader,
+      lines?.length,
+      loading,
+      navigation,
+      screenState,
+    ],
   );
 
   useLayoutEffect(() => {
@@ -365,7 +387,7 @@ export const LaboratoryViewScreen = () => {
       const lineGood = getLineGood(barc.shcode, barc.weight, goods, goodRemains, remainsUse);
 
       if (!lineGood.good) {
-        handleErrorMessage(visibleDialog, 'Товар не найден');
+        handleErrorMessage(visibleDialog, 'Товар не найден!');
         return;
       }
 
@@ -377,7 +399,7 @@ export const LaboratoryViewScreen = () => {
       const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
 
       if (line) {
-        handleErrorMessage(visibleDialog, 'Товар уже добавлен');
+        handleErrorMessage(visibleDialog, 'Товар уже добавлен!');
         return;
       }
 
@@ -387,6 +409,7 @@ export const LaboratoryViewScreen = () => {
         weight: barc.weight,
         barcode: barc.barcode,
         workDate: barc.workDate,
+        time: barc.time,
         numReceived: barc.numReceived,
         sortOrder: doc?.lines?.length + 1,
         quantPack: barc.quantPack,
@@ -394,7 +417,15 @@ export const LaboratoryViewScreen = () => {
 
       dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
 
-      setScanned(false);
+      if (visibleDialog) {
+        setVisibleDialog(false);
+        setErrorMessage('');
+        setBarcode('');
+      } else {
+        setScanned(false);
+      }
+
+      handleFocus();
     },
 
     [

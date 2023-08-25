@@ -128,7 +128,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
     )
     .use(router.routes())
     .use(router.allowedMethods());
-  if (process.env.PUBLIC_PATH === '/admin/') {
+  if (process.env.IS_ADMIN_ENABLED === 'true') {
     app.use(historyApiFallback({ index: '/admin/index.html' })).use(serve({ rootDir: 'admin', rootPath: '/admin' }));
   }
 
@@ -148,8 +148,8 @@ export const startServer = (app: KoaApp) => {
 
   const httpServer = http.createServer(koaCallback);
 
-  httpServer.listen(config.PORT, config.HOST, () =>
-    log.info(`>>> HTTP server is running at http://${config.HOST}:${config.PORT}`),
+  httpServer.listen(config.PORT, config.LOCALHOST, () =>
+    log.info(`>>> HTTP server is running at http://${config.LOCALHOST}:${config.PORT}`),
   );
 
   /**
@@ -163,17 +163,31 @@ export const startServer = (app: KoaApp) => {
     const ca = fs
       .readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.ca-bundle'), { encoding: 'utf8' })
       .split('-----END CERTIFICATE-----\r\n')
+      .filter((cert) => cert.trim() !== '')
+      .map((cert) => cert + '-----END CERTIFICATE-----\r\n');
+
+    if (!ca) {
+        throw new Error('No CA file or file is invalid');
+    } else {
+        console.log(`CA file is valid. Number of certificates: ${ca.length}...`);
+    }
+
+/*
+    const ca = fs
+      .readFileSync(path.resolve(process.cwd(), 'ssl/gdmn.app.ca-bundle'), { encoding: 'utf8' })
+      .split('-----END CERTIFICATE-----\r\n')
       .map((cert) => cert + '-----END CERTIFICATE-----\r\n')
       .pop();
 
     if (!ca) {
       throw new Error('No CA file or file is invalid');
     }
+*/    
 
     https
       .createServer({ cert, ca, key }, koaCallback)
-      .listen(config.HTTPS_PORT, config.HOST, () =>
-        log.info(`>>> HTTPS server is running at https://${config.HOST}:${config.HTTPS_PORT}`),
+      .listen(config.HTTPS_PORT, config.LOCALHOST, () =>
+        log.info(`>>> HTTPS server is running at https://${config.LOCALHOST}:${config.HTTPS_PORT}`),
       );
   } catch (err) {
     log.warn('HTTPS server is not running. No SSL files');

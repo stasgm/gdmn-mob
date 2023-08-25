@@ -109,12 +109,14 @@ export interface IMoveLine extends IEntity {
   good: IGood;
   weight: number;
   workDate: string; // Дата производства
+  time?: string; // Время производства
   numReceived: string; // Номер партии
   quantPack: number; // порядковый номер сканирования в документе
   barcode?: string; // технологический код
   sortOrder?: number; // порядок сортировки
   fromCell?: string; // номер ячейки
   toCell?: string; // номер ячейки
+  scannedBarcode?: string;
 }
 
 export type IMoveDocument = MandateProps<IDocument<IMoveHead, IMoveLine>, 'head' | 'lines'>;
@@ -129,12 +131,14 @@ export interface IReceiptLine extends IEntity {
   good: IGood;
   weight: number;
   workDate: string; // Дата производства
+  time?: string; // Время производства
   numReceived: string; // Номер партии
   quantPack: number; // порядковый номер сканирования в документе
   barcode?: string; // технологический код
   sortOrder?: number; // порядок сортировки
   fromCell?: string; // номер ячейки
   toCell?: string; // номер ячейки
+  scannedBarcode?: string;
 }
 
 export type IReceiptDocument = MandateProps<IDocument<IReceiptHead, IReceiptLine>, 'head' | 'lines'>;
@@ -169,6 +173,7 @@ export interface IShipmentLine extends IEntity {
   good: IGood; // товар
   weight: number; //вес
   workDate: string; // Дата производства
+  time?: string; // Время производства
   numReceived: string; // Номер партии
   barcode: string; // технологический код
   quantPack: number; // порядковый номер сканирования в документе
@@ -186,6 +191,7 @@ export interface IFreeShipmentLine extends IEntity {
   good: IGood;
   weight: number;
   workDate: string; // Дата производства
+  time?: string; // Время производства
   numReceived: string; // Номер партии
   barcode?: string; // технологический код
   sortOrder?: number; // порядок сортировки
@@ -204,6 +210,7 @@ export interface IInventoryLine extends IEntity {
   good: IGood;
   weight: number;
   workDate: string; // Дата производства
+  time?: string; // Время производства
   numReceived: string; // Номер партии
   barcode?: string; // технологический код
   sortOrder?: number; // порядок сортировки
@@ -223,6 +230,7 @@ export interface ILaboratoryLine extends IEntity {
   good: IGood;
   weight: number;
   workDate: string; // Дата производства
+  time?: string; // Время производства
   numReceived: string; // Номер партии
   barcode?: string; // технологический код
   sortOrder?: number; // порядок сортировки
@@ -240,6 +248,7 @@ export interface IReturnLine extends IEntity {
   good: IGood;
   weight: number;
   workDate: string; // Дата производства
+  time?: string; // Время производства
   numReceived: string; // Номер партии
   barcode?: string; // технологический код
   sortOrder?: number; // порядок сортировки

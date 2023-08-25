@@ -99,8 +99,20 @@ export const STATUS_LIST: IListItem[] = [
   { id: 'READY', value: 'Готов' },
 ];
 
-const goodGroup = { id: 'goodScan', name: 'Код товара', sortOrder: 21, description: 'Количество символов' };
-const orderGroup = { id: 'orderScan', name: 'Код заявки', sortOrder: 22, description: 'Количество символов' };
+const goodGroup = {
+  id: 'goodScan',
+  name: 'Код товара',
+  sortOrder: 21,
+  description: 'Количество символов',
+  checkSettingsCode: true,
+};
+const orderGroup = {
+  id: 'orderScan',
+  name: 'Код заявки',
+  sortOrder: 22,
+  description: 'Количество символов',
+  checkSettingsCode: true,
+};
 
 export const appSettings: Settings = {
   scannerUse: {
@@ -129,6 +141,7 @@ export const appSettings: Settings = {
     type: 'boolean',
     visible: true,
     group: mainSettingGroup,
+    checkSettingsCode: true,
   },
   minBarcodeLength: {
     id: 'minBarcodeLength',
@@ -188,16 +201,7 @@ export const appSettings: Settings = {
     id: 'countQuantPack',
     sortOrder: 12,
     description: 'Номер взвешивания',
-    data: 3,
-    type: 'number',
-    visible: true,
-    group: goodGroup,
-  },
-  countType: {
-    id: 'countType',
-    sortOrder: 13,
-    description: 'Тип взвешивания',
-    data: 1,
+    data: 4,
     type: 'number',
     visible: true,
     group: goodGroup,
@@ -215,7 +219,7 @@ export const appSettings: Settings = {
     id: 'boxNumber',
     sortOrder: 15,
     description: 'Количество коробок',
-    data: 35,
+    data: 0,
     type: 'number',
     visible: true,
     group: goodGroup,

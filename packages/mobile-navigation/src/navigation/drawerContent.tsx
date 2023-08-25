@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
   },
   userProfile: {
     marginTop: 15,
+    marginBottom: 4,
     flexDirection: 'column',
   },
   profileInfo: {
