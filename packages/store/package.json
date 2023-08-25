@@ -28,7 +28,7 @@
     "@lib/mock": "*",
     "@lib/types": "*",
     "@redux-devtools/extension": "^3.2.5",
-    "@types/node": "^20.4.2",
+    "@types/node": "^20.4.4",
     "@types/redux-actions": "^2.6.2",
     "@types/redux-logger": "3.0.9",
     "react-redux": "^8.0.5",
