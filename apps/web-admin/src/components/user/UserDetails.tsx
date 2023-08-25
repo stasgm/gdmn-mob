@@ -32,6 +32,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
   const { list: users, loading: loadingUsers } = useSelector((state) => state.users);
 
   const { user: authUser } = useSelector((state) => state.auth);
+
   const formik = useFormik<IUser | NewUser | IUserCredentials>({
     enableReinitialize: true,
     initialValues: isAdmin
@@ -41,6 +42,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
           email: user.email || '',
           password: (user as NewUser).password || '',
           verifyPassword: '',
+          accessCode: user.accessCode || '',
         }
       : {
           ...user,
@@ -127,7 +129,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
 
   const handleCreateCode = () => {
     const code = getCode();
-    formik.setValues({ ...formik.values, accessCode: code });
+    formik.setFieldValue('accessCode', code);
   };
 
   return (
