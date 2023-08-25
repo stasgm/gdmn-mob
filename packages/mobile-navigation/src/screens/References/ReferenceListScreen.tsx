@@ -23,7 +23,7 @@ const ReferenceListScreen = () => {
 
   const refData = useMemo(() => {
     return Object.entries(list)
-      .map(([key, value]) => ({ ...value, refName: key } as RefListItem))
+      .map(([key, value]) => ({ ...value, refName: key }) as RefListItem)
       .filter((i) => i.visible !== false)
       .sort((a, b) => ((a?.description || a?.name) < (b?.description || b?.name) ? -1 : 1));
   }, [list]);

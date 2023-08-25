@@ -73,7 +73,7 @@ export const LaboratoryListScreen = () => {
           subtitle: `№ ${i.number} на ${getDateString(i.documentDate)}` || '',
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
-        } as IListItemProps),
+        }) as IListItemProps,
     );
   }, [status, list]);
 

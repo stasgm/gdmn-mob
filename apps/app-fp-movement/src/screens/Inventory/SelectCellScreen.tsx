@@ -146,11 +146,7 @@ export const SelectCellScreen = () => {
 
   const CellsColumn = useCallback(
     ({ cellData }: { cellData: ICellData[] }) => (
-      <View style={styles.flexDirectionRow}>
-        {cellData?.map((i) => (
-          <Cell key={i.name} i={i} />
-        ))}
-      </View>
+      <View style={styles.flexDirectionRow}>{cellData?.map((i) => <Cell key={i.name} i={i} />)}</View>
     ),
     [Cell],
   );

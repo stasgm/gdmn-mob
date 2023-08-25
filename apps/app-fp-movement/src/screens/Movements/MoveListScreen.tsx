@@ -104,7 +104,7 @@ export const MoveListScreen = () => {
               </MediumText>
             </View>
           ),
-        } as IListItemProps),
+        }) as IListItemProps,
     );
   }, [status, list, type?.id, date.id]);
 

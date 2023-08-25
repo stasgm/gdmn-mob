@@ -137,7 +137,7 @@ export const DocLine = ({ item, onSetLine, onSetDisabledSave }: IProps) => {
         flexDirection: 'column',
         justifyContent: isKeyboardOpen ? 'space-between' : 'flex-start',
         flex: 1,
-      } as any),
+      }) as any,
     [isKeyboardOpen],
   );
 

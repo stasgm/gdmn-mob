@@ -65,7 +65,7 @@ const ReferenceDetailScreen = () => {
               title: meta?.[key]?.name || key,
               visible: meta?.[key]?.visible !== false,
               value: value instanceof Object ? value.name || '-' : value,
-            } as IProperty),
+            }) as IProperty,
         )
         .filter((i) => i.visible)
         .sort((a, b) => (a.sortOrder < b.sortOrder ? -1 : 1)),

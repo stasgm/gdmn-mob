@@ -89,11 +89,7 @@ const Cells = ({
 
   const CellsColumn = useCallback(
     ({ data }: { data: ICellData[] }) => (
-      <View style={styles.flexDirectionRow}>
-        {data?.map((item) => (
-          <Cell key={item.name} item={item} />
-        ))}
-      </View>
+      <View style={styles.flexDirectionRow}>{data?.map((item) => <Cell key={item.name} item={item} />)}</View>
     ),
     [Cell],
   );

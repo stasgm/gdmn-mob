@@ -84,7 +84,7 @@ const VisitScreen = () => {
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [lineType, setLineType] = useState(lineTypes[0].id);
 
-  const route = useMemo(() => ({ id: routeId, name: '' } as INamedEntity), [routeId]);
+  const route = useMemo(() => ({ id: routeId, name: '' }) as INamedEntity, [routeId]);
   const point = docSelectors.selectByDocId<IRouteDocument>(routeId)?.lines.find((i) => i.id === id);
   const outlet = refSelectors.selectByRefId<IOutlet>('outlet', point?.outlet.id);
   const contact = refSelectors.selectByRefId<IContact>('contact', outlet?.company.id);

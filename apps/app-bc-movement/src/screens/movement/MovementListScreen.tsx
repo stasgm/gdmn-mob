@@ -66,7 +66,7 @@ export const MovementListScreen = () => {
           isFromRoute: !!i.head.route,
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
-        } as IListItemProps),
+        }) as IListItemProps,
     );
   }, [status, list]);
 

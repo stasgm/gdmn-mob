@@ -84,7 +84,7 @@ export const FreeShipmentListScreen = () => {
               </MediumText>
             </View>
           ),
-        } as IListItemProps),
+        }) as IListItemProps,
     );
   }, [list, status, sortDateType.id]);
 

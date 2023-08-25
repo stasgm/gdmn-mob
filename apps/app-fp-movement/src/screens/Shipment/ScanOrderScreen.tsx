@@ -56,8 +56,9 @@ const ScanOrderScreen = () => {
 
   const orders = docSelectors.selectByDocType<IOrderDocument>('order');
 
-  const shipments = useSelector((state) =>
-    state.documents?.list.filter((i) => i.documentType.name === 'currShipment' || i.documentType.name === 'shipment'),
+  const shipments = useSelector(
+    (state) =>
+      state.documents?.list.filter((i) => i.documentType.name === 'currShipment' || i.documentType.name === 'shipment'),
   ) as IShipmentDocument[];
 
   const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as ICodeEntity;
