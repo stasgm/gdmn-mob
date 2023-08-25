@@ -54,7 +54,7 @@ const getCompany = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getCompanies = async (ctx: ParameterizedContext): Promise<void> => {
-  const { companyId, appSystemId, filterText, fromRecord, toRecord, adminId, name } = ctx.query;
+  const { companyId, filterText, fromRecord, toRecord, adminId, name } = ctx.query;
   const params: Record<string, string> = {};
 
   if (companyId && typeof companyId === 'string') {
@@ -63,10 +63,6 @@ const getCompanies = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (adminId && typeof adminId === 'string') {
     params.adminId = adminId;
-  }
-
-  if (typeof appSystemId === 'string') {
-    params.appSystemId = appSystemId;
   }
 
   if (typeof filterText === 'string') {

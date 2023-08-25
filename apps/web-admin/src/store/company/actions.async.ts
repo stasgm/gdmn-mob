@@ -9,9 +9,6 @@ import { AppState } from '../';
 
 import { webRequest } from '../webRequest';
 
-import appSystem from '../appSystem';
-import AppSystems from '../../pages/AppSystems/routes';
-
 import { companyActions, CompanyActionType } from './actions';
 
 export type AppThunk = ThunkAction<Promise<CompanyActionType>, AppState, null, CompanyActionType>;

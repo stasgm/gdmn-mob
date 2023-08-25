@@ -29,8 +29,7 @@ const AppSystemCompany = ({ appSystem }: IProps) => {
   const { loading, errorMessage, pageParams } = useSelector((state) => state.companies);
   const { user: authUser } = useSelector((state) => state.auth);
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
-  const company = selectors.companyByAppSystem(appSystem.id);
-  const list = selectors.companyByAppSystem(appSystem.id);
+  const list = selectors.companyByAppSystemID(appSystem.id);
 
   const fetchCompanies = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {

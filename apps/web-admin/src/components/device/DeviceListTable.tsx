@@ -162,11 +162,9 @@ const DeviceListTable = ({
                 display: 'flex',
               }}
             >
-              <NavLink to={`${adminPath}/app/devices/${device.id}`}>
-                <Typography color="textPrimary" variant="body1" key={device.id}>
-                  {device.id}
-                </Typography>
-              </NavLink>
+              <Typography color="textPrimary" variant="body1" key={device.id}>
+                {device.id}
+              </Typography>
             </Box>
           </TableCell>
           <TableCell>
