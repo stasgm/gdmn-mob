@@ -65,7 +65,7 @@ const OrderListTotal = ({ sectionOrders }: IItem) => {
   return (
     <View>
       <Divider style={{ backgroundColor: colors.primary }} />
-      {totalListByOrders.length ? (
+      {totalListByOrders?.length ? (
         <>
           <View style={[localStyles.margins, styles.rowCenter]}>
             <LargeText style={styles.textTotal}>Итого вес, кг:</LargeText>
@@ -82,17 +82,19 @@ const OrderListTotal = ({ sectionOrders }: IItem) => {
       ) : null}
       <View style={[styles.directionRow, localStyles.margins]}>
         <LargeText style={styles.textTotal}>Общий вес, кг: </LargeText>
-        <MediumText style={styles.textTotal}>{formatValue({ type: 'number' }, round(total?.quantity, 3))}</MediumText>
+        <MediumText style={styles.textTotal}>
+          {formatValue({ type: 'number' }, round(total?.quantity || 0, 3))}
+        </MediumText>
       </View>
       <Divider style={{ backgroundColor: colors.primary }} />
       <View style={[styles.directionColumn, localStyles.margins]}>
         <View style={styles.itemNoMargin}>
           <LargeText style={styles.textTotal}>Принятых заявок: </LargeText>
-          <MediumText>{sectionOrders.data.length}</MediumText>
+          <MediumText>{sectionOrders.data?.length}</MediumText>
         </View>
         <View style={styles.itemNoMargin}>
           <LargeText style={styles.textTotal}>Одобренных заявок: </LargeText>
-          <MediumText>{sectionOrders.data.filter((i) => i.status === 'PROCESSED').length}</MediumText>
+          <MediumText>{sectionOrders.data.filter((i) => i.status === 'PROCESSED')?.length}</MediumText>
         </View>
       </View>
     </View>
