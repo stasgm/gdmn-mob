@@ -155,18 +155,7 @@ const DeviceListTable = ({
               </NavLink>
             </Box>
           </TableCell>
-          <TableCell style={{ padding: '0 16px' }}>
-            <Box
-              sx={{
-                alignItems: 'center',
-                display: 'flex',
-              }}
-            >
-              <Typography color="textPrimary" variant="body1" key={device.id}>
-                {device.id}
-              </Typography>
-            </Box>
-          </TableCell>
+          <TableCell style={{ padding: '0 16px' }}>{device.id} </TableCell>
           <TableCell>
             <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
               <Box>
