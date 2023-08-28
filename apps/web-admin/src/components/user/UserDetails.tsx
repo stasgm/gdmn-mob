@@ -1,12 +1,25 @@
-import { Box, Card, CardContent, Grid, TextField, Divider, Button, Checkbox } from '@mui/material';
+import {
+  Box,
+  Card,
+  CardContent,
+  Grid,
+  TextField,
+  Divider,
+  Button,
+  Checkbox,
+  InputAdornment,
+  IconButton,
+} from '@mui/material';
 
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { INamedEntity, IUser, IUserCredentials, NewUser } from '@lib/types';
 import { FormikTouched, useFormik, Field, FormikProvider } from 'formik';
 import * as yup from 'yup';
 
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 import ComboBox from '../ComboBox';
 import { useSelector } from '../../store';
@@ -29,6 +42,19 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
   const { list: companies, loading: loadingСompanies } = useSelector((state) => state.companies);
   const { list: users, loading: loadingUsers } = useSelector((state) => state.users);
 
+  const [showPassword, setShowPassword] = React.useState(false);
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event: { preventDefault: () => void }) => {
+    event.preventDefault();
+  };
+  const [showVerifyPassword, setShowVerifyPassword] = React.useState(false);
+  const handleClickShowVerifyPassword = () => setShowVerifyPassword((show) => !show);
+
+  const handleMouseDownVerifyPassword = (event: { preventDefault: () => void }) => {
+    event.preventDefault();
+  };
   const { user: authUser } = useSelector((state) => state.auth);
   const formik = useFormik<IUser | NewUser | IUserCredentials>({
     enableReinitialize: true,
@@ -359,10 +385,23 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                     variant="outlined"
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
-                    type="password"
                     disabled={loading}
                     value={(formik.values as NewUser | IUserCredentials).password.trim()}
                     autoComplete="new-password"
+                    type={showPassword ? 'text' : 'password'}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                          >
+                            {showPassword ? <Visibility /> : <VisibilityOff />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
                 <Grid item md={6} xs={12} display={open ? 'block' : 'none'}>
@@ -378,10 +417,23 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                     variant="outlined"
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
-                    type="password"
                     disabled={loading}
                     value={(formik.values as NewUser | IUserCredentials).verifyPassword?.trim()}
                     autoComplete="new-password"
+                    type={showVerifyPassword ? 'text' : 'password'}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowVerifyPassword}
+                            onMouseDown={handleMouseDownVerifyPassword}
+                          >
+                            {showVerifyPassword ? <Visibility /> : <VisibilityOff />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
                 {passwordCondition && (

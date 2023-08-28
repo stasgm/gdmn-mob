@@ -1,16 +1,28 @@
 import { Link as RouterLink } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { useFormik } from 'formik';
-import { Box, Button, Container, Link, TextField, Typography, CircularProgress } from '@mui/material';
+import {
+  Box,
+  Button,
+  Container,
+  Link,
+  TextField,
+  Typography,
+  CircularProgress,
+  InputAdornment,
+  IconButton,
+} from '@mui/material';
 import * as yup from 'yup';
 
 import { IUserCredentials } from '@lib/types';
 
-import { useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 import { authActions, useSelector, useDispatch, useAuthThunkDispatch } from '@lib/store';
 
 import Reaptcha from 'reaptcha';
+
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 import Logo from '../components/Logo';
 
@@ -40,6 +52,14 @@ const Login = () => {
       authDispatch(authActions.login(webRequest(dispatch, authActions), values));
     },
   });
+
+  const [showPassword, setShowPassword] = React.useState(false);
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event: { preventDefault: () => void }) => {
+    event.preventDefault();
+  };
 
   useEffect(() => {
     dispatch(authActions.clearError());
@@ -114,11 +134,24 @@ const Login = () => {
               name="password"
               onBlur={formik.handleBlur}
               onChange={formik.handleChange}
-              type="password"
               value={formik.values.password}
               variant="outlined"
               disabled={loading}
               autoComplete="new-password"
+              type={showPassword ? 'text' : 'password'}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                    >
+                      {showPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
             {withCaptcha && !!process.env.REACT_APP_SITE_KEY && (
               <Box
