@@ -7,6 +7,7 @@ import styles from './styles';
 interface Props {
   onChangeText?: (text: string) => void;
   onEndEditing?: () => void;
+  onFocus?: () => void;
   value?: string;
   label?: string;
   secureText?: boolean;
@@ -52,6 +53,7 @@ const Input = ({
   editable,
   disabled,
   onEndEditing,
+  onFocus,
   clearInput,
   autoCapitalize,
   onIconPress,
@@ -105,6 +107,7 @@ const Input = ({
           editable={editable}
           children={undefined}
           autoCapitalize={autoCapitalize}
+          onFocus={onFocus}
         />
       </View>
     </View>

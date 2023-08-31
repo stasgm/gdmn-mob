@@ -38,10 +38,12 @@ export const MoveEditScreen = () => {
 
   const departs = refSelectors.selectByName<IAddressStoreEntity>('depart')?.data;
 
-  const userDefaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity;
+  const userDefaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as INamedEntity;
   const defaultDepart = departs?.find((i) => i.id === userDefaultDepart?.id);
-  const userDefaultSecondDepart = useSelector((state) => state.auth.user?.settings?.secondDepart?.data) as INamedEntity;
+  const userDefaultSecondDepart = useSelector((state) => state.settings?.userData?.secondDepart?.data) as INamedEntity;
   const defaultSecondDepart = departs?.find((i) => i.id === userDefaultSecondDepart?.id);
+
+  const isAddressStore = useSelector((state) => state.settings?.data?.addressStore?.data);
 
   const movementType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
@@ -97,25 +99,39 @@ export const MoveEditScreen = () => {
             number: newNumber,
             documentDate: new Date().toISOString(),
             status: 'DRAFT',
-            fromDepart:
-              docDocumentSubtype?.id === 'internalMovement'
-                ? defaultDepart
-                : docDocumentSubtype?.id === 'movement'
-                ? defaultSecondDepart
-                : undefined,
-            toDepart:
-              docDocumentSubtype?.id === 'movement'
-                ? defaultDepart
-                : docDocumentSubtype?.id === 'internalMovement'
-                ? defaultSecondDepart
-                : undefined,
-            documentSubtype: movementSubtype ? movementSubtype : undefined,
+            fromDepart: undefined,
+            toDepart: undefined,
+            documentSubtype: movementSubtype || undefined,
           },
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, doc, defaultDepart, defaultSecondDepart, docDocumentSubtype, movementSubtype]);
+  }, [dispatch, doc, defaultDepart, defaultSecondDepart, movementSubtype]);
+
+  useEffect(() => {
+    if (docDocumentSubtype?.id === 'internalMovement') {
+      dispatch(
+        appActions.setScreenFormParams({
+          screenName,
+          params: {
+            fromDepart: defaultDepart,
+            toDepart: defaultSecondDepart,
+          },
+        }),
+      );
+    } else if (docDocumentSubtype?.id === 'movement') {
+      dispatch(
+        appActions.setScreenFormParams({
+          screenName,
+          params: {
+            fromDepart: defaultSecondDepart,
+            toDepart: defaultDepart,
+          },
+        }),
+      );
+    }
+  }, [defaultDepart, defaultSecondDepart, dispatch, docDocumentSubtype?.id, screenName]);
 
   useEffect(() => {
     if (docDocumentSubtype?.id === 'cellMovement' && docFromDepart) {
@@ -129,6 +145,20 @@ export const MoveEditScreen = () => {
       );
     }
   }, [dispatch, docDocumentSubtype?.id, docFromDepart, screenName]);
+
+  useEffect(() => {
+    if (docDocumentSubtype?.id === 'cellMovement' && !docFromDepart) {
+      dispatch(
+        appActions.setScreenFormParams({
+          screenName,
+          params: {
+            fromDepart: defaultSecondDepart,
+            toDepart: defaultSecondDepart,
+          },
+        }),
+      );
+    }
+  }, [defaultSecondDepart, dispatch, docDocumentSubtype?.id, docFromDepart, screenName]);
 
   useEffect(() => {
     if (screenState === 'saving') {
@@ -153,6 +183,11 @@ export const MoveEditScreen = () => {
         return;
       }
 
+      if (docDocumentSubtype?.id === 'cellMovement' && !docFromDepart?.isAddressStore) {
+        alertWithSound('Ошибка!', 'Подразделение должно быть адресного типа.');
+        setScreenState('idle');
+        return;
+      }
       if (!(docNumber && docDate && docFromDepart && docToDepart)) {
         alertWithSound('Ошибка!', 'Не все поля заполнены.');
         setScreenState('idle');
@@ -286,9 +321,19 @@ export const MoveEditScreen = () => {
     });
   };
 
-  const handleFromDepart = () => {
+  const handleFromDepart = useCallback(() => {
     if (isBlocked) {
       return;
+    }
+
+    const params: Record<string, string> = {};
+
+    if (isAddressStore) {
+      if (docDocumentSubtype?.id === 'cellMovement' || docDocumentSubtype?.id === 'movement') {
+        params.isAddressStore = 'true';
+      } else if (docDocumentSubtype?.id === 'departMovement') {
+        params.isAddressStore = 'false';
+      }
     }
 
     navigation.navigate('SelectRefItem', {
@@ -297,18 +342,23 @@ export const MoveEditScreen = () => {
       fieldName: 'fromDepart',
       value: docFromDepart && [docFromDepart],
       descrFieldName: 'shcode',
+      clause: params,
+      clauseType: 'boolean',
     });
-  };
+  }, [docDocumentSubtype?.id, docFromDepart, isAddressStore, isBlocked, navigation, screenName]);
 
-  const handleToDepart = () => {
+  const handleToDepart = useCallback(() => {
     if (isBlocked) {
       return;
     }
 
     const params: Record<string, string> = {};
-
-    if (docDocumentSubtype?.id === 'cellMovement') {
-      params.isAddressedStore = 'true';
+    if (isAddressStore) {
+      if (docDocumentSubtype?.id === 'cellMovement' || docDocumentSubtype?.id === 'internalMovement') {
+        params.isAddressStore = 'true';
+      } else if (docDocumentSubtype?.id === 'departMovement') {
+        params.isAddressStore = 'false';
+      }
     }
 
     navigation.navigate('SelectRefItem', {
@@ -318,8 +368,9 @@ export const MoveEditScreen = () => {
       value: docToDepart && [docToDepart],
       descrFieldName: 'shcode',
       clause: params,
+      clauseType: 'boolean',
     });
-  };
+  }, [docDocumentSubtype?.id, docToDepart, isAddressStore, isBlocked, navigation, screenName]);
 
   const handleChangeNumber = useCallback(
     (text: string) =>
@@ -369,7 +420,7 @@ export const MoveEditScreen = () => {
             label={'Куда'}
             value={docDocumentSubtype?.id === 'cellMovement' ? docFromDepart?.name : docToDepart?.name}
             onPress={handleToDepart}
-            disabled={!docDocumentSubtype ? true : isBlocked}
+            disabled={docDocumentSubtype?.id === 'cellMovement' ? true : !docDocumentSubtype ? true : isBlocked}
           />
           <Input
             label="Комментарий"

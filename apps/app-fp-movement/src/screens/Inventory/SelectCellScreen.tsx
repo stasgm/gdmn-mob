@@ -16,7 +16,9 @@ import { MD2Theme, useTheme } from 'react-native-paper';
 
 import { ScrollView } from 'react-native-gesture-handler';
 
-import { ICell, ICellRef, IInventoryLine, IMoveDocument, IMoveLine } from '../../store/types';
+import { DashboardStackParamList } from '@lib/mobile-navigation';
+
+import { ICell, ICellRef, IInventoryDocument, IInventoryLine, IMoveDocument, IMoveLine } from '../../store/types';
 import { InventoryStackParamList } from '../../navigation/Root/types';
 
 import { alertWithSound, getCellItem, getCellList, getCellListRef } from '../../utils/helpers';
@@ -39,13 +41,14 @@ const NamedRow = ({ item }: { item: string }) => (
 
 export const SelectCellScreen = () => {
   const dispatch = useDispatch();
-  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'InventorySelectCell'>>();
+  const navigation =
+    useNavigation<StackNavigationProp<InventoryStackParamList & DashboardStackParamList, 'InventorySelectCell'>>();
   const { colors } = useTheme<MD2Theme>();
 
   const [visibleDialog, setVisibleDialog] = useState(false);
   const { docId, item, mode } = useRoute<RouteProp<InventoryStackParamList, 'InventorySelectCell'>>().params;
 
-  const doc = docSelectors.selectByDocId<IMoveDocument>(docId);
+  const doc = docSelectors.selectByDocId<IInventoryDocument>(docId);
 
   const cells = refSelectors.selectByName<ICellRefList>('cell')?.data[0];
 
@@ -57,7 +60,7 @@ export const SelectCellScreen = () => {
     setSelectedRow('');
     setSelectedChamber(chamber);
   };
-  const departId = doc?.head.toDepart?.id;
+  const departId = doc?.head.fromDepart?.id;
 
   const docList = useSelector((state) => state.documents.list);
 
@@ -133,7 +136,7 @@ export const SelectCellScreen = () => {
       return (
         <Pressable
           key={i.name}
-          style={[localStyles.buttons, backColorStyle]}
+          style={({ pressed }) => [localStyles.buttons, backColorStyle, pressed && { backgroundColor: colors.accent }]}
           onPress={() => handleSaveLine(i)}
           disabled={i.barcode !== item.barcode || Boolean(i.disabled)}
         >
@@ -141,16 +144,12 @@ export const SelectCellScreen = () => {
         </Pressable>
       );
     },
-    [colors.backdrop, handleSaveLine, item.barcode, toCell],
+    [colors.accent, colors.backdrop, handleSaveLine, item.barcode, toCell],
   );
 
   const CellsColumn = useCallback(
     ({ cellData }: { cellData: ICellData[] }) => (
-      <View style={styles.flexDirectionRow}>
-        {cellData?.map((i) => (
-          <Cell key={i.name} i={i} />
-        ))}
-      </View>
+      <View style={styles.flexDirectionRow}>{cellData?.map((i) => <Cell key={i.name} i={i} />)}</View>
     ),
     [Cell],
   );

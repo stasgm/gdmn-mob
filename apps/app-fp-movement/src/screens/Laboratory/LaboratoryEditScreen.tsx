@@ -39,7 +39,7 @@ export const LaboratoryEditScreen = () => {
 
   const doc = shipments?.find((e) => e.id === id);
 
-  const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data);
+  const defaultDepart = useSelector((state) => state.settings?.userData?.depart?.data);
 
   const shipmentType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')

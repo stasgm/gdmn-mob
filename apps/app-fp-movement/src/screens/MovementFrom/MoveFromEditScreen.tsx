@@ -39,9 +39,9 @@ export const MoveFromEditScreen = () => {
 
   const departs = refSelectors.selectByName<IAddressStoreEntity>('depart')?.data;
 
-  const userDefaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity;
+  const userDefaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as INamedEntity;
   const defaultDepart = departs?.find((i) => i.id === userDefaultDepart?.id);
-  const userDefaultSecondDepart = useSelector((state) => state.auth.user?.settings?.secondDepart?.data) as INamedEntity;
+  const userDefaultSecondDepart = useSelector((state) => state.settings?.userData?.secondDepart?.data) as INamedEntity;
   const defaultSecondDepart = departs?.find((i) => i.id === userDefaultSecondDepart?.id);
 
   const movementType = refSelectors
@@ -260,12 +260,16 @@ export const MoveFromEditScreen = () => {
       return;
     }
 
+    const params: Record<string, string> = { isAddressStore: 'true' };
+
     navigation.navigate('SelectRefItem', {
       screenName,
       refName: 'depart',
       fieldName: 'fromDepart',
       value: docFromDepart && [docFromDepart],
       descrFieldName: 'shcode',
+      clause: params,
+      clauseType: 'boolean',
     });
   };
 
@@ -274,15 +278,12 @@ export const MoveFromEditScreen = () => {
       return;
     }
 
-    const params: Record<string, string> = {};
-
     navigation.navigate('SelectRefItem', {
       screenName,
       refName: 'depart',
       fieldName: 'toDepart',
       value: docToDepart && [docToDepart],
       descrFieldName: 'shcode',
-      clause: params,
     });
   };
 

@@ -11,6 +11,7 @@ interface ISettingsOption<T = SettingValue> extends IEntity {
   group?: ISettingsGroup;
   groupInGroup?: ISettingsGroup;
   readonly?: boolean;
+  checkSettingsCode?: boolean;
 }
 
 type Settings<T = Record<string, SettingValue>> = {

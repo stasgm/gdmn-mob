@@ -1,5 +1,5 @@
 import { IApiConfig } from '@lib/client-types';
-import { IDevice, IUser, ICompany, DeviceState, IUserSettings, INamedEntity } from '@lib/types';
+import { IDevice, IUser, ICompany, INamedEntity } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
 import { AuthState, ConnectionStatus } from './types';
@@ -30,6 +30,12 @@ const activateDeviceAsync = createAsyncAction(
   'AUTH/ACTIVATE_DEVICE_SUCCESS',
   'AUTH/ACTIVATE_DEVICE_FAILURE',
 )<string | undefined, string | undefined, string>();
+
+const checkAccessCodeAsync = createAsyncAction(
+  'AUTH/VERIFY_ACCESS_CODE',
+  'AUTH/VERIFY_ACCESS_CODE_SUCCESS',
+  'AUTH/VERIFY_ACCESS_CODE_FAILURE',
+)<string | undefined, boolean, string>();
 
 const loginUserAsync = createAsyncAction('AUTH/LOGIN', 'AUTH/LOGIN_SUCCESS', 'AUTH/LOGIN_FAILURE')<
   string | undefined,
@@ -67,12 +73,6 @@ const getDeviceStatusAsync = createAsyncAction(
   'AUTH/GET_DEVICE_STATUS_FAILURE',
 )<string, ConnectionStatus, string>();
 
-const setUserSettingsAsync = createAsyncAction(
-  'AUTH/SET_USER_SETTINGS',
-  'AUTH/SET_USER_SETTINGS_SUCCESS',
-  'AUTH/SET_USER_SETTINGS_FAILURE',
-)<string, IUserSettings, string>();
-
 const setDemoModeAsync = createAsyncAction(
   'AUTH/SET_DEMOMODE',
   'AUTH/SET_DEMOMODE_SUCCESS',
@@ -92,10 +92,10 @@ export const actions = {
   signupAsync,
   activateDeviceAsync,
   getDeviceStatusAsync,
-  setUserSettingsAsync,
   setConnectionStatus,
   getCompanyAsync,
   setDemoModeAsync,
+  checkAccessCodeAsync,
   setLoading,
   setLoadingData,
   setLoadingError,

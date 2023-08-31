@@ -10,14 +10,6 @@ export interface IUserSetting {
   description: string;
 }
 
-export interface IAppSystemSettings {
-  [name: string]: IAppSystemSetting;
-}
-
-export interface IAppSystemSetting {
-  data: string | number | INamedEntity;
-}
-
 // Типы для передачи и хранения данных на клиенте
 export interface IUser extends INamedEntity, IExternalSystemProps {
   alias?: string;
@@ -34,6 +26,7 @@ export interface IUser extends INamedEntity, IExternalSystemProps {
   settings?: IUserSettings;
   externalId?: string;
   disabled?: boolean;
+  accessCode?: string;
 }
 
 export type n = Omit<IUser, 'id' | 'name'>;
@@ -75,6 +68,10 @@ export interface IActivationCode extends IEntity {
 }
 
 export type NewActivationCode = Pick<IActivationCode, 'code'>;
+
+export type NewAccessCode = {
+  code: string;
+};
 
 // Типы для хранения данных в бд
 export interface IDBUser extends Omit<IUser, 'creator' | 'company' | 'erpUser' | 'appSystem'> {

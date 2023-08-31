@@ -42,8 +42,9 @@ export const getBarcode = (barcode: string, settings: barcodeSettings) => {
   const dayLast = weightLast + settings.countDay;
   const monthLast = dayLast + settings.countMonth;
   const yearLast = monthLast + settings.countYear;
-  const shcodeLast = yearLast + 4 + settings.countCode;
-  const quantPackLast = shcodeLast + settings.countQuantPack + settings.countType;
+  const timeLast = yearLast + 4;
+  const shcodeLast = timeLast + settings.countCode;
+  const quantPackLast = shcodeLast + settings.countQuantPack;
   const numReceivedLast = quantPackLast + settings.countNumReceived;
 
   const weight = barcode.slice(0, weightLast);
@@ -54,6 +55,8 @@ export const getBarcode = (barcode: string, settings: barcodeSettings) => {
   const quantPack = barcode.slice(shcodeLast, quantPackLast);
   const numReceived = barcode.slice(quantPackLast, numReceivedLast);
 
+  const time = barcode.slice(yearLast, timeLast);
+
   const workDate = new Date(Number(year), Number(month) - 1, Number(day)).toISOString();
 
   const barcodeObj: IBarcode = {
@@ -63,12 +66,29 @@ export const getBarcode = (barcode: string, settings: barcodeSettings) => {
     shcode: shcode,
     numReceived: numReceived,
     quantPack: Number(weight) < settings.boxWeight * 1000 ? 1 : Number(quantPack),
+    time,
   };
 
   return barcodeObj;
 };
 
-const getLastMovingPos = (pos: ICellRef, lines: IMoveLine[]) => {
+export const getBarcodeString = (barcodeObj: IBarcode) => {
+  const day = `00${new Date(barcodeObj.workDate).getDate().toLocaleString()}`.slice(-2);
+  const month = `00${(new Date(barcodeObj.workDate).getMonth() + 1).toLocaleString()}`.slice(-2);
+  const year = `00${new Date(barcodeObj.workDate).getFullYear().toLocaleString().slice(2)}`.slice(-2);
+
+  const shcode = `0000${barcodeObj.shcode}`.slice(-4);
+  const quantPack = `0000${barcodeObj.quantPack.toLocaleString()}`.slice(-4);
+
+  const weight = `000000${round(barcodeObj.weight * 1000, 3).toLocaleString()}`.slice(-6);
+
+  const barcode =
+    weight + day + month + year + (barcodeObj.time || '0000') + shcode + quantPack + barcodeObj.numReceived;
+
+  return barcode;
+};
+
+export const getLastMovingPos = (pos: ICellRef, lines: IMoveLine[]) => {
   const from = lines.find((i) => i.fromCell === pos.name);
   const to = lines.find((i) => i.toCell === pos.name);
   return { from, to };
@@ -199,22 +219,26 @@ export const getLineGood = (
   goodRemains: IRemGood[],
   remainsUse: boolean,
 ) => {
-  if (remainsUse && goodRemains.length) {
-    const good = goodRemains.find((item) => item.good && `0000${item.good.shcode}`.slice(-4) === shcode);
+  if (remainsUse) {
+    if (goodRemains.length) {
+      const good = goodRemains.find((item) => item.good && `0000${item.good.shcode}`.slice(-4) === shcode);
 
-    if (good) {
-      const isRightWeight = good.remains >= weight;
+      if (good) {
+        const isRightWeight = good.remains >= weight;
 
-      return {
-        good: {
-          id: good.good.id,
-          name: good.good.name,
-          shcode: good.good.shcode,
-          isCattle: good.good.isCattle,
-          goodGroupId: good.good.goodGroupId,
-        },
-        isRightWeight,
-      };
+        return {
+          good: {
+            id: good.good.id,
+            name: good.good.name,
+            shcode: good.good.shcode,
+            isCattle: good.good.isCattle,
+            goodGroupId: good.good.goodGroupId,
+          },
+          isRightWeight,
+        };
+      } else {
+        return { good: undefined, isRightWeight: false };
+      }
     } else {
       return { good: undefined, isRightWeight: false };
     }
@@ -255,6 +279,18 @@ export const getTotalLines = (docList: IShipmentDocument[], departId: string) =>
 
     return prev;
   }, {});
+
+// export const fuck = (quantity: number, line: IShipmentLine) => {
+//   const weight = round(line?.weight * quantity, 3);
+
+//   const newLine: IShipmentLine = {
+//     ...line,
+//     quantPack: quantity,
+//     weight,
+//     scannedBarcode: line?.barcode,
+//   };
+
+// };
 
 export const getRemGoodListByContact = (
   goods: IGood[],

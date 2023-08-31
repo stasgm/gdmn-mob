@@ -49,7 +49,7 @@ const OrderEditScreen = () => {
   } = useSelector((state) => state.app.formParams as IOrderFormParam);
 
   // Подразделение по умолчанию
-  const departSetting = useSelector((state) => state.auth.user?.settings?.depart?.data);
+  const departSetting = useSelector((state) => state.settings?.userData?.depart?.data);
   const defaultDepart = useMemo(() => (isNamedEntity(departSetting) ? departSetting : undefined), [departSetting]);
   const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === docOutlet?.id);
 

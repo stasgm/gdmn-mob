@@ -30,7 +30,7 @@ import {
 
 import { ActivityIndicator, Caption, Text } from 'react-native-paper';
 
-import { IDocument, IReferences, ISettingsOption } from '@lib/types';
+import { IDocument, IReferences } from '@lib/types';
 
 import { TouchableOpacity, Linking, View, ScrollView } from 'react-native';
 
@@ -76,7 +76,6 @@ const Root = () => {
 
   //Загружаем в стор дополнительные настройки приложения
   const isInit = useSelector((state) => state.settings.isInit);
-  const getReferences = useSelector((state) => state.settings?.data?.getReferences);
   const authLoading = useSelector((state) => state.auth.loadingData);
   const appDataLoading = appSelectors.selectLoading();
   const isLogged = authSelectors.isLoggedWithCompany();
@@ -100,14 +99,10 @@ const Root = () => {
   }, [docDispatch, refDispatch]);
 
   useEffect(() => {
+    //isInit - true при открытии приложения или при ручном сбросе настроек
+    //До загрузки данных пользователя устанавливаем настройки по умолчанию
     if (appSettings && isInit) {
       dispatch(settingsActions.addSettings(appSettings));
-      dispatch(
-        settingsActions.updateOption({
-          optionName: 'getReferences',
-          value: { ...getReferences, data: false } as ISettingsOption,
-        }),
-      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInit]);
@@ -124,6 +119,20 @@ const Root = () => {
   }, [dispatch, isLogged]);
 
   const [loading, setLoading] = useState(true);
+  const [addSettings, setAddSettings] = useState('INIT');
+
+  useEffect(() => {
+    //После загрузки данных пользователя устанавливаем настройки поверх настроек по умолчанию и загруженных из памяти
+    //Необходимо при добавлении новых параметров
+    if (appDataLoading) {
+      if (addSettings === 'INIT') {
+        setAddSettings('ADDING');
+      }
+    } else if (addSettings === 'ADDING') {
+      dispatch(settingsActions.addSettings(appSettings));
+      setAddSettings('ADDED');
+    }
+  }, [addSettings, appDataLoading, dispatch]);
 
   useEffect(() => {
     //Для отрисовки при первом подключении

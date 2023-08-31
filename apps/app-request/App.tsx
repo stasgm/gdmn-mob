@@ -67,14 +67,10 @@ const Root = () => {
     if (isDemo) {
       //Если включен демо режим, то запускаем получение данных из мока
       getMessages();
-      // if (connectionStatus === 'connected') {
-      //   handleSetInfoWindow_1();
-      // }
     }
   }, [isDemo, getMessages, connectionStatus]);
 
   useEffect(() => {
-    // dispatch(authActions.init());
     dispatch(appActions.loadGlobalDataFromDisc());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

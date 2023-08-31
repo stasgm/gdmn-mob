@@ -176,27 +176,10 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
         status: '',
         error: false,
         connectionStatus: action.payload,
-        // connectionStatus: action.payload === 'ACTIVE' ? 'connected' : 'not-activated',
       };
 
     case getType(actions.getDeviceStatusAsync.failure):
       return { ...state, loading: false, status: action.payload, connectionStatus: 'not-connected', error: true };
-
-    case getType(actions.setUserSettingsAsync.request):
-      return {
-        ...state,
-        loading: true,
-        status: '',
-        error: false,
-      };
-
-    case getType(actions.setUserSettingsAsync.success): {
-      const newUser = state.user ? { ...state.user, settings: action.payload } : undefined;
-      return { ...state, user: newUser, loading: false, status: '', error: false };
-    }
-
-    case getType(actions.setUserSettingsAsync.failure):
-      return { ...state, loading: false, status: '', error: true };
 
     case getType(actions.setConnectionStatus):
       return { ...state, error: false, connectionStatus: action.payload };
@@ -241,6 +224,15 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
 
     case getType(actions.getCompanyAsync.failure):
       return { ...state, loading: false, status: action.payload, error: true };
+
+    case getType(actions.checkAccessCodeAsync.request):
+      return { ...state, error: false, loading: true };
+
+    case getType(actions.checkAccessCodeAsync.success):
+      return { ...state, error: false, loading: false };
+
+    case getType(actions.checkAccessCodeAsync.failure):
+      return { ...state, error: true, loading: false };
 
     default:
       return state;

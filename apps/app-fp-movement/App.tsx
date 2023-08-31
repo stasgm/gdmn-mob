@@ -9,12 +9,10 @@ import { StatusBar } from 'expo-status-bar';
 import {
   appActions,
   appSelectors,
-  authActions,
   authSelectors,
   documentActions,
   referenceActions,
   settingsActions,
-  useAuthThunkDispatch,
   useDispatch,
   useDocThunkDispatch,
   useRefThunkDispatch,
@@ -31,13 +29,15 @@ import {
 
 import { ActivityIndicator, Caption, Text } from 'react-native-paper';
 
-import { IDocument, IReferences, ISettingsOption, IUserSettings } from '@lib/types';
+import { IDocument, IReferences, IUserSettings } from '@lib/types';
 
 import { sleep, dialCall } from '@lib/mobile-hooks';
 
 import { TouchableOpacity, Linking, ScrollView, View } from 'react-native';
 
 import Constants from 'expo-constants';
+
+import { useSettingsThunkDispatch } from '@lib/store/src/settings/actions.async';
 
 import { MoveNavigator } from './src/navigation/MoveNavigator';
 
@@ -298,11 +298,10 @@ const Root = () => {
   const fpLoading = useFpSelector((state) => state.fpMovement.loading);
   const isDemo = useSelector((state) => state.auth.isDemo);
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
-  const getReferences = useSelector((state) => state.settings?.data?.getReferences);
 
   const refDispatch = useRefThunkDispatch();
   const docDispatch = useDocThunkDispatch();
-  const authDispatch = useAuthThunkDispatch();
+  const settingsDispatch = useSettingsThunkDispatch();
 
   const getMessages = useCallback(async () => {
     await sleep(ONE_SECOND_IN_MS);
@@ -314,22 +313,18 @@ const Root = () => {
     await docDispatch(
       documentActions.setDocuments(messageFpMovement.find((m) => m.body.type === 'DOCS')?.body.payload as IDocument[]),
     );
-    await authDispatch(
-      authActions.setUserSettings(
+    await settingsDispatch(
+      settingsActions.setUserSettings(
         messageFpMovement.find((m) => m.body.type === 'SETTINGS')?.body.payload as IUserSettings,
       ),
     );
-  }, [authDispatch, docDispatch, refDispatch]);
+  }, [docDispatch, refDispatch, settingsDispatch]);
 
   useEffect(() => {
+    //isInit - true при открытии приложения или при ручном сбросе настроек
+    //До загрузки данных пользователя устанавливаем настройки по умолчанию
     if (appSettings && isInit) {
       dispatch(settingsActions.addSettings(appSettings));
-      dispatch(
-        settingsActions.updateOption({
-          optionName: 'getReferences',
-          value: { ...getReferences, data: false } as ISettingsOption,
-        }),
-      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInit]);
@@ -346,6 +341,20 @@ const Root = () => {
   }, [dispatch, isLogged]);
 
   const [loading, setLoading] = useState(true);
+  const [addSettings, setAddSettings] = useState('INIT');
+
+  useEffect(() => {
+    //После загрузки данных пользователя устанавливаем настройки поверх настроек по умолчанию и загруженных из памяти
+    //Необходимо при добавлении новых параметров
+    if (appDataLoading) {
+      if (addSettings === 'INIT') {
+        setAddSettings('ADDING');
+      }
+    } else if (addSettings === 'ADDING') {
+      dispatch(settingsActions.addSettings(appSettings));
+      setAddSettings('ADDED');
+    }
+  }, [addSettings, appDataLoading, dispatch]);
 
   useEffect(() => {
     //Для отрисовки при первом подключении
