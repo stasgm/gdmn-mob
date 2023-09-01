@@ -92,6 +92,7 @@ export const MoveFromViewScreen = () => {
   }, {});
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
+  const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
   const isAddressStore = Boolean(settings.addressStore?.data);
 
@@ -150,11 +151,12 @@ export const MoveFromViewScreen = () => {
           quantPack: quantity,
           scannedBarcode: line?.barcode,
           barcode: newBarcode,
+          usedRemains: remainsUse,
         };
         dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
       }
     },
-    [dispatch, goodBarcodeSettings?.boxWeight, id, lines],
+    [dispatch, goodBarcodeSettings?.boxWeight, id, lines, remainsUse],
   );
 
   const handleEditQuantPack = () => {
@@ -181,16 +183,21 @@ export const MoveFromViewScreen = () => {
       return;
     }
 
-    alertWithSoundMulti('Вы уверены, что хотите удалить документ?', '', async () => {
-      setScreenState('deleting');
-      await sleep(1);
-      const res = await docDispatch(documentActions.removeDocument(id));
-      if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
-        setScreenState('deleted');
-      } else {
-        setScreenState('idle');
-      }
-    });
+    alertWithSoundMulti(
+      'Вы уверены, что хотите удалить документ?',
+      '',
+      async () => {
+        setScreenState('deleting');
+        await sleep(1);
+        const res = await docDispatch(documentActions.removeDocument(id));
+        if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
+          setScreenState('deleted');
+        } else {
+          setScreenState('idle');
+        }
+      },
+      handleFocus,
+    );
   }, [docDispatch, id]);
 
   const hanldeCancelLastScan = useCallback(() => {
@@ -254,6 +261,7 @@ export const MoveFromViewScreen = () => {
       {
         title: 'Отмена',
         type: 'cancel',
+        onPress: handleFocus,
       },
     ]);
   }, [showActionSheet, handleSendCellRequest, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
@@ -347,7 +355,7 @@ export const MoveFromViewScreen = () => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      alertWithSound('Внимание!', `${text}.`);
+      alertWithSound('Внимание!', `${text}.`, handleFocus);
       setScanned(false);
     }
   }, []);
@@ -371,6 +379,14 @@ export const MoveFromViewScreen = () => {
         handleErrorMessage(
           visibleDialog,
           'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
+        );
+        return;
+      }
+
+      if (brc.length > maxBarcodeLength) {
+        handleErrorMessage(
+          visibleDialog,
+          'Длина штрих-кода больше максимальной длины, указанной в настройках. Повторите сканирование!',
         );
         return;
       }
@@ -410,8 +426,8 @@ export const MoveFromViewScreen = () => {
         time: barc.time,
         numReceived: barc.numReceived,
         quantPack: barc.quantPack,
-
         sortOrder: doc.lines?.length + 1,
+        usedRemains: remainsUse,
       };
 
       const isFromAddressed = departs.find((i) => i.id === doc.head.fromDepart?.id && i.isAddressStore);
@@ -443,6 +459,7 @@ export const MoveFromViewScreen = () => {
     [
       doc,
       minBarcodeLength,
+      maxBarcodeLength,
       goodBarcodeSettings,
       goods,
       goodRemains,

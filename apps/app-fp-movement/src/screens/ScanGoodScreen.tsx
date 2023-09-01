@@ -98,6 +98,7 @@ const ScanGoodScreen = () => {
   const tempOrder = useFpSelector((state) => state.fpMovement.list).find((i) => i.orderId === shipment?.head?.orderId);
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
+  const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
   const departs = refSelectors.selectByName<IAddressStoreEntity>('depart')?.data;
 
@@ -128,6 +129,13 @@ const ScanGoodScreen = () => {
         return;
       }
 
+      if (brc.length > maxBarcodeLength) {
+        setScaner({
+          state: 'error',
+          message: `Неверный формат штрих-кода \nДлина больше ${maxBarcodeLength} символов`,
+        });
+        return;
+      }
       const barc = getBarcode(brc, goodBarcodeSettings);
 
       const lineGood = getLineGood(
@@ -170,7 +178,16 @@ const ScanGoodScreen = () => {
       setScaner({ state: 'found' });
     },
 
-    [goodBarcodeSettings, goodRemains, goods, minBarcodeLength, remainsUse, shipment?.documentType.name, shipmentLines],
+    [
+      goodBarcodeSettings,
+      goodRemains,
+      goods,
+      maxBarcodeLength,
+      minBarcodeLength,
+      remainsUse,
+      shipment?.documentType.name,
+      shipmentLines,
+    ],
   );
 
   const handleSaveScannedItem = useCallback(() => {
@@ -226,9 +243,11 @@ const ScanGoodScreen = () => {
         isFromAddressed ||
         isToAddressed
       ) {
-        if (scannedObject.quantPack < goodBarcodeSettings.boxNumber) {
-          alertWithSound('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}.`);
-          setScaner({ state: 'init' });
+        if (scannedObject.weight < goodBarcodeSettings?.boxWeight) {
+          alertWithSound('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings?.boxWeight}.`, () =>
+            setScaner({ state: 'init' }),
+          );
+
           return;
         }
 
@@ -252,7 +271,7 @@ const ScanGoodScreen = () => {
     dispatch,
     docId,
     departs,
-    goodBarcodeSettings.boxNumber,
+    goodBarcodeSettings?.boxWeight,
     isInventory,
     navigation,
   ]);

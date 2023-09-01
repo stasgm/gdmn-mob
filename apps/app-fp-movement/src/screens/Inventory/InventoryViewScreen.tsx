@@ -35,7 +35,7 @@ import { barcodeSettings, IInventoryDocument, IInventoryLine } from '../../store
 import { InventoryStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { alertWithSound, alertWithSoundMulti, getBarcode, getBarcodeString } from '../../utils/helpers';
+import { alertWithSound, alertWithSoundMulti, getBarcode, getUpdatedLine } from '../../utils/helpers';
 import { IAddressStoreEntity, IBarcode, IGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
@@ -77,6 +77,7 @@ export const InventoryViewScreen = () => {
   }, {});
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
+  const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -122,63 +123,15 @@ export const InventoryViewScreen = () => {
       };
 
       if (line?.weight >= goodBarcodeSettings?.boxWeight) {
-        const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: quantity });
-        const newLine: IInventoryLine = {
-          ...line,
-          quantPack: quantity,
-          scannedBarcode: line?.barcode,
-          barcode: newBarcode,
-        };
+        const newLine: IInventoryLine = getUpdatedLine(false, lineBarcode, line, quantity);
+
         dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
       } else {
         const weight = round(line?.weight * quantity, 3);
 
-        if (weight < 1000) {
-          const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: quantity, weight });
-          const newLine: IInventoryLine = {
-            ...line,
-            quantPack: quantity,
-            weight,
-            scannedBarcode: line?.barcode,
-            barcode: newBarcode,
-          };
+        const newLine: IInventoryLine = getUpdatedLine(false, lineBarcode, line, quantity, weight);
 
-          dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-        } else {
-          const maxQuantPack = round(Math.floor(999.99 / line?.weight), 3);
-
-          let newQuantity = quantity;
-          let sortOrder = line.sortOrder || lines.length;
-
-          while (newQuantity > 0) {
-            const q = newQuantity > maxQuantPack ? maxQuantPack : newQuantity;
-            const newWeight = round(line?.weight * q, 3);
-
-            const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: q, weight: newWeight });
-            const newLine: IInventoryLine = {
-              ...line,
-              quantPack: q,
-              weight: newWeight,
-              scannedBarcode: line?.barcode,
-              barcode: newBarcode,
-            };
-
-            if (newQuantity === quantity) {
-              dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-            } else {
-              sortOrder = sortOrder + 1;
-
-              const addedLine = { ...newLine, id: generateId(), sortOrder };
-              dispatch(
-                documentActions.addDocumentLine({
-                  docId: id,
-                  line: addedLine,
-                }),
-              );
-            }
-            newQuantity = newQuantity - maxQuantPack;
-          }
-        }
+        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
       }
     },
     [dispatch, goodBarcodeSettings?.boxWeight, id, lines],
@@ -208,16 +161,21 @@ export const InventoryViewScreen = () => {
       return;
     }
 
-    alertWithSoundMulti('Вы уверены, что хотите удалить документ?', '', async () => {
-      setScreenState('deleting');
-      await sleep(1);
-      const res = await docDispatch(documentActions.removeDocument(id));
-      if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
-        setScreenState('deleted');
-      } else {
-        setScreenState('idle');
-      }
-    });
+    alertWithSoundMulti(
+      'Вы уверены, что хотите удалить документ?',
+      '',
+      async () => {
+        setScreenState('deleting');
+        await sleep(1);
+        const res = await docDispatch(documentActions.removeDocument(id));
+        if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
+          setScreenState('deleted');
+        } else {
+          setScreenState('idle');
+        }
+      },
+      handleFocus,
+    );
     handleFocus();
   }, [docDispatch, id]);
 
@@ -261,6 +219,7 @@ export const InventoryViewScreen = () => {
       {
         title: 'Отмена',
         type: 'cancel',
+        onPress: handleFocus,
       },
     ]);
   }, [showActionSheet, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
@@ -365,7 +324,7 @@ export const InventoryViewScreen = () => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      alertWithSound('Внимание!', `${text}.`);
+      alertWithSound('Внимание!', `${text}.`, handleFocus);
       setScanned(false);
     }
   }, []);
@@ -393,6 +352,14 @@ export const InventoryViewScreen = () => {
         return;
       }
 
+      if (brc.length > maxBarcodeLength) {
+        handleErrorMessage(
+          visibleDialog,
+          'Длина штрих-кода больше максимальной длины, указанной в настройках. Повторите сканирование!',
+        );
+        return;
+      }
+
       const barc = getBarcode(brc, goodBarcodeSettings);
 
       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
@@ -402,7 +369,7 @@ export const InventoryViewScreen = () => {
         return;
       }
 
-      const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
+      const line = doc?.lines?.find((i) => i.barcode === barc.barcode || i.scannedBarcode === barc.barcode);
 
       if (line) {
         handleErrorMessage(visibleDialog, 'Данный штрих-код уже добавлен!');
@@ -447,6 +414,7 @@ export const InventoryViewScreen = () => {
     [
       doc,
       minBarcodeLength,
+      maxBarcodeLength,
       goodBarcodeSettings,
       goods,
       departs,

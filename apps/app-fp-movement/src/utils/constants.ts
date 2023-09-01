@@ -37,6 +37,10 @@ export const getStatusColor = (status: StatusType) => {
 
 export const ONE_SECOND_IN_MS = 1000;
 
+export const ONE_KG_IN_G = 1000;
+
+export const ONE_T_IN_KG = 1000;
+
 export const contactTypes: IListItem[] = [
   { id: 'department', value: 'Подразделение' },
   { id: 'contact', value: 'Организация' },
@@ -148,6 +152,15 @@ export const appSettings: Settings = {
     sortOrder: 6,
     description: 'Мин. длина штрих-кода',
     data: 28,
+    type: 'number',
+    visible: true,
+    group: goodGroup,
+  },
+  maxBarcodeLength: {
+    id: 'maxBarcodeLength',
+    sortOrder: 6,
+    description: 'Макс. длина штрих-кода',
+    data: 40,
     type: 'number',
     visible: true,
     group: goodGroup,

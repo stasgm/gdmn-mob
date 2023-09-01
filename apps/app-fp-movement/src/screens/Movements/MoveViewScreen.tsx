@@ -45,9 +45,9 @@ import {
   alertWithSound,
   alertWithSoundMulti,
   getBarcode,
-  getBarcodeString,
   getLineGood,
   getRemGoodListByContact,
+  getUpdatedLine,
 } from '../../utils/helpers';
 import { IAddressStoreEntity, IBarcode, IGood, IRemains, IRemGood } from '../../store/app/types';
 
@@ -100,6 +100,7 @@ export const MoveViewScreen = () => {
   }, {});
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
+  const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
   const isAddressStore = Boolean(settings.addressStore?.data);
 
@@ -111,7 +112,7 @@ export const MoveViewScreen = () => {
 
   const goodRemains = useMemo<IRemGood[]>(() => {
     return doc?.head?.fromDepart?.id && isFocused && remains && remains
-      ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id], docList, doc.head.fromDepart.id)
+      ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id], docList, doc.head?.fromDepart?.id)
       : [];
   }, [doc?.head?.fromDepart?.id, docList, goods, isFocused, remains]);
 
@@ -158,140 +159,42 @@ export const MoveViewScreen = () => {
           doc?.head.fromDepart?.isAddressStore ||
           isFromAddressed ||
           isToAddressed) &&
-        line.weight >= goodBarcodeSettings?.boxWeight
+        line?.weight >= goodBarcodeSettings?.boxWeight
       ) {
-        const newLine: IMoveLine = {
-          ...line,
-          quantPack: quantity,
-          scannedBarcode: line?.barcode,
-        };
-        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-        return;
-      }
+        const updatedLine: IMoveLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity);
+        const newLine = line.fromCell
+          ? { ...updatedLine, fromCell: line.fromCell }
+          : line.toCell
+          ? { ...updatedLine, toCell: line.toCell }
+          : updatedLine;
 
-      if (line?.weight >= goodBarcodeSettings?.boxWeight) {
-        const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: quantity });
-        const newLine: IMoveLine = {
-          ...line,
-          quantPack: quantity,
-          scannedBarcode: line?.barcode,
-          barcode: newBarcode,
-        };
+        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+      } else if (line?.weight >= goodBarcodeSettings?.boxWeight) {
+        const newLine: IMoveLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity);
+
         dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
       } else {
         const weight = round(line?.weight * quantity, 3);
 
+        const good =
+          remainsUse && goodRemains.length
+            ? goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === `0000${line.good.shcode}`.slice(-4))
+            : undefined;
+
         if (remainsUse && goodRemains.length) {
-          const good = goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === line.good.shcode);
+          if (!good) {
+            alertWithSound('Ошибка!', 'Товар не найден.', handleFocus);
 
-          if (good) {
-            if (good.remains < weight - line.weight) {
-              alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.');
-
-              return;
-            } else if (weight < 1000) {
-              const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: quantity, weight });
-
-              const newLine: IMoveLine = {
-                ...line,
-                quantPack: quantity,
-                weight,
-                scannedBarcode: line?.barcode,
-                barcode: newBarcode,
-              };
-
-              dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-            } else {
-              const maxQuantPack = round(Math.floor(999.99 / line?.weight), 3);
-
-              let newQuantity = quantity;
-              let sortOrder = line.sortOrder || lines.length;
-
-              while (newQuantity > 0) {
-                const q = newQuantity > maxQuantPack ? maxQuantPack : newQuantity;
-                const newWeight = round(line?.weight * q, 3);
-
-                const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: q, weight: newWeight });
-
-                const newLine: IMoveLine = {
-                  ...line,
-                  quantPack: q,
-                  weight: newWeight,
-                  scannedBarcode: line?.barcode,
-                  barcode: newBarcode,
-                };
-
-                if (newQuantity === quantity) {
-                  dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-                } else {
-                  sortOrder = sortOrder + 1;
-
-                  const addedLine = { ...newLine, id: generateId(), sortOrder };
-                  dispatch(
-                    documentActions.addDocumentLine({
-                      docId: id,
-                      line: addedLine,
-                    }),
-                  );
-                }
-                newQuantity = newQuantity - maxQuantPack;
-              }
-            }
-          } else {
-            alertWithSound('Ошибка!', 'Товар не найден.');
+            return;
+          } else if (good.remains < weight - line.weight) {
+            alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.', handleFocus);
 
             return;
           }
-        } else {
-          if (weight < 1000) {
-            const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: quantity, weight });
-
-            const newLine: IMoveLine = {
-              ...line,
-              quantPack: quantity,
-              weight,
-              scannedBarcode: line?.barcode,
-              barcode: newBarcode,
-            };
-
-            dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-          } else {
-            const maxQuantPack = round(Math.floor(999.99 / line?.weight), 3);
-
-            let newQuantity = quantity;
-            let sortOrder = line.sortOrder || lines.length;
-
-            while (newQuantity > 0) {
-              const q = newQuantity > maxQuantPack ? maxQuantPack : newQuantity;
-              const newWeight = round(line?.weight * q, 3);
-
-              const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: q, weight: newWeight });
-
-              const newLine: IMoveLine = {
-                ...line,
-                quantPack: q,
-                weight: newWeight,
-                scannedBarcode: line?.barcode,
-                barcode: newBarcode,
-              };
-
-              if (newQuantity === quantity) {
-                dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-              } else {
-                sortOrder = sortOrder + 1;
-
-                const addedLine = { ...newLine, id: generateId(), sortOrder };
-                dispatch(
-                  documentActions.addDocumentLine({
-                    docId: id,
-                    line: addedLine,
-                  }),
-                );
-              }
-              newQuantity = newQuantity - maxQuantPack;
-            }
-          }
         }
+        const newLine: IMoveLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity, weight);
+
+        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
       }
     },
     [
@@ -333,16 +236,21 @@ export const MoveViewScreen = () => {
       return;
     }
 
-    alertWithSoundMulti('Вы уверены, что хотите удалить документ?', '', async () => {
-      setScreenState('deleting');
-      await sleep(1);
-      const res = await docDispatch(documentActions.removeDocument(id));
-      if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
-        setScreenState('deleted');
-      } else {
-        setScreenState('idle');
-      }
-    });
+    alertWithSoundMulti(
+      'Вы уверены, что хотите удалить документ?',
+      '',
+      async () => {
+        setScreenState('deleting');
+        await sleep(1);
+        const res = await docDispatch(documentActions.removeDocument(id));
+        if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
+          setScreenState('deleted');
+        } else {
+          setScreenState('idle');
+        }
+      },
+      handleFocus,
+    );
   }, [docDispatch, id]);
 
   const hanldeCancelLastScan = useCallback(() => {
@@ -406,6 +314,7 @@ export const MoveViewScreen = () => {
       {
         title: 'Отмена',
         type: 'cancel',
+        onPress: handleFocus,
       },
     ]);
   }, [showActionSheet, handleSendCellRequest, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
@@ -499,7 +408,7 @@ export const MoveViewScreen = () => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      alertWithSound('Внимание!', `${text}.`);
+      alertWithSound('Внимание!', `${text}.`, handleFocus);
       setScanned(false);
     }
   }, []);
@@ -527,6 +436,14 @@ export const MoveViewScreen = () => {
         return;
       }
 
+      if (brc.length > maxBarcodeLength) {
+        handleErrorMessage(
+          visibleDialog,
+          'Длина штрих-кода больше максимальной длины, указанной в настройках. Повторите сканирование!',
+        );
+        return;
+      }
+
       const barc = getBarcode(brc, goodBarcodeSettings);
 
       const lineGood = getLineGood(barc.shcode, barc.weight, goods, goodRemains, remainsUse);
@@ -541,7 +458,7 @@ export const MoveViewScreen = () => {
         return;
       }
 
-      const line = doc.lines?.find((i) => i.barcode === barc.barcode);
+      const line = doc.lines?.find((i) => i.barcode === barc.barcode || i.scannedBarcode === barc.barcode);
 
       if (line) {
         handleErrorMessage(visibleDialog, 'Данный штрих-код уже добавлен!');
@@ -557,8 +474,8 @@ export const MoveViewScreen = () => {
         time: barc.time,
         numReceived: barc.numReceived,
         quantPack: barc.quantPack,
-
         sortOrder: doc.lines?.length + 1,
+        usedRemains: remainsUse,
       };
 
       const isFromAddressed = departs.find((i) => i.id === doc.head.fromDepart?.id && i.isAddressStore);
@@ -603,9 +520,10 @@ export const MoveViewScreen = () => {
     [
       doc,
       minBarcodeLength,
+      maxBarcodeLength,
       goodBarcodeSettings,
-      goods,
       goodRemains,
+      goods,
       remainsUse,
       departs,
       visibleDialog,
