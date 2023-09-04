@@ -14,6 +14,8 @@ import { IScannedObject } from '@lib/client-types';
 
 import { DashboardStackParamList } from '@lib/mobile-navigation';
 
+import { IDocumentType, INamedEntity } from '@lib/types';
+
 import {
   CurrFreeShipmentParamList,
   CurrShipmentParamList,
@@ -104,7 +106,17 @@ const ScanGoodScreen = () => {
 
   const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
-  const remainsUse = Boolean(settings.remainsUse?.data);
+  const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
+  const documentType = useMemo(
+    () => documentTypes?.find((d) => d.id === shipment?.documentType.id),
+    [shipment?.documentType.id, documentTypes],
+  );
+
+  const defaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as INamedEntity;
+
+  const remainsUse =
+    (shipment?.head.fromDepart.id === defaultDepart.id || Boolean(documentType?.isRemains)) &&
+    Boolean(settings.remainsUse?.data);
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 

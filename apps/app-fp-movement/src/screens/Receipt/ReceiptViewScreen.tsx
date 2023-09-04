@@ -31,7 +31,7 @@ import {
   round,
 } from '@lib/mobile-hooks';
 
-import { IDocumentType, ScreenState } from '@lib/types';
+import { IDocumentType, INamedEntity, ScreenState } from '@lib/types';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -109,7 +109,11 @@ export const ReceiptViewScreen = () => {
     [doc?.documentType.id, documentTypes],
   );
 
-  const remainsUse = Boolean(documentType?.isRemains) && Boolean(settings.remainsUse?.data);
+  const defaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as INamedEntity;
+
+  const remainsUse =
+    (doc?.head.fromDepart.id === defaultDepart.id || Boolean(documentType?.isRemains)) &&
+    Boolean(settings.remainsUse?.data);
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 

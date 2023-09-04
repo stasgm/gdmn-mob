@@ -177,6 +177,7 @@ export const FreeShipmentViewScreen = () => {
             return;
           }
         }
+
         const newLine: IFreeShipmentLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity, weight);
 
         dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));

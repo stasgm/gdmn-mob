@@ -380,6 +380,7 @@ const ShipmentViewScreen = () => {
             return;
           }
         }
+
         if (tempLine && tempOrder) {
           const newTempLine = { ...tempLine, weight: round(tempLine?.weight + line.weight - weight, 3) };
           if (newTempLine.weight >= 0) {
@@ -401,10 +402,11 @@ const ShipmentViewScreen = () => {
                   }),
                 );
               },
-              () => {
-                handleFocus();
-                // return;
-              },
+              // () => {
+              handleFocus,
+              //();
+              // return;
+              // },
             );
           }
         }
