@@ -123,18 +123,18 @@ class CollectionMessage<T extends CollectionItem> {
       if (fn) {
         return await this._getFileSizeInMB(fn);
       } else {
-        throw new DataNotFoundException('Ошибка получения размера файла: наименование файла не определено.');
+        throw new Error('При определении размера файла его наименование не определено');
       }
     };
 
     if (sortedFiles.length > 0) {
       dataVolume = await getSize(0);
     }
+
     for (; c < sortedFiles.length && c < limitFiles && dataVolume <= limitDataVolume; c++) {
       // eslint-disable-next-line no-await-in-loop
       dataVolume += await getSize(c);
     }
-
     return sortedFiles.slice(0, c);
   }
 
@@ -145,7 +145,7 @@ class CollectionMessage<T extends CollectionItem> {
     const filesInfoArr = await this._readDir(params);
     const fileInfo = filesInfoArr.find((item: IFileMessageInfo) => item.id === id);
     if (!fileInfo) {
-      throw new DataNotFoundException('Сообщение не найдено');
+      throw new DataNotFoundException('При поиске файла его наименование не определено');
     }
     return await this._get(await this._Obj2FullFileName(params, fileInfo));
   }
@@ -158,7 +158,7 @@ class CollectionMessage<T extends CollectionItem> {
     const filesInfoArr = await this._readDir(params);
     const fileInfo = filesInfoArr.find((item: IFileMessageInfo) => item.id === id);
     if (!fileInfo) {
-      throw new DataNotFoundException('Сообщение не найдено');
+      throw new DataNotFoundException('При удалении файла его наименование не определено');
     }
     return await this._delete(await this._Obj2FullFileName(params, fileInfo));
   }
@@ -185,10 +185,10 @@ class CollectionMessage<T extends CollectionItem> {
     }
   }
 
-  private async _save(data: T, params: IAppSystemParams, fileInfo: IFileMessageInfo): Promise<void> {
+  private async _save(data: T, params: IAppSystemParams, fileInfo: IFileMessageInfo) {
     try {
       const fileName = await this._Obj2FullFileName(params, fileInfo);
-      return fs.writeFile(fileName, JSON.stringify(data), { encoding: 'utf8' });
+      return await fs.writeFile(fileName, JSON.stringify(data), { encoding: 'utf8' });
     } catch (err) {
       throw new Error(`Ошибка записи данных в файл - ${err}`);
     }
