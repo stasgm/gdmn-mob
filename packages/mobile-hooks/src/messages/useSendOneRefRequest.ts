@@ -1,4 +1,12 @@
-import { useDispatch, useSelector, appActions, authActions, useAuthThunkDispatch } from '@lib/store';
+import {
+  useDispatch,
+  useSelector,
+  appActions,
+  authActions,
+  useAuthThunkDispatch,
+  useAppStore,
+  RootState,
+} from '@lib/store';
 
 import { ICmdParams, IDeviceLog, IMessage } from '@lib/types';
 import api, { isConnectError } from '@lib/client-api';
@@ -9,13 +17,14 @@ import { generateId } from '../utils';
 
 import { mobileRequest } from '../mobileRequest';
 
-import { getNextOrder } from './helpers';
+import { REPEAT_REQUEST_TIME_IN_MS, getNextOrder } from './helpers';
 import { useSaveErrors } from './useSaveErrors';
 
 export const useSendOneRefRequest = (description: string, params: ICmdParams) => {
   const dispatch = useDispatch();
   const authDispatch = useAuthThunkDispatch();
   const appRequest = useMemo(() => mobileRequest(authDispatch, authActions), [authDispatch]);
+  const store = useAppStore();
 
   const { user, company, config, appSystem } = useSelector((state) => state.auth);
   const refVersion = 1;
@@ -72,34 +81,61 @@ export const useSendOneRefRequest = (description: string, params: ICmdParams) =>
         );
       }
       if (!tempErrs.length) {
-        addRequestNotice(`Запрос на получение справочника: ${description}`);
-
-        const messageCompany = { id: company.id, name: company.name };
-        const consumer = user.erpUser;
-
-        //Формируем запрос на получение справочника
-        const messageGetRef: IMessage['body'] = {
-          type: 'CMD',
-          version: refVersion,
-          payload: {
-            name: 'GET_ONE_REF',
-            params,
-          },
-        };
-
-        //Отправляем запрос на получение справочника
-        const sendMesRefResponse = await api.message.sendMessages(
-          appRequest,
-          appSystem,
-          messageCompany,
-          consumer,
-          messageGetRef,
-          getNextOrder(),
-          deviceId,
+        const state = store.getState() as RootState;
+        const currentDate = new Date();
+        const syncRequests = state.app.syncRequests || [];
+        const syncReq = syncRequests.find(
+          (req) => req.cmdName === 'GET_ONE_REF' && req.param?.name === 'name' && req.param?.value === 'remains',
         );
+        //Если запрос такого типа не был отправлен или время запроса меньше текущего на час, то отправляем
+        if (
+          !syncReq ||
+          (syncReq?.date && currentDate.getTime() - new Date(syncReq.date).getTime() > REPEAT_REQUEST_TIME_IN_MS)
+        ) {
+          addRequestNotice(`Запрос на получение справочника: ${description}`);
 
-        if (sendMesRefResponse?.type !== 'SEND_MESSAGE') {
-          addError('useSendOneRefRequest: api.message.sendMessages', sendMesRefResponse.message, tempErrs);
+          const messageCompany = { id: company.id, name: company.name };
+          const consumer = user.erpUser;
+
+          //Формируем запрос на получение справочника
+          const messageGetRef: IMessage['body'] = {
+            type: 'CMD',
+            version: refVersion,
+            payload: {
+              name: 'GET_ONE_REF',
+              params,
+            },
+          };
+
+          //Отправляем запрос на получение справочника
+          const sendMesRefResponse = await api.message.sendMessages(
+            appRequest,
+            appSystem,
+            messageCompany,
+            consumer,
+            messageGetRef,
+            getNextOrder(),
+            deviceId,
+          );
+
+          console.log('', typeof params === 'object', 'name' in params, params.name);
+
+          if (sendMesRefResponse.type !== 'SEND_MESSAGE') {
+            addError('useSendOneRefRequest: api.message.sendMessages', sendMesRefResponse.message, tempErrs);
+          } else if (
+            sendMesRefResponse.type === 'SEND_MESSAGE' &&
+            typeof params === 'object' &&
+            'name' in params &&
+            params.name === 'remains'
+          ) {
+            dispatch(
+              appActions.addSyncRequest({
+                cmdName: 'GET_ONE_REF',
+                date: currentDate,
+                param: { name: 'name', value: 'remains' },
+              }),
+            );
+          }
         }
       }
     }
