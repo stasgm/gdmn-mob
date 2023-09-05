@@ -128,7 +128,7 @@ const deleteOne = async ({
   try {
     await getDb().messages.deleteById({ companyId, appSystemName }, messageId);
   } catch (err) {
-    throw new DataNotFoundException(`Сообщение ${messageId} не найдено`);
+    throw new DataNotFoundException(`При удалении сообщение ${messageId} не найдено`);
   }
 };
 

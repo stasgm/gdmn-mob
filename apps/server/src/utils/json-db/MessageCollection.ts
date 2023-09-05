@@ -101,7 +101,7 @@ class CollectionMessage<T extends CollectionItem> {
     maxDataVolume?: number,
     maxFiles?: number,
   ): Promise<Array<T>> {
-    const filesInfoArr: IFileMessageInfo[] | undefined = await this._readDir(params, true);
+    const filesInfoArr: IFileMessageInfo[] | undefined = await this._readDir(params);
 
     if (!filesInfoArr) return [];
 
@@ -116,12 +116,25 @@ class CollectionMessage<T extends CollectionItem> {
     const limitFiles = maxFiles || sortedFiles.length;
 
     let c = 0;
-    let dataVolume = sortedFiles.length > 0 ? fileInfo.find((i) => i.id === sortedFiles[0].id)?.size || 0 : 0;
+    let dataVolume = 0;
 
-    for (; c < sortedFiles.length && c < limitFiles && dataVolume <= limitDataVolume; c++) {
-      dataVolume += fileInfo.find((i) => i.id === sortedFiles[c].id)?.size || 0;
+    const getSize = async (xId: number) => {
+      const fn = fileInfo.find((i) => i.id === sortedFiles[xId].id)?.fullName;
+      if (fn) {
+        return await this._getFileSizeInMB(fn);
+      } else {
+        throw new Error('При определении размера файла его наименование не определено');
+      }
+    };
+
+    if (sortedFiles.length > 0) {
+      dataVolume = await getSize(0);
     }
 
+    for (; c < sortedFiles.length && c < limitFiles && dataVolume <= limitDataVolume; c++) {
+      // eslint-disable-next-line no-await-in-loop
+      dataVolume += await getSize(c);
+    }
     return sortedFiles.slice(0, c);
   }
 
@@ -132,7 +145,7 @@ class CollectionMessage<T extends CollectionItem> {
     const filesInfoArr = await this._readDir(params);
     const fileInfo = filesInfoArr.find((item: IFileMessageInfo) => item.id === id);
     if (!fileInfo) {
-      throw new DataNotFoundException('Сообщение не найдено');
+      throw new DataNotFoundException('При поиске файла его наименование не определено');
     }
     return await this._get(await this._Obj2FullFileName(params, fileInfo));
   }
@@ -145,7 +158,7 @@ class CollectionMessage<T extends CollectionItem> {
     const filesInfoArr = await this._readDir(params);
     const fileInfo = filesInfoArr.find((item: IFileMessageInfo) => item.id === id);
     if (!fileInfo) {
-      throw new DataNotFoundException('Сообщение не найдено');
+      throw new DataNotFoundException('При удалении файла его наименование не определено');
     }
     return await this._delete(await this._Obj2FullFileName(params, fileInfo));
   }
@@ -172,10 +185,10 @@ class CollectionMessage<T extends CollectionItem> {
     }
   }
 
-  private async _save(data: T, params: IAppSystemParams, fileInfo: IFileMessageInfo): Promise<void> {
+  private async _save(data: T, params: IAppSystemParams, fileInfo: IFileMessageInfo) {
     try {
       const fileName = await this._Obj2FullFileName(params, fileInfo);
-      return fs.writeFile(fileName, JSON.stringify(data), { encoding: 'utf8' });
+      return await fs.writeFile(fileName, JSON.stringify(data), { encoding: 'utf8' });
     } catch (err) {
       throw new Error(`Ошибка записи данных в файл - ${err}`);
     }
@@ -185,7 +198,7 @@ class CollectionMessage<T extends CollectionItem> {
     return fs.unlink(fileName);
   }
 
-  private async _readDir(params: IAppSystemParams, withSize = false): Promise<IFileMessageInfo[]> {
+  private async _readDir(params: IAppSystemParams): Promise<IFileMessageInfo[]> {
     try {
       const filePath = await this.getPathMessages(params);
       const fileNames = await readdir(filePath);
@@ -194,8 +207,7 @@ class CollectionMessage<T extends CollectionItem> {
       for (const fileName of fileNames) {
         fileParams.push({
           ...messageFileName2params(fileName),
-          // eslint-disable-next-line no-await-in-loop
-          size: withSize ? await this._getFileSizeInMB(path.join(filePath, fileName)) : undefined,
+          fullName: path.join(filePath, fileName),
         });
       }
 
