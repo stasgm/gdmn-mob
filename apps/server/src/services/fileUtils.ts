@@ -47,7 +47,6 @@ export const _readDir = async (root: string, excludeFolders: string[] | undefine
 
 export const checkFiles = async (): Promise<void> => {
   const defaultExclude = Object.values(collectionNames).map((i) => `${i}.json`);
-  const subString = 'DOCS';
 
   const root = getDb().dbPath;
   const files = await _readDir(root, [...defaultExclude, 'deviceLogs']);
@@ -134,7 +133,6 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
     log.error(`Устройство ${deviceUid}  не найдено`);
   }*/
 
-  const deviceId = device?.id;
   const deviceName = device?.name;
 
   return {
