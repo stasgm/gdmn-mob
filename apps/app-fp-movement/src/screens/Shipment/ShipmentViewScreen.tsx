@@ -390,6 +390,9 @@ const ShipmentViewScreen = () => {
                 line: newTempLine,
               }),
             );
+            const newLine: IShipmentLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity, weight);
+
+            dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
           } else {
             alertWithSoundMulti(
               'Данное количество превышает количество в заявке.',
@@ -401,19 +404,18 @@ const ShipmentViewScreen = () => {
                     line: newTempLine,
                   }),
                 );
+                const newLine: IShipmentLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity, weight);
+
+                dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
               },
-              // () => {
               handleFocus,
-              //();
-              // return;
-              // },
             );
           }
+        } else {
+          const newLine: IShipmentLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity, weight);
+
+          dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
         }
-
-        const newLine: IShipmentLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity, weight);
-
-        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
       }
     },
     [dispatch, fpDispatch, goodBarcodeSettings?.boxWeight, goodRemains, id, remainsUse, shipmentLines, tempOrder],
@@ -527,6 +529,7 @@ const ShipmentViewScreen = () => {
   }, [dispatch, id, navigation, shipment]);
 
   const [visibleSendDialog, setVisibleSendDialog] = useState(false);
+  const [visibleRequestDialog, setVisibleRequestDialog] = useState(false);
 
   const sendDoc = useSendDocs(shipment ? [shipment] : []);
 
@@ -534,6 +537,11 @@ const ShipmentViewScreen = () => {
 
   const handleSendRemainsRequest = useCallback(async () => {
     setVisibleDialog(false);
+    await sendRemainsRequest();
+  }, [sendRemainsRequest]);
+
+  const handleSendRequest = useCallback(async () => {
+    setVisibleRequestDialog(false);
     await sendRemainsRequest();
   }, [sendRemainsRequest]);
 
@@ -653,7 +661,7 @@ const ShipmentViewScreen = () => {
       const lineGood = getLineGood(barc.shcode, barc.weight, goods, goodRemains, remainsUse);
 
       if (!lineGood.good) {
-        handleErrorMessage(visibleDialog, 'Товар не найден!');
+        setVisibleRequestDialog(true);
         return;
       }
 
@@ -971,6 +979,14 @@ const ShipmentViewScreen = () => {
         text={'Сформировано полностью?'}
         onCancel={() => setVisibleSendDialog(false)}
         onOk={handleSendDocument}
+        okDisabled={loading}
+      />
+      <SimpleDialog
+        visible={visibleRequestDialog}
+        title={'Внимание!'}
+        text={'Товар не найден. Отправить запрос за остатками?'}
+        onCancel={() => setVisibleRequestDialog(false)}
+        onOk={handleSendRequest}
         okDisabled={loading}
       />
     </View>

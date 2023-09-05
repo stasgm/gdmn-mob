@@ -245,6 +245,7 @@ export const FreeShipmentViewScreen = () => {
   }, [dispatch, id, lines]);
 
   const [visibleSendDialog, setVisibleSendDialog] = useState(false);
+  const [visibleRequestDialog, setVisibleRequestDialog] = useState(false);
 
   const sendDoc = useSendDocs(doc ? [doc] : []);
 
@@ -263,6 +264,11 @@ export const FreeShipmentViewScreen = () => {
     handleSendRemainsRequest();
     setScreenState('sent');
   }, [handleSendRemainsRequest, sendDoc]);
+
+  const handleSendRequest = useCallback(async () => {
+    setVisibleRequestDialog(false);
+    await sendRemainsRequest();
+  }, [sendRemainsRequest]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -426,7 +432,7 @@ export const FreeShipmentViewScreen = () => {
       const lineGood = getLineGood(barc.shcode, barc.weight, goods, goodRemains, remainsUse);
 
       if (!lineGood.good) {
-        handleErrorMessage(visibleDialog, 'Товар не найден!');
+        setVisibleRequestDialog(true);
         return;
       }
 
@@ -608,6 +614,14 @@ export const FreeShipmentViewScreen = () => {
         text={'Сформировано полностью?'}
         onCancel={() => setVisibleSendDialog(false)}
         onOk={handleSendDocument}
+        okDisabled={loading}
+      />
+      <SimpleDialog
+        visible={visibleRequestDialog}
+        title={'Внимание!'}
+        text={'Товар не найден. Отправить запрос за остатками?'}
+        onCancel={() => setVisibleRequestDialog(false)}
+        onOk={handleSendRequest}
         okDisabled={loading}
       />
     </View>
