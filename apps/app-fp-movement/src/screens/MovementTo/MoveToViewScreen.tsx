@@ -248,7 +248,7 @@ export const MoveToViewScreen = () => {
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
-        title: 'Отправить запрос на получение справочника ячеек',
+        title: 'Запросить справочник ячеек',
         onPress: handleSendCellRequest,
       },
       {
