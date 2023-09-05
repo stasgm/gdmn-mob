@@ -47,15 +47,21 @@ export const _readDir = async (root: string, excludeFolders: string[] | undefine
 
 export const checkFiles = async (): Promise<void> => {
   const defaultExclude = Object.values(collectionNames).map((i) => `${i}.json`);
+  const subString = 'DOCS';
 
   const root = getDb().dbPath;
   const files = await _readDir(root, [...defaultExclude, 'deviceLogs']);
+
   for (const file of files) {
     try {
       // eslint-disable-next-line no-await-in-loop
       const fileStat = await stat(file);
       const fileDate = fileStat.birthtimeMs;
-      if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > config.FILES_SAVING_PERIOD_IN_DAYS) {
+      const period =
+        file.toUpperCase().indexOf('DOCS') === -1
+          ? config.FILES_SAVING_PERIOD_IN_DAYS
+          : config.DOCS_SAVING_PERIOD_IN_DAYS;
+      if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > period) {
         unlink(file);
       }
     } catch (err) {
