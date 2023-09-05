@@ -143,6 +143,16 @@ export const appSettings: Settings = {
     group: mainSettingGroup,
     checkSettingsCode: true,
   },
+  getRemains: {
+    id: 'getRemains',
+    sortOrder: 2,
+    description: 'Запрашивать остатки',
+    data: true,
+    type: 'boolean',
+    visible: true,
+    group: mainSettingGroup,
+    checkSettingsCode: true,
+  },
   minBarcodeLength: {
     id: 'minBarcodeLength',
     sortOrder: 6,

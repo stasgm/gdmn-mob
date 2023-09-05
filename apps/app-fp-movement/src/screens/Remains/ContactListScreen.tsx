@@ -90,7 +90,7 @@ const ContactListScreen = () => {
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
-        title: 'Отправить запрос на получение справочника остатков',
+        title: 'Запросить справочник остатков',
         onPress: handleSendRequest,
       },
 
