@@ -153,8 +153,8 @@ export const useSync = (onSync?: () => Promise<any>) => {
                 dispatch(
                   appActions.removeSyncRequest({ cmdName: 'GET_ONE_REF', param: { name: 'name', value: 'remains' } }),
                 );
-                break;
               }
+              break;
             }
           }
         }
