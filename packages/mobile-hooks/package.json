@@ -27,8 +27,8 @@
     "@types/react": "~18.2.14",
     "nanoid": "^3.3.4",
     "react": "18.2.0",
-    "react-native": "0.72.3",
-    "react-native-get-random-values": "~1.8.0",
+    "react-native": "0.72.4",
+    "react-native-get-random-values": "~1.9.0",
     "typescript": "^5.1.3"
   },
   "devDependencies": {
