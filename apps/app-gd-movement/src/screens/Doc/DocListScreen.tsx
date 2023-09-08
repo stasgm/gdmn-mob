@@ -212,7 +212,7 @@ export const DocListScreen = () => {
                 ({
                   id: i.name,
                   value: i.description || '',
-                } as IListItem),
+                }) as IListItem,
             ),
           )
         : docContactTypes,

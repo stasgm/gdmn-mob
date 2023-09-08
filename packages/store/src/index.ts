@@ -10,6 +10,10 @@ import { Reducer, createStore, combineReducers, applyMiddleware, AnyAction } fro
 import { composeWithDevTools } from '@redux-devtools/extension';
 import { StateType } from 'typesafe-actions';
 
+import { memoize } from 'proxy-memoize';
+
+import { useCallback } from 'react';
+
 import { reducer as documentReducer } from './documents';
 import { reducer as authReducer } from './auth';
 import { reducer as referenceReducer } from './references';
@@ -75,3 +79,12 @@ export const useSelector: TypedUseSelectorHook<RootState> = useReduxSelector;
 export const useDispatch = useReduxDispatch;
 export const useThunkDispatch = () => useReduxDispatch<AppDispatch>();
 export const useAppStore = useStore;
+
+const createProxySelectorHook = () => {
+  const useProxySelector = <TReturnType>(fn: (state: any) => TReturnType, deps: any[] = []): TReturnType => {
+    return useSelector(useCallback(memoize(fn), deps));
+  };
+  return useProxySelector;
+};
+
+export const useProxySelector = createProxySelectorHook();

@@ -83,7 +83,7 @@ export const MoveFromListScreen = () => {
               </MediumText>
             </View>
           ),
-        } as IListItemProps),
+        }) as IListItemProps,
     );
   }, [status, list]);
 

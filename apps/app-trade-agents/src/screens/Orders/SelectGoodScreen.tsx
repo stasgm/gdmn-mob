@@ -257,7 +257,9 @@ const SelectGoodScreen = () => {
             {values.map((item) => {
               const colorStyle = { color: item.id === selectedGroupId ? 'white' : colors.text };
               const backColorStyle = { backgroundColor: item.id === selectedGroupId ? colorSelected : colorBack };
-              const badgeColor = { backgroundColor: item.decoration?.color ? item.decoration.color : 'transparent' };
+              const badgeColor = {
+                backgroundColor: item.decoration?.color ? item.decoration.color : 'transparent',
+              };
               return (
                 <View
                   key={item.id}
@@ -416,7 +418,6 @@ const SelectGoodScreen = () => {
               selectionColor={colors.primary}
             />
           </View>
-
           <ItemSeparator />
         </View>
       )}

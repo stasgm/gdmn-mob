@@ -81,7 +81,7 @@ export const ShipmentListScreen = () => {
               </MediumText>
             </View>
           ),
-        } as IListItemProps),
+        }) as IListItemProps,
     );
   }, [filterStatus, list, sortDateType.id]);
 

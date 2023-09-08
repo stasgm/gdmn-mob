@@ -1,13 +1,14 @@
 import { IDocument } from '@lib/types';
 
-import { useSelector } from '../';
+import { useProxySelector } from '../';
 
-const selectByDocType = <T extends IDocument>(docType: string) => {
-  return useSelector((state: any) => state.documents?.list.filter((i: any) => i.documentType?.name === docType)) as T[];
-};
+const selectByDocId = <T extends IDocument>(docId?: string) =>
+  useProxySelector<T>((state) => state.documents?.list.find((doc: T) => doc.id === docId), [docId]);
 
-const selectByDocId = <T extends IDocument>(docId?: string) => {
-  return useSelector((state: any) => state.documents?.list.find((i: any) => i.id === docId)) as T | undefined;
-};
+const selectByDocType = <T extends IDocument>(docType: string) =>
+  useProxySelector<T[]>(
+    (state) => state.documents?.list.find((doc: T) => doc.documentType?.name === docType),
+    [docType],
+  );
 
 export default { selectByDocType, selectByDocId };

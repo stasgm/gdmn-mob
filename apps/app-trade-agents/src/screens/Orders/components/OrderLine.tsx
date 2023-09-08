@@ -45,7 +45,7 @@ const OrderLine = ({ item, packages, onSetLine }: IProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pack]);
 
-  const textStyle = [styles.number, styles.field, { color: colors.text, blackgroundColor: 'transparent' }];
+  const textStyle = [styles.number, styles.field, { color: colors.text, backgroundColor: 'transparent' }];
 
   return (
     <View style={localStyles.container}>
