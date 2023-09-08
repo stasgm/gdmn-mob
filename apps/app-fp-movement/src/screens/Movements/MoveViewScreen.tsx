@@ -115,7 +115,7 @@ export const MoveViewScreen = () => {
   const defaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as INamedEntity;
 
   const remainsUse =
-    (doc?.head.fromDepart.id === defaultDepart.id || Boolean(documentType?.isRemains)) &&
+    (doc?.head.fromDepart.id === defaultDepart?.id || Boolean(documentType?.isRemains)) &&
     Boolean(settings.remainsUse?.data);
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
@@ -384,7 +384,9 @@ export const MoveViewScreen = () => {
             <LargeText style={styles.textBold}>{item.good.name}</LargeText>
             <View style={styles.flexDirectionRow}>
               <MaterialCommunityIcons name="shopping-outline" size={18} />
-              <MediumText> {(item.weight || 0).toString()} кг</MediumText>
+              <MediumText>
+                {(item.weight || 0).toString()} кг, {(item.quantPack || 0).toString()} кор.
+              </MediumText>
             </View>
             <View style={styles.flexDirectionRow}>
               <MediumText>

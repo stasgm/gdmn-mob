@@ -82,7 +82,7 @@ export const LaboratoryViewScreen = () => {
   }, {});
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
-  const maxBarcodeLength = (settings.maxarcodeLength?.data as number) || 0;
+  const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
   const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
@@ -95,7 +95,7 @@ export const LaboratoryViewScreen = () => {
   const defaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as INamedEntity;
 
   const remainsUse =
-    (doc?.head.fromDepart.id === defaultDepart.id || Boolean(documentType?.isRemains)) &&
+    (doc?.head.fromDepart.id === defaultDepart?.id || Boolean(documentType?.isRemains)) &&
     Boolean(settings.remainsUse?.data);
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];

@@ -115,7 +115,7 @@ const ScanGoodScreen = () => {
   const defaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as INamedEntity;
 
   const remainsUse =
-    (shipment?.head.fromDepart.id === defaultDepart.id || Boolean(documentType?.isRemains)) &&
+    (shipment?.head.fromDepart.id === defaultDepart?.id || Boolean(documentType?.isRemains)) &&
     Boolean(settings.remainsUse?.data);
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
