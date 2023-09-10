@@ -27,7 +27,8 @@
     },
     "android": {
       "package": "com.gsbelarus.applrequests",
-      "versionCode": 1
+      "versionCode": 1,
+      "apiLevel": 33
     }
   }
 }

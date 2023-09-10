@@ -23,7 +23,8 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.gs.moving"
+      "package": "com.gs.moving",
+      "apiLevel": 33
     },
     "web": {
       "favicon": "./assets/favicon.png"

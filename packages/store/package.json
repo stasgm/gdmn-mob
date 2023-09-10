@@ -31,13 +31,13 @@
     "@types/node": "^20.4.4",
     "@types/redux-actions": "^2.6.2",
     "@types/redux-logger": "3.0.9",
-    "react-redux": "^8.0.5",
+    "proxy-memoize": "^2.0.4",
+    "react-redux": "^8.1.2",
     "redux": "4.2.1",
     "redux-logger": "~3.0.6",
     "redux-thunk": "^2.4.2",
     "reselect": "~4.1.7",
-    "typesafe-actions": "^5.1.0",
-    "proxy-memoize": "^2.0.4"
+    "typesafe-actions": "^5.1.0"
   },
   "devDependencies": {
     "@config/eslint-config": "*",

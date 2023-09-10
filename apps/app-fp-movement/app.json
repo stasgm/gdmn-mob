@@ -26,7 +26,8 @@
     "android": {
       "package": "com.gsbelarus.fpmovement",
       "permissions": ["CAMERA", "VIBRATE"],
-      "versionCode": 23
+      "versionCode": 23,
+      "apiLevel": 33
     },
     "web": {
       "favicon": "./assets/favicon.png"
