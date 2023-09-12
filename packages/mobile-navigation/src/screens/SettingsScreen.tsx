@@ -115,7 +115,7 @@ const SettingsScreen = () => {
                         <View style={localStyles.details}>
                           <MediumText>{group.name}</MediumText>
                         </View>
-                        <IconButton icon="chevron-right" color={colors.text} />
+                        <IconButton icon="chevron-right" iconColor={colors.text} />
                       </View>
                     </TouchableOpacity>
                   </View>

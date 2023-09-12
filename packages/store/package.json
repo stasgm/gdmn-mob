@@ -42,7 +42,7 @@
   "devDependencies": {
     "@config/eslint-config": "*",
     "@config/prettier-config": "*",
-    "lint-staged": "^13.1.2",
+    "lint-staged": "^14.0.1",
     "typescript": "^5.2.2"
   }
 }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, Vibration, Text } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import { Camera } from 'expo-camera';
+import { AutoFocus, Camera, FlashMode } from 'expo-camera';
 
 import { useIsFocused, useTheme } from '@react-navigation/native';
 
@@ -76,25 +76,24 @@ const ScanBarcode = ({ onSave, getScannedObject }: IProps) => {
   return isFocused ? (
     <View style={[styles.content]}>
       <Camera
-        flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
+        flashMode={flashMode ? FlashMode.torch : FlashMode.off}
         barCodeScannerSettings={{
           barCodeTypes: [BarCodeScanner.Constants.BarCodeType.ean13, BarCodeScanner.Constants.BarCodeType.ean8],
         }}
-        autoFocus="on"
-        whiteBalance="auto"
+        autoFocus={AutoFocus.on}
         onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
         style={[styles.camera, { backgroundColor: colors.card }]}
       >
         <View style={styles.header}>
           <IconButton
             icon={flashMode ? 'flash' : 'flash-off'}
-            color={'#FFF'}
+            iconColor={'#FFF'}
             style={styles.transparent}
             onPress={() => setFlashMode(!flashMode)}
           />
           <IconButton
             icon={vibroMode ? 'vibrate' : 'vibrate-off'}
-            color={'#FFF'}
+            iconColor={'#FFF'}
             style={styles.transparent}
             onPress={() => setVibroMode(!vibroMode)}
           />
@@ -122,14 +121,14 @@ const ScanBarcode = ({ onSave, getScannedObject }: IProps) => {
                   setItemLine(undefined);
                 }}
               >
-                <IconButton icon="barcode-scan" color={'#FFF'} size={30} />
+                <IconButton icon="barcode-scan" iconColor={'#FFF'} size={30} />
                 <Text style={styles.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
             {scanned && itemLine?.barcode === '-1' && (
               <View style={styles.infoContainer}>
                 <View style={[styles.buttons, styles.btnNotFind]}>
-                  <IconButton icon={'information-outline'} color={'#FFF'} size={30} />
+                  <IconButton icon={'information-outline'} iconColor={'#FFF'} size={30} />
                   <View>
                     <Text style={styles.error}>{'Данный штрихкод уже существует'}</Text>
                   </View>
@@ -146,7 +145,7 @@ const ScanBarcode = ({ onSave, getScannedObject }: IProps) => {
                     setItemLine(undefined);
                   }}
                 >
-                  <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
+                  <IconButton icon={'checkbox-marked-circle-outline'} iconColor={'#FFF'} size={30} />
                   <View>
                     <Text style={styles.text}>{barcode}</Text>
                   </View>
@@ -158,7 +157,7 @@ const ScanBarcode = ({ onSave, getScannedObject }: IProps) => {
         {!scanned && (
           <View style={styles.footer}>
             <>
-              <IconButton icon={'barcode-scan'} color={'#FFF'} size={40} />
+              <IconButton icon={'barcode-scan'} iconColor={'#FFF'} size={40} />
               <Text style={styles.text}>Наведите рамку на штрихкод</Text>
             </>
           </View>

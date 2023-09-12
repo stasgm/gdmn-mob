@@ -44,6 +44,6 @@
     "@config/eslint-config-react": "*",
     "@config/eslint-config-react-native": "*",
     "@config/prettier-config": "*",
-    "lint-staged": "^13.1.2"
+    "lint-staged": "^14.0.1"
   }
 }

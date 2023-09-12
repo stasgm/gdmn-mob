@@ -11,4 +11,10 @@ const selectByDocType = <T extends IDocument>(docType: string) =>
     [docType],
   );
 
-export default { selectByDocType, selectByDocId };
+const selectByDocSubType = <T extends IDocument>(docSubType: string) =>
+  useProxySelector<T[]>(
+    (state) => state.documents?.list.filter((doc: T) => doc.documentType?.subtype === docSubType) || [],
+    [docSubType],
+  );
+
+export default { selectByDocType, selectByDocId, selectByDocSubType };

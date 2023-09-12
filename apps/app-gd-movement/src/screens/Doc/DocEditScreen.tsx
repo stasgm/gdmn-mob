@@ -17,7 +17,7 @@ import {
   RadioGroup,
   navBackButton,
 } from '@lib/mobile-ui';
-import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
+import { useDispatch, documentActions, appActions, useSelector, refSelectors, docSelectors } from '@lib/store';
 
 import { generateId, getDateString, isNamedEntity } from '@lib/mobile-hooks';
 
@@ -36,9 +36,11 @@ export const DocEditScreen = () => {
   const dispatch = useDispatch();
   const { colors } = useTheme();
 
-  const documents = useSelector((state) =>
-    state.documents.list.filter((i) => i.documentType.subtype === 'inventory'),
-  ) as IMovementDocument[];
+  // const documents = useSelector((state) =>
+  //   state.documents.list.filter((i) => i.documentType.subtype === 'inventory'),
+  // ) as IMovementDocument[];
+
+  const documents = docSelectors.selectByDocSubType<IMovementDocument>('inventory');
 
   const documentTypes = refSelectors
     .selectByName<IDocumentType>('documentType')

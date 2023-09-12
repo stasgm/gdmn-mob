@@ -34,7 +34,6 @@
     "@shopify/flash-list": "1.4.3",
     "@types/node": "^20.6.0",
     "@types/react": "~18.2.21",
-    "expo-app-loading": "^2.1.1",
     "expo-constants": "~14.4.2",
     "react": "18.2.0",
     "react-native": "0.72.4",
@@ -42,12 +41,13 @@
     "react-native-paper": "^5.10.4",
     "react-native-reanimated": "~3.3.0",
     "react-native-web": "~0.19.8",
+    "react-native-vector-icons": "^10.0.0",
     "react-redux": "^8.1.2",
     "typescript": "^5.2.2"
   },
   "devDependencies": {
     "@config/eslint-config": "*",
     "@config/prettier-config": "*",
-    "lint-staged": "^13.1.2"
+    "lint-staged": "^14.0.1"
   }
 }

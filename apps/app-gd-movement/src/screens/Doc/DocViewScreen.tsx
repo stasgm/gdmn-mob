@@ -464,7 +464,7 @@ export const DocViewScreen = () => {
         keyExtractor={keyExtractor}
         extraData={[goods, delList, isDelList, isBlocked, navigation, id]}
       />
-      {doc.lines.length ? (
+      {doc.lines?.length ? (
         <DocTotal lineCount={doc.lines?.length || 0} sum={docLineSum} quantity={docLineQuantity} />
       ) : null}
       <SimpleDialog
