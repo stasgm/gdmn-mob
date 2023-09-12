@@ -27,10 +27,13 @@ const GoodItem = ({ item }: IProps) => {
         </View>
         <View style={styles.details}>
           <LargeText style={styles.textBold}>{item?.good.name}</LargeText>
-          <View style={styles.flexDirectionRow}>
-            <MaterialCommunityIcons name="shopping-outline" size={18} />
+          <View style={styles.directionRow}>
+            <View style={styles.flexDirectionRow}>
+              <MaterialCommunityIcons name="shopping-outline" size={18} />
 
-            <MediumText>{item.remains} кг</MediumText>
+              <MediumText>{item.remains} кг</MediumText>
+            </View>
+            <MediumText>{item.good.shcode}</MediumText>
           </View>
         </View>
       </View>

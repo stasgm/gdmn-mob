@@ -131,19 +131,43 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
       return { ...state, errorNotice: [] };
 
     case getType(appActions.addSyncRequest): {
+      const param = action.payload.param;
       return {
         ...state,
         syncRequests: state.syncRequests
-          ? state.syncRequests.filter((req) => req.cmdName !== action.payload.cmdName).concat(action.payload)
+          ? state.syncRequests
+              .filter(
+                (req) =>
+                  !(
+                    req.cmdName === action.payload.cmdName &&
+                    (param && req.param
+                      ? req.param.name === param.name && req.param.value === param.value
+                      : !req.param === !param)
+                  ),
+              )
+              .concat(action.payload)
           : [action.payload],
       };
     }
 
-    case getType(appActions.removeSyncRequest):
+    case getType(appActions.removeSyncRequest): {
+      const param = action.payload.param;
+      //Удаляем записи с полным совпадением
       return {
         ...state,
-        syncRequests: state.syncRequests ? state.syncRequests.filter((req) => req.cmdName !== action.payload) : [],
+        syncRequests: state.syncRequests
+          ? state.syncRequests.filter(
+              (req) =>
+                !(
+                  req.cmdName === action.payload.cmdName &&
+                  (param && req.param
+                    ? req.param.name === param.name && req.param.value === param.value
+                    : !req.param === !param)
+                ),
+            )
+          : [],
       };
+    }
 
     default:
       return state;

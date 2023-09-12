@@ -41,7 +41,7 @@ const ReferenceListScreen = () => {
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
-        title: 'Отправить запрос на получение справочников',
+        title: 'Запросить справочники',
         onPress: handleSendRefsRequest,
       },
       {
