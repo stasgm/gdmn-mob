@@ -3,39 +3,45 @@ import { Box, Container } from '@mui/material';
 import { useNavigate } from 'react-router';
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import CachedIcon from '@mui/icons-material/Cached';
+import { ICompany, IAppSystem } from '@lib/types';
 
-import { IUser } from '@lib/types';
+import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
+import { useSelector, useDispatch, AppDispatch } from '../../store';
+import actions from '../../store/company';
+import CircularProgressWithContent from '../CircularProgressWidthContent';
+import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
+import SortableTable from '../SortableTable';
 
-import SortableTable from '../../components/SortableTable';
+import selectors from '../../store/company/selectors';
 
-import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
-import { useSelector, useDispatch } from '../../store';
-import actions from '../../store/user';
-import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-import { IToolBarButton, IHeadCells, IPageParam } from '../../types';
+interface IProps {
+  appSystem: IAppSystem;
+}
 
-const UserList = () => {
+const AppSystemCompany = ({ appSystem }: IProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = useDispatch();
 
-  const { list, loading, pageParams } = useSelector((state) => state.users);
-
+  const dispatch: AppDispatch = useDispatch();
+  const { loading, errorMessage, pageParams } = useSelector((state) => state.companies);
+  const { user: authUser } = useSelector((state) => state.auth);
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
+  const list = selectors.companyByAppSystemID(appSystem.id);
 
-  const fetchUsers = useCallback(
+  const fetchCompanies = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(actions.fetchUsers('', filterText, fromRecord, toRecord));
+      dispatch(actions.fetchCompanies(filterText, fromRecord, toRecord));
     },
     [dispatch],
   );
 
   useEffect(() => {
-    /* Загружаем данные при загрузке компонента */
-    fetchUsers(pageParams?.filterText);
-  }, [fetchUsers, pageParams?.filterText]);
+    // Загружаем данные при загрузке компонента.
+    fetchCompanies(pageParams?.filterText);
+  }, [fetchCompanies, pageParams?.filterText]);
 
   const handleUpdateInput = (value: string) => {
     const inputValue: string = value;
@@ -44,18 +50,13 @@ const UserList = () => {
 
     if (inputValue) return;
 
-    fetchUsers('');
+    fetchCompanies('');
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.userActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
-    fetchUsers(pageParamLocal?.filterText);
-  };
+    dispatch(actions.companyActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
 
-  const handleClearSearch = () => {
-    dispatch(actions.userActions.setPageParam({ filterText: undefined, page: 0 }));
-    setPageParamLocal({ filterText: undefined });
-    fetchUsers();
+    fetchCompanies(pageParamLocal?.filterText);
   };
 
   const handleKeyPress = (key: string) => {
@@ -64,10 +65,28 @@ const UserList = () => {
     handleSearchClick();
   };
 
+  const handleClearSearch = () => {
+    dispatch(actions.companyActions.setPageParam({ filterText: undefined, page: 0 }));
+    setPageParamLocal({ filterText: undefined });
+    fetchCompanies();
+  };
+
+  const handleClearError = () => {
+    dispatch(actions.companyActions.clearError());
+  };
+
+  const handleAddCompany = () => {
+    if (list.length && !(authUser?.role === 'SuperAdmin')) {
+      dispatch(actions.companyActions.setError('Компания уже существует'));
+    } else {
+      return navigate(`${location.pathname}/new`);
+    }
+  };
+
   const handleSetPageParams = useCallback(
     (pageParams: IPageParam) => {
       dispatch(
-        actions.userActions.setPageParam({
+        actions.companyActions.setPageParam({
           page: pageParams.page,
           limit: pageParams.limit,
         }),
@@ -80,26 +99,22 @@ const UserList = () => {
     {
       name: 'Обновить',
       sx: { mx: 1 },
-      onClick: () => fetchUsers(),
+      onClick: () => fetchCompanies(),
       icon: <CachedIcon />,
     },
     {
       name: 'Добавить',
       color: 'primary',
       variant: 'contained',
-      onClick: () => navigate(`${location.pathname}/new`),
+      onClick: handleAddCompany,
       icon: <AddCircleOutlineIcon />,
     },
   ];
 
-  const headCells: IHeadCells<IUser>[] = [
-    { id: 'name', label: 'Пользователь', sortEnable: true },
-    { id: 'lastName', label: 'Фамилия', sortEnable: true },
-    { id: 'firstName', label: 'Имя', sortEnable: true },
-    { id: 'id', label: 'ID', sortEnable: false },
-    { id: 'externalId', label: 'ID из ERP системы', sortEnable: false },
-    { id: 'erpUser', label: 'Пользователь ERP', sortEnable: true },
-    { id: 'appSystem', label: 'Подсистема', sortEnable: true },
+  const headCells: IHeadCells<ICompany>[] = [
+    { id: 'name', label: 'Наименование', sortEnable: true },
+    { id: 'id', label: 'ID', sortEnable: true },
+    { id: 'admin', label: 'Администратор', sortEnable: true },
     { id: 'creationDate', label: 'Дата создания', sortEnable: true },
     { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },
   ];
@@ -107,7 +122,7 @@ const UserList = () => {
   return (
     <>
       <Helmet>
-        <title>Пользователи</title>
+        <title>Компании</title>
       </Helmet>
       <Box
         sx={{
@@ -119,7 +134,8 @@ const UserList = () => {
         <Container maxWidth={false}>
           <ToolbarActionsWithSearch
             buttons={buttons}
-            searchTitle={'Найти пользователя'}
+            searchTitle={'Найти компанию'}
+            // valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
@@ -130,10 +146,10 @@ const UserList = () => {
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <SortableTable<IUser>
+              <SortableTable<ICompany>
                 headCells={headCells}
                 data={list}
-                path={'/app/users/'}
+                path={'/app/companies/'}
                 onSetPageParams={handleSetPageParams}
                 pageParams={pageParams}
                 style={{ overflowY: 'auto', maxHeight: window.innerHeight - 268 }}
@@ -146,4 +162,4 @@ const UserList = () => {
   );
 };
 
-export default UserList;
+export default AppSystemCompany;

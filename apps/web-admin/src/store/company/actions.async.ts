@@ -32,7 +32,6 @@ const fetchCompanies = (filterText?: string, fromRecord?: number, toRecord?: num
     dispatch(companyActions.fetchCompaniesAsync.request(''));
 
     const params: Record<string, string | number> = {};
-
     if (filterText) params.filterText = filterText;
     if (fromRecord) params.fromRecord = fromRecord;
     if (toRecord) params.toRecord = toRecord;
