@@ -42,4 +42,6 @@ export default {
   DEVICE_LOG_MAX_LINES: getNumber(process.env.DEVICE_LOG_MAX_LINES, config.DEVICE_LOG_MAX_LINES),
   /** Период хранения файлов, в днях */
   FILES_SAVING_PERIOD_IN_DAYS: getNumber(process.env.FILES_SAVING_PERIOD_IN_DAYS, config.FILES_SAVING_PERIOD_IN_DAYS),
+  /** Период хранения файлов, в днях */
+  DOCS_SAVING_PERIOD_IN_DAYS: getNumber(process.env.DOCS_SAVING_PERIOD_IN_DAYS, config.DOCS_SAVING_PERIOD_IN_DAYS),
 };
