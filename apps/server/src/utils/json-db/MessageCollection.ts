@@ -195,7 +195,7 @@ class CollectionMessage<T extends CollectionItem> {
   }
 
   private async _delete(fileName: string): Promise<void> {
-    return fs.unlink(fileName);
+    return await fs.unlink(fileName);
   }
 
   private async _readDir(params: IAppSystemParams): Promise<IFileMessageInfo[]> {

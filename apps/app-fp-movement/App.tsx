@@ -17,6 +17,7 @@ import {
   useDocThunkDispatch,
   useRefThunkDispatch,
   useSelector,
+  useSettingsThunkDispatch,
 } from '@lib/store';
 import {
   AppScreen,
@@ -36,8 +37,6 @@ import { sleep, dialCall } from '@lib/mobile-hooks';
 import { TouchableOpacity, Linking, ScrollView, View } from 'react-native';
 
 import Constants from 'expo-constants';
-
-import { useSettingsThunkDispatch } from '@lib/store/src/settings/actions.async';
 
 import { MoveNavigator } from './src/navigation/MoveNavigator';
 
