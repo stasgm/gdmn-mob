@@ -26,11 +26,22 @@
     "android": {
       "package": "com.gsbelarus.fpmovement",
       "permissions": ["CAMERA", "VIBRATE"],
-      "apiLevel": 33,
       "versionCode": 26
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 33,
+            "targetSdkVersion": 33,
+            "buildToolsVersion": "33.0.0"
+          }
+        }
+      ]
+    ]
   }
 }
