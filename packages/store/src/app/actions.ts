@@ -1,13 +1,21 @@
 import { IDeviceLog } from '@lib/types';
 import { ActionType, createAction } from 'typesafe-actions';
 
-import { IFormParam, IAppState, IRequestNotice, IErrorNotice, ISyncRequest, ISyncRequestParam } from './types';
+import {
+  IFormParam,
+  IAppState,
+  IRequestNotice,
+  IErrorNotice,
+  ISyncRequest,
+  SyncRequestDelParam,
+  ISetScreenFormParam,
+} from './types';
 
 const init = createAction('APP/INIT')();
 
 const setFormParams = createAction('APP/SET_FORM_PARAMS')<IFormParam>();
 const clearFormParams = createAction('APP/CLEAR_FORM_PARAMS')();
-const setScreenFormParams = createAction('APP/SET_SCREEN_FORM_PARAMS')<{ screenName: string; params: IFormParam }>();
+const setScreenFormParams = createAction('APP/SET_SCREEN_FORM_PARAMS')<ISetScreenFormParam>();
 const clearScreenFormParams = createAction('APP/CLEAR_SCREEN_FORM_PARAMS')<string>();
 const setLoading = createAction('APP/SET_LOADING')<boolean>();
 const setAutoSync = createAction('APP/SET_AUTO_SYNC')<boolean>();
@@ -27,10 +35,7 @@ const addErrorNotice = createAction('APP/ADD_ERROR_NOTICE')<IErrorNotice>();
 const clearErrorNotice = createAction('APP/CLEAR_ERROR_NOTICE')();
 
 const addSyncRequest = createAction('APP/ADD_SYNC_REQUEST')<ISyncRequest>();
-const removeSyncRequest = createAction('APP/DEL_SYNC_REQUEST')<{
-  cmdName: string;
-  param?: ISyncRequestParam;
-}>();
+const removeSyncRequest = createAction('APP/DEL_SYNC_REQUEST')<SyncRequestDelParam>();
 
 /**
  * Для ускорения работы программы мы кэшируем часть данных

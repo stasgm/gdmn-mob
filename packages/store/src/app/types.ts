@@ -8,6 +8,11 @@ export interface IScreenFormParams {
   [screenName: string]: IFormParam;
 }
 
+export interface ISetScreenFormParam {
+  screenName: string;
+  params: IFormParam;
+}
+
 export interface IAppState {
   loading: boolean;
   showSyncInfo: boolean;
@@ -32,7 +37,7 @@ export type IErrorNotice = Omit<IDeviceLog, 'isSent'>;
 
 export interface ISyncRequestParam {
   name: string;
-  value: string | number;
+  value: any;
 }
 
 export interface ISyncRequest {
@@ -40,3 +45,5 @@ export interface ISyncRequest {
   date: Date;
   param?: ISyncRequestParam;
 }
+
+export type SyncRequestDelParam = Omit<ISyncRequest, 'date'>;
