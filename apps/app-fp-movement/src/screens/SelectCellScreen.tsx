@@ -229,7 +229,7 @@ export const SelectCellScreen = () => {
 
       return (
         <Pressable
-          key={i.name}
+          key={`${i.name}-${i.sortOrder}`}
           style={({ pressed }) => [localStyles.buttons, backColorStyle, pressed && { backgroundColor: colors.accent }]}
           onPress={() => handleSaveLine(i)}
           disabled={
@@ -256,7 +256,7 @@ export const SelectCellScreen = () => {
     ({ cellData }: { cellData: ICellData[] }) => (
       <View style={styles.flexDirectionRow}>
         {cellData?.map((i) => (
-          <Cell key={i.name} i={i} />
+          <Cell key={`${i.name}-${i.sortOrder}`} i={i} />
         ))}
       </View>
     ),

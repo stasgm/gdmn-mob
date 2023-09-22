@@ -15,6 +15,10 @@ import {
   ICellName,
   IInventoryDocument,
   IBasedLine,
+  ILaboratoryDocument,
+  IReceiptDocument,
+  IReturnDocument,
+  ISendingLine,
 } from '../store/types';
 import {
   IBarcode,
@@ -303,6 +307,38 @@ export const getUpdatedLine = (
     barcode: newBarcode,
     usedRemains,
   } as IBasedLine;
+};
+
+export const getDocToSend = (
+  doc:
+    | IShipmentDocument
+    | IFreeShipmentDocument
+    | IMoveDocument
+    | ILaboratoryDocument
+    | IInventoryDocument
+    | IReceiptDocument
+    | IReturnDocument,
+) => {
+  return {
+    ...doc,
+    head: { ...doc?.head, linesNumber: doc?.lines.length },
+    lines: doc?.lines.map(
+      (i) =>
+        ({
+          id: i.id,
+          goodId: i.good.id,
+          weight: i.weight,
+          workDate: i.workDate,
+          numReceived: i.numReceived,
+          barcode: i.barcode,
+          quantPack: i.quantPack,
+          scannedBarcode: i.scannedBarcode,
+          usedRemains: i.usedRemains,
+          fromCell: (i as IMoveLine).fromCell,
+          toCell: (i as IMoveLine).toCell,
+        } as ISendingLine),
+    ),
+  };
 };
 
 export const getRemGoodListByContact = (

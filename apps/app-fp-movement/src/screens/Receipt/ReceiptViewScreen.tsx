@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { View, TextInput, Keyboard } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { Audio } from 'expo-av';
 
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
@@ -45,6 +46,7 @@ import {
   alertWithSound,
   alertWithSoundMulti,
   getBarcode,
+  getDocToSend,
   getLineGood,
   getRemGoodListByContact,
   getUpdatedLine,
@@ -122,6 +124,12 @@ export const ReceiptViewScreen = () => {
       ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id], docList, doc.head.fromDepart.id)
       : [];
   }, [doc?.head?.fromDepart?.id, docList, goods, isFocused, remains]);
+
+  const sound = Audio.Sound.createAsync(require('../../../assets/ok.wav'));
+
+  const playSound = useCallback(async () => {
+    (await sound).sound.playAsync();
+  }, [sound]);
 
   const handleFocus = () => {
     ref?.current?.focus();
@@ -239,7 +247,7 @@ export const ReceiptViewScreen = () => {
     handleFocus();
   }, [dispatch, doc?.lines, id]);
 
-  const sendDoc = useSendDocs(doc ? [doc] : []);
+  const sendDoc = useSendDocs(doc ? [doc] : [], doc ? [getDocToSend(doc)] : []);
 
   const sendRemainsRequest = useSendOneRefRequest('Остатки', { name: 'remains' });
 
@@ -433,6 +441,7 @@ export const ReceiptViewScreen = () => {
       };
 
       dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+      playSound();
 
       if (visibleDialog) {
         setVisibleDialog(false);
@@ -454,6 +463,7 @@ export const ReceiptViewScreen = () => {
       remainsUse,
       dispatch,
       id,
+      playSound,
       visibleDialog,
       handleErrorMessage,
     ],

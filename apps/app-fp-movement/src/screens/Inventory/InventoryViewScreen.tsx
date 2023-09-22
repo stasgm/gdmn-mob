@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { View, TextInput, Keyboard } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { Audio } from 'expo-av';
+
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   MenuButton,
@@ -35,7 +37,7 @@ import { barcodeSettings, IInventoryDocument, IInventoryLine } from '../../store
 import { InventoryStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { alertWithSound, alertWithSoundMulti, getBarcode, getUpdatedLine } from '../../utils/helpers';
+import { alertWithSound, alertWithSoundMulti, getBarcode, getDocToSend, getUpdatedLine } from '../../utils/helpers';
 import { IAddressStoreEntity, IBarcode, IGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
@@ -88,6 +90,12 @@ export const InventoryViewScreen = () => {
   const [quantPack, setQuantPack] = useState('');
 
   const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
+
+  const sound = Audio.Sound.createAsync(require('../../../assets/ok.wav'));
+
+  const playSound = useCallback(async () => {
+    (await sound).sound.playAsync();
+  }, [sound]);
 
   const handleFocus = () => {
     ref?.current?.focus();
@@ -186,7 +194,7 @@ export const InventoryViewScreen = () => {
     handleFocus();
   }, [dispatch, id, lines]);
 
-  const sendDoc = useSendDocs(doc ? [doc] : []);
+  const sendDoc = useSendDocs(doc ? [doc] : [], doc ? [getDocToSend(doc)] : []);
 
   const [visibleSendDialog, setVisibleSendDialog] = useState(false);
 
@@ -401,6 +409,7 @@ export const InventoryViewScreen = () => {
         });
       } else {
         dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+        playSound();
       }
 
       if (visibleDialog) {
@@ -425,6 +434,7 @@ export const InventoryViewScreen = () => {
       navigation,
       id,
       dispatch,
+      playSound,
     ],
   );
 

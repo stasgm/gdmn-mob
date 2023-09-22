@@ -118,8 +118,6 @@ export const useSendOneRefRequest = (description: string, params: ICmdParams) =>
             deviceId,
           );
 
-          console.log('', typeof params === 'object', 'name' in params, params.name);
-
           if (sendMesRefResponse.type !== 'SEND_MESSAGE') {
             addError('useSendOneRefRequest: api.message.sendMessages', sendMesRefResponse.message, tempErrs);
           } else if (

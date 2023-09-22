@@ -118,6 +118,19 @@ export interface IBasedLine extends IEntity {
   usedRemains?: boolean; // используются остатки в приложении
 }
 
+export interface ISendingLine extends IEntity {
+  goodId: string; // ид товара
+  weight: number; //вес
+  workDate: string; // Дата производства
+  numReceived: string; // Номер партии
+  barcode: string; // технологический код
+  quantPack: number; // порядковый номер сканирования в документе
+  scannedBarcode?: string;
+  usedRemains?: boolean; // используются остатки в приложении
+  fromCell?: string; // номер ячейки
+  toCell?: string; // номер ячейки
+}
+
 export interface IMoveLine extends IBasedLine {
   fromCell?: string; // номер ячейки
   toCell?: string; // номер ячейки
@@ -131,10 +144,7 @@ export interface IReceiptHead extends IHead {
   comment?: string; // Комvентарий
 }
 
-export interface IReceiptLine extends IBasedLine {
-  fromCell?: string; // номер ячейки
-  toCell?: string; // номер ячейки
-}
+export type IReceiptLine = IBasedLine;
 
 export type IReceiptDocument = MandateProps<IDocument<IReceiptHead, IReceiptLine>, 'head' | 'lines'>;
 

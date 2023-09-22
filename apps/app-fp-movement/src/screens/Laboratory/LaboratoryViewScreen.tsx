@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { View, TextInput, Keyboard } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { Audio } from 'expo-av';
 
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
@@ -38,6 +39,7 @@ import {
   alertWithSound,
   alertWithSoundMulti,
   getBarcode,
+  getDocToSend,
   getLineGood,
   getRemGoodListByContact,
 } from '../../utils/helpers';
@@ -114,6 +116,12 @@ export const LaboratoryViewScreen = () => {
   const [visibleWeightDialog, setVisibleWeightDialog] = useState(false);
   const [weight, setWeight] = useState('');
 
+  const sound = Audio.Sound.createAsync(require('../../../assets/ok.wav'));
+
+  const playSound = useCallback(async () => {
+    (await sound).sound.playAsync();
+  }, [sound]);
+
   const handleFocus = () => {
     ref?.current?.focus();
   };
@@ -138,7 +146,9 @@ export const LaboratoryViewScreen = () => {
       }
 
       if (remainsUse && goodRemains.length) {
-        const good = goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === line.good.shcode);
+        const good = goodRemains.find(
+          (item) => `0000${item.good.shcode}`.slice(-4) === `0000${line.good.shcode}`.slice(-4),
+        );
 
         if (good) {
           const newLocal = newWeight < ONE_T_IN_KG || newWeight <= line.weight;
@@ -236,7 +246,7 @@ export const LaboratoryViewScreen = () => {
 
   const [visibleSendDialog, setVisibleSendDialog] = useState(false);
 
-  const sendDoc = useSendDocs(doc ? [doc] : []);
+  const sendDoc = useSendDocs(doc ? [doc] : [], doc ? [getDocToSend(doc)] : []);
 
   const sendRemainsRequest = useSendOneRefRequest('Остатки', { name: 'remains' });
 
@@ -445,6 +455,7 @@ export const LaboratoryViewScreen = () => {
       };
 
       dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+      playSound();
 
       if (visibleDialog) {
         setVisibleDialog(false);
@@ -467,6 +478,7 @@ export const LaboratoryViewScreen = () => {
       remainsUse,
       dispatch,
       id,
+      playSound,
       visibleDialog,
       handleErrorMessage,
     ],

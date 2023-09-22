@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { View, TextInput, Keyboard } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { Audio } from 'expo-av';
 
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
@@ -34,7 +35,7 @@ import { barcodeSettings, IReturnDocument, IReturnLine } from '../../store/types
 import { ReturnStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { alertWithSound, alertWithSoundMulti, getBarcode, getUpdatedLine } from '../../utils/helpers';
+import { alertWithSound, alertWithSoundMulti, getBarcode, getDocToSend, getUpdatedLine } from '../../utils/helpers';
 import { IBarcode, IGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
@@ -81,6 +82,12 @@ export const ReturnViewScreen = () => {
   const [visibleDialog, setVisibleDialog] = useState(false);
   const [barcode, setBarcode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+
+  const sound = Audio.Sound.createAsync(require('../../../assets/ok.wav'));
+
+  const playSound = useCallback(async () => {
+    (await sound).sound.playAsync();
+  }, [sound]);
 
   const handleFocus = () => {
     ref?.current?.focus();
@@ -190,7 +197,7 @@ export const ReturnViewScreen = () => {
     handleFocus();
   }, [dispatch, id, lines]);
 
-  const sendDoc = useSendDocs(doc ? [doc] : []);
+  const sendDoc = useSendDocs(doc ? [doc] : [], doc ? [getDocToSend(doc)] : []);
 
   const [visibleSendDialog, setVisibleSendDialog] = useState(false);
 
@@ -388,6 +395,7 @@ export const ReturnViewScreen = () => {
       };
 
       dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+      playSound();
 
       if (visibleDialog) {
         setVisibleDialog(false);
@@ -407,6 +415,7 @@ export const ReturnViewScreen = () => {
       goods,
       dispatch,
       id,
+      playSound,
       visibleDialog,
       handleErrorMessage,
     ],

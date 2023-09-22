@@ -38,6 +38,7 @@ import {
   alertWithSoundMulti,
   getBarcode,
   getBarcodeString,
+  getDocToSend,
   getLineGood,
   getRemGoodListByContact,
 } from '../../utils/helpers';
@@ -218,7 +219,7 @@ export const MoveFromViewScreen = () => {
     handleFocus();
   }, [dispatch, doc?.lines, id]);
 
-  const sendDoc = useSendDocs(doc ? [doc] : []);
+  const sendDoc = useSendDocs(doc ? [doc] : [], doc ? [getDocToSend(doc)] : []);
 
   const sendCellRequest = useSendOneRefRequest('Ячейки', { name: 'cell' });
 

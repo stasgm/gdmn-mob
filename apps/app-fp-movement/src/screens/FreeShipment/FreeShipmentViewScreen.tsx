@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { View, TextInput, Keyboard } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { Audio } from 'expo-av';
 
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
@@ -46,6 +47,7 @@ import {
   alertWithSound,
   alertWithSoundMulti,
   getBarcode,
+  getDocToSend,
   getLineGood,
   getRemGoodListByContact,
   getUpdatedLine,
@@ -120,6 +122,12 @@ export const FreeShipmentViewScreen = () => {
 
   const [visibleQuantPackDialog, setVisibleQuantPackDialog] = useState(false);
   const [quantPack, setQuantPack] = useState('');
+
+  const sound = Audio.Sound.createAsync(require('../../../assets/ok.wav'));
+
+  const playSound = useCallback(async () => {
+    (await sound).sound.playAsync();
+  }, [sound]);
 
   const handleFocus = () => {
     ref?.current?.focus();
@@ -247,7 +255,7 @@ export const FreeShipmentViewScreen = () => {
   const [visibleSendDialog, setVisibleSendDialog] = useState(false);
   const [visibleRequestDialog, setVisibleRequestDialog] = useState(false);
 
-  const sendDoc = useSendDocs(doc ? [doc] : []);
+  const sendDoc = useSendDocs(doc ? [doc] : [], doc ? [getDocToSend(doc)] : []);
 
   const sendRemainsRequest = useSendOneRefRequest('Остатки', { name: 'remains' });
 
@@ -268,7 +276,13 @@ export const FreeShipmentViewScreen = () => {
   const handleSendRequest = useCallback(async () => {
     setVisibleRequestDialog(false);
     await sendRemainsRequest();
+    handleFocus();
   }, [sendRemainsRequest]);
+
+  const handleCancelRequest = () => {
+    setVisibleRequestDialog(false);
+    handleFocus();
+  };
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -397,7 +411,6 @@ export const FreeShipmentViewScreen = () => {
   const [scanned, setScanned] = useState(false);
 
   const ref = useRef<TextInput>(null);
-
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!doc) {
@@ -476,6 +489,7 @@ export const FreeShipmentViewScreen = () => {
       };
 
       dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+      playSound();
 
       if (visibleDialog) {
         setVisibleDialog(false);
@@ -499,6 +513,7 @@ export const FreeShipmentViewScreen = () => {
       isCattle,
       dispatch,
       id,
+      playSound,
       visibleDialog,
       handleErrorMessage,
     ],
@@ -622,7 +637,7 @@ export const FreeShipmentViewScreen = () => {
         visible={visibleRequestDialog}
         title={'Внимание!'}
         text={'Товар не найден. Отправить запрос за остатками?'}
-        onCancel={() => setVisibleRequestDialog(false)}
+        onCancel={handleCancelRequest}
         onOk={handleSendRequest}
         okDisabled={loading}
       />
