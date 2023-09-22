@@ -92,7 +92,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
 
   const accessLogStream: RotatingFileStream = createStream('access.log', {
     size: '20M',
-    maxFiles: 1,
+    maxFiles: 5,
     path: logPath,
     initialRotation: true,
   });
