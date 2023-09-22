@@ -13,6 +13,8 @@ export const errorHandler = async (ctx: Context, next: Next) => {
     await pendingWrites();
     await next();
   } catch (error: any) {
+    const userInfo = ctx.state.user ? `\nuser '${ctx.state.user.name}' (${ctx.state.user.id})` : '';
+
     if (error instanceof ApplicationException) {
       const result: FailureResponse = {
         result: false,
@@ -23,8 +25,7 @@ export const errorHandler = async (ctx: Context, next: Next) => {
 
       ctx.status = 200;
       ctx.body = result;
-
-      log.error(error.toString());
+      log.error(`${error.toString()}${userInfo}`);
     } else {
       const errorMsg = error instanceof Error && error.message ? error.message : `Неизвестная ошибка: ${error}`;
       ctx.status = 500;
@@ -34,8 +35,7 @@ export const errorHandler = async (ctx: Context, next: Next) => {
         status: 500,
         error: errorMsg,
       };
-
-      log.error(errorMsg, JSON.stringify(error));
+      log.error(`${errorMsg}${userInfo}`, JSON.stringify(error));
     }
   }
 };

@@ -12,7 +12,8 @@ export class ApplicationException extends Error {
   }
 
   public toString(): string {
-    const stackString = this.status === 401 || !this.stack ? '' : `\n${this.stack}`;
-    return `${this.name} (${this.status}): ${this.message}${stackString}`;
+    return this.status === 401 || !this.stack
+      ? `${this.name} (${this.status}): ${this.message}`
+      : `${this.status} ${this.stack}`;
   }
 }
