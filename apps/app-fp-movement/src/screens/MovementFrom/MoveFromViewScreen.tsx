@@ -23,7 +23,7 @@ import {
 
 import { generateId, getDateString, keyExtractor, useSendDocs, sleep, useSendOneRefRequest } from '@lib/mobile-hooks';
 
-import { ScreenState } from '@lib/types';
+import { IDocumentType, INamedEntity, ScreenState } from '@lib/types';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -38,6 +38,7 @@ import {
   alertWithSoundMulti,
   getBarcode,
   getBarcodeString,
+  getDocToSend,
   getLineGood,
   getRemGoodListByContact,
 } from '../../utils/helpers';
@@ -92,12 +93,23 @@ export const MoveFromViewScreen = () => {
   }, {});
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
+  const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
   const isAddressStore = Boolean(settings.addressStore?.data);
 
   const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
-  const remainsUse = Boolean(settings.remainsUse?.data);
+  const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
+  const documentType = useMemo(
+    () => documentTypes?.find((d) => d.id === doc?.documentType.id),
+    [doc?.documentType.id, documentTypes],
+  );
+
+  const defaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as INamedEntity;
+
+  const remainsUse =
+    (doc?.head.fromDepart.id === defaultDepart?.id || Boolean(documentType?.isRemains)) &&
+    Boolean(settings.remainsUse?.data);
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
@@ -150,11 +162,12 @@ export const MoveFromViewScreen = () => {
           quantPack: quantity,
           scannedBarcode: line?.barcode,
           barcode: newBarcode,
+          usedRemains: remainsUse,
         };
         dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
       }
     },
-    [dispatch, goodBarcodeSettings?.boxWeight, id, lines],
+    [dispatch, goodBarcodeSettings?.boxWeight, id, lines, remainsUse],
   );
 
   const handleEditQuantPack = () => {
@@ -181,16 +194,21 @@ export const MoveFromViewScreen = () => {
       return;
     }
 
-    alertWithSoundMulti('Вы уверены, что хотите удалить документ?', '', async () => {
-      setScreenState('deleting');
-      await sleep(1);
-      const res = await docDispatch(documentActions.removeDocument(id));
-      if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
-        setScreenState('deleted');
-      } else {
-        setScreenState('idle');
-      }
-    });
+    alertWithSoundMulti(
+      'Вы уверены, что хотите удалить документ?',
+      '',
+      async () => {
+        setScreenState('deleting');
+        await sleep(1);
+        const res = await docDispatch(documentActions.removeDocument(id));
+        if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
+          setScreenState('deleted');
+        } else {
+          setScreenState('idle');
+        }
+      },
+      handleFocus,
+    );
   }, [docDispatch, id]);
 
   const hanldeCancelLastScan = useCallback(() => {
@@ -201,7 +219,7 @@ export const MoveFromViewScreen = () => {
     handleFocus();
   }, [dispatch, doc?.lines, id]);
 
-  const sendDoc = useSendDocs(doc ? [doc] : []);
+  const sendDoc = useSendDocs(doc ? [doc] : [], doc ? [getDocToSend(doc)] : []);
 
   const sendCellRequest = useSendOneRefRequest('Ячейки', { name: 'cell' });
 
@@ -231,7 +249,7 @@ export const MoveFromViewScreen = () => {
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
-        title: 'Отправить запрос на получение справочника ячеек',
+        title: 'Запросить справочник ячеек',
         onPress: handleSendCellRequest,
       },
       {
@@ -254,6 +272,7 @@ export const MoveFromViewScreen = () => {
       {
         title: 'Отмена',
         type: 'cancel',
+        onPress: handleFocus,
       },
     ]);
   }, [showActionSheet, handleSendCellRequest, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
@@ -313,7 +332,9 @@ export const MoveFromViewScreen = () => {
             <LargeText style={styles.textBold}>{item.good.name}</LargeText>
             <View style={styles.flexDirectionRow}>
               <MaterialCommunityIcons name="shopping-outline" size={18} />
-              <MediumText> {(item.weight || 0).toString()} кг</MediumText>
+              <MediumText>
+                {(item.weight || 0).toString()} кг, {(item.quantPack || 0).toString()} кор.
+              </MediumText>
             </View>
             <View style={styles.flexDirectionRow}>
               <MediumText>
@@ -347,7 +368,7 @@ export const MoveFromViewScreen = () => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      alertWithSound('Внимание!', `${text}.`);
+      alertWithSound('Внимание!', `${text}.`, handleFocus);
       setScanned(false);
     }
   }, []);
@@ -371,6 +392,14 @@ export const MoveFromViewScreen = () => {
         handleErrorMessage(
           visibleDialog,
           'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
+        );
+        return;
+      }
+
+      if (brc.length > maxBarcodeLength) {
+        handleErrorMessage(
+          visibleDialog,
+          'Длина штрих-кода больше максимальной длины, указанной в настройках. Повторите сканирование!',
         );
         return;
       }
@@ -410,8 +439,8 @@ export const MoveFromViewScreen = () => {
         time: barc.time,
         numReceived: barc.numReceived,
         quantPack: barc.quantPack,
-
         sortOrder: doc.lines?.length + 1,
+        usedRemains: remainsUse,
       };
 
       const isFromAddressed = departs.find((i) => i.id === doc.head.fromDepart?.id && i.isAddressStore);
@@ -443,6 +472,7 @@ export const MoveFromViewScreen = () => {
     [
       doc,
       minBarcodeLength,
+      maxBarcodeLength,
       goodBarcodeSettings,
       goods,
       goodRemains,

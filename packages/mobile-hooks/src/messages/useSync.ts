@@ -84,6 +84,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
   const cleanDocTime = (settings.cleanDocTime as ISettingsOption<number>).data || 0;
   const refLoadType = (settings.refLoadType as ISettingsOption<boolean>).data;
   const isGetReferences = settings.getReferences?.data;
+  const isGetRemains = settings.getRemains?.data;
   const autoSynchPeriod = (settings.autoSynchPeriod?.data as number) || 10;
   const deviceId = config.deviceId!;
   const appRequest = useMemo(() => mobileRequest(authDispatch, authActions), [authDispatch]);
@@ -130,19 +131,29 @@ export const useSync = (onSync?: () => Promise<any>) => {
           //Если ответ пришел, удаляем элемент с данным типом из массива запросов
           switch (msg.body.type) {
             case 'REFS': {
-              dispatch(appActions.removeSyncRequest('GET_REF'));
+              dispatch(appActions.removeSyncRequest({ cmdName: 'GET_REF' }));
               break;
             }
             case 'DOCS': {
-              dispatch(appActions.removeSyncRequest('GET_DOCUMENTS'));
+              dispatch(appActions.removeSyncRequest({ cmdName: 'GET_DOCUMENTS' }));
               break;
             }
             case 'APP_SYSTEM_SETTINGS': {
-              dispatch(appActions.removeSyncRequest('GET_APP_SYSTEM_SETTINGS'));
+              dispatch(appActions.removeSyncRequest({ cmdName: 'GET_APP_SYSTEM_SETTINGS' }));
               break;
             }
             case 'SETTINGS': {
-              dispatch(appActions.removeSyncRequest('GET_USER_SETTINGS'));
+              dispatch(appActions.removeSyncRequest({ cmdName: 'GET_USER_SETTINGS' }));
+              break;
+            }
+            case 'ONE_REF': {
+              //GET_ONE_REF в syncRequest только для остатков, так как запрос остатков добавлен в синхронизацию.
+              //Для других таблиц запрос можно слать вручную сколько угодно.
+              if ((msg.body.payload as IReferences).remains) {
+                dispatch(
+                  appActions.removeSyncRequest({ cmdName: 'GET_ONE_REF', param: { name: 'name', value: 'remains' } }),
+                );
+              }
               break;
             }
           }
@@ -634,6 +645,60 @@ export const useSync = (onSync?: () => Promise<any>) => {
                     }
                     if (sendMesRefResponse.type === 'SEND_MESSAGE') {
                       dispatch(appActions.addSyncRequest({ cmdName: 'GET_REF', date: currentDate }));
+                    }
+                  }
+                }
+
+                if (isGetRemains && !connectError) {
+                  const syncReq = syncRequests.find(
+                    (req) =>
+                      req.cmdName === 'GET_ONE_REF' && req.param?.name === 'name' && req.param?.value === 'remains',
+                  );
+                  //Если запрос такого типа не был отправлен или время запроса меньше текущего на час, то отправляем
+                  if (
+                    !syncReq ||
+                    (syncReq?.date &&
+                      currentDate.getTime() - new Date(syncReq.date).getTime() > REPEAT_REQUEST_TIME_IN_MS)
+                  ) {
+                    //Формируем запрос на получение справочников для следующего раза
+                    const messageGetRef: IMessage['body'] = {
+                      type: 'CMD',
+                      version: refVersion,
+                      payload: {
+                        name: 'GET_ONE_REF',
+                        params: { name: 'remains' },
+                      },
+                    };
+
+                    addRequestNotice('Запрос остатков');
+
+                    //3. Отправляем запрос на получение остатков
+                    const sendMesRefResponse = await api.message.sendMessages(
+                      appRequest,
+                      appSystem,
+                      messageCompany,
+                      consumer,
+                      messageGetRef,
+                      getNextOrder(),
+                      deviceId,
+                    );
+
+                    if (sendMesRefResponse.type !== 'SEND_MESSAGE') {
+                      addError(
+                        'useSync: api.message.sendMessages',
+                        `Запрос на получение остатков не отправлен. ${sendMesRefResponse.message}`,
+                        tempErrs,
+                      );
+                      connectError = isConnectError(sendMesRefResponse.type);
+                    }
+                    if (sendMesRefResponse.type === 'SEND_MESSAGE') {
+                      dispatch(
+                        appActions.addSyncRequest({
+                          cmdName: 'GET_ONE_REF',
+                          date: currentDate,
+                          param: { name: 'name', value: 'remains' },
+                        }),
+                      );
                     }
                   }
                 }
