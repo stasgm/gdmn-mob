@@ -14,25 +14,18 @@ const router = new Router();
 router.prefix('/api');
 
 const ADMIN_CONTAINER_PORT = process.env.ADMIN_CONTAINER_PORT || 3000;
+const HOST = process.env.HOST || 'localhost';
+const USE_HTTPS = process.env.USE_HTTPS !== 'true';
 
 const env = Router();
 env.prefix('/env');
 env.get('/', (ctx) => {
-  if (process.env.HOST === 'server.gdmn.app') {
-    ctx.body = {
-      protocol: 'https://',
-      host: 'server.gdmn.app',
-      port: process.env.HTTPS_PORT,
-    };
-    ctx.status = 200;
-  } else {
-    ctx.body = {
-      protocol: 'http://',
-      host: process.env.HOST || 'localhost',
-      port: process.env.PORT,
-    };
-    ctx.status = 200;
-  }
+  ctx.body = {
+    protocol: USE_HTTPS ? 'https://' : 'http://',
+    host: 'server.gdmn.app', ////HOST,
+    port: USE_HTTPS ? process.env.HTTPS_PORT : process.env.PORT,
+  };
+  ctx.status = 200;
 });
 
 router.use(env.middleware());
@@ -45,7 +38,7 @@ app
 
 const koaCallback = app.callback();
 
-if (process.env.HOST === 'server.gdmn.app') {
+if (USE_HTTPS) {
   /**
    * HTTPS сервер с платным сертификатом
    */
@@ -68,7 +61,7 @@ if (process.env.HOST === 'server.gdmn.app') {
     https
       .createServer({ cert, ca, key }, koaCallback)
       .listen(ADMIN_CONTAINER_PORT, () =>
-        console.info(`>>> HTTPS admin server is running at https://localhost:${ADMIN_CONTAINER_PORT}`),
+        console.info(`>>> HTTPS admin server is running at https://${HOST}:${ADMIN_CONTAINER_PORT}`),
       );
   } catch (err) {
     console.warn('HTTPS admin server is not running. No SSL files');
@@ -76,6 +69,6 @@ if (process.env.HOST === 'server.gdmn.app') {
 } else {
   const httpServer = http.createServer(koaCallback);
   httpServer.listen(ADMIN_CONTAINER_PORT, () =>
-    console.info(`>>> HTTP admin server is running at http://localhost:${ADMIN_CONTAINER_PORT}`),
+    console.info(`>>> HTTP admin server is running at http://${HOST}:${ADMIN_CONTAINER_PORT}`),
   );
 }
