@@ -15,7 +15,7 @@ router.prefix('/api');
 
 const ADMIN_CONTAINER_PORT = process.env.ADMIN_CONTAINER_PORT || 3000;
 const HOST = process.env.HOST || 'localhost';
-const USE_HTTPS = process.env.USE_HTTPS !== 'true';
+const USE_HTTPS = process.env.USE_HTTPS === 'true';
 
 const env = Router();
 env.prefix('/env');
