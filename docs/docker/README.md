@@ -84,7 +84,11 @@ ADMIN_CONTAINER_PORT=3000
 
 #### Протокол админки, если он Https
 
-ADMIN_PROTOCOL_HTTPS=true
+ADMIN_HTTPS=true
+
+#### Протокол бэка для админки, если он Https
+
+ADMIN_BACKEND_HTTPS=true
 
 #### Хост для сервера, если отличается от '0.0.0.0'
 
@@ -98,9 +102,6 @@ PORT=3654
 
 HTTPS_PORT=3655
 
-#### Протокол сервера, если он Https
-
-PROTOCOL_HTTPS=true
 
 5. Устанавите необходимые версии сервисов в файле docker-compose.yaml, например, gsbelarus/gdmn-mob.web-admin:1.1.1, gsbelarus/gdmn-mob.server:1.0.0
 

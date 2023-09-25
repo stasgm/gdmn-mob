@@ -13,16 +13,16 @@ const app = new Koa();
 const router = new Router();
 router.prefix('/api');
 
-const ADMIN_CONTAINER_PORT = process.env.ADMIN_USE_HTTPS_SERVER || 3000;
-const PROTOCOL_HTTPS = process.env.PROTOCOL_HTTPS === 'true';
+const ADMIN_CONTAINER_PORT = process.env.ADMIN_CONTAINER_PORT || 3000;
+const ADMIN_BACKEND_HTTPS = process.env.ADMIN_BACKEND_HTTPS === 'true';
 
 const env = Router();
 env.prefix('/env');
 env.get('/', (ctx) => {
   ctx.body = {
-    protocol: PROTOCOL_HTTPS ? 'https://' : 'http://',
+    protocol: ADMIN_BACKEND_HTTPS ? 'https://' : 'http://',
     host: process.env.HOST || 'localhost',
-    port: PROTOCOL_HTTPS ? process.env.HTTPS_PORT : process.env.PORT,
+    port: ADMIN_BACKEND_HTTPS ? process.env.HTTPS_PORT : process.env.PORT,
   };
   ctx.status = 200;
 });
@@ -37,7 +37,7 @@ app
 
 const koaCallback = app.callback();
 
-if (process.env.ADMIN_PROTOCOL_HTTPS === 'true') {
+if (process.env.ADMIN_HTTPS === 'true') {
   /**
    * HTTPS сервер с платным сертификатом
    */
