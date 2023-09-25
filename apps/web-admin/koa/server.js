@@ -13,17 +13,16 @@ const app = new Koa();
 const router = new Router();
 router.prefix('/api');
 
-const ADMIN_CONTAINER_PORT = process.env.ADMIN_CONTAINER_PORT || 3000;
-const HOST = process.env.HOST || 'localhost';
-const USE_HTTPS = process.env.USE_HTTPS === 'true';
+const ADMIN_CONTAINER_PORT = process.env.ADMIN_USE_HTTPS_SERVER || 3000;
+const PROTOCOL_HTTPS = process.env.PROTOCOL_HTTPS === 'true';
 
 const env = Router();
 env.prefix('/env');
 env.get('/', (ctx) => {
   ctx.body = {
-    protocol: USE_HTTPS ? 'https://' : 'http://',
-    host: HOST,
-    port: USE_HTTPS ? process.env.HTTPS_PORT : process.env.PORT,
+    protocol: PROTOCOL_HTTPS ? 'https://' : 'http://',
+    host: process.env.HOST || 'localhost',
+    port: PROTOCOL_HTTPS ? process.env.HTTPS_PORT : process.env.PORT,
   };
   ctx.status = 200;
 });
@@ -38,7 +37,7 @@ app
 
 const koaCallback = app.callback();
 
-if (USE_HTTPS) {
+if (process.env.ADMIN_PROTOCOL_HTTPS === 'true') {
   /**
    * HTTPS сервер с платным сертификатом
    */
@@ -61,7 +60,7 @@ if (USE_HTTPS) {
     https
       .createServer({ cert, ca, key }, koaCallback)
       .listen(ADMIN_CONTAINER_PORT, () =>
-        console.info(`>>> HTTPS admin server is running at https://${HOST}:${ADMIN_CONTAINER_PORT}`),
+        console.info(`>>> HTTPS admin server is running at https://localhost:${ADMIN_CONTAINER_PORT}`),
       );
   } catch (err) {
     console.warn('HTTPS admin server is not running. No SSL files');
@@ -69,6 +68,6 @@ if (USE_HTTPS) {
 } else {
   const httpServer = http.createServer(koaCallback);
   httpServer.listen(ADMIN_CONTAINER_PORT, () =>
-    console.info(`>>> HTTP admin server is running at http://${HOST}:${ADMIN_CONTAINER_PORT}`),
+    console.info(`>>> HTTP admin server is running at http://localhost:${ADMIN_CONTAINER_PORT}`),
   );
 }
