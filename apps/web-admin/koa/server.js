@@ -22,7 +22,7 @@ env.prefix('/env');
 env.get('/', (ctx) => {
   ctx.body = {
     protocol: USE_HTTPS ? 'https://' : 'http://',
-    host: 'server.gdmn.app', ////HOST,
+    host: HOST,
     port: USE_HTTPS ? process.env.HTTPS_PORT : process.env.PORT,
   };
   ctx.status = 200;
