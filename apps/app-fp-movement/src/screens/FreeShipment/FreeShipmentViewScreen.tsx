@@ -162,36 +162,31 @@ export const FreeShipmentViewScreen = () => {
         time: line.time,
       };
 
-      if (line?.weight >= goodBarcodeSettings?.boxWeight) {
-        const weight = round(round(line?.weight / line?.quantPack, 3) * quantity, 3);
+      const weight =
+        line?.weight >= goodBarcodeSettings?.boxWeight
+          ? round(round(line?.weight / line?.quantPack, 3) * quantity, 3)
+          : round(line?.weight * quantity, 3);
 
-        const newLine: IFreeShipmentLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity, weight);
+      const good =
+        remainsUse && goodRemains.length
+          ? goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === `0000${line.good.shcode}`.slice(-4))
+          : undefined;
 
-        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-      } else {
-        const weight = round(line?.weight * quantity, 3);
+      if (remainsUse && goodRemains.length) {
+        if (!good) {
+          alertWithSound('Ошибка!', 'Товар не найден.', handleFocus);
 
-        const good =
-          remainsUse && goodRemains.length
-            ? goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === `0000${line.good.shcode}`.slice(-4))
-            : undefined;
+          return;
+        } else if (good.remains < weight - line.weight) {
+          alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.', handleFocus);
 
-        if (remainsUse && goodRemains.length) {
-          if (!good) {
-            alertWithSound('Ошибка!', 'Товар не найден.', handleFocus);
-
-            return;
-          } else if (good.remains < weight - line.weight) {
-            alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.', handleFocus);
-
-            return;
-          }
+          return;
         }
-
-        const newLine: IFreeShipmentLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity, weight);
-
-        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
       }
+
+      const newLine: IFreeShipmentLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity, weight);
+
+      dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
     },
     [dispatch, goodBarcodeSettings?.boxWeight, goodRemains, id, lines, remainsUse],
   );
