@@ -163,7 +163,9 @@ export const FreeShipmentViewScreen = () => {
       };
 
       if (line?.weight >= goodBarcodeSettings?.boxWeight) {
-        const newLine: IFreeShipmentLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity);
+        const weight = round(round(line?.weight / line?.quantPack, 3) * quantity, 3);
+
+        const newLine: IFreeShipmentLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity, weight);
 
         dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
       } else {

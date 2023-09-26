@@ -113,6 +113,10 @@ export const InventoryViewScreen = () => {
     handleFocus();
   };
 
+  const isFromAddressed = departs.find((i) => i.id === doc?.head.fromDepart?.id && i.isAddressStore);
+
+  const isAddressedDoc = doc?.head.fromDepart?.isAddressStore || isFromAddressed;
+
   const handleAddQuantPack = useCallback(
     (quantity: number) => {
       const line = lines?.[0];
@@ -129,20 +133,22 @@ export const InventoryViewScreen = () => {
         workDate: line.workDate,
         time: line.time,
       };
+      if (!isAddressedDoc) {
+        if (line?.weight >= goodBarcodeSettings?.boxWeight) {
+          const weight = round(round(line?.weight / line?.quantPack, 3) * quantity, 3);
+          const newLine: IInventoryLine = getUpdatedLine(false, lineBarcode, line, quantity, weight);
 
-      if (line?.weight >= goodBarcodeSettings?.boxWeight) {
-        const newLine: IInventoryLine = getUpdatedLine(false, lineBarcode, line, quantity);
+          dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+        } else {
+          const weight = round(line?.weight * quantity, 3);
 
-        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-      } else {
-        const weight = round(line?.weight * quantity, 3);
+          const newLine: IInventoryLine = getUpdatedLine(false, lineBarcode, line, quantity, weight);
 
-        const newLine: IInventoryLine = getUpdatedLine(false, lineBarcode, line, quantity, weight);
-
-        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+          dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+        }
       }
     },
-    [dispatch, goodBarcodeSettings?.boxWeight, id, lines],
+    [dispatch, goodBarcodeSettings?.boxWeight, id, isAddressedDoc, lines],
   );
 
   const handleEditQuantPack = () => {
@@ -398,9 +404,7 @@ export const InventoryViewScreen = () => {
         quantPack: barc.quantPack,
       };
 
-      const isToAddressed = departs.find((i) => i.id === doc.head.fromDepart?.id && i.isAddressStore);
-
-      if (doc.head.fromDepart?.isAddressStore || isToAddressed) {
+      if (isAddressedDoc) {
         navigation.navigate('InventorySelectCell', {
           docId: id,
           item: newLine,
@@ -428,7 +432,7 @@ export const InventoryViewScreen = () => {
       maxBarcodeLength,
       goodBarcodeSettings,
       goods,
-      departs,
+      isAddressedDoc,
       visibleDialog,
       handleErrorMessage,
       navigation,

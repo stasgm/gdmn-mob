@@ -168,7 +168,8 @@ export const ReceiptViewScreen = () => {
       };
 
       if (line?.weight >= goodBarcodeSettings?.boxWeight) {
-        const newLine: IReceiptLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity);
+        const weight = round(round(line?.weight / line?.quantPack, 3) * quantity, 3);
+        const newLine: IReceiptLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity, weight);
 
         dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
       } else {

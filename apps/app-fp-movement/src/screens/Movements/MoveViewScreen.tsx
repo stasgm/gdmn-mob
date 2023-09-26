@@ -106,6 +106,14 @@ export const MoveViewScreen = () => {
 
   const isAddressStore = Boolean(settings.addressStore?.data);
 
+  const isFromAddressed = departs.find((i) => i.id === doc?.head.fromDepart?.id && i.isAddressStore);
+  const isToAddressed = departs.find((i) => i.id === doc?.head.toDepart?.id && i.isAddressStore);
+  const isAddressedDoc = useMemo(
+    () =>
+      doc?.head.toDepart?.isAddressStore || doc?.head.fromDepart?.isAddressStore || isFromAddressed || isToAddressed,
+    [doc?.head.fromDepart?.isAddressStore, doc?.head.toDepart?.isAddressStore, isFromAddressed, isToAddressed],
+  );
+
   const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
   const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
@@ -169,65 +177,49 @@ export const MoveViewScreen = () => {
         time: line.time,
       };
 
-      const isFromAddressed = departs.find((i) => i.id === doc?.head.fromDepart?.id && i.isAddressStore);
-      const isToAddressed = departs.find((i) => i.id === doc?.head.toDepart?.id && i.isAddressStore);
+      // if (isAddressedDoc && line?.weight >= goodBarcodeSettings?.boxWeight) {
+      //   const updatedLine: IMoveLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity);
+      //   const newLine = line.fromCell
+      //     ? { ...updatedLine, fromCell: line.fromCell }
+      //     : line.toCell
+      //     ? { ...updatedLine, toCell: line.toCell }
+      //     : updatedLine;
 
-      if (
-        (doc?.head.toDepart?.isAddressStore ||
-          doc?.head.fromDepart?.isAddressStore ||
-          isFromAddressed ||
-          isToAddressed) &&
-        line?.weight >= goodBarcodeSettings?.boxWeight
-      ) {
-        const updatedLine: IMoveLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity);
-        const newLine = line.fromCell
-          ? { ...updatedLine, fromCell: line.fromCell }
-          : line.toCell
-          ? { ...updatedLine, toCell: line.toCell }
-          : updatedLine;
+      //   dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+      // }
+      // else
+      if (!isAddressedDoc) {
+        if (line?.weight >= goodBarcodeSettings?.boxWeight) {
+          const weight = round(round(line?.weight / line?.quantPack, 3) * quantity, 3);
+          const newLine: IMoveLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity, weight);
 
-        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-      } else if (line?.weight >= goodBarcodeSettings?.boxWeight) {
-        const newLine: IMoveLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity);
+          dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+        } else {
+          const weight = round(line?.weight * quantity, 3);
 
-        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-      } else {
-        const weight = round(line?.weight * quantity, 3);
+          const good =
+            remainsUse && goodRemains.length
+              ? goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === `0000${line.good.shcode}`.slice(-4))
+              : undefined;
 
-        const good =
-          remainsUse && goodRemains.length
-            ? goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === `0000${line.good.shcode}`.slice(-4))
-            : undefined;
+          if (remainsUse && goodRemains.length) {
+            if (!good) {
+              alertWithSound('Ошибка!', 'Товар не найден.', handleFocus);
 
-        if (remainsUse && goodRemains.length) {
-          if (!good) {
-            alertWithSound('Ошибка!', 'Товар не найден.', handleFocus);
+              return;
+            } else if (good.remains < weight - line.weight) {
+              alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.', handleFocus);
 
-            return;
-          } else if (good.remains < weight - line.weight) {
-            alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.', handleFocus);
-
-            return;
+              return;
+            }
           }
-        }
-        const newLine: IMoveLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity, weight);
+          const newLine: IMoveLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity, weight);
 
-        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+          dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+        }
       }
     },
-    [
-      departs,
-      dispatch,
-      doc?.head.fromDepart?.id,
-      doc?.head.fromDepart?.isAddressStore,
-      doc?.head.toDepart?.id,
-      doc?.head.toDepart?.isAddressStore,
-      goodBarcodeSettings?.boxWeight,
-      goodRemains,
-      id,
-      lines,
-      remainsUse,
-    ],
+    [dispatch, goodBarcodeSettings?.boxWeight, goodRemains, id, isAddressedDoc, lines, remainsUse],
   );
 
   const handleEditQuantPack = () => {
@@ -499,26 +491,12 @@ export const MoveViewScreen = () => {
         usedRemains: remainsUse,
       };
 
-      const isFromAddressed = departs.find((i) => i.id === doc.head.fromDepart?.id && i.isAddressStore);
-      const isToAddressed = departs.find((i) => i.id === doc.head.toDepart?.id && i.isAddressStore);
-
-      if (
-        (doc.head.toDepart?.isAddressStore ||
-          doc.head.fromDepart?.isAddressStore ||
-          isFromAddressed ||
-          isToAddressed) &&
-        barc.weight < goodBarcodeSettings?.boxWeight
-      ) {
+      if (isAddressedDoc && barc.weight < goodBarcodeSettings?.boxWeight) {
         handleErrorMessage(visibleDialog, 'Отсканированный товар не является поддоном!');
         return;
       }
 
-      if (
-        doc.head.toDepart?.isAddressStore ||
-        doc.head.fromDepart?.isAddressStore ||
-        isFromAddressed ||
-        isToAddressed
-      ) {
+      if (isAddressedDoc) {
         if (goodBarcodeSettings.boxWeight > newLine.weight) {
           handleErrorMessage(visibleDialog, `Вес поддона не может быть меньше ${goodBarcodeSettings.boxWeight}!`);
           return;
@@ -547,7 +525,7 @@ export const MoveViewScreen = () => {
       goods,
       goodRemains,
       remainsUse,
-      departs,
+      isAddressedDoc,
       visibleDialog,
       handleErrorMessage,
       navigation,
