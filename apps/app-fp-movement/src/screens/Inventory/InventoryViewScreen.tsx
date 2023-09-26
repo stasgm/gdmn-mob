@@ -134,18 +134,14 @@ export const InventoryViewScreen = () => {
         time: line.time,
       };
       if (!isAddressedDoc) {
-        if (line?.weight >= goodBarcodeSettings?.boxWeight) {
-          const weight = round(round(line?.weight / line?.quantPack, 3) * quantity, 3);
-          const newLine: IInventoryLine = getUpdatedLine(false, lineBarcode, line, quantity, weight);
+        const weight =
+          line?.weight >= goodBarcodeSettings?.boxWeight
+            ? round(round(line?.weight / line?.quantPack, 3) * quantity, 3)
+            : round(line?.weight * quantity, 3);
 
-          dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-        } else {
-          const weight = round(line?.weight * quantity, 3);
+        const newLine: IInventoryLine = getUpdatedLine(false, lineBarcode, line, quantity, weight);
 
-          const newLine: IInventoryLine = getUpdatedLine(false, lineBarcode, line, quantity, weight);
-
-          dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-        }
+        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
       }
     },
     [dispatch, goodBarcodeSettings?.boxWeight, id, isAddressedDoc, lines],

@@ -189,34 +189,30 @@ export const MoveViewScreen = () => {
       // }
       // else
       if (!isAddressedDoc) {
-        if (line?.weight >= goodBarcodeSettings?.boxWeight) {
-          const weight = round(round(line?.weight / line?.quantPack, 3) * quantity, 3);
-          const newLine: IMoveLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity, weight);
+        const weight =
+          line?.weight >= goodBarcodeSettings?.boxWeight
+            ? round(round(line?.weight / line?.quantPack, 3) * quantity, 3)
+            : round(line?.weight * quantity, 3);
 
-          dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-        } else {
-          const weight = round(line?.weight * quantity, 3);
+        const good =
+          remainsUse && goodRemains.length
+            ? goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === `0000${line.good.shcode}`.slice(-4))
+            : undefined;
 
-          const good =
-            remainsUse && goodRemains.length
-              ? goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === `0000${line.good.shcode}`.slice(-4))
-              : undefined;
+        if (remainsUse && goodRemains.length) {
+          if (!good) {
+            alertWithSound('Ошибка!', 'Товар не найден.', handleFocus);
 
-          if (remainsUse && goodRemains.length) {
-            if (!good) {
-              alertWithSound('Ошибка!', 'Товар не найден.', handleFocus);
+            return;
+          } else if (good.remains < weight - line.weight) {
+            alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.', handleFocus);
 
-              return;
-            } else if (good.remains < weight - line.weight) {
-              alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.', handleFocus);
-
-              return;
-            }
+            return;
           }
-          const newLine: IMoveLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity, weight);
-
-          dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
         }
+        const newLine: IMoveLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity, weight);
+
+        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
       }
     },
     [dispatch, goodBarcodeSettings?.boxWeight, goodRemains, id, isAddressedDoc, lines, remainsUse],
