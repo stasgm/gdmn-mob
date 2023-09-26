@@ -257,7 +257,7 @@ export const ReceiptViewScreen = () => {
     setVisibleSendDialog(false);
     setScreenState('sending');
     await sendDoc();
-    handleSendRemainsRequest();
+    await handleSendRemainsRequest();
     setScreenState('sent');
   }, [handleSendRemainsRequest, sendDoc]);
 

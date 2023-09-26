@@ -376,7 +376,7 @@ const ShipmentViewScreen = () => {
     setScreenState('sending');
     await sendDoc();
 
-    handleSendRemainsRequest();
+    await handleSendRemainsRequest();
     setScreenState('sent');
   }, [handleSendRemainsRequest, sendDoc]);
 

@@ -15,6 +15,7 @@ import {
   useAppStore,
   IMultipartData,
   RootState,
+  useSettingsThunkDispatch,
 } from '@lib/store';
 
 import api, { isConnectError } from '@lib/client-api';
@@ -30,8 +31,6 @@ import {
 } from '@lib/types';
 
 import { useCallback, useMemo } from 'react';
-
-import { useSettingsThunkDispatch } from '@lib/store/src/settings/actions.async';
 
 import { generateId, getDateString, isIMessage, isIReferences, isNumeric } from '../utils';
 
@@ -521,12 +520,18 @@ export const useSync = (onSync?: () => Promise<any>) => {
                 appSystemId: appSystem.id,
                 companyId: company.id,
               });
+              //На случай зацикливания, count < 100
+              let count = 0;
 
               //Если сообщения получены успешно, то
               //  справочники: очищаем старые и записываем в хранилище новые данные
               //  документы: добавляем новые, а старые заменяем, только если был статус 'DRAFT'
               //  отправляем запросы за остальными данными
-              while (getMessagesResponse.type === 'GET_MESSAGES' && getMessagesResponse.messageList.length > 0) {
+              while (
+                getMessagesResponse.type === 'GET_MESSAGES' &&
+                getMessagesResponse.messageList.length > 0 &&
+                count < 100
+              ) {
                 for (const message of getMessagesResponse.messageList) {
                   //Получая сообщение(я) у которого присутствует признак multipartId, помещаем его в хранилище
                   //Файл сообщения удаляем
@@ -544,8 +549,11 @@ export const useSync = (onSync?: () => Promise<any>) => {
                   appSystemId: appSystem.id,
                   companyId: company.id,
                 });
+                count++;
               }
+
               const state = store.getState() as RootState;
+
               if (getMessagesResponse.type === 'GET_MESSAGES') {
                 //Обрабатываем все сборные сообщения
                 for (const [key, value] of Object.entries(state.messages.multipartData as IMultipartData)) {
@@ -602,6 +610,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
                     }
                   }
                 }
+
                 const currentDate = new Date();
                 const syncRequests = state.app.syncRequests || [];
 

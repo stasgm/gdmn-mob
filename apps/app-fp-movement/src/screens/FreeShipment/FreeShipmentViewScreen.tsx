@@ -265,8 +265,7 @@ export const FreeShipmentViewScreen = () => {
     setVisibleSendDialog(false);
     setScreenState('sending');
     await sendDoc();
-
-    handleSendRemainsRequest();
+    await handleSendRemainsRequest();
     setScreenState('sent');
   }, [handleSendRemainsRequest, sendDoc]);
 

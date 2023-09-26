@@ -239,9 +239,9 @@ export const MoveToViewScreen = () => {
     setScreenState('sending');
     await sendDoc();
     if (isAddressStore) {
-      handleSendCellRequest();
+      await handleSendCellRequest();
     }
-    handleSendRemainsRequest();
+    await handleSendRemainsRequest();
     setScreenState('sent');
   }, [handleSendCellRequest, handleSendRemainsRequest, isAddressStore, sendDoc]);
 
