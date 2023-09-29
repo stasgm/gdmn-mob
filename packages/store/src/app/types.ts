@@ -1,4 +1,4 @@
-import { CmdName, IDeviceLog } from '@lib/types';
+import { IDeviceLog, ISyncRequest } from '@lib/types';
 
 export interface IFormParam {
   [fieldName: string]: unknown;
@@ -39,11 +39,3 @@ export interface ISyncRequestParam {
   name: string;
   value: any;
 }
-
-export interface ISyncRequest {
-  cmdName: CmdName;
-  date: Date;
-  param?: ISyncRequestParam;
-}
-
-export type SyncRequestDelParam = Omit<ISyncRequest, 'date'>;

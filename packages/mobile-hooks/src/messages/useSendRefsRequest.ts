@@ -1,4 +1,12 @@
-import { useDispatch, useSelector, appActions, authActions, useAuthThunkDispatch } from '@lib/store';
+import {
+  useDispatch,
+  useSelector,
+  appActions,
+  authActions,
+  useAuthThunkDispatch,
+  useAppStore,
+  RootState,
+} from '@lib/store';
 
 import { IDeviceLog, IMessage } from '@lib/types';
 import api, { isConnectError } from '@lib/client-api';
@@ -9,13 +17,14 @@ import { generateId } from '../utils';
 
 import { mobileRequest } from '../mobileRequest';
 
-import { getNextOrder } from './helpers';
+import { getNextOrder, needRequest } from './helpers';
 import { useSaveErrors } from './useSaveErrors';
 
 export const useSendRefsRequest = () => {
   const dispatch = useDispatch();
   const authDispatch = useAuthThunkDispatch();
   const appRequest = useMemo(() => mobileRequest(authDispatch, authActions), [authDispatch]);
+  const store = useAppStore();
 
   const { user, company, config, appSystem } = useSelector((state) => state.auth);
   const refVersion = 1;
@@ -71,32 +80,45 @@ export const useSendRefsRequest = () => {
         );
       }
       if (!tempErrs.length) {
-        addRequestNotice('Запрос на получение справочников');
-        const messageCompany = { id: company.id, name: company.name };
-        const consumer = user.erpUser;
+        const state = store.getState() as RootState;
+        const currentDate = new Date();
+        const syncRequests = state.app.syncRequests || [];
+        //Если запрос такого типа не был отправлен или время запроса меньше текущего на час, то отправляем
+        if (needRequest(syncRequests, 'GET_REF', currentDate)) {
+          addRequestNotice('Запрос на получение справочников');
+          const messageCompany = { id: company.id, name: company.name };
+          const consumer = user.erpUser;
 
-        //Формируем запрос на получение справочников
-        const messageGetRef: IMessage['body'] = {
-          type: 'CMD',
-          version: refVersion,
-          payload: {
-            name: 'GET_REF',
-          },
-        };
+          //Формируем запрос на получение справочников
+          const messageGetRef: IMessage['body'] = {
+            type: 'CMD',
+            version: refVersion,
+            payload: {
+              name: 'GET_REF',
+            },
+          };
 
-        //Отправляем запрос на получение справочников
-        const sendMesRefResponse = await api.message.sendMessages(
-          appRequest,
-          appSystem,
-          messageCompany,
-          consumer,
-          messageGetRef,
-          getNextOrder(),
-          deviceId,
-        );
+          //Отправляем запрос на получение справочников
+          const sendMesRefResponse = await api.message.sendMessages(
+            appRequest,
+            appSystem,
+            messageCompany,
+            consumer,
+            messageGetRef,
+            getNextOrder(),
+            deviceId,
+          );
 
-        if (sendMesRefResponse?.type !== 'SEND_MESSAGE') {
-          addError('useSendRefsRequest: api.message.sendMessages', sendMesRefResponse.message, tempErrs);
+          if (sendMesRefResponse?.type !== 'SEND_MESSAGE') {
+            addError('useSendRefsRequest: api.message.sendMessages', sendMesRefResponse.message, tempErrs);
+          } else if (sendMesRefResponse.type === 'SEND_MESSAGE') {
+            dispatch(
+              appActions.addSyncRequest({
+                cmdName: 'GET_REF',
+                date: currentDate,
+              }),
+            );
+          }
         }
       }
     }

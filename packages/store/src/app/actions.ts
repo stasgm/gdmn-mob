@@ -1,15 +1,7 @@
-import { IDeviceLog } from '@lib/types';
+import { CmdNameSyncRequest, IDeviceLog, ISyncRequest } from '@lib/types';
 import { ActionType, createAction } from 'typesafe-actions';
 
-import {
-  IFormParam,
-  IAppState,
-  IRequestNotice,
-  IErrorNotice,
-  ISyncRequest,
-  SyncRequestDelParam,
-  ISetScreenFormParam,
-} from './types';
+import { IFormParam, IAppState, IRequestNotice, IErrorNotice, ISetScreenFormParam } from './types';
 
 const init = createAction('APP/INIT')();
 
@@ -35,7 +27,7 @@ const addErrorNotice = createAction('APP/ADD_ERROR_NOTICE')<IErrorNotice>();
 const clearErrorNotice = createAction('APP/CLEAR_ERROR_NOTICE')();
 
 const addSyncRequest = createAction('APP/ADD_SYNC_REQUEST')<ISyncRequest>();
-const removeSyncRequest = createAction('APP/DEL_SYNC_REQUEST')<SyncRequestDelParam>();
+const removeSyncRequest = createAction('APP/DEL_SYNC_REQUEST')<CmdNameSyncRequest>();
 
 /**
  * Для ускорения работы программы мы кэшируем часть данных

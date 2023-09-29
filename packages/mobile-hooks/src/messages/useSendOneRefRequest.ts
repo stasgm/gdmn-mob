@@ -17,7 +17,7 @@ import { generateId } from '../utils';
 
 import { mobileRequest } from '../mobileRequest';
 
-import { REPEAT_REQUEST_TIME_IN_MS, getNextOrder } from './helpers';
+import { getNextOrder, needRequest } from './helpers';
 import { useSaveErrors } from './useSaveErrors';
 
 export const useSendOneRefRequest = (description: string, params: ICmdParams) => {
@@ -84,14 +84,10 @@ export const useSendOneRefRequest = (description: string, params: ICmdParams) =>
         const state = store.getState() as RootState;
         const currentDate = new Date();
         const syncRequests = state.app.syncRequests || [];
-        const syncReq = syncRequests.find(
-          (req) => req.cmdName === 'GET_ONE_REF' && req.param?.name === 'name' && req.param?.value === 'remains',
-        );
+        const isRemains = typeof params === 'object' && 'name' in params && params.name === 'remains';
+        const needSendRequest = isRemains ? needRequest(syncRequests, 'GET_REMAINS', currentDate) : true;
         //Если запрос такого типа не был отправлен или время запроса меньше текущего на час, то отправляем
-        if (
-          !syncReq ||
-          (syncReq?.date && currentDate.getTime() - new Date(syncReq.date).getTime() > REPEAT_REQUEST_TIME_IN_MS)
-        ) {
+        if (needSendRequest) {
           addRequestNotice(`Запрос на получение справочника: ${description}`);
 
           const messageCompany = { id: company.id, name: company.name };
@@ -120,23 +116,18 @@ export const useSendOneRefRequest = (description: string, params: ICmdParams) =>
 
           if (sendMesRefResponse.type !== 'SEND_MESSAGE') {
             addError('useSendOneRefRequest: api.message.sendMessages', sendMesRefResponse.message, tempErrs);
-          } else if (
-            sendMesRefResponse.type === 'SEND_MESSAGE' &&
-            typeof params === 'object' &&
-            'name' in params &&
-            params.name === 'remains'
-          ) {
+          } else if (sendMesRefResponse.type === 'SEND_MESSAGE' && isRemains) {
             dispatch(
               appActions.addSyncRequest({
-                cmdName: 'GET_ONE_REF',
+                cmdName: 'GET_REMAINS',
                 date: currentDate,
-                param: { name: 'name', value: 'remains' },
               }),
             );
           }
         }
       }
     }
+
     if (tempErrs.length) {
       dispatch(appActions.setShowSyncInfo(true));
     }

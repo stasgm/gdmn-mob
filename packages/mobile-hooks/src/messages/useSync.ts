@@ -36,7 +36,7 @@ import { generateId, getDateString, isIMessage, isIReferences, isNumeric } from 
 
 import { mobileRequest } from '../mobileRequest';
 
-import { getNextOrder, MULTIPART_ITEM_LIVE_IN_MS, REPEAT_REQUEST_TIME_IN_MS } from './helpers';
+import { getNextOrder, MULTIPART_ITEM_LIVE_IN_MS, needRequest } from './helpers';
 import { useSaveErrors } from './useSaveErrors';
 
 export const useSync = (onSync?: () => Promise<any>) => {
@@ -130,28 +130,26 @@ export const useSync = (onSync?: () => Promise<any>) => {
           //Если ответ пришел, удаляем элемент с данным типом из массива запросов
           switch (msg.body.type) {
             case 'REFS': {
-              dispatch(appActions.removeSyncRequest({ cmdName: 'GET_REF' }));
+              dispatch(appActions.removeSyncRequest('GET_REF'));
               break;
             }
             case 'DOCS': {
-              dispatch(appActions.removeSyncRequest({ cmdName: 'GET_DOCUMENTS' }));
+              dispatch(appActions.removeSyncRequest('GET_DOCUMENTS'));
               break;
             }
             case 'APP_SYSTEM_SETTINGS': {
-              dispatch(appActions.removeSyncRequest({ cmdName: 'GET_APP_SYSTEM_SETTINGS' }));
+              dispatch(appActions.removeSyncRequest('GET_APP_SYSTEM_SETTINGS'));
               break;
             }
             case 'SETTINGS': {
-              dispatch(appActions.removeSyncRequest({ cmdName: 'GET_USER_SETTINGS' }));
+              dispatch(appActions.removeSyncRequest('GET_USER_SETTINGS'));
               break;
             }
             case 'ONE_REF': {
               //GET_ONE_REF в syncRequest только для остатков, так как запрос остатков добавлен в синхронизацию.
               //Для других таблиц запрос можно слать вручную сколько угодно.
               if ((msg.body.payload as IReferences).remains) {
-                dispatch(
-                  appActions.removeSyncRequest({ cmdName: 'GET_ONE_REF', param: { name: 'name', value: 'remains' } }),
-                );
+                dispatch(appActions.removeSyncRequest('GET_REMAINS'));
               }
               break;
             }
@@ -614,14 +612,9 @@ export const useSync = (onSync?: () => Promise<any>) => {
                 const currentDate = new Date();
                 const syncRequests = state.app.syncRequests || [];
 
-                if (isGetReferences) {
-                  const syncReq = syncRequests.find((req) => req.cmdName === 'GET_REF');
+                if (isGetReferences && !connectError) {
                   //Если запрос такого типа не был отправлен или время запроса меньше текущего на час, то отправляем
-                  if (
-                    !syncReq ||
-                    (syncReq?.date &&
-                      currentDate.getTime() - new Date(syncReq.date).getTime() > REPEAT_REQUEST_TIME_IN_MS)
-                  ) {
+                  if (needRequest(syncRequests, 'GET_REF', currentDate)) {
                     //Формируем запрос на получение справочников для следующего раза
                     const messageGetRef: IMessage['body'] = {
                       type: 'CMD',
@@ -659,16 +652,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
                 }
 
                 if (isGetRemains && !connectError) {
-                  const syncReq = syncRequests.find(
-                    (req) =>
-                      req.cmdName === 'GET_ONE_REF' && req.param?.name === 'name' && req.param?.value === 'remains',
-                  );
-                  //Если запрос такого типа не был отправлен или время запроса меньше текущего на час, то отправляем
-                  if (
-                    !syncReq ||
-                    (syncReq?.date &&
-                      currentDate.getTime() - new Date(syncReq.date).getTime() > REPEAT_REQUEST_TIME_IN_MS)
-                  ) {
+                  if (needRequest(syncRequests, 'GET_REMAINS', currentDate)) {
                     //Формируем запрос на получение справочников для следующего раза
                     const messageGetRef: IMessage['body'] = {
                       type: 'CMD',
@@ -703,56 +687,47 @@ export const useSync = (onSync?: () => Promise<any>) => {
                     if (sendMesRefResponse.type === 'SEND_MESSAGE') {
                       dispatch(
                         appActions.addSyncRequest({
-                          cmdName: 'GET_ONE_REF',
+                          cmdName: 'GET_REMAINS',
                           date: currentDate,
-                          param: { name: 'name', value: 'remains' },
                         }),
                       );
                     }
                   }
                 }
 
-                if (!connectError) {
-                  const syncReq = syncRequests.find((req) => req.cmdName === 'GET_DOCUMENTS');
-                  //Если запрос такого типа не был отправлен или время запроса меньше текущего на час, то отправляем
-                  if (
-                    !syncReq ||
-                    (syncReq?.date &&
-                      currentDate.getTime() - new Date(syncReq.date).getTime() > REPEAT_REQUEST_TIME_IN_MS)
-                  ) {
-                    addRequestNotice('Запрос документов');
+                if (!connectError && needRequest(syncRequests, 'GET_DOCUMENTS', currentDate)) {
+                  addRequestNotice('Запрос документов');
 
-                    //Формируем запрос на получение документов для следующего раза
-                    const messageGetDoc: IMessage['body'] = {
-                      type: 'CMD',
-                      version: docVersion,
-                      payload: {
-                        name: 'GET_DOCUMENTS',
-                      },
-                    };
+                  //Формируем запрос на получение документов для следующего раза
+                  const messageGetDoc: IMessage['body'] = {
+                    type: 'CMD',
+                    version: docVersion,
+                    payload: {
+                      name: 'GET_DOCUMENTS',
+                    },
+                  };
 
-                    //4. Отправляем запрос на получение документов
-                    const sendMesDocRespone = await api.message.sendMessages(
-                      appRequest,
-                      appSystem,
-                      messageCompany,
-                      consumer,
-                      messageGetDoc,
-                      getNextOrder(),
-                      deviceId,
+                  //4. Отправляем запрос на получение документов
+                  const sendMesDocRespone = await api.message.sendMessages(
+                    appRequest,
+                    appSystem,
+                    messageCompany,
+                    consumer,
+                    messageGetDoc,
+                    getNextOrder(),
+                    deviceId,
+                  );
+
+                  if (sendMesDocRespone.type !== 'SEND_MESSAGE') {
+                    addError(
+                      'useSync: api.message.sendMessages',
+                      `Запрос документов не отправлен. ${sendMesDocRespone.message}`,
+                      tempErrs,
                     );
-
-                    if (sendMesDocRespone.type !== 'SEND_MESSAGE') {
-                      addError(
-                        'useSync: api.message.sendMessages',
-                        `Запрос на получение документов не отправлен. ${sendMesDocRespone.message}`,
-                        tempErrs,
-                      );
-                      connectError = isConnectError(sendMesDocRespone.type);
-                    }
-                    if (sendMesDocRespone.type === 'SEND_MESSAGE') {
-                      dispatch(appActions.addSyncRequest({ cmdName: 'GET_DOCUMENTS', date: currentDate }));
-                    }
+                    connectError = isConnectError(sendMesDocRespone.type);
+                  }
+                  if (sendMesDocRespone.type === 'SEND_MESSAGE') {
+                    dispatch(appActions.addSyncRequest({ cmdName: 'GET_DOCUMENTS', date: currentDate }));
                   }
                 }
 
@@ -785,91 +760,75 @@ export const useSync = (onSync?: () => Promise<any>) => {
                   }
                 }
 
-                if (!connectError) {
-                  const syncReq = syncRequests.find((req) => req.cmdName === 'GET_USER_SETTINGS');
-                  //Если запрос такого типа не был отправлен или время запроса меньше текущего на час, то отправляем
-                  if (
-                    !syncReq ||
-                    (syncReq?.date &&
-                      currentDate.getTime() - new Date(syncReq.date).getTime() > REPEAT_REQUEST_TIME_IN_MS)
-                  ) {
-                    addRequestNotice('Запрос настроек пользователя');
+                if (!connectError && needRequest(syncRequests, 'GET_USER_SETTINGS', currentDate)) {
+                  addRequestNotice('Запрос настроек пользователя');
 
-                    //Формируем запрос на получение настроек для юзера
-                    const messageGetUserSettings: IMessage['body'] = {
-                      type: 'CMD',
-                      version: docVersion,
-                      payload: {
-                        name: 'GET_USER_SETTINGS',
-                      },
-                    };
+                  //Формируем запрос на получение настроек для юзера
+                  const messageGetUserSettings: IMessage['body'] = {
+                    type: 'CMD',
+                    version: docVersion,
+                    payload: {
+                      name: 'GET_USER_SETTINGS',
+                    },
+                  };
 
-                    //7. Отправляем запрос на получение настроек пользователя
-                    const sendMesUserSettResponse = await api.message.sendMessages(
-                      appRequest,
-                      appSystem,
-                      messageCompany,
-                      consumer,
-                      messageGetUserSettings,
-                      getNextOrder(),
-                      deviceId,
+                  //7. Отправляем запрос на получение настроек пользователя
+                  const sendMesUserSettResponse = await api.message.sendMessages(
+                    appRequest,
+                    appSystem,
+                    messageCompany,
+                    consumer,
+                    messageGetUserSettings,
+                    getNextOrder(),
+                    deviceId,
+                  );
+
+                  if (sendMesUserSettResponse.type !== 'SEND_MESSAGE') {
+                    addError(
+                      'useSync: api.message.sendMessages',
+                      `Запрос на получение настроек пользователя не отправлен. ${sendMesUserSettResponse.message}`,
+                      tempErrs,
                     );
-
-                    if (sendMesUserSettResponse.type !== 'SEND_MESSAGE') {
-                      addError(
-                        'useSync: api.message.sendMessages',
-                        `Запрос на получение настроек пользователя не отправлен. ${sendMesUserSettResponse.message}`,
-                        tempErrs,
-                      );
-                      connectError = isConnectError(sendMesUserSettResponse.type);
-                    }
-                    if (sendMesUserSettResponse.type === 'SEND_MESSAGE') {
-                      dispatch(appActions.addSyncRequest({ cmdName: 'GET_USER_SETTINGS', date: currentDate }));
-                    }
+                    connectError = isConnectError(sendMesUserSettResponse.type);
+                  }
+                  if (sendMesUserSettResponse.type === 'SEND_MESSAGE') {
+                    dispatch(appActions.addSyncRequest({ cmdName: 'GET_USER_SETTINGS', date: currentDate }));
                   }
                 }
 
-                if (!connectError) {
-                  const syncReq = syncRequests.find((req) => req.cmdName === 'GET_APP_SYSTEM_SETTINGS');
-                  //Если запрос такого типа не был отправлен или время запроса меньше текущего на час, то отправляем
-                  if (
-                    !syncReq ||
-                    (syncReq?.date &&
-                      currentDate.getTime() - new Date(syncReq.date).getTime() > REPEAT_REQUEST_TIME_IN_MS)
-                  ) {
-                    addRequestNotice('Запрос настроек подсистемы');
+                if (!connectError && needRequest(syncRequests, 'GET_APP_SYSTEM_SETTINGS', currentDate)) {
+                  addRequestNotice('Запрос настроек подсистемы');
 
-                    //Формируем запрос на получение настроек подсистемы
-                    const messageGetAppSettings: IMessage['body'] = {
-                      type: 'CMD',
-                      version: docVersion,
-                      payload: {
-                        name: 'GET_APP_SYSTEM_SETTINGS',
-                      },
-                    };
+                  //Формируем запрос на получение настроек подсистемы
+                  const messageGetAppSettings: IMessage['body'] = {
+                    type: 'CMD',
+                    version: docVersion,
+                    payload: {
+                      name: 'GET_APP_SYSTEM_SETTINGS',
+                    },
+                  };
 
-                    //8. Отправляем запрос на получение настроек подсистемы
-                    const sendMesAppSettResponse = await api.message.sendMessages(
-                      appRequest,
-                      appSystem,
-                      messageCompany,
-                      consumer,
-                      messageGetAppSettings,
-                      getNextOrder(),
-                      deviceId,
+                  //8. Отправляем запрос на получение настроек подсистемы
+                  const sendMesAppSettResponse = await api.message.sendMessages(
+                    appRequest,
+                    appSystem,
+                    messageCompany,
+                    consumer,
+                    messageGetAppSettings,
+                    getNextOrder(),
+                    deviceId,
+                  );
+
+                  if (sendMesAppSettResponse.type !== 'SEND_MESSAGE') {
+                    addError(
+                      'useSync: api.message.sendMessages',
+                      `Запрос на получение настроек подсистемы не отправлен. ${sendMesAppSettResponse.message}`,
+                      tempErrs,
                     );
-
-                    if (sendMesAppSettResponse.type !== 'SEND_MESSAGE') {
-                      addError(
-                        'useSync: api.message.sendMessages',
-                        `Запрос на получение настроек подсистемы не отправлен. ${sendMesAppSettResponse.message}`,
-                        tempErrs,
-                      );
-                      connectError = isConnectError(sendMesAppSettResponse.type);
-                    }
-                    if (sendMesAppSettResponse.type === 'SEND_MESSAGE') {
-                      dispatch(appActions.addSyncRequest({ cmdName: 'GET_APP_SYSTEM_SETTINGS', date: currentDate }));
-                    }
+                    connectError = isConnectError(sendMesAppSettResponse.type);
+                  }
+                  if (sendMesAppSettResponse.type === 'SEND_MESSAGE') {
+                    dispatch(appActions.addSyncRequest({ cmdName: 'GET_APP_SYSTEM_SETTINGS', date: currentDate }));
                   }
                 }
               } else {
