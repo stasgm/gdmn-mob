@@ -60,6 +60,7 @@ import {
   getUpdatedLine,
 } from '../../utils/helpers';
 import ViewTotal from '../../components/ViewTotal';
+import QuantDialog from '../../components/QuantDialog';
 
 const keyExtractor = (item: IShipmentLine | ITempLine) => item.id;
 const ShipmentViewScreen = () => {
@@ -120,6 +121,8 @@ const ShipmentViewScreen = () => {
 
   const [visibleQuantPackDialog, setVisibleQuantPackDialog] = useState(false);
   const [quantPack, setQuantPack] = useState('');
+  const [quantPallet, setQuantPallet] = useState('');
+  const [isPack, setIsPack] = useState(true);
 
   const goods = refSelectors.selectByName<IGood>('good').data;
 
@@ -168,7 +171,7 @@ const ShipmentViewScreen = () => {
   };
 
   const handleAddQuantPack = useCallback(
-    (quantity: number) => {
+    (quantity: number, pallet: number) => {
       const line = shipmentLines?.[0];
       if (!line) {
         return;
@@ -186,7 +189,7 @@ const ShipmentViewScreen = () => {
 
       const weight =
         line?.weight >= goodBarcodeSettings?.boxWeight
-          ? round(round(line?.weight / line?.quantPack, 3) * quantity, 3)
+          ? round(round(line?.weight / line?.quantPack, 3) * quantity * pallet, 3)
           : round(line?.weight * quantity, 3);
 
       const tempLine = tempOrder?.lines?.find((i) => line.good.id === i.good.id);
@@ -217,7 +220,13 @@ const ShipmentViewScreen = () => {
               line: newTempLine,
             }),
           );
-          const newLine: IShipmentLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity, weight);
+          const newLine: IShipmentLine = getUpdatedLine(
+            remainsUse,
+            lineBarcode,
+            line,
+            line?.weight >= goodBarcodeSettings?.boxWeight ? round(quantity * pallet, 3) : quantity,
+            weight,
+          );
 
           dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
         } else {
@@ -231,7 +240,13 @@ const ShipmentViewScreen = () => {
                   line: newTempLine,
                 }),
               );
-              const newLine: IShipmentLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity, weight);
+              const newLine: IShipmentLine = getUpdatedLine(
+                remainsUse,
+                lineBarcode,
+                line,
+                line?.weight >= goodBarcodeSettings?.boxWeight ? round(quantity * pallet, 3) : quantity,
+                weight,
+              );
 
               dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
             },
@@ -239,7 +254,13 @@ const ShipmentViewScreen = () => {
           );
         }
       } else {
-        const newLine: IShipmentLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity, weight);
+        const newLine: IShipmentLine = getUpdatedLine(
+          remainsUse,
+          lineBarcode,
+          line,
+          line?.weight >= goodBarcodeSettings?.boxWeight ? round(quantity * pallet, 3) : quantity,
+          weight,
+        );
 
         dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
       }
@@ -247,22 +268,24 @@ const ShipmentViewScreen = () => {
     [dispatch, fpDispatch, goodBarcodeSettings?.boxWeight, goodRemains, id, remainsUse, shipmentLines, tempOrder],
   );
 
-  const handleEditQuantPack = () => {
-    if (!isNumeric(quantPack)) {
+  const handleEditQuantPack = useCallback(() => {
+    if (!isNumeric(quantPack) || !isNumeric(quantPallet)) {
       alertWithSound('Ошибка!', 'Неправильное количество.', handleFocus);
       return;
     }
 
-    handleAddQuantPack(Number(quantPack));
+    handleAddQuantPack(Number(quantPack), Number(quantPallet));
     setVisibleQuantPackDialog(false);
     setQuantPack('');
+    setQuantPallet('');
     Keyboard.dismiss();
     handleFocus();
-  };
+  }, [handleAddQuantPack, quantPack, quantPallet]);
 
   const handleDismissQuantPack = () => {
     setVisibleQuantPackDialog(false);
     setQuantPack('');
+    setQuantPallet('');
     Keyboard.dismiss();
     handleFocus();
   };
@@ -667,6 +690,16 @@ const ShipmentViewScreen = () => {
     [colors.background, colors.primary, colors.text, lineType],
   );
 
+  const handlePressLine = useCallback(
+    (weight: number) => {
+      setQuantPack((shipmentLines?.[0].quantPack || '').toString());
+      setQuantPallet('1');
+      setVisibleQuantPackDialog(true);
+      weight >= goodBarcodeSettings?.boxWeight ? setIsPack(false) : setIsPack(true);
+    },
+    [goodBarcodeSettings?.boxWeight, shipmentLines],
+  );
+
   const renderShipmentItem = useCallback(
     ({ item }: { item: IShipmentLine }) => {
       return (
@@ -675,7 +708,7 @@ const ShipmentViewScreen = () => {
           readonly={
             shipment?.status !== 'DRAFT' || item.sortOrder !== shipmentLines?.length || Boolean(item.scannedBarcode)
           }
-          onPress={() => setVisibleQuantPackDialog(true)}
+          onPress={() => handlePressLine(item.weight)}
         >
           <View style={styles.details}>
             <LargeText style={styles.textBold}>{item.good.name}</LargeText>
@@ -694,7 +727,7 @@ const ShipmentViewScreen = () => {
         </ListItemLine>
       );
     },
-    [shipment?.status, shipmentLines?.length],
+    [handlePressLine, shipment?.status, shipmentLines?.length],
   );
 
   const renderTempItem = useCallback(({ item }: { item: ITempLine }) => {
@@ -796,15 +829,18 @@ const ShipmentViewScreen = () => {
         okLabel={'Найти'}
         errorMessage={errorMessage}
       />
-      <AppDialog
-        title="Количество"
+      <QuantDialog
         visible={visibleQuantPackDialog}
-        text={quantPack}
-        onChangeText={setQuantPack}
+        textPack={quantPack}
+        textPallet={quantPallet}
+        onChangeTextPack={setQuantPack}
+        onChangeTextPallet={setQuantPallet}
         onCancel={handleDismissQuantPack}
         onOk={handleEditQuantPack}
         okLabel={'Ок'}
-        // errorMessage={errorMessage}
+        isPack={isPack}
+        keyboardType="numbers-and-punctuation"
+        okDisabled={!quantPack || !quantPallet}
       />
       <SimpleDialog
         visible={visibleSendDialog}
