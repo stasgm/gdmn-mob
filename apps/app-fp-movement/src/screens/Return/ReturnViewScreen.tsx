@@ -23,7 +23,7 @@ import {
   SimpleDialog,
 } from '@lib/mobile-ui';
 
-import { generateId, getDateString, keyExtractor, useSendDocs, sleep, round } from '@lib/mobile-hooks';
+import { generateId, getDateString, keyExtractor, useSendDocs, sleep, round, isNumeric } from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
 
@@ -39,6 +39,7 @@ import { alertWithSound, alertWithSoundMulti, getBarcode, getDocToSend, getUpdat
 import { IBarcode, IGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
+import QuantDialog from '../../components/QuantDialog';
 
 export interface IScanerObject {
   item?: IReturnLine;
@@ -107,9 +108,11 @@ export const ReturnViewScreen = () => {
 
   const [visibleQuantPackDialog, setVisibleQuantPackDialog] = useState(false);
   const [quantPack, setQuantPack] = useState('');
+  const [quantPallet, setQuantPallet] = useState('');
+  const [isPack, setIsPack] = useState(true);
 
   const handleAddQuantPack = useCallback(
-    (quantity: number) => {
+    (quantity: number, pallet: number) => {
       const line = lines?.[0];
       if (!line) {
         return;
@@ -127,27 +130,40 @@ export const ReturnViewScreen = () => {
 
       const weight =
         line?.weight >= goodBarcodeSettings?.boxWeight
-          ? round(round(line?.weight / line?.quantPack, 3) * quantity, 3)
+          ? round(round(line?.weight / line?.quantPack, 3) * quantity * pallet, 3)
           : round(line?.weight * quantity, 3);
 
-      const newLine: IReturnLine = getUpdatedLine(false, lineBarcode, line, quantity, weight);
+      const newLine: IReturnLine = getUpdatedLine(
+        false,
+        lineBarcode,
+        line,
+        line?.weight >= goodBarcodeSettings?.boxWeight ? round(quantity * pallet, 3) : quantity,
+        weight,
+      );
 
       dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
     },
     [dispatch, goodBarcodeSettings?.boxWeight, id, lines],
   );
 
-  const handleEditQuantPack = () => {
-    handleAddQuantPack(Number(quantPack));
+  const handleEditQuantPack = useCallback(() => {
+    if (!isNumeric(quantPack) || !isNumeric(quantPallet)) {
+      alertWithSound('Ошибка!', 'Неправильное количество.', handleFocus);
+      return;
+    }
+
+    handleAddQuantPack(Number(quantPack), Number(quantPallet));
     setVisibleQuantPackDialog(false);
     setQuantPack('');
+    setQuantPallet('');
     Keyboard.dismiss();
     handleFocus();
-  };
+  }, [handleAddQuantPack, quantPack, quantPallet]);
 
   const handleDismissQuantPack = () => {
     setVisibleQuantPackDialog(false);
     setQuantPack('');
+    setQuantPallet('');
     Keyboard.dismiss();
     handleFocus();
   };
@@ -291,13 +307,23 @@ export const ReturnViewScreen = () => {
     });
   }, [navigation, renderRight]);
 
+  const handlePressLine = useCallback(
+    (weight: number) => {
+      setQuantPack((lines?.[0].quantPack || '').toString());
+      setQuantPallet('1');
+      setVisibleQuantPackDialog(true);
+      weight >= goodBarcodeSettings?.boxWeight ? setIsPack(false) : setIsPack(true);
+    },
+    [goodBarcodeSettings?.boxWeight, lines],
+  );
+
   const renderItem = useCallback(
     ({ item }: { item: IReturnLine }) => {
       return (
         <ListItemLine
           key={item.id}
           readonly={doc?.status !== 'DRAFT' || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
-          onPress={() => setVisibleQuantPackDialog(true)}
+          onPress={() => handlePressLine(item.weight)}
         >
           <View style={styles.details}>
             <LargeText style={styles.textBold}>{item.good.name}</LargeText>
@@ -316,7 +342,7 @@ export const ReturnViewScreen = () => {
         </ListItemLine>
       );
     },
-    [doc?.status, lines?.length],
+    [doc?.status, handlePressLine, lines?.length],
   );
 
   const [scanned, setScanned] = useState(false);
@@ -514,16 +540,18 @@ export const ReturnViewScreen = () => {
         okLabel={'Найти'}
         errorMessage={errorMessage}
       />
-      <AppDialog
-        title="Количество"
+      <QuantDialog
         visible={visibleQuantPackDialog}
-        text={quantPack}
-        onChangeText={setQuantPack}
+        textPack={quantPack}
+        textPallet={quantPallet}
+        onChangeTextPack={setQuantPack}
+        onChangeTextPallet={setQuantPallet}
         onCancel={handleDismissQuantPack}
         onOk={handleEditQuantPack}
         okLabel={'Ок'}
+        isPack={isPack}
         keyboardType="numbers-and-punctuation"
-        // errorMessage={errorMessage}
+        okDisabled={!quantPack || !quantPallet}
       />
       <SimpleDialog
         visible={visibleSendDialog}
