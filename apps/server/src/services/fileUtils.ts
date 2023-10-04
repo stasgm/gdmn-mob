@@ -1,7 +1,7 @@
 import path from 'path';
 import { readdir, unlink, stat, rename } from 'fs/promises';
 
-import { IFileSystem, IExtraFileInfo, IPathParams } from '@lib/types';
+import { IFileSystem, IExtraFileInfo, IPathParams, IDBCompany } from '@lib/types';
 
 import { BYTES_PER_KB, MSEС_IN_DAY, collectionNames } from '../utils/constants';
 
@@ -192,10 +192,21 @@ const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => 
   }
 };
 
+const getCompanyIdByName = (name: string): IDBCompany | undefined => {
+  const { companies } = getDb();
+  return companies.data.find((item) => item.name.toUpperCase() === name.toUpperCase());
+};
+
 export const readListFiles = async (params: Record<string, string | number>): Promise<IFileSystem[]> => {
   const root = getDb().dbPath;
+
+  const fullRoot =
+    'company' in params && 'appSystem' in params
+      ? path.join(root, `db_${getCompanyIdByName(params['company'] as string)?.id}`, params['appSystem'] as string)
+      : root;
+
   let files: IFileSystem[] = [];
-  const fileStrings = await _readDir(root, undefined);
+  const fileStrings = await _readDir(fullRoot, undefined);
   for (const file of fileStrings) {
     // eslint-disable-next-line no-await-in-loop
     const fileObj = await splitFilePath(file);
