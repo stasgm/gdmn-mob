@@ -14,25 +14,17 @@ const router = new Router();
 router.prefix('/api');
 
 const ADMIN_CONTAINER_PORT = process.env.ADMIN_CONTAINER_PORT || 3000;
+const ADMIN_BACKEND_HTTPS = process.env.ADMIN_BACKEND_HTTPS === 'true';
 
 const env = Router();
 env.prefix('/env');
 env.get('/', (ctx) => {
-  if (process.env.HOST === 'server.gdmn.app') {
-    ctx.body = {
-      protocol: 'https://',
-      host: 'server.gdmn.app',
-      port: process.env.HTTPS_PORT,
-    };
-    ctx.status = 200;
-  } else {
-    ctx.body = {
-      protocol: 'http://',
-      host: process.env.HOST || 'localhost',
-      port: process.env.PORT,
-    };
-    ctx.status = 200;
-  }
+  ctx.body = {
+    protocol: ADMIN_BACKEND_HTTPS ? 'https://' : 'http://',
+    host: process.env.HOST || 'localhost',
+    port: ADMIN_BACKEND_HTTPS ? process.env.HTTPS_PORT : process.env.PORT,
+  };
+  ctx.status = 200;
 });
 
 router.use(env.middleware());
@@ -45,7 +37,7 @@ app
 
 const koaCallback = app.callback();
 
-if (process.env.HOST === 'server.gdmn.app') {
+if (process.env.ADMIN_HTTPS === 'true') {
   /**
    * HTTPS сервер с платным сертификатом
    */

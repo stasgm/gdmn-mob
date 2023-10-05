@@ -108,8 +108,8 @@ const ScanGoodScreen = () => {
 
   const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
   const documentType = useMemo(
-    () => documentTypes?.find((d) => d.id === shipment?.documentType.id),
-    [shipment?.documentType.id, documentTypes],
+    () => documentTypes?.find((d) => d.id === shipment?.documentType?.id),
+    [shipment?.documentType?.id, documentTypes],
   );
 
   const defaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as INamedEntity;
@@ -155,7 +155,7 @@ const ScanGoodScreen = () => {
         barc.weight,
         goods,
         goodRemains,
-        remainsUse && shipment?.documentType.name !== 'return' && shipment?.documentType.name !== 'inventory',
+        remainsUse && shipment?.documentType?.name !== 'return' && shipment?.documentType?.name !== 'inventory',
       );
 
       if (!lineGood.good) {
@@ -197,7 +197,7 @@ const ScanGoodScreen = () => {
       maxBarcodeLength,
       minBarcodeLength,
       remainsUse,
-      shipment?.documentType.name,
+      shipment?.documentType?.name,
       shipmentLines,
     ],
   );
@@ -241,7 +241,7 @@ const ScanGoodScreen = () => {
           setScaner({ state: 'init' });
         });
       }
-    } else if (shipment?.documentType.name === 'shipment' || shipment?.documentType.name === 'currShipment') {
+    } else if (shipment?.documentType?.name === 'shipment' || shipment?.documentType?.name === 'currShipment') {
       alertWithSoundMulti('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', () => {
         dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
         setScaner({ state: 'init' });
@@ -274,7 +274,7 @@ const ScanGoodScreen = () => {
   }, [
     scannedObject,
     tempOrder,
-    shipment?.documentType.name,
+    shipment?.documentType?.name,
     shipment?.head.toDepart?.isAddressStore,
     shipment?.head.toDepart?.id,
     shipment?.head.fromDepart?.isAddressStore,

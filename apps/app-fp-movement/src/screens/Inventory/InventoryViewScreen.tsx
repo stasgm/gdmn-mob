@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { View, TextInput, Keyboard } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { Audio } from 'expo-av';
+
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   MenuButton,
@@ -21,7 +23,7 @@ import {
   SimpleDialog,
 } from '@lib/mobile-ui';
 
-import { generateId, getDateString, keyExtractor, useSendDocs, sleep, round } from '@lib/mobile-hooks';
+import { generateId, getDateString, keyExtractor, useSendDocs, sleep, round, isNumeric } from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
 
@@ -35,10 +37,11 @@ import { barcodeSettings, IInventoryDocument, IInventoryLine } from '../../store
 import { InventoryStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { alertWithSound, alertWithSoundMulti, getBarcode, getUpdatedLine } from '../../utils/helpers';
+import { alertWithSound, alertWithSoundMulti, getBarcode, getDocToSend, getUpdatedLine } from '../../utils/helpers';
 import { IAddressStoreEntity, IBarcode, IGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
+import QuantDialog from '../../components/QuantDialog';
 
 export interface IScanerObject {
   item?: IInventoryLine;
@@ -86,8 +89,16 @@ export const InventoryViewScreen = () => {
 
   const [visibleQuantPackDialog, setVisibleQuantPackDialog] = useState(false);
   const [quantPack, setQuantPack] = useState('');
+  const [quantPallet, setQuantPallet] = useState('');
+  const [isPack, setIsPack] = useState(true);
 
   const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
+
+  const sound = Audio.Sound.createAsync(require('../../../assets/ok.wav'));
+
+  const playSound = useCallback(async () => {
+    (await sound).sound.playAsync();
+  }, [sound]);
 
   const handleFocus = () => {
     ref?.current?.focus();
@@ -105,8 +116,12 @@ export const InventoryViewScreen = () => {
     handleFocus();
   };
 
+  const isFromAddressed = departs.find((i) => i.id === doc?.head.fromDepart?.id && i.isAddressStore);
+
+  const isAddressedDoc = doc?.head.fromDepart?.isAddressStore || isFromAddressed;
+
   const handleAddQuantPack = useCallback(
-    (quantity: number) => {
+    (quantity: number, pallet: number) => {
       const line = lines?.[0];
       if (!line) {
         return;
@@ -121,33 +136,43 @@ export const InventoryViewScreen = () => {
         workDate: line.workDate,
         time: line.time,
       };
+      if (!isAddressedDoc) {
+        const weight =
+          line?.weight >= goodBarcodeSettings?.boxWeight
+            ? round(round(line?.weight / line?.quantPack, 3) * quantity * pallet, 3)
+            : round(line?.weight * quantity, 3);
 
-      if (line?.weight >= goodBarcodeSettings?.boxWeight) {
-        const newLine: IInventoryLine = getUpdatedLine(false, lineBarcode, line, quantity);
-
-        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-      } else {
-        const weight = round(line?.weight * quantity, 3);
-
-        const newLine: IInventoryLine = getUpdatedLine(false, lineBarcode, line, quantity, weight);
+        const newLine: IInventoryLine = getUpdatedLine(
+          false,
+          lineBarcode,
+          line,
+          line?.weight >= goodBarcodeSettings?.boxWeight ? round(quantity * pallet, 3) : quantity,
+          weight,
+        );
 
         dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
       }
     },
-    [dispatch, goodBarcodeSettings?.boxWeight, id, lines],
+    [dispatch, goodBarcodeSettings?.boxWeight, id, isAddressedDoc, lines],
   );
 
-  const handleEditQuantPack = () => {
-    handleAddQuantPack(Number(quantPack));
+  const handleEditQuantPack = useCallback(() => {
+    if (!isNumeric(quantPack) || !isNumeric(quantPallet)) {
+      alertWithSound('Ошибка!', 'Неправильное количество.', handleFocus);
+      return;
+    }
+
+    handleAddQuantPack(Number(quantPack), Number(quantPallet));
     setVisibleQuantPackDialog(false);
     setQuantPack('');
+    setQuantPallet('');
     Keyboard.dismiss();
     handleFocus();
-  };
-
+  }, [handleAddQuantPack, quantPack, quantPallet]);
   const handleDismissQuantPack = () => {
     setVisibleQuantPackDialog(false);
     setQuantPack('');
+    setQuantPallet('');
     Keyboard.dismiss();
     handleFocus();
   };
@@ -186,7 +211,7 @@ export const InventoryViewScreen = () => {
     handleFocus();
   }, [dispatch, id, lines]);
 
-  const sendDoc = useSendDocs(doc ? [doc] : []);
+  const sendDoc = useSendDocs(doc ? [doc] : [], doc ? [getDocToSend(doc)] : []);
 
   const [visibleSendDialog, setVisibleSendDialog] = useState(false);
 
@@ -283,13 +308,23 @@ export const InventoryViewScreen = () => {
     });
   }, [navigation, renderRight]);
 
+  const handlePressLine = useCallback(
+    (weight: number) => {
+      setQuantPack((lines?.[0].quantPack || '').toString());
+      setQuantPallet('1');
+      setVisibleQuantPackDialog(true);
+      weight >= goodBarcodeSettings?.boxWeight ? setIsPack(false) : setIsPack(true);
+    },
+    [goodBarcodeSettings?.boxWeight, lines],
+  );
+
   const renderItem = useCallback(
     ({ item }: { item: IInventoryLine }) => {
       return (
         <ListItemLine
           key={item.id}
           readonly={doc?.status !== 'DRAFT' || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
-          onPress={() => setVisibleQuantPackDialog(true)}
+          onPress={() => handlePressLine(item.weight)}
         >
           <View style={styles.details}>
             <LargeText style={styles.textBold}>{item.good.name}</LargeText>
@@ -315,7 +350,7 @@ export const InventoryViewScreen = () => {
         </ListItemLine>
       );
     },
-    [doc?.head.fromDepart?.isAddressStore, doc?.status, lines?.length],
+    [doc?.head.fromDepart?.isAddressStore, doc?.status, handlePressLine, lines?.length],
   );
 
   const [scanned, setScanned] = useState(false);
@@ -390,9 +425,7 @@ export const InventoryViewScreen = () => {
         quantPack: barc.quantPack,
       };
 
-      const isToAddressed = departs.find((i) => i.id === doc.head.fromDepart?.id && i.isAddressStore);
-
-      if (doc.head.fromDepart?.isAddressStore || isToAddressed) {
+      if (isAddressedDoc) {
         navigation.navigate('InventorySelectCell', {
           docId: id,
           item: newLine,
@@ -401,6 +434,7 @@ export const InventoryViewScreen = () => {
         });
       } else {
         dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+        playSound();
       }
 
       if (visibleDialog) {
@@ -419,12 +453,13 @@ export const InventoryViewScreen = () => {
       maxBarcodeLength,
       goodBarcodeSettings,
       goods,
-      departs,
+      isAddressedDoc,
       visibleDialog,
       handleErrorMessage,
       navigation,
       id,
       dispatch,
+      playSound,
     ],
   );
 
@@ -524,16 +559,18 @@ export const InventoryViewScreen = () => {
         okLabel={'Найти'}
         errorMessage={errorMessage}
       />
-      <AppDialog
-        title="Количество"
+      <QuantDialog
         visible={visibleQuantPackDialog}
-        text={quantPack}
-        onChangeText={setQuantPack}
+        textPack={quantPack}
+        textPallet={quantPallet}
+        onChangeTextPack={setQuantPack}
+        onChangeTextPallet={setQuantPallet}
         onCancel={handleDismissQuantPack}
         onOk={handleEditQuantPack}
         okLabel={'Ок'}
+        isPack={isPack}
         keyboardType="numbers-and-punctuation"
-        // errorMessage={errorMessage}
+        okDisabled={!quantPack || !quantPallet}
       />
       <SimpleDialog
         visible={visibleSendDialog}

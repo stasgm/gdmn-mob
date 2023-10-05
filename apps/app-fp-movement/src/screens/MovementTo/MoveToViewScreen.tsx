@@ -37,11 +37,11 @@ import {
   alertWithSound,
   alertWithSoundMulti,
   getBarcode,
-  getBarcodeString,
+  getDocToSend,
   getLineGood,
   getRemGoodListByContact,
 } from '../../utils/helpers';
-import { IAddressStoreEntity, IBarcode, IGood, IRemains, IRemGood } from '../../store/app/types';
+import { IAddressStoreEntity, IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
 
@@ -134,55 +134,55 @@ export const MoveToViewScreen = () => {
     handleFocus();
   };
 
-  const [visibleQuantPackDialog, setVisibleQuantPackDialog] = useState(false);
-  const [quantPack, setQuantPack] = useState('');
+  // const [visibleQuantPackDialog, setVisibleQuantPackDialog] = useState(false);
+  // const [quantPack, setQuantPack] = useState('');
 
-  const handleAddQuantPack = useCallback(
-    (quantity: number) => {
-      const line = lines?.[0];
-      if (!line) {
-        return;
-      }
+  // const handleAddQuantPack = useCallback(
+  //   (quantity: number) => {
+  //     const line = lines?.[0];
+  //     if (!line) {
+  //       return;
+  //     }
 
-      const lineBarcode: IBarcode = {
-        barcode: line.barcode || '',
-        numReceived: line.numReceived,
-        quantPack: line.quantPack,
-        shcode: line.good.shcode,
-        weight: line.weight,
-        workDate: line.workDate,
-        time: line.time,
-      };
+  //     const lineBarcode: IBarcode = {
+  //       barcode: line.barcode || '',
+  //       numReceived: line.numReceived,
+  //       quantPack: line.quantPack,
+  //       shcode: line.good.shcode,
+  //       weight: line.weight,
+  //       workDate: line.workDate,
+  //       time: line.time,
+  //     };
 
-      if (line?.weight >= goodBarcodeSettings?.boxWeight) {
-        const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: quantity });
-        const newLine: IMoveLine = {
-          ...line,
-          quantPack: quantity,
-          scannedBarcode: line?.barcode,
-          barcode: newBarcode,
-          usedRemains: remainsUse,
-        };
-        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-      }
-    },
-    [dispatch, goodBarcodeSettings?.boxWeight, id, lines, remainsUse],
-  );
+  //     if (line?.weight >= goodBarcodeSettings?.boxWeight) {
+  //       const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: quantity });
+  //       const newLine: IMoveLine = {
+  //         ...line,
+  //         quantPack: quantity,
+  //         scannedBarcode: line?.barcode,
+  //         barcode: newBarcode,
+  //         usedRemains: remainsUse,
+  //       };
+  //       dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+  //     }
+  //   },
+  //   [dispatch, goodBarcodeSettings?.boxWeight, id, lines, remainsUse],
+  // );
 
-  const handleEditQuantPack = () => {
-    handleAddQuantPack(Number(quantPack));
-    setVisibleQuantPackDialog(false);
-    setQuantPack('');
-    Keyboard.dismiss();
-    handleFocus();
-  };
+  // const handleEditQuantPack = () => {
+  //   handleAddQuantPack(Number(quantPack));
+  //   setVisibleQuantPackDialog(false);
+  //   setQuantPack('');
+  //   Keyboard.dismiss();
+  //   handleFocus();
+  // };
 
-  const handleDismissQuantPack = () => {
-    setVisibleQuantPackDialog(false);
-    setQuantPack('');
-    Keyboard.dismiss();
-    handleFocus();
-  };
+  // const handleDismissQuantPack = () => {
+  //   setVisibleQuantPackDialog(false);
+  //   setQuantPack('');
+  //   Keyboard.dismiss();
+  //   handleFocus();
+  // };
 
   const handleEditDocHead = useCallback(() => {
     navigation.navigate('MoveToEdit', { id });
@@ -218,7 +218,7 @@ export const MoveToViewScreen = () => {
     handleFocus();
   }, [dispatch, doc?.lines, id]);
 
-  const sendDoc = useSendDocs(doc ? [doc] : []);
+  const sendDoc = useSendDocs(doc ? [doc] : [], doc ? [getDocToSend(doc)] : []);
 
   const sendCellRequest = useSendOneRefRequest('Ячейки', { name: 'cell' });
 
@@ -239,9 +239,9 @@ export const MoveToViewScreen = () => {
     setScreenState('sending');
     await sendDoc();
     if (isAddressStore) {
-      handleSendCellRequest();
+      await handleSendCellRequest();
     }
-    handleSendRemainsRequest();
+    await handleSendRemainsRequest();
     setScreenState('sent');
   }, [handleSendCellRequest, handleSendRemainsRequest, isAddressStore, sendDoc]);
 
@@ -325,7 +325,7 @@ export const MoveToViewScreen = () => {
         <ListItemLine
           key={item.id}
           readonly={doc?.status !== 'DRAFT' || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
-          onPress={() => setVisibleQuantPackDialog(true)}
+          // onPress={() => setVisibleQuantPackDialog(true)}
         >
           <View style={styles.details}>
             <LargeText style={styles.textBold}>{item.good.name}</LargeText>
@@ -585,7 +585,7 @@ export const MoveToViewScreen = () => {
         okLabel={'Найти'}
         errorMessage={errorMessage}
       />
-      <AppDialog
+      {/* <AppDialog
         title="Количество"
         visible={visibleQuantPackDialog}
         text={quantPack}
@@ -594,7 +594,7 @@ export const MoveToViewScreen = () => {
         onOk={handleEditQuantPack}
         okLabel={'Ок'}
         keyboardType="numbers-and-punctuation"
-      />
+      /> */}
       <SimpleDialog
         visible={visibleSendDialog}
         title={'Внимание!'}

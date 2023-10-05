@@ -145,13 +145,11 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
 };
 
 const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => {
-  /* const pathArr = root.split(path.sep);
-  const name = pathArr.pop();*/
   const name = path.basename(root);
   const ext = path.extname(root);
   if (!name) {
     log.error(`Invalid filename ${root}`);
-    return undefined;
+    return;
   }
   const nameWithoutExt = path.basename(root, ext);
   const subPath = path.dirname(root);
@@ -189,8 +187,8 @@ const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => 
       mdate: fileModifiedDate,
     };
   } catch (err) {
-    log.error(`Invalid filename ${root}`);
-    return undefined;
+    log.error(`Invalid filename ${root}: ${err}`);
+    return;
   }
 };
 

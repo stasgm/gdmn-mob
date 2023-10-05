@@ -1,4 +1,4 @@
-import { CmdName, IDeviceLog } from '@lib/types';
+import { IDeviceLog, ISyncRequest } from '@lib/types';
 
 export interface IFormParam {
   [fieldName: string]: unknown;
@@ -6,6 +6,11 @@ export interface IFormParam {
 
 export interface IScreenFormParams {
   [screenName: string]: IFormParam;
+}
+
+export interface ISetScreenFormParam {
+  screenName: string;
+  params: IFormParam;
 }
 
 export interface IAppState {
@@ -32,11 +37,5 @@ export type IErrorNotice = Omit<IDeviceLog, 'isSent'>;
 
 export interface ISyncRequestParam {
   name: string;
-  value: string | number;
-}
-
-export interface ISyncRequest {
-  cmdName: CmdName;
-  date: Date;
-  param?: ISyncRequestParam;
+  value: any;
 }

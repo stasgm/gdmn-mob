@@ -40,6 +40,13 @@ export type BodyType = 'CMD' | 'REFS' | 'ONE_REF' | 'DOCS' | 'SETTINGS' | 'APP_S
 
 export type CmdName = 'GET_REF' | 'GET_ONE_REF' | 'GET_DOCUMENTS' | 'GET_USER_SETTINGS' | 'GET_APP_SYSTEM_SETTINGS';
 
+export type CmdNameSyncRequest = CmdName | 'GET_REMAINS';
+
+export interface ISyncRequest {
+  cmdName: CmdNameSyncRequest;
+  date: Date;
+}
+
 export type ScreenState =
   | 'idle'
   | 'sending'
