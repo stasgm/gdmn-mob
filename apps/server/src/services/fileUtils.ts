@@ -61,7 +61,8 @@ export const checkFiles = async (): Promise<void> => {
           ? config.FILES_SAVING_PERIOD_IN_DAYS
           : config.DOCS_SAVING_PERIOD_IN_DAYS;
       if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > period) {
-        unlink(file);
+        // eslint-disable-next-line no-await-in-loop
+        await unlink(file);
       }
     } catch (err) {
       log.warn(`Ошибка при удалении старого файла-- ${err}`);
@@ -192,7 +193,7 @@ const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => 
   }
 };
 
-const getCompanyIdByName = (name: string): IDBCompany | undefined => {
+export const getCompanyIdByName = (name: string): IDBCompany | undefined => {
   const { companies } = getDb();
   return companies.data.find((item) => item.name.toUpperCase() === name.toUpperCase());
 };
@@ -302,14 +303,14 @@ export const deleteFileById = async (fid: string): Promise<void> => {
     log.error(`Неправильный параметр ID '${fid} в запросе`);
     return;
   }
-  return unlink(fullName);
+  return await unlink(fullName);
 };
 
 export const deleteManyFiles = async (ids: string[]): Promise<void> => {
   await Promise.allSettled(
     ids.map(async (id) => {
       const fullName = alias2fullFileName(id);
-      return unlink(fullName);
+      return await unlink(fullName);
     }),
   );
 };

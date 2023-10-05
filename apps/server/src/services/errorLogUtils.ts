@@ -25,6 +25,7 @@ import { getListPart } from '../utils/helpers';
 import { BYTES_PER_KB, MSEС_IN_DAY } from '../utils/constants';
 
 import { getDb } from './dao/db';
+import { getCompanyIdByName } from './fileUtils';
 
 export const getPathDeviceLog = (params: IPathParams, fn = '') => getPath([getPathSystem(params), 'deviceLogs'], fn);
 
@@ -103,19 +104,26 @@ const getListDirs = async (root: string): Promise<string[]> => {
   }
 };
 
-export const getDeviceLogsFolders = async (): Promise<string[]> => {
+export const getDeviceLogsFolders = async (pathParams: IPathParams | undefined): Promise<string[]> => {
   const root = getDb().dbPath;
-  const db = await getListDirs(root);
+  const fullRoot = pathParams ? path.join(root, `db_${pathParams.companyId}`, pathParams.appSystemId) : root;
+  const db = await getListDirs(fullRoot);
   let app: string[] = [];
-  for (const item of db) {
-    // eslint-disable-next-line no-await-in-loop
-    app = [...app, ...(await getListDirs(item)).flat().map((i) => path.join(i, 'deviceLogs'))];
+
+  if (!pathParams) {
+    for (const item of db) {
+      // eslint-disable-next-line no-await-in-loop
+      app = [...app, ...(await getListDirs(item)).flat().map((i) => path.join(i, 'deviceLogs'))];
+    }
+  } else {
+    app = db.filter((item) => item.toUpperCase().includes('DEVICELOGS'));
   }
+
   return app;
 };
 
-export const getDeviceLogsFiles = async (): Promise<string[]> => {
-  const folders = await getDeviceLogsFolders();
+export const getDeviceLogsFiles = async (pathParams: IPathParams | undefined): Promise<string[]> => {
+  const folders = await getDeviceLogsFolders(pathParams);
   let files: string[] = [];
   for (const item of folders) {
     // eslint-disable-next-line no-await-in-loop
@@ -130,14 +138,15 @@ export const getDeviceLogsFiles = async (): Promise<string[]> => {
 
 export const checkDeviceLogsFiles = async (): Promise<void> => {
   const { devices } = getDb();
-  const files = await getDeviceLogsFiles();
+  const files = await getDeviceLogsFiles(undefined);
   for (const file of files) {
     try {
       const re = /from_(.+)_dev_(.+)\.json/gi;
       const match = re.exec(file);
       if (!match) {
         log.error(`Invalid deviceLogs file name ${file}`);
-        unlink(file);
+        // eslint-disable-next-line no-await-in-loop
+        await unlink(file);
       } else {
         const device = devices.data.find((el: any) => el.uid === match[2]);
 
@@ -146,7 +155,8 @@ export const checkDeviceLogsFiles = async (): Promise<void> => {
           const fileStat = await stat(file);
           const fileDate = fileStat.birthtimeMs;
           if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > config.FILES_SAVING_PERIOD_IN_DAYS) {
-            unlink(file);
+            // eslint-disable-next-line no-await-in-loop
+            await unlink(file);
           }
         }
       }
@@ -232,7 +242,15 @@ const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined
 };
 
 export const getFilesObject = async (params: Record<string, string | number>): Promise<IDeviceLogFiles[]> => {
-  const filesFull = await getDeviceLogsFiles();
+  const isPathParams = 'company' in params && 'appSystem' in params;
+  const pathParams = isPathParams
+    ? {
+        companyId: getCompanyIdByName(params['company'] as string)?.id as string,
+        appSystemId: params['appSystem'] as string,
+      }
+    : undefined;
+
+  const filesFull = await getDeviceLogsFiles(pathParams);
   let fileObjs: IDeviceLogFiles[] = [];
   for (const item of filesFull) {
     const re = /db_(.+)/gi;
@@ -260,6 +278,16 @@ export const getFilesObject = async (params: Record<string, string | number>): P
       }
     }
 
+    let mDateFound = true;
+    if ('mdate' in newParams) {
+      mDateFound = false;
+      if (item.mdate) {
+        const mdate = new Date(item.mdate || '').toLocaleString('ru', { hour12: false }).toUpperCase();
+        mDateFound = mdate.includes((newParams.mdate as string).toUpperCase());
+        delete newParams['mdate'];
+      }
+    }
+
     let uidFound = true;
     if ('uid' in newParams) {
       uidFound = false;
@@ -283,7 +311,7 @@ export const getFilesObject = async (params: Record<string, string | number>): P
       delete newParams['filterText'];
     }
  */
-    return companyFound && appSystemFound && contactFound && deviceFound && dateFound && uidFound;
+    return companyFound && appSystemFound && contactFound && deviceFound && dateFound && uidFound && mDateFound;
   });
 
   return getListPart(fileObjs, params);
@@ -309,14 +337,14 @@ export const deleteFileById = async (fid: string): Promise<void> => {
     log.error(`Неправильный параметр ID '${fid} в запросе`);
     return;
   }
-  return unlink(fullName);
+  return await unlink(fullName);
 };
 
 export const deleteManyFiles = async (ids: string[]): Promise<void> => {
   await Promise.allSettled(
     ids.map(async (id) => {
       const fullName = alias2fullFileName(id);
-      return unlink(fullName);
+      return await unlink(fullName);
     }),
   );
 };

@@ -59,7 +59,7 @@ const removeDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
 const getDeviceLogs = async (ctx: ParameterizedContext): Promise<void> => {
   const params: Record<string, string | number> = {};
 
-  const { uid, date, company, appSystem, contact, device, filterText, fromRecord, toRecord } = ctx.query;
+  const { uid, date, company, appSystem, contact, device, filterText, fromRecord, toRecord, mdate } = ctx.query;
 
   if (typeof company === 'string' && company) {
     params.company = company;
@@ -75,6 +75,10 @@ const getDeviceLogs = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (typeof date === 'string' && date) {
     params.date = date;
+  }
+
+  if (typeof mdate === 'string' && mdate) {
+    params.mdate = mdate;
   }
 
   if (typeof appSystem === 'string' && appSystem) {
