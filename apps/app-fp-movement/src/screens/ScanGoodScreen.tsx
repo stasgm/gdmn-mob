@@ -14,6 +14,8 @@ import { IScannedObject } from '@lib/client-types';
 
 import { DashboardStackParamList } from '@lib/mobile-navigation';
 
+import { IDocumentType, INamedEntity } from '@lib/types';
+
 import {
   CurrFreeShipmentParamList,
   CurrShipmentParamList,
@@ -98,12 +100,23 @@ const ScanGoodScreen = () => {
   const tempOrder = useFpSelector((state) => state.fpMovement.list).find((i) => i.orderId === shipment?.head?.orderId);
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
+  const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
   const departs = refSelectors.selectByName<IAddressStoreEntity>('depart')?.data;
 
   const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
-  const remainsUse = Boolean(settings.remainsUse?.data);
+  const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
+  const documentType = useMemo(
+    () => documentTypes?.find((d) => d.id === shipment?.documentType.id),
+    [shipment?.documentType.id, documentTypes],
+  );
+
+  const defaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as INamedEntity;
+
+  const remainsUse =
+    (shipment?.head.fromDepart.id === defaultDepart?.id || Boolean(documentType?.isRemains)) &&
+    Boolean(settings.remainsUse?.data);
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
@@ -128,6 +141,13 @@ const ScanGoodScreen = () => {
         return;
       }
 
+      if (brc.length > maxBarcodeLength) {
+        setScaner({
+          state: 'error',
+          message: `Неверный формат штрих-кода \nДлина больше ${maxBarcodeLength} символов`,
+        });
+        return;
+      }
       const barc = getBarcode(brc, goodBarcodeSettings);
 
       const lineGood = getLineGood(
@@ -170,7 +190,16 @@ const ScanGoodScreen = () => {
       setScaner({ state: 'found' });
     },
 
-    [goodBarcodeSettings, goodRemains, goods, minBarcodeLength, remainsUse, shipment?.documentType.name, shipmentLines],
+    [
+      goodBarcodeSettings,
+      goodRemains,
+      goods,
+      maxBarcodeLength,
+      minBarcodeLength,
+      remainsUse,
+      shipment?.documentType.name,
+      shipmentLines,
+    ],
   );
 
   const handleSaveScannedItem = useCallback(() => {
@@ -226,9 +255,11 @@ const ScanGoodScreen = () => {
         isFromAddressed ||
         isToAddressed
       ) {
-        if (scannedObject.quantPack < goodBarcodeSettings.boxNumber) {
-          alertWithSound('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}.`);
-          setScaner({ state: 'init' });
+        if (scannedObject.weight < goodBarcodeSettings?.boxWeight) {
+          alertWithSound('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings?.boxWeight}.`, () =>
+            setScaner({ state: 'init' }),
+          );
+
           return;
         }
 
@@ -252,7 +283,7 @@ const ScanGoodScreen = () => {
     dispatch,
     docId,
     departs,
-    goodBarcodeSettings.boxNumber,
+    goodBarcodeSettings?.boxWeight,
     isInventory,
     navigation,
   ]);

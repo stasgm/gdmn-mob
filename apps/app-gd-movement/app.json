@@ -34,6 +34,18 @@
     "androidStatusBar": {
       "translucent": false
     },
-    "plugins": ["react-native-keyevent-expo-config-plugin"]
+    "plugins": [
+        "react-native-keyevent-expo-config-plugin",
+        [
+          "expo-build-properties",
+          {
+            "android": {
+              "compileSdkVersion": 33,
+              "targetSdkVersion": 33,
+              "buildToolsVersion": "33.0.0"
+            }
+          }
+        ]
+      ]
   }
 }

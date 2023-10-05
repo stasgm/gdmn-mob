@@ -22,7 +22,7 @@ import Constants from 'expo-constants';
 
 import api from '@lib/client-api';
 
-import { Snackbar } from 'react-native-paper';
+import { MD2Theme, Snackbar, useTheme } from 'react-native-paper';
 
 import { NavigationContainer } from '@react-navigation/native';
 
@@ -68,8 +68,6 @@ const AppRoot = ({ items, dashboardScreens, onSync }: Omit<IApp, 'store'>) => {
     };
   }, [authDispatch, user]);
 
-  const timeOutRef = useRef<NodeJS.Timer | null>(null);
-
   //Если в параметрах указана Автосинхронизация, выполняем синхронизацию при запуске
   useEffect(() => {
     if (autoSync && !loading && !isDemo) {
@@ -84,7 +82,7 @@ const AppRoot = ({ items, dashboardScreens, onSync }: Omit<IApp, 'store'>) => {
     if (!autoSync || loading || isDemo) {
       return;
     }
-    timeOutRef.current = setTimeout(
+    const timeOutId = setTimeout(
       () => {
         syncData();
       },
@@ -92,10 +90,7 @@ const AppRoot = ({ items, dashboardScreens, onSync }: Omit<IApp, 'store'>) => {
     );
 
     return () => {
-      if (timeOutRef.current) {
-        clearInterval(timeOutRef.current);
-        timeOutRef.current = null;
-      }
+      clearTimeout(timeOutId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoSynchPeriod, autoSync, loading, isDemo]);
@@ -105,6 +100,7 @@ const AppRoot = ({ items, dashboardScreens, onSync }: Omit<IApp, 'store'>) => {
 
 const MobileApp = ({ loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
   const dispatch = useDispatch();
+  const { colors } = useTheme<MD2Theme>();
   const { loadingError: authLoadingError, errorMessage } = useSelector((state) => state.auth);
   const isLoggedWithCompany = authSelectors.isLoggedWithCompany();
   const docsLoadingError = useSelector<string>((state) => state.documents.loadingError);
@@ -244,13 +240,13 @@ const MobileApp = ({ loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
           color: 'white',
         }}
       >
-        <Text>{errorMessage}</Text>
+        <Text style={localStyles.snackText}>{errorMessage}</Text>
       </Snackbar>
       {isLoggedWithCompany ? <AppRoot {...props} /> : <AuthNavigator />}
       <Snackbar
         visible={barVisible}
         onDismiss={closeSnackbar}
-        style={{ backgroundColor: defaultTheme.colors.error }}
+        style={{ backgroundColor: colors.error }}
         action={{
           icon: 'close',
           label: '',
@@ -259,7 +255,12 @@ const MobileApp = ({ loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
         }}
       >
         <View style={globalStyles.container}>
-          {!!errList?.length && errList.map((err, id) => <Text key={id}>{truncate(err)}</Text>)}
+          {!!errList?.length &&
+            errList.map((err, id) => (
+              <Text style={localStyles.snackText} key={id}>
+                {truncate(err)}
+              </Text>
+            ))}
         </View>
       </Snackbar>
     </NavigationContainer>
@@ -272,5 +273,8 @@ const localStyles = StyleSheet.create({
   snack: {
     backgroundColor: defaultTheme.colors.error,
     zIndex: 1000,
+  },
+  snackText: {
+    color: 'white',
   },
 });

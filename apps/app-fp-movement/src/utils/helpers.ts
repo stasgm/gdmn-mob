@@ -14,6 +14,7 @@ import {
   IMoveLine,
   ICellName,
   IInventoryDocument,
+  IBasedLine,
 } from '../store/types';
 import {
   IBarcode,
@@ -26,6 +27,8 @@ import {
   IRemGood,
   IRemainsData,
 } from '../store/app/types';
+
+import { ONE_KG_IN_G, ONE_T_IN_KG } from './constants';
 
 export const getNextDocNumber = (
   documents: IMoveDocument[] | IShipmentDocument[] | IFreeShipmentDocument[] | IInventoryDocument[],
@@ -61,11 +64,11 @@ export const getBarcode = (barcode: string, settings: barcodeSettings) => {
 
   const barcodeObj: IBarcode = {
     barcode: barcode,
-    weight: round(Number(weight) / 1000, 3),
+    weight: round(Number(weight) / ONE_KG_IN_G, 3),
     workDate,
     shcode: shcode,
     numReceived: numReceived,
-    quantPack: Number(weight) < settings.boxWeight * 1000 ? 1 : Number(quantPack),
+    quantPack: Number(weight) < settings.boxWeight * ONE_KG_IN_G ? 1 : Number(quantPack),
     time,
   };
 
@@ -80,7 +83,7 @@ export const getBarcodeString = (barcodeObj: IBarcode) => {
   const shcode = `0000${barcodeObj.shcode}`.slice(-4);
   const quantPack = `0000${barcodeObj.quantPack.toLocaleString()}`.slice(-4);
 
-  const weight = `000000${round(barcodeObj.weight * 1000, 3).toLocaleString()}`.slice(-6);
+  const weight = `000000${round(barcodeObj.weight * ONE_KG_IN_G, 3).toLocaleString()}`.slice(-6);
 
   const barcode =
     weight + day + month + year + (barcodeObj.time || '0000') + shcode + quantPack + barcodeObj.numReceived;
@@ -280,17 +283,27 @@ export const getTotalLines = (docList: IShipmentDocument[], departId: string) =>
     return prev;
   }, {});
 
-// export const fuck = (quantity: number, line: IShipmentLine) => {
-//   const weight = round(line?.weight * quantity, 3);
-
-//   const newLine: IShipmentLine = {
-//     ...line,
-//     quantPack: quantity,
-//     weight,
-//     scannedBarcode: line?.barcode,
-//   };
-
-// };
+export const getUpdatedLine = (
+  usedRemains: boolean,
+  lineBarcode: IBarcode,
+  line: IBasedLine,
+  quantity: number,
+  weight?: number,
+) => {
+  const newBarcode = weight
+    ? weight < ONE_T_IN_KG
+      ? getBarcodeString({ ...lineBarcode, quantPack: quantity, weight })
+      : (weight * ONE_KG_IN_G).toString() + getBarcodeString({ ...lineBarcode, quantPack: quantity, weight }).slice(6)
+    : getBarcodeString({ ...lineBarcode, quantPack: quantity });
+  return {
+    ...line,
+    quantPack: quantity,
+    weight: weight ? weight : line.weight,
+    scannedBarcode: line?.barcode,
+    barcode: newBarcode,
+    usedRemains,
+  } as IBasedLine;
+};
 
 export const getRemGoodListByContact = (
   goods: IGood[],
@@ -360,17 +373,17 @@ const getRemainsByGoodId = (remains: IRemainsData[], linesQuantity: IGoodQuantit
   }, {});
 };
 
-export const alertWithSound = (label: string, text: string) => {
+export const alertWithSound = (label: string, text: string, onClose?: () => void) => {
   const playSound = async () => {
     const { sound } = await Audio.Sound.createAsync(require('../../assets/error.wav'));
     await sound.playAsync();
   };
 
   playSound();
-  Alert.alert(label, text, [{ text: 'OK' }]);
+  Alert.alert(label, text, [{ text: 'OK', onPress: onClose }]);
 };
 
-export const alertWithSoundMulti = (label: string, text: string, onOk: () => void) => {
+export const alertWithSoundMulti = (label: string, text: string, onOk: () => void, onClose?: () => void) => {
   const playSound = async () => {
     const { sound } = await Audio.Sound.createAsync(require('../../assets/error.wav'));
     await sound.playAsync();
@@ -381,6 +394,7 @@ export const alertWithSoundMulti = (label: string, text: string, onOk: () => voi
   Alert.alert(`${label}`, `${text}`, [
     {
       text: 'Отмена',
+      onPress: onClose,
     },
     {
       text: 'Да',

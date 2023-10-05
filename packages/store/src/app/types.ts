@@ -30,7 +30,13 @@ export interface IRequestNotice {
 
 export type IErrorNotice = Omit<IDeviceLog, 'isSent'>;
 
+export interface ISyncRequestParam {
+  name: string;
+  value: string | number;
+}
+
 export interface ISyncRequest {
   cmdName: CmdName;
   date: Date;
+  param?: ISyncRequestParam;
 }

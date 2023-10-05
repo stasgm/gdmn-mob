@@ -187,7 +187,7 @@ const DrawerNavigator = ({ onSyncClick, items, dashboardScreens }: IProps) => {
             color: 'white',
           }}
         >
-          <Text style={{ color: 'white' }}>{errorMessage}</Text>
+          <Text style={localStyles.snackText}>{errorMessage}</Text>
         </Snackbar>
       </Modal>
       <Drawer.Navigator
@@ -269,6 +269,9 @@ const localStyles = StyleSheet.create({
   },
   syncInfoText: {
     fontSize: 8,
+    color: 'white',
+  },
+  snackText: {
     color: 'white',
   },
 });

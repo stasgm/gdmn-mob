@@ -24,7 +24,7 @@ import {
 
 import { generateId, getDateString, keyExtractor, useSendDocs, sleep, useSendOneRefRequest } from '@lib/mobile-hooks';
 
-import { ScreenState } from '@lib/types';
+import { IDocumentType, INamedEntity, ScreenState } from '@lib/types';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -32,7 +32,7 @@ import { FlashList } from '@shopify/flash-list';
 
 import { barcodeSettings, ILaboratoryDocument, ILaboratoryLine, IShipmentDocument } from '../../store/types';
 import { LaboratoryStackParamList } from '../../navigation/Root/types';
-import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
+import { getStatusColor, ONE_SECOND_IN_MS, ONE_T_IN_KG } from '../../utils/constants';
 
 import {
   alertWithSound,
@@ -82,10 +82,21 @@ export const LaboratoryViewScreen = () => {
   }, {});
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
+  const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
   const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
-  const remainsUse = Boolean(settings.remainsUse?.data);
+  const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
+  const documentType = useMemo(
+    () => documentTypes?.find((d) => d.id === doc?.documentType.id),
+    [doc?.documentType.id, documentTypes],
+  );
+
+  const defaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as INamedEntity;
+
+  const remainsUse =
+    (doc?.head.fromDepart.id === defaultDepart?.id || Boolean(documentType?.isRemains)) &&
+    Boolean(settings.remainsUse?.data);
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
@@ -130,32 +141,35 @@ export const LaboratoryViewScreen = () => {
         const good = goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === line.good.shcode);
 
         if (good) {
+          const newLocal = newWeight < ONE_T_IN_KG || newWeight <= line.weight;
           if (good.remains < newWeight - line.weight) {
-            alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.');
+            alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.', handleFocus);
 
             return;
-          } else if (newWeight < 1000 || newWeight <= line.weight) {
+          } else if (newLocal) {
             const newLine: ILaboratoryLine = {
               ...line,
               weight: newWeight,
+              usedRemains: remainsUse,
             };
 
             dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
           }
         } else {
-          alertWithSound('Ошибка!', 'Товар не найден.');
+          alertWithSound('Ошибка!', 'Товар не найден.', handleFocus);
           return;
         }
       } else {
-        if (newWeight < 1000 || newWeight <= line.weight) {
+        if (newWeight < ONE_T_IN_KG || newWeight <= line.weight) {
           const newLine: ILaboratoryLine = {
             ...line,
             weight: newWeight,
+            usedRemains: remainsUse,
           };
 
           dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
         } else {
-          alertWithSound('Ошибка!', 'Неверный вес.');
+          alertWithSound('Ошибка!', 'Неверный вес.', handleFocus);
           return;
         }
       }
@@ -187,16 +201,21 @@ export const LaboratoryViewScreen = () => {
       return;
     }
 
-    alertWithSoundMulti('Вы уверены, что хотите удалить документ?', '', async () => {
-      setScreenState('deleting');
-      await sleep(1);
-      const res = await docDispatch(documentActions.removeDocument(id));
-      if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
-        setScreenState('deleted');
-      } else {
-        setScreenState('idle');
-      }
-    });
+    alertWithSoundMulti(
+      'Вы уверены, что хотите удалить документ?',
+      '',
+      async () => {
+        setScreenState('deleting');
+        await sleep(1);
+        const res = await docDispatch(documentActions.removeDocument(id));
+        if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
+          setScreenState('deleted');
+        } else {
+          setScreenState('idle');
+        }
+      },
+      handleFocus,
+    );
   }, [docDispatch, id]);
 
   const hanldeCancelLastScan = useCallback(() => {
@@ -257,6 +276,7 @@ export const LaboratoryViewScreen = () => {
       {
         title: 'Отмена',
         type: 'cancel',
+        onPress: handleFocus,
       },
     ]);
   }, [showActionSheet, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
@@ -354,7 +374,7 @@ export const LaboratoryViewScreen = () => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      alertWithSound('Внимание!', `${text}.`);
+      alertWithSound('Внимание!', `${text}.`, handleFocus);
       setScanned(false);
     }
   }, []);
@@ -378,6 +398,14 @@ export const LaboratoryViewScreen = () => {
         handleErrorMessage(
           visibleDialog,
           'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
+        );
+        return;
+      }
+
+      if (brc.length > maxBarcodeLength) {
+        handleErrorMessage(
+          visibleDialog,
+          'Длина штрих-кода больше максимальной длины, указанной в настройках. Повторите сканирование!',
         );
         return;
       }
@@ -413,6 +441,7 @@ export const LaboratoryViewScreen = () => {
         numReceived: barc.numReceived,
         sortOrder: doc?.lines?.length + 1,
         quantPack: barc.quantPack,
+        usedRemains: remainsUse,
       };
 
       dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
@@ -431,14 +460,15 @@ export const LaboratoryViewScreen = () => {
     [
       doc,
       minBarcodeLength,
+      maxBarcodeLength,
       goodBarcodeSettings,
       goods,
       goodRemains,
       remainsUse,
       dispatch,
       id,
-      handleErrorMessage,
       visibleDialog,
+      handleErrorMessage,
     ],
   );
 

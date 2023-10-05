@@ -186,7 +186,7 @@ const ProfileScreen = () => {
               <View style={styles.settingsDetails}>
                 <MediumText>Настройки пользователя</MediumText>
               </View>
-              <IconButton icon="chevron-right" color={colors.text} />
+              <IconButton icon="chevron-right" iconColor={colors.text} />
             </View>
           </TouchableOpacity>
         )}

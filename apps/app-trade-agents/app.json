@@ -29,8 +29,19 @@
     "android": {
       "package": "com.gsbelarus.salesrepresentative2",
       "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "FOREGROUND_SERVICE"],
-      "versionCode": 46,
-      "apiLevel": 33
-    }
+      "versionCode": 46
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 33,
+            "targetSdkVersion": 33,
+            "buildToolsVersion": "33.0.0"
+          }
+        }
+      ]
+    ]
   }
 }

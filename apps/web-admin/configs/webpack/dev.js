@@ -25,7 +25,6 @@ module.exports = merge(commonConfig, {
   },
   devtool: 'inline-source-map',
   plugins: [
-    new webpack.HotModuleReplacementPlugin(), // enable HMR globally
     new webpack.DefinePlugin({
       'process.env': {
         MOCK: JSON.stringify(process.env.MOCK),

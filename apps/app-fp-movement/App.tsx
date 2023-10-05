@@ -17,6 +17,7 @@ import {
   useDocThunkDispatch,
   useRefThunkDispatch,
   useSelector,
+  useSettingsThunkDispatch,
 } from '@lib/store';
 import {
   AppScreen,
@@ -36,8 +37,6 @@ import { sleep, dialCall } from '@lib/mobile-hooks';
 import { TouchableOpacity, Linking, ScrollView, View } from 'react-native';
 
 import Constants from 'expo-constants';
-
-import { useSettingsThunkDispatch } from '@lib/store/src/settings/actions.async';
 
 import { MoveNavigator } from './src/navigation/MoveNavigator';
 
@@ -292,12 +291,10 @@ const Root = () => {
   const dispatch = useDispatch();
 
   //Загружаем в стор дополнительные настройки приложения
-  const authLoading = useSelector((state) => state.auth.loadingData);
   const appDataLoading = appSelectors.selectLoading();
   const isLogged = authSelectors.isLoggedWithCompany();
   const fpLoading = useFpSelector((state) => state.fpMovement.loading);
-  const isDemo = useSelector((state) => state.auth.isDemo);
-  const connectionStatus = useSelector((state) => state.auth.connectionStatus);
+  const { connectionStatus, isDemo, loadingData: authLoading, user } = useSelector((state) => state.auth);
 
   const refDispatch = useRefThunkDispatch();
   const docDispatch = useDocThunkDispatch();
@@ -355,6 +352,12 @@ const Root = () => {
       setAddSettings('ADDED');
     }
   }, [addSettings, appDataLoading, dispatch]);
+
+  useEffect(() => {
+    if (user) {
+      setAddSettings('INIT');
+    }
+  }, [user]);
 
   useEffect(() => {
     //Для отрисовки при первом подключении
