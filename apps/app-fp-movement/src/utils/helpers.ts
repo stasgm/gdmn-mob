@@ -336,7 +336,7 @@ export const getDocToSend = (
           usedRemains: i.usedRemains,
           fromCell: (i as IMoveLine).fromCell,
           toCell: (i as IMoveLine).toCell,
-        } as ISendingLine),
+        }) as ISendingLine,
     ),
   };
 };
