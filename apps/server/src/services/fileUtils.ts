@@ -56,7 +56,7 @@ export const checkFiles = async (): Promise<void> => {
       const fileStat = await stat(file);
       const fileDate = fileStat.birthtimeMs;
       const period =
-        file.toUpperCase().indexOf('DOCS') === -1
+        file.toUpperCase().indexOf('DOCS') === -1 || file.toUpperCase().indexOf('MESSAGES') > 0
           ? config.FILES_SAVING_PERIOD_IN_DAYS
           : config.DOCS_SAVING_PERIOD_IN_DAYS;
       if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > period) {
