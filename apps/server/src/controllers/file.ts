@@ -1,6 +1,6 @@
 import { Context, ParameterizedContext } from 'koa';
 
-import { IFileIds } from '@lib/types';
+import { IFileIds, IFileObject } from '@lib/types';
 
 import { fileService } from '../services';
 
@@ -77,18 +77,42 @@ const getFiles = async (ctx: ParameterizedContext): Promise<void> => {
   ok(ctx as Context, filesList, 'getFiles: deviceLogs are successfully received');
 };
 
-const getFile = async (ctx: ParameterizedContext): Promise<void> => {
+export const getFileParams = async (ctx: ParameterizedContext): Promise<IFileObject> => {
   const { id } = ctx.request.params;
+  const { companyId, appSystemId, locatefolderName, ext } = ctx.query;
 
-  const file = await fileService.findOne(id);
+  const params: IFileObject = { id: id, ext: 'json' };
+
+  if (typeof companyId === 'string' && companyId) {
+    params.companyId = companyId;
+  }
+
+  if (typeof appSystemId === 'string' && appSystemId) {
+    params.appSystemId = appSystemId;
+  }
+
+  if (typeof locatefolderName === 'string' && locatefolderName) {
+    params.locatefolderName = locatefolderName;
+  }
+
+  if (typeof ext === 'string' && ext) {
+    params.ext = ext;
+  }
+
+  return params;
+};
+
+const getFile = async (ctx: ParameterizedContext): Promise<void> => {
+  const params = await getFileParams(ctx);
+  const file = await fileService.findOne(params);
 
   ok(ctx as Context, file, 'getFile: file is successfully  received');
 };
 
 const removeFile = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id } = ctx.request.params;
+  const params = await getFileParams(ctx);
 
-  await fileService.deleteOne(id);
+  await fileService.deleteOne(params);
 
   ok(ctx as Context, undefined, 'removeFile: file is successfully  deleted');
 };
@@ -114,13 +138,13 @@ const removeManyFiles = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const updateFile = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id } = ctx.request.params;
+  const params = await getFileParams(ctx);
 
   const fileData = ctx.request.body as Partial<any>;
 
-  const updatedFile = fileService.updateOne(id, fileData);
+  const updatedFile = fileService.updateOne(params, fileData);
 
-  ok(ctx as Context, updatedFile, `updateFile: file '${id}' is successfully updated`);
+  ok(ctx as Context, updatedFile, `updateFile: file '${params.id}' is successfully updated`);
 };
 
 const getFolders = async (ctx: ParameterizedContext): Promise<void> => {

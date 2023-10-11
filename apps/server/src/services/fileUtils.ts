@@ -1,7 +1,7 @@
 import path from 'path';
 import { readdir, unlink, stat, rename } from 'fs/promises';
 
-import { IFileSystem, IExtraFileInfo, IPathParams, IDBCompany } from '@lib/types';
+import { IFileSystem, IExtraFileInfo, IPathParams, IDBCompany, IFileObject } from '@lib/types';
 
 import { BYTES_PER_KB, MSEС_IN_DAY, collectionNames } from '../utils/constants';
 
@@ -12,14 +12,13 @@ import config from '../../config';
 import { getListPart } from '../utils/helpers';
 
 import {
-  fullFileName2alias,
   getAppSystemId,
-  alias2fullFileName,
   readJsonFile,
   writeIterableToFile,
   getFoundEntity,
   getFoundString,
   getPathSystem,
+  idObj2fullFileName,
 } from '../utils/fileHelper';
 
 import { checkDeviceLogsFiles } from './errorLogUtils';
@@ -96,6 +95,8 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
     log.error('Компания не найдена');
   }
 
+  const folderName = arr[2];
+
   const getRx = (str: string): RegExp => {
     const isNewFormat = str.includes('__');
     const isMess = str.includes('_to_');
@@ -142,6 +143,7 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
     producer: producerName ? { id: producerId, name: producerName } : undefined,
     consumer: consumerId && consumerName ? { id: consumerId, name: consumerName } : undefined,
     device: deviceUid && deviceName ? { id: deviceUid, name: deviceName } : undefined,
+    folderName: folderName,
   };
 };
 
@@ -160,16 +162,17 @@ const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => 
     const fileDate = fileStat.birthtime.toString();
     const fileModifiedDate = fileStat.mtime.toString();
 
-    const alias = fullFileName2alias(root);
+    //const alias = fullFileName2alias(root);
 
     const fileInfo = await splitFileMessage(root);
     if (fileInfo) {
       return {
-        id: alias ?? nameWithoutExt,
+        id: nameWithoutExt,
         date: fileDate,
         size: fileSize,
-        fileName: name,
         path: subPath,
+        ext: ext.slice(1),
+        folderName: fileInfo.folderName,
         company: fileInfo.company,
         appSystem: fileInfo.appSystem,
         producer: fileInfo.producer,
@@ -180,11 +183,11 @@ const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => 
     }
 
     return {
-      id: alias ?? nameWithoutExt,
+      id: nameWithoutExt,
       date: fileDate,
       size: fileSize,
-      fileName: name,
       path: subPath,
+      ext: ext,
       mdate: fileModifiedDate,
     };
   } catch (err) {
@@ -252,7 +255,7 @@ export const readListFiles = async (params: Record<string, string | number>): Pr
       const filterText: string = (newParams.filterText as string).toUpperCase();
 
       if (filterText) {
-        const fileName = item.fileName.toUpperCase();
+        const fileName = item.id.toUpperCase();
 
         filteredFiles = fileName.includes(filterText);
       }
@@ -276,8 +279,8 @@ export const readListFiles = async (params: Record<string, string | number>): Pr
   return getListPart(files, params);
 };
 
-export const getFile = async (fid: string): Promise<any> => {
-  const fullName = alias2fullFileName(fid);
+export const getFile = async (fid: IFileObject): Promise<any> => {
+  const fullName = idObj2fullFileName(fid);
   if (!fullName) {
     log.error(`Неправильный параметр ID '${fid} в запросе`);
     return undefined;
@@ -297,8 +300,8 @@ export const getFile = async (fid: string): Promise<any> => {
   return fileJson;
 };
 
-export const deleteFileById = async (fid: string): Promise<void> => {
-  const fullName = alias2fullFileName(fid);
+export const deleteFileById = async (fid: IFileObject): Promise<void> => {
+  const fullName = idObj2fullFileName(fid);
   if (!fullName) {
     log.error(`Неправильный параметр ID '${fid} в запросе`);
     return;
@@ -306,17 +309,17 @@ export const deleteFileById = async (fid: string): Promise<void> => {
   return await unlink(fullName);
 };
 
-export const deleteManyFiles = async (ids: string[]): Promise<void> => {
+export const deleteManyFiles = async (ids: IFileObject[]): Promise<void> => {
   await Promise.allSettled(
     ids.map(async (id) => {
-      const fullName = alias2fullFileName(id);
+      const fullName = idObj2fullFileName(id);
       return await unlink(fullName);
     }),
   );
 };
 
-export const updateById = async <T>(id: string, fileData: Partial<Awaited<T>>): Promise<void> => {
-  const fullName = alias2fullFileName(id);
+export const updateById = async <T>(id: IFileObject, fileData: Partial<Awaited<T>>): Promise<void> => {
+  const fullName = idObj2fullFileName(id);
   if (!fullName) {
     log.error(`Неправильный параметр ID '${id} в запросе`);
     return;
@@ -358,14 +361,13 @@ export const getListFolders = async (appPathParams: IPathParams): Promise<string
   }
 };
 
-export const moveManyFiles = async (ids: string[], folderName: string): Promise<void> => {
+export const moveManyFiles = async (ids: IFileObject[], folderName: string): Promise<void> => {
   try {
     await Promise.allSettled(
       ids.map(async (id) => {
-        const name = alias2fullFileName(id);
-        const arr = id.split('_D_');
-        const newAlias = arr.map((item, index) => (index === 2 ? folderName : item)).join('_D_');
-        const newName = alias2fullFileName(newAlias);
+        const newId = { ...id, locatefolderName: folderName };
+        const name = idObj2fullFileName(id);
+        const newName = idObj2fullFileName(newId);
         return await rename(name, newName);
       }),
     );

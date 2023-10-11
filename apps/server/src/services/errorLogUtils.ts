@@ -1,14 +1,13 @@
 import path from 'path';
 import { readdir, unlink, stat } from 'fs/promises';
 
-import { IPathParams, IFileDeviceLogInfo, IDeviceLog, IDeviceLogFiles, IDeviceLogOptions } from '@lib/types';
+import { IPathParams, IFileDeviceLogInfo, IDeviceLog, IDeviceLogFiles, IFileObject } from '@lib/types';
 
 import {
   checkFileExists,
   getPath,
   getPathSystem,
-  fullFileName2alias,
-  alias2fullFileName,
+  idObj2fullFileName,
   readJsonFile,
   getAppSystemId,
   writeIterableToFile,
@@ -172,6 +171,8 @@ const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined
     log.error('Invalid deviceLogs');
     return undefined;
   }
+  const ext = path.extname(arr[3]);
+  const nameWithoutExt = path.basename(arr[3], ext);
   const re = /from_(.+)_dev_(.+)\.json/gi;
   const match = re.exec(arr[3]);
   if (!match) {
@@ -220,13 +221,13 @@ const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined
     const fileDate = fileStat.birthtime.toString();
     const fileModifiedDate = fileStat.mtime.toString();
 
-    const alias = fullFileName2alias(fullFileName);
-    if (!alias) {
+    //const alias = fullFileName2alias(fullFileName);
+    if (!nameWithoutExt) {
       log.error(`Invalid deviceLogs file name ${fullFileName}`);
       return undefined;
     }
     return {
-      id: alias,
+      id: nameWithoutExt,
       company: { id: arr[0], name: companyName },
       appSystem: { id: appSystemId, name: arr[1] },
       contact: { id: match[1], name: contactName },
@@ -234,6 +235,8 @@ const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined
       date: fileDate,
       size: fileSize,
       mdate: fileModifiedDate,
+      folderName: arr[2],
+      ext: ext.slice(1),
     };
   } catch (err) {
     log.error(`Ошибка чтения статистики файла-- ${err}`);
@@ -317,8 +320,8 @@ export const getFilesObject = async (params: Record<string, string | number>): P
   return getListPart(fileObjs, params);
 };
 
-export const getFile = async <IDeviceLog>(fid: string): Promise<IDeviceLog[]> => {
-  const fullName = alias2fullFileName(fid);
+export const getFile = async <IDeviceLog>(fid: IFileObject): Promise<IDeviceLog[]> => {
+  const fullName = idObj2fullFileName(fid);
   if (!fullName) {
     log.error(`Неправильный параметр ID '${fid} в запросе`);
     return [];
@@ -331,8 +334,8 @@ export const getFile = async <IDeviceLog>(fid: string): Promise<IDeviceLog[]> =>
   return deviceLog;
 };
 
-export const deleteFileById = async (fid: string): Promise<void> => {
-  const fullName = alias2fullFileName(fid);
+export const deleteFileById = async (fid: IFileObject): Promise<void> => {
+  const fullName = idObj2fullFileName(fid);
   if (!fullName) {
     log.error(`Неправильный параметр ID '${fid} в запросе`);
     return;
@@ -340,10 +343,10 @@ export const deleteFileById = async (fid: string): Promise<void> => {
   return await unlink(fullName);
 };
 
-export const deleteManyFiles = async (ids: string[]): Promise<void> => {
+export const deleteManyFiles = async (ids: IFileObject[]): Promise<void> => {
   await Promise.allSettled(
     ids.map(async (id) => {
-      const fullName = alias2fullFileName(id);
+      const fullName = idObj2fullFileName(id);
       return await unlink(fullName);
     }),
   );
