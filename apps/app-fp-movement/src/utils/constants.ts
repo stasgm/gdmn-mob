@@ -251,7 +251,7 @@ export const appSettings: Settings = {
     id: 'boxWeight',
     sortOrder: 16,
     description: 'Мин. вес поддона, кг',
-    data: 25,
+    data: 30,
     type: 'number',
     visible: true,
     group: goodGroup,
