@@ -189,7 +189,7 @@ const ShipmentViewScreen = () => {
 
       const weight =
         line?.weight >= goodBarcodeSettings?.boxWeight
-          ? round(round(line?.weight / line?.quantPack, 3) * quantity * pallet, 3)
+          ? round(line?.weight * pallet, 3)
           : round(line?.weight * quantity, 3);
 
       const tempLine = tempOrder?.lines?.find((i) => line.good.id === i.good.id);
@@ -692,12 +692,12 @@ const ShipmentViewScreen = () => {
 
   const handlePressLine = useCallback(
     (weight: number) => {
-      setQuantPack((shipmentLines?.[0].quantPack || '').toString());
+      setQuantPack('');
       setQuantPallet('1');
       setVisibleQuantPackDialog(true);
       weight >= goodBarcodeSettings?.boxWeight ? setIsPack(false) : setIsPack(true);
     },
-    [goodBarcodeSettings?.boxWeight, shipmentLines],
+    [goodBarcodeSettings?.boxWeight],
   );
 
   const renderShipmentItem = useCallback(
