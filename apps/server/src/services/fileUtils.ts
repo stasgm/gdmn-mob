@@ -282,14 +282,14 @@ export const readListFiles = async (params: Record<string, string | number>): Pr
 export const getFile = async (fid: IFileObject): Promise<any> => {
   const fullName = idObj2fullFileName(fid);
   if (!fullName) {
-    log.error(`Неправильный параметр ID '${fid} в запросе`);
+    log.error(`Неправильный параметр ID ${fid.id} в запросе`);
     return undefined;
   }
 
   const fileExt = path.extname(fullName);
 
   if (!fileExt || fileExt.toLowerCase() !== '.json') {
-    log.error(`Файл некорректного формата '${fid} в запросе`);
+    log.error(`Файл некорректного формата ${fid.id} в запросе`);
     return undefined;
   }
   const fileJson: any | string = await readJsonFile(fullName);
@@ -303,7 +303,7 @@ export const getFile = async (fid: IFileObject): Promise<any> => {
 export const deleteFileById = async (fid: IFileObject): Promise<void> => {
   const fullName = idObj2fullFileName(fid);
   if (!fullName) {
-    log.error(`Неправильный параметр ID '${fid} в запросе`);
+    log.error(`Неправильный параметр ID ${fid.id} в запросе`);
     return;
   }
   return await unlink(fullName);
@@ -364,9 +364,9 @@ export const getListFolders = async (appPathParams: IPathParams): Promise<string
 export const moveManyFiles = async (ids: IFileObject[], folderName: string): Promise<void> => {
   try {
     await Promise.allSettled(
-      ids.map(async (id) => {
-        const newId = { ...id, locatefolderName: folderName };
-        const name = idObj2fullFileName(id);
+      ids.map(async (idObj) => {
+        const newId = { ...idObj, locateFolderName: folderName };
+        const name = idObj2fullFileName(idObj);
         const newName = idObj2fullFileName(newId);
         return await rename(name, newName);
       }),

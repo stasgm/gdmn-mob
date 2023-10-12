@@ -24,7 +24,17 @@ const addDeviceLog: Config = {
         ),
       }),
       Joi.object({
-        ids: Joi.array().items(Joi.string()).required(),
+        ids: Joi.array().items(
+          Joi.object({
+            id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор файла')),
+            companyId: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор компании')),
+            appSystemId: Joi.string()
+              .required()
+              .error(new InvalidParameterException('Не указан идентификатор подсистемы')),
+            locateFolderName: Joi.string().required().error(new InvalidParameterException('Не указано имя папки')),
+            ext: Joi.string(),
+          }),
+        ),
       }),
     ),
   },

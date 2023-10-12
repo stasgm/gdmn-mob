@@ -51,12 +51,13 @@ export const getPathSystem = ({ companyId, appSystemId }: IPathParams) =>
 
 export const idObj2fullFileName = (idObj: IFileObject): string => {
   const { appSystems } = getDb();
-  const appSystemName = idObj.appSystemId ? appSystems.findById(idObj.appSystemId) : undefined;
+  const appSystemName = idObj.appSystemId ? appSystems.findById(idObj.appSystemId)?.name : undefined;
+  const ext = idObj.ext ? `.${idObj.ext}` : '';
   const match =
-    appSystemName && idObj.companyId && idObj.locatefolderName
-      ? `db_${idObj.companyId}${path.sep}${appSystemName}${path.sep}
-          ${idObj.locatefolderName}${path.sep}${idObj.id}.${idObj.ext}`
-      : `${idObj.id}.${idObj.ext}`;
+    appSystemName && idObj.companyId && idObj.locateFolderName
+      ? // eslint-disable-next-line max-len
+        `db_${idObj.companyId}${path.sep}${appSystemName}${path.sep}${idObj.locateFolderName}${path.sep}${idObj.id}${ext}`
+      : `${idObj.id}${ext}`;
   return getPath([match]);
 };
 

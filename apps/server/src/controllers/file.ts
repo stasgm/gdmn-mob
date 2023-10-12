@@ -79,9 +79,9 @@ const getFiles = async (ctx: ParameterizedContext): Promise<void> => {
 
 export const getFileParams = async (ctx: ParameterizedContext): Promise<IFileObject> => {
   const { id } = ctx.request.params;
-  const { companyId, appSystemId, locatefolderName, ext } = ctx.query;
+  const { companyId, appSystemId, locateFolderName, ext } = ctx.query;
 
-  const params: IFileObject = { id: id, ext: 'json' };
+  const params: IFileObject = { id: id };
 
   if (typeof companyId === 'string' && companyId) {
     params.companyId = companyId;
@@ -91,8 +91,8 @@ export const getFileParams = async (ctx: ParameterizedContext): Promise<IFileObj
     params.appSystemId = appSystemId;
   }
 
-  if (typeof locatefolderName === 'string' && locatefolderName) {
-    params.locatefolderName = locatefolderName;
+  if (typeof locateFolderName === 'string' && locateFolderName) {
+    params.locateFolderName = locateFolderName;
   }
 
   if (typeof ext === 'string' && ext) {
