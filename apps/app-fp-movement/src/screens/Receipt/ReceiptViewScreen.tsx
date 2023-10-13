@@ -173,7 +173,7 @@ export const ReceiptViewScreen = () => {
 
       const weight =
         line?.weight >= goodBarcodeSettings?.boxWeight
-          ? round(round(line?.weight / line?.quantPack, 3) * quantity * pallet, 3)
+          ? round(line?.weight * pallet, 3)
           : round(line?.weight * quantity, 3);
 
       const good =
@@ -350,12 +350,12 @@ export const ReceiptViewScreen = () => {
 
   const handlePressLine = useCallback(
     (weight: number) => {
-      setQuantPack((lines?.[0].quantPack || '').toString());
+      setQuantPack('');
       setQuantPallet('1');
       setVisibleQuantPackDialog(true);
       weight >= goodBarcodeSettings?.boxWeight ? setIsPack(false) : setIsPack(true);
     },
-    [goodBarcodeSettings?.boxWeight, lines],
+    [goodBarcodeSettings?.boxWeight],
   );
 
   const renderItem = useCallback(
