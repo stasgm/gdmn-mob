@@ -95,7 +95,7 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
     log.error('Компания не найдена');
   }
 
-  const folderName = arr[2];
+  const folder = arr[2];
 
   const getRx = (str: string): RegExp => {
     const isNewFormat = str.includes('__');
@@ -143,7 +143,7 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
     producer: producerName ? { id: producerId, name: producerName } : undefined,
     consumer: consumerId && consumerName ? { id: consumerId, name: consumerName } : undefined,
     device: deviceUid && deviceName ? { id: deviceUid, name: deviceName } : undefined,
-    folderName: folderName,
+    folder: folder,
   };
 };
 
@@ -172,7 +172,7 @@ const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => 
         size: fileSize,
         path: subPath,
         ext: ext.slice(1),
-        folderName: fileInfo.folderName,
+        folder: fileInfo.folder,
         company: fileInfo.company,
         appSystem: fileInfo.appSystem,
         producer: fileInfo.producer,
@@ -349,8 +349,8 @@ export const getListFolders = async (appPathParams: IPathParams): Promise<string
     const folders = await Promise.all(
       files.map(async (curr: string) => {
         const res = path.join(pathSystem, curr);
-        const folderName = res.split(path.sep).pop();
-        return (await stat(res)).isDirectory() ? folderName : undefined;
+        const folder = res.split(path.sep).pop();
+        return (await stat(res)).isDirectory() ? folder : undefined;
       }),
     );
 
@@ -361,17 +361,17 @@ export const getListFolders = async (appPathParams: IPathParams): Promise<string
   }
 };
 
-export const moveManyFiles = async (ids: IFileObject[], folderName: string): Promise<void> => {
+export const moveManyFiles = async (ids: IFileObject[], toFolder: string): Promise<void> => {
   try {
     await Promise.allSettled(
       ids.map(async (idObj) => {
-        const newId = { ...idObj, folder: folderName };
+        const newId = { ...idObj, folder: toFolder };
         const name = idObj2fullFileName(idObj);
         const newName = idObj2fullFileName(newId);
         return await rename(name, newName);
       }),
     );
   } catch (err) {
-    log.error(`Ошибка перемещения файлов в директорию ${folderName}  - ${err}`);
+    log.error(`Ошибка перемещения файлов в директорию ${toFolder}  - ${err}`);
   }
 };

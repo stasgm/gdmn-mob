@@ -50,10 +50,10 @@ const deleteMany = async (ids: IFileObject[]): Promise<void> => {
 /**
 /* Перемещает множество файлов по массиву ИД и названию папаки
 /* @param ids ИД файла массив
-/* @param folderName наименование папки, в которую перемещаем
+/* @param toFolder наименование папки, в которую перемещаем
 */
-const moveMany = async (ids: IFileObject[], folderName: string): Promise<void> => {
-  return await moveManyFiles(ids, folderName);
+const moveMany = async (ids: IFileObject[], toFolder: string): Promise<void> => {
+  return await moveManyFiles(ids, toFolder);
 };
 
 /**

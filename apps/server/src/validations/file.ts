@@ -52,7 +52,7 @@ const deleteFiles: Config = {
           ext: Joi.string().optional,
         }),
       ),
-      folderName: Joi.string(),
+      folder: Joi.string(),
     }).error(new InvalidParameterException('Некорректный формат списка файлов')),
   },
 };

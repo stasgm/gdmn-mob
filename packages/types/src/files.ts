@@ -6,7 +6,7 @@ export interface IExtraFileInfo {
   consumer?: INamedEntity;
   producer?: INamedEntity;
   device?: INamedEntity;
-  folderName?: string;
+  folder?: string;
 }
 
 export interface IFileSystem extends IEntity, IExtraFileInfo {
