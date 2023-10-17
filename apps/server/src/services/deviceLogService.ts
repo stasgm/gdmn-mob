@@ -1,4 +1,4 @@
-import { IDeviceLog, IDeviceLogFiles } from '@lib/types';
+import { IDeviceLog, IDeviceLogFiles, IFileObject } from '@lib/types';
 
 import { saveDeviceLogFile, getFilesObject, getFile, deleteFileById, deleteManyFiles } from './errorLogUtils';
 
@@ -47,8 +47,8 @@ const addOne = async ({
 /* Удаляет  файла по ИД
 /* @param id ИД файла
 */
-const deleteOne = async (id: string): Promise<void> => {
-  return await deleteFileById(id);
+const deleteOne = async (idObj: IFileObject): Promise<void> => {
+  return await deleteFileById(idObj);
 };
 
 //**
@@ -56,8 +56,8 @@ const deleteOne = async (id: string): Promise<void> => {
 //  * @param id ИД сформированный из названия файла
 //  * @returns Объект из JSON  найденного файла
 //  */
-const findOne = async (id: string): Promise<IDeviceLog[]> => {
-  return await getFile(id);
+const findOne = async (idObj: IFileObject): Promise<IDeviceLog[]> => {
+  return await getFile(idObj);
 };
 
 /**
@@ -72,7 +72,7 @@ const findMany = async (params: Record<string, string | number>): Promise<IDevic
 /* Удаляет множество файлов по массиву ИД
 /* @param id ИД файла
 */
-const deleteMany = async (ids: string[]): Promise<void> => {
+const deleteMany = async (ids: IFileObject[]): Promise<void> => {
   return await deleteManyFiles(ids);
 };
 

@@ -8,7 +8,7 @@ import { finished } from 'stream';
 
 import { promisify } from 'util';
 
-import { IPathParams, IFileSystem, INamedEntity, IDeviceLogFiles } from '@lib/types';
+import { IPathParams, IFileSystem, INamedEntity, IDeviceLogFiles, IFileObject } from '@lib/types';
 
 import { BYTES_PER_MB, defMaxFilesSize } from '../utils/constants';
 
@@ -31,7 +31,7 @@ export const getPath = (folders: string[], fn = '') => {
 export const getPathSystem = ({ companyId, appSystemId }: IPathParams) =>
   `db_${companyId}/${getDb().appSystems.findById(appSystemId)?.name}`;
 
-export const fullFileName2alias = (fullFileName: string): string | undefined => {
+/*export const fullFileName2alias = (fullFileName: string): string | undefined => {
   const re = /db_(.+)/gi;
   const match = re.exec(fullFileName);
   const fileNameArr = fullFileName.split(getDb().dbPath);
@@ -42,10 +42,22 @@ export const fullFileName2alias = (fullFileName: string): string | undefined => 
     str += i === 0 ? temp : `_D_${temp}`;
     return str;
   }, '');
-};
+};*/
 
-export const alias2fullFileName = (alias: string): string => {
+/* export const alias2fullFileName = (alias: string): string => {
   const match = alias.split('_D_').join(path.sep).split('_EXT_').join('.');
+  return getPath([match]);
+}; */
+
+export const idObj2fullFileName = (idObj: IFileObject): string => {
+  const { appSystems } = getDb();
+  const appSystemName = idObj.appSystemId ? appSystems.findById(idObj.appSystemId)?.name : undefined;
+  const ext = idObj.ext ? `.${idObj.ext}` : '';
+  const match =
+    appSystemName && idObj.companyId && idObj.locateFolderName
+      ? // eslint-disable-next-line max-len
+        `db_${idObj.companyId}${path.sep}${appSystemName}${path.sep}${idObj.locateFolderName}${path.sep}${idObj.id}${ext}`
+      : `${idObj.id}${ext}`;
   return getPath([match]);
 };
 
