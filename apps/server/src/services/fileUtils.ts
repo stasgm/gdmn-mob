@@ -365,7 +365,7 @@ export const moveManyFiles = async (ids: IFileObject[], folderName: string): Pro
   try {
     await Promise.allSettled(
       ids.map(async (idObj) => {
-        const newId = { ...idObj, locateFolderName: folderName };
+        const newId = { ...idObj, folder: folderName };
         const name = idObj2fullFileName(idObj);
         const newName = idObj2fullFileName(newId);
         return await rename(name, newName);

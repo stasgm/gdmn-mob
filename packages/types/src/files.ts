@@ -34,7 +34,7 @@ export interface IFileSearchOptions {
 export interface IFileQueryObject {
   companyId?: string;
   appSystemId?: string;
-  locateFolderName?: string;
+  folder?: string;
   ext?: string;
 }
 
@@ -43,5 +43,5 @@ export interface IFileObject extends IFileQueryObject {
 }
 export interface IFileIds {
   ids: IFileObject[];
-  folderName?: string;
+  toFolder?: string;
 }

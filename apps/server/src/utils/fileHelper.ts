@@ -54,9 +54,9 @@ export const idObj2fullFileName = (idObj: IFileObject): string => {
   const appSystemName = idObj.appSystemId ? appSystems.findById(idObj.appSystemId)?.name : undefined;
   const ext = idObj.ext ? `.${idObj.ext}` : '';
   const match =
-    appSystemName && idObj.companyId && idObj.locateFolderName
+    appSystemName && idObj.companyId && idObj.folder
       ? // eslint-disable-next-line max-len
-        `db_${idObj.companyId}${path.sep}${appSystemName}${path.sep}${idObj.locateFolderName}${path.sep}${idObj.id}${ext}`
+        `db_${idObj.companyId}${path.sep}${appSystemName}${path.sep}${idObj.folder}${path.sep}${idObj.id}${ext}`
       : `${idObj.id}${ext}`;
   return getPath([match]);
 };
