@@ -235,7 +235,7 @@ const fileInfoToObj = async (arr: string[]): Promise<IDeviceLogFiles | undefined
       date: fileDate,
       size: fileSize,
       mdate: fileModifiedDate,
-      folderName: arr[2],
+      folder: arr[2],
       ext: ext.slice(1),
     };
   } catch (err) {
