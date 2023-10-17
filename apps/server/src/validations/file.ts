@@ -48,7 +48,7 @@ const deleteFiles: Config = {
           id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор файла')),
           companyId: Joi.string().optional,
           appSystemId: Joi.string().optional,
-          locateFolderName: Joi.string().optional,
+          folder: Joi.string().optional,
           ext: Joi.string().optional,
         }),
       ),

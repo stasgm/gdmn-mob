@@ -31,7 +31,7 @@ const addDeviceLog: Config = {
             appSystemId: Joi.string()
               .required()
               .error(new InvalidParameterException('Не указан идентификатор подсистемы')),
-            locateFolderName: Joi.string().required().error(new InvalidParameterException('Не указано имя папки')),
+            folder: Joi.string().required().error(new InvalidParameterException('Не указано имя папки')),
             ext: Joi.string(),
           }),
         ),

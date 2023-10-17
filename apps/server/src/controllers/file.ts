@@ -79,7 +79,7 @@ const getFiles = async (ctx: ParameterizedContext): Promise<void> => {
 
 export const getFileParams = async (ctx: ParameterizedContext): Promise<IFileObject> => {
   const { id } = ctx.request.params;
-  const { companyId, appSystemId, locateFolderName, ext } = ctx.query;
+  const { companyId, appSystemId, folder, ext } = ctx.query;
 
   const params: IFileObject = { id: id };
 
@@ -91,8 +91,8 @@ export const getFileParams = async (ctx: ParameterizedContext): Promise<IFileObj
     params.appSystemId = appSystemId;
   }
 
-  if (typeof locateFolderName === 'string' && locateFolderName) {
-    params.locateFolderName = locateFolderName;
+  if (typeof folder === 'string' && folder) {
+    params.folder = folder;
   }
 
   if (typeof ext === 'string' && ext) {
@@ -124,14 +124,14 @@ const removeManyFiles = async (ctx: ParameterizedContext): Promise<void> => {
     notOk(ctx as Context);
     return;
   }
-  const { ids, folderName } = ctx.request.body as IFileIds;
+  const { ids, toFolder } = ctx.request.body as IFileIds;
 
-  if (action === 'move' && !folderName) {
+  if (action === 'move' && !toFolder) {
     notOk(ctx as Context);
     return;
   }
 
-  action === 'move' ? await fileService.moveMany(ids, folderName!) : await fileService.deleteMany(ids);
+  action === 'move' ? await fileService.moveMany(ids, toFolder!) : await fileService.deleteMany(ids);
   const actionName = action === 'move' ? 'moved' : 'deleted';
 
   ok(ctx as Context, undefined, `removeManyFiles: files are successfully  ${actionName}`);
