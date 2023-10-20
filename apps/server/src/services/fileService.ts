@@ -10,6 +10,7 @@ import {
   deleteManyFiles,
   getListFolders,
   moveManyFiles,
+  downLoadFile,
 } from './fileUtils';
 
 import { getDb } from './dao/db';
@@ -29,6 +30,10 @@ const findMany = async (params: Record<string, string | number>): Promise<IFileS
 //  */
 const findOne = async (id: string): Promise<any> => {
   return await getFile(id);
+};
+
+const downloadOne = async (id: string): Promise<any> => {
+  return await downLoadFile(id);
 };
 
 /**
@@ -84,4 +89,4 @@ const getFolders = async (appPathParams: IPathParams): Promise<string[]> => {
   return await getListFolders(appPathParams);
 };
 
-export { findMany, findOne, deleteOne, updateOne, deleteMany, getFolders, moveMany };
+export { findMany, findOne, deleteOne, updateOne, deleteMany, getFolders, moveMany, downloadOne };

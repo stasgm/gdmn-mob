@@ -285,6 +285,25 @@ export const getFile = async (fid: string): Promise<any> => {
   return fileJson;
 };
 
+export const downLoadFile = async (fid: string): Promise<any> => {
+  const fullName = alias2fullFileName(fid);
+  if (!fullName) {
+    log.error(`Неправильный параметр ID '${fid} в запросе`);
+    return undefined;
+  }
+
+  const fileJson = await getFile(fid);
+  if (!fileJson) {
+    log.error(`Неправильный параметр ID '${fid} в запросе`);
+    return undefined;
+  }
+
+  return {
+    fileJson: fileJson,
+    fileName: fullName,
+  };
+};
+
 export const deleteFileById = async (fid: string): Promise<void> => {
   const fullName = alias2fullFileName(fid);
   if (!fullName) {

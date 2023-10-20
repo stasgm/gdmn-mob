@@ -85,6 +85,14 @@ const getFile = async (ctx: ParameterizedContext): Promise<void> => {
   ok(ctx as Context, file, 'getFile: file is successfully  received');
 };
 
+const downloadFile = async (ctx: ParameterizedContext): Promise<void> => {
+  const { id } = ctx.request.params;
+  const file = await fileService.downloadOne(id);
+  ctx.attachment(file.fileName);
+
+  ok(ctx as Context, file.fileJson, 'getFile: file is successfully  received');
+};
+
 const removeFile = async (ctx: ParameterizedContext): Promise<void> => {
   const { id } = ctx.request.params;
 
@@ -132,4 +140,4 @@ const getFolders = async (ctx: ParameterizedContext): Promise<void> => {
 
   ok(ctx as Context, folderlist, 'getfolders: folders is successfully  received');
 };
-export { getFiles, getFile, removeFile, updateFile, removeManyFiles, getFolders };
+export { getFiles, getFile, removeFile, updateFile, removeManyFiles, getFolders, downloadFile };
