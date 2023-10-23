@@ -300,7 +300,7 @@ export const downLoadFile = async (fid: string): Promise<any> => {
 
   return {
     fileJson: fileJson,
-    fileName: fullName,
+    fileName: path.basename(fullName),
   };
 };
 

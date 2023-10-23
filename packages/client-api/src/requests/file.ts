@@ -206,6 +206,35 @@ class File extends BaseRequest {
       message: response2Log(res) || 'Данные о папках не получены',
     } as error.IServerError;
   };
+
+  downloadFile = async (customRequest: CustomRequest, fileId: string) => {
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
+
+      return {
+        type: 'ERROR',
+        message: 'Файл не найден',
+      } as error.IServerError;
+    }
+
+    const res = await customRequest<any>({
+      api: this.api.axios,
+      method: 'GET',
+      url: `/files/download/${fileId}`,
+    });
+
+    if (res.type === 'SUCCESS') {
+      return {
+        type: 'DOWNLOAD_FILE',
+        file: res?.data,
+      } as types.IDownloadFileResponse;
+    }
+
+    return {
+      type: res.type,
+      message: response2Log(res) || 'Данные файла не получены',
+    } as error.IServerError;
+  };
 }
 
 export default File;

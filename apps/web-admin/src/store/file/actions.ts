@@ -49,6 +49,12 @@ const fetchFoldersAsync = createAsyncAction('FILE/GET_FOLDERS', 'FILE/GET_FOLDER
   string
 >();
 
+const downloadFileAsync = createAsyncAction(
+  'FILE/DOWNLOAD_FILE',
+  'FILE/DOWNLOAD_FILE_SUCCESS',
+  'FILE/DOWNLOAD_FILE_FAILURE',
+)<string | undefined, any, string>();
+
 const setPageParam = createAction('FILE/SET_PARAM')<IFilePageParam | undefined>();
 const clearPageParams = createAction('FILE/CLEAR_PARAMS')();
 
@@ -60,6 +66,7 @@ export const fileSystemActions = {
   removeFilesAsync,
   moveFilesAsync,
   fetchFoldersAsync,
+  downloadFileAsync,
   clearPageParams,
   setPageParam,
   clearError,

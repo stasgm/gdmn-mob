@@ -59,6 +59,23 @@ const reducer: Reducer<IFileSystemState, FileSystemActionType> = (state = initia
         errorMessage: action.payload || 'error',
       };
 
+    case getType(fileSystemActions.downloadFileAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
+
+    case getType(fileSystemActions.downloadFileAsync.success):
+      return {
+        ...state,
+        file: action.payload,
+        loading: false,
+      };
+
+    case getType(fileSystemActions.downloadFileAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
+      };
+
     case getType(fileSystemActions.updateFileAsync.request):
       return { ...state, loading: true, errorMessage: '' };
 

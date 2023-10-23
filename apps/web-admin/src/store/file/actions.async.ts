@@ -52,6 +52,20 @@ const fetchFile = (id: string): AppThunk => {
   };
 };
 
+const downloadFile = (id: string): AppThunk => {
+  return async (dispatch) => {
+    dispatch(fileSystemActions.downloadFileAsync.request(''));
+
+    const response = await api.file.downloadFile(webRequest(dispatch, authActions), id);
+
+    if (response.type === 'DOWNLOAD_FILE') {
+      return dispatch(fileSystemActions.downloadFileAsync.success(response.file));
+    }
+
+    return dispatch(fileSystemActions.downloadFileAsync.failure(response.message));
+  };
+};
+
 const updateFile = (id: string, file: any): AppThunk => {
   return async (dispatch) => {
     dispatch(fileSystemActions.updateFileAsync.request('Обновление файла'));
@@ -127,4 +141,4 @@ const fetchFolders = (companyId: string, appSystemId: string): AppThunk => {
   };
 };
 
-export default { fetchFiles, fetchFile, updateFile, removeFile, removeFiles, moveFiles, fetchFolders };
+export default { fetchFiles, fetchFile, updateFile, removeFile, removeFiles, moveFiles, fetchFolders, downloadFile };

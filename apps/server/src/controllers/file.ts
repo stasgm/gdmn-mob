@@ -6,6 +6,8 @@ import { fileService } from '../services';
 
 import { ok, notOk } from '../utils/apiHelpers';
 
+const mime = require('mime');
+
 const getFiles = async (ctx: ParameterizedContext): Promise<void> => {
   const params: Record<string, string | number> = {};
 
@@ -90,7 +92,7 @@ const downloadFile = async (ctx: ParameterizedContext): Promise<void> => {
   const file = await fileService.downloadOne(id);
   ctx.attachment(file.fileName);
 
-  ok(ctx as Context, file.fileJson, 'getFile: file is successfully  received');
+  ok(ctx as Context, file, 'getFile: file is successfully  received');
 };
 
 const removeFile = async (ctx: ParameterizedContext): Promise<void> => {

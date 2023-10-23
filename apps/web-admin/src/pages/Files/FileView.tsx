@@ -15,6 +15,7 @@ import {
 import CachedIcon from '@mui/icons-material/Cached';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import DriveFileMoveOutlinedIcon from '@mui/icons-material/DriveFileMoveOutlined';
 
 import { useNavigate, useParams } from 'react-router-dom';
@@ -96,6 +97,33 @@ const FileView = () => {
     dispatch(fileActions.fetchFile(id));
   }, [dispatch, id]);
 
+  const encode = (s: string) => {
+    const out = [];
+    for (let i = 0; i < s.length; i++) {
+      out[i] = s.charCodeAt(i);
+    }
+    return new Uint16Array(out);
+  };
+
+  const handleDownload = useCallback(async () => {
+    setOpen(false);
+    const res = await dispatch(fileActions.downloadFile(id));
+    if (res.type === 'FILE/DOWNLOAD_FILE_SUCCESS') {
+      const fileStr = JSON.stringify(res.payload.fileJson);
+      const bufferArray = encode(fileStr);
+      const blob = new Blob([bufferArray], {
+        type: 'application/octet-stream',
+      });
+
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = res.payload.fileName;
+      a.click();
+      refreshData();
+    }
+  }, [dispatch, id, refreshData]);
+
   useEffect(() => {
     refreshData();
   }, [refreshData]);
@@ -165,6 +193,15 @@ const FileView = () => {
       variant: 'contained',
       onClick: handleGetFolders,
       icon: <DriveFileMoveOutlinedIcon />,
+    },
+    {
+      name: 'Скачать',
+      sx: { marginRight: 1 },
+      disabled: true,
+      color: 'secondary',
+      variant: 'contained',
+      onClick: handleDownload,
+      icon: <ArrowDownwardIcon />,
     },
     {
       name: 'Удалить',

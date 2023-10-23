@@ -9,7 +9,8 @@ export interface IFileQueryResponse {
     | 'REMOVE_FILE'
     | 'REMOVE_FILES'
     | 'MOVE_FILES'
-    | 'GET_FOLDERS';
+    | 'GET_FOLDERS'
+    | 'DOWNLOAD_FILE';
 }
 
 export interface IGetFilesResponse extends IFileQueryResponse {
@@ -48,4 +49,9 @@ export interface IMoveFilesResponse extends IFileQueryResponse {
 export interface IGetFoldersResponse extends IFileQueryResponse {
   type: 'GET_FOLDERS';
   folders: string[];
+}
+
+export interface IDownloadFileResponse extends IFileQueryResponse {
+  type: 'DOWNLOAD_FILE';
+  file: any;
 }
