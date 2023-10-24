@@ -107,22 +107,23 @@ const FileView = () => {
 
   const handleDownload = useCallback(async () => {
     setOpen(false);
-    const res = await dispatch(fileActions.downloadFile(id));
-    if (res.type === 'FILE/DOWNLOAD_FILE_SUCCESS') {
-      const fileStr = JSON.stringify(res.payload.fileJson);
-      const bufferArray = encode(fileStr);
-      const blob = new Blob([bufferArray], {
-        type: 'application/octet-stream',
-      });
+    // const res = await dispatch(fileActions.downloadFile(id));
+    // if (res.type === 'FILE/DOWNLOAD_FILE_SUCCESS') {
+    // const fileStr = JSON.stringify(res.payload.fileJson);
+    const fileStr = JSON.stringify(file);
+    const bufferArray = encode(fileStr);
+    const blob = new Blob([bufferArray], {
+      type: 'application/octet-stream',
+    });
 
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = res.payload.fileName;
-      a.click();
-      refreshData();
-    }
-  }, [dispatch, id, refreshData]);
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${process?.fileName}`;
+    a.click();
+    // refreshData();
+    // }
+  }, [file, process?.fileName]);
 
   useEffect(() => {
     refreshData();
