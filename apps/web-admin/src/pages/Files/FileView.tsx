@@ -121,6 +121,7 @@ const FileView = () => {
     a.href = url;
     a.download = `${process?.fileName}`;
     a.click();
+    window.URL.revokeObjectURL(url);
     // refreshData();
     // }
   }, [file, process?.fileName]);
