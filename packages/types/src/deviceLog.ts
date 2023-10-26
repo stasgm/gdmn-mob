@@ -32,7 +32,7 @@ export interface IDeviceLogFiles extends IEntity {
   size: number;
   mdate: string;
   ext: string;
-  folderName?: string;
+  folder?: string;
 }
 
 export interface IDeviceLogOptions {

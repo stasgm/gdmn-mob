@@ -187,7 +187,7 @@ const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => 
       date: fileDate,
       size: fileSize,
       path: subPath,
-      ext: ext,
+      ext: ext.slice(1),
       mdate: fileModifiedDate,
     };
   } catch (err) {

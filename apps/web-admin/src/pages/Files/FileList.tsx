@@ -6,7 +6,7 @@ import FilterIcon from '@mui/icons-material/FilterAltOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import DriveFileMoveOutlinedIcon from '@mui/icons-material/DriveFileMoveOutlined';
 
-import { IFileSystem } from '@lib/types';
+import { IFileObject, IFileSystem } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
@@ -16,6 +16,10 @@ import SnackBar from '../../components/SnackBar';
 import actions from '../../store/file';
 import FileListTable from '../../components/file/FileListTable';
 import RadioGroup from '../../components/RadioGoup';
+import companyActions from '../../store/company';
+import userActions from '../../store/user';
+import appSystemActions from '../../store/appSystem';
+import deviceActions from '../../store/device';
 
 const FileList = () => {
   const dispatch = useDispatch();
@@ -23,6 +27,7 @@ const FileList = () => {
   const { list, loading, errorMessage, pageParams, folders } = useSelector((state) => state.files);
 
   const sortedList = useMemo(() => list.sort((a, b) => (a.path < b.path ? -1 : 1)), [list]);
+
   const fetchFiles = useCallback(
     (filesFilters?: IFileFilter, filterText?: string, fromRecord?: number, toRecord?: number) => {
       dispatch(actions.fetchFiles(filesFilters, filterText, fromRecord, toRecord));
@@ -38,9 +43,18 @@ const FileList = () => {
   );
 
   useEffect(() => {
-    // Загружаем данные при загрузке компонента.
-    fetchFiles(pageParams?.filesFilters);
-  }, [fetchFiles, pageParams?.filesFilters]);
+    dispatch(companyActions.fetchCompanies());
+    dispatch(userActions.fetchUsers());
+    dispatch(appSystemActions.fetchAppSystems());
+    dispatch(deviceActions.fetchDevices());
+  }, [dispatch]);
+
+  // useEffect(() => {
+  //   // Загружаем данные при загрузке компонента.
+  //   fetchFiles(pageParams?.filesFilters);
+  // }, [fetchFiles, pageParams?.filesFilters]);
+
+  console.log('pageParams', pageParams?.filesFilters);
 
   const [pageParamLocal, setPageParamLocal] = useState<IFilePageParam | undefined>(pageParams);
 
@@ -75,6 +89,10 @@ const FileList = () => {
 
   const handleClearError = () => {
     dispatch(actions.fileSystemActions.clearError());
+  };
+
+  const handleClearFilters = () => {
+    dispatch(actions.fileSystemActions.clearFilesFilters());
   };
 
   const [selectedFileIds, setSelectedFileIds] = useState<IFileSystem[]>([]);
@@ -160,8 +178,14 @@ const FileList = () => {
 
   const handleDelete = useCallback(() => {
     setOpen(false);
-    const ids = selectedFileIds.map((i) => {
-      return i.id;
+    const ids: IFileObject[] = selectedFileIds.map((i) => {
+      return {
+        id: i.id,
+        appSystemId: i.appSystem?.id || '',
+        companyId: i.company?.id || '',
+        ext: i.ext || '',
+        folder: i.folder || '',
+      };
     });
     if (ids) {
       dispatch(actions.removeFiles(ids));
@@ -222,7 +246,13 @@ const FileList = () => {
     setOpenFolder(false);
     if (selectedFolder && selectedFileIds.length) {
       const ids = selectedFileIds.map((i) => {
-        return i.id;
+        return {
+          id: i.id,
+          appSystemId: i.appSystem?.id || '',
+          companyId: i.company?.id || '',
+          ext: i.ext || '',
+          folder: i.folder || '',
+        };
       });
       dispatch(actions.moveFiles(ids, selectedFolder));
       dispatch(actions.fetchFiles());
@@ -245,7 +275,6 @@ const FileList = () => {
       onClick: handleFilter,
       icon: <FilterIcon />,
     },
-
     {
       name: 'Переместить',
       sx: { mx: 1 },
@@ -323,6 +352,8 @@ const FileList = () => {
                 selectedFileIds={selectedFileIds}
                 onSetPageParams={handleSetPageParams}
                 pageParams={pageParams}
+                onCloseFilters={() => setFilterVisible(false)}
+                onClearFilters={handleClearFilters}
               />
             </Box>
             // <Box sx={{ pt: 2 }}>

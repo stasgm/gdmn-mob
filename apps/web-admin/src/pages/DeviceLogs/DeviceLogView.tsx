@@ -38,38 +38,43 @@ const DeviceLogView = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading, errorMessage, logList, pageParams } = useSelector((state) => state.deviceLogs);
+  const { loading, errorMessage, logList } = useSelector((state) => state.deviceLogs);
 
-  const fetchDeviceLogs = useCallback(
-    (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(deviceLogActions.fetchDeviceLog(id));
-    },
-    [dispatch, id],
-  );
+  const deviceLog = deviceLogSelectors.deviceLogById(id);
+
+  const fetchDeviceLogs = useCallback(() => {
+    dispatch(
+      deviceLogActions.fetchDeviceLog(
+        id,
+        deviceLog?.ext || '',
+        deviceLog?.folder || '',
+        deviceLog?.appSystem?.id || '',
+        deviceLog?.company?.id || '',
+      ),
+    );
+  }, [dispatch, id, deviceLog]);
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchDeviceLogs(pageParams?.filterText as string);
-  }, [fetchDeviceLogs, pageParams?.filterText]);
-
-  const process = deviceLogSelectors.deviceLogById(id);
+    fetchDeviceLogs();
+  }, [fetchDeviceLogs]);
 
   const deviceLogsDetails: ILinkedEntity[] = useMemo(
     () =>
-      process
+      deviceLog
         ? [
-            { id: 'Компания', value: process.company, link: `${adminPath}/app/companies/${process.company.id}/` },
+            { id: 'Компания', value: deviceLog.company, link: `${adminPath}/app/companies/${deviceLog.company.id}/` },
             {
               id: 'Подсистема',
-              value: process?.appSystem,
-              link: `${adminPath}/app/appSystems/${process.appSystem.id}/`,
+              value: deviceLog?.appSystem,
+              link: `${adminPath}/app/appSystems/${deviceLog.appSystem.id}/`,
             },
-            { id: 'Устройство', value: process.device, link: `${adminPath}/app/devices/${process.device.id}/` },
-            { id: 'Идентификатор устройства', value: process?.device.id },
-            { id: 'Пользователь', value: process?.contact, link: `${adminPath}/app/users/${process.contact.id}/` },
+            { id: 'Устройство', value: deviceLog.device, link: `${adminPath}/app/devices/${deviceLog.device.id}/` },
+            { id: 'Идентификатор устройства', value: deviceLog?.device.id },
+            { id: 'Пользователь', value: deviceLog?.contact, link: `${adminPath}/app/users/${deviceLog.contact.id}/` },
           ]
         : [],
-    [process],
+    [deviceLog],
   );
 
   const [open, setOpen] = useState(false);
@@ -78,17 +83,33 @@ const DeviceLogView = () => {
     navigate(-1);
   };
 
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     setOpen(false);
-    const res = await dispatch(deviceLogActions.removeDeviceLog(id));
+    const res = await dispatch(
+      deviceLogActions.removeDeviceLog(
+        id,
+        deviceLog?.ext || '',
+        deviceLog?.folder || '',
+        deviceLog?.appSystem?.id || '',
+        deviceLog?.company?.id || '',
+      ),
+    );
     if (res.type === 'DEVICE_LOG/REMOVE_DEVICE_LOG_SUCCESS') {
       navigate(-1);
     }
-  };
+  }, [deviceLog, dispatch, id, navigate]);
 
   const refreshData = useCallback(() => {
-    dispatch(deviceLogActions.fetchDeviceLog(id));
-  }, [dispatch, id]);
+    dispatch(
+      deviceLogActions.fetchDeviceLog(
+        id,
+        deviceLog?.ext || '',
+        deviceLog?.folder || '',
+        deviceLog?.appSystem?.id || '',
+        deviceLog?.company?.id || '',
+      ),
+    );
+  }, [dispatch, id, deviceLog?.appSystem?.id, deviceLog?.company?.id, deviceLog?.ext, deviceLog?.folder]);
 
   useEffect(() => {
     refreshData();
@@ -106,7 +127,7 @@ const DeviceLogView = () => {
     dispatch(deviceLogActions.deviceLogActions.clearError());
   };
 
-  if (!process) {
+  if (!deviceLog) {
     return (
       <Box
         sx={{

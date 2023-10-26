@@ -60,6 +60,7 @@
     "@mui/material": "^5.0.0-alpha.37",
     "@mui/styled-engine": "^5.0.0-alpha.27",
     "@mui/styles": "^5.0.0-alpha.27",
+    "@mui/x-date-pickers": "^5.0.0-alpha.27",
     "@types/material-ui": "^0.21.8",
     "@types/node": "^18.11.19",
     "@types/react": "~18.0.25",
