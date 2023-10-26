@@ -22,6 +22,9 @@ const getFiles = async (ctx: ParameterizedContext): Promise<void> => {
     filterText,
     fromRecord,
     toRecord,
+    folder,
+    dateFrom,
+    dateTo,
   } = ctx.query;
 
   if (typeof company === 'string' && company) {
@@ -70,6 +73,18 @@ const getFiles = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (typeof toRecord === 'string' && isFinite(Number(toRecord))) {
     params.toRecord = Number(toRecord);
+  }
+
+  if (typeof dateFrom === 'string' && dateFrom) {
+    params.dateFrom = dateFrom;
+  }
+
+  if (typeof dateTo === 'string' && dateTo) {
+    params.dateTo = dateTo;
+  }
+
+  if (typeof folder === 'string' && folder) {
+    params.folder = folder;
   }
 
   const filesList = await fileService.findMany(params);

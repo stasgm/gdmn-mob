@@ -218,6 +218,7 @@ export const readListFiles = async (params: Record<string, string | number>): Pr
       files = [...files, fileObj];
     }
   }
+
   files = files.filter((item: IFileSystem) => {
     const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
 
@@ -228,6 +229,7 @@ export const readListFiles = async (params: Record<string, string | number>): Pr
     const deviceFound = getFoundEntity('device', newParams, item);
     const pathFound = getFoundString('path', newParams, item);
     const fileNameFound = getFoundString('fileName', newParams, item);
+    const folderFound = getFoundString('folder', newParams, item);
 
     let dateFound = true;
     if ('date' in newParams) {
@@ -236,6 +238,28 @@ export const readListFiles = async (params: Record<string, string | number>): Pr
         const date = new Date(item.date || '').toLocaleString('ru', { hour12: false }).toUpperCase();
         dateFound = date.includes((newParams.date as string).toUpperCase());
         delete newParams['date'];
+      }
+    }
+
+    let dateFromFound = true;
+    if ('dateFrom' in newParams) {
+      dateFromFound = false;
+      if (item.date) {
+        const date = new Date(item.date || '').getTime();
+        const dateFrom = new Date((newParams.dateFrom as string) || '').getTime();
+        dateFromFound = date >= dateFrom;
+        delete newParams['dateFrom'];
+      }
+    }
+
+    let dateToFound = true;
+    if ('dateTo' in newParams) {
+      dateToFound = false;
+      if (item.date) {
+        const date = new Date(item.date || '').getTime();
+        const dateTo = new Date((newParams.dateTo as string) || '').getTime();
+        dateToFound = date <= dateTo;
+        delete newParams['dateTo'];
       }
     }
 
@@ -271,6 +295,9 @@ export const readListFiles = async (params: Record<string, string | number>): Pr
       pathFound &&
       fileNameFound &&
       dateFound &&
+      dateFromFound &&
+      dateToFound &&
+      folderFound &&
       uidFound &&
       filteredFiles
     );
