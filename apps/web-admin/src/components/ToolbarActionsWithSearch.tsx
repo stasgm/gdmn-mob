@@ -60,6 +60,8 @@ const ToolbarActionsWithSearch = ({
             onChange={(event) => updateInput(event.target.value)}
             onKeyPress={(event) => keyPress(event.key)}
             type="text"
+            id="search"
+            name="search"
             value={value || ''}
           />
         </Box>

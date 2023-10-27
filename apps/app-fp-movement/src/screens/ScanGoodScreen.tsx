@@ -12,7 +12,23 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { IScannedObject } from '@lib/client-types';
 
-import { ShipmentStackParamList } from '../navigation/Root/types';
+import { DashboardStackParamList } from '@lib/mobile-navigation';
+
+import { IDocumentType, INamedEntity } from '@lib/types';
+
+import {
+  CurrFreeShipmentParamList,
+  CurrShipmentParamList,
+  FreeShipmentParamList,
+  InventoryStackParamList,
+  LaboratoryStackParamList,
+  MoveFromStackParamList,
+  MoveStackParamList,
+  MoveToStackParamList,
+  ReceiptStackParamList,
+  ReturnStackParamList,
+  ShipmentStackParamList,
+} from '../navigation/Root/types';
 import { IShipmentLine, IShipmentDocument, barcodeSettings } from '../store/types';
 
 import { IAddressStoreEntity, IGood, IRemains, IRemGood } from '../store/app/types';
@@ -29,7 +45,28 @@ import { barCodeTypes } from '../utils/constants';
 
 const ScanGoodScreen = () => {
   const docId = useRoute<RouteProp<ShipmentStackParamList, 'ScanGood'>>().params?.docId;
-  const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ScanGood'>>();
+  const navigation =
+    useNavigation<
+      StackNavigationProp<
+        ShipmentStackParamList &
+          MoveFromStackParamList &
+          MoveStackParamList &
+          MoveToStackParamList &
+          CurrShipmentParamList &
+          FreeShipmentParamList &
+          CurrFreeShipmentParamList &
+          ReceiptStackParamList &
+          ReturnStackParamList &
+          LaboratoryStackParamList &
+          InventoryStackParamList &
+          DashboardStackParamList,
+        'ScanGood'
+      >
+    >();
+  const navState = navigation.getState();
+
+  const isInventory = navState.routes.some((route) => route.name === 'InventoryView');
+
   const isFocused = useIsFocused();
 
   const fpDispatch = useFpDispatch();
@@ -63,17 +100,28 @@ const ScanGoodScreen = () => {
   const tempOrder = useFpSelector((state) => state.fpMovement.list).find((i) => i.orderId === shipment?.head?.orderId);
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
+  const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
   const departs = refSelectors.selectByName<IAddressStoreEntity>('depart')?.data;
 
   const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
-  const remainsUse = Boolean(settings.remainsUse?.data);
+  const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
+  const documentType = useMemo(
+    () => documentTypes?.find((d) => d.id === shipment?.documentType?.id),
+    [shipment?.documentType?.id, documentTypes],
+  );
+
+  const defaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as INamedEntity;
+
+  const remainsUse =
+    (shipment?.head.fromDepart.id === defaultDepart?.id || Boolean(documentType?.isRemains)) &&
+    Boolean(settings.remainsUse?.data);
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return shipment?.head?.fromDepart?.id && isFocused
+    return shipment?.head?.fromDepart?.id && isFocused && remains
       ? getRemGoodListByContact(goods, remains[shipment.head.fromDepart.id], docList, shipment.head.fromDepart.id)
       : [];
   }, [docList, goods, isFocused, remains, shipment?.head?.fromDepart?.id]);
@@ -93,6 +141,13 @@ const ScanGoodScreen = () => {
         return;
       }
 
+      if (brc.length > maxBarcodeLength) {
+        setScaner({
+          state: 'error',
+          message: `Неверный формат штрих-кода \nДлина больше ${maxBarcodeLength} символов`,
+        });
+        return;
+      }
       const barc = getBarcode(brc, goodBarcodeSettings);
 
       const lineGood = getLineGood(
@@ -100,7 +155,7 @@ const ScanGoodScreen = () => {
         barc.weight,
         goods,
         goodRemains,
-        remainsUse && shipment?.documentType.name !== 'return' && shipment?.documentType.name !== 'inventory',
+        remainsUse && shipment?.documentType?.name !== 'return' && shipment?.documentType?.name !== 'inventory',
       );
 
       if (!lineGood.good) {
@@ -126,6 +181,7 @@ const ScanGoodScreen = () => {
         weight: barc.weight,
         barcode: barc.barcode,
         workDate: barc.workDate,
+        time: barc.time,
         numReceived: barc.numReceived,
         quantPack: barc.quantPack,
         sortOrder: (shipmentLines?.length || 0) + 1,
@@ -134,7 +190,16 @@ const ScanGoodScreen = () => {
       setScaner({ state: 'found' });
     },
 
-    [goodBarcodeSettings, goodRemains, goods, minBarcodeLength, remainsUse, shipment?.documentType.name, shipmentLines],
+    [
+      goodBarcodeSettings,
+      goodRemains,
+      goods,
+      maxBarcodeLength,
+      minBarcodeLength,
+      remainsUse,
+      shipment?.documentType?.name,
+      shipmentLines,
+    ],
   );
 
   const handleSaveScannedItem = useCallback(() => {
@@ -176,7 +241,7 @@ const ScanGoodScreen = () => {
           setScaner({ state: 'init' });
         });
       }
-    } else if (shipment?.documentType.name === 'shipment' || shipment?.documentType.name === 'currShipment') {
+    } else if (shipment?.documentType?.name === 'shipment' || shipment?.documentType?.name === 'currShipment') {
       alertWithSoundMulti('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', () => {
         dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
         setScaner({ state: 'init' });
@@ -190,12 +255,17 @@ const ScanGoodScreen = () => {
         isFromAddressed ||
         isToAddressed
       ) {
-        if (scannedObject.quantPack < goodBarcodeSettings.boxNumber) {
-          alertWithSound('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings.boxNumber}.`);
-          setScaner({ state: 'init' });
+        if (scannedObject.weight < goodBarcodeSettings?.boxWeight) {
+          alertWithSound('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings?.boxWeight}.`, () =>
+            setScaner({ state: 'init' }),
+          );
+
           return;
         }
-        navigation.navigate('SelectCell', { docId, item: scannedObject, mode: 0 });
+
+        isInventory
+          ? navigation.navigate('InventorySelectCell', { docId, item: scannedObject, mode: 0 })
+          : navigation.navigate('SelectCell', { docId, item: scannedObject, mode: 0 });
       } else {
         dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
       }
@@ -204,7 +274,7 @@ const ScanGoodScreen = () => {
   }, [
     scannedObject,
     tempOrder,
-    shipment?.documentType.name,
+    shipment?.documentType?.name,
     shipment?.head.toDepart?.isAddressStore,
     shipment?.head.toDepart?.id,
     shipment?.head.fromDepart?.isAddressStore,
@@ -213,7 +283,8 @@ const ScanGoodScreen = () => {
     dispatch,
     docId,
     departs,
-    goodBarcodeSettings.boxNumber,
+    goodBarcodeSettings?.boxWeight,
+    isInventory,
     navigation,
   ]);
 

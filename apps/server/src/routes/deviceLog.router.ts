@@ -11,7 +11,6 @@ deviceLog.prefix('/deviceLogs');
 deviceLog.post('/', deviceLogValidation.addDeviceLog, authMiddleware, deviceMiddleware, addDeviceLog);
 deviceLog.get('/:id', deviceLogValidation.getDeviceLog, authMiddleware, deviceMiddleware, getDeviceLog);
 deviceLog.get('/', authMiddleware, deviceMiddleware, getDeviceLogs);
-// deviceLog.patch('/:id', appSystemValidation.updateAppSystem, authMiddleware, updateAppSystem);
 deviceLog.delete('/:id', deviceLogValidation.removeDeviceLog, authMiddleware, removeDeviceLog);
 
 export default deviceLog;

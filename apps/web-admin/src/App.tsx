@@ -5,7 +5,9 @@ import { hot } from 'react-hot-loader/root';
 import { Provider } from 'react-redux';
 import { createBrowserHistory } from 'history';
 
-import { appActions, authSelectors, useDispatch } from '@lib/store';
+import { appActions, authActions, authSelectors, useDispatch, useSelector } from '@lib/store';
+
+import api from '@lib/client-api';
 
 import { store } from './store';
 
@@ -14,6 +16,7 @@ import theme from './theme';
 import routes from './routes';
 
 import useClearPageParams from './utils/useClearPageParams';
+import { getNumber } from './utils/helpers';
 
 const Router = () => {
   const dispatch = useDispatch();
@@ -24,6 +27,7 @@ const Router = () => {
 
   const [history, setHistory] = useState('');
   const [loadingData, setLoadingData] = useState(false);
+  const config = useSelector((state) => state.auth.config);
 
   useEffect(() => {
     //Если пользователь logged, но идет загрузка данных из локального хранилища,
@@ -38,8 +42,33 @@ const Router = () => {
     setLoadingData(true);
     setHistory(browserHistory.location.pathname);
     dispatch(appActions.loadGlobalDataFromDisc());
+
+    const fetchEnv = async () => {
+      try {
+        //Получаем переменные среды, содержащие настройки сервера
+        const response = await fetch('/api/env');
+        const envs = await response.json();
+        //Перезаписываем конфиг для апи
+        dispatch(
+          authActions.setConfig({
+            ...config,
+            protocol: envs.protocol,
+            port: getNumber(envs.port, config.port),
+            server: envs.host,
+          }),
+        );
+      } catch (error) {
+        // console.error('Ошибка при выполнении запроса:', error);
+      }
+    };
+
+    fetchEnv();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    api.config = { ...api.config, ...config };
+  }, [config]);
 
   useClearPageParams();
   return useRoutes(routes(isLogged));

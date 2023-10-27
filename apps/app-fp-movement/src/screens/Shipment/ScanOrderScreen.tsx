@@ -57,81 +57,14 @@ const ScanOrderScreen = () => {
   const orders = docSelectors.selectByDocType<IOrderDocument>('order');
 
   const shipments = useSelector((state) =>
-    state.documents?.list.filter((i) => i.documentType.name === 'currShipment' || i.documentType.name === 'shipment'),
+    state.documents?.list.filter((i) => i.documentType?.name === 'currShipment' || i.documentType?.name === 'shipment'),
   ) as IShipmentDocument[];
 
-  const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as ICodeEntity;
+  const defaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as ICodeEntity;
 
   const tempOrders = useFpSelector((state) => state.fpMovement.list);
 
   const [scannedObject, setScannedObject] = useState<IOrderDocument>();
-
-  const handleSaveScannedItem = useCallback(() => {
-    if (!scannedObject) {
-      return;
-    }
-
-    const shipment = shipments.find((i) => i.head.orderId === scannedObject.id);
-
-    if (shipment) {
-      navigation.dispatch(
-        StackActions.replace('ShipmentView', {
-          id: shipment.id,
-          isCurr,
-        }),
-      );
-    }
-
-    const tempOrder = tempOrders.find((i) => i.orderId === scannedObject.head.orderId);
-    if (!tempOrder) {
-      const newTempOrder: ITempDocument = {
-        id: generateId(),
-        orderId: scannedObject.id,
-        lines: scannedObject.lines,
-      };
-
-      dispatch(fpActions.addTempOrder(newTempOrder));
-    }
-
-    const depart = defaultDepart || scannedObject.head.depart;
-
-    const shipmentDoc: IShipmentDocument = {
-      id: generateId(),
-      documentType: shipmentType!,
-      number: scannedObject.number,
-      documentDate: new Date().toISOString(),
-      status: 'DRAFT',
-      head: {
-        barcode: scannedObject.head.barcode,
-        contact: scannedObject.head.contact,
-        fromDepart: depart,
-        outlet: scannedObject.head.outlet,
-        onDate: scannedObject.head.onDate,
-        orderId: scannedObject.id,
-      },
-      lines: [],
-      creationDate: new Date().toISOString(),
-      editionDate: new Date().toISOString(),
-    };
-
-    dispatch(documentActions.addDocument(shipmentDoc));
-
-    if (depart) {
-      navigation.dispatch(
-        StackActions.replace('ShipmentView', {
-          id: shipmentDoc.id,
-          isCurr,
-        }),
-      );
-    } else {
-      navigation.dispatch(
-        StackActions.replace('ShipmentEdit', {
-          id: shipmentDoc.id,
-          isCurr,
-        }),
-      );
-    }
-  }, [scannedObject, shipments, tempOrders, defaultDepart, shipmentType, dispatch, navigation, isCurr]);
 
   const [scaner, setScaner] = useState<IScannedObject>({ state: 'init' });
 
@@ -143,20 +76,80 @@ const ScanOrderScreen = () => {
       }
 
       const order = orders.find((item) => item.head.barcode === brc);
-      if (order) {
-        const shipment = shipments.find((i) => i.head.orderId === order.id);
-
-        if (shipment) {
-          setScaner({ state: 'error', message: 'Заявка уже добавлена' });
-        } else {
-          setScannedObject(order);
-          setScaner({ state: 'found' });
-        }
-      } else {
+      if (!order) {
         setScaner({ state: 'error', message: 'Заявка не найдена' });
+        return;
+      }
+
+      const shipment = shipments.find((i) => i.head.orderId === order.id);
+
+      if (shipment) {
+        setScaner({ state: 'error', message: 'Заявка уже добавлена' });
+      } else {
+        setScannedObject(order);
+        setScaner({ state: 'found' });
+      }
+
+      // if (shipment) {
+      //   navigation.dispatch(
+      //     StackActions.replace('ShipmentView', {
+      //       id: shipment.id,
+      //       isCurr,
+      //     }),
+      //   );
+      // }
+
+      const tempOrder = tempOrders.find((i) => i.orderId === order.head.orderId);
+      if (!tempOrder) {
+        const newTempOrder: ITempDocument = {
+          id: generateId(),
+          orderId: order.id,
+          lines: order.lines,
+        };
+
+        dispatch(fpActions.addTempOrder(newTempOrder));
+      }
+
+      const depart = defaultDepart || order.head.depart;
+
+      const shipmentDoc: IShipmentDocument = {
+        id: generateId(),
+        documentType: shipmentType!,
+        number: order.number,
+        documentDate: new Date().toISOString(),
+        status: 'DRAFT',
+        head: {
+          barcode: order.head.barcode,
+          contact: order.head.contact,
+          fromDepart: depart,
+          outlet: order.head.outlet,
+          onDate: order.head.onDate,
+          orderId: order.id,
+        },
+        lines: [],
+        creationDate: new Date().toISOString(),
+        editionDate: new Date().toISOString(),
+      };
+
+      dispatch(documentActions.addDocument(shipmentDoc));
+
+      if (depart) {
+        navigation.dispatch(
+          StackActions.replace('ShipmentView', {
+            id: shipmentDoc.id,
+            isCurr,
+          }),
+        );
+      } else {
+        navigation.dispatch(
+          StackActions.replace('ShipmentEdit', {
+            id: shipmentDoc.id,
+            isCurr,
+          }),
+        );
       }
     },
-    [orders, shipments],
+    [orders, shipments, tempOrders, defaultDepart, shipmentType, dispatch, navigation, isCurr],
   );
 
   const handleClearScaner = () => setScaner({ state: 'init' });
@@ -193,7 +186,6 @@ const ScanOrderScreen = () => {
     <>
       {isScanerReader ? (
         <ScanBarcodeReader
-          onSave={handleSaveScannedItem}
           onGetScannedObject={handleGetScannedObject}
           onClearScannedObject={handleClearScaner}
           scaner={scaner}
@@ -202,7 +194,6 @@ const ScanOrderScreen = () => {
         </ScanBarcodeReader>
       ) : (
         <ScanBarcode
-          onSave={handleSaveScannedItem}
           onGetScannedObject={handleGetScannedObject}
           onClearScannedObject={handleClearScaner}
           scaner={scaner}

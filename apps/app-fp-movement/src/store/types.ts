@@ -105,14 +105,33 @@ export interface IMoveHead extends IHead {
   comment?: string; // Комvентарий
 }
 
-export interface IMoveLine extends IEntity {
-  good: IGood;
-  weight: number;
+export interface IBasedLine extends IEntity {
+  good: IGood; // товар
+  weight: number; //вес
+  workDate: string; // Дата производства
+  time?: string; // Время производства
+  numReceived: string; // Номер партии
+  barcode: string; // технологический код
+  quantPack: number; // порядковый номер сканирования в документе
+  sortOrder?: number; // порядок сортировки
+  scannedBarcode?: string;
+  usedRemains?: boolean; // используются остатки в приложении
+}
+
+export interface ISendingLine extends IEntity {
+  goodId: string; // ид товара
+  weight: number; //вес
   workDate: string; // Дата производства
   numReceived: string; // Номер партии
+  barcode: string; // технологический код
   quantPack: number; // порядковый номер сканирования в документе
-  barcode?: string; // технологический код
-  sortOrder?: number; // порядок сортировки
+  scannedBarcode?: string;
+  usedRemains?: boolean; // используются остатки в приложении
+  fromCell?: string; // номер ячейки
+  toCell?: string; // номер ячейки
+}
+
+export interface IMoveLine extends IBasedLine {
   fromCell?: string; // номер ячейки
   toCell?: string; // номер ячейки
 }
@@ -125,17 +144,7 @@ export interface IReceiptHead extends IHead {
   comment?: string; // Комvентарий
 }
 
-export interface IReceiptLine extends IEntity {
-  good: IGood;
-  weight: number;
-  workDate: string; // Дата производства
-  numReceived: string; // Номер партии
-  quantPack: number; // порядковый номер сканирования в документе
-  barcode?: string; // технологический код
-  sortOrder?: number; // порядок сортировки
-  fromCell?: string; // номер ячейки
-  toCell?: string; // номер ячейки
-}
+export type IReceiptLine = IBasedLine;
 
 export type IReceiptDocument = MandateProps<IDocument<IReceiptHead, IReceiptLine>, 'head' | 'lines'>;
 
@@ -165,16 +174,7 @@ export interface IShipmentHead extends IHead {
   orderId: string;
 }
 
-export interface IShipmentLine extends IEntity {
-  good: IGood; // товар
-  weight: number; //вес
-  workDate: string; // Дата производства
-  numReceived: string; // Номер партии
-  barcode: string; // технологический код
-  quantPack: number; // порядковый номер сканирования в документе
-  sortOrder?: number; // порядок сортировки
-  scannedBarcode?: string;
-}
+export type IShipmentLine = IBasedLine;
 
 export type IShipmentDocument = MandateProps<IDocument<IShipmentHead, IShipmentLine>, 'head' | 'lines'>;
 
@@ -182,17 +182,8 @@ export interface IFreeShipmentHead extends IHead {
   fromDepart: ICodeEntity;
   comment?: string; // Коментарий
 }
-export interface IFreeShipmentLine extends IEntity {
-  good: IGood;
-  weight: number;
-  workDate: string; // Дата производства
-  numReceived: string; // Номер партии
-  barcode?: string; // технологический код
-  sortOrder?: number; // порядок сортировки
-  scannedBarcode?: string;
-  quantPack: number; // порядковый номер сканирования в документе
-  isCattle?: number;
-}
+export type IFreeShipmentLine = IBasedLine;
+
 export type IFreeShipmentDocument = MandateProps<IDocument<IFreeShipmentHead, IFreeShipmentLine>, 'head' | 'lines'>;
 
 export interface IInventoryHead extends IHead {
@@ -200,17 +191,9 @@ export interface IInventoryHead extends IHead {
   comment?: string; // Комvентарий
 }
 
-export interface IInventoryLine extends IEntity {
-  good: IGood;
-  weight: number;
-  workDate: string; // Дата производства
-  numReceived: string; // Номер партии
-  barcode?: string; // технологический код
-  sortOrder?: number; // порядок сортировки
+export interface IInventoryLine extends IBasedLine {
   // fromCell?: string; // номер ячейки
   toCell?: string; // номер ячейки
-  quantPack: number; // порядковый номер сканирования в документе
-  scannedBarcode?: string;
 }
 
 export type IInventoryDocument = MandateProps<IDocument<IInventoryHead, IInventoryLine>, 'head' | 'lines'>;
@@ -219,16 +202,7 @@ export interface ILaboratoryHead extends IHead {
   fromDepart: ICodeEntity;
   comment?: string; // Коментарий
 }
-export interface ILaboratoryLine extends IEntity {
-  good: IGood;
-  weight: number;
-  workDate: string; // Дата производства
-  numReceived: string; // Номер партии
-  barcode?: string; // технологический код
-  sortOrder?: number; // порядок сортировки
-  scannedBarcode?: string;
-  quantPack: number; // порядковый номер сканирования в документе
-}
+export type ILaboratoryLine = IBasedLine;
 
 export type ILaboratoryDocument = MandateProps<IDocument<ILaboratoryHead, ILaboratoryLine>, 'head' | 'lines'>;
 
@@ -236,16 +210,7 @@ export interface IReturnHead extends IHead {
   fromDepart: ICodeEntity;
   comment?: string; // Коментарий
 }
-export interface IReturnLine extends IEntity {
-  good: IGood;
-  weight: number;
-  workDate: string; // Дата производства
-  numReceived: string; // Номер партии
-  barcode?: string; // технологический код
-  sortOrder?: number; // порядок сортировки
-  scannedBarcode?: string;
-  quantPack: number; // порядковый номер сканирования в документе
-}
+export type IReturnLine = IBasedLine;
 export type IReturnDocument = MandateProps<IDocument<IReturnHead, IReturnLine>, 'head' | 'lines'>;
 
 export type barcodeSettings = {

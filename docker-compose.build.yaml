@@ -1,7 +1,7 @@
 version: "3"
 services:
   web-admin:
-    image: gsbelarus/gdmn-mob.web-admin.${CLIENT_ENV}
+    image: gsbelarus/gdmn-mob.web-admin
     container_name: web-admin
     restart: always
     build:
@@ -17,8 +17,7 @@ services:
     ports:
      - ${ADMIN_HOST_PORT}:${ADMIN_CONTAINER_PORT}
     volumes:
-      - ./ssl:/etc/nginx/ssl:ro
-      - ./apps/web-admin/nginx/nginx.https.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./ssl:/web-admin/ssl:ro
   server:
     image: gsbelarus/gdmn-mob.server
     container_name: server
@@ -36,6 +35,6 @@ services:
       - ${HTTPS_PORT}:${HTTPS_PORT}
     volumes:
       - db:/var/lib/gdmn-mob_db
-      - ./ssl:/gdmn-mob/ssl:ro
+      - ./ssl:/server/ssl:ro
 volumes:
   db:

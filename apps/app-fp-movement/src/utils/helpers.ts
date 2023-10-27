@@ -14,6 +14,11 @@ import {
   IMoveLine,
   ICellName,
   IInventoryDocument,
+  IBasedLine,
+  ILaboratoryDocument,
+  IReceiptDocument,
+  IReturnDocument,
+  ISendingLine,
 } from '../store/types';
 import {
   IBarcode,
@@ -26,6 +31,8 @@ import {
   IRemGood,
   IRemainsData,
 } from '../store/app/types';
+
+import { ONE_KG_IN_G, ONE_T_IN_KG } from './constants';
 
 export const getNextDocNumber = (
   documents: IMoveDocument[] | IShipmentDocument[] | IFreeShipmentDocument[] | IInventoryDocument[],
@@ -42,8 +49,9 @@ export const getBarcode = (barcode: string, settings: barcodeSettings) => {
   const dayLast = weightLast + settings.countDay;
   const monthLast = dayLast + settings.countMonth;
   const yearLast = monthLast + settings.countYear;
-  const shcodeLast = yearLast + 4 + settings.countCode;
-  const quantPackLast = shcodeLast + settings.countQuantPack + settings.countType;
+  const timeLast = yearLast + 4;
+  const shcodeLast = timeLast + settings.countCode;
+  const quantPackLast = shcodeLast + settings.countQuantPack;
   const numReceivedLast = quantPackLast + settings.countNumReceived;
 
   const weight = barcode.slice(0, weightLast);
@@ -54,21 +62,40 @@ export const getBarcode = (barcode: string, settings: barcodeSettings) => {
   const quantPack = barcode.slice(shcodeLast, quantPackLast);
   const numReceived = barcode.slice(quantPackLast, numReceivedLast);
 
+  const time = barcode.slice(yearLast, timeLast);
+
   const workDate = new Date(Number(year), Number(month) - 1, Number(day)).toISOString();
 
   const barcodeObj: IBarcode = {
     barcode: barcode,
-    weight: round(Number(weight) / 1000, 3),
+    weight: round(Number(weight) / ONE_KG_IN_G, 3),
     workDate,
     shcode: shcode,
     numReceived: numReceived,
-    quantPack: Number(weight) < settings.boxWeight * 1000 ? 1 : Number(quantPack),
+    quantPack: Number(weight) < settings.boxWeight * ONE_KG_IN_G ? 1 : Number(quantPack),
+    time,
   };
 
   return barcodeObj;
 };
 
-const getLastMovingPos = (pos: ICellRef, lines: IMoveLine[]) => {
+export const getBarcodeString = (barcodeObj: IBarcode) => {
+  const day = `00${new Date(barcodeObj.workDate).getDate().toLocaleString()}`.slice(-2);
+  const month = `00${(new Date(barcodeObj.workDate).getMonth() + 1).toLocaleString()}`.slice(-2);
+  const year = `00${new Date(barcodeObj.workDate).getFullYear().toLocaleString().slice(2)}`.slice(-2);
+
+  const shcode = `0000${barcodeObj.shcode}`.slice(-4);
+  const quantPack = `0000${barcodeObj.quantPack.toLocaleString()}`.slice(-4);
+
+  const weight = `000000${round(barcodeObj.weight * ONE_KG_IN_G, 3).toLocaleString()}`.slice(-6);
+
+  const barcode =
+    weight + day + month + year + (barcodeObj.time || '0000') + shcode + quantPack + barcodeObj.numReceived;
+
+  return barcode;
+};
+
+export const getLastMovingPos = (pos: ICellRef, lines: IMoveLine[]) => {
   const from = lines.find((i) => i.fromCell === pos.name);
   const to = lines.find((i) => i.toCell === pos.name);
   return { from, to };
@@ -199,22 +226,26 @@ export const getLineGood = (
   goodRemains: IRemGood[],
   remainsUse: boolean,
 ) => {
-  if (remainsUse && goodRemains.length) {
-    const good = goodRemains.find((item) => item.good && `0000${item.good.shcode}`.slice(-4) === shcode);
+  if (remainsUse) {
+    if (goodRemains.length) {
+      const good = goodRemains.find((item) => item.good && `0000${item.good.shcode}`.slice(-4) === shcode);
 
-    if (good) {
-      const isRightWeight = good.remains >= weight;
+      if (good) {
+        const isRightWeight = good.remains >= weight;
 
-      return {
-        good: {
-          id: good.good.id,
-          name: good.good.name,
-          shcode: good.good.shcode,
-          isCattle: good.good.isCattle,
-          goodGroupId: good.good.goodGroupId,
-        },
-        isRightWeight,
-      };
+        return {
+          good: {
+            id: good.good.id,
+            name: good.good.name,
+            shcode: good.good.shcode,
+            isCattle: good.good.isCattle,
+            goodGroupId: good.good.goodGroupId,
+          },
+          isRightWeight,
+        };
+      } else {
+        return { good: undefined, isRightWeight: false };
+      }
     } else {
       return { good: undefined, isRightWeight: false };
     }
@@ -255,6 +286,60 @@ export const getTotalLines = (docList: IShipmentDocument[], departId: string) =>
 
     return prev;
   }, {});
+
+export const getUpdatedLine = (
+  usedRemains: boolean,
+  lineBarcode: IBarcode,
+  line: IBasedLine,
+  quantity: number,
+  weight?: number,
+) => {
+  const newBarcode = weight
+    ? weight < ONE_T_IN_KG
+      ? getBarcodeString({ ...lineBarcode, quantPack: quantity, weight })
+      : (weight * ONE_KG_IN_G).toString() + getBarcodeString({ ...lineBarcode, quantPack: quantity, weight }).slice(6)
+    : getBarcodeString({ ...lineBarcode, quantPack: quantity });
+  return {
+    ...line,
+    quantPack: quantity,
+    weight: weight ? weight : line.weight,
+    scannedBarcode: line?.barcode,
+    barcode: newBarcode,
+    usedRemains,
+  } as IBasedLine;
+};
+
+export const getDocToSend = (
+  doc:
+    | IShipmentDocument
+    | IFreeShipmentDocument
+    | IMoveDocument
+    | ILaboratoryDocument
+    | IInventoryDocument
+    | IReceiptDocument
+    | IReturnDocument,
+) => {
+  return {
+    ...doc,
+    head: { ...doc?.head, linesNumber: doc?.lines.length },
+    lines: doc?.lines.map(
+      (i) =>
+        ({
+          id: i.id,
+          goodId: i.good.id,
+          weight: i.weight,
+          workDate: i.workDate,
+          numReceived: i.numReceived,
+          barcode: i.barcode,
+          quantPack: i.quantPack,
+          scannedBarcode: i.scannedBarcode,
+          usedRemains: i.usedRemains,
+          fromCell: (i as IMoveLine).fromCell,
+          toCell: (i as IMoveLine).toCell,
+        } as ISendingLine),
+    ),
+  };
+};
 
 export const getRemGoodListByContact = (
   goods: IGood[],
@@ -324,17 +409,17 @@ const getRemainsByGoodId = (remains: IRemainsData[], linesQuantity: IGoodQuantit
   }, {});
 };
 
-export const alertWithSound = (label: string, text: string) => {
+export const alertWithSound = (label: string, text: string, onClose?: () => void) => {
   const playSound = async () => {
     const { sound } = await Audio.Sound.createAsync(require('../../assets/error.wav'));
     await sound.playAsync();
   };
 
   playSound();
-  Alert.alert(label, text, [{ text: 'OK' }]);
+  Alert.alert(label, text, [{ text: 'OK', onPress: onClose }]);
 };
 
-export const alertWithSoundMulti = (label: string, text: string, onOk: () => void) => {
+export const alertWithSoundMulti = (label: string, text: string, onOk: () => void, onClose?: () => void) => {
   const playSound = async () => {
     const { sound } = await Audio.Sound.createAsync(require('../../assets/error.wav'));
     await sound.playAsync();
@@ -345,6 +430,7 @@ export const alertWithSoundMulti = (label: string, text: string, onOk: () => voi
   Alert.alert(`${label}`, `${text}`, [
     {
       text: 'Отмена',
+      onPress: onClose,
     },
     {
       text: 'Да',

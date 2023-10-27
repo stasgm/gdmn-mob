@@ -13,13 +13,9 @@ export const errorHandler = async (ctx: Context, next: Next) => {
     await pendingWrites();
     await next();
   } catch (error: any) {
+    const userInfo = ctx.state.user ? `\nuser '${ctx.state.user.name}' (${ctx.state.user.id})` : '';
+
     if (error instanceof ApplicationException) {
-      // const result: IResponse<string> = {
-      //   result: false,
-      //   error: error.message || 'Неизвестная внутренняя ошибка',
-      //   data: error.name || 'InnerErrorException',
-      //   status: error.status || 500,
-      // };
       const result: FailureResponse = {
         result: false,
         type: 'FAILURE',
@@ -29,24 +25,17 @@ export const errorHandler = async (ctx: Context, next: Next) => {
 
       ctx.status = 200;
       ctx.body = result;
-
-      log.error(error.toString());
+      log.error(`${error.toString()}${userInfo}`);
     } else {
       const errorMsg = error instanceof Error && error.message ? error.message : `Неизвестная ошибка: ${error}`;
       ctx.status = 500;
-      // ctx.body = {
-      //   result: false,
-      //   error: errorMsg,
-      //   data: 'InnerErrorException',
-      // };
       ctx.body = {
         result: false,
         type: 'FAILURE',
         status: 500,
         error: errorMsg,
       };
-
-      log.error(errorMsg, JSON.stringify(error));
+      log.error(`${errorMsg}${userInfo}`, JSON.stringify(error));
     }
   }
 };

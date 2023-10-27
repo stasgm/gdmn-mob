@@ -190,6 +190,7 @@ export const SelectRefItemScreen = () => {
         ListEmptyComponent={EmptyList}
         extraData={[screenState, checkedItem]}
         keyExtractor={keyExtractor}
+        keyboardShouldPersistTaps={'handled'}
       />
     </AppScreen>
   );

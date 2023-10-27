@@ -38,6 +38,7 @@ export interface IBarcode {
   shcode: string;
   numReceived: string; // Номер партии
   quantPack: number;
+  time?: string;
 }
 
 export interface ITempDocument extends IEntity {

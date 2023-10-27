@@ -56,7 +56,6 @@ const ScreenListItem = ({
         </View>
         <View style={styles.details}>
           <LargeText style={styles.textBold}>{title}</LargeText>
-
           <View style={styles.directionRow}>
             <View style={localStyles.info}>
               {subtitle ? <MediumText>{subtitle}</MediumText> : null}

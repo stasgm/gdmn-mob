@@ -1,7 +1,7 @@
 import path from 'path';
-import { readdir, unlink, stat } from 'fs/promises';
+import { readdir, unlink, stat, rename } from 'fs/promises';
 
-import { IFileSystem, IExtraFileInfo } from '@lib/types';
+import { IFileSystem, IExtraFileInfo, IPathParams } from '@lib/types';
 
 import { BYTES_PER_KB, MSEС_IN_DAY, collectionNames } from '../utils/constants';
 
@@ -19,6 +19,7 @@ import {
   writeIterableToFile,
   getFoundEntity,
   getFoundString,
+  getPathSystem,
 } from '../utils/fileHelper';
 
 import { checkDeviceLogsFiles } from './errorLogUtils';
@@ -49,12 +50,17 @@ export const checkFiles = async (): Promise<void> => {
 
   const root = getDb().dbPath;
   const files = await _readDir(root, [...defaultExclude, 'deviceLogs']);
+
   for (const file of files) {
     try {
       // eslint-disable-next-line no-await-in-loop
       const fileStat = await stat(file);
       const fileDate = fileStat.birthtimeMs;
-      if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > config.FILES_SAVING_PERIOD_IN_DAYS) {
+      const period =
+        file.toUpperCase().indexOf('DOCS') === -1
+          ? config.FILES_SAVING_PERIOD_IN_DAYS
+          : config.DOCS_SAVING_PERIOD_IN_DAYS;
+      if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > period) {
         unlink(file);
       }
     } catch (err) {
@@ -127,7 +133,6 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
     log.error(`Устройство ${deviceUid}  не найдено`);
   }*/
 
-  const deviceId = device?.id;
   const deviceName = device?.name;
 
   return {
@@ -140,13 +145,11 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
 };
 
 const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => {
-  /* const pathArr = root.split(path.sep);
-  const name = pathArr.pop();*/
   const name = path.basename(root);
   const ext = path.extname(root);
   if (!name) {
     log.error(`Invalid filename ${root}`);
-    return undefined;
+    return;
   }
   const nameWithoutExt = path.basename(root, ext);
   const subPath = path.dirname(root);
@@ -184,8 +187,8 @@ const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => 
       mdate: fileModifiedDate,
     };
   } catch (err) {
-    log.error(`Invalid filename ${root}`);
-    return undefined;
+    log.error(`Invalid filename ${root}: ${err}`);
+    return;
   }
 };
 
@@ -321,5 +324,40 @@ export const updateById = async <T>(id: string, fileData: Partial<Awaited<T>>): 
     });
   } catch (err) {
     log.error(`Ошибка редактирования файла ${fullName}  - ${err}`);
+  }
+};
+
+export const getListFolders = async (appPathParams: IPathParams): Promise<string[]> => {
+  const pathSystem = path.join(getDb().dbPath, getPathSystem(appPathParams));
+  try {
+    const files = await readdir(pathSystem);
+    const folders = await Promise.all(
+      files.map(async (curr: string) => {
+        const res = path.join(pathSystem, curr);
+        const folderName = res.split(path.sep).pop();
+        return (await stat(res)).isDirectory() ? folderName : undefined;
+      }),
+    );
+
+    return folders.filter((i) => !!i) as string[];
+  } catch (err) {
+    log.error(`Ошибка чтения директории ${pathSystem}  - ${err}`);
+    return [];
+  }
+};
+
+export const moveManyFiles = async (ids: string[], folderName: string): Promise<void> => {
+  try {
+    await Promise.allSettled(
+      ids.map(async (id) => {
+        const name = alias2fullFileName(id);
+        const arr = id.split('_D_');
+        const newAlias = arr.map((item, index) => (index === 2 ? folderName : item)).join('_D_');
+        const newName = alias2fullFileName(newAlias);
+        return await rename(name, newName);
+      }),
+    );
+  } catch (err) {
+    log.error(`Ошибка перемещения файлов в директорию ${folderName}  - ${err}`);
   }
 };

@@ -11,7 +11,7 @@ import {
   referenceActions,
   appActions,
   useAuthThunkDispatch,
-  useSettingThunkDispatch,
+  settingsActions,
 } from '@lib/store';
 
 import {
@@ -31,6 +31,8 @@ import { mobileRequest } from '@lib/mobile-hooks';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
+import { useSettingsThunkDispatch } from '@lib/store/src/settings/actions.async';
+
 import { ProfileStackParamList } from '../navigation/Root/types';
 
 const ProfileScreen = () => {
@@ -38,11 +40,11 @@ const ProfileScreen = () => {
 
   const { user, company, device, isDemo, loading, isLogout } = useSelector((state) => state.auth);
 
-  const userSettings = user?.settings;
+  const userSettings = useSelector((state) => state.settings.userData);
 
   const dispatch = useDispatch();
   const authDispatch = useAuthThunkDispatch();
-  const settingsDispatch = useSettingThunkDispatch();
+  const settingsDispatch = useSettingsThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<ProfileStackParamList, 'Profile'>>();
   const showActionSheet = useActionSheet();
 
@@ -67,7 +69,7 @@ const ProfileScreen = () => {
       {
         text: 'Да',
         onPress: () => {
-          authDispatch(authActions.setUserSettings({}));
+          settingsDispatch(settingsActions.setUserSettings({}));
         },
       },
       {

@@ -16,10 +16,12 @@ import { useTheme } from 'react-native-paper';
 
 import { ScrollView } from 'react-native-gesture-handler';
 
+import { DashboardStackParamList } from '@lib/mobile-navigation';
+
 import { ICell, ICellName, ICellRef, IInventoryLine, IMoveDocument, IMoveLine } from '../store/types';
 import { MoveStackParamList } from '../navigation/Root/types';
 
-import { alertWithSound, getCellItem, getCellList } from '../utils/helpers';
+import { alertWithSound, getCellItem, getCellList, getCellListRef } from '../utils/helpers';
 import { ICellRefList, ICellData } from '../store/app/types';
 import { Group } from '../components/Group';
 import { cellColors } from '../utils/constants';
@@ -39,7 +41,7 @@ const NamedRow = ({ item }: { item: string }) => (
 
 export const SelectCellScreen = () => {
   const dispatch = useDispatch();
-  const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'SelectCell'>>();
+  const navigation = useNavigation<StackNavigationProp<MoveStackParamList & DashboardStackParamList, 'SelectCell'>>();
   const { colors } = useTheme();
 
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -115,6 +117,18 @@ export const SelectCellScreen = () => {
         (i) => i.cell === dividedCells[0].cell,
       )
     : undefined;
+
+  const cellListRef = getCellListRef(cellList);
+
+  const cell = cellListRef.find((i) => i.barcode === item.barcode)?.name;
+
+  useEffect(() => {
+    if (cell && doc?.head.fromDepart?.isAddressStore && mode === 0) {
+      setSelectedChamber(getCellItem(cell).chamber);
+      setSelectedRow(getCellItem(cell).row);
+      setToCell(item);
+    }
+  }, [cell, doc?.head.fromDepart?.isAddressStore, item, mode]);
 
   useEffect(() => {
     if (currentCell && !currentCell?.barcode && doc?.head.toDepart?.isAddressStore) {
@@ -215,8 +229,8 @@ export const SelectCellScreen = () => {
 
       return (
         <Pressable
-          key={i.name}
-          style={[localStyles.buttons, backColorStyle]}
+          key={`${i.name}-${i.sortOrder}`}
+          style={({ pressed }) => [localStyles.buttons, backColorStyle, pressed && { backgroundColor: colors.accent }]}
           onPress={() => handleSaveLine(i)}
           disabled={
             (doc?.head.fromDepart?.isAddressStore && !fromCell ? !i.barcode : Boolean(i.barcode)) || Boolean(i.disabled)
@@ -227,6 +241,7 @@ export const SelectCellScreen = () => {
       );
     },
     [
+      colors.accent,
       colors.backdrop,
       colors.error,
       defaultCell,
@@ -241,7 +256,7 @@ export const SelectCellScreen = () => {
     ({ cellData }: { cellData: ICellData[] }) => (
       <View style={styles.flexDirectionRow}>
         {cellData?.map((i) => (
-          <Cell key={i.name} i={i} />
+          <Cell key={`${i.name}-${i.sortOrder}`} i={i} />
         ))}
       </View>
     ),

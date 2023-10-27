@@ -1,36 +1,36 @@
-import { ThunkDispatch } from 'redux-thunk';
-import { useDispatch } from 'react-redux';
-
-import { Settings } from '@lib/types';
+import { IUserSettings } from '@lib/types';
 
 import { ActionType } from 'typesafe-actions';
 
+import { ThunkDispatch } from 'redux-thunk';
+
+import { useDispatch } from 'react-redux';
+
 import { AppThunk } from '../types';
 
-import { SettingsActionType, actions } from './actions';
 import { SettingsState } from './types';
+import { actions, SettingsActionType } from './actions';
 
-export type SettingDispatch = ThunkDispatch<SettingsState, any, SettingsActionType>;
+export type SettingsDispatch = ThunkDispatch<SettingsState, any, SettingsActionType>;
 
-export const useSettingThunkDispatch = () => useDispatch<SettingDispatch>();
+export const useSettingsThunkDispatch = () => useDispatch<SettingsDispatch>();
 
-const addSettings = (
-  settings: Settings,
+const setUserSettings = (
+  settings: IUserSettings,
 ): AppThunk<
-  Promise<ActionType<typeof actions.addSettingsAsync>>,
+  Promise<ActionType<typeof actions.setUserSettingsAsync>>,
   SettingsState,
-  ActionType<typeof actions.addSettingsAsync>
+  ActionType<typeof actions.setUserSettingsAsync>
 > => {
   return async (dispatch) => {
-    dispatch(actions.addSettingsAsync.request());
+    dispatch(actions.setUserSettingsAsync.request(''));
 
-    //TODO: проверка
-    if (settings) {
-      return dispatch(actions.addSettingsAsync.success(settings));
+    try {
+      return dispatch(actions.setUserSettingsAsync.success(settings));
+    } catch {
+      return dispatch(actions.setUserSettingsAsync.failure('Ошибка записи настроек пользователя'));
     }
-
-    return dispatch(actions.addSettingsAsync.failure('Ошибка записи настроек пользователя'));
   };
 };
 
-export default { addSettings, useSettingThunkDispatch };
+export default { setUserSettings };

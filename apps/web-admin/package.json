@@ -1,7 +1,7 @@
 {
   "name": "@apps/web-admin",
   "displayName": "web-admin",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "web-admin",
   "license": "MIT",
@@ -11,7 +11,7 @@
     "start-dev": "webpack serve --config=configs/webpack/dev.js",
     "start-prod": "yarn run build",
     "build-docker": "set \"INLINE_RUNTIME_CHUNK=false\" && cross-env NODE_ENV=production && yarn run clean-dist && webpack --config=configs/webpack/prod.js",
-    "build": "set \"INLINE_RUNTIME_CHUNK=false\" && yarn run clean-dist && webpack --config=configs/webpack/prod.js && yarn run copy-dist-admin",
+    "build": "set \"INLINE_RUNTIME_CHUNK=false\" && cross-env NODE_ENV=production && yarn run clean-dist && webpack --config=configs/webpack/prod.js && yarn run copy-dist-admin",
     "clean-dist": "rimraf dist/*",
     "clean-admin": "rimraf ../server/admin/*",
     "copy-dist-admin-linux": "yarn run clean-admin && cp -r dist/. ../server/admin",
@@ -21,7 +21,8 @@
     "lint": "eslint \"**/*.ts*\"",
     "lint:fix": "eslint --fix \"**/*.ts*\"",
     "precommit": "lint-staged",
-    "test": "jest --coverage --watchAll --config=configs/jest.json"
+    "test": "jest --coverage --watchAll --config=configs/jest.json",
+    "start-server": "cross-env PORT=3654 HOST=192.168.0.109 ADMIN_CONTAINER_PORT=80 && node server.js"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -55,8 +56,8 @@
     "@lib/mock": "*",
     "@lib/store": "*",
     "@lib/types": "*",
-    "@mui/material": "^5.0.0-alpha.37",
     "@mui/icons-material": "^5.0.0-alpha.27",
+    "@mui/material": "^5.0.0-alpha.37",
     "@mui/styled-engine": "^5.0.0-alpha.27",
     "@mui/styles": "^5.0.0-alpha.27",
     "@types/material-ui": "^0.21.8",

@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, TextInput } from 'react-native';
+import { View, TextInput, Keyboard } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { Audio } from 'expo-av';
 
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
@@ -24,7 +25,7 @@ import {
 
 import { generateId, getDateString, keyExtractor, useSendDocs, sleep, useSendOneRefRequest } from '@lib/mobile-hooks';
 
-import { ScreenState } from '@lib/types';
+import { IDocumentType, INamedEntity, ScreenState } from '@lib/types';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -32,12 +33,13 @@ import { FlashList } from '@shopify/flash-list';
 
 import { barcodeSettings, ILaboratoryDocument, ILaboratoryLine, IShipmentDocument } from '../../store/types';
 import { LaboratoryStackParamList } from '../../navigation/Root/types';
-import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
+import { getStatusColor, ONE_SECOND_IN_MS, ONE_T_IN_KG } from '../../utils/constants';
 
 import {
   alertWithSound,
   alertWithSoundMulti,
   getBarcode,
+  getDocToSend,
   getLineGood,
   getRemGoodListByContact,
 } from '../../utils/helpers';
@@ -82,15 +84,26 @@ export const LaboratoryViewScreen = () => {
   }, {});
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
+  const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
   const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
-  const remainsUse = Boolean(settings.remainsUse?.data);
+  const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
+  const documentType = useMemo(
+    () => documentTypes?.find((d) => d.id === doc?.documentType.id),
+    [doc?.documentType.id, documentTypes],
+  );
+
+  const defaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as INamedEntity;
+
+  const remainsUse =
+    (doc?.head.fromDepart.id === defaultDepart?.id || Boolean(documentType?.isRemains)) &&
+    Boolean(settings.remainsUse?.data);
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return doc?.head?.fromDepart?.id && isFocused
+    return doc?.head?.fromDepart?.id && isFocused && remains
       ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id], docList, doc.head.fromDepart.id)
       : [];
   }, [doc?.head?.fromDepart?.id, docList, goods, isFocused, remains]);
@@ -103,6 +116,16 @@ export const LaboratoryViewScreen = () => {
   const [visibleWeightDialog, setVisibleWeightDialog] = useState(false);
   const [weight, setWeight] = useState('');
 
+  const sound = Audio.Sound.createAsync(require('../../../assets/ok.wav'));
+
+  const playSound = useCallback(async () => {
+    (await sound).sound.playAsync();
+  }, [sound]);
+
+  const handleFocus = () => {
+    ref?.current?.focus();
+  };
+
   const handleShowDialog = () => {
     setVisibleDialog(true);
   };
@@ -111,6 +134,8 @@ export const LaboratoryViewScreen = () => {
     setVisibleDialog(false);
     setBarcode('');
     setErrorMessage('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const handleUpdateWeight = useCallback(
@@ -120,36 +145,41 @@ export const LaboratoryViewScreen = () => {
         return;
       }
 
-      if (remainsUse) {
-        const good = goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === line.good.shcode);
+      if (remainsUse && goodRemains.length) {
+        const good = goodRemains.find(
+          (item) => `0000${item.good.shcode}`.slice(-4) === `0000${line.good.shcode}`.slice(-4),
+        );
 
         if (good) {
+          const newLocal = newWeight < ONE_T_IN_KG || newWeight <= line.weight;
           if (good.remains < newWeight - line.weight) {
-            alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.');
+            alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.', handleFocus);
 
             return;
-          } else if (newWeight < 1000 || newWeight <= line.weight) {
+          } else if (newLocal) {
             const newLine: ILaboratoryLine = {
               ...line,
               weight: newWeight,
+              usedRemains: remainsUse,
             };
 
             dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
           }
         } else {
-          alertWithSound('Ошибка!', 'Товар не найден.');
+          alertWithSound('Ошибка!', 'Товар не найден.', handleFocus);
           return;
         }
       } else {
-        if (newWeight < 1000 || newWeight <= line.weight) {
+        if (newWeight < ONE_T_IN_KG || newWeight <= line.weight) {
           const newLine: ILaboratoryLine = {
             ...line,
             weight: newWeight,
+            usedRemains: remainsUse,
           };
 
           dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
         } else {
-          alertWithSound('Ошибка!', 'Неверный вес.');
+          alertWithSound('Ошибка!', 'Неверный вес.', handleFocus);
           return;
         }
       }
@@ -161,12 +191,15 @@ export const LaboratoryViewScreen = () => {
     handleUpdateWeight(Number(weight));
     setVisibleWeightDialog(false);
     setWeight('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const handleDismissQuantPack = () => {
     setVisibleWeightDialog(false);
     setWeight('');
-    // setErrorMessage('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const handleEditDocHead = useCallback(() => {
@@ -178,21 +211,22 @@ export const LaboratoryViewScreen = () => {
       return;
     }
 
-    alertWithSoundMulti('Вы уверены, что хотите удалить документ?', '', async () => {
-      setScreenState('deleting');
-      await sleep(1);
-      const res = await docDispatch(documentActions.removeDocument(id));
-      if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
-        setScreenState('deleted');
-      } else {
-        setScreenState('idle');
-      }
-    });
+    alertWithSoundMulti(
+      'Вы уверены, что хотите удалить документ?',
+      '',
+      async () => {
+        setScreenState('deleting');
+        await sleep(1);
+        const res = await docDispatch(documentActions.removeDocument(id));
+        if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
+          setScreenState('deleted');
+        } else {
+          setScreenState('idle');
+        }
+      },
+      handleFocus,
+    );
   }, [docDispatch, id]);
-
-  const handleFocus = () => {
-    ref?.current?.focus();
-  };
 
   const hanldeCancelLastScan = useCallback(() => {
     if (lines?.length) {
@@ -212,7 +246,7 @@ export const LaboratoryViewScreen = () => {
 
   const [visibleSendDialog, setVisibleSendDialog] = useState(false);
 
-  const sendDoc = useSendDocs(doc ? [doc] : []);
+  const sendDoc = useSendDocs(doc ? [doc] : [], doc ? [getDocToSend(doc)] : []);
 
   const sendRemainsRequest = useSendOneRefRequest('Остатки', { name: 'remains' });
 
@@ -225,8 +259,7 @@ export const LaboratoryViewScreen = () => {
     setVisibleSendDialog(false);
     setScreenState('sending');
     await sendDoc();
-
-    handleSendRemainsRequest();
+    await handleSendRemainsRequest();
     setScreenState('sent');
   }, [handleSendRemainsRequest, sendDoc]);
 
@@ -252,6 +285,7 @@ export const LaboratoryViewScreen = () => {
       {
         title: 'Отмена',
         type: 'cancel',
+        onPress: handleFocus,
       },
     ]);
   }, [showActionSheet, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
@@ -273,14 +307,20 @@ export const LaboratoryViewScreen = () => {
     () =>
       isBlocked ? (
         doc?.status === 'READY' ? (
-          <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
+          <SendButton
+            onPress={() => setVisibleSendDialog(true)}
+            disabled={screenState !== 'idle' || loading || !lines?.length}
+          />
         ) : (
           doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
         )
       ) : (
         <View style={styles.buttons}>
           {doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />}
-          <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
+          <SendButton
+            onPress={() => setVisibleSendDialog(true)}
+            disabled={screenState !== 'idle' || loading || !lines?.length}
+          />
           <ScanButton
             onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('ScanGood', { docId: id }))}
             disabled={screenState !== 'idle'}
@@ -288,7 +328,18 @@ export const LaboratoryViewScreen = () => {
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [actionsMenu, doc?.status, handleSaveDocument, id, isBlocked, isScanerReader, loading, navigation, screenState],
+    [
+      actionsMenu,
+      doc?.status,
+      handleSaveDocument,
+      id,
+      isBlocked,
+      isScanerReader,
+      lines?.length,
+      loading,
+      navigation,
+      screenState,
+    ],
   );
 
   useLayoutEffect(() => {
@@ -332,7 +383,7 @@ export const LaboratoryViewScreen = () => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      alertWithSound('Внимание!', `${text}.`);
+      alertWithSound('Внимание!', `${text}.`, handleFocus);
       setScanned(false);
     }
   }, []);
@@ -360,12 +411,20 @@ export const LaboratoryViewScreen = () => {
         return;
       }
 
+      if (brc.length > maxBarcodeLength) {
+        handleErrorMessage(
+          visibleDialog,
+          'Длина штрих-кода больше максимальной длины, указанной в настройках. Повторите сканирование!',
+        );
+        return;
+      }
+
       const barc = getBarcode(brc, goodBarcodeSettings);
 
       const lineGood = getLineGood(barc.shcode, barc.weight, goods, goodRemains, remainsUse);
 
       if (!lineGood.good) {
-        handleErrorMessage(visibleDialog, 'Товар не найден');
+        handleErrorMessage(visibleDialog, 'Товар не найден!');
         return;
       }
 
@@ -377,7 +436,7 @@ export const LaboratoryViewScreen = () => {
       const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
 
       if (line) {
-        handleErrorMessage(visibleDialog, 'Товар уже добавлен');
+        handleErrorMessage(visibleDialog, 'Товар уже добавлен!');
         return;
       }
 
@@ -387,27 +446,40 @@ export const LaboratoryViewScreen = () => {
         weight: barc.weight,
         barcode: barc.barcode,
         workDate: barc.workDate,
+        time: barc.time,
         numReceived: barc.numReceived,
         sortOrder: doc?.lines?.length + 1,
         quantPack: barc.quantPack,
+        usedRemains: remainsUse,
       };
 
       dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+      playSound();
 
-      setScanned(false);
+      if (visibleDialog) {
+        setVisibleDialog(false);
+        setErrorMessage('');
+        setBarcode('');
+      } else {
+        setScanned(false);
+      }
+
+      handleFocus();
     },
 
     [
       doc,
       minBarcodeLength,
+      maxBarcodeLength,
       goodBarcodeSettings,
       goods,
       goodRemains,
       remainsUse,
       dispatch,
       id,
-      handleErrorMessage,
+      playSound,
       visibleDialog,
+      handleErrorMessage,
     ],
   );
 

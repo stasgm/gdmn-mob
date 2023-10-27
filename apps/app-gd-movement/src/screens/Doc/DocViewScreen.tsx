@@ -455,7 +455,6 @@ export const DocViewScreen = () => {
           onChangeText={(text) => setScan(text)}
         />
       ) : null}
-
       <FlashList
         data={doc.lines}
         renderItem={renderItem}

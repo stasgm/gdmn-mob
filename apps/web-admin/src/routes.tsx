@@ -20,7 +20,7 @@ import Login from './pages/Login';
 import { adminPath } from './utils/constants';
 const routes = (isLoggedIn: boolean): RouteObject[] => [
   {
-    path: 'admin/app',
+    path: `${adminPath}/app`,
     element: isLoggedIn ? <DashboardLayout /> : <Navigate to={`${adminPath}/login`} />,
     children: [
       { path: 'account', element: <Account /> },
@@ -41,11 +41,11 @@ const routes = (isLoggedIn: boolean): RouteObject[] => [
     path: '/',
     element: !isLoggedIn ? <MainLayout /> : <Navigate to={`${adminPath}/app/dashboard`} />,
     children: [
-      { path: 'admin/login', element: <Login /> },
-      { path: 'admin/register', element: <Register /> },
-      { path: 'admin/404', element: <NotFound /> },
+      { path: `${adminPath}/login`, element: <Login /> },
+      { path: `${adminPath}/register`, element: <Register /> },
+      { path: `${adminPath}/404`, element: <NotFound /> },
       { path: '', element: <Navigate to={`${adminPath}/login`} /> },
-      { path: 'admin', element: <Navigate to={`${adminPath}/login`} /> },
+      { path: adminPath, element: <Navigate to={`${adminPath}/login`} /> },
       { path: '*', element: <Navigate to={`${adminPath}/404`} /> },
     ],
   },

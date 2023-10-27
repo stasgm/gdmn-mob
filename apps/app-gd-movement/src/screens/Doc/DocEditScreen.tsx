@@ -59,7 +59,7 @@ export const DocEditScreen = () => {
     toContactType: docToContactType,
   } = useSelector((state) => state.app.formParams as IDocFormParam);
 
-  const departmentSetting = useSelector((state) => state.auth.user?.settings?.toDepartment?.data);
+  const departmentSetting = useSelector((state) => state.settings?.userData?.toDepartment?.data);
 
   const defaultToDepartment = useMemo(
     () =>

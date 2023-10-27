@@ -32,6 +32,7 @@ export interface IScanFormParam extends IFormParam {
   status?: StatusType;
   department?: Department;
   comment?: string;
+  isBindGood?: boolean;
 }
 
 //Подразделения-склады
@@ -72,11 +73,13 @@ export type IMovementDocument = MandateProps<IDocument<IMovementHead, IMovementL
 
 export interface IScanHead extends IHead {
   department?: Department;
+  isBindGood?: boolean;
   comment?: string; // Комvентарий
 }
 
 export interface IScanLine extends IEntity {
   barcode: string;
+  good?: INamedEntity;
   sortOrder?: number;
 }
 

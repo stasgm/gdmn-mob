@@ -11,6 +11,7 @@ interface ISettingsOption<T = SettingValue> extends IEntity {
   group?: ISettingsGroup;
   groupInGroup?: ISettingsGroup;
   readonly?: boolean;
+  checkSettingsCode?: boolean;
 }
 
 type Settings<T = Record<string, SettingValue>> = {
@@ -26,4 +27,9 @@ interface IBaseSettings {
   [name: string]: SettingValue;
 }
 
-export { Settings, ISettingsOption, IBaseSettings };
+interface IServerConfig {
+  protocol: string;
+  port: number;
+}
+
+export { Settings, ISettingsOption, IBaseSettings, IServerConfig };

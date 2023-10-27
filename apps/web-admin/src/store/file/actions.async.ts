@@ -94,4 +94,37 @@ const removeFiles = (fileIds: string[]): AppThunk => {
   };
 };
 
-export default { fetchFiles, fetchFile, updateFile, removeFile, removeFiles };
+const moveFiles = (fileIds: string[], folderName: string): AppThunk => {
+  return async (dispatch) => {
+    dispatch(fileSystemActions.moveFilesAsync.request(''));
+
+    const response = await api.file.moveFiles(webRequest(dispatch, authActions), fileIds, folderName);
+
+    if (response.type === 'MOVE_FILES') {
+      return dispatch(fileSystemActions.moveFilesAsync.success(fileIds));
+    }
+
+    return dispatch(fileSystemActions.moveFilesAsync.failure(response.message));
+  };
+};
+
+const fetchFolders = (companyId: string, appSystemId: string): AppThunk => {
+  const params: Record<string, string | number> = {};
+
+  params.companyId = companyId;
+  params.appSystemId = appSystemId;
+
+  return async (dispatch) => {
+    dispatch(fileSystemActions.fetchFoldersAsync.request(''));
+
+    const response = await api.file.getFolders(webRequest(dispatch, authActions), params);
+
+    if (response.type === 'GET_FOLDERS') {
+      return dispatch(fileSystemActions.fetchFoldersAsync.success(response.folders));
+    }
+
+    return dispatch(fileSystemActions.fetchFoldersAsync.failure(response.message));
+  };
+};
+
+export default { fetchFiles, fetchFile, updateFile, removeFile, removeFiles, moveFiles, fetchFolders };

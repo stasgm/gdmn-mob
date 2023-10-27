@@ -78,6 +78,7 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel }: 
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
                     type="name"
+                    id="name"
                     disabled={loading}
                     value={formik.values.name}
                   />
@@ -85,6 +86,7 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel }: 
                 <Grid item md={6} xs={12}>
                   <Field
                     component={ComboBox}
+                    newSelectedProcessIds="state"
                     name="state"
                     label="Статус"
                     type="state"
@@ -101,6 +103,7 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel }: 
                     error={formik.touched.code && Boolean(formik.errors.code)}
                     fullWidth
                     label="Код активации"
+                    id="code"
                     name="code"
                     variant="outlined"
                     onBlur={formik.handleBlur}
@@ -116,6 +119,7 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel }: 
                       error={formik.touched.uid && Boolean(formik.errors.uid)}
                       fullWidth
                       label="Номер"
+                      id="uid"
                       name="uid"
                       variant="outlined"
                       onBlur={formik.handleBlur}
@@ -130,6 +134,7 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel }: 
                   <Grid item md={12} xs={12}>
                     <Field
                       component={ComboBox}
+                      idr="company"
                       name="company"
                       label="Компания"
                       type="company"

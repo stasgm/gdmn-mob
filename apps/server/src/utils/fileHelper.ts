@@ -1,5 +1,5 @@
 import path from 'path';
-import { access, readFile } from 'fs/promises';
+import { access } from 'fs/promises';
 import { constants, createReadStream, createWriteStream } from 'fs';
 
 import { once } from 'events';

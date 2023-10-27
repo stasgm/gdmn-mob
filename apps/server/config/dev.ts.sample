@@ -1,6 +1,6 @@
 export default {
-  /** Хост для сервера **/
-  HOST: '0.0.0.0',
+  /** Локальный хост для сервера **/
+  LOCALHOST: '0.0.0.0',
   /** Порт для сервера */
   PORT: 3654,
   /** Https порт для сервера */
@@ -33,4 +33,6 @@ export default {
   FILES_CHECK_PERIOD_IN_DAYS: 7,
   /** Период хранения файлов, в днях */
   FILES_SAVING_PERIOD_IN_DAYS: 7,
+  /** Период хранения файлов документов, в днях */
+  DOCS_SAVING_PERIOD_IN_DAYS: 7,
 };
