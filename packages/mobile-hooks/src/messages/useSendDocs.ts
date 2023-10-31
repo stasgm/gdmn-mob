@@ -20,7 +20,7 @@ import { mobileRequest } from '../mobileRequest';
 import { getNextOrder } from './helpers';
 import { useSaveErrors } from './useSaveErrors';
 
-export const useSendDocs = (readyDocs: IDocument[]) => {
+export const useSendDocs = (readyDocs: IDocument[], sendingDocs: IDocument[] = readyDocs) => {
   const docDispatch = useDocThunkDispatch();
   const authDispatch = useAuthThunkDispatch();
   const dispatch = useDispatch();
@@ -91,7 +91,7 @@ export const useSendDocs = (readyDocs: IDocument[]) => {
           const sendingDocsMessage: IMessage['body'] = {
             type: 'DOCS',
             version: docVersion,
-            payload: readyDocs,
+            payload: sendingDocs,
           };
 
           const sendMessageResponse = await api.message.sendMessages(

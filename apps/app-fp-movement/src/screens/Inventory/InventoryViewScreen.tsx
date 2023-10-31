@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { View, TextInput, Keyboard } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { Audio } from 'expo-av';
+
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   MenuButton,
@@ -21,7 +23,7 @@ import {
   SimpleDialog,
 } from '@lib/mobile-ui';
 
-import { generateId, getDateString, keyExtractor, useSendDocs, sleep, round } from '@lib/mobile-hooks';
+import { generateId, getDateString, keyExtractor, useSendDocs, sleep, round, isNumeric } from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
 
@@ -35,10 +37,11 @@ import { barcodeSettings, IInventoryDocument, IInventoryLine } from '../../store
 import { InventoryStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { alertWithSound, alertWithSoundMulti, getBarcode, getBarcodeString } from '../../utils/helpers';
+import { alertWithSound, alertWithSoundMulti, getBarcode, getDocToSend, getUpdatedLine } from '../../utils/helpers';
 import { IAddressStoreEntity, IBarcode, IGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
+import QuantDialog from '../../components/QuantDialog';
 
 export interface IScanerObject {
   item?: IInventoryLine;
@@ -77,6 +80,7 @@ export const InventoryViewScreen = () => {
   }, {});
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
+  const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -85,8 +89,16 @@ export const InventoryViewScreen = () => {
 
   const [visibleQuantPackDialog, setVisibleQuantPackDialog] = useState(false);
   const [quantPack, setQuantPack] = useState('');
+  const [quantPallet, setQuantPallet] = useState('');
+  const [isPack, setIsPack] = useState(true);
 
   const departs = refSelectors.selectByName<IAddressStoreEntity>('depart').data;
+
+  const sound = Audio.Sound.createAsync(require('../../../assets/ok.wav'));
+
+  const playSound = useCallback(async () => {
+    (await sound).sound.playAsync();
+  }, [sound]);
 
   const handleFocus = () => {
     ref?.current?.focus();
@@ -104,8 +116,12 @@ export const InventoryViewScreen = () => {
     handleFocus();
   };
 
+  const isFromAddressed = departs.find((i) => i.id === doc?.head.fromDepart?.id && i.isAddressStore);
+
+  const isAddressedDoc = doc?.head.fromDepart?.isAddressStore || isFromAddressed;
+
   const handleAddQuantPack = useCallback(
-    (quantity: number) => {
+    (quantity: number, pallet: number) => {
       const line = lines?.[0];
       if (!line) {
         return;
@@ -120,81 +136,43 @@ export const InventoryViewScreen = () => {
         workDate: line.workDate,
         time: line.time,
       };
+      if (!isAddressedDoc) {
+        const weight =
+          line?.weight >= goodBarcodeSettings?.boxWeight
+            ? round(line?.weight * pallet, 3)
+            : round(line?.weight * quantity, 3);
 
-      if (line?.weight >= goodBarcodeSettings?.boxWeight) {
-        const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: quantity });
-        const newLine: IInventoryLine = {
-          ...line,
-          quantPack: quantity,
-          scannedBarcode: line?.barcode,
-          barcode: newBarcode,
-        };
+        const newLine: IInventoryLine = getUpdatedLine(
+          false,
+          lineBarcode,
+          line,
+          line?.weight >= goodBarcodeSettings?.boxWeight ? round(quantity * pallet, 3) : quantity,
+          weight,
+        );
+
         dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-      } else {
-        const weight = round(line?.weight * quantity, 3);
-
-        if (weight < 1000) {
-          const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: quantity, weight });
-          const newLine: IInventoryLine = {
-            ...line,
-            quantPack: quantity,
-            weight,
-            scannedBarcode: line?.barcode,
-            barcode: newBarcode,
-          };
-
-          dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-        } else {
-          const maxQuantPack = round(Math.floor(999.99 / line?.weight), 3);
-
-          let newQuantity = quantity;
-          let sortOrder = line.sortOrder || lines.length;
-
-          while (newQuantity > 0) {
-            const q = newQuantity > maxQuantPack ? maxQuantPack : newQuantity;
-            const newWeight = round(line?.weight * q, 3);
-
-            const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: q, weight: newWeight });
-            const newLine: IInventoryLine = {
-              ...line,
-              quantPack: q,
-              weight: newWeight,
-              scannedBarcode: line?.barcode,
-              barcode: newBarcode,
-            };
-
-            if (newQuantity === quantity) {
-              dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-            } else {
-              sortOrder = sortOrder + 1;
-
-              const addedLine = { ...newLine, id: generateId(), sortOrder };
-              dispatch(
-                documentActions.addDocumentLine({
-                  docId: id,
-                  line: addedLine,
-                }),
-              );
-            }
-            newQuantity = newQuantity - maxQuantPack;
-          }
-        }
       }
     },
-    [dispatch, goodBarcodeSettings?.boxWeight, id, lines],
+    [dispatch, goodBarcodeSettings?.boxWeight, id, isAddressedDoc, lines],
   );
 
-  const handleEditQuantPack = () => {
-    handleAddQuantPack(Number(quantPack));
+  const handleEditQuantPack = useCallback(() => {
+    if (!isNumeric(quantPack) || !isNumeric(quantPallet)) {
+      alertWithSound('Ошибка!', 'Неправильное количество.', handleFocus);
+      return;
+    }
+
+    handleAddQuantPack(Number(quantPack), Number(quantPallet));
     setVisibleQuantPackDialog(false);
     setQuantPack('');
+    setQuantPallet('');
     Keyboard.dismiss();
     handleFocus();
-  };
-
+  }, [handleAddQuantPack, quantPack, quantPallet]);
   const handleDismissQuantPack = () => {
     setVisibleQuantPackDialog(false);
     setQuantPack('');
+    setQuantPallet('');
     Keyboard.dismiss();
     handleFocus();
   };
@@ -208,16 +186,21 @@ export const InventoryViewScreen = () => {
       return;
     }
 
-    alertWithSoundMulti('Вы уверены, что хотите удалить документ?', '', async () => {
-      setScreenState('deleting');
-      await sleep(1);
-      const res = await docDispatch(documentActions.removeDocument(id));
-      if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
-        setScreenState('deleted');
-      } else {
-        setScreenState('idle');
-      }
-    });
+    alertWithSoundMulti(
+      'Вы уверены, что хотите удалить документ?',
+      '',
+      async () => {
+        setScreenState('deleting');
+        await sleep(1);
+        const res = await docDispatch(documentActions.removeDocument(id));
+        if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
+          setScreenState('deleted');
+        } else {
+          setScreenState('idle');
+        }
+      },
+      handleFocus,
+    );
     handleFocus();
   }, [docDispatch, id]);
 
@@ -228,7 +211,7 @@ export const InventoryViewScreen = () => {
     handleFocus();
   }, [dispatch, id, lines]);
 
-  const sendDoc = useSendDocs(doc ? [doc] : []);
+  const sendDoc = useSendDocs(doc ? [doc] : [], doc ? [getDocToSend(doc)] : []);
 
   const [visibleSendDialog, setVisibleSendDialog] = useState(false);
 
@@ -261,6 +244,7 @@ export const InventoryViewScreen = () => {
       {
         title: 'Отмена',
         type: 'cancel',
+        onPress: handleFocus,
       },
     ]);
   }, [showActionSheet, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
@@ -282,14 +266,20 @@ export const InventoryViewScreen = () => {
     () =>
       isBlocked ? (
         doc?.status === 'READY' ? (
-          <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
+          <SendButton
+            onPress={() => setVisibleSendDialog(true)}
+            disabled={screenState !== 'idle' || loading || !lines?.length}
+          />
         ) : (
           doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
         )
       ) : (
         <View style={styles.buttons}>
           {doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />}
-          <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
+          <SendButton
+            onPress={() => setVisibleSendDialog(true)}
+            disabled={screenState !== 'idle' || loading || !lines?.length}
+          />
           <ScanButton
             onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('ScanGood', { docId: id }))}
             disabled={screenState !== 'idle'}
@@ -297,7 +287,18 @@ export const InventoryViewScreen = () => {
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [actionsMenu, doc?.status, handleSaveDocument, id, isBlocked, isScanerReader, loading, navigation, screenState],
+    [
+      actionsMenu,
+      doc?.status,
+      handleSaveDocument,
+      id,
+      isBlocked,
+      isScanerReader,
+      lines?.length,
+      loading,
+      navigation,
+      screenState,
+    ],
   );
 
   useLayoutEffect(() => {
@@ -307,19 +308,31 @@ export const InventoryViewScreen = () => {
     });
   }, [navigation, renderRight]);
 
+  const handlePressLine = useCallback(
+    (weight: number) => {
+      setQuantPack('');
+      setQuantPallet('1');
+      setVisibleQuantPackDialog(true);
+      weight >= goodBarcodeSettings?.boxWeight ? setIsPack(false) : setIsPack(true);
+    },
+    [goodBarcodeSettings?.boxWeight],
+  );
+
   const renderItem = useCallback(
     ({ item }: { item: IInventoryLine }) => {
       return (
         <ListItemLine
           key={item.id}
           readonly={doc?.status !== 'DRAFT' || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
-          onPress={() => setVisibleQuantPackDialog(true)}
+          onPress={() => handlePressLine(item.weight)}
         >
           <View style={styles.details}>
             <LargeText style={styles.textBold}>{item.good.name}</LargeText>
             <View style={styles.flexDirectionRow}>
               <MaterialCommunityIcons name="shopping-outline" size={18} />
-              <MediumText> {(item.weight || 0).toString()} кг</MediumText>
+              <MediumText>
+                {(item.weight || 0).toString()} кг, {(item.quantPack || 0).toString()} кор.
+              </MediumText>
             </View>
             <View style={styles.flexDirectionRow}>
               <MediumText>
@@ -337,7 +350,7 @@ export const InventoryViewScreen = () => {
         </ListItemLine>
       );
     },
-    [doc?.head.fromDepart?.isAddressStore, doc?.status, lines?.length],
+    [doc?.head.fromDepart?.isAddressStore, doc?.status, handlePressLine, lines?.length],
   );
 
   const [scanned, setScanned] = useState(false);
@@ -348,7 +361,7 @@ export const InventoryViewScreen = () => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      alertWithSound('Внимание!', `${text}.`);
+      alertWithSound('Внимание!', `${text}.`, handleFocus);
       setScanned(false);
     }
   }, []);
@@ -376,19 +389,27 @@ export const InventoryViewScreen = () => {
         return;
       }
 
+      if (brc.length > maxBarcodeLength) {
+        handleErrorMessage(
+          visibleDialog,
+          'Длина штрих-кода больше максимальной длины, указанной в настройках. Повторите сканирование!',
+        );
+        return;
+      }
+
       const barc = getBarcode(brc, goodBarcodeSettings);
 
       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
       if (!good) {
-        handleErrorMessage(visibleDialog, 'Товар не найден');
+        handleErrorMessage(visibleDialog, 'Товар не найден!');
         return;
       }
 
-      const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
+      const line = doc?.lines?.find((i) => i.barcode === barc.barcode || i.scannedBarcode === barc.barcode);
 
       if (line) {
-        handleErrorMessage(visibleDialog, 'Данный штрих-код уже добавлен');
+        handleErrorMessage(visibleDialog, 'Данный штрих-код уже добавлен!');
         return;
       }
 
@@ -404,9 +425,7 @@ export const InventoryViewScreen = () => {
         quantPack: barc.quantPack,
       };
 
-      const isToAddressed = departs.find((i) => i.id === doc.head.fromDepart?.id && i.isAddressStore);
-
-      if (doc.head.fromDepart?.isAddressStore || isToAddressed) {
+      if (isAddressedDoc) {
         navigation.navigate('InventorySelectCell', {
           docId: id,
           item: newLine,
@@ -415,6 +434,7 @@ export const InventoryViewScreen = () => {
         });
       } else {
         dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+        playSound();
       }
 
       if (visibleDialog) {
@@ -430,14 +450,16 @@ export const InventoryViewScreen = () => {
     [
       doc,
       minBarcodeLength,
+      maxBarcodeLength,
       goodBarcodeSettings,
       goods,
-      departs,
+      isAddressedDoc,
       visibleDialog,
       handleErrorMessage,
       navigation,
       id,
       dispatch,
+      playSound,
     ],
   );
 
@@ -537,16 +559,18 @@ export const InventoryViewScreen = () => {
         okLabel={'Найти'}
         errorMessage={errorMessage}
       />
-      <AppDialog
-        title="Количество"
+      <QuantDialog
         visible={visibleQuantPackDialog}
-        text={quantPack}
-        onChangeText={setQuantPack}
+        textPack={quantPack}
+        textPallet={quantPallet}
+        onChangeTextPack={setQuantPack}
+        onChangeTextPallet={setQuantPallet}
         onCancel={handleDismissQuantPack}
         onOk={handleEditQuantPack}
         okLabel={'Ок'}
+        isPack={isPack}
         keyboardType="numbers-and-punctuation"
-        // errorMessage={errorMessage}
+        okDisabled={!quantPack || !quantPallet}
       />
       <SimpleDialog
         visible={visibleSendDialog}

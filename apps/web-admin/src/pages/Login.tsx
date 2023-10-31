@@ -14,7 +14,7 @@ import Reaptcha from 'reaptcha';
 
 import Logo from '../components/Logo';
 
-import { adminPath, hostName } from '../utils/constants';
+import { adminPath } from '../utils/constants';
 
 import { webRequest } from '../store/webRequest';
 
@@ -25,7 +25,7 @@ const Login = () => {
   const { error, loading, status, errorMessage, config } = useSelector((state) => state.auth);
   const [captchaToken, setCaptchaToken] = useState('');
   const captchaRef = useRef(null);
-  const withCaptcha = config.server === hostName;
+  const withCaptcha = config.protocol.toLowerCase().includes('https');
   const formik = useFormik<IUserCredentials>({
     enableReinitialize: true,
     initialValues: {

@@ -167,6 +167,7 @@ const DeviceListTable = ({
               </NavLink>
             </Box>
           </TableCell>
+          <TableCell style={{ padding: '0 16px' }}>{device.id} </TableCell>
           <TableCell>
             <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
               <Box>
@@ -234,6 +235,7 @@ const DeviceListTable = ({
                   />
                 </TableCell>
                 <TableCell>Наименование</TableCell>
+                <TableCell>ID</TableCell>
                 <TableCell>Номер</TableCell>
                 <TableCell>Состояние</TableCell>
                 <TableCell>Код активации</TableCell>

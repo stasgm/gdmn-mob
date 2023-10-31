@@ -2,7 +2,11 @@ import { useSelector } from '../';
 
 const selectLoading = () => {
   return useSelector(
-    (state) => state.documents.loadingData || state.references.loadingData || state.settings.loadingData,
+    (state) =>
+      state.app.loadingData ||
+      state.documents.loadingData ||
+      state.references.loadingData ||
+      state.settings.loadingData,
   );
 };
 

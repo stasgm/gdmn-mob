@@ -37,6 +37,10 @@ export const getStatusColor = (status: StatusType) => {
 
 export const ONE_SECOND_IN_MS = 1000;
 
+export const ONE_KG_IN_G = 1000;
+
+export const ONE_T_IN_KG = 1000;
+
 export const contactTypes: IListItem[] = [
   { id: 'department', value: 'Подразделение' },
   { id: 'contact', value: 'Организация' },
@@ -99,8 +103,20 @@ export const STATUS_LIST: IListItem[] = [
   { id: 'READY', value: 'Готов' },
 ];
 
-const goodGroup = { id: 'goodScan', name: 'Код товара', sortOrder: 21, description: 'Количество символов' };
-const orderGroup = { id: 'orderScan', name: 'Код заявки', sortOrder: 22, description: 'Количество символов' };
+const goodGroup = {
+  id: 'goodScan',
+  name: 'Код товара',
+  sortOrder: 21,
+  description: 'Количество символов',
+  checkSettingsCode: true,
+};
+const orderGroup = {
+  id: 'orderScan',
+  name: 'Код заявки',
+  sortOrder: 22,
+  description: 'Количество символов',
+  checkSettingsCode: true,
+};
 
 export const appSettings: Settings = {
   scannerUse: {
@@ -129,12 +145,32 @@ export const appSettings: Settings = {
     type: 'boolean',
     visible: true,
     group: mainSettingGroup,
+    checkSettingsCode: true,
+  },
+  getRemains: {
+    id: 'getRemains',
+    sortOrder: 2,
+    description: 'Запрашивать остатки',
+    data: true,
+    type: 'boolean',
+    visible: true,
+    group: mainSettingGroup,
+    checkSettingsCode: true,
   },
   minBarcodeLength: {
     id: 'minBarcodeLength',
     sortOrder: 6,
     description: 'Мин. длина штрих-кода',
     data: 28,
+    type: 'number',
+    visible: true,
+    group: goodGroup,
+  },
+  maxBarcodeLength: {
+    id: 'maxBarcodeLength',
+    sortOrder: 6,
+    description: 'Макс. длина штрих-кода',
+    data: 40,
     type: 'number',
     visible: true,
     group: goodGroup,
@@ -215,7 +251,7 @@ export const appSettings: Settings = {
     id: 'boxWeight',
     sortOrder: 16,
     description: 'Мин. вес поддона, кг',
-    data: 25,
+    data: 30,
     type: 'number',
     visible: true,
     group: goodGroup,

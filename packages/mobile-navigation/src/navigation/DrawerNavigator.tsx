@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Modal, View, StyleSheet, ScrollView } from 'react-native';
 
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -87,7 +87,7 @@ const DrawerNavigator = ({ onSyncClick, items, dashboardScreens }: IProps) => {
   const [errorListVisible, setErrorListVisible] = useState(false);
   const { errorMessage } = useSelector((state) => state.auth);
 
-  const onSync = () => {
+  const onSync = useCallback(() => {
     //Если идет процесс, то выходим
     if (loading) {
       //Отрисовать окно синхронизации
@@ -103,21 +103,21 @@ const DrawerNavigator = ({ onSyncClick, items, dashboardScreens }: IProps) => {
 
     dispatch(appActions.setShowSyncInfo(true));
     onSyncClick();
-  };
+  }, [loading, syncDate, dispatch, onSyncClick]);
 
-  const onDismissDialog = () => {
+  const onDismissDialog = useCallback(() => {
     dispatch(appActions.setShowSyncInfo(false));
     setErrorListVisible(false);
     if (!loading) {
       dispatch(appActions.clearRequestNotice());
       dispatch(appActions.clearErrorNotice());
     }
-  };
+  }, [loading, dispatch]);
 
-  const closeErrBar = () => {
+  const closeErrBar = useCallback(() => {
     dispatch(authActions.setErrorMessage(''));
     dispatch(authActions.clearError());
-  };
+  }, [dispatch]);
 
   return (
     <>

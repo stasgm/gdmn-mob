@@ -1,8 +1,8 @@
 import { BodyType, CmdName, INamedEntity, StatusType } from './common';
-import { IDocument, IDocumentType } from './document';
+import { IDocument } from './document';
 import { IReferences } from './references';
 
-import { IAppSystemSettings, IUserSettings } from './models';
+import { IUserSettings } from './models';
 
 export interface IHeadMessage {
   appSystem: INamedEntity;
@@ -29,7 +29,7 @@ export interface IRefCmd {
   contactId?: string;
 }
 
-export type MessageType = ICmd | IDocument[] | IReferences | IUserSettings | IAppSystemSettings;
+export type MessageType = ICmd | IDocument[] | IReferences | IUserSettings;
 
 export type IMessage<T = MessageType> = ISimpleMessage<T> | IMultipartMessage;
 
@@ -102,7 +102,7 @@ export interface IFileMessageInfo {
   consumerId: string;
   deviceId: string;
   commandType: string;
-  size?: number;
+  fullName?: string;
 }
 
 export interface ICheckTransafer {

@@ -329,7 +329,7 @@ export const MoveEditScreen = () => {
     const params: Record<string, string> = {};
 
     if (isAddressStore) {
-      if (docDocumentSubtype?.id === 'cellMovement' || docDocumentSubtype?.id === 'movement') {
+      if ((docDocumentSubtype?.id === 'cellMovement' || docDocumentSubtype?.id === 'movement') && isAddressStore) {
         params.isAddressStore = 'true';
       } else if (docDocumentSubtype?.id === 'departMovement') {
         params.isAddressStore = 'false';
@@ -354,7 +354,10 @@ export const MoveEditScreen = () => {
 
     const params: Record<string, string> = {};
     if (isAddressStore) {
-      if (docDocumentSubtype?.id === 'cellMovement' || docDocumentSubtype?.id === 'internalMovement') {
+      if (
+        (docDocumentSubtype?.id === 'cellMovement' || docDocumentSubtype?.id === 'internalMovement') &&
+        isAddressStore
+      ) {
         params.isAddressStore = 'true';
       } else if (docDocumentSubtype?.id === 'departMovement') {
         params.isAddressStore = 'false';

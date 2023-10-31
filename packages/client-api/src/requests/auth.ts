@@ -1,4 +1,4 @@
-import { DeviceState, IUser, IUserCredentials } from '@lib/types';
+import { DeviceState, IUser, IUserCredentials, NewAccessCode } from '@lib/types';
 import { user as mockUser } from '@lib/mock';
 
 import { error, auth as types } from '../types';
@@ -177,6 +177,29 @@ class Auth extends BaseRequest {
     return {
       type: res.type,
       message: response2Log(res) || 'Статус устройства не получен',
+    } as error.IServerError;
+  };
+
+  verifyAccessCode = async (customRequest: CustomRequest, code: string) => {
+    const body = { code };
+
+    const res = await customRequest<boolean>({
+      api: this.api.axios,
+      method: 'POST',
+      url: '/auth/checkAccessCode',
+      data: body,
+    });
+
+    if (res.type === 'SUCCESS') {
+      return {
+        type: 'VERIFY_ACCESS_CODE',
+        check: res.data,
+      } as types.IVerifyAccessCodeResponse;
+    }
+
+    return {
+      type: res.type,
+      message: response2Log(res) || 'Код активации не проверен',
     } as error.IServerError;
   };
 }

@@ -23,6 +23,7 @@ const addUser = async (ctx: ParameterizedContext) => {
     appSystem,
     disabled,
     company,
+    accessCode,
   } = ctx.request.body as NewUser;
 
   const creator = ctx.state.user as IUser;
@@ -43,6 +44,7 @@ const addUser = async (ctx: ParameterizedContext) => {
     disabled,
     creator: { id: creator.id, name: creator.name },
     company,
+    accessCode,
   } as NewUser;
 
   const newUser = userService.addOne(user);

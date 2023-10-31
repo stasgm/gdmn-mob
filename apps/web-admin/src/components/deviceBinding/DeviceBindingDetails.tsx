@@ -4,7 +4,7 @@ import { IDeviceBinding, INamedEntity } from '@lib/types';
 import { Field, FormikProvider, useFormik } from 'formik';
 import * as yup from 'yup';
 
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import { useNavigate } from 'react-router';
 
@@ -56,6 +56,31 @@ const DeviceBindingDetails = ({ deviceBinding, loading, onSubmit, onCancel }: IP
     },
   });
 
+  const handleAddDevice = useCallback(
+    (_: any, value: INamedEntity) => {
+      if (deviceBinding.device?.id !== value.id) {
+        const device = devices.find((i) => i.id === value?.id);
+        if (device) {
+          formik.setValues({
+            ...formik.values,
+            device: value,
+            state: { id: device?.state, name: deviceStates[device?.state] },
+          });
+        }
+      }
+    },
+    [deviceBinding.device?.id, devices, formik],
+  );
+
+  const filteredDeviceStates =
+    Object.entries(deviceStates)
+      .filter((key) => {
+        const device = devices.find((i) => i.id === formik.values.device?.id);
+
+        return key[0] === 'BLOCKED' || key[0] === device?.state;
+      })
+      .map((key) => ({ id: key[0], name: key[1] })) || [];
+
   return (
     <FormikProvider value={formik}>
       <Box
@@ -89,7 +114,7 @@ const DeviceBindingDetails = ({ deviceBinding, loading, onSubmit, onCancel }: IP
                     name="device"
                     type="device"
                     options={devices?.map((d) => ({ id: d.id, name: d.name })) || []}
-                    setFieldValue={formik.setFieldValue}
+                    setFieldValue={handleAddDevice}
                     setTouched={formik.setTouched}
                     error={Boolean(formik.touched.device && formik.errors.device)}
                     onButtonClick={() => navigate(`${adminPath}/app/devices/new`)}
@@ -104,7 +129,7 @@ const DeviceBindingDetails = ({ deviceBinding, loading, onSubmit, onCancel }: IP
                     label="Статус"
                     type="state"
                     required={true}
-                    options={Object.entries(deviceStates).map((key) => ({ id: key[0], name: key[1] })) || []}
+                    options={filteredDeviceStates}
                     setFieldValue={formik.setFieldValue}
                     setTouched={formik.setTouched}
                     error={Boolean(formik.touched.state && formik.errors.state)}
