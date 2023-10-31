@@ -92,6 +92,6 @@ const Account = () => {
       </Box>
     </>
   );
-};
+}
 
 export default Account;

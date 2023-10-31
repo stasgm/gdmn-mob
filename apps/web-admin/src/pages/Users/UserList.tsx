@@ -15,11 +15,25 @@ import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/user';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import { IToolBarButton, IHeadCells, IPageParam } from '../../types';
+import { getMaxHeight } from '../../utils/helpers';
 
 const UserList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+
+  const [maxHeight, setMaxHeight] = useState(getMaxHeight());
+
+  useEffect(() => {
+    const updateDimension = () => {
+      setMaxHeight(getMaxHeight());
+    };
+    window.addEventListener('resize', updateDimension);
+
+    return () => {
+      window.removeEventListener('resize', updateDimension);
+    };
+  }, [maxHeight]);
 
   const { list, loading, pageParams } = useSelector((state) => state.users);
 
@@ -96,6 +110,7 @@ const UserList = () => {
     { id: 'name', label: 'Пользователь', sortEnable: true },
     { id: 'lastName', label: 'Фамилия', sortEnable: true },
     { id: 'firstName', label: 'Имя', sortEnable: true },
+    { id: 'externalId', label: 'ID из ERP', sortEnable: false },
     { id: 'id', label: 'ID', sortEnable: false },
     { id: 'externalId', label: 'ID из ERP системы', sortEnable: false },
     { id: 'erpUser', label: 'Пользователь ERP', sortEnable: true },
@@ -136,7 +151,7 @@ const UserList = () => {
                 path={'/app/users/'}
                 onSetPageParams={handleSetPageParams}
                 pageParams={pageParams}
-                style={{ overflowY: 'auto', maxHeight: window.innerHeight - 268 }}
+                style={{ overflowY: 'auto', maxHeight }}
               />
             </Box>
           )}
@@ -147,3 +162,6 @@ const UserList = () => {
 };
 
 export default UserList;
+function getCurrentDimension(): any {
+  throw new Error('Function not implemented.');
+}

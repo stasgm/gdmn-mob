@@ -19,6 +19,7 @@ import {
 import { IAppSystem } from '@lib/types';
 
 import { adminPath } from '../../utils/constants';
+import { getMaxHeight } from '../../utils/helpers';
 
 interface IProps {
   appSystems: IAppSystem[];
@@ -36,6 +37,20 @@ const AppSystemListTable = ({
   const [selectedAppSystemIds, setSelectedAppSystemIds] = useState<IAppSystem[]>(selectedAppSystems);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
+
+  const [maxHeight, setMaxHeight] = useState(getMaxHeight());
+
+  useEffect(() => {
+    const updateDimension = () => {
+      setMaxHeight(getMaxHeight())
+    }
+    window.addEventListener('resize', updateDimension);
+
+
+    return(() => {
+        window.removeEventListener('resize', updateDimension);
+    })
+}, [maxHeight])
 
   const handleSelectAll = (event: any) => {
     let newSelectedAppSystemIds;
@@ -155,7 +170,7 @@ const AppSystemListTable = ({
   return (
     <Card>
       <PerfectScrollbar>
-        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight: window.innerHeight - 268 }}>
+        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight }}>
           <Table>
             <TableHead>
               <TableRow>
