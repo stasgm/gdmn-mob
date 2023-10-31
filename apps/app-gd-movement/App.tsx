@@ -76,7 +76,7 @@ const Root = () => {
 
   //Загружаем в стор дополнительные настройки приложения
   const isInit = useSelector((state) => state.settings.isInit);
-  const authLoading = useSelector((state) => state.auth.loadingData);
+  const { loadingData: authLoading, user } = useSelector((state) => state.auth);
   const appDataLoading = appSelectors.selectLoading();
   const isLogged = authSelectors.isLoggedWithCompany();
   const invLoading = useInvSelector((state) => state.appInventory.loading);
@@ -133,6 +133,12 @@ const Root = () => {
       setAddSettings('ADDED');
     }
   }, [addSettings, appDataLoading, dispatch]);
+
+  useEffect(() => {
+    if (user) {
+      setAddSettings('INIT');
+    }
+  }, [user]);
 
   useEffect(() => {
     //Для отрисовки при первом подключении

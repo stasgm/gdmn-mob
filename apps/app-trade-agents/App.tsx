@@ -120,7 +120,7 @@ const Root = () => {
   }, [isInit]);
 
   const appDataLoading = appSelectors.selectLoading();
-  const authLoading = useSelector((state) => state.auth.loadingData);
+  const { loadingData: authLoading, user } = useSelector((state) => state.auth);
   const tradeLoading = useAppTradeSelector((state) => state.appTrade.loadingData);
   const tradeLoadingError = useAppTradeSelector<string>((state) => state.appTrade.loadingError);
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
@@ -147,6 +147,12 @@ const Root = () => {
       setAddSettings('ADDED');
     }
   }, [addSettings, appDataLoading, dispatch]);
+
+  useEffect(() => {
+    if (user) {
+      setAddSettings('INIT');
+    }
+  }, [user]);
 
   useEffect(() => {
     //Для отрисовки при первом подключении
