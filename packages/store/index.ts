@@ -16,3 +16,4 @@ export { default as settingsActions } from './src/settings';
 export { baseSettingGroup, mainSettingGroup } from './src/settings';
 export { default as appActions } from './src/app';
 export { default as appSelectors } from './src/app/selectors';
+export { useSettingsThunkDispatch } from './src/settings';

@@ -50,12 +50,17 @@ export const checkFiles = async (): Promise<void> => {
 
   const root = getDb().dbPath;
   const files = await _readDir(root, [...defaultExclude, 'deviceLogs']);
+
   for (const file of files) {
     try {
       // eslint-disable-next-line no-await-in-loop
       const fileStat = await stat(file);
       const fileDate = fileStat.birthtimeMs;
-      if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > config.FILES_SAVING_PERIOD_IN_DAYS) {
+      const period =
+        file.toUpperCase().indexOf('DOCS') === -1 || file.toUpperCase().indexOf('MESSAGES') > 0
+          ? config.FILES_SAVING_PERIOD_IN_DAYS
+          : config.DOCS_SAVING_PERIOD_IN_DAYS;
+      if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > period) {
         unlink(file);
       }
     } catch (err) {
@@ -128,7 +133,6 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
     log.error(`Устройство ${deviceUid}  не найдено`);
   }*/
 
-  const deviceId = device?.id;
   const deviceName = device?.name;
 
   return {
@@ -141,13 +145,11 @@ const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefine
 };
 
 const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => {
-  /* const pathArr = root.split(path.sep);
-  const name = pathArr.pop();*/
   const name = path.basename(root);
   const ext = path.extname(root);
   if (!name) {
     log.error(`Invalid filename ${root}`);
-    return undefined;
+    return;
   }
   const nameWithoutExt = path.basename(root, ext);
   const subPath = path.dirname(root);
@@ -185,8 +187,8 @@ const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => 
       mdate: fileModifiedDate,
     };
   } catch (err) {
-    log.error(`Invalid filename ${root}`);
-    return undefined;
+    log.error(`Invalid filename ${root}: ${err}`);
+    return;
   }
 };
 

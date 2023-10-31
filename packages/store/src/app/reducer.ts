@@ -139,11 +139,12 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
       };
     }
 
-    case getType(appActions.removeSyncRequest):
+    case getType(appActions.removeSyncRequest): {
       return {
         ...state,
         syncRequests: state.syncRequests ? state.syncRequests.filter((req) => req.cmdName !== action.payload) : [],
       };
+    }
 
     default:
       return state;

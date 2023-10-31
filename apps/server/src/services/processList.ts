@@ -325,14 +325,24 @@ export const deleteFile = (filePath: string) => {
   unlinkSync(filePath);
 };
 
-const readMessageFile = (pathDb: string, fileName: string): IDBMessage => {
+const readMessageFile = (pathDb: string, fileName: string, params: IMessageParams): IDBMessage | undefined => {
   const fullName = path.join(pathDb, fileName);
-  const data = readFileSync(fullName, { encoding: 'utf8' });
-  const parsed = JSON.parse(data);
-  if (isIDBMessage(parsed)) {
-    return parsed;
+  try {
+    const data = readFileSync(fullName, { encoding: 'utf8' });
+    const parsed = JSON.parse(data);
+    if (isIDBMessage(parsed)) {
+      return parsed;
+    } else {
+      // throw new InvalidParameterException(`Неверный тип данных в файле ${fullName}`);
+      log.warn(`Robust-protocol.addProcess: неверный тип данных в файле ${fullName}`);
+      renameSync(fullName, getPathError(params, fileName));
+    }
+  } catch (err) {
+    log.warn(`Robust-protocol.addProcess: неверный тип данных в файле ${fullName},
+          ${err instanceof Error ? err.message : 'ошибка'}`);
+    renameSync(fullName, getPathError(params, fileName));
   }
-  throw new InvalidParameterException(`Неверный тип данных в файле ${fullName}`);
+  return;
 };
 
 const getFileSizeInMB = (fileName: string) => {
@@ -351,7 +361,13 @@ export const getFiles = (params: AddProcess): IFiles => {
   }
 
   const sorted = files
-    .map<[string, IMessage]>((fn) => [fn, makeMessageSync(readMessageFile(pathDb, fn))])
+    .reduce<[string, IMessage][]>((prev, fn) => {
+      const file = readMessageFile(pathDb, fn, { companyId: params.companyId, appSystemId: params.appSystemId });
+      if (file) {
+        prev.push([fn, makeMessageSync(file)]);
+      }
+      return prev;
+    }, [])
     .sort((a, b) => a[1].head.order - b[1].head.order);
 
   const limitDataVolume = Math.min(
@@ -371,7 +387,7 @@ export const getFiles = (params: AddProcess): IFiles => {
 };
 
 export const makeMessageSync = (message: IDBMessage): IMessage => {
-  const { users, companies, appSystems } = getDb();
+  const { users } = getDb();
 
   const consumer = users.getNamedItem(message.head.consumerId);
   const producer = users.getNamedItem(message.head.producerId);

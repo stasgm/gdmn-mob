@@ -23,11 +23,12 @@ import ToolBarAction from '../../components/ToolBarActions';
 
 import appSystemSelectors from '../../store/appSystem/selectors';
 
-import AppSystemDetailsView from '../../components/appSystem/AppSystemDetailsView';
 import actions from '../../store/appSystem';
 
 import { adminPath } from '../../utils/constants';
 import DetailsView from '../../components/DetailsView';
+
+import AppSystemCompany from '../../components/appSystem/AppSystemCompany';
 
 export type Params = {
   id: string;
@@ -185,6 +186,10 @@ const AppSystemView = () => {
         >
           <DetailsView details={appSystemDetails} />
         </Box>
+      </Box>
+      <Box>
+        <CardHeader title={'Компании'} sx={{ mx: 2 }} />
+        <AppSystemCompany appSystem={appSystem} />
       </Box>
     </>
   );

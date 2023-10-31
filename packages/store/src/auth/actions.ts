@@ -31,6 +31,12 @@ const activateDeviceAsync = createAsyncAction(
   'AUTH/ACTIVATE_DEVICE_FAILURE',
 )<string | undefined, string | undefined, string>();
 
+const checkAccessCodeAsync = createAsyncAction(
+  'AUTH/VERIFY_ACCESS_CODE',
+  'AUTH/VERIFY_ACCESS_CODE_SUCCESS',
+  'AUTH/VERIFY_ACCESS_CODE_FAILURE',
+)<string | undefined, boolean, string>();
+
 const loginUserAsync = createAsyncAction('AUTH/LOGIN', 'AUTH/LOGIN_SUCCESS', 'AUTH/LOGIN_FAILURE')<
   string | undefined,
   IUser | undefined,
@@ -89,6 +95,7 @@ export const actions = {
   setConnectionStatus,
   getCompanyAsync,
   setDemoModeAsync,
+  checkAccessCodeAsync,
   setLoading,
   setLoadingData,
   setLoadingError,

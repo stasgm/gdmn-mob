@@ -25,14 +25,14 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 import Logo from '../components/Logo';
 
-import { adminPath, hostName, validPassword } from '../utils/constants';
+import { adminPath, validPassword } from '../utils/constants';
 import { webRequest } from '../store/webRequest';
 
 const Register = () => {
   const navigate = useNavigate();
   const dispatch = useAuthThunkDispatch();
   const { error, loading, status, config } = useSelector((state) => state.auth);
-  const withCaptcha = config.server === hostName;
+  const withCaptcha = config.protocol.toLowerCase().includes('https');
 
   const [showPassword, setShowPassword] = React.useState(false);
 

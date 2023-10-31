@@ -183,7 +183,7 @@ export const ScanListScreen = () => {
     return res.map((i) => {
       return {
         id: i.id,
-        title: i.documentType.description || '',
+        title: i.head.isBindGood ? 'Привязка штрихкодов к ТМЦ' : i.documentType.description || '',
         documentDate: getDateString(i.documentDate),
         status: i.status,
         documentType: i.documentType.name,
@@ -231,7 +231,7 @@ export const ScanListScreen = () => {
         checked={!!delList[item.id]}
         addInfo={
           <View>
-            <MediumText>{doc.head.department?.name || ''}</MediumText>
+            {doc.head.department && <MediumText>{doc.head.department.name}</MediumText>}
             <MediumText>
               № {doc.number} на {getDateString(doc.documentDate)}
             </MediumText>
