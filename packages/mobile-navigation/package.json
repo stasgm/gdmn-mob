@@ -36,7 +36,7 @@
     "@types/react": "~18.2.28",
     "expo-constants": "~14.4.2",
     "react": "18.2.0",
-    "react-native": "0.72.5",
+    "react-native": "0.72.6",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-paper": "^5.10.6",
     "react-native-reanimated": "~3.3.0",
