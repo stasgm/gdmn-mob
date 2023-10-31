@@ -26,15 +26,14 @@ const UserList = () => {
 
   useEffect(() => {
     const updateDimension = () => {
-      setMaxHeight(getMaxHeight())
-    }
+      setMaxHeight(getMaxHeight());
+    };
     window.addEventListener('resize', updateDimension);
 
-
-    return(() => {
-        window.removeEventListener('resize', updateDimension);
-    })
-}, [maxHeight])
+    return () => {
+      window.removeEventListener('resize', updateDimension);
+    };
+  }, [maxHeight]);
 
   const { list, loading, pageParams } = useSelector((state) => state.users);
 
@@ -111,12 +110,9 @@ const UserList = () => {
     { id: 'name', label: 'Пользователь', sortEnable: true },
     { id: 'lastName', label: 'Фамилия', sortEnable: true },
     { id: 'firstName', label: 'Имя', sortEnable: true },
-<<<<<<< HEAD
     { id: 'externalId', label: 'ID из ERP', sortEnable: false },
-=======
     { id: 'id', label: 'ID', sortEnable: false },
     { id: 'externalId', label: 'ID из ERP системы', sortEnable: false },
->>>>>>> predev
     { id: 'erpUser', label: 'Пользователь ERP', sortEnable: true },
     { id: 'appSystem', label: 'Подсистема', sortEnable: true },
     { id: 'creationDate', label: 'Дата создания', sortEnable: true },
