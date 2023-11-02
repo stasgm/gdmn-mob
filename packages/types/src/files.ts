@@ -6,15 +6,16 @@ export interface IExtraFileInfo {
   consumer?: INamedEntity;
   producer?: INamedEntity;
   device?: INamedEntity;
+  folder?: string;
 }
 
 export interface IFileSystem extends IEntity, IExtraFileInfo {
   [key: string]: unknown;
   date: string;
   size: number;
-  fileName: string;
   path: string;
   mdate: string;
+  ext: string;
 }
 
 export interface IFileSearchOptions {
@@ -30,7 +31,17 @@ export interface IFileSearchOptions {
   device: string;
 }
 
+export interface IFileQueryObject {
+  companyId?: string;
+  appSystemId?: string;
+  folder?: string;
+  ext?: string;
+}
+
+export interface IFileObject extends IFileQueryObject {
+  id: string;
+}
 export interface IFileIds {
-  ids: string[];
-  folderName?: string;
+  ids: IFileObject[];
+  toFolder?: string;
 }

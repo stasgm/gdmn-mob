@@ -1,4 +1,4 @@
-import { IFileIds, IFileSystem } from '@lib/types';
+import { IFileIds, IFileObject, IFileSystem } from '@lib/types';
 
 import { error, file as types } from '../types';
 import { response2Log, sleep } from '../utils';
@@ -11,7 +11,7 @@ class File extends BaseRequest {
     super(api);
   }
 
-  getFile = async (customRequest: CustomRequest, fileId: string) => {
+  getFile = async (customRequest: CustomRequest, params: Record<string, string | number>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -21,10 +21,12 @@ class File extends BaseRequest {
       } as error.IServerError;
     }
 
+    console.log('params', params);
     const res = await customRequest<any>({
       api: this.api.axios,
       method: 'GET',
-      url: `/files/${fileId}`,
+      url: `/files/${params.id}`,
+      params,
     });
 
     if (res.type === 'SUCCESS') {
@@ -70,12 +72,13 @@ class File extends BaseRequest {
     } as error.IServerError;
   };
 
-  updateFile = async (customRequest: CustomRequest, id: string, file: Partial<any>) => {
+  updateFile = async (customRequest: CustomRequest, file: Partial<any>, params: Record<string, string | number>) => {
     const res = await customRequest<any>({
       api: this.api.axios,
       method: 'PATCH',
-      url: `/files/${id}`,
+      url: `/files/${params.id}`,
       data: file,
+      params,
     });
 
     if (res.type === 'SUCCESS') {
@@ -91,7 +94,7 @@ class File extends BaseRequest {
     } as error.IServerError;
   };
 
-  removeFile = async (customRequest: CustomRequest, fileId: string) => {
+  removeFile = async (customRequest: CustomRequest, params: Record<string, string | number>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -103,7 +106,8 @@ class File extends BaseRequest {
     const res = await customRequest<void>({
       api: this.api.axios,
       method: 'DELETE',
-      url: `/files/${fileId}`,
+      url: `/files/${params.id}`,
+      params,
     });
 
     if (res.type === 'SUCCESS') {
@@ -118,7 +122,7 @@ class File extends BaseRequest {
     } as error.IServerError;
   };
 
-  removeFiles = async (customRequest: CustomRequest, fileIds: string[]) => {
+  removeFiles = async (customRequest: CustomRequest, fileIds: IFileObject[]) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -148,7 +152,7 @@ class File extends BaseRequest {
     } as error.IServerError;
   };
 
-  moveFiles = async (customRequest: CustomRequest, fileIds: string[], folderName: string) => {
+  moveFiles = async (customRequest: CustomRequest, fileIds: IFileObject[], toFolder: string) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -157,7 +161,12 @@ class File extends BaseRequest {
       } as types.IMoveFilesResponse;
     }
 
-    const body: Partial<IFileIds> = { ids: fileIds, folderName: folderName };
+    console.log('fileIds api', fileIds);
+
+    console.log('toFolder api', toFolder);
+
+    const body: Partial<IFileIds> = { ids: fileIds, toFolder: toFolder };
+    console.log('body', body);
 
     const res = await customRequest<void>({
       api: this.api.axios,

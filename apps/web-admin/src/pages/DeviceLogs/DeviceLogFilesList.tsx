@@ -128,7 +128,13 @@ const DeviceLogFilesList = () => {
   const handleDelete = useCallback(() => {
     setOpen(false);
     const ids = selectedDeviceLogFileIds.map((i) => {
-      return i.id;
+      return {
+        id: i.id,
+        appSystemId: i.appSystem?.id || '',
+        companyId: i.company?.id || '',
+        ext: i.ext || '',
+        folder: i.folder || '',
+      };
     });
     if (ids) {
       dispatch(actions.removeDeviceLogs(ids));

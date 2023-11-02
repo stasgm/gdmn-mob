@@ -100,7 +100,14 @@ const reducer: Reducer<IFileSystemState, FileSystemActionType> = (state = initia
       return {
         ...state,
         loading: false,
-        list: state.list.filter((i) => action.payload.indexOf(i.id) === -1),
+        list: state.list.filter(
+          (
+            i, //{
+          ) =>
+            // console.log('1234', action.payload);
+            action.payload.indexOf(i) === -1,
+          // action.payload.indexOf(i) === -1;
+        ),
       };
 
     case getType(fileSystemActions.removeFilesAsync.failure):
@@ -146,6 +153,13 @@ const reducer: Reducer<IFileSystemState, FileSystemActionType> = (state = initia
       return {
         ...state,
         pageParams: undefined,
+      };
+
+    case getType(fileSystemActions.clearFilesFilters):
+      return {
+        ...state,
+        pageParams: undefined,
+        list: [],
       };
 
     default:

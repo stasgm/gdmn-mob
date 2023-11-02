@@ -1,4 +1,4 @@
-import { IDeviceLog, IDeviceLogFiles, IFileIds } from '@lib/types';
+import { IDeviceLog, IDeviceLogFiles, IFileIds, IFileObject } from '@lib/types';
 
 import { error, deviceLog as types } from '../types';
 import { getParams, response2Log, sleep } from '../utils';
@@ -50,7 +50,7 @@ class DeviceLog extends BaseRequest {
     } as error.IServerError;
   };
 
-  getDeviceLog = async (customRequest: CustomRequest, deviceLogId: string) => {
+  getDeviceLog = async (customRequest: CustomRequest, params: Record<string, string | number>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -63,7 +63,8 @@ class DeviceLog extends BaseRequest {
     const res = await customRequest<IDeviceLog[]>({
       api: this.api.axios,
       method: 'GET',
-      url: `/deviceLogs/${deviceLogId}`,
+      url: `/deviceLogs/${params.id}`,
+      params,
     });
 
     if (res.type === 'SUCCESS') {
@@ -109,7 +110,7 @@ class DeviceLog extends BaseRequest {
     } as error.IServerError;
   };
 
-  removeDeviceLog = async (customRequest: CustomRequest, deviceLogId: string) => {
+  removeDeviceLog = async (customRequest: CustomRequest, params: Record<string, string | number>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -121,7 +122,8 @@ class DeviceLog extends BaseRequest {
     const res = await customRequest<void>({
       api: this.api.axios,
       method: 'DELETE',
-      url: `/deviceLogs/${deviceLogId}`,
+      url: `/deviceLogs/${params.id}`,
+      params,
     });
 
     if (res.type === 'SUCCESS') {
@@ -136,7 +138,7 @@ class DeviceLog extends BaseRequest {
     } as error.IServerError;
   };
 
-  removeDeviceLogs = async (customRequest: CustomRequest, deviceLogIds: string[]) => {
+  removeDeviceLogs = async (customRequest: CustomRequest, deviceLogIds: IFileObject[]) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 

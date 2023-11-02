@@ -1,4 +1,4 @@
-import { IFileSystem, IPathParams } from '@lib/types';
+import { IFileSystem, IPathParams, IFileObject } from '@lib/types';
 
 import { DataNotFoundException } from '../exceptions';
 
@@ -27,33 +27,33 @@ const findMany = async (params: Record<string, string | number>): Promise<IFileS
 //  * @param id ИД сформированный из названия файла
 //  * @returns Объект из JSON  найденного файла
 //  */
-const findOne = async (id: string): Promise<any> => {
-  return await getFile(id);
+const findOne = async (idObj: IFileObject): Promise<any> => {
+  return await getFile(idObj);
 };
 
 /**
 /* Удаляет  файл по ИД
 /* @param id ИД файла
 */
-const deleteOne = async (id: string): Promise<void> => {
-  return await deleteFileById(id);
+const deleteOne = async (idObj: IFileObject): Promise<void> => {
+  return await deleteFileById(idObj);
 };
 
 /**
 /* Удаляет множество файлов по массиву ИД
 /* @param id ИД файла
 */
-const deleteMany = async (ids: string[]): Promise<void> => {
+const deleteMany = async (ids: IFileObject[]): Promise<void> => {
   return await deleteManyFiles(ids);
 };
 
 /**
 /* Перемещает множество файлов по массиву ИД и названию папаки
 /* @param ids ИД файла массив
-/* @param folderName наименование папки, в которую перемещаем
+/* @param toFolder наименование папки, в которую перемещаем
 */
-const moveMany = async (ids: string[], folderName: string): Promise<void> => {
-  return await moveManyFiles(ids, folderName);
+const moveMany = async (ids: IFileObject[], toFolder: string): Promise<void> => {
+  return await moveManyFiles(ids, toFolder);
 };
 
 /**
@@ -61,8 +61,8 @@ const moveMany = async (ids: string[], folderName: string): Promise<void> => {
 /* @param id ИД файла
  * @param fileData Новые данные файла
 */
-const updateOne = async (id: string, fileData: any): Promise<void> => {
-  return await updateById(id, fileData);
+const updateOne = async (idObj: IFileObject, fileData: any): Promise<void> => {
+  return await updateById(idObj, fileData);
 };
 
 /**

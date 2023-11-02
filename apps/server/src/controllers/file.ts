@@ -1,6 +1,6 @@
 import { Context, ParameterizedContext } from 'koa';
 
-import { IFileIds } from '@lib/types';
+import { IFileIds, IFileObject } from '@lib/types';
 
 import { fileService } from '../services';
 
@@ -22,6 +22,9 @@ const getFiles = async (ctx: ParameterizedContext): Promise<void> => {
     filterText,
     fromRecord,
     toRecord,
+    folder,
+    dateFrom,
+    dateTo,
   } = ctx.query;
 
   if (typeof company === 'string' && company) {
@@ -72,23 +75,59 @@ const getFiles = async (ctx: ParameterizedContext): Promise<void> => {
     params.toRecord = Number(toRecord);
   }
 
+  if (typeof dateFrom === 'string' && dateFrom) {
+    params.dateFrom = dateFrom;
+  }
+
+  if (typeof dateTo === 'string' && dateTo) {
+    params.dateTo = dateTo;
+  }
+
+  if (typeof folder === 'string' && folder) {
+    params.folder = folder;
+  }
+
   const filesList = await fileService.findMany(params);
 
   ok(ctx as Context, filesList, 'getFiles: deviceLogs are successfully received');
 };
 
-const getFile = async (ctx: ParameterizedContext): Promise<void> => {
+export const getFileParams = async (ctx: ParameterizedContext): Promise<IFileObject> => {
   const { id } = ctx.request.params;
+  const { companyId, appSystemId, folder, ext } = ctx.query;
 
-  const file = await fileService.findOne(id);
+  const params: IFileObject = { id: id };
+
+  if (typeof companyId === 'string' && companyId) {
+    params.companyId = companyId;
+  }
+
+  if (typeof appSystemId === 'string' && appSystemId) {
+    params.appSystemId = appSystemId;
+  }
+
+  if (typeof folder === 'string' && folder) {
+    params.folder = folder;
+  }
+
+  if (typeof ext === 'string' && ext) {
+    params.ext = ext;
+  }
+
+  return params;
+};
+
+const getFile = async (ctx: ParameterizedContext): Promise<void> => {
+  const params = await getFileParams(ctx);
+  const file = await fileService.findOne(params);
 
   ok(ctx as Context, file, 'getFile: file is successfully  received');
 };
 
 const removeFile = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id } = ctx.request.params;
+  const params = await getFileParams(ctx);
 
-  await fileService.deleteOne(id);
+  await fileService.deleteOne(params);
 
   ok(ctx as Context, undefined, 'removeFile: file is successfully  deleted');
 };
@@ -100,27 +139,27 @@ const removeManyFiles = async (ctx: ParameterizedContext): Promise<void> => {
     notOk(ctx as Context);
     return;
   }
-  const { ids, folderName } = ctx.request.body as IFileIds;
+  const { ids, toFolder } = ctx.request.body as IFileIds;
 
-  if (action === 'move' && !folderName) {
+  if (action === 'move' && !toFolder) {
     notOk(ctx as Context);
     return;
   }
 
-  action === 'move' ? await fileService.moveMany(ids, folderName!) : await fileService.deleteMany(ids);
+  action === 'move' ? await fileService.moveMany(ids, toFolder!) : await fileService.deleteMany(ids);
   const actionName = action === 'move' ? 'moved' : 'deleted';
 
   ok(ctx as Context, undefined, `removeManyFiles: files are successfully  ${actionName}`);
 };
 
 const updateFile = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id } = ctx.request.params;
+  const params = await getFileParams(ctx);
 
   const fileData = ctx.request.body as Partial<any>;
 
-  const updatedFile = fileService.updateOne(id, fileData);
+  const updatedFile = fileService.updateOne(params, fileData);
 
-  ok(ctx as Context, updatedFile, `updateFile: file '${id}' is successfully updated`);
+  ok(ctx as Context, updatedFile, `updateFile: file '${params.id}' is successfully updated`);
 };
 
 const getFolders = async (ctx: ParameterizedContext): Promise<void> => {
