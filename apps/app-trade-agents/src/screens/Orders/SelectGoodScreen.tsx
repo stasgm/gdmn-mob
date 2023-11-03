@@ -76,24 +76,25 @@ const SelectGoodScreen = () => {
   const groups = useMemo(() => refGroup.data.concat(UNKNOWN_GROUP), [refGroup.data]);
   const doc = docSelectors.selectByDocId<IOrderDocument>(docId);
   const contactId = doc?.head.contact.id;
+  const outletId = doc?.head.outlet.id;
   const docs = useSelector((state) => state.documents.list) as IOrderDocument[];
-  const prevOrderByContact = useMemo(
+  const prevOrderByOutlet = useMemo(
     () =>
       doc && isShowPrevOrderLines
         ? docs
             .filter(
               (o) =>
                 o.documentType.name === 'order' &&
-                o.head.contact.id === contactId &&
+                o.head.outlet.id === outletId &&
                 o.id !== doc.id &&
                 new Date(o.documentDate).getTime() < new Date(doc.documentDate).getTime(),
             )
             .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime())
         : [],
-    [contactId, doc, isShowPrevOrderLines, docs],
+    [doc, isShowPrevOrderLines, docs, outletId],
   );
 
-  const prevLines = useMemo(() => (prevOrderByContact.length ? prevOrderByContact[0].lines : []), [prevOrderByContact]);
+  const prevLines = useMemo(() => (prevOrderByOutlet.length ? prevOrderByOutlet[0].lines : []), [prevOrderByOutlet]);
 
   const { parentGroupId } = useSelector((state) => state.app.formParams as IGroupFormParam);
 

@@ -55,7 +55,7 @@ const AppDialog = ({
           autoFocus
           right={
             !!text && (
-              <TextInput.Icon name="close" size={20} style={{ marginTop: 14 }} onPress={() => onChangeText('')} />
+              <TextInput.Icon icon="close" size={20} style={{ marginTop: 14 }} onPress={() => onChangeText('')} />
             )
           }
           keyboardType={keyboardType ? keyboardType : 'default'}

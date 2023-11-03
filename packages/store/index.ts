@@ -1,13 +1,4 @@
-export {
-  configureStore,
-  useDispatch,
-  useThunkDispatch,
-  useSelector,
-  AppDispatch,
-  RootState,
-  useAppStore,
-  useProxySelector,
-} from './src';
+export { configureStore, useDispatch, useThunkDispatch, useSelector, AppDispatch, RootState, useAppStore } from './src';
 export { PersistedMiddleware, SaveDataToDisk, LoadDataFromDisk, AppStorage } from './src/types';
 export { IFormParam, IRequestNotice, IErrorNotice, IScreenFormParams } from './src/app/types';
 export { IMultipartData, IMultipartItem } from './src/messages/types';
