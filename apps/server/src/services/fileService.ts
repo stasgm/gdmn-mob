@@ -10,6 +10,7 @@ import {
   deleteManyFiles,
   getListFolders,
   moveManyFiles,
+  searchFilesList,
 } from './fileUtils';
 
 import { getDb } from './dao/db';
@@ -20,6 +21,14 @@ import { getDb } from './dao/db';
  */
 const findMany = async (params: Record<string, string | number>): Promise<IFileSystem[]> => {
   return await readListFiles(params);
+};
+
+/**
+ * Возвращает множество файлов
+ * @returns Массив объектов файлов
+ */
+const searchInFiles = async (params: Record<string, string | number>): Promise<IFileSystem[]> => {
+  return await searchFilesList(params);
 };
 
 //**
@@ -84,4 +93,4 @@ const getFolders = async (appPathParams: IPathParams): Promise<string[]> => {
   return await getListFolders(appPathParams);
 };
 
-export { findMany, findOne, deleteOne, updateOne, deleteMany, getFolders, moveMany };
+export { findMany, findOne, deleteOne, updateOne, deleteMany, getFolders, moveMany, searchInFiles };

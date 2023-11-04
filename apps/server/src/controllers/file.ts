@@ -25,7 +25,14 @@ const getFiles = async (ctx: ParameterizedContext): Promise<void> => {
     folder,
     dateFrom,
     dateTo,
+    action,
+    searchQuery,
   } = ctx.query;
+
+  if (action && (action !== 'search' || !searchQuery)) {
+    notOk(ctx as Context);
+    return;
+  }
 
   if (typeof company === 'string' && company) {
     params.company = company;
@@ -83,11 +90,15 @@ const getFiles = async (ctx: ParameterizedContext): Promise<void> => {
     params.dateTo = dateTo;
   }
 
+  if (typeof searchQuery === 'string' && searchQuery) {
+    params.searchQuery = searchQuery;
+  }
+
   if (typeof folder === 'string' && folder) {
     params.folder = folder;
   }
 
-  const filesList = await fileService.findMany(params);
+  const filesList = action ? await fileService.searchInFiles(params) : await fileService.findMany(params);
 
   ok(ctx as Context, filesList, 'getFiles: deviceLogs are successfully received');
 };

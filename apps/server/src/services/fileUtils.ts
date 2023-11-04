@@ -19,6 +19,7 @@ import {
   getFoundString,
   getPathSystem,
   idObj2fullFileName,
+  searchInTextFile,
 } from '../utils/fileHelper';
 
 import { checkDeviceLogsFiles } from './errorLogUtils';
@@ -304,6 +305,29 @@ export const readListFiles = async (params: Record<string, string | number>): Pr
   });
   files = files.sort((a, b) => new Date(b.mdate).getTime() - new Date(a.mdate).getTime());
   return getListPart(files, params);
+};
+
+export const searchFilesList = async (params: Record<string, string | number>): Promise<IFileSystem[]> => {
+  const paramsWithout = (({ searchQuery, ...filterParams }) => filterParams)(params);
+  const searchString = params.searchQuery as string;
+  const files: IFileSystem[] = await readListFiles(paramsWithout);
+  let prev: IFileSystem[] = [];
+  const searchFiles = files.reduce(async (_, cur: IFileSystem) => {
+    const curObj: IFileObject = {
+      id: cur.id,
+      companyId: cur.company?.id,
+      appSystemId: cur.appSystem?.id,
+      folder: cur.folder,
+      ext: cur.ext,
+    };
+
+    const fullName = idObj2fullFileName(curObj);
+
+    const isInclude = !fullName ? false : await searchInTextFile(fullName, searchString, undefined, undefined);
+    if (isInclude) prev = [...prev, cur as IFileSystem];
+    return prev;
+  }, Promise.resolve([] as IFileSystem[]));
+  return searchFiles;
 };
 
 export const getFile = async (fid: IFileObject): Promise<any> => {
