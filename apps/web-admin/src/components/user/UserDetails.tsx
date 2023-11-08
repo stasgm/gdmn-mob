@@ -21,7 +21,8 @@ import * as yup from 'yup';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 import ComboBox from '../ComboBox';
 import { useSelector } from '../../store';
@@ -45,19 +46,13 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
   const { list: companies, loading: loadingСompanies } = useSelector((state) => state.companies);
   const { list: users, loading: loadingUsers } = useSelector((state) => state.users);
 
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
-  const handleMouseDownPassword = (event: { preventDefault: () => void }) => {
-    event.preventDefault();
-  };
-  const [showVerifyPassword, setShowVerifyPassword] = React.useState(false);
+  const [showVerifyPassword, setShowVerifyPassword] = useState(false);
   const handleClickShowVerifyPassword = () => setShowVerifyPassword((show) => !show);
 
-  const handleMouseDownVerifyPassword = (event: { preventDefault: () => void }) => {
-    event.preventDefault();
-  };
   const { user: authUser } = useSelector((state) => state.auth);
 
   const formik = useFormik<IUser | NewUser | IUserCredentials>({
@@ -440,12 +435,8 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={handleClickShowPassword}
-                            onMouseDown={handleMouseDownPassword}
-                          >
-                            {showPassword ? <Visibility /> : <VisibilityOff />}
+                          <IconButton onClick={handleClickShowPassword}>
+                            {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
                           </IconButton>
                         </InputAdornment>
                       ),
@@ -472,12 +463,8 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={handleClickShowVerifyPassword}
-                            onMouseDown={handleMouseDownVerifyPassword}
-                          >
-                            {showVerifyPassword ? <Visibility /> : <VisibilityOff />}
+                          <IconButton onClick={handleClickShowVerifyPassword}>
+                            {showVerifyPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
                           </IconButton>
                         </InputAdornment>
                       ),
