@@ -21,6 +21,7 @@ import { IProcess, ICompany } from '@lib/types';
 import { adminPath } from '../../utils/constants';
 
 import { getMaxHeight } from '../../utils/helpers';
+import { setMaxHeight } from '../../utils/hooksMaxHeight';
 
 interface IProps {
   processes: IProcess[];
@@ -39,20 +40,6 @@ const ProcessListTable = ({
   const [selectedProcessIds, setSelectedProcessIds] = useState<IProcess[]>(selectedProcesses);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
-
-  const [maxHeight, setMaxHeight] = useState(getMaxHeight());
-
-  useEffect(() => {
-    const updateDimension = () => {
-      setMaxHeight(getMaxHeight())
-    }
-    window.addEventListener('resize', updateDimension);
-
-
-    return(() => {
-        window.removeEventListener('resize', updateDimension);
-    })
-}, [maxHeight])
 
   const handleSelectAll = (event: any) => {
     let newSelectedProcessIds;
@@ -173,7 +160,7 @@ const ProcessListTable = ({
   return (
     <Card>
       <PerfectScrollbar>
-        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight }}>
+        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight: setMaxHeight(getMaxHeight()) }}>
           <Table>
             <TableHead>
               <TableRow>

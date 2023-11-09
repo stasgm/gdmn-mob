@@ -15,6 +15,7 @@ import CircularProgressWithContent from '../../components/CircularProgressWidthC
 import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
 import SortableTable from '../../components/SortableTable';
 import { getMaxHeight } from '../../utils/helpers';
+import { setMaxHeight } from '../../utils/hooksMaxHeight';
 
 const CompanyList = () => {
   const navigate = useNavigate();
@@ -24,19 +25,7 @@ const CompanyList = () => {
   const { user: authUser } = useSelector((state) => state.auth);
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
-  const [maxHeight, setMaxHeight] = useState(getMaxHeight());
-
-  useEffect(() => {
-    const updateDimension = () => {
-      setMaxHeight(getMaxHeight())
-    }
-    window.addEventListener('resize', updateDimension);
-
-
-    return(() => {
-        window.removeEventListener('resize', updateDimension);
-    })
-}, [maxHeight])
+  const maxHeight = setMaxHeight(getMaxHeight());
 
   const fetchCompanies = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {

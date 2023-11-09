@@ -16,24 +16,13 @@ import actions from '../../store/user';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import { IToolBarButton, IHeadCells, IPageParam } from '../../types';
 import { getMaxHeight } from '../../utils/helpers';
+import { setMaxHeight } from '../../utils/hooksMaxHeight';
 
 const UserList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-
-  const [maxHeight, setMaxHeight] = useState(getMaxHeight());
-
-  useEffect(() => {
-    const updateDimension = () => {
-      setMaxHeight(getMaxHeight());
-    };
-    window.addEventListener('resize', updateDimension);
-
-    return () => {
-      window.removeEventListener('resize', updateDimension);
-    };
-  }, [maxHeight]);
+  const maxHeight = setMaxHeight(getMaxHeight());
 
   const { list, loading, pageParams } = useSelector((state) => state.users);
 

@@ -26,6 +26,7 @@ import { adminPath } from '../../utils/constants';
 import { IFileFilter, IFilePageParam, IPageParam } from '../../types';
 import { useDispatch } from '../../store';
 import { getMaxHeight } from '../../utils/helpers';
+import { setMaxHeight } from '../../utils/hooksMaxHeight';
 
 interface IProps {
   files: IFileSystem[];
@@ -61,20 +62,6 @@ const FileListTable = ({
     pageParams?.limit && !isNaN(Number(pageParams?.limit)) ? Number(pageParams?.limit) : 10,
   );
   const [page, setPage] = useState(pageParams?.page && !isNaN(Number(pageParams?.page)) ? Number(pageParams.page) : 0);
-
-  const [maxHeight, setMaxHeight] = useState(getMaxHeight());
-
-  useEffect(() => {
-    const updateDimension = () => {
-      setMaxHeight(getMaxHeight())
-    }
-    window.addEventListener('resize', updateDimension);
-
-
-    return(() => {
-        window.removeEventListener('resize', updateDimension);
-    })
-}, [maxHeight])
 
   const initialValues = useMemo(() => {
     return {
@@ -221,7 +208,7 @@ const FileListTable = ({
   return (
     <Card>
       <PerfectScrollbar>
-        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight }}>
+        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight: setMaxHeight(getMaxHeight()) }}>
           <Table>
             <TableHead>
               <TableRow>

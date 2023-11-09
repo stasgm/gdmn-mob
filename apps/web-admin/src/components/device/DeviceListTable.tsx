@@ -26,6 +26,7 @@ import { IDevice, IActivationCode } from '@lib/types';
 import { deviceStates, adminPath } from '../../utils/constants';
 import { IPageParam } from '../../types';
 import { getMaxHeight } from '../../utils/helpers';
+import { setMaxHeight } from '../../utils/hooksMaxHeight';
 
 interface IProps {
   devices: IDevice[];
@@ -51,18 +52,6 @@ const DeviceListTable = ({
   pageParams,
 }: IProps) => {
   const [selectedDeviceIds, setSelectedDeviceIds] = useState<IDevice[]>(selectedDevices);
-  const [maxHeight, setMaxHeight] = useState(getMaxHeight());
-
-  useEffect(() => {
-    const updateDimension = () => {
-      setMaxHeight(getMaxHeight())
-    }
-    window.addEventListener('resize', updateDimension);
-
-    return(() => {
-        window.removeEventListener('resize', updateDimension);
-    })
-}, [maxHeight])
   const [limit, setLimit] = useState(
     pageParams?.limit && !isNaN(Number(pageParams?.limit)) ? Number(pageParams?.limit) : 10,
   );
@@ -222,7 +211,7 @@ const DeviceListTable = ({
   return (
     <Card>
       <PerfectScrollbar>
-        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight}}>
+        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight: setMaxHeight(getMaxHeight()) }}>
           <Table>
             <TableHead>
               <TableRow>

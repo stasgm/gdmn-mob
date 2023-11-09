@@ -13,6 +13,8 @@ import actions from '../../store/company';
 import CircularProgressWithContent from '../CircularProgressWidthContent';
 import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
 import SortableTable from '../SortableTable';
+import { getMaxHeight } from '../../utils/helpers';
+import { setMaxHeight } from '../../utils/hooksMaxHeight';
 
 import selectors from '../../store/company/selectors';
 
@@ -25,6 +27,8 @@ const AppSystemCompany = ({ appSystem }: IProps) => {
   const { loading, errorMessage, pageParams } = useSelector((state) => state.companies);
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
   const list = selectors.companyByAppSystemID(appSystem.id);
+
+  const maxHeight = setMaxHeight(getMaxHeight());
 
   const fetchCompanies = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
@@ -127,7 +131,7 @@ const AppSystemCompany = ({ appSystem }: IProps) => {
                 path={'/app/companies/'}
                 onSetPageParams={handleSetPageParams}
                 pageParams={pageParams}
-                style={{ overflowY: 'auto', maxHeight: window.innerHeight - 268 }}
+                style={{ overflowY: 'auto', maxHeight }}
               />
             </Box>
           )}

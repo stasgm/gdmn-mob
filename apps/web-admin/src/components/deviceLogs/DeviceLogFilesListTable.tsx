@@ -23,6 +23,7 @@ import { useFormik } from 'formik';
 import { adminPath } from '../../utils/constants';
 import { IDeviceLogFileFilter, IDeviceLogPageParam, IPageParam } from '../../types';
 import { getMaxHeight } from '../../utils/helpers';
+import { setMaxHeight } from '../../utils/hooksMaxHeight';
 
 interface IProps {
   deviceLogFiles: IDeviceLogFiles[];
@@ -67,20 +68,6 @@ const DeviceLogFilesListTable = ({
       mDate: '',
     };
   }, []);
-
-  const [maxHeight, setMaxHeight] = useState(getMaxHeight());
-
-  useEffect(() => {
-    const updateDimension = () => {
-      setMaxHeight(getMaxHeight())
-    }
-    window.addEventListener('resize', updateDimension);
-
-
-    return(() => {
-        window.removeEventListener('resize', updateDimension);
-    })
-}, [maxHeight])
 
   const navigate = useNavigate();
 
@@ -205,7 +192,7 @@ const DeviceLogFilesListTable = ({
   return (
     <Card>
       <PerfectScrollbar>
-        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight }}>
+        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight: setMaxHeight(getMaxHeight()) }}>
           <Table>
             <TableHead>
               <TableRow>
