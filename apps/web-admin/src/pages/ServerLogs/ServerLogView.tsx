@@ -60,19 +60,19 @@ const ServerLogView = () => {
     dispatch(serverLogActions.serverLogActions.clearError());
   };
 
-  // if (!serverLog) {
-  //   return (
-  //     <Box
-  //       sx={{
-  //         display: 'flex',
-  //         alignItems: 'center',
-  //         p: 3,
-  //       }}
-  //     >
-  //       {loading ? <CircularProgressWithContent content={'Идет загрузка данных...'} /> : 'Сообщение не найдено'}
-  //     </Box>
-  //   );
-  // }
+  if (!serverLog) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          p: 3,
+        }}
+      >
+        {loading ? <CircularProgressWithContent content={'Идет загрузка данных...'} /> : 'Сообщение не найдено'}
+      </Box>
+    );
+  }
 
   const buttons: IToolBarButton[] = [
     {
@@ -114,7 +114,7 @@ const ServerLogView = () => {
             <ToolBarAction buttons={buttons} />
           </Box>
         </Box>
-        {!loading ? (serverLog ? (
+        {serverLog ? (
           <>
             <Box
               sx={{
@@ -134,7 +134,7 @@ const ServerLogView = () => {
               </Typography>
             </Grid>
           </Box>
-        )) : null}
+        )}
       </Box>
 
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />

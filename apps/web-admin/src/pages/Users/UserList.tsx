@@ -99,7 +99,6 @@ const UserList = () => {
     { id: 'name', label: 'Пользователь', sortEnable: true },
     { id: 'lastName', label: 'Фамилия', sortEnable: true },
     { id: 'firstName', label: 'Имя', sortEnable: true },
-    { id: 'externalId', label: 'ID из ERP', sortEnable: false },
     { id: 'id', label: 'ID', sortEnable: false },
     { id: 'externalId', label: 'ID из ERP системы', sortEnable: false },
     { id: 'erpUser', label: 'Пользователь ERP', sortEnable: true },
@@ -151,6 +150,3 @@ const UserList = () => {
 };
 
 export default UserList;
-function getCurrentDimension(): any {
-  throw new Error('Function not implemented.');
-}

@@ -24,7 +24,6 @@ const CompanyList = () => {
   const { list, loading, errorMessage, pageParams } = useSelector((state) => state.companies);
   const { user: authUser } = useSelector((state) => state.auth);
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
-
   const maxHeight = setMaxHeight(getMaxHeight());
 
   const fetchCompanies = useCallback(

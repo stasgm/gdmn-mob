@@ -52,6 +52,7 @@ const DeviceListTable = ({
   pageParams,
 }: IProps) => {
   const [selectedDeviceIds, setSelectedDeviceIds] = useState<IDevice[]>(selectedDevices);
+
   const [limit, setLimit] = useState(
     pageParams?.limit && !isNaN(Number(pageParams?.limit)) ? Number(pageParams?.limit) : 10,
   );

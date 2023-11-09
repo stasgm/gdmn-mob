@@ -19,7 +19,6 @@ import {
 import { IProcess, ICompany } from '@lib/types';
 
 import { adminPath } from '../../utils/constants';
-
 import { getMaxHeight } from '../../utils/helpers';
 import { setMaxHeight } from '../../utils/hooksMaxHeight';
 
