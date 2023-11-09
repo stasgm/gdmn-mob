@@ -21,7 +21,16 @@ import {
   SimpleDialog,
 } from '@lib/mobile-ui';
 
-import { generateId, getDateString, keyExtractor, useSendDocs, sleep, useSendOneRefRequest } from '@lib/mobile-hooks';
+import {
+  generateId,
+  getDateString,
+  keyExtractor,
+  useSendDocs,
+  sleep,
+  useSendOneRefRequest,
+  isNumeric,
+  round,
+} from '@lib/mobile-hooks';
 
 import { IDocumentType, INamedEntity, ScreenState } from '@lib/types';
 
@@ -40,10 +49,12 @@ import {
   getDocToSend,
   getLineGood,
   getRemGoodListByContact,
+  getUpdatedLine,
 } from '../../utils/helpers';
-import { IAddressStoreEntity, IGood, IRemains, IRemGood } from '../../store/app/types';
+import { IAddressStoreEntity, IBarcode, IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
+import QuantDialog from '../../components/QuantDialog';
 
 export interface IScanerObject {
   item?: IMoveLine;
@@ -63,12 +74,21 @@ export const MoveToViewScreen = () => {
   const [barcode, setBarcode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
+  const [scanned, setScanned] = useState(false);
+
+  const [visibleQuantPackDialog, setVisibleQuantPackDialog] = useState(false);
+  const [quantPack, setQuantPack] = useState('');
+  const [quantPallet, setQuantPallet] = useState('');
+  const [newwLine, setNewLine] = useState<IMoveLine | undefined>(undefined);
+
   const id = useRoute<RouteProp<MoveToStackParamList, 'MoveToView'>>().params?.id;
   const doc = docSelectors.selectByDocId<IMoveDocument>(id);
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
   const loading = useSelector((state) => state.app.loading);
 
   const [visibleSendDialog, setVisibleSendDialog] = useState(false);
+
+  const ref = useRef<TextInput>(null);
 
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
   const lineSum = lines?.reduce(
@@ -130,6 +150,7 @@ export const MoveToViewScreen = () => {
     setVisibleDialog(false);
     setBarcode('');
     setErrorMessage('');
+    setScanned(false);
     Keyboard.dismiss();
     handleFocus();
   };
@@ -183,6 +204,76 @@ export const MoveToViewScreen = () => {
   //   Keyboard.dismiss();
   //   handleFocus();
   // };
+
+  const handleAddQuantPack = useCallback(
+    (quantity: number) => {
+      const line = newwLine;
+      if (!line) {
+        return;
+      }
+
+      const lineBarcode: IBarcode = {
+        barcode: line.barcode || '',
+        numReceived: line.numReceived,
+        quantPack: line.quantPack,
+        shcode: line.good.shcode,
+        weight: line.weight,
+        workDate: line.workDate,
+        time: line.time,
+      };
+
+      const weight = round(line?.weight * quantity, 3);
+
+      const good =
+        remainsUse && goodRemains.length
+          ? goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === `0000${line.good.shcode}`.slice(-4))
+          : undefined;
+
+      if (remainsUse && goodRemains.length) {
+        if (!good) {
+          alertWithSound('Ошибка!', 'Товар не найден.', handleFocus);
+
+          return;
+        } else if (good.remains < weight - line.weight) {
+          alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.', handleFocus);
+
+          return;
+        }
+      }
+
+      const newLine: IMoveLine = getUpdatedLine(remainsUse, lineBarcode, line, quantity, weight);
+
+      navigation.navigate('SelectCell', { docId: id, item: newLine, mode: 0 });
+
+      // dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+    },
+    [goodRemains, id, navigation, newwLine, remainsUse],
+  );
+
+  const handleEditQuantPack = useCallback(() => {
+    if (!isNumeric(quantPack)) {
+      alertWithSound('Ошибка!', 'Неправильное количество.', handleFocus);
+      return;
+    }
+    setScanned(false);
+    handleAddQuantPack(Number(quantPack));
+
+    setVisibleQuantPackDialog(false);
+    setQuantPack('');
+    setQuantPallet('');
+    Keyboard.dismiss();
+    handleFocus();
+  }, [handleAddQuantPack, quantPack]);
+
+  const handleDismissQuantPack = () => {
+    setScanned(false);
+
+    setVisibleQuantPackDialog(false);
+    setQuantPack('');
+    setQuantPallet('');
+    Keyboard.dismiss();
+    handleFocus();
+  };
 
   const handleEditDocHead = useCallback(() => {
     navigation.navigate('MoveToEdit', { id });
@@ -359,10 +450,6 @@ export const MoveToViewScreen = () => {
     [doc?.head.fromDepart?.isAddressStore, doc?.head.toDepart?.isAddressStore, doc?.status, lines?.length],
   );
 
-  const [scanned, setScanned] = useState(false);
-
-  const ref = useRef<TextInput>(null);
-
   const handleErrorMessage = useCallback((visible: boolean, text: string) => {
     if (visible) {
       setErrorMessage(text);
@@ -412,17 +499,17 @@ export const MoveToViewScreen = () => {
         return;
       }
 
-      if (barc.weight < goodBarcodeSettings?.boxWeight) {
-        handleErrorMessage(visibleDialog, 'Отсканированный товар не является поддоном!');
-        return;
-      }
+      // if (barc.weight < goodBarcodeSettings?.boxWeight) {
+      //   handleErrorMessage(visibleDialog, 'Отсканированный товар не является поддоном!');
+      //   return;
+      // }
 
       if (!lineGood.isRightWeight) {
         handleErrorMessage(visibleDialog, 'Вес товара превышает вес в остатках!');
         return;
       }
 
-      const line = doc.lines?.find((i) => i.barcode === barc.barcode);
+      const line = doc.lines?.find((i) => i.barcode === barc.barcode || i.scannedBarcode === barc.barcode);
 
       if (line) {
         handleErrorMessage(visibleDialog, 'Данный штрих-код уже добавлен!');
@@ -452,7 +539,8 @@ export const MoveToViewScreen = () => {
         isToAddressed
       ) {
         if (goodBarcodeSettings.boxWeight > newLine.weight) {
-          handleErrorMessage(visibleDialog, `Вес поддона не может быть меньше ${goodBarcodeSettings.boxWeight}!`);
+          setVisibleQuantPackDialog(true);
+          setNewLine(newLine);
           return;
         }
 
@@ -505,7 +593,7 @@ export const MoveToViewScreen = () => {
           ref.current?.clear();
         }, ONE_SECOND_IN_MS);
     }
-  }, [scanned, ref, visibleDialog]);
+  }, [scanned, ref, visibleDialog, visibleQuantPackDialog]);
 
   useEffect(() => {
     if (screenState === 'sent' || screenState === 'deleted') {
@@ -585,16 +673,19 @@ export const MoveToViewScreen = () => {
         okLabel={'Найти'}
         errorMessage={errorMessage}
       />
-      {/* <AppDialog
-        title="Количество"
+      <QuantDialog
         visible={visibleQuantPackDialog}
-        text={quantPack}
-        onChangeText={setQuantPack}
+        textPack={quantPack}
+        textPallet={quantPallet}
+        onChangeTextPack={setQuantPack}
+        onChangeTextPallet={setQuantPallet}
         onCancel={handleDismissQuantPack}
         onOk={handleEditQuantPack}
         okLabel={'Ок'}
+        isPack={true}
         keyboardType="numbers-and-punctuation"
-      /> */}
+        okDisabled={!quantPack || (newwLine?.weight || 0) * Number(quantPack) < goodBarcodeSettings.boxWeight}
+      />
       <SimpleDialog
         visible={visibleSendDialog}
         title={'Внимание!'}

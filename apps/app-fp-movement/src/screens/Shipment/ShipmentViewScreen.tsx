@@ -511,6 +511,7 @@ const ShipmentViewScreen = () => {
 
       if (!lineGood.good) {
         setVisibleRequestDialog(true);
+        setScanned(false);
         return;
       }
 
