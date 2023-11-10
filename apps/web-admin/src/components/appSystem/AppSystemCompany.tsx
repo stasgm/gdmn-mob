@@ -14,9 +14,9 @@ import CircularProgressWithContent from '../CircularProgressWidthContent';
 import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
 import SortableTable from '../SortableTable';
 import { getMaxHeight } from '../../utils/helpers';
-import { setMaxHeight } from '../../utils/hooksMaxHeight';
 
 import selectors from '../../store/company/selectors';
+import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
   appSystem: IAppSystem;
@@ -28,7 +28,7 @@ const AppSystemCompany = ({ appSystem }: IProps) => {
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
   const list = selectors.companyByAppSystemID(appSystem.id);
 
-  const maxHeight = setMaxHeight(getMaxHeight());
+  const maxHeight = useWindowResizeMaxHeight(getMaxHeight());
 
   const fetchCompanies = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
