@@ -14,13 +14,14 @@ import TotalUsers from '../components/dashboard/Totalusers';
 import TotalDevices from '../components/dashboard/Totaldevices';
 import CompaniesAppSystem from '../components/dashboard/GridAppSystem';
 import TotalAppSystems from '../components/dashboard/TotalappSystems';
-import Graph from '../components/dashboard/Graph';
 
 import appsystemActions from '../store/appSystem';
 import companyActions from '../store/company';
 import userActions from '../store/user';
 import deviceActions from '../store/device';
 import CircularProgressWithContent from '../components/CircularProgressWidthContent';
+import SimpleLineChart from '../components/dashboard/ReChart';
+import Graph from '../components/dashboard/Graph';
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -137,9 +138,7 @@ const Dashboard = () => {
             ))}
           </Grid>
         </Container>
-        {
-          //<Graph selectedCompany={selectedCompany} />
-        }
+        <SimpleLineChart />
       </Box>
     </>
   );
