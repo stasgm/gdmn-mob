@@ -57,6 +57,7 @@ const addOne = (userData: NewUser): IUser => {
     disabled: userData.disabled,
     creationDate: new Date().toISOString(),
     editionDate: new Date().toISOString(),
+    accessCode: userData.accessCode,
   });
 
   return makeUser(user);
@@ -140,6 +141,7 @@ const updateOne = (id: string, userData: Partial<IUser & { password: string }>):
     disabled: userData.disabled === undefined ? oldUser.disabled : userData.disabled,
     creationDate: oldUser.creationDate,
     editionDate: new Date().toISOString(),
+    accessCode: userData.accessCode === undefined ? oldUser.accessCode : userData.accessCode,
   });
 
   const updatedUser = users.findById(id);
@@ -317,7 +319,8 @@ export const findManyWithDevice = (params: Record<string, string | number>): IUs
   const { devices, deviceBindings } = getDb();
   return userList.map((user) => {
     const deviceUids = deviceBindings.data.reduce<(string | undefined)[]>((prev, item) => {
-      return item.userId === user.id && item.state === 'ACTIVE' && !!devices.findById(item.deviceId)?.uid
+      const device = devices.findById(item.deviceId);
+      return item.userId === user.id && item.state !== 'BLOCKED' && !!device?.uid && device?.state === 'ACTIVE'
         ? [...prev, devices.findById(item.deviceId)?.uid]
         : prev;
     }, []) as string[];
@@ -334,7 +337,8 @@ export const findOneWithDevice = (id: string): IUserWithDevice => {
   const user = findOne(id);
   const { devices, deviceBindings } = getDb();
   const deviceUids = deviceBindings.data.reduce<(string | undefined)[]>((prev, item) => {
-    return item.userId === user.id && item.state === 'ACTIVE' && !!devices.findById(item.deviceId)?.uid
+    const device = devices.findById(item.deviceId);
+    return item.userId === user.id && item.state !== 'BLOCKED' && !!device?.uid && device?.state === 'ACTIVE'
       ? [...prev, devices.findById(item.deviceId)?.uid]
       : prev;
   }, []) as string[];
@@ -363,6 +367,7 @@ export const makeUser = (user: IDBUser): IUser => {
     appSystem: user.appSystemId ? appSystems.getNamedItem(user.appSystemId) : undefined,
     erpUser: user.erpUserId ? users.getNamedItem(user.erpUserId) : undefined,
     disabled: user.disabled,
+    accessCode: user.accessCode,
   };
 };
 

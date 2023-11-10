@@ -2,25 +2,45 @@ import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
-import { Box, Button, Container, Link, TextField, Typography, CircularProgress } from '@mui/material';
+import {
+  Box,
+  Button,
+  Container,
+  Link,
+  TextField,
+  Typography,
+  CircularProgress,
+  InputAdornment,
+  IconButton,
+} from '@mui/material';
 import { IUserCredentials } from '@lib/types';
 
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { authActions, useAuthThunkDispatch, useSelector } from '@lib/store';
 
 import Reaptcha from 'reaptcha';
 
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+
 import Logo from '../components/Logo';
 
-import { adminPath, hostName, validPassword } from '../utils/constants';
+import { adminPath, validPassword } from '../utils/constants';
 import { webRequest } from '../store/webRequest';
 
 const Register = () => {
   const navigate = useNavigate();
   const dispatch = useAuthThunkDispatch();
   const { error, loading, status, config } = useSelector((state) => state.auth);
-  const withCaptcha = config.server === hostName;
+  const withCaptcha = config.protocol.toLowerCase().includes('https');
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const [showVerifyPassword, setShowVerifyPassword] = useState(false);
+  const handleClickShowVerifyPassword = () => setShowVerifyPassword((show) => !show);
 
   const handleSubmit = async (values: IUserCredentials) => {
     const res = await dispatch(authActions.signup(webRequest(dispatch, authActions), values));
@@ -141,10 +161,19 @@ const Register = () => {
               name="password"
               onBlur={formik.handleBlur}
               onChange={formik.handleChange}
-              type="password"
               value={formik.values.password}
               variant="outlined"
               autoComplete="new-password"
+              type={showPassword ? 'text' : 'password'}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={handleClickShowPassword}>
+                      {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
             <TextField
               error={Boolean(formik.touched.verifyPassword && formik.errors.verifyPassword)}
@@ -156,10 +185,19 @@ const Register = () => {
               name="verifyPassword"
               onBlur={formik.handleBlur}
               onChange={formik.handleChange}
-              type="password"
               value={formik.values.verifyPassword}
               variant="outlined"
               autoComplete="new-password"
+              type={showVerifyPassword ? 'text' : 'password'}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={handleClickShowVerifyPassword}>
+                      {showVerifyPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
             <Box style={{ color: 'GrayText' }}>
               Пароль должен содержать не менее восьми знаков, включать буквы (заглавные и строчные), цифры и специальные

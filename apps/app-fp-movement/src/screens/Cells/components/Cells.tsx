@@ -69,7 +69,7 @@ const Cells = ({
 
       return (
         <TouchableOpacity
-          key={item.name}
+          key={`${item.name}-${item.sortOrder}`}
           style={[localStyles.buttons, backColorStyle]}
           onPress={() =>
             item.defaultGroup?.id && !item.barcode
@@ -91,7 +91,7 @@ const Cells = ({
     ({ data }: { data: ICellData[] }) => (
       <View style={styles.flexDirectionRow}>
         {data?.map((item) => (
-          <Cell key={item.name} item={item} />
+          <Cell key={`${item.name}-${item.sortOrder}`} item={item} />
         ))}
       </View>
     ),

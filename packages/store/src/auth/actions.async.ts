@@ -237,6 +237,27 @@ const setDemoMode = (): AppThunk<
   };
 };
 
+const checkAccessCode = (
+  customRequest: CustomRequest,
+  code: string,
+): AppThunk<
+  Promise<ActionType<typeof actions.checkAccessCodeAsync>>,
+  AuthState,
+  ActionType<typeof actions.checkAccessCodeAsync>
+> => {
+  return async (dispatch) => {
+    dispatch(actions.checkAccessCodeAsync.request(''));
+
+    const response = await api.auth.verifyAccessCode(customRequest, code);
+
+    if (response.type === 'VERIFY_ACCESS_CODE') {
+      return dispatch(actions.checkAccessCodeAsync.success(response.check));
+    }
+
+    return dispatch(actions.checkAccessCodeAsync.failure(response.message));
+  };
+};
+
 export default {
   getDeviceByUid,
   activateDevice,
@@ -248,4 +269,5 @@ export default {
   useAuthThunkDispatch,
   getCompany,
   setDemoMode,
+  checkAccessCode,
 };

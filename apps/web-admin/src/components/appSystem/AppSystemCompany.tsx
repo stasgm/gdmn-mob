@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router';
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import CachedIcon from '@mui/icons-material/Cached';
 import { ICompany, IAppSystem } from '@lib/types';
 
@@ -22,12 +21,8 @@ interface IProps {
 }
 
 const AppSystemCompany = ({ appSystem }: IProps) => {
-  const navigate = useNavigate();
-  const location = useLocation();
-
   const dispatch: AppDispatch = useDispatch();
   const { loading, errorMessage, pageParams } = useSelector((state) => state.companies);
-  const { user: authUser } = useSelector((state) => state.auth);
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
   const list = selectors.companyByAppSystemID(appSystem.id);
 
@@ -71,18 +66,6 @@ const AppSystemCompany = ({ appSystem }: IProps) => {
     fetchCompanies();
   };
 
-  const handleClearError = () => {
-    dispatch(actions.companyActions.clearError());
-  };
-
-  const handleAddCompany = () => {
-    if (list.length && !(authUser?.role === 'SuperAdmin')) {
-      dispatch(actions.companyActions.setError('Компания уже существует'));
-    } else {
-      return navigate(`${location.pathname}/new`);
-    }
-  };
-
   const handleSetPageParams = useCallback(
     (pageParams: IPageParam) => {
       dispatch(
@@ -101,13 +84,6 @@ const AppSystemCompany = ({ appSystem }: IProps) => {
       sx: { mx: 1 },
       onClick: () => fetchCompanies(),
       icon: <CachedIcon />,
-    },
-    {
-      name: 'Добавить',
-      color: 'primary',
-      variant: 'contained',
-      onClick: handleAddCompany,
-      icon: <AddCircleOutlineIcon />,
     },
   ];
 
@@ -135,7 +111,6 @@ const AppSystemCompany = ({ appSystem }: IProps) => {
           <ToolbarActionsWithSearch
             buttons={buttons}
             searchTitle={'Найти компанию'}
-            // valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}

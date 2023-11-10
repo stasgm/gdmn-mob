@@ -1,16 +1,33 @@
-import { Box, Card, CardContent, Grid, TextField, Divider, Button, Checkbox } from '@mui/material';
+import {
+  Box,
+  Card,
+  CardContent,
+  Grid,
+  TextField,
+  Divider,
+  Button,
+  Checkbox,
+  Tooltip,
+  InputAdornment,
+  IconButton,
+} from '@mui/material';
 
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { INamedEntity, IUser, IUserCredentials, NewUser } from '@lib/types';
 import { FormikTouched, useFormik, Field, FormikProvider } from 'formik';
 import * as yup from 'yup';
 
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import RefreshIcon from '@mui/icons-material/Refresh';
+
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 import ComboBox from '../ComboBox';
 import { useSelector } from '../../store';
 import { validPassword } from '../../utils/constants';
+import { getCode } from '../../utils/helpers';
 
 interface IProps {
   loading: boolean;
@@ -29,7 +46,15 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
   const { list: companies, loading: loadingСompanies } = useSelector((state) => state.companies);
   const { list: users, loading: loadingUsers } = useSelector((state) => state.users);
 
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const [showVerifyPassword, setShowVerifyPassword] = useState(false);
+  const handleClickShowVerifyPassword = () => setShowVerifyPassword((show) => !show);
+
   const { user: authUser } = useSelector((state) => state.auth);
+
   const formik = useFormik<IUser | NewUser | IUserCredentials>({
     enableReinitialize: true,
     initialValues: isAdmin
@@ -39,6 +64,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
           email: user.email || '',
           password: (user as NewUser).password || '',
           verifyPassword: '',
+          accessCode: user.accessCode || '',
         }
       : {
           ...user,
@@ -55,6 +81,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
           erpUser: (user.erpUser || null) as INamedEntity,
           externalId: user.externalId || '',
           disabled: user.disabled || false,
+          accessCode: user.accessCode || '',
         },
 
     validationSchema: yup.object().shape({
@@ -66,8 +93,19 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
     }),
     onSubmit: (values) => {
       isAdmin
-        ? onSubmitAdmin &&
-          onSubmitAdmin({ ...values, name: values.name.trim(), password: (values as IUserCredentials).password.trim() })
+        ? (user as IUser).id
+          ? onSubmit({
+              ...values,
+              name: values.name.trim(),
+              email: (values as IUser | NewUser).email?.trim(),
+              externalId: (values as IUser | NewUser).externalId?.trim(),
+            } as IUser | NewUser)
+          : onSubmitAdmin &&
+            onSubmitAdmin({
+              ...values,
+              name: values.name.trim(),
+              password: (values as IUserCredentials).password.trim(),
+            })
         : onSubmit({
             ...values,
             name: values.name.trim(),
@@ -80,6 +118,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
           } as IUser | NewUser);
     },
   });
+
   const appSystems =
     authUser?.role === 'SuperAdmin'
       ? companies?.find((i) => i.id === (formik.values as NewUser | IUser).company?.id)?.appSystems || []
@@ -109,6 +148,11 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
     !validPassword.test((formik.values as NewUser | IUserCredentials).password) &&
     open &&
     (isAdmin || (user.role && user.role !== 'User'));
+
+  const handleCreateCode = () => {
+    const code = getCode();
+    formik.setFieldValue('accessCode', code);
+  };
 
   return (
     <FormikProvider value={formik}>
@@ -155,7 +199,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                   </>
                 )}
 
-                <Grid item md={6} xs={12}>
+                <Grid item md={isAdmin ? 12 : 6} xs={12}>
                   <TextField
                     error={formik.touched.name && Boolean(formik.errors.name)}
                     fullWidth
@@ -346,6 +390,31 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                     </Grid>
                   </>
                 )}
+                <Grid item md={6} xs={12} display={isAdmin ? 'block' : 'none'}>
+                  <Grid container>
+                    <Box style={{ flexGrow: 1 }}>
+                      <TextField
+                        error={
+                          (formik.touched as FormikTouched<NewUser | IUser>).accessCode &&
+                          Boolean((formik.errors as FormikTouched<NewUser | IUser>).accessCode)
+                        }
+                        fullWidth
+                        label="Код доступа"
+                        name="accessCode"
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        value={(formik.values as NewUser | IUser).accessCode}
+                        variant="outlined"
+                        disabled={loading}
+                      />
+                    </Box>
+                    <Tooltip title="Сгенерировать код">
+                      <Button onClick={handleCreateCode}>
+                        <RefreshIcon />
+                      </Button>
+                    </Tooltip>
+                  </Grid>
+                </Grid>
                 <Grid item md={6} xs={12} display={open ? 'block' : 'none'}>
                   <TextField
                     error={
@@ -359,10 +428,19 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                     variant="outlined"
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
-                    type="password"
                     disabled={loading}
                     value={(formik.values as NewUser | IUserCredentials).password.trim()}
                     autoComplete="new-password"
+                    type={showPassword ? 'text' : 'password'}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={handleClickShowPassword}>
+                            {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
                 <Grid item md={6} xs={12} display={open ? 'block' : 'none'}>
@@ -378,10 +456,19 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                     variant="outlined"
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
-                    type="password"
                     disabled={loading}
                     value={(formik.values as NewUser | IUserCredentials).verifyPassword?.trim()}
                     autoComplete="new-password"
+                    type={showVerifyPassword ? 'text' : 'password'}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={handleClickShowVerifyPassword}>
+                            {showVerifyPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
                 {passwordCondition && (

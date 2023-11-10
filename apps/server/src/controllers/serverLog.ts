@@ -22,7 +22,7 @@ const getServerLog = async (ctx: ParameterizedContext): Promise<void> => {
 
   const serverLog = await serverLogService.findOne(id, paramStart, paramEnd);
 
-  ok(ctx as Context, serverLog, 'getServerLog: DeviceLog is successfully  received');
+  ok(ctx as Context, serverLog, 'getServerLog: ServerLog is successfully  received');
 };
 
 export { getServerLogs, getServerLog };

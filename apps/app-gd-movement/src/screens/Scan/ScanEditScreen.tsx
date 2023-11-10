@@ -16,8 +16,10 @@ import {
   RadioGroup,
   AppActivityIndicator,
   navBackButton,
+  Switch,
+  LargeText,
 } from '@lib/mobile-ui';
-import { useDispatch, documentActions, appActions, useSelector, refSelectors, docSelectors } from '@lib/store';
+import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
 import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks';
 
@@ -42,7 +44,7 @@ export const ScanEditScreen = () => {
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'scan');
 
-  const doc = docSelectors.selectByDocType<IScanDocument>('scan')?.find((e) => e.id === id);
+  const doc = useMemo(() => documents?.find((e) => e.id === id), [documents, id]);
 
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {
@@ -51,9 +53,8 @@ export const ScanEditScreen = () => {
     number: docNumber,
     comment: docComment,
     status: docStatus,
-  } = useMemo(() => {
-    return formParams;
-  }, [formParams]);
+    isBindGood: docIsBindGood = false,
+  } = useMemo(() => formParams, [formParams]);
 
   useEffect(() => {
     return () => {
@@ -72,6 +73,7 @@ export const ScanEditScreen = () => {
           status: doc.status,
           comment: doc.head.comment,
           department: doc.head.department,
+          isBindGood: doc.head.isBindGood,
         }),
       );
     } else {
@@ -90,7 +92,7 @@ export const ScanEditScreen = () => {
     if (!scanType) {
       return Alert.alert('Ошибка!', 'Тип документа для сканирования не найден', [{ text: 'OK' }]);
     }
-    if (!docNumber || !docDate || !docDepartment) {
+    if (!docNumber || !docDate || (!docDepartment && !docIsBindGood)) {
       return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
@@ -107,6 +109,7 @@ export const ScanEditScreen = () => {
         head: {
           comment: docComment && docComment.trim(),
           department: docDepartment,
+          isBindGood: docIsBindGood,
         },
         lines: [],
         creationDate: createdDate,
@@ -135,6 +138,7 @@ export const ScanEditScreen = () => {
           ...doc.head,
           comment: docComment && docComment.trim(),
           department: docDepartment,
+          isBindGood: docIsBindGood,
         },
         lines: doc.lines,
         creationDate: doc.creationDate || updatedDate,
@@ -144,7 +148,19 @@ export const ScanEditScreen = () => {
       dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
       navigation.navigate('ScanView', { id });
     }
-  }, [scanType, docNumber, docDate, docDepartment, id, docComment, dispatch, navigation, doc, docStatus]);
+  }, [
+    scanType,
+    docNumber,
+    docDate,
+    docDepartment,
+    id,
+    docComment,
+    docIsBindGood,
+    dispatch,
+    navigation,
+    doc,
+    docStatus,
+  ]);
 
   const renderRight = useCallback(() => <SaveButton onPress={handleSave} />, [handleSave]);
 
@@ -162,24 +178,27 @@ export const ScanEditScreen = () => {
   // Окно календаря для выбора даты
   const [showDate, setShowDate] = useState(false);
 
-  const handleApplyDate = (_event: any, selectedDate: Date | undefined) => {
-    //Закрываем календарь и записываем выбранную дату
-    setShowDate(false);
+  const handleApplyDate = useCallback(
+    (_event: any, selectedDate: Date | undefined) => {
+      //Закрываем календарь и записываем выбранную дату
+      setShowDate(false);
 
-    if (selectedDate) {
-      dispatch(appActions.setFormParams({ documentDate: selectedDate.toISOString() }));
-    }
-  };
+      if (selectedDate) {
+        dispatch(appActions.setFormParams({ documentDate: selectedDate.toISOString() }));
+      }
+    },
+    [dispatch],
+  );
 
-  const handlePresentDate = () => {
+  const handlePresentDate = useCallback(() => {
     if (docStatus !== 'DRAFT') {
       return;
     }
 
     setShowDate(true);
-  };
+  }, [docStatus]);
 
-  const handlePresentDepartment = () => {
+  const handlePresentDepartment = useCallback(() => {
     if (isBlocked) {
       return;
     }
@@ -189,7 +208,12 @@ export const ScanEditScreen = () => {
       fieldName: 'department',
       value: docDepartment && [docDepartment],
     });
-  };
+  }, [docDepartment, isBlocked, navigation]);
+
+  const handleChangeIsBindGood = useCallback(
+    () => dispatch(appActions.setFormParams({ isBindGood: !docIsBindGood })),
+    [dispatch, docIsBindGood],
+  );
 
   const handleChangeStatus = useCallback(() => {
     dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
@@ -242,7 +266,6 @@ export const ScanEditScreen = () => {
             onPress={handlePresentDate}
             disabled={docStatus !== 'DRAFT'}
           />
-
           <SelectableInput
             label="Подразделение"
             value={docDepartment?.name}
@@ -258,6 +281,10 @@ export const ScanEditScreen = () => {
             disabled={isBlocked}
             clearInput={true}
           />
+          <View style={localStyles.switch}>
+            <LargeText>Привязать ТМЦ</LargeText>
+            <Switch value={docIsBindGood} onValueChange={handleChangeIsBindGood} />
+          </View>
         </ScrollView>
         {showDate && (
           <DateTimePicker
@@ -284,5 +311,11 @@ export const localStyles = StyleSheet.create({
     marginBottom: 12,
     borderWidth: 1,
     borderRadius: 2,
+  },
+  switch: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingHorizontal: 12,
+    justifyContent: 'space-between',
   },
 });

@@ -1,7 +1,7 @@
 {
   "name": "@apps/web-admin",
   "displayName": "web-admin",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "web-admin",
   "license": "MIT",

@@ -43,11 +43,12 @@ const getActivationCode: Config = {
   },
 };
 
-const checkDevice: Config = {
+const checkAccessCode: Config = {
   validate: {
-    query: {
-      deviceId: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор устройства')),
-    },
+    type: 'json',
+    body: Joi.object({
+      code: Joi.string().required().error(new InvalidParameterException('Не указан код доступа')),
+    }),
   },
 };
 
@@ -60,4 +61,4 @@ const getDeviceStatus: Config = {
   },
 };
 
-export { login, signup, verifyCode, getActivationCode, checkDevice, getDeviceStatus };
+export { login, signup, verifyCode, getActivationCode, getDeviceStatus, checkAccessCode };

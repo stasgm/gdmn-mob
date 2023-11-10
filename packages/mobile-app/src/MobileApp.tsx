@@ -68,8 +68,6 @@ const AppRoot = ({ items, dashboardScreens, onSync }: Omit<IApp, 'store'>) => {
     };
   }, [authDispatch, user]);
 
-  const timeOutRef = useRef<NodeJS.Timer | null>(null);
-
   //Если в параметрах указана Автосинхронизация, выполняем синхронизацию при запуске
   useEffect(() => {
     if (autoSync && !loading && !isDemo) {
@@ -84,15 +82,12 @@ const AppRoot = ({ items, dashboardScreens, onSync }: Omit<IApp, 'store'>) => {
     if (!autoSync || loading || isDemo) {
       return;
     }
-    timeOutRef.current = setTimeout(() => {
+    const timeOutId = setTimeout(() => {
       syncData();
     }, autoSynchPeriod * 60 * 1000);
 
     return () => {
-      if (timeOutRef.current) {
-        clearInterval(timeOutRef.current);
-        timeOutRef.current = null;
-      }
+      clearTimeout(timeOutId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoSynchPeriod, autoSync, loading, isDemo]);
