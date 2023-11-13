@@ -78,6 +78,7 @@ const FileListTable = ({
   }, []);
 
   const navigate = useNavigate();
+  const maxHeight = useWindowResizeMaxHeight(getMaxHeight());
 
   const formik = useFormik<IFileFilter>({
     enableReinitialize: true,
@@ -208,7 +209,7 @@ const FileListTable = ({
   return (
     <Card>
       <PerfectScrollbar>
-        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight: useWindowResizeMaxHeight(getMaxHeight()) }}>
+        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight }}>
           <Table>
             <TableHead>
               <TableRow>

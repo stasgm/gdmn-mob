@@ -53,6 +53,8 @@ const DeviceListTable = ({
 }: IProps) => {
   const [selectedDeviceIds, setSelectedDeviceIds] = useState<IDevice[]>(selectedDevices);
 
+  const maxHeight = useWindowResizeMaxHeight(getMaxHeight());
+
   const [limit, setLimit] = useState(
     pageParams?.limit && !isNaN(Number(pageParams?.limit)) ? Number(pageParams?.limit) : 10,
   );
@@ -212,7 +214,7 @@ const DeviceListTable = ({
   return (
     <Card>
       <PerfectScrollbar>
-        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight: useWindowResizeMaxHeight(getMaxHeight()) }}>
+        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight }}>
           <Table>
             <TableHead>
               <TableRow>

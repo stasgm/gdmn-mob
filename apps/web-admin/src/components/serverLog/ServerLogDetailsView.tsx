@@ -10,6 +10,7 @@ interface IProps {
 }
 
 const ServerLogDetailsView = ({ serverLog, title }: IProps) => {
+  const maxHeight = useWindowResizeMaxHeight(getMaxHeight());
   return (
     <Card>
       <CardHeader title={title || 'Общая информация'} />

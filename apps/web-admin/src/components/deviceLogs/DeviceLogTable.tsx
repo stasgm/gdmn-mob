@@ -16,6 +16,7 @@ interface IProps {
 const DeviceLogTable = ({ deviceLog = [], limitRows = 0 }: IProps) => {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
+  const maxHeight = useWindowResizeMaxHeight(getMaxHeight());
 
   const handleLimitChange = (event: any) => {
     setLimit(event.target.value);
@@ -59,7 +60,7 @@ const DeviceLogTable = ({ deviceLog = [], limitRows = 0 }: IProps) => {
   return (
     <Card>
       <PerfectScrollbar>
-        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight: useWindowResizeMaxHeight(getMaxHeight()) }}>
+        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight }}>
           <Table>
             <TableHead>
               <TableRow>

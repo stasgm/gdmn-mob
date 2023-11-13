@@ -57,6 +57,8 @@ const DeviceLogFilesListTable = ({
   );
   const [page, setPage] = useState(pageParams?.page && !isNaN(Number(pageParams?.page)) ? Number(pageParams.page) : 0);
 
+  const maxHeight = useWindowResizeMaxHeight(getMaxHeight());
+
   const initialValues = useMemo(() => {
     return {
       company: '',
@@ -192,7 +194,7 @@ const DeviceLogFilesListTable = ({
   return (
     <Card>
       <PerfectScrollbar>
-        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight: useWindowResizeMaxHeight(getMaxHeight()) }}>
+        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight }}>
           <Table>
             <TableHead>
               <TableRow>

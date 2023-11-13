@@ -39,6 +39,7 @@ const ProcessListTable = ({
   const [selectedProcessIds, setSelectedProcessIds] = useState<IProcess[]>(selectedProcesses);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
+  const maxHeight = useWindowResizeMaxHeight(getMaxHeight());
 
   const handleSelectAll = (event: any) => {
     let newSelectedProcessIds;
@@ -159,7 +160,7 @@ const ProcessListTable = ({
   return (
     <Card>
       <PerfectScrollbar>
-        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight: useWindowResizeMaxHeight(getMaxHeight()) }}>
+        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight }}>
           <Table>
             <TableHead>
               <TableRow>
