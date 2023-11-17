@@ -1,6 +1,6 @@
 import { useSelector } from '../';
 
-const usersByCompanyId = (companyId: string) => {
+const usersByCompanyId = (companyId?: string) => {
   return useSelector((state) => state.users.list.filter((u) => u.company?.id === companyId));
 };
 

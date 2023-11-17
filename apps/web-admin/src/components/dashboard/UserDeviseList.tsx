@@ -28,8 +28,8 @@ interface IProps {
 }
 
 const UserDeviseList = ({ company }: IProps) => {
-  if (t) const users = userSelectors.usersByCompanyId(company?.id);
-  const device = deviceSelectors.deviceByCompanyId(company.id);
+  const users = userSelectors.usersByCompanyId(company?.id);
+  const device = deviceSelectors.deviceByCompanyId(company?.id);
 
   return (
     <Card>
