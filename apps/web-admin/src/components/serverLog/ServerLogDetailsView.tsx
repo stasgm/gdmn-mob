@@ -15,7 +15,7 @@ const ServerLogDetailsView = ({ serverLog, title }: IProps) => {
       <CardHeader title={title || 'Общая информация'} />
       <Divider />
       <CardContent>
-        <Grid sx={{ overflowX: 'auto', overflowY: 'auto', maxHeight: useWindowResizeMaxHeight() }}>
+        <Grid sx={{ overflowX: 'auto', overflowY: 'auto', maxHeight }}>
           <Grid container>
             <Grid item>
               <pre>
