@@ -25,7 +25,6 @@ import { IDevice, IActivationCode } from '@lib/types';
 
 import { deviceStates, adminPath } from '../../utils/constants';
 import { IPageParam } from '../../types';
-import { getMaxHeight } from '../../utils/helpers';
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
@@ -53,7 +52,7 @@ const DeviceListTable = ({
 }: IProps) => {
   const [selectedDeviceIds, setSelectedDeviceIds] = useState<IDevice[]>(selectedDevices);
 
-  const maxHeight = useWindowResizeMaxHeight(getMaxHeight());
+  const maxHeight = useWindowResizeMaxHeight();
 
   const [limit, setLimit] = useState(
     pageParams?.limit && !isNaN(Number(pageParams?.limit)) ? Number(pageParams?.limit) : 10,

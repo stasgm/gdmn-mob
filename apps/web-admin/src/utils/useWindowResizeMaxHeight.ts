@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 
 import { getMaxHeight } from './helpers';
 
-export const useWindowResizeMaxHeight = (initialMaxHeight: number) => {
-  const [maxHeight, setMaxHeight] = useState(initialMaxHeight);
+export const useWindowResizeMaxHeight = () => {
+  const [maxHeight, setMaxHeight] = useState(getMaxHeight());
 
   useEffect(() => {
     const updateDimension = () => {

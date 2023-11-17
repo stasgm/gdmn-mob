@@ -15,14 +15,13 @@ import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/user';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import { IToolBarButton, IHeadCells, IPageParam } from '../../types';
-import { getMaxHeight } from '../../utils/helpers';
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 const UserList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-  const maxHeight = useWindowResizeMaxHeight(getMaxHeight());
+  const maxHeight = useWindowResizeMaxHeight();
 
   const { list, loading, pageParams } = useSelector((state) => state.users);
 

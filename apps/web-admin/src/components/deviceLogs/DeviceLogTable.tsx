@@ -5,7 +5,6 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Box, Card, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@mui/material';
 import { IDeviceLog } from '@lib/types';
 
-import { getMaxHeight } from '../../utils/helpers';
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
@@ -16,7 +15,7 @@ interface IProps {
 const DeviceLogTable = ({ deviceLog = [], limitRows = 0 }: IProps) => {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
-  const maxHeight = useWindowResizeMaxHeight(getMaxHeight());
+  const maxHeight = useWindowResizeMaxHeight();
 
   const handleLimitChange = (event: any) => {
     setLimit(event.target.value);

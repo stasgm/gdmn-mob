@@ -19,7 +19,6 @@ import {
 import { IProcess, ICompany } from '@lib/types';
 
 import { adminPath } from '../../utils/constants';
-import { getMaxHeight } from '../../utils/helpers';
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
@@ -39,7 +38,7 @@ const ProcessListTable = ({
   const [selectedProcessIds, setSelectedProcessIds] = useState<IProcess[]>(selectedProcesses);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
-  const maxHeight = useWindowResizeMaxHeight(getMaxHeight());
+  const maxHeight = useWindowResizeMaxHeight();
 
   const handleSelectAll = (event: any) => {
     let newSelectedProcessIds;
