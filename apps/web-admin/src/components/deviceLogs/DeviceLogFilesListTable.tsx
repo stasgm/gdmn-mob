@@ -22,6 +22,7 @@ import { useFormik } from 'formik';
 
 import { adminPath } from '../../utils/constants';
 import { IDeviceLogFileFilter, IDeviceLogPageParam, IPageParam } from '../../types';
+import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
   deviceLogFiles: IDeviceLogFiles[];
@@ -54,6 +55,8 @@ const DeviceLogFilesListTable = ({
     pageParams?.limit && !isNaN(Number(pageParams?.limit)) ? Number(pageParams?.limit) : 10,
   );
   const [page, setPage] = useState(pageParams?.page && !isNaN(Number(pageParams?.page)) ? Number(pageParams.page) : 0);
+
+  const maxHeight = useWindowResizeMaxHeight();
 
   const initialValues = useMemo(() => {
     return {
@@ -190,7 +193,7 @@ const DeviceLogFilesListTable = ({
   return (
     <Card>
       <PerfectScrollbar>
-        <Box sx={{ p: 1, overflowX: 'auto' }}>
+        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight }}>
           <Table>
             <TableHead>
               <TableRow>
