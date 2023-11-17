@@ -7,7 +7,7 @@ interface IProps {
   value: number;
 }
 
-const TotalCompanies = (props: IProps) => {
+const TotalAppSystems = (props: IProps) => {
   const { value } = props;
 
   const { palette } = useTheme();
@@ -41,4 +41,4 @@ const TotalCompanies = (props: IProps) => {
   );
 };
 
-export default TotalCompanies;
+export default TotalAppSystems;

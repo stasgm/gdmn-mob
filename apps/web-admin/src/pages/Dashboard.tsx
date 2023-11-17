@@ -9,11 +9,11 @@ import Companies from '../components/dashboard/GridCompany';
 
 import { useDispatch, useSelector } from '../store';
 
-import TotalCompanies from '../components/dashboard/Totalcompanies';
-import TotalUsers from '../components/dashboard/Totalusers';
-import TotalDevices from '../components/dashboard/Totaldevices';
+import TotalCompanies from '../components/dashboard/TotalCompanies';
+import TotalUsers from '../components/dashboard/TotalUsers';
+import TotalDevices from '../components/dashboard/TotalDevices';
 import CompaniesAppSystem from '../components/dashboard/GridAppSystem';
-import TotalAppSystems from '../components/dashboard/TotalappSystems';
+import TotalAppSystems from '../components/dashboard/TotalAppSystems';
 
 import appsystemActions from '../store/appSystem';
 import companyActions from '../store/company';
@@ -21,7 +21,7 @@ import userActions from '../store/user';
 import deviceActions from '../store/device';
 import CircularProgressWithContent from '../components/CircularProgressWidthContent';
 import SimpleLineChart from '../components/dashboard/ReChart';
-import Graph from '../components/dashboard/Graph';
+import TimeIntervalSelect from '../components/dashboard/PeriodList';
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -50,6 +50,7 @@ const Dashboard = () => {
   const [state, setState] = useState<ICompany[]>([]);
   const [selectedAppSystem, setSelectedAppSystem] = useState<IAppSystem>();
   const [selectedCompany, setSelectedCompany] = useState<ICompany>();
+  const [period, setPeriod] = useState<string[]>(['', '']);
 
   console.log('state', state);
 
@@ -138,7 +139,8 @@ const Dashboard = () => {
             ))}
           </Grid>
         </Container>
-        <SimpleLineChart />
+        {/* <SimpleLineChart /> */}
+        <TimeIntervalSelect callBack={(period) => setPeriod(period)} />
       </Box>
     </>
   );
