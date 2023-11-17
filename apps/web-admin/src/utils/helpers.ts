@@ -11,8 +11,6 @@ export const isDate = (date: any) => {
 export const getNumber = (value: any, defaultValue: number) =>
   value !== undefined && !isNaN(Number(value)) ? Number(value) : defaultValue;
 
-export const getMaxHeight = () => (window.innerHeight - 268 < 200 ? 200 : window.innerHeight - 268);
-
 export const getCode = () => {
   return `${Math.floor(1000 + Math.random() * 9000)}`;
 };

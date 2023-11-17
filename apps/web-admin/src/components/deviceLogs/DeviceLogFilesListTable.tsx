@@ -22,7 +22,6 @@ import { useFormik } from 'formik';
 
 import { adminPath } from '../../utils/constants';
 import { IDeviceLogFileFilter, IDeviceLogPageParam, IPageParam } from '../../types';
-import { getMaxHeight } from '../../utils/helpers';
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
@@ -57,7 +56,7 @@ const DeviceLogFilesListTable = ({
   );
   const [page, setPage] = useState(pageParams?.page && !isNaN(Number(pageParams?.page)) ? Number(pageParams.page) : 0);
 
-  const maxHeight = useWindowResizeMaxHeight(getMaxHeight());
+  const maxHeight = useWindowResizeMaxHeight();
 
   const initialValues = useMemo(() => {
     return {

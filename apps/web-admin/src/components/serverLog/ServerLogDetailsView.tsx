@@ -1,7 +1,6 @@
 import { IServerLogResponse } from '@lib/types';
 import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@mui/material';
 
-import { getMaxHeight } from '../../utils/helpers';
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
@@ -10,13 +9,13 @@ interface IProps {
 }
 
 const ServerLogDetailsView = ({ serverLog, title }: IProps) => {
-  const maxHeight = useWindowResizeMaxHeight(getMaxHeight());
+  const maxHeight = useWindowResizeMaxHeight();
   return (
     <Card>
       <CardHeader title={title || 'Общая информация'} />
       <Divider />
       <CardContent>
-        <Grid sx={{ overflowX: 'auto', overflowY: 'auto', maxHeight: useWindowResizeMaxHeight(getMaxHeight()) }}>
+        <Grid sx={{ overflowX: 'auto', overflowY: 'auto', maxHeight: useWindowResizeMaxHeight() }}>
           <Grid container>
             <Grid item>
               <pre>

@@ -25,7 +25,6 @@ import actions from '../../store/file';
 import { adminPath } from '../../utils/constants';
 import { IFileFilter, IFilePageParam, IPageParam } from '../../types';
 import { useDispatch } from '../../store';
-import { getMaxHeight } from '../../utils/helpers';
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
@@ -78,7 +77,7 @@ const FileListTable = ({
   }, []);
 
   const navigate = useNavigate();
-  const maxHeight = useWindowResizeMaxHeight(getMaxHeight());
+  const maxHeight = useWindowResizeMaxHeight();
 
   const formik = useFormik<IFileFilter>({
     enableReinitialize: true,
