@@ -1,31 +1,23 @@
 import { useState, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
-import {
-  Box,
-  Card,
-  Checkbox,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TablePagination,
-  TableRow,
-  Typography,
-} from '@mui/material';
+import { Box, Card, Checkbox, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@mui/material';
 
 import { IServerLogFile } from '@lib/types';
 
 import { adminPath } from '../../utils/constants';
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
+import { IPageParam } from '../../types';
 
 interface IProps {
   serverLogs: IServerLogFile[];
   selectedServerLogs?: IServerLogFile[];
   limitRows?: number;
   onChangeSelectedDevices?: (newSelectedDeviceIds: any[]) => void;
+  onSetPageParams?: (pageParams: IPageParam) => void;
+  pageParams?: IPageParam | undefined;
 }
 
 const ServerLogListTable = ({
@@ -33,6 +25,8 @@ const ServerLogListTable = ({
   onChangeSelectedDevices,
   selectedServerLogs = [],
   limitRows = 0,
+  onSetPageParams,
+  pageParams,
 }: IProps) => {
   const navigate = useNavigate();
 
@@ -79,10 +73,12 @@ const ServerLogListTable = ({
 
   const handleLimitChange = (event: any) => {
     setLimit(event.target.value);
+    onSetPageParams && onSetPageParams({ ...pageParams, limit: event.target.value });
   };
 
   const handlePageChange = (_event: any, newPage: any) => {
     setPage(newPage);
+    onSetPageParams && onSetPageParams({ ...pageParams, page: newPage });
   };
 
   useEffect(() => {
