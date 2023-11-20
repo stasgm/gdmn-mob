@@ -21,6 +21,6 @@ flowchart TD;
 
     classDef core fill:#ff7777,color:#000,stroke:#550000,stroke-width:2px;
     classDef outlier fill:#ffffff,color:#000,stroke:#000000,stroke-width:2px,stroke-daskarray: 5, 5;
-    class T,S,M core;
-    class E,Mngmt outlier;
+    class C core;
+    class B outlier;
 ```
