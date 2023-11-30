@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, TextInput, Keyboard } from 'react-native';
-import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
+import { View, TextInput, Keyboard, TouchableHighlight, StyleProp, ViewStyle } from 'react-native';
+import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Audio } from 'expo-av';
 
@@ -35,7 +35,7 @@ import { DashboardStackParamList } from '@lib/mobile-navigation';
 
 import { barcodeSettings, IInventoryDocument, IInventoryLine } from '../../store/types';
 import { InventoryStackParamList } from '../../navigation/Root/types';
-import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
+import { getStatusColor, lineTypes, ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import { alertWithSound, alertWithSoundMulti, getBarcode, getDocToSend, getUpdatedLine } from '../../utils/helpers';
 import { IAddressStoreEntity, IBarcode, IGood } from '../../store/app/types';
@@ -55,6 +55,8 @@ export const InventoryViewScreen = () => {
   const docDispatch = useDocThunkDispatch();
   const navigation =
     useNavigation<StackNavigationProp<InventoryStackParamList & DashboardStackParamList, 'InventoryView'>>();
+
+  const { colors } = useTheme();
 
   const id = useRoute<RouteProp<InventoryStackParamList, 'InventoryView'>>().params?.id;
   const doc = docSelectors.selectByDocId<IInventoryDocument>(id);
@@ -318,11 +320,40 @@ export const InventoryViewScreen = () => {
     [goodBarcodeSettings?.boxWeight],
   );
 
+  const [lineType, setLineType] = useState(lineTypes[1].id);
+
+  const LineTypes = useCallback(
+    () => (
+      <View style={styles.containerCenter}>
+        {lineTypes.map((e, i) => {
+          return (
+            <TouchableHighlight
+              activeOpacity={0.7}
+              underlayColor="#DDDDDD"
+              key={e.id}
+              style={[
+                styles.btnTab,
+                i === 0 && styles.firstBtnTab,
+                i === lineTypes.length - 1 && styles.lastBtnTab,
+                e.id === lineType && { backgroundColor: colors.primary },
+                { borderColor: colors.primary },
+              ]}
+              onPress={() => setLineType(e.id)}
+            >
+              <LargeText style={{ color: e.id === lineType ? colors.background : colors.text }}>{e.value}</LargeText>
+            </TouchableHighlight>
+          );
+        })}
+      </View>
+    ),
+    [colors.background, colors.primary, colors.text, lineType],
+  );
+
   const renderItem = useCallback(
     ({ item }: { item: IInventoryLine }) => {
       return (
         <ListItemLine
-          key={item.id}
+          // key={item.id}
           readonly={doc?.status !== 'DRAFT' || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
           onPress={() => handlePressLine(item.weight)}
         >
@@ -352,6 +383,8 @@ export const InventoryViewScreen = () => {
     },
     [doc?.head.fromDepart?.isAddressStore, doc?.status, handlePressLine, lines?.length],
   );
+
+  const LastLine = useMemo(() => renderItem, [renderItem]);
 
   const [scanned, setScanned] = useState(false);
 
@@ -467,6 +500,11 @@ export const InventoryViewScreen = () => {
     getScannedObject(barcode);
   };
 
+  const viewStyle: StyleProp<ViewStyle> = useMemo(
+    () => ({ ...styles.container, justifyContent: lineType === 'last' ? 'flex-start' : 'center' }),
+    [lineType],
+  );
+
   const [key, setKey] = useState(1);
 
   const setScan = (brc: string) => {
@@ -517,7 +555,7 @@ export const InventoryViewScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={viewStyle}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
         title={doc.documentType.description || ''}
@@ -530,6 +568,7 @@ export const InventoryViewScreen = () => {
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
         </View>
       </InfoBlock>
+      <LineTypes />
       <TextInput
         style={styles.scanInput}
         key={key}
@@ -539,16 +578,26 @@ export const InventoryViewScreen = () => {
         showSoftInputOnFocus={false}
         onChangeText={(text) => !scanned && setScan(text)}
       />
-      <FlashList
-        data={lines}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        ItemSeparatorComponent={ItemSeparator}
-        estimatedItemSize={60}
-        extraData={[lines, isBlocked]}
-        keyboardShouldPersistTaps={'always'}
-      />
-      {lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
+      {lineType === 'all' ? (
+        <>
+          <FlashList
+            data={lines}
+            keyExtractor={keyExtractor}
+            renderItem={renderItem}
+            ItemSeparatorComponent={ItemSeparator}
+            estimatedItemSize={60}
+            extraData={[lines, isBlocked]}
+            keyboardShouldPersistTaps={'always'}
+          />
+          {lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
+        </>
+      ) : lineType === 'last' && lines?.[0] ? (
+        <View style={styles.spaceBetween}>
+          <LastLine item={lines?.[0]} />
+          {lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
+        </View>
+      ) : null}
+
       <AppDialog
         title="Введите штрих-код"
         visible={visibleDialog}

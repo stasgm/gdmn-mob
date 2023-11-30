@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, TextInput, Keyboard } from 'react-native';
-import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
+import { View, TextInput, Keyboard, TouchableHighlight, StyleProp, ViewStyle } from 'react-native';
+import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Audio } from 'expo-av';
 
@@ -33,7 +33,7 @@ import { FlashList } from '@shopify/flash-list';
 
 import { barcodeSettings, ILaboratoryDocument, ILaboratoryLine, IShipmentDocument } from '../../store/types';
 import { LaboratoryStackParamList } from '../../navigation/Root/types';
-import { getStatusColor, ONE_SECOND_IN_MS, ONE_T_IN_KG } from '../../utils/constants';
+import { getStatusColor, lineTypes, ONE_SECOND_IN_MS, ONE_T_IN_KG } from '../../utils/constants';
 
 import {
   alertWithSound,
@@ -59,6 +59,8 @@ export const LaboratoryViewScreen = () => {
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<LaboratoryStackParamList, 'LaboratoryView'>>();
   const isFocused = useIsFocused();
+
+  const { colors } = useTheme();
 
   const id = useRoute<RouteProp<LaboratoryStackParamList, 'LaboratoryView'>>().params?.id;
   const doc = docSelectors.selectByDocId<ILaboratoryDocument>(id);
@@ -349,11 +351,40 @@ export const LaboratoryViewScreen = () => {
     });
   }, [navigation, renderRight]);
 
+  const [lineType, setLineType] = useState(lineTypes[1].id);
+
+  const LineTypes = useCallback(
+    () => (
+      <View style={styles.containerCenter}>
+        {lineTypes.map((e, i) => {
+          return (
+            <TouchableHighlight
+              activeOpacity={0.7}
+              underlayColor="#DDDDDD"
+              key={e.id}
+              style={[
+                styles.btnTab,
+                i === 0 && styles.firstBtnTab,
+                i === lineTypes.length - 1 && styles.lastBtnTab,
+                e.id === lineType && { backgroundColor: colors.primary },
+                { borderColor: colors.primary },
+              ]}
+              onPress={() => setLineType(e.id)}
+            >
+              <LargeText style={{ color: e.id === lineType ? colors.background : colors.text }}>{e.value}</LargeText>
+            </TouchableHighlight>
+          );
+        })}
+      </View>
+    ),
+    [colors.background, colors.primary, colors.text, lineType],
+  );
+
   const renderItem = useCallback(
     ({ item }: { item: ILaboratoryLine }) => {
       return (
         <ListItemLine
-          key={item.id}
+          // key={item.id}
           readonly={doc?.status !== 'DRAFT' || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
           onPress={() => setVisibleWeightDialog(true)}
         >
@@ -374,6 +405,8 @@ export const LaboratoryViewScreen = () => {
     },
     [doc?.status, lines?.length],
   );
+
+  const LastLine = useMemo(() => renderItem, [renderItem]);
 
   const [scanned, setScanned] = useState(false);
 
@@ -512,6 +545,11 @@ export const LaboratoryViewScreen = () => {
     }
   }, [navigation, screenState]);
 
+  const viewStyle: StyleProp<ViewStyle> = useMemo(
+    () => ({ ...styles.container, justifyContent: lineType === 'last' ? 'flex-start' : 'center' }),
+    [lineType],
+  );
+
   if (!isFocused) {
     return <AppActivityIndicator />;
   }
@@ -536,7 +574,7 @@ export const LaboratoryViewScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={viewStyle}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
         title={doc.documentType.description || ''}
@@ -549,6 +587,7 @@ export const LaboratoryViewScreen = () => {
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
         </View>
       </InfoBlock>
+      <LineTypes />
       <TextInput
         style={styles.scanInput}
         key={key}
@@ -558,16 +597,25 @@ export const LaboratoryViewScreen = () => {
         showSoftInputOnFocus={false}
         onChangeText={(text) => !scanned && setScan(text)}
       />
-      <FlashList
-        data={lines}
-        renderItem={renderItem}
-        estimatedItemSize={60}
-        ItemSeparatorComponent={ItemSeparator}
-        keyExtractor={keyExtractor}
-        extraData={[lines, isBlocked]}
-        keyboardShouldPersistTaps={'always'}
-      />
-      {lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
+      {lineType === 'all' ? (
+        <>
+          <FlashList
+            data={lines}
+            renderItem={renderItem}
+            estimatedItemSize={60}
+            ItemSeparatorComponent={ItemSeparator}
+            keyExtractor={keyExtractor}
+            extraData={[lines, isBlocked]}
+            keyboardShouldPersistTaps={'always'}
+          />
+          {lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
+        </>
+      ) : lineType === 'last' && lines?.[0] ? (
+        <View style={styles.spaceBetween}>
+          <LastLine item={lines?.[0]} />
+          {lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
+        </View>
+      ) : null}
       <AppDialog
         title="Введите штрих-код"
         visible={visibleDialog}
