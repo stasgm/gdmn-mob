@@ -69,6 +69,10 @@ export const DocViewScreen = () => {
 
   const ref = useRef<TextInput>(null);
 
+  const handleFocus = () => {
+    ref?.current?.focus();
+  };
+
   useFocusEffect(
     useCallback(() => {
       if (ref?.current) {
@@ -114,6 +118,7 @@ export const DocViewScreen = () => {
       },
       {
         text: 'Отмена',
+        onPress: () => handleFocus(),
       },
     ]);
   }, [docDispatch, id]);
@@ -166,6 +171,7 @@ export const DocViewScreen = () => {
       {
         title: 'Отмена',
         type: 'cancel',
+        onPress: handleFocus,
       },
     ]);
   }, [showActionSheet, handleAddDocLine, handleDelete, handleEditDocHead]);
@@ -201,7 +207,11 @@ export const DocViewScreen = () => {
                 <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
               )}
               <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
-              {!isScanerReader && <ScanButton onPress={handleDoScan} disabled={screenState !== 'idle'} />}
+              <ScanButton
+                onPress={() => (isScanerReader ? handleFocus() : handleDoScan())}
+                disabled={screenState !== 'idle'}
+              />
+
               <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
             </>
           )}
@@ -316,6 +326,7 @@ export const DocViewScreen = () => {
               text: 'ОК',
             },
           ]);
+          handleFocus();
 
           return;
         }
@@ -352,6 +363,8 @@ export const DocViewScreen = () => {
               text: 'ОК',
             },
           ]);
+          handleFocus();
+
           return;
         }
 
