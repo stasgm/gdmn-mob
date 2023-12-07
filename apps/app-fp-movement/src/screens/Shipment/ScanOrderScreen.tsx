@@ -84,6 +84,8 @@ const ScanOrderScreen = () => {
 
       if (shipment) {
         setScaner({ state: 'error', message: 'Заявка уже добавлена' });
+        setScannedObject(shipment);
+        return;
       } else {
         setScannedObject(order);
         setScaner({ state: 'found' });
@@ -153,6 +155,12 @@ const ScanOrderScreen = () => {
 
   const handleClearScaner = () => setScaner({ state: 'init' });
 
+  const handleNavigate = useCallback(() => {
+    if (scannedObject && scannedObject?.id) {
+      navigation.navigate('ShipmentView', { id: scannedObject?.id, isCurr });
+    }
+  }, [isCurr, navigation, scannedObject]);
+
   const ScanItem = useCallback(
     () =>
       scannedObject ? (
@@ -188,6 +196,8 @@ const ScanOrderScreen = () => {
           onGetScannedObject={handleGetScannedObject}
           onClearScannedObject={handleClearScaner}
           scaner={scaner}
+          onErrorSave={handleNavigate}
+          isErrorTouchable={true}
         >
           <ScanItem />
         </ScanBarcodeReader>

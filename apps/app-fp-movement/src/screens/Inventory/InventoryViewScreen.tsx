@@ -16,7 +16,6 @@ import {
   MediumText,
   AppDialog,
   LargeText,
-  ListItemLine,
   ScanButton,
   navBackButton,
   SaveDocument,
@@ -26,8 +25,6 @@ import {
 import { generateId, getDateString, keyExtractor, useSendDocs, sleep, round, isNumeric } from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
-
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { FlashList } from '@shopify/flash-list';
 
@@ -42,6 +39,7 @@ import { IAddressStoreEntity, IBarcode, IGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
 import QuantDialog from '../../components/QuantDialog';
+import LineItem from '../../components/LineItem';
 
 export interface IScanerObject {
   item?: IInventoryLine;
@@ -352,39 +350,16 @@ export const InventoryViewScreen = () => {
   const renderItem = useCallback(
     ({ item }: { item: IInventoryLine }) => {
       return (
-        <ListItemLine
-          // key={item.id}
-          readonly={doc?.status !== 'DRAFT' || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
+        <LineItem
+          item={item}
+          disabled={doc?.status !== 'DRAFT' || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
           onPress={() => handlePressLine(item.weight)}
-        >
-          <View style={styles.details}>
-            <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-            <View style={styles.flexDirectionRow}>
-              <MaterialCommunityIcons name="shopping-outline" size={18} />
-              <MediumText>
-                {(item.weight || 0).toString()} кг, {(item.quantPack || 0).toString()} кор.
-              </MediumText>
-            </View>
-            <View style={styles.flexDirectionRow}>
-              <MediumText>
-                Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
-              </MediumText>
-            </View>
-            {doc?.head.fromDepart?.isAddressStore ? (
-              <View style={styles.flexDirectionRow}>
-                <MediumText>
-                  {'Ячейка №'} {item.toCell || ''}
-                </MediumText>
-              </View>
-            ) : null}
-          </View>
-        </ListItemLine>
+          isToAddressed={doc?.head.fromDepart?.isAddressStore}
+        />
       );
     },
     [doc?.head.fromDepart?.isAddressStore, doc?.status, handlePressLine, lines?.length],
   );
-
-  const LastLine = useMemo(() => renderItem, [renderItem]);
 
   const [scanned, setScanned] = useState(false);
 
@@ -593,7 +568,12 @@ export const InventoryViewScreen = () => {
         </>
       ) : lineType === 'last' && lines?.[0] ? (
         <View style={styles.spaceBetween}>
-          <LastLine item={lines?.[0]} />
+          <LineItem
+            item={lines?.[0]}
+            disabled={doc?.status !== 'DRAFT' || Boolean(lines?.[0].scannedBarcode)}
+            onPress={() => handlePressLine(lines?.[0].weight)}
+            isToAddressed={doc?.head.fromDepart?.isAddressStore}
+          />
           {lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
         </View>
       ) : null}

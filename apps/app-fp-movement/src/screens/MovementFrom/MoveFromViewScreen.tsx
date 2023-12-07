@@ -15,7 +15,6 @@ import {
   MediumText,
   LargeText,
   AppDialog,
-  ListItemLine,
   ScanButton,
   navBackButton,
   SimpleDialog,
@@ -24,8 +23,6 @@ import {
 import { generateId, getDateString, keyExtractor, useSendDocs, sleep, useSendOneRefRequest } from '@lib/mobile-hooks';
 
 import { IDocumentType, INamedEntity, ScreenState } from '@lib/types';
-
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { FlashList } from '@shopify/flash-list';
 
@@ -44,6 +41,7 @@ import {
 import { IAddressStoreEntity, IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
+import LineItem from '../../components/LineItem';
 
 export interface IScanerObject {
   item?: IMoveLine;
@@ -353,44 +351,16 @@ export const MoveFromViewScreen = () => {
   const renderItem = useCallback(
     ({ item }: { item: IMoveLine }) => {
       return (
-        <ListItemLine
-          // key={item.id}
-          readonly={doc?.status !== 'DRAFT' || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
-          // onPress={() => setVisibleQuantPackDialog(true)}
-        >
-          <View style={styles.details}>
-            <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-            <View style={styles.flexDirectionRow}>
-              <MaterialCommunityIcons name="shopping-outline" size={18} />
-              <MediumText>
-                {(item.weight || 0).toString()} кг, {(item.quantPack || 0).toString()} кор.
-              </MediumText>
-            </View>
-            <View style={styles.flexDirectionRow}>
-              <MediumText>
-                Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
-              </MediumText>
-            </View>
-            {doc?.head.fromDepart?.isAddressStore ? (
-              <View style={styles.flexDirectionRow}>
-                <MediumText>Откуда: {item.fromCell || ''}</MediumText>
-              </View>
-            ) : null}
-            {doc?.head.toDepart?.isAddressStore ? (
-              <View style={styles.flexDirectionRow}>
-                <MediumText>
-                  {doc?.head.fromDepart?.isAddressStore ? 'Куда:' : 'Ячейка №'} {item.toCell || ''}
-                </MediumText>
-              </View>
-            ) : null}
-          </View>
-        </ListItemLine>
+        <LineItem
+          item={item}
+          disabled={doc?.status !== 'DRAFT' || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
+          isFromAddressed={doc?.head.fromDepart?.isAddressStore}
+          isToAddressed={doc?.head.toDepart?.isAddressStore}
+        />
       );
     },
     [doc?.head.fromDepart?.isAddressStore, doc?.head.toDepart?.isAddressStore, doc?.status, lines?.length],
   );
-
-  const LastLine = useMemo(() => renderItem, [renderItem]);
 
   const [scanned, setScanned] = useState(false);
 
@@ -617,7 +587,12 @@ export const MoveFromViewScreen = () => {
         </>
       ) : lineType === 'last' && lines?.[0] ? (
         <View style={styles.spaceBetween}>
-          <LastLine item={lines?.[0]} />
+          <LineItem
+            item={lines?.[0]}
+            disabled={doc?.status !== 'DRAFT' || Boolean(lines?.[0].scannedBarcode)}
+            isFromAddressed={doc?.head.fromDepart?.isAddressStore}
+            isToAddressed={doc?.head.toDepart?.isAddressStore}
+          />
           {doc?.lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
         </View>
       ) : null}

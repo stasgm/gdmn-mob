@@ -25,6 +25,8 @@ const ONE_SECOND_IN_MS = 1000;
 interface IProps {
   scaner: IScannedObject;
   onSave?: () => void;
+  onErrorSave?: () => void;
+  isErrorTouchable?: boolean;
   onGetScannedObject: (brc: string) => void;
   onClearScannedObject: () => void;
   children?: ReactNode;
@@ -35,7 +37,9 @@ interface IProps {
 
 const ScanBarcodeReader = ({
   scaner,
+  isErrorTouchable = false,
   onSave,
+  onErrorSave,
   onGetScannedObject,
   onClearScannedObject,
   children,
@@ -99,6 +103,10 @@ const ScanBarcodeReader = ({
     onSave && onSave();
   };
 
+  const handleErrorSave = () => {
+    onErrorSave && onErrorSave();
+  };
+
   const handleChangeText = (text: string) => {
     setBarcode(text);
     if (!text) {
@@ -106,6 +114,7 @@ const ScanBarcodeReader = ({
     }
   };
 
+  console.log('isErrorTouchable', isErrorTouchable);
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={viewStyle}>
       <View style={styles.camera}>
@@ -151,13 +160,15 @@ const ScanBarcodeReader = ({
             </View>
             {scaner.message ? (
               <View style={styles.infoContainer}>
-                <View style={[styles.buttons, styles.btnNotFind]}>
-                  <IconButton icon={'information-outline'} iconColor={'#FFF'} size={30} />
-                  <View>
-                    <Text style={styles.text}>{barcode}</Text>
-                    <Text style={styles.text}>{scaner.message}</Text>
+                <TouchableOpacity onPress={handleErrorSave} disabled={!isErrorTouchable}>
+                  <View style={[styles.buttons, styles.btnNotFind]}>
+                    <IconButton icon={'information-outline'} iconColor={'#FFF'} size={30} />
+                    <View>
+                      <Text style={styles.text}>{barcode}</Text>
+                      <Text style={styles.text}>{scaner.message}</Text>
+                    </View>
                   </View>
-                </View>
+                </TouchableOpacity>
               </View>
             ) : (
               <View style={styles.buttonsContainer}>
