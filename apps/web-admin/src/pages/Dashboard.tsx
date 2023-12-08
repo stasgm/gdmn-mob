@@ -3,7 +3,7 @@ import { Box, Container, Typography, Grid } from '@mui/material';
 
 import { useEffect, useState } from 'react';
 
-import { IAppSystem, ICompany } from '@lib/types';
+import { IAppSystem, ICompany, IUser } from '@lib/types';
 
 import Companies from '../components/dashboard/GridCompany';
 
@@ -21,7 +21,7 @@ import userActions from '../store/user';
 import deviceActions from '../store/device';
 import CircularProgressWithContent from '../components/CircularProgressWidthContent';
 import SimpleLineChart from '../components/dashboard/ReChart';
-import TimeIntervalSelect from '../components/dashboard/PeriodList';
+import UserDeviseList from '../components/dashboard/UserDeviseList';
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -50,7 +50,12 @@ const Dashboard = () => {
   const [state, setState] = useState<ICompany[]>([]);
   const [selectedAppSystem, setSelectedAppSystem] = useState<IAppSystem>();
   const [selectedCompany, setSelectedCompany] = useState<ICompany>();
-  const [period, setPeriod] = useState<string[]>(['', '']);
+  const [selectedUser, setSelectedUser] = useState<IUser>();
+  const date = new Date();
+  const [selectedPeriod, setSelectedPeriod] = useState<string[]>([
+    String(date.getFullYear()) + '.' + String(date.getMonth() + 1) + '.' + String(date.getDate()),
+    String(date.getFullYear()) + '.' + String(date.getMonth() + 1) + '.' + String(date.getDate()),
+  ]);
 
   console.log('state', state);
 
@@ -139,8 +144,14 @@ const Dashboard = () => {
             ))}
           </Grid>
         </Container>
-        {/* <SimpleLineChart /> */}
-        <TimeIntervalSelect callBack={(period) => setPeriod(period)} />
+        <UserDeviseList
+          company={selectedCompany}
+          onClickUser={(selectedUser) => {
+            setSelectedUser(selectedUser);
+          }}
+          onClickSelectedPeriod={(timePeriod) => setSelectedPeriod(timePeriod)}
+        />
+        <SimpleLineChart selectedUser={selectedUser} selectedPeriod={selectedPeriod} />
       </Box>
     </>
   );
