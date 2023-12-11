@@ -29,6 +29,46 @@ const Dashboard = () => {
   const { list: users, loading: userLoading } = useSelector((state) => state.users);
   const { list: companies, loading: companyLoading } = useSelector((state) => state.companies);
   const { list: appSystem, loading: appSystemLoading } = useSelector((state) => state.appSystems);
+  const dataTest1 = [
+    { name: '01.01.2023', device1: 100, device2: 900, device3: 390 },
+    { name: '02.01.2023', device1: 200, device2: 780, device3: 590 },
+    { name: '03.01.2023', device1: 300, device2: 600, device3: 490 },
+    { name: '04.01.2023', device1: 150, device2: 880, device3: 390 },
+    { name: '05.01.2023', device1: 100, device2: 980, device3: 220 },
+    { name: '06.01.2023', device1: 300, device2: 600, device3: 390 },
+    { name: '07.01.2023', device1: 200, device2: 980, device3: 320 },
+  ];
+
+  const dataTest2 = [
+    { name: '01.01.2023', device: 100 },
+    { name: '02.01.2023', device: 200 },
+    { name: '03.01.2023', device: 600 },
+    { name: '04.01.2023', device: 300 },
+    { name: '04.01.2023', device: 900 },
+    { name: '04.01.2023', device: 400 },
+    { name: '04.01.2023', device: 100 },
+  ];
+
+  const dataTest3 = [
+    { name: '18.01.2024', device1: 100, device2: 900, device3: 390 },
+    { name: '25.01.2024', device1: 200, device2: 780, device3: 590 },
+    { name: '01.02.2024', device1: 300, device2: 600, device3: 490 },
+    { name: '08.02.2024', device1: 150, device2: 880, device3: 390 },
+    { name: '15.02.2024', device1: 100, device2: 980, device3: 220 },
+  ];
+
+  const dataTest4 = [
+    { name: '18.01.2024', device: 100 },
+    { name: '25.01.2024', device: 200 },
+    { name: '01.02.2024', device: 600 },
+    { name: '08.02.2024', device: 300 },
+    { name: '15.02.2024', device: 900 },
+  ];
+
+  const dataTest5 = [
+    { name: '18.01.2024', device1: 100, device2: 900, device3: 390 },
+    { name: '18.01.2024', device1: 100, device2: 900, device3: 390 },
+  ];
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
@@ -151,7 +191,7 @@ const Dashboard = () => {
           }}
           onClickSelectedPeriod={(timePeriod) => setSelectedPeriod(timePeriod)}
         />
-        <SimpleLineChart selectedUser={selectedUser} selectedPeriod={selectedPeriod} />
+        <SimpleLineChart data={dataTest1} company={selectedCompany} />
       </Box>
     </>
   );
