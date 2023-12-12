@@ -24,7 +24,7 @@
     "@lib/types": "*",
     "@react-native-community/netinfo": "9.3.10",
     "@types/node": "^20.8.4",
-    "@types/react": "~18.2.28",
+    "@types/react": "~18.2.43",
     "nanoid": "^3.3.4",
     "react": "18.2.0",
     "react-native": "0.72.6",
