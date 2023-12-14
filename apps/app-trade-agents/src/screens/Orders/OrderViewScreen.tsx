@@ -26,7 +26,7 @@ import { formatValue, generateId, getDateString, useSendDocs, keyExtractor, slee
 
 import { INamedEntity, ScreenState } from '@lib/types';
 
-import { useTheme } from 'react-native-paper';
+import { useTheme, MD2Theme } from 'react-native-paper';
 
 import { FlashList } from '@shopify/flash-list';
 
@@ -74,7 +74,7 @@ const OrderViewScreen = () => {
 
   const debt = refSelectors.selectByRefId<IDebt>('debt', order?.head?.contact.id);
 
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   const debtTextStyle = { color: debt?.saldoDebt && debt?.saldoDebt > 0 ? colors.error : colors.text };
 

@@ -66,6 +66,7 @@ export const DocListScreen = () => {
   const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
 
   const list = useSelector((state) => state.documents.list) as IMovementDocument[];
+
   const unknownGoods = useInvSelector((state) => state.appInventory.unknownGoods);
   const settings = useSelector((state) => state.settings.data);
   const cleanDocTime = (settings.cleanDocTime as ISettingsOption<number>).data || 0;
@@ -212,7 +213,7 @@ export const DocListScreen = () => {
                 ({
                   id: i.name,
                   value: i.description || '',
-                } as IListItem),
+                }) as IListItem,
             ),
           )
         : docContactTypes,
@@ -225,6 +226,7 @@ export const DocListScreen = () => {
     if (!filteredList.list.length) {
       return [];
     }
+
     const res =
       status === 'all'
         ? filteredList.list
@@ -250,11 +252,11 @@ export const DocListScreen = () => {
         status: i.status,
         documentType: i.documentType.name,
         isFromRoute: !!i.head.route,
-        lineCount: i.lines.length,
+        lineCount: i.lines?.length,
         errorMessage: i.errorMessage,
       } as IListItemProps;
     });
-  }, [date.id, filteredList.list, status, type?.id]);
+  }, [date.id, filteredList?.list, status, type?.id]);
 
   const sections = useMemo(
     () =>

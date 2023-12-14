@@ -7,7 +7,7 @@ import { config } from '@lib/client-config';
 import { company as mockCompany, device as mockDevice, user as mockUser, appSystem as mockAppSystem } from '@lib/mock';
 
 import { actions, AuthActionType } from './actions';
-import { AuthState } from './types';
+import { AuthState, ConnectionStatus } from './types';
 
 const {
   server: { name, port, protocol },
@@ -22,7 +22,7 @@ export const initialState: Readonly<AuthState> = {
   device: undefined,
   company: undefined,
   appSystem: undefined,
-  connectionStatus: 'not-connected',
+  connectionStatus: 'not-connected' as ConnectionStatus,
   config: {
     apiPath,
     port,

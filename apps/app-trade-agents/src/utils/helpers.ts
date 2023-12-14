@@ -214,6 +214,10 @@ const viewabilityConfig = {
   itemVisiblePercentThreshold: 50,
 };
 
+const jsonFormat = (str: any) => {
+  return JSON.stringify(str, null, '\t');
+};
+
 export {
   getTimeProcess,
   twoDigits,
@@ -223,4 +227,5 @@ export {
   totalList,
   getItemLayout,
   viewabilityConfig,
+  jsonFormat,
 };

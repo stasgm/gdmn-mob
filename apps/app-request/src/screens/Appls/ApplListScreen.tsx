@@ -82,7 +82,7 @@ const ApplListScreen = () => {
           description: shortenString(i.head.justification || '', 90),
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
-        } as ApplListRenderItemProps),
+        }) as ApplListRenderItemProps,
     );
   }, [status, list]);
 

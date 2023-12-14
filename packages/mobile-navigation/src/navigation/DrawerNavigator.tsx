@@ -5,7 +5,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import { appActions, authActions, useDispatch, useSelector } from '@lib/store';
 
-import { Button, Dialog, Snackbar, useTheme, Text } from 'react-native-paper';
+import { Button, Dialog, Snackbar, useTheme, Text, MD2Theme } from 'react-native-paper';
 
 import { globalStyles as styles, AppActivityIndicator, LargeText, MediumText } from '@lib/mobile-ui';
 
@@ -56,7 +56,7 @@ export interface IProps {
 }
 
 const DrawerNavigator = ({ onSyncClick, items, dashboardScreens }: IProps) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
   const dispatch = useDispatch();
 
   const dashboard: INavItem | undefined = useMemo(() => {
@@ -187,11 +187,10 @@ const DrawerNavigator = ({ onSyncClick, items, dashboardScreens }: IProps) => {
             color: 'white',
           }}
         >
-          <Text style={{ color: 'white' }}>{errorMessage}</Text>
+          <Text style={localStyles.snackText}>{errorMessage}</Text>
         </Snackbar>
       </Modal>
       <Drawer.Navigator
-        useLegacyImplementation
         screenOptions={{
           drawerActiveBackgroundColor: colors.primary,
           drawerActiveTintColor: '#ffffff',
@@ -270,6 +269,9 @@ const localStyles = StyleSheet.create({
   },
   syncInfoText: {
     fontSize: 8,
+    color: 'white',
+  },
+  snackText: {
     color: 'white',
   },
 });

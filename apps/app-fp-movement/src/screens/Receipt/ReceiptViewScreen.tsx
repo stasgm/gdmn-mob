@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, TextInput, Keyboard } from 'react-native';
-import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
+import { View, TextInput, Keyboard, TouchableHighlight, StyleProp, ViewStyle } from 'react-native';
+import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Audio } from 'expo-av';
 
@@ -16,7 +16,6 @@ import {
   MediumText,
   LargeText,
   AppDialog,
-  ListItemLine,
   ScanButton,
   navBackButton,
   SimpleDialog,
@@ -35,13 +34,11 @@ import {
 
 import { IDocumentType, INamedEntity, ScreenState } from '@lib/types';
 
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-
 import { FlashList } from '@shopify/flash-list';
 
 import { barcodeSettings, IReceiptDocument, IReceiptLine, IShipmentDocument } from '../../store/types';
 import { ReceiptStackParamList } from '../../navigation/Root/types';
-import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
+import { getStatusColor, lineTypes, ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import {
   alertWithSound,
@@ -56,6 +53,7 @@ import { IBarcode, IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
 import QuantDialog from '../../components/QuantDialog';
+import LineItem from '../../components/LineItem';
 
 export interface IScanerObject {
   item?: IReceiptLine;
@@ -69,6 +67,8 @@ export const ReceiptViewScreen = () => {
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<ReceiptStackParamList, 'ReceiptView'>>();
   const isFocused = useIsFocused();
+
+  const { colors } = useTheme();
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -348,6 +348,35 @@ export const ReceiptViewScreen = () => {
   //   return sum;
   // }, []);
 
+  const [lineType, setLineType] = useState(lineTypes[1].id);
+
+  const LineTypes = useCallback(
+    () => (
+      <View style={styles.containerCenter}>
+        {lineTypes.map((e, i) => {
+          return (
+            <TouchableHighlight
+              activeOpacity={0.7}
+              underlayColor="#DDDDDD"
+              key={e.id}
+              style={[
+                styles.btnTab,
+                i === 0 && styles.firstBtnTab,
+                i === lineTypes.length - 1 && styles.lastBtnTab,
+                e.id === lineType && { backgroundColor: colors.primary },
+                { borderColor: colors.primary },
+              ]}
+              onPress={() => setLineType(e.id)}
+            >
+              <LargeText style={{ color: e.id === lineType ? colors.background : colors.text }}>{e.value}</LargeText>
+            </TouchableHighlight>
+          );
+        })}
+      </View>
+    ),
+    [colors.background, colors.primary, colors.text, lineType],
+  );
+
   const handlePressLine = useCallback(
     (weight: number) => {
       setQuantPack('');
@@ -361,26 +390,11 @@ export const ReceiptViewScreen = () => {
   const renderItem = useCallback(
     ({ item }: { item: IReceiptLine }) => {
       return (
-        <ListItemLine
-          key={item.id}
-          readonly={doc?.status !== 'DRAFT' || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
+        <LineItem
+          item={item}
+          disabled={doc?.status !== 'DRAFT' || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
           onPress={() => handlePressLine(item.weight)}
-        >
-          <View style={styles.details}>
-            <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-            <View style={styles.flexDirectionRow}>
-              <MaterialCommunityIcons name="shopping-outline" size={18} />
-              <MediumText>
-                {(item.weight || 0).toString()} кг, {(item.quantPack || 0).toString()} кор.
-              </MediumText>
-            </View>
-            <View style={styles.flexDirectionRow}>
-              <MediumText>
-                Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
-              </MediumText>
-            </View>
-          </View>
-        </ListItemLine>
+        />
       );
     },
     [doc?.status, handlePressLine, lines?.length],
@@ -497,6 +511,11 @@ export const ReceiptViewScreen = () => {
     getScannedObject(barcode);
   };
 
+  const viewStyle: StyleProp<ViewStyle> = useMemo(
+    () => ({ ...styles.container, justifyContent: lineType === 'last' ? 'flex-start' : 'center' }),
+    [lineType],
+  );
+
   const [key, setKey] = useState(1);
 
   const setScan = (brc: string) => {
@@ -546,7 +565,7 @@ export const ReceiptViewScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={viewStyle}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
         title={doc.documentType.description || ''}
@@ -564,6 +583,7 @@ export const ReceiptViewScreen = () => {
           </View>
         </>
       </InfoBlock>
+      <LineTypes />
       <TextInput
         style={styles.scanInput}
         key={key}
@@ -573,16 +593,30 @@ export const ReceiptViewScreen = () => {
         showSoftInputOnFocus={false}
         onChangeText={(text) => !scanned && setScan(text)}
       />
-      <FlashList
-        data={lines}
-        renderItem={renderItem}
-        estimatedItemSize={90}
-        ItemSeparatorComponent={ItemSeparator}
-        keyExtractor={keyExtractor}
-        extraData={[lines, isBlocked]}
-        keyboardShouldPersistTaps={'always'}
-      />
-      {doc?.lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
+      {lineType === 'all' ? (
+        <>
+          <FlashList
+            data={lines}
+            renderItem={renderItem}
+            estimatedItemSize={90}
+            ItemSeparatorComponent={ItemSeparator}
+            keyExtractor={keyExtractor}
+            extraData={[lines, isBlocked]}
+            keyboardShouldPersistTaps={'always'}
+          />
+          {doc?.lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
+        </>
+      ) : lineType === 'last' && lines?.[0] ? (
+        <View style={styles.spaceBetween}>
+          <LineItem
+            item={lines?.[0]}
+            disabled={doc?.status !== 'DRAFT' || Boolean(lines?.[0].scannedBarcode)}
+            onPress={() => handlePressLine(lines?.[0].weight)}
+          />
+          {doc?.lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
+        </View>
+      ) : null}
+
       <AppDialog
         title="Введите штрих-код"
         visible={visibleDialog}

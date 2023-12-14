@@ -139,26 +139,26 @@ const ScanBarcode = ({
       >
         <View style={styles.header}>
           {isLeftButton ? (
-            <IconButton icon="arrow-left" color={'#FFF'} size={30} style={styles.transparent} onPress={onCancel} />
+            <IconButton icon="arrow-left" iconColor={'#FFF'} size={30} style={styles.transparent} onPress={onCancel} />
           ) : null}
           <IconButton
             icon={flashMode ? 'flash' : 'flash-off'}
             size={30}
-            color={'#FFF'}
+            iconColor={'#FFF'}
             style={styles.transparent}
             onPress={() => setFlashMode(!flashMode)}
           />
           <IconButton
             icon={vibroMode ? 'vibrate' : 'vibrate-off'}
             size={30}
-            color={'#FFF'}
+            iconColor={'#FFF'}
             style={styles.transparent}
             onPress={() => setVibroMode(!vibroMode)}
           />
           <IconButton
             icon={'feature-search-outline'}
             size={30}
-            color={'#FFF'}
+            iconColor={'#FFF'}
             style={styles.transparent}
             onPress={onSearch ? onSearch : handleShowDialog}
           />
@@ -180,14 +180,14 @@ const ScanBarcode = ({
           <View style={styles.scannerContainer}>
             <View style={styles.buttonsContainer}>
               <TouchableOpacity style={[styles.buttons, styles.btnReScan]} onPress={onClearScannedObject}>
-                <IconButton icon="barcode-scan" color={'#FFF'} size={30} />
+                <IconButton icon="barcode-scan" iconColor={'#FFF'} size={30} />
                 <Text style={styles.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
             {scaner.message ? (
               <View style={styles.infoContainer}>
                 <View style={[styles.buttons, styles.btnNotFind]}>
-                  <IconButton icon={'information-outline'} color={'#FFF'} size={30} />
+                  <IconButton icon={'information-outline'} iconColor={'#FFF'} size={30} />
                   <View>
                     <Text style={styles.text}>{barcode}</Text>
                     <Text style={styles.text}>{scaner.message}</Text>
@@ -200,7 +200,7 @@ const ScanBarcode = ({
                   style={[styles.buttons, scaner.state === 'error' ? styles.btnNotFind : styles.btnFind]}
                   onPress={handleSave}
                 >
-                  <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
+                  <IconButton icon={'checkbox-marked-circle-outline'} iconColor={'#FFF'} size={30} />
                   {children}
                 </TouchableOpacity>
               </View>
@@ -209,7 +209,7 @@ const ScanBarcode = ({
         )}
         {!scanned && (
           <View style={styles.footer}>
-            <IconButton icon={'barcode-scan'} color={'#FFF'} size={40} />
+            <IconButton icon={'barcode-scan'} iconColor={'#FFF'} size={40} />
             <Text style={styles.text}>Наведите рамку на штрихкод</Text>
           </View>
         )}

@@ -7,7 +7,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { IDepartment } from '@lib/types';
 
-import { useTheme } from 'react-native-paper';
+import { MD2Theme, useTheme } from 'react-native-paper';
 
 import { CellsStackParamList } from '../../../navigation/Root/types';
 import { ICellData, IEmployee, IModelData } from '../../../store/app/types';
@@ -45,7 +45,7 @@ const Cells = ({
   selectedRow: string;
 }) => {
   const navigation = useNavigation<StackNavigationProp<CellsStackParamList, 'ContactList'>>();
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   const Cell = useCallback(
     ({ item }: { item: ICellData }) => {
@@ -90,9 +90,7 @@ const Cells = ({
   const CellsColumn = useCallback(
     ({ data }: { data: ICellData[] }) => (
       <View style={styles.flexDirectionRow}>
-        {data?.map((item) => (
-          <Cell key={`${item.name}-${item.sortOrder}`} item={item} />
-        ))}
+        {data?.map((item) => <Cell key={`${item.name}-${item.sortOrder}`} item={item} />)}
       </View>
     ),
     [Cell],

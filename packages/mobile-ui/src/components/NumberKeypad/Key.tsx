@@ -1,6 +1,5 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, Text } from 'react-native';
-import { useTheme } from 'react-native-paper';
 
 import globalColors from '../../styles/colors';
 

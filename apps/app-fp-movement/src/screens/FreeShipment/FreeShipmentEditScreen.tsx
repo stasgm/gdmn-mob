@@ -35,10 +35,11 @@ export const FreeShipmentEditScreen = () => {
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
-  const shipments = useSelector((state) =>
-    state.documents?.list.filter((i) =>
-      isCurr ? i.documentType.name === 'currFreeShipment' : i.documentType.name === 'freeShipment',
-    ),
+  const shipments = useSelector(
+    (state) =>
+      state.documents?.list.filter((i) =>
+        isCurr ? i.documentType.name === 'currFreeShipment' : i.documentType.name === 'freeShipment',
+      ),
   ) as IFreeShipmentDocument[];
 
   const doc = shipments?.find((e) => e.id === id);

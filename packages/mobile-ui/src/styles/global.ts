@@ -290,6 +290,10 @@ const globalStyles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'flex-end',
   },
+  spaceBetween: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
 });
 
 export default globalStyles;

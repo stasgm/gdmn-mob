@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, Text, StyleProp, ViewStyle, TouchableHighlight } from 'react-native';
-import { IconButton, Menu as PaperMenu, useTheme } from 'react-native-paper';
-import { IconSource } from 'react-native-paper/lib/typescript/components/Icon';
+import { IconButton, MD2Theme, Menu as PaperMenu, useTheme } from 'react-native-paper';
 
 import { IListItem } from '@lib/mobile-types';
 interface Props {
@@ -17,7 +16,7 @@ interface Props {
   menuStyle?: StyleProp<ViewStyle>;
   viewMenuStyle?: StyleProp<ViewStyle>;
   isActive?: boolean;
-  iconName?: IconSource;
+  iconName?: any;
   iconSize?: number;
   menuIconSize?: number;
 }
@@ -39,7 +38,7 @@ const Menu = ({
   menuIconSize,
   iconName,
 }: Props) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   return (
     <View style={[style, isActive && { backgroundColor: colors.primary }]}>
@@ -64,7 +63,7 @@ const Menu = ({
                 size={iconSize || 20}
                 onPress={onPress}
                 disabled={disabled}
-                color={isActive ? colors.background : disabled ? colors.disabled : colors.primary}
+                iconColor={isActive ? colors.background : disabled ? colors.disabled : colors.primary}
                 style={localStyles.icon}
               />
             )}

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, TextInput, Keyboard } from 'react-native';
-import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
+import { View, TextInput, Keyboard, TouchableHighlight, StyleProp, ViewStyle } from 'react-native';
+import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Audio } from 'expo-av';
 
@@ -16,7 +16,6 @@ import {
   MediumText,
   AppDialog,
   LargeText,
-  ListItemLine,
   ScanButton,
   navBackButton,
   SaveDocument,
@@ -36,13 +35,11 @@ import {
 
 import { ScreenState } from '@lib/types';
 
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-
 import { FlashList } from '@shopify/flash-list';
 
 import { barcodeSettings, IFreeShipmentDocument, IFreeShipmentLine, IShipmentDocument } from '../../store/types';
 import { FreeShipmentStackParamList } from '../../navigation/Root/types';
-import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
+import { getStatusColor, lineTypes, ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import {
   alertWithSound,
@@ -57,6 +54,7 @@ import { IBarcode, IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
 import QuantDialog from '../../components/QuantDialog';
+import LineItem from '../../components/LineItem';
 
 export interface IScanerObject {
   item?: IFreeShipmentLine;
@@ -74,6 +72,8 @@ export const FreeShipmentViewScreen = () => {
   const { id, isCurr } = useRoute<RouteProp<FreeShipmentStackParamList, 'FreeShipmentView'>>().params;
   const doc = docSelectors.selectByDocId<IFreeShipmentDocument>(id);
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
+
+  const { colors } = useTheme();
 
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)) || [], [doc?.lines]);
 
@@ -393,33 +393,49 @@ export const FreeShipmentViewScreen = () => {
     [goodBarcodeSettings?.boxWeight],
   );
 
+  const [lineType, setLineType] = useState(lineTypes[1].id);
+
+  const LineTypes = useCallback(
+    () => (
+      <View style={styles.containerCenter}>
+        {lineTypes.map((e, i) => {
+          return (
+            <TouchableHighlight
+              activeOpacity={0.7}
+              underlayColor="#DDDDDD"
+              key={e.id}
+              style={[
+                styles.btnTab,
+                i === 0 && styles.firstBtnTab,
+                i === lineTypes.length - 1 && styles.lastBtnTab,
+                e.id === lineType && { backgroundColor: colors.primary },
+                { borderColor: colors.primary },
+              ]}
+              onPress={() => setLineType(e.id)}
+            >
+              <LargeText style={{ color: e.id === lineType ? colors.background : colors.text }}>{e.value}</LargeText>
+            </TouchableHighlight>
+          );
+        })}
+      </View>
+    ),
+    [colors.background, colors.primary, colors.text, lineType],
+  );
+
   const renderItem = useCallback(
     ({ item }: { item: IFreeShipmentLine }) => {
       return (
-        <ListItemLine
-          key={item.id}
-          readonly={doc?.status !== 'DRAFT' || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
+        <LineItem
+          item={item}
+          disabled={doc?.status !== 'DRAFT' || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
           onPress={() => handlePressLine(item.weight)}
-        >
-          <View style={styles.details}>
-            <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-            <View style={styles.flexDirectionRow}>
-              <MaterialCommunityIcons name="shopping-outline" size={18} />
-              <MediumText>
-                {(item.weight || 0).toString()} кг, {(item.quantPack || 0).toString()} кор.
-              </MediumText>
-            </View>
-            <View style={styles.flexDirectionRow}>
-              <MediumText>
-                Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
-              </MediumText>
-            </View>
-          </View>
-        </ListItemLine>
+        />
       );
     },
     [doc?.status, handlePressLine, lines?.length],
   );
+
+  const [scanned, setScanned] = useState(false);
 
   const handleErrorMessage = useCallback((visible: boolean, text: string) => {
     if (visible) {
@@ -430,8 +446,6 @@ export const FreeShipmentViewScreen = () => {
     }
     handleFocus();
   }, []);
-
-  const [scanned, setScanned] = useState(false);
 
   const ref = useRef<TextInput>(null);
   const getScannedObject = useCallback(
@@ -471,6 +485,7 @@ export const FreeShipmentViewScreen = () => {
 
       if (!lineGood.good) {
         setVisibleRequestDialog(true);
+        setScanned(false);
         return;
       }
 
@@ -571,6 +586,11 @@ export const FreeShipmentViewScreen = () => {
     }
   }, [navigation, screenState]);
 
+  const viewStyle: StyleProp<ViewStyle> = useMemo(
+    () => ({ ...styles.container, justifyContent: lineType === 'last' ? 'flex-start' : 'center' }),
+    [lineType],
+  );
+
   if (!isFocused) {
     return <AppActivityIndicator />;
   }
@@ -595,7 +615,7 @@ export const FreeShipmentViewScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={viewStyle}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
         title={doc.documentType.description || ''}
@@ -608,6 +628,7 @@ export const FreeShipmentViewScreen = () => {
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
         </View>
       </InfoBlock>
+      <LineTypes />
       <TextInput
         style={styles.scanInput}
         key={key}
@@ -617,16 +638,29 @@ export const FreeShipmentViewScreen = () => {
         showSoftInputOnFocus={false}
         onChangeText={(text) => !scanned && setScan(text)}
       />
-      <FlashList
-        data={lines}
-        renderItem={renderItem}
-        estimatedItemSize={60}
-        ItemSeparatorComponent={ItemSeparator}
-        keyExtractor={keyExtractor}
-        extraData={[lines, isBlocked]}
-        keyboardShouldPersistTaps={'always'}
-      />
-      {lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
+      {lineType === 'all' ? (
+        <>
+          <FlashList
+            data={lines}
+            renderItem={renderItem}
+            estimatedItemSize={60}
+            ItemSeparatorComponent={ItemSeparator}
+            keyExtractor={keyExtractor}
+            extraData={[lines, isBlocked]}
+            keyboardShouldPersistTaps={'always'}
+          />
+          {lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
+        </>
+      ) : lineType === 'last' && lines?.[0] ? (
+        <View style={styles.spaceBetween}>
+          <LineItem
+            item={lines?.[0]}
+            disabled={doc?.status !== 'DRAFT' || Boolean(lines?.[0]?.scannedBarcode)}
+            onPress={() => handlePressLine(lines?.[0]?.weight)}
+          />
+          {lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
+        </View>
+      ) : null}
       <AppDialog
         title="Введите штрих-код"
         visible={visibleDialog}

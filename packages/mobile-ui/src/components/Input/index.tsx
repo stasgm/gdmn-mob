@@ -1,6 +1,6 @@
 import React from 'react';
 import { ReturnKeyTypeOptions, View } from 'react-native';
-import { TextInput, useTheme } from 'react-native-paper';
+import { MD2Theme, TextInput, useTheme } from 'react-native-paper';
 
 import styles from './styles';
 
@@ -36,7 +36,7 @@ interface Props {
   clearInput?: boolean;
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters' | undefined;
   isIcon?: boolean;
-  iconName?: string;
+  iconName?: any;
   onIconPress?: () => void;
 }
 
@@ -60,7 +60,7 @@ const Input = ({
   isIcon,
   iconName,
 }: Props) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   return (
     <View style={styles.container}>
@@ -86,14 +86,14 @@ const Input = ({
           maxLength={maxLength}
           placeholderTextColor={colors.text}
           right={
-            isIcon ? (
-              <TextInput.Icon name={iconName} size={20} style={{ marginTop: 14 }} onPress={onIconPress} />
+            isIcon && iconName ? (
+              <TextInput.Icon icon={iconName} size={20} style={{ marginTop: 14 }} onPress={onIconPress} />
             ) : (
               !!value &&
               !!clearInput &&
               !disabled && (
                 <TextInput.Icon
-                  name="close"
+                  icon="close"
                   size={20}
                   style={{ marginTop: 14 }}
                   onPress={() => onChangeText && onChangeText('')}

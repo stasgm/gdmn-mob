@@ -2,7 +2,7 @@ import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { ListRenderItem, SectionList, SectionListData, View, StyleSheet } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
-import { documentActions, useDocThunkDispatch, useSelector } from '@lib/store';
+import { documentActions, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   ItemSeparator,
@@ -30,6 +30,7 @@ import { IDelList, IListItem } from '@lib/mobile-types';
 import { IShipmentDocument } from '../../store/types';
 import { ShipmentStackParamList } from '../../navigation/Root/types';
 import { dateTypes, statusTypes } from '../../utils/constants';
+import { fpMovementActions, useSelector as useFpSelector } from '../../store';
 
 export interface ShipmentListSectionProps {
   title: string;
@@ -42,6 +43,10 @@ export const ShipmentListScreen = () => {
   const isCurr = route.name.toLowerCase().includes('curr');
   const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ShipmentList'>>();
   const docDispatch = useDocThunkDispatch();
+
+  const dispatch = useDispatch();
+
+  const tempOrders = useFpSelector((state) => state.fpMovement.list);
 
   const docs = useSelector((state) => state.documents.list) as IShipmentDocument[];
   const loading = useSelector((state) => state.app.loading);
@@ -81,7 +86,7 @@ export const ShipmentListScreen = () => {
               </MediumText>
             </View>
           ),
-        } as IListItemProps),
+        }) as IListItemProps,
     );
   }, [filterStatus, list, sortDateType.id]);
 
@@ -121,18 +126,26 @@ export const ShipmentListScreen = () => {
   };
 
   const [delList, setDelList] = useState<IDelList>({});
+  const [delTempList, setDelTempList] = useState<IDelList>({});
   const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
 
   const handleDeleteDocs = useCallback(() => {
     const docIds = Object.keys(delList);
+    const tempIds = Object.keys(delTempList);
 
     const deleteDocs = () => {
       docDispatch(documentActions.removeDocuments(docIds));
       setDelList({});
     };
 
+    const deleteTempOrders = () => {
+      dispatch(fpMovementActions.removeTempOrders(tempIds));
+      setDelTempList({});
+    };
+
     deleteSelectedItems(delList, deleteDocs);
-  }, [delList, docDispatch]);
+    deleteSelectedItems(delTempList, deleteTempOrders, true);
+  }, [delList, delTempList, dispatch, docDispatch]);
 
   const handleAddDocument = useCallback(() => {
     navigation.navigate('ScanOrder', { isCurr });
@@ -159,6 +172,7 @@ export const ShipmentListScreen = () => {
     // setScreenState('sending');
     await sendDoc();
     setDelList({});
+    setDelTempList({});
 
     // setScreenState('sent');
   }, [sendDoc]);
@@ -179,7 +193,18 @@ export const ShipmentListScreen = () => {
     [handleAddDocument, handleDeleteDocs, isDelList],
   );
 
-  const renderLeft = useCallback(() => isDelList && <CloseButton onPress={() => setDelList({})} />, [isDelList]);
+  const renderLeft = useCallback(
+    () =>
+      isDelList && (
+        <CloseButton
+          onPress={() => {
+            setDelList({});
+            setDelTempList({});
+          }}
+        />
+      ),
+    [isDelList],
+  );
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -194,16 +219,26 @@ export const ShipmentListScreen = () => {
     });
   }, [delList, isDelList, isCurr, navigation, renderLeft, renderRight]);
 
+  const handleSetDelList = useCallback(
+    (item: IListItemProps) => {
+      setDelList(getDelList(delList, item.id, item.status!));
+      const shipment = list.find((i) => i.id === item.id);
+      const temp = tempOrders.find((i) => i.orderId === shipment?.head?.orderId);
+      if (temp) {
+        setDelTempList(getDelList(delTempList, temp?.id, item.status!));
+      }
+    },
+    [delList, delTempList, list, tempOrders],
+  );
+
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => (
     <ScreenListItem
       key={item.id}
       {...item}
       onPress={() =>
-        isDelList
-          ? setDelList(getDelList(delList, item.id, item.status!))
-          : navigation.navigate('ShipmentView', { id: item.id, isCurr })
+        isDelList ? handleSetDelList(item) : navigation.navigate('ShipmentView', { id: item.id, isCurr })
       }
-      onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
+      onLongPress={() => handleSetDelList(item)}
       checked={!!delList[item.id]}
     />
   );

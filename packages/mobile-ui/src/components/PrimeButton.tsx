@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleProp, TouchableOpacity, View, StyleSheet, ViewStyle, Text } from 'react-native';
-import { ActivityIndicator, useTheme } from 'react-native-paper';
+import { ActivityIndicator, MD2Theme, useTheme } from 'react-native-paper';
 
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 
@@ -27,7 +27,7 @@ const PrimeButton = ({
   type = 'normal',
   loadIcon = false,
 }: IProps) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   return (
     <TouchableOpacity
