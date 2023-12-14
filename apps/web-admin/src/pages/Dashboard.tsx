@@ -29,46 +29,30 @@ const Dashboard = () => {
   const { list: users, loading: userLoading } = useSelector((state) => state.users);
   const { list: companies, loading: companyLoading } = useSelector((state) => state.companies);
   const { list: appSystem, loading: appSystemLoading } = useSelector((state) => state.appSystems);
+
   const dataTest1 = [
-    { name: '01.01.2023', device1: 100, device2: 900, device3: 390 },
-    { name: '02.01.2023', device1: 200, device2: 780, device3: 590 },
-    { name: '03.01.2023', device1: 300, device2: 600, device3: 490 },
-    { name: '04.01.2023', device1: 150, device2: 880, device3: 390 },
-    { name: '05.01.2023', device1: 100, device2: 980, device3: 220 },
-    { name: '06.01.2023', device1: 300, device2: 600, device3: 390 },
-    { name: '07.01.2023', device1: 200, device2: 980, device3: 320 },
+    { name: '01.01.2023', телефон: 100, компьютер: 900, ноутбук: 390 },
+    { name: '02.01.2023', телефон: 200, компьютер: 780, ноутбук: 590 },
+    { name: '03.01.2023', телефон: 300, компьютер: 600, ноутбук: 490 },
+    { name: '04.01.2023', телефон: 150, компьютер: 880, ноутбук: 390 },
+    { name: '05.01.2023', телефон: 100, компьютер: 980, ноутбук: 220 },
+    { name: '06.01.2023', телефон: 300, компьютер: 600, ноутбук: 390 },
+    { name: '07.01.2023', телефон: 200, компьютер: 980, ноутбук: 320 },
   ];
 
   const dataTest2 = [
-    { name: '01.01.2023', device1: 100 },
-    { name: '02.01.2023', device1: 200 },
-    { name: '03.01.2023', device1: 600 },
-    { name: '04.01.2023', device1: 300 },
-    { name: '05.01.2023', device1: 900 },
-    { name: '06.01.2023', device1: 400 },
-    { name: '07.01.2023', device1: 100 },
+    { name: '01.01.2023', утройства: 100 },
+    { name: '02.01.2023', утройства: 200 },
+    { name: '03.01.2023', утройства: 600 },
+    { name: '04.01.2023', утройства: 300 },
+    { name: '05.01.2023', утройства: 900 },
+    { name: '06.01.2023', утройства: 400 },
+    { name: '07.01.2023', утройства: 100 },
   ];
 
-  const dataTest3 = [
-    { name: '18.01.2024', device1: 100, device2: 900, device3: 390 },
-    { name: '25.01.2024', device1: 200, device2: 780, device3: 590 },
-    { name: '01.02.2024', device1: 300, device2: 600, device3: 490 },
-    { name: '08.02.2024', device1: 150, device2: 880, device3: 390 },
-    { name: '15.02.2024', device1: 100, device2: 980, device3: 220 },
-  ];
+  const dataTest3 = [{ name: '18.01.2024', телефон: 100, компьютер: 900, ноутбук: 390 }];
 
-  const dataTest4 = [
-    { name: '18.01.2024', device1: 100 },
-    { name: '25.01.2024', device1: 200 },
-    { name: '01.02.2024', device1: 600 },
-    { name: '08.02.2024', device1: 300 },
-    { name: '15.02.2024', device1: 900 },
-  ];
-
-  const dataTest5 = [
-    { name: '18.01.2024', device1: 100, device2: 900, device3: 390 },
-    { name: '18.01.2024', device1: 100, device2: 900, device3: 390 },
-  ];
+  const dataTest4 = [{ name: '18.01.2024', устройства: 100 }];
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
@@ -191,7 +175,7 @@ const Dashboard = () => {
           }}
           onClickSelectedPeriod={(timePeriod) => setSelectedPeriod(timePeriod)}
         />
-        <SimpleLineChart data={dataTest3} company={selectedCompany} />
+        <SimpleLineChart data={dataTest4} company={selectedCompany} />
       </Box>
     </>
   );

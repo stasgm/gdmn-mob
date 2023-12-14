@@ -8,7 +8,9 @@ interface IProps {
   data: any[];
 }
 const SimpleLineChart = ({ company, data }: IProps) => {
-  const arrayColour = ['red', 'blue', 'green', 'grey', 'black'];
+  const arrayColour = ['red', 'blue', 'green', 'yellow', 'black', 'grey', 'pink'];
+  const keys = Object.keys(data[0]);
+  keys.shift();
 
   return company ? (
     <>
@@ -26,20 +28,19 @@ const SimpleLineChart = ({ company, data }: IProps) => {
               <YAxis />
               <Tooltip />
               <Legend />
-              {data.map((_item, index) => (
+              {keys.map((_item, index) => (
                 <Line
                   key={index}
                   type="monotone"
-                  dataKey={'device' + (index + 1)}
+                  dataKey={keys[index]}
                   stroke={arrayColour[index]}
-                  activeDot={{ r: 8 }}
+                  activeDot={{ r: 6 }}
                 />
               ))}
             </LineChart>
           </Box>
         </Card>
       </Grid>
-      ;
     </>
   ) : null;
 };
