@@ -15,11 +15,13 @@ import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/user';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import { IToolBarButton, IHeadCells, IPageParam } from '../../types';
+import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 const UserList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+  const maxHeight = useWindowResizeMaxHeight();
 
   const { list, loading, pageParams } = useSelector((state) => state.users);
 
@@ -136,7 +138,7 @@ const UserList = () => {
                 path={'/app/users/'}
                 onSetPageParams={handleSetPageParams}
                 pageParams={pageParams}
-                style={{ overflowY: 'auto', maxHeight: window.innerHeight - 268 }}
+                style={{ overflowY: 'auto', maxHeight }}
               />
             </Box>
           )}
