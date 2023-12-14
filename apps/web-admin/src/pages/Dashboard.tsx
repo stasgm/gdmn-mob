@@ -40,13 +40,13 @@ const Dashboard = () => {
   ];
 
   const dataTest2 = [
-    { name: '01.01.2023', device: 100 },
-    { name: '02.01.2023', device: 200 },
-    { name: '03.01.2023', device: 600 },
-    { name: '04.01.2023', device: 300 },
-    { name: '04.01.2023', device: 900 },
-    { name: '04.01.2023', device: 400 },
-    { name: '04.01.2023', device: 100 },
+    { name: '01.01.2023', device1: 100 },
+    { name: '02.01.2023', device1: 200 },
+    { name: '03.01.2023', device1: 600 },
+    { name: '04.01.2023', device1: 300 },
+    { name: '05.01.2023', device1: 900 },
+    { name: '06.01.2023', device1: 400 },
+    { name: '07.01.2023', device1: 100 },
   ];
 
   const dataTest3 = [
@@ -58,11 +58,11 @@ const Dashboard = () => {
   ];
 
   const dataTest4 = [
-    { name: '18.01.2024', device: 100 },
-    { name: '25.01.2024', device: 200 },
-    { name: '01.02.2024', device: 600 },
-    { name: '08.02.2024', device: 300 },
-    { name: '15.02.2024', device: 900 },
+    { name: '18.01.2024', device1: 100 },
+    { name: '25.01.2024', device1: 200 },
+    { name: '01.02.2024', device1: 600 },
+    { name: '08.02.2024', device1: 300 },
+    { name: '15.02.2024', device1: 900 },
   ];
 
   const dataTest5 = [
@@ -191,7 +191,7 @@ const Dashboard = () => {
           }}
           onClickSelectedPeriod={(timePeriod) => setSelectedPeriod(timePeriod)}
         />
-        <SimpleLineChart data={dataTest1} company={selectedCompany} />
+        <SimpleLineChart data={dataTest3} company={selectedCompany} />
       </Box>
     </>
   );

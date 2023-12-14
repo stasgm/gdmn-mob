@@ -8,6 +8,8 @@ interface IProps {
   data: any[];
 }
 const SimpleLineChart = ({ company, data }: IProps) => {
+  const arrayColour = ['red', 'blue', 'green', 'grey', 'black'];
+
   return company ? (
     <>
       <Grid bgcolor={'white'} ml={3} mt={2} right={10} mr={3}>
@@ -24,9 +26,15 @@ const SimpleLineChart = ({ company, data }: IProps) => {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="device" stroke="#8884d8" activeDot={{ r: 8 }} />
-              <Line type="monotone" dataKey="device2" stroke="#82ca9d" />
-              <Line type="monotone" dataKey="device3" stroke="#42ca9d" />
+              {data.map((_item, index) => (
+                <Line
+                  key={index}
+                  type="monotone"
+                  dataKey={'device' + (index + 1)}
+                  stroke={arrayColour[index]}
+                  activeDot={{ r: 8 }}
+                />
+              ))}
             </LineChart>
           </Box>
         </Card>
