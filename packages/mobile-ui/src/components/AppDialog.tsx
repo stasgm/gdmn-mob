@@ -36,7 +36,7 @@ const AppDialog = ({
 
   return (
     <Dialog visible={visible} onDismiss={onCancel}>
-      <View style={{ flexDirection: 'row', maxWidth: '100%', alignItems: 'center' }}>
+      <View style={localStyles.container}>
         <Dialog.Title>{title}</Dialog.Title>
         {loadIcon ? <ActivityIndicator size="small" color="#70667D" /> : <View style={localStyles.blank} />}
       </View>
@@ -51,11 +51,11 @@ const AppDialog = ({
             },
           }}
           value={text}
-          onChangeText={(text) => onChangeText(text)}
+          onChangeText={onChangeText}
           autoFocus
           right={
             !!text && (
-              <TextInput.Icon icon="close" size={20} style={{ marginTop: 14 }} onPress={() => onChangeText('')} />
+              <TextInput.Icon icon="close" size={20} style={localStyles.textInput} onPress={() => onChangeText('')} />
             )
           }
           keyboardType={keyboardType ? keyboardType : 'default'}
@@ -80,6 +80,14 @@ const AppDialog = ({
 };
 
 const localStyles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    maxWidth: '100%',
+    alignItems: 'center',
+  },
+  textInput: {
+    marginTop: 14,
+  },
   blank: {
     width: 20,
   },

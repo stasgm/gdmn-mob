@@ -1,5 +1,5 @@
 import { Feather } from '@expo/vector-icons';
-import { evaluate, exp } from 'mathjs';
+import { evaluate } from 'mathjs';
 import React, { useCallback, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, useWindowDimensions } from 'react-native';
 
