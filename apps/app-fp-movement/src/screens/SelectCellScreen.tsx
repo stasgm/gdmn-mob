@@ -211,20 +211,20 @@ export const SelectCellScreen = () => {
           defaultCell.length && defaultCell.find((e) => e === i.name)
             ? cellColors.textWhite
             : i.disabled || !i.barcode
-            ? colors.backdrop
-            : cellColors.textWhite,
+              ? colors.backdrop
+              : cellColors.textWhite,
       };
       const backColorStyle = {
         backgroundColor:
           (fromCell && fromCell.barcode === i.barcode) || (toCell && toCell.barcode === i.barcode)
             ? colors.error
             : i.disabled
-            ? colors.backdrop
-            : defaultCell.length && defaultCell.find((e) => e === i.name)
-            ? cellColors.default
-            : i.barcode
-            ? cellColors.barcode
-            : cellColors.free,
+              ? colors.backdrop
+              : defaultCell.length && defaultCell.find((e) => e === i.name)
+                ? cellColors.default
+                : i.barcode
+                  ? cellColors.barcode
+                  : cellColors.free,
       };
 
       return (

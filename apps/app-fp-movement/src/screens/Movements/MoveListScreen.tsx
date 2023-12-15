@@ -72,10 +72,10 @@ export const MoveListScreen = () => {
       status === 'all'
         ? list
         : status === 'active'
-        ? list.filter((e) => e.status !== 'PROCESSED')
-        : status !== 'archive' && status !== 'all'
-        ? list.filter((e) => e.status === status)
-        : [];
+          ? list.filter((e) => e.status !== 'PROCESSED')
+          : status !== 'archive' && status !== 'all'
+            ? list.filter((e) => e.status === status)
+            : [];
 
     const newRes = type?.id === 'all' ? res : res?.filter((i) => i?.head.subtype.id === type?.id);
 

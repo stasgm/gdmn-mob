@@ -231,10 +231,10 @@ export const DocListScreen = () => {
       status === 'all'
         ? filteredList.list
         : status === 'active'
-        ? filteredList.list.filter((e) => e.status !== 'PROCESSED')
-        : status !== 'archive' && status !== 'all'
-        ? filteredList.list.filter((e) => e.status === status)
-        : [];
+          ? filteredList.list.filter((e) => e.status !== 'PROCESSED')
+          : status !== 'archive' && status !== 'all'
+            ? filteredList.list.filter((e) => e.status === status)
+            : [];
 
     const newRes = type?.id === 'all' ? res : res?.filter((i) => i?.documentType.name === type?.id);
 

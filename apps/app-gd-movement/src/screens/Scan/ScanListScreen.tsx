@@ -175,10 +175,10 @@ export const ScanListScreen = () => {
       status === 'all'
         ? filteredList.list
         : status === 'active'
-        ? filteredList.list.filter((e) => e.status !== 'PROCESSED')
-        : status === 'archive'
-        ? filteredList.list.filter((e) => e.status === 'PROCESSED')
-        : [];
+          ? filteredList.list.filter((e) => e.status !== 'PROCESSED')
+          : status === 'archive'
+            ? filteredList.list.filter((e) => e.status === 'PROCESSED')
+            : [];
 
     return res.map((i) => {
       return {

@@ -248,8 +248,8 @@ export const completeById = (processId: string): IStatusResponse => {
         mes.status === 'PROCESSED' || mes.status === 'READY'
           ? getPathLog(process, requestFN)
           : mes.status === 'PROCESSED_INCORRECT'
-          ? getPathError(process, requestFN)
-          : undefined;
+            ? getPathError(process, requestFN)
+            : undefined;
 
       if (toPath && requestFN) {
         try {

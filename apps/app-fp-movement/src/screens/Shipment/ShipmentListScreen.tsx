@@ -214,8 +214,8 @@ export const ShipmentListScreen = () => {
         delList && Object.values(delList).length > 0
           ? `${Object.values(delList).length}`
           : isCurr
-          ? 'Отвес $'
-          : 'Отвес',
+            ? 'Отвес $'
+            : 'Отвес',
     });
   }, [delList, isDelList, isCurr, navigation, renderLeft, renderRight]);
 

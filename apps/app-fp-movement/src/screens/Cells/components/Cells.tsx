@@ -59,10 +59,10 @@ const Cells = ({
         backgroundColor: item.barcode
           ? cellColors.barcode
           : item.disabled
-          ? colors.backdrop
-          : item.defaultGroup && item.defaultGroup.id
-          ? cellColors.default
-          : cellColors.free,
+            ? colors.backdrop
+            : item.defaultGroup && item.defaultGroup.id
+              ? cellColors.default
+              : cellColors.free,
       };
 
       const newItem = lines.find((e) => e.barcode === item.barcode) || getScannedObject(item.barcode || '', item.name);

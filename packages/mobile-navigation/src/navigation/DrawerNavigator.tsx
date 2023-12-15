@@ -134,8 +134,8 @@ const DrawerNavigator = ({ onSyncClick, items, dashboardScreens }: IProps) => {
                 {loading
                   ? 'Выполняются операции:'
                   : errorNotice.length
-                  ? 'Закончено с ошибками!'
-                  : 'Выполнено успешно!'}
+                    ? 'Закончено с ошибками!'
+                    : 'Выполнено успешно!'}
               </LargeText>
             </View>
           </Dialog.Title>

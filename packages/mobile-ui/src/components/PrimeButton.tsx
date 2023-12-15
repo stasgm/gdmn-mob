@@ -66,10 +66,10 @@ const PrimeButton = ({
                   ? colors.disabled
                   : colors.background
                 : disabled
-                ? colors.disabled
-                : type === 'normal'
-                ? colors.primary
-                : '#a91160'
+                  ? colors.disabled
+                  : type === 'normal'
+                    ? colors.primary
+                    : '#a91160'
             }
             style={localStyles.indicator}
           />
