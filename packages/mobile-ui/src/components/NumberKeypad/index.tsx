@@ -1,7 +1,7 @@
 import { Feather } from '@expo/vector-icons';
 import { evaluate } from 'mathjs';
-import React, { useCallback, useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, useWindowDimensions } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity, useWindowDimensions, StyleProp, ViewStyle } from 'react-native';
 
 import globalColors from '../../styles/colors';
 
@@ -149,9 +149,13 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
   ];
 
   const windowHeight = useWindowDimensions().height;
+  const viewStyle: StyleProp<ViewStyle> = useMemo(
+    () => ({ height: windowHeight > 650 ? windowHeight / 2.6 : 250 }),
+    [windowHeight],
+  );
 
   return (
-    <View style={{ height: windowHeight > 650 ? windowHeight / 2.6 : 250 }}>
+    <View style={viewStyle}>
       <View style={[styles.input, { borderColor: globalColors.border, backgroundColor: globalColors.card }]}>
         <View>
           <Text style={styles.currentNumber}>

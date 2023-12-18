@@ -24,19 +24,19 @@ const BaseStyle = StyleSheet.create({
   constrained: {
     paddingHorizontal: 20,
   },
-  mainHead: {
-    maxWidth: 650,
-    width: '100%',
-    paddingBottom: 40,
-  },
-  mainContainer: {
-    width: '100%',
-    paddingHorizontal: 20,
-  },
-  main: {
-    maxWidth: 800,
-    width: '100%',
-  },
+  // mainHead: {
+  //   maxWidth: 650,
+  //   width: '100%',
+  //   paddingBottom: 40,
+  // },
+  // mainContainer: {
+  //   width: '100%',
+  //   paddingHorizontal: 20,
+  // },
+  // main: {
+  //   maxWidth: 800,
+  //   width: '100%',
+  // },
   container: {
     display: 'flex',
     flex: 1,
@@ -51,33 +51,35 @@ const BaseStyle = StyleSheet.create({
     justifyContent: 'center',
     padding: 5,
   },
-  box: {
-    paddingVertical: 30,
-    borderTopWidth: 1,
-    borderTopColor: AppColor.greyLLL,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    marginTop: 20,
-  },
-  gridItem: {
-    height: 274,
-    width: 395,
-    paddingHorizontal: 15,
-  },
-  borderBox: {
-    flex: 1,
-    padding: 45,
-    borderColor: AppColor.primary,
-    borderWidth: 2,
-    borderRadius: 4,
-    shadowColor: AppColor.blackT,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 1,
-    shadowRadius: 5,
-  },
+  // box: {
+  //   paddingVertical: 30,
+  //   borderTopWidth: 1,
+  //   borderTopColor: AppColor.greyLLL,
+  // },
+  // grid: {
+  //   flexDirection: 'row',
+  //   flexWrap: 'wrap',
+  //   justifyContent: 'center',
+  //   marginTop: 20,
+  // },
+  // gridItem: {
+  //   height: 274,
+  //   width: 395,
+  //   paddingHorizontal: 15,
+  // },
+  // borderBox: {
+  //   flex: 1,
+  //   padding: 45,
+  //   borderColor: AppColor.primary,
+  //   borderWidth: 2,
+  //   borderRadius: 4,
+  //   shadowColor: AppColor.blackT,
+  //   shadowOffset: { width: 0, height: 1 },
+  //   shadowOpacity: 1,
+  //   shadowRadius: 5,
+  // },
+  fullWidth: { width: '100%' },
+  contentCenter: { justifyContent: 'center', alignItems: 'center' },
 });
 
 type AppViewPropsBase = Omit<View['props'], 'accessibilityRole'> & {
@@ -126,13 +128,13 @@ export class AppView extends React.Component<AppViewProps> {
         style={[
           BaseStyle.defaultStyle,
           backgroundColor && { backgroundColor },
-          center && { justifyContent: 'center', alignItems: 'center' },
+          center && BaseStyle.contentCenter,
           type === 'constrained' && BaseStyle.constrained,
           direction && { flexDirection: direction },
           justifyContent && { justifyContent },
           alignItems && { alignItems },
           flexWrap && { flexWrap },
-          fullWidth && { width: '100%' },
+          fullWidth && BaseStyle.fullWidth,
           style,
         ]}
         {...otherProps}
