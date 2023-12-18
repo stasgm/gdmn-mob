@@ -487,8 +487,9 @@ export const useSync = (onSync?: () => Promise<any>) => {
               );
 
               if (sendMessageResponse.type === 'SEND_MESSAGE') {
+                const sentDate = new Date().toISOString();
                 const updateDocResponse = await docDispatch(
-                  documentActions.updateDocuments(readyDocs.map((d) => ({ ...d, status: 'SENT' }))),
+                  documentActions.updateDocuments(readyDocs.map((d) => ({ ...d, status: 'SENT', sentDate }))),
                 );
 
                 if (updateDocResponse.type === 'DOCUMENTS/UPDATE_MANY_FAILURE') {

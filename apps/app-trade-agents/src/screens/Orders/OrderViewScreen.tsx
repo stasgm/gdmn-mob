@@ -475,6 +475,14 @@ const OrderViewScreen = () => {
                 <MediumText>Комментарий: {order.head.comment || ''}</MediumText>
               </View>
             ) : null}
+            {order.sentDate ? (
+              <View style={styles.rowCenter}>
+                <MediumText>
+                  Отправлено: {getDateString(order.sentDate)} {new Date(order.sentDate).getHours()}:
+                  {new Date(order.sentDate).getMinutes()}:{new Date(order.sentDate).getSeconds()}
+                </MediumText>
+              </View>
+            ) : null}
           </View>
         </InfoBlock>
         <FlashList

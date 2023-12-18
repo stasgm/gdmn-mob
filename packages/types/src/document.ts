@@ -45,6 +45,7 @@ interface IDocument<T = IHead, K extends IEntity = IEntity> extends IEntity {
   errorMessage?: string;
   head?: T;
   lines?: K[];
+  sentDate?: string;
 }
 
 type MandateProps<T extends IEntity, K extends keyof T> = Omit<T, K> & {

@@ -165,10 +165,10 @@ const OrderListScreen = () => {
       status === 'all'
         ? filteredOrderList
         : status === 'active'
-          ? filteredOrderList.filter((e) => e.status !== 'PROCESSED')
-          : status === 'archive'
-            ? filteredOrderList.filter((e) => e.status === 'PROCESSED')
-            : [];
+        ? filteredOrderList.filter((e) => e.status !== 'PROCESSED')
+        : status === 'archive'
+        ? filteredOrderList.filter((e) => e.status === 'PROCESSED')
+        : [];
 
     return res.map((i) => {
       const address = outlets?.find((o) => i?.head?.outlet.id === o.id)?.address;
@@ -214,10 +214,10 @@ const OrderListScreen = () => {
       status === 'all'
         ? statusTypes
         : status === 'active'
-          ? statusTypes.filter((e) => e.id !== 'PROCESSED')
-          : status === 'archive'
-            ? statusTypes.filter((e) => e.id === 'PROCESSED')
-            : [],
+        ? statusTypes.filter((e) => e.id !== 'PROCESSED')
+        : status === 'archive'
+        ? statusTypes.filter((e) => e.id === 'PROCESSED')
+        : [],
     [status],
   );
 
