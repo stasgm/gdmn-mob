@@ -80,17 +80,9 @@ const SettingsGroup = ({ groupDescription, list, onValueChange, onCheckSettings 
 };
 
 const localStyles = StyleSheet.create({
-  border: {
-    borderWidth: 1,
-    borderRadius: 2,
-    marginHorizontal: 5,
-  },
   title: {
     margin: 3,
     textAlign: 'center',
-  },
-  container: {
-    marginTop: 5,
   },
 });
 
