@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, React } from 'react';
 import {
   Box,
   Button,
@@ -15,6 +15,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
+import AppSettingsAltIcon from '@mui/icons-material/AppSettingsAlt';
+
+import Drawer from '@material-ui/core';
 
 import { useSelector, useDispatch } from '../../store';
 import bindingActions from '../../store/deviceBinding';
@@ -100,7 +104,23 @@ const UserDeviceView = () => {
     setOpen(false);
   };
 
+  const toggleDrawer = (open) => (event) => {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return;
+    }
+
+    setState({ ...state, [anchor]: open });
+  };
+
   const buttons: IToolBarButton[] = [
+    {
+      name: 'Обновить',
+      sx: { marginRight: 1 },
+      color: 'primary',
+      variant: 'contained',
+      onClick: toggleDrawer(true),
+      icon: <AppSettingsAltIcon />,
+    },
     {
       name: 'Обновить',
       sx: { marginRight: 1 },
@@ -196,10 +216,16 @@ const UserDeviceView = () => {
         </Box>
       </Box>
       {user?.role === 'SuperAdmin' ? (
-        <Box>
-          <CardHeader title={'Журнал ошибок устройства пользователя'} sx={{ mx: 2 }} />
-          <UserDeviceLog deviceId={device?.uid} userId={deviceBinding.user.id} />
-        </Box>
+        <>
+          <Box>
+            <CardHeader title={'Журнал ошибок устройства пользователя'} sx={{ mx: 2 }} />
+            <UserDeviceLog deviceId={device?.uid} userId={deviceBinding.user.id} />
+          </Box>
+          <React.Fragment>
+            <Button onClick={toggleDrawer(anchor, true)}>{anchor}</Button>
+            <Drawer anchor={anchor} open={state[anchor]} onClose={toggleDrawer(anchor, false)}></Drawer>
+          </React.Fragment>
+        </>
       ) : null}
     </>
   );

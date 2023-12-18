@@ -101,13 +101,20 @@
     "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^4.10.0",
     "webpack-merge": "^5.8.0",
-    "yup": "^0.32.11"
+    "yup": "^0.32.11",
+    "@material-ui/core": "latest",
+    "@material-ui/icons": "latest",
+    "clsx": "latest",
+    "react": "latest",
+    "react-dom": "latest"
   },
   "devDependencies": {
+    "react-scripts": "latest",
     "@config/eslint-config": "*",
     "@config/eslint-config-react": "*",
     "@config/prettier-config": "*",
     "lint-staged": "^13.0.3",
     "react-hot-loader": "^4.13.1"
-  }
+  },
+  "title": "Material demo"
 }
