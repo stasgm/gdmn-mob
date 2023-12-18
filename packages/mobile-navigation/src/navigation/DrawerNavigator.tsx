@@ -1,3 +1,10 @@
+import { INavItem, RootDrawerParamList } from './types';
+import SettingsNavigator from './Root/SettingsNavigator';
+import ReferencesNavigator from './Root/ReferencesNavigator';
+import ProfileNavigator from './Root/ProfileNavigator';
+import InformationNavigator from './Root/InformationNavigator';
+import { DrawerContent } from './drawerContent';
+import DashboardNavigator from './Root/DashboardNavigator';
 import React, { useCallback, useMemo, useState } from 'react';
 import { Modal, View, StyleSheet, ScrollView } from 'react-native';
 
@@ -10,15 +17,6 @@ import { Button, Dialog, Snackbar, useTheme, Text, MD2Theme } from 'react-native
 import { globalStyles as styles, AppActivityIndicator, LargeText, MediumText } from '@lib/mobile-ui';
 
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
-
-import { INavItem, RootDrawerParamList } from './types';
-
-import SettingsNavigator from './Root/SettingsNavigator';
-import ReferencesNavigator from './Root/ReferencesNavigator';
-import ProfileNavigator from './Root/ProfileNavigator';
-import InformationNavigator from './Root/InformationNavigator';
-import { DrawerContent } from './drawerContent';
-import DashboardNavigator from './Root/DashboardNavigator';
 
 const Drawer = createDrawerNavigator<RootDrawerParamList>();
 
@@ -59,17 +57,23 @@ const DrawerNavigator = ({ onSyncClick, items, dashboardScreens }: IProps) => {
   const { colors } = useTheme<MD2Theme>();
   const dispatch = useDispatch();
 
+  const DashboardComponent = useCallback(
+    () => <DashboardNavigator dashboardScreens={dashboardScreens} items={items} />,
+    [dashboardScreens, items],
+  );
+
   const dashboard: INavItem | undefined = useMemo(() => {
     if (items && dashboardScreens) {
-      const DashboardComponent = () => <DashboardNavigator dashboardScreens={dashboardScreens} items={items} />;
       return {
         name: 'DashboardNav',
         component: DashboardComponent,
         icon: 'view-dashboard-outline',
         title: 'Дашборд',
       };
-    } else return;
-  }, [dashboardScreens, items]);
+    } else {
+      return;
+    }
+  }, [DashboardComponent, dashboardScreens, items]);
 
   const navList: INavItem[] = useMemo(
     () => (dashboard ? [dashboard, ...(items || []), ...baseNavList] : [...(items || []), ...baseNavList]),
@@ -119,6 +123,8 @@ const DrawerNavigator = ({ onSyncClick, items, dashboardScreens }: IProps) => {
     dispatch(authActions.clearError());
   }, [dispatch]);
 
+  const drawerContent = (props: any) => <DrawerContent {...props} onSync={onSync} />;
+
   return (
     <>
       <Modal animationType="fade" visible={showSyncInfo} statusBarTranslucent={true}>
@@ -154,7 +160,7 @@ const DrawerNavigator = ({ onSyncClick, items, dashboardScreens }: IProps) => {
                 requestNotice
                   .sort((a, b) => new Date(b.started).getTime() - new Date(a.started).getTime())
                   .map((note, key) => (
-                    <View key={key} style={{ flexDirection: 'row' }}>
+                    <View key={key} style={localStyles.view}>
                       <MediumText>
                         {requestNotice.length - key}. {note.message}
                         {key === 0 && loading ? '...' : ''}
@@ -196,33 +202,30 @@ const DrawerNavigator = ({ onSyncClick, items, dashboardScreens }: IProps) => {
           drawerActiveTintColor: '#ffffff',
           drawerStyle: { width: 270 },
         }}
-        drawerContent={(props) => <DrawerContent {...props} onSync={onSync} />}
+        drawerContent={drawerContent}
       >
-        {navList.map((item) => (
-          <Drawer.Screen
-            name={item.name}
-            key={item.name}
-            component={item.component}
-            options={{
-              headerShown: false,
-              title: item.title,
-              drawerLabelStyle: { fontSize: 16 },
-              drawerIcon: (pr) => <Icon name={item.icon} {...pr} />,
-            }}
-          />
-        ))}
+        {navList.map((item) => {
+          const drawerIcon = (pr: any) => <Icon name={item.icon} {...pr} />;
+
+          return (
+            <Drawer.Screen
+              name={item.name}
+              key={item.name}
+              component={item.component}
+              options={{
+                headerShown: false,
+                title: item.title,
+                drawerLabelStyle: { fontSize: 16 },
+                drawerIcon,
+              }}
+            />
+          );
+        })}
       </Drawer.Navigator>
       {loading && (
-        <View
-          style={{
-            backgroundColor: 'transparent',
-            position: 'absolute',
-            bottom: 10,
-            right: 10,
-          }}
-        >
+        <View style={localStyles.viewSync}>
           <Button
-            style={{ opacity: 0.7, borderRadius: 20 }}
+            style={localStyles.buttonSync}
             icon="sync"
             mode="contained"
             loading={true}
@@ -246,8 +249,18 @@ const localStyles = StyleSheet.create({
     lineHeight: 18,
     fontWeight: '500',
   },
-  text: {
-    marginTop: -16,
+  view: {
+    flexDirection: 'row',
+  },
+  viewSync: {
+    backgroundColor: 'transparent',
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+  },
+  buttonSync: {
+    opacity: 0.7,
+    borderRadius: 20,
   },
   content: {
     height: 240,
@@ -257,16 +270,7 @@ const localStyles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'flex-end',
   },
-  syncInfo: {
-    position: 'absolute',
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    paddingLeft: 6,
-    paddingVertical: 10,
-    opacity: 0.5,
-    bottom: 0,
-  },
+
   syncInfoText: {
     fontSize: 8,
     color: 'white',

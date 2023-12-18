@@ -1,3 +1,5 @@
+import { styles } from '../styles';
+import { ReferenceStackParamList } from '../../../navigation/Root/types';
 import React from 'react';
 import { TouchableOpacity, View, Text } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
@@ -5,9 +7,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { IReference } from '@lib/types';
-
-import { styles } from '../styles';
-import { ReferenceStackParamList } from '../../../navigation/Root/types';
 
 export type RefListItem = IReference & { refName: string };
 
