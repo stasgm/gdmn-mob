@@ -56,7 +56,7 @@
     "passport-local": "^1.0",
     "ramda": "^0.29.1",
     "rotating-file-stream": "^3.1.1",
-    "typescript": "^5.3.3",
+    "typescript": "^5.2.2",
     "winston": "^3.11.0",
     "winston-daily-rotate-file": "^4.7.1"
   },
