@@ -37,11 +37,13 @@ const PrimeButton = ({
       style={[
         styles.rectangularButton,
         outlined
-          ? {
-              borderWidth: 1,
-              borderColor: colors.primary,
-              backgroundColor: disabled ? colors.disabled : colors.background,
-            }
+          ? [
+              localStyles.border,
+              {
+                borderColor: colors.primary,
+                backgroundColor: disabled ? colors.disabled : colors.background,
+              },
+            ]
           : { backgroundColor: disabled ? colors.disabled : type === 'normal' ? colors.primary : '#a91160' },
         style,
       ]}
@@ -100,4 +102,5 @@ const localStyles = StyleSheet.create({
   indicator: {
     paddingLeft: 10,
   },
+  border: { borderWidth: 1 },
 });

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, ReactNode } from 'react';
-import { View, TouchableOpacity, Vibration, Text, Alert } from 'react-native';
+import { View, TouchableOpacity, Vibration, Text } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import { Camera, FlashMode, AutoFocus, WhiteBalance } from 'expo-camera';
 

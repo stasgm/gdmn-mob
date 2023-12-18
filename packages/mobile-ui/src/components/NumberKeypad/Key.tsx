@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, TouchableOpacity, Text } from 'react-native';
+import React, { useMemo } from 'react';
+import { StyleSheet, TouchableOpacity, Text, StyleProp, ViewStyle } from 'react-native';
 
 import globalColors from '../../styles/colors';
 
@@ -10,25 +10,32 @@ interface IKeyProps {
   onPress: () => void;
 }
 
-const Key = ({ title, grow = 1, operation, onPress }: IKeyProps) => (
-  <TouchableOpacity
-    onPress={onPress}
-    style={[
-      styles.container,
-      {
-        borderColor: globalColors.border,
-        backgroundColor:
-          title === '=' ? globalColors.backgroundLight : operation ? globalColors.background : globalColors.card,
-      },
-      {
-        flexGrow: grow,
-        paddingBottom: grow > 1 ? grow : 0,
-      },
-    ]}
-  >
-    <Text style={styles.text}>{title}</Text>
-  </TouchableOpacity>
-);
+const Key = ({ title, grow = 1, operation, onPress }: IKeyProps) => {
+  const viewStyle: StyleProp<ViewStyle> = useMemo(
+    () => ({
+      flexGrow: grow,
+      paddingBottom: grow > 1 ? grow : 0,
+    }),
+    [grow],
+  );
+
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={[
+        styles.container,
+        {
+          borderColor: globalColors.border,
+          backgroundColor:
+            title === '=' ? globalColors.backgroundLight : operation ? globalColors.background : globalColors.card,
+        },
+        viewStyle,
+      ]}
+    >
+      <Text style={styles.text}>{title}</Text>
+    </TouchableOpacity>
+  );
+};
 export { Key, IKeyProps };
 
 const styles = StyleSheet.create({

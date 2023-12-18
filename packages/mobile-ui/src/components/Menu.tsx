@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, StyleProp, ViewStyle, TouchableHighlight } from
 import { IconButton, MD2Theme, Menu as PaperMenu, useTheme } from 'react-native-paper';
 
 import { IListItem } from '@lib/mobile-types';
+
 interface Props {
   options: IListItem[];
   activeOptionId?: string;
@@ -49,10 +50,12 @@ const Menu = ({
           <View style={[localStyles.menu, menuStyle]}>
             {title && (
               <Text
-                style={{
-                  color: isActive ? colors.background : disabled ? colors.disabled : colors.primary,
-                  fontSize: 15,
-                }}
+                style={[
+                  {
+                    color: isActive ? colors.background : disabled ? colors.disabled : colors.primary,
+                  },
+                  localStyles.fontSize,
+                ]}
               >
                 {title}
               </Text>
@@ -78,7 +81,7 @@ const Menu = ({
             onPress={() => onChange(option)}
             disabled={disabled}
           >
-            <View style={viewMenuStyle ? viewMenuStyle : { flexDirection: 'row', alignItems: 'center' }}>
+            <View style={viewMenuStyle ? viewMenuStyle : localStyles.rowCenter}>
               {activeOptionId ? (
                 <IconButton icon={activeOptionId === option?.id ? 'check' : ''} size={menuIconSize || 20} />
               ) : null}
@@ -92,10 +95,6 @@ const Menu = ({
 };
 
 const localStyles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
   menu: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -104,6 +103,8 @@ const localStyles = StyleSheet.create({
   icon: {
     margin: 0,
   },
+  fontSize: { fontSize: 15 },
+  rowCenter: { flexDirection: 'row', alignItems: 'center' },
 });
 
 export default Menu;
