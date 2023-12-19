@@ -44,6 +44,8 @@
     "@react-navigation/native": "^6.1.9",
     "@react-navigation/stack": "^6.3.20",
     "@types/react-test-renderer": "^18.0.7",
+    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.18.6",
+    "@babel/plugin-proposal-optional-chaining": "^7.21.0",
     "expo": "^49.0.21",
     "expo-asset": "~8.10.1",
     "expo-barcode-scanner": "~12.5.3",
@@ -73,6 +75,10 @@
   },
   "devDependencies": {
     "@babel/core": "^7.22.17",
+    "@babel/plugin-transform-arrow-functions": "^7.23.3",
+    "@babel/plugin-transform-shorthand-properties": "^7.23.3",
+    "@babel/plugin-transform-template-literals": "^7.23.3",
+    "@babel/preset-env": "^7.22.15",
     "@config/eslint-config": "*",
     "@config/eslint-config-react": "*",
     "@config/eslint-config-react-native": "*",
@@ -83,6 +89,7 @@
     "babel-preset-expo": "~9.5.2",
     "metro-react-native-babel-preset": "^0.76.0",
     "reactotron-react-native": "^5.0.3",
+    "reactotron-core-client": "^2.8.11",
     "reactotron-redux": "^3.1.3",
     "redux-logger": "^3.0.6",
     "typescript": "^5.2.2"

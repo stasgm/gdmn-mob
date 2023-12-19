@@ -17,17 +17,18 @@ const QuantityInput = (props: IProps) => {
     if (value !== goodQty) {
       onChangeText(goodQty);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goodQty]);
 
-  const handelChange = (value: string) => {
+  const handleChange = (text: string) => {
     setGoodQty((prev) => {
-      value = value.replace(',', '.');
+      text = text.replace(',', '.');
 
-      value = !value.includes('.') ? parseFloat(value).toString() : value;
-      value = Number.isNaN(parseFloat(value)) ? '0' : value;
+      text = !text.includes('.') ? parseFloat(text).toString() : text;
+      text = Number.isNaN(parseFloat(text)) ? '0' : text;
 
       const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
-      return validNumber.test(value) ? value : prev;
+      return validNumber.test(text) ? text : prev;
     });
   };
 
@@ -39,7 +40,7 @@ const QuantityInput = (props: IProps) => {
       style={[localStyles.text, { color: colors.text }]}
       keyboardType="numeric"
       autoCapitalize="words"
-      onChangeText={handelChange}
+      onChangeText={handleChange}
       returnKeyType="done"
       {...rest}
     />
