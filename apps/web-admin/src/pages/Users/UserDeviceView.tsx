@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, React } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -18,7 +18,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import AppSettingsAltIcon from '@mui/icons-material/AppSettingsAlt';
 
-import Drawer from '@material-ui/core';
+import Drawer from '@material-ui/core/Drawer';
 
 import { useSelector, useDispatch } from '../../store';
 import bindingActions from '../../store/deviceBinding';
@@ -104,7 +104,14 @@ const UserDeviceView = () => {
     setOpen(false);
   };
 
-  const toggleDrawer = (open) => (event) => {
+  const [state, setState] = React.useState({
+    top: false,
+    left: false,
+    bottom: false,
+    right: false,
+  });
+
+  const toggleDrawer = (anchor: string, open: boolean) => (event: any) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return;
     }
@@ -112,15 +119,20 @@ const UserDeviceView = () => {
     setState({ ...state, [anchor]: open });
   };
 
-  const buttons: IToolBarButton[] = [
+  const openDrawer = () => {
     {
-      name: 'Обновить',
-      sx: { marginRight: 1 },
-      color: 'primary',
-      variant: 'contained',
-      onClick: toggleDrawer(true),
-      icon: <AppSettingsAltIcon />,
-    },
+      toggleDrawer('right', true);
+    }
+    return (
+      <React.Fragment>
+        <Drawer anchor={'right'} open={state['right']} onClose={toggleDrawer('right', false)}>
+          12223485679685724
+        </Drawer>
+      </React.Fragment>
+    );
+  };
+
+  const buttons: IToolBarButton[] = [
     {
       name: 'Обновить',
       sx: { marginRight: 1 },
@@ -198,6 +210,14 @@ const UserDeviceView = () => {
             <CardHeader title={'Назад'} />
             {loading && <CircularProgress size={40} />}
           </Box>
+          <React.Fragment>
+            <Button variant="contained" startIcon={<AppSettingsAltIcon />} onClick={toggleDrawer('right', true)}>
+              Настройки
+            </Button>
+            <Drawer anchor={'right'} open={state['right']} onClose={toggleDrawer('right', false)}>
+              12223485679685724
+            </Drawer>
+          </React.Fragment>
           <Box
             sx={{
               justifyContent: 'right',
@@ -221,10 +241,6 @@ const UserDeviceView = () => {
             <CardHeader title={'Журнал ошибок устройства пользователя'} sx={{ mx: 2 }} />
             <UserDeviceLog deviceId={device?.uid} userId={deviceBinding.user.id} />
           </Box>
-          <React.Fragment>
-            <Button onClick={toggleDrawer(anchor, true)}>{anchor}</Button>
-            <Drawer anchor={anchor} open={state[anchor]} onClose={toggleDrawer(anchor, false)}></Drawer>
-          </React.Fragment>
         </>
       ) : null}
     </>
