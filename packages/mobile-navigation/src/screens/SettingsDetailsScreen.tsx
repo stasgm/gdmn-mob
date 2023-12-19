@@ -1,3 +1,4 @@
+import { SettingsStackParamList } from '../navigation/Root/types';
 import React, { useLayoutEffect, useState } from 'react';
 import { Alert, StyleSheet } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -8,7 +9,6 @@ import { ISettingsOption } from '@lib/types';
 
 import { mobileRequest } from '@lib/mobile-hooks';
 
-import { SettingsStackParamList } from '../navigation/Root/types';
 const SettingsDetailsScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -118,7 +118,7 @@ const SettingsDetailsScreen = () => {
       headerLeft: navBackButton,
       title: groupName,
     });
-  }, [navigation]);
+  }, [groupName, navigation]);
 
   return (
     <AppScreen>

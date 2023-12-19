@@ -1,3 +1,4 @@
+import { InformationStackParamList } from '../navigation/Root/types';
 import React, { useCallback, useLayoutEffect } from 'react';
 import { FlatList, View, Text, Alert } from 'react-native';
 import { appActions, useDispatch, useSelector } from '@lib/store';
@@ -20,14 +21,12 @@ import { useNavigation } from '@react-navigation/native';
 
 import { IDeviceLog } from '@lib/types';
 
-import { InformationStackParamList } from '../navigation/Root/types';
-
 const InformationLogScreen = () => {
   const navigation = useNavigation<StackNavigationProp<InformationStackParamList, 'Log'>>();
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
 
-  const handleClearLog = () => {
+  const handleClearLog = useCallback(() => {
     Alert.alert('Вы уверены, что хотите удалить всю историю ошибок?', '', [
       {
         text: 'Да',
@@ -39,7 +38,7 @@ const InformationLogScreen = () => {
         text: 'Отмена',
       },
     ]);
-  };
+  }, [dispatch]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -53,14 +52,16 @@ const InformationLogScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [handleClearLog]);
+  }, [handleClearLog, showActionSheet]);
+
+  const headerRight = useCallback(() => <MenuButton actionsMenu={actionsMenu} />, [actionsMenu]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackButton,
-      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+      headerRight,
     });
-  }, []);
+  }, [headerRight, navigation]);
 
   const errorLog = useSelector((state) => state.app.errorLog || [])?.sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),

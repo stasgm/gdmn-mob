@@ -80,6 +80,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.22.17",
+    "@babel/runtime": "^7.23.6",
     "@config/eslint-config": "*",
     "@config/eslint-config-react": "*",
     "@config/eslint-config-react-native": "*",

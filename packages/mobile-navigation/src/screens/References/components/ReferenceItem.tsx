@@ -1,3 +1,5 @@
+import { styles } from '../styles';
+import { ReferenceStackParamList } from '../../../navigation/Root/types';
 import React from 'react';
 import { TouchableOpacity, View, Text } from 'react-native';
 
@@ -7,9 +9,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { INamedEntity } from '@lib/types';
-
-import { styles } from '../styles';
-import { ReferenceStackParamList } from '../../../navigation/Root/types';
 
 export interface IRefItem {
   refName: string;
