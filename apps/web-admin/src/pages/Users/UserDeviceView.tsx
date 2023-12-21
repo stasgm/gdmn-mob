@@ -5,6 +5,7 @@ import {
   CardHeader,
   IconButton,
   CircularProgress,
+  TextField,
   Dialog,
   DialogActions,
   DialogContent,
@@ -21,7 +22,7 @@ import AppSettingsAltIcon from '@mui/icons-material/AppSettingsAlt';
 import Drawer from '@material-ui/core/Drawer';
 
 import { SettingValue, Settings } from '@lib/types';
-import { mainSettingGroup } from '@lib/store';
+import { mainSettingGroup, baseSettingGroup } from '@lib/store';
 
 import { useSelector, useDispatch } from '../../store';
 import bindingActions from '../../store/deviceBinding';
@@ -387,27 +388,37 @@ const UserDeviceView = () => {
   };
 
   const sotrList = (list: Settings) => {
-    const arrayGroups: any[] = [];
-    const callBack: string[] = [];
-    let state = true;
-    Object.values(list).forEach((a) => {
-      if (arrayGroups.indexOf(String(a.group?.id)) == -1) arrayGroups.push(String(a.group?.id));
+    const arrayValues: any[] = Object.values(list);
+    let arrayGroups: [
+      {
+        id: string;
+        name: string;
+      },
+    ];
+    // const callBack: any[] = [];
+    arrayValues.forEach((a) => {
+      if (arrayGroups.indexOf(a.group?.id) == -1) arrayGroups.push(a.group?.id, a.group.name);
     });
-    for (let i = 0; i < arrayGroups.length; i++) {
-      Object.values(list).forEach((a) => {
-        if (arrayGroups[i] == a.group?.id && state) {
-          callBack.push(String(a.group?.name));
-          state = false;
-        }
-      });
-      Object.values(list).forEach((a) => {
-        if (arrayGroups[i] == a.group?.id) {
-          callBack[i] = callBack[i] + '____' + a.description + ': ' + a.data;
-        }
-      });
-      state = true;
-    }
-    return callBack;
+    return (
+      <Box>
+        {arrayGroups.map((item, index) => (
+          <TextField key={index}> {item.name} </TextField>
+        ))}
+      </Box>
+    );
+    // for (let i = 0; i < arrayGroups.length; i++) {
+    //   arrayValues.forEach((a) => {
+    //     if (arrayGroups[i] == a.group?.id) {
+    //       callBack.push(a.group?.name);
+    //     }
+    //   });
+    //   arrayValues.forEach((a) => {
+    //     if (arrayGroups[i] == a.group?.id) {
+    //       callBack[i] = callBack[i] + '____' + a.description + ': ' + a.data;
+    //     }
+    //   });
+    // }
+    // return callBack;
   };
 
   return (
