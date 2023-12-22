@@ -5,11 +5,11 @@ import {
   CardHeader,
   IconButton,
   CircularProgress,
-  TextField,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
+  Typography,
 } from '@mui/material';
 import CachedIcon from '@mui/icons-material/Cached';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -389,23 +389,52 @@ const UserDeviceView = () => {
 
   const sotrList = (list: Settings) => {
     const arrayValues: any[] = Object.values(list);
-    let arrayGroups: [
-      {
-        id: string;
-        name: string;
-      },
-    ];
-    // const callBack: any[] = [];
+    const arrayGroups: {
+      id: string[];
+      name: string[];
+    } = {
+      id: [],
+      name: [],
+    };
     arrayValues.forEach((a) => {
-      if (arrayGroups.indexOf(a.group?.id) == -1) arrayGroups.push(a.group?.id, a.group.name);
+      if (a.group == null) {
+        a.group = baseSettingGroup;
+        arrayGroups.id.push(baseSettingGroup.id);
+        arrayGroups.name.push(baseSettingGroup.name);
+      }
     });
+    arrayValues.forEach((a) => {
+      if (arrayGroups.id.indexOf(a.group?.id) == -1) {
+        arrayGroups.id.push(a.group.id);
+        arrayGroups.name.push(a.group.name);
+      }
+    });
+
+    const sortArray = (id: string) => {
+      const newArray: any[] = [];
+      arrayValues.forEach((a) => {
+        if (a.group.id == id) newArray.push(a);
+      });
+      return newArray;
+    };
+
     return (
       <Box>
-        {arrayGroups.map((item, index) => (
-          <TextField key={index}> {item.name} </TextField>
+        {arrayGroups.id.map((item, index) => (
+          <>
+            <Typography key={index} color="red">
+              {arrayGroups.name[index]}
+            </Typography>
+            {sortArray(item).map((item2, index2) => (
+              <Typography key={index2} color="blue">
+                {item2.description}: {String(item2.data)}
+              </Typography>
+            ))}
+          </>
         ))}
       </Box>
     );
+    //
     // for (let i = 0; i < arrayGroups.length; i++) {
     //   arrayValues.forEach((a) => {
     //     if (arrayGroups[i] == a.group?.id) {
