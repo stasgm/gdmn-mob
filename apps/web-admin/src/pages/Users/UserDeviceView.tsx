@@ -21,7 +21,7 @@ import AppSettingsAltIcon from '@mui/icons-material/AppSettingsAlt';
 
 import Drawer from '@material-ui/core/Drawer';
 
-import { SettingValue, Settings } from '@lib/types';
+import { ISettingsGroup, SettingValue, Settings } from '@lib/types';
 import { mainSettingGroup, baseSettingGroup } from '@lib/store';
 
 import { useSelector, useDispatch } from '../../store';
@@ -29,6 +29,7 @@ import bindingActions from '../../store/deviceBinding';
 import deviceActions from '../../store/device';
 import { ILinkedEntity, IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
+import UserDeviceSettings from '../../components/UserDeviceSettings';
 
 import deviceBindingSelectors from '../../store/deviceBinding/selectors';
 import deviceSelectors from '../../store/device/selectors';
@@ -387,67 +388,30 @@ const UserDeviceView = () => {
     },
   };
 
-  const sotrList = (list: Settings) => {
-    const arrayValues: any[] = Object.values(list);
-    const arrayGroups: {
-      id: string[];
-      name: string[];
-    } = {
-      id: [],
-      name: [],
-    };
-    arrayValues.forEach((a) => {
-      if (a.group == null) {
-        a.group = baseSettingGroup;
-        arrayGroups.id.push(baseSettingGroup.id);
-        arrayGroups.name.push(baseSettingGroup.name);
+  const groups: ISettingsGroup[] = [];
+  let addBaseGroup = true;
+
+  Object.values(appSettings).forEach((setting) => {
+    if (setting.group) {
+      if (!groups.find((group) => group.id === setting.group?.id)) groups.push(setting.group);
+    } else {
+      if (addBaseGroup) {
+        groups.push(baseSettingGroup);
+        addBaseGroup = false;
+      }
+    }
+  });
+  groups.sort((a, b) => (a.sortOrder > b.sortOrder ? 1 : -1));
+
+  const sortArray = (group: ISettingsGroup) => {
+    const sortArray = Object.values(appSettings).filter((appSetting) => {
+      if (group == baseSettingGroup) {
+        !appSetting.group;
+      } else {
+        appSetting.group == group;
       }
     });
-    arrayValues.forEach((a) => {
-      if (arrayGroups.id.indexOf(a.group?.id) == -1) {
-        arrayGroups.id.push(a.group.id);
-        arrayGroups.name.push(a.group.name);
-      }
-    });
-
-    const sortArray = (id: string) => {
-      const newArray: any[] = [];
-      arrayValues.forEach((a) => {
-        if (a.group.id == id) newArray.push(a);
-      });
-      return newArray;
-    };
-
-    return (
-      <Box>
-        {arrayGroups.id.map((item, index) => (
-          <>
-            <Typography key={index} color="red">
-              {arrayGroups.name[index]}
-            </Typography>
-            {sortArray(item).map((item2, index2) => (
-              <Typography key={index2} color="blue">
-                {item2.description}: {String(item2.data)}
-              </Typography>
-            ))}
-          </>
-        ))}
-      </Box>
-    );
-    //
-    // for (let i = 0; i < arrayGroups.length; i++) {
-    //   arrayValues.forEach((a) => {
-    //     if (arrayGroups[i] == a.group?.id) {
-    //       callBack.push(a.group?.name);
-    //     }
-    //   });
-    //   arrayValues.forEach((a) => {
-    //     if (arrayGroups[i] == a.group?.id) {
-    //       callBack[i] = callBack[i] + '____' + a.description + ': ' + a.data;
-    //     }
-    //   });
-    // }
-    // return callBack;
+    return sortArray;
   };
 
   return (
@@ -491,7 +455,9 @@ const UserDeviceView = () => {
               Настройки
             </Button>
             <Drawer anchor={'right'} open={state['right']} onClose={toggleDrawer('right', false)}>
-              {sotrList(appSettings)}
+              {groups.map((item, index) => (
+                <UserDeviceSettings key={index} group={item} appSettings={sortArray(item)} />
+              ))}
             </Drawer>
           </React.Fragment>
           <Box
