@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 
 import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigation/native';
 
@@ -13,8 +13,6 @@ import { IScannedObject } from '@lib/client-types';
 import { generateId } from '@lib/mobile-hooks';
 
 import { INamedEntity } from '@lib/types';
-
-import { IconButton } from 'react-native-paper';
 
 import { RevisionStackParamList } from '../../navigation/Root/types';
 import { IRevisionDocument, IRevisionLine } from '../../store/types';
@@ -89,6 +87,14 @@ const RevisionGoodScreen = () => {
           setScaner({ state: 'found' });
           setScannedObject({ ...scannedGood, good: { id: good.id, name: good.name }, price: good.price || 0 });
         } else {
+          // if (doc?.lines?.find((l) => l.barcode === brc)) {
+          //   setScaner({
+          //     state: 'error',
+          //     message: 'Баркод  уже добавлен',
+          //   });
+          //   return;
+          // }
+
           setScannedObject({ ...scannedGood, good: { id: unknownGood.id, name: unknownGood.name } });
           setScaner({ state: 'error' });
         }
@@ -101,7 +107,7 @@ const RevisionGoodScreen = () => {
   const good = useSelector((state) => state.app.formParams?.good) as INamedEntity | undefined;
 
   useEffect(() => {
-    if (doc?.head.isBindGood && currentLineId) {
+    if (doc && good && currentLineId) {
       const currentLine = doc.lines?.find((l) => l.id === currentLineId);
       if (currentLine && currentLine.good?.id !== good?.id) {
         dispatch(
@@ -116,29 +122,32 @@ const RevisionGoodScreen = () => {
     }
   }, [currentLineId, dispatch, doc, good]);
 
-  const handleSaveScannedItem = useCallback(() => {
-    if (!scannedObject) {
-      return;
-    }
+  const handleSaveScannedItem = useCallback(
+    (isWithGood: boolean) => {
+      if (!scannedObject) {
+        return;
+      }
 
-    if (!doc) {
-      return;
-    }
+      if (!doc) {
+        return;
+      }
 
-    const line: IRevisionLine = { ...scannedObject, sortOrder: doc.lines?.length + 1 };
+      const line: IRevisionLine = { ...scannedObject, sortOrder: doc.lines?.length + 1 };
 
-    dispatch(documentActions.addDocumentLine({ docId, line }));
+      dispatch(documentActions.addDocumentLine({ docId, line }));
 
-    // if (doc.head.isBindGood) {
-    //   setCurrentLineId(line.id);
-    //   navigation.navigate('SelectRefItem', {
-    //     refName: 'good',
-    //     fieldName: 'good',
-    //   });
-    // }
+      if (isWithGood) {
+        setCurrentLineId(line.id);
+        navigation.navigate('SelectRefItem', {
+          refName: 'good',
+          fieldName: 'good',
+        });
+      }
 
-    setScaner({ state: 'init' });
-  }, [scannedObject, doc, dispatch, docId]);
+      setScaner({ state: 'init' });
+    },
+    [scannedObject, doc, dispatch, docId, navigation],
+  );
 
   const handleClearScaner = () => setScaner({ state: 'init' });
 
@@ -157,17 +166,16 @@ const RevisionGoodScreen = () => {
 
   return (
     <ScanBarcode
-      onSave={handleSaveScannedItem}
+      onSave={() => handleSaveScannedItem(false)}
       onGetScannedObject={handleGetScannedObject}
       onClearScannedObject={handleClearScaner}
       scaner={scaner}
       barCodeTypes={[]}
+      showExtraButton={scannedObject?.good?.id === 'unknown'}
+      extraButtonIcon="clipboard-text-search-outline"
+      extraButtonName="Привязать"
+      onPressExtraButton={() => handleSaveScannedItem(true)}
     >
-      {/* {scannedObject ? (
-        <View style={localStyles.itemInfo}>
-          <MediumText style={localStyles.text}>{scannedObject.barcode}</MediumText>
-        </View>
-      ) : undefined} */}
       {scannedObject ? (
         <View style={localStyles.itemInfo}>
           <View style={localStyles.goodInfo}>
@@ -185,29 +193,18 @@ const RevisionGoodScreen = () => {
             ) : (
               <>
                 <Text style={localStyles.goodName} numberOfLines={3}>
-                  Товар не найден
+                  {scannedObject?.barcode}
                 </Text>
-                <Text style={localStyles.barcode}>{scannedObject?.barcode}</Text>
+                {doc?.lines?.find((l) => l.barcode === scannedObject.barcode) ? (
+                  <Text style={localStyles.goodName} numberOfLines={3}>
+                    Баркод уже добавлен
+                  </Text>
+                ) : null}
               </>
             )}
-            {/* <Text style={localStyles.barcode}>количество: {scannedObject?.quantity}</Text> */}
           </View>
         </View>
       ) : undefined}
-      {scannedObject ? (
-        <View style={localStyles.buttonsContainer}>
-          <TouchableOpacity
-            style={[localStyles.buttons, scaner.state === 'error' ? localStyles.btnNotFind : localStyles.btnFind]}
-            // onPress={handleSave}
-          >
-            <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
-            <Text style={localStyles.goodName} numberOfLines={3}>
-              Товар не найден
-            </Text>
-            <Text style={localStyles.barcode}>{scannedObject?.barcode}</Text>
-          </TouchableOpacity>
-        </View>
-      ) : null}
     </ScanBarcode>
   );
 };
@@ -233,25 +230,5 @@ const localStyles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     opacity: 0.5,
-  },
-  buttonsContainer: {
-    margin: 10,
-  },
-  buttons: {
-    alignItems: 'center',
-    borderRadius: 10,
-    elevation: 8,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    minHeight: 100,
-  },
-  btnNotFind: {
-    backgroundColor: '#CC3C4D',
-  },
-  btnFind: {
-    backgroundColor: '#4380D3',
-  },
-  btnUnknown: {
-    backgroundColor: '#CC3C4D',
   },
 });

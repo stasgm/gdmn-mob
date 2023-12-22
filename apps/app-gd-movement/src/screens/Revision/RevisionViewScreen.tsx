@@ -43,7 +43,7 @@ import {
   keyExtractor,
 } from '@lib/mobile-hooks';
 
-import { ScreenState } from '@lib/types';
+import { INamedEntity, ScreenState } from '@lib/types';
 
 import { FlashList } from '@shopify/flash-list';
 
@@ -250,8 +250,8 @@ export const RevisionViewScreen = () => {
           ? `Выделено позиций: ${delList.length}`
           : `Позиций: ${delList.length}`
         : windowWidth > 320
-        ? 'Документ'
-        : '',
+          ? 'Документ'
+          : '',
     });
   }, [delList.length, isDelList, navigation, renderLeft, renderRight, windowWidth]);
 
@@ -274,6 +274,25 @@ export const RevisionViewScreen = () => {
   const [scanned, setScanned] = useState(false);
 
   const [key, setKey] = useState(1);
+
+  const [currentLineId, setCurrentLineId] = useState('');
+  const good = useSelector((state) => state.app.formParams?.good) as INamedEntity | undefined;
+
+  useEffect(() => {
+    if (doc && good && currentLineId) {
+      const currentLine = doc.lines?.find((l) => l.id === currentLineId);
+      if (currentLine && currentLine.good?.id !== good?.id) {
+        dispatch(
+          documentActions.updateDocumentLine({
+            docId: doc.id,
+            line: { ...currentLine, good } as IRevisionLine,
+          }),
+        );
+        setCurrentLineId('');
+        dispatch(appActions.setFormParams({ good: undefined }));
+      }
+    }
+  }, [currentLineId, dispatch, doc, good]);
 
   const getScannedObject = useCallback(
     (brc: string) => {
@@ -314,16 +333,16 @@ export const RevisionViewScreen = () => {
         return;
       }
 
-      const good = goods.find((i) => i.barcode === brc);
-      if (good) {
+      const good1 = goods.find((i) => i.barcode === brc);
+      if (good1) {
         const line: IRevisionLine = {
-          good: { id: good.id, name: good.name },
+          good: { id: good1.id, name: good1.name },
           id: generateId(),
           barcode: brc,
           sortOrder: (lines?.length || 0) + 1,
-          price: good.price || 0,
+          price: good1.price || 0,
         };
-        Alert.alert(good.name, `Цена: ${good.price || 0} р.`, [
+        Alert.alert(good1.name, `Цена: ${good1.price || 0} р.`, [
           {
             text: 'Добавить',
             onPress: () => {
@@ -338,24 +357,62 @@ export const RevisionViewScreen = () => {
 
         return;
       }
-      if (!remItem && !good) {
-        const line: IRevisionLine = {
+
+      if (!remItem && !good1) {
+        const line = lines?.find((i) => i.barcode === brc);
+
+        if (line) {
+          Alert.alert(`Штрихкод ${brc} уже привязан`, 'Заменить товар?', [
+            {
+              text: 'Заменить',
+              onPress: () => {
+                setCurrentLineId(line.id);
+                navigation.navigate('SelectRefItem', {
+                  refName: 'good',
+                  fieldName: 'good',
+                });
+
+                handleFocus();
+              },
+            },
+
+            { text: 'Отмена', onPress: handleFocus },
+          ]);
+          return;
+        }
+
+        const newLine: IRevisionLine = {
           good: unknownGood,
           id: generateId(),
           barcode: brc,
           sortOrder: (lines?.length || 0) + 1,
+          withGood: true,
         };
         Alert.alert('Товар не найден', brc, [
           {
             text: 'Добавить',
             onPress: () => {
-              dispatch(documentActions.addDocumentLine({ docId: id, line: line }));
+              dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
               handleFocus();
             },
           },
-          { text: 'Привязать' },
-          { text: 'Отмена' },
+          {
+            text: 'Привязать',
+            onPress: () => {
+              dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+              setCurrentLineId(newLine.id);
+
+              navigation.navigate('SelectRefItem', {
+                refName: 'good',
+                fieldName: 'good',
+              });
+
+              handleFocus();
+            },
+          },
+          { text: 'Пересканировать' },
         ]);
+
         setScanned(false);
 
         return;
@@ -364,7 +421,7 @@ export const RevisionViewScreen = () => {
 
       handleFocus();
     },
-    [dispatch, doc, goodRemains, goods, id, lines?.length],
+    [dispatch, doc, goodRemains, goods, id, lines, navigation],
   );
 
   const setScan = (brc: string) => {
@@ -429,6 +486,14 @@ export const RevisionViewScreen = () => {
               <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
               {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
             </View>
+            {doc.sentDate ? (
+              <View style={styles.rowCenter}>
+                <MediumText>
+                  Отправлено: {getDateString(doc.sentDate)} {new Date(doc.sentDate).getHours()}:
+                  {new Date(doc.sentDate).getMinutes()}:{new Date(doc.sentDate).getSeconds()}
+                </MediumText>
+              </View>
+            ) : null}
           </>
         </InfoBlock>
         <TextInput

@@ -31,6 +31,10 @@ interface IProps {
   onSearch?: () => void;
   isLeftButton?: boolean;
   onCancel?: () => void;
+  showExtraButton?: boolean;
+  extraButtonName?: string;
+  extraButtonIcon?: string;
+  onPressExtraButton?: () => void;
 }
 
 const ScanBarcode = ({
@@ -43,6 +47,10 @@ const ScanBarcode = ({
   onSearch,
   isLeftButton,
   onCancel,
+  showExtraButton = false,
+  extraButtonName,
+  extraButtonIcon,
+  onPressExtraButton,
 }: IProps) => {
   const [flashMode, setFlashMode] = useState(false);
   const [vibroMode, setVibroMode] = useState(false);
@@ -94,6 +102,10 @@ const ScanBarcode = ({
 
   const handleSave = () => {
     onSave && onSave();
+  };
+
+  const handlePressExtraButton = () => {
+    onPressExtraButton && onPressExtraButton();
   };
 
   const handleChangeText = (text: string) => {
@@ -205,6 +217,14 @@ const ScanBarcode = ({
                 </TouchableOpacity>
               </View>
             ) : null}
+            {showExtraButton && (
+              <View style={styles.buttonsContainer}>
+                <TouchableOpacity style={[styles.buttons, styles.btnFind]} onPress={handlePressExtraButton}>
+                  <IconButton icon={extraButtonIcon || 'checkbox-marked-circle-outline'} iconColor={'#FFF'} size={30} />
+                  <Text style={styles.text}>{extraButtonName || ''}</Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         )}
         {!scanned && (

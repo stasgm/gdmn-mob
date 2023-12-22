@@ -267,7 +267,7 @@ export const ScanViewScreen = () => {
   const good = useSelector((state) => state.app.formParams?.good) as INamedEntity | undefined;
 
   useEffect(() => {
-    if (doc?.head.isBindGood && currentLineId) {
+    if (doc?.head.isBindGood && currentLineId && good) {
       const currentLine = doc.lines?.find((l) => l.id === currentLineId);
       if (currentLine && currentLine.good?.id !== good?.id) {
         dispatch(
@@ -378,6 +378,14 @@ export const ScanViewScreen = () => {
               <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
               {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
             </View>
+            {doc.sentDate ? (
+              <View style={styles.rowCenter}>
+                <MediumText>
+                  Отправлено: {getDateString(doc.sentDate)} {new Date(doc.sentDate).getHours()}:
+                  {new Date(doc.sentDate).getMinutes()}:{new Date(doc.sentDate).getSeconds()}
+                </MediumText>
+              </View>
+            ) : null}
           </>
         </InfoBlock>
         <TextInput

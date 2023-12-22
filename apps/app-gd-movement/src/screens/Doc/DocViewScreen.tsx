@@ -455,6 +455,14 @@ export const DocViewScreen = () => {
             >{`${doc.documentType.toDescription}: ${doc.head.toContact?.name}`}</MediumText>
           )}
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
+          {doc.sentDate ? (
+            <View style={styles.rowCenter}>
+              <MediumText>
+                Отправлено: {getDateString(doc.sentDate)} {new Date(doc.sentDate).getHours()}:
+                {new Date(doc.sentDate).getMinutes()}:{new Date(doc.sentDate).getSeconds()}
+              </MediumText>
+            </View>
+          ) : null}
         </>
       </InfoBlock>
       {isScanerReader ? (

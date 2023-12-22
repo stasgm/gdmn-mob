@@ -175,10 +175,10 @@ export const RevisionListScreen = () => {
       status === 'all'
         ? filteredList.list
         : status === 'active'
-        ? filteredList.list.filter((e) => e.status !== 'PROCESSED')
-        : status === 'archive'
-        ? filteredList.list.filter((e) => e.status === 'PROCESSED')
-        : [];
+          ? filteredList.list.filter((e) => e.status !== 'PROCESSED')
+          : status === 'archive'
+            ? filteredList.list.filter((e) => e.status === 'PROCESSED')
+            : [];
 
     return res.map((i) => {
       return {
@@ -189,6 +189,7 @@ export const RevisionListScreen = () => {
         documentType: i.documentType.name,
         lineCount: i.lines.length,
         errorMessage: i.errorMessage,
+        sentDate: i.sentDate,
       } as IListItemProps;
     });
   }, [filteredList.list, status]);

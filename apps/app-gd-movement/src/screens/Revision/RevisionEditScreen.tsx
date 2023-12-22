@@ -82,7 +82,8 @@ export const RevisionEditScreen = () => {
         }),
       );
     }
-  }, [dispatch, doc, documents]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, doc]);
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 

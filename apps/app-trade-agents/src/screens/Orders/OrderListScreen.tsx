@@ -183,6 +183,7 @@ const OrderListScreen = () => {
         isFromRoute: !!i.head.route,
         lineCount: i.lines.length,
         errorMessage: i.errorMessage,
+        sentDate: i.sentDate,
       } as IListItemProps;
     });
   }, [status, filteredOrderList, outlets]);

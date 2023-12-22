@@ -154,7 +154,7 @@ export const DocListScreen = () => {
   useFocusEffect(
     React.useCallback(() => {
       if (!searchQuery) {
-        setFilteredList({ searchQuery, list: list.filter((i) => i.documentType.name !== 'scan') });
+        setFilteredList({ searchQuery, list: list.filter((i) => i.documentType.subtype === 'inventory') });
       }
     }, [list, searchQuery]),
   );
@@ -164,7 +164,7 @@ export const DocListScreen = () => {
       if (!searchQuery) {
         setFilteredList({
           searchQuery,
-          list: list.filter((i) => i.documentType.name !== 'scan'),
+          list: list.filter((i) => i.documentType.subtype === 'inventory'),
         });
       } else {
         const lower = searchQuery.toLowerCase();
@@ -186,7 +186,7 @@ export const DocListScreen = () => {
         ) {
           gr = filteredList.list.filter(fn);
         } else {
-          const newList = list.filter((i) => i.documentType.name !== 'scan');
+          const newList = list.filter((i) => i.documentType.subtype === 'inventory');
           gr = newList.filter(fn);
         }
 
