@@ -60,16 +60,6 @@ export const appSettings: Settings = {
     visible: true,
     group: mainSettingGroup,
   },
-  isDepartEditable: {
-    id: 'isDepartEditable',
-    description: 'Редактировать склад',
-    data: false,
-    type: 'boolean',
-    sortOrder: 5,
-    visible: true,
-    group: mainSettingGroup,
-    checkSettingsCode: true,
-  },
 };
 
 export const viewTypeList: IListItem[] = [
