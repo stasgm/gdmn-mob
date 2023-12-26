@@ -1,30 +1,23 @@
 import { useState, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
-import {
-  Box,
-  Card,
-  Checkbox,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TablePagination,
-  TableRow,
-  Typography,
-} from '@mui/material';
+import { Box, Card, Checkbox, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@mui/material';
 
 import { IServerLogFile } from '@lib/types';
 
 import { adminPath } from '../../utils/constants';
+import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
+import { IPageParam } from '../../types';
 
 interface IProps {
   serverLogs: IServerLogFile[];
   selectedServerLogs?: IServerLogFile[];
   limitRows?: number;
   onChangeSelectedDevices?: (newSelectedDeviceIds: any[]) => void;
+  onSetPageParams?: (pageParams: IPageParam) => void;
+  pageParams?: IPageParam | undefined;
 }
 
 const ServerLogListTable = ({
@@ -32,12 +25,15 @@ const ServerLogListTable = ({
   onChangeSelectedDevices,
   selectedServerLogs = [],
   limitRows = 0,
+  onSetPageParams,
+  pageParams,
 }: IProps) => {
   const navigate = useNavigate();
 
   const [selectedServerLogsIds, setSelectedServerLogsIds] = useState<IServerLogFile[]>(selectedServerLogs);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
+  const maxHeight = useWindowResizeMaxHeight();
 
   const handleSelectAll = (event: any) => {
     let newSelectedServerLogIds;
@@ -77,10 +73,12 @@ const ServerLogListTable = ({
 
   const handleLimitChange = (event: any) => {
     setLimit(event.target.value);
+    onSetPageParams && onSetPageParams({ ...pageParams, limit: event.target.value });
   };
 
   const handlePageChange = (_event: any, newPage: any) => {
     setPage(newPage);
+    onSetPageParams && onSetPageParams({ ...pageParams, page: newPage });
   };
 
   useEffect(() => {
@@ -151,7 +149,7 @@ const ServerLogListTable = ({
   return (
     <Card>
       <PerfectScrollbar>
-        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight: window.innerHeight - 268 }}>
+        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight }}>
           <Table>
             <TableHead>
               <TableRow>

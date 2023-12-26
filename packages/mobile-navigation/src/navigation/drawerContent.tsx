@@ -16,10 +16,12 @@ interface ICutsomProps {
 
 type Props = DrawerContentComponentProps & ICutsomProps;
 
-export const DrawerContent = ({ onSync, syncing, ...props }: Props) => {
+export const DrawerContent = ({ onSync, ...props }: Props) => {
   const { colors } = useTheme();
   const { user, company, isDemo } = useSelector((state) => state.auth);
   const syncDate = useSelector((state) => state.app.syncDate) as Date;
+
+  const captionStyle = { color: colors.text, fontSize: 16 };
 
   return (
     <>
@@ -59,7 +61,7 @@ export const DrawerContent = ({ onSync, syncing, ...props }: Props) => {
       {!isDemo && (
         <PrimeButton icon="cloud-sync-outline" onPress={onSync} outlined>
           <View>
-            <Caption style={{ color: colors.text, fontSize: 16 }}>Синхронизировать</Caption>
+            <Caption style={captionStyle}>Синхронизировать</Caption>
             {!!syncDate && (
               <Caption style={[styles.caption, { color: colors.text }]}>
                 {getDateString(syncDate)} {new Date(syncDate).toLocaleTimeString()}
@@ -97,32 +99,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     lineHeight: 20,
   },
-  text: {
-    padding: 2,
-  },
   caption: {
     textAlign: 'center',
     fontSize: 16,
     lineHeight: 16,
   },
-  updateSection: {
-    alignItems: 'flex-end',
-  },
-  systemInfo: {
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-  },
   drawerSection: {
     marginTop: 0,
-  },
-  preference: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
   },
   contentStyle: {
     paddingTop: 4,

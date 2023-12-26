@@ -1,16 +1,13 @@
-import { createStackNavigator } from '@react-navigation/stack';
-import React from 'react';
-
-import DashboardScreen from '../../screens/DashboardScreen';
-
-import { INavItem } from '../types';
-
 import { DashboardStackParamList } from './types';
+import DashboardScreen from '../../screens/DashboardScreen';
+import { INavItem } from '../types';
+import { createStackNavigator } from '@react-navigation/stack';
+import React, { useCallback } from 'react';
 
 const Stack = createStackNavigator<DashboardStackParamList>();
 
-const DashboardNavigator = ({ dashboardScreens, items }: { dashboardScreens: any; items: INavItem[] }) => {
-  const DashboardScreenComponent = () => <DashboardScreen items={items} />;
+const DashboardNavigator = ({ dashboardScreens, items = [] }: { dashboardScreens: any; items?: INavItem[] }) => {
+  const DashboardScreenComponent = useCallback(() => <DashboardScreen items={items} />, [items]);
   return (
     <Stack.Navigator
       initialRouteName="Dashboard"

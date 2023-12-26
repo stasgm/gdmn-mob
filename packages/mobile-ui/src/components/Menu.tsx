@@ -1,9 +1,9 @@
 import React from 'react';
 import { StyleSheet, View, Text, StyleProp, ViewStyle, TouchableHighlight } from 'react-native';
-import { IconButton, Menu as PaperMenu, useTheme } from 'react-native-paper';
-import { IconSource } from 'react-native-paper/lib/typescript/components/Icon';
+import { IconButton, MD2Theme, Menu as PaperMenu, useTheme } from 'react-native-paper';
 
 import { IListItem } from '@lib/mobile-types';
+
 interface Props {
   options: IListItem[];
   activeOptionId?: string;
@@ -17,7 +17,7 @@ interface Props {
   menuStyle?: StyleProp<ViewStyle>;
   viewMenuStyle?: StyleProp<ViewStyle>;
   isActive?: boolean;
-  iconName?: IconSource;
+  iconName?: any;
   iconSize?: number;
   menuIconSize?: number;
 }
@@ -39,7 +39,7 @@ const Menu = ({
   menuIconSize,
   iconName,
 }: Props) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   return (
     <View style={[style, isActive && { backgroundColor: colors.primary }]}>
@@ -50,10 +50,12 @@ const Menu = ({
           <View style={[localStyles.menu, menuStyle]}>
             {title && (
               <Text
-                style={{
-                  color: isActive ? colors.background : disabled ? colors.disabled : colors.primary,
-                  fontSize: 15,
-                }}
+                style={[
+                  {
+                    color: isActive ? colors.background : disabled ? colors.disabled : colors.primary,
+                  },
+                  localStyles.fontSize,
+                ]}
               >
                 {title}
               </Text>
@@ -64,7 +66,7 @@ const Menu = ({
                 size={iconSize || 20}
                 onPress={onPress}
                 disabled={disabled}
-                color={isActive ? colors.background : disabled ? colors.disabled : colors.primary}
+                iconColor={isActive ? colors.background : disabled ? colors.disabled : colors.primary}
                 style={localStyles.icon}
               />
             )}
@@ -79,7 +81,7 @@ const Menu = ({
             onPress={() => onChange(option)}
             disabled={disabled}
           >
-            <View style={viewMenuStyle ? viewMenuStyle : { flexDirection: 'row', alignItems: 'center' }}>
+            <View style={viewMenuStyle ? viewMenuStyle : localStyles.rowCenter}>
               {activeOptionId ? (
                 <IconButton icon={activeOptionId === option?.id ? 'check' : ''} size={menuIconSize || 20} />
               ) : null}
@@ -93,10 +95,6 @@ const Menu = ({
 };
 
 const localStyles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
   menu: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -105,6 +103,8 @@ const localStyles = StyleSheet.create({
   icon: {
     margin: 0,
   },
+  fontSize: { fontSize: 15 },
+  rowCenter: { flexDirection: 'row', alignItems: 'center' },
 });
 
 export default Menu;

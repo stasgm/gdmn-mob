@@ -42,6 +42,7 @@ import { adminPath, fileFilterValues, fileFiltersDescription } from '../../utils
 import { IFileFilter, IFilePageParam, IFilterObject, IFilterOption, IPageParam } from '../../types';
 import { useDispatch, useSelector } from '../../store';
 import { getFilesFilters, getFilterObject } from '../../utils/helpers';
+import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
   files: IFileSystem[];
@@ -85,6 +86,7 @@ const FileListTable = ({
   const [page, setPage] = useState(pageParams?.page && !isNaN(Number(pageParams?.page)) ? Number(pageParams.page) : 0);
 
   const navigate = useNavigate();
+  const maxHeight = useWindowResizeMaxHeight();
 
   const formik = useFormik<IFilterObject>({
     enableReinitialize: true,

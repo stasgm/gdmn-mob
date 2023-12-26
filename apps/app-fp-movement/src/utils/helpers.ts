@@ -87,11 +87,13 @@ export const getBarcodeString = (barcodeObj: IBarcode) => {
   const shcode = `0000${barcodeObj.shcode}`.slice(-4);
   const quantPack = `0000${barcodeObj.quantPack.toLocaleString()}`.slice(-4);
 
-  const weight = `000000${round(barcodeObj.weight * ONE_KG_IN_G, 3).toLocaleString()}`.slice(-6);
+  const weight =
+    barcodeObj.weight < ONE_T_IN_KG
+      ? `000000${round(barcodeObj.weight * ONE_KG_IN_G, 3).toString()}`.slice(-6)
+      : `000000${round(barcodeObj.weight * ONE_KG_IN_G, 3).toString()}`.slice(6);
 
   const barcode =
     weight + day + month + year + (barcodeObj.time || '0000') + shcode + quantPack + barcodeObj.numReceived;
-
   return barcode;
 };
 
@@ -295,10 +297,9 @@ export const getUpdatedLine = (
   weight?: number,
 ) => {
   const newBarcode = weight
-    ? weight < ONE_T_IN_KG
-      ? getBarcodeString({ ...lineBarcode, quantPack: quantity, weight })
-      : (weight * ONE_KG_IN_G).toString() + getBarcodeString({ ...lineBarcode, quantPack: quantity, weight }).slice(6)
+    ? getBarcodeString({ ...lineBarcode, quantPack: quantity, weight })
     : getBarcodeString({ ...lineBarcode, quantPack: quantity });
+
   return {
     ...line,
     quantPack: quantity,
@@ -336,7 +337,7 @@ export const getDocToSend = (
           usedRemains: i.usedRemains,
           fromCell: (i as IMoveLine).fromCell,
           toCell: (i as IMoveLine).toCell,
-        } as ISendingLine),
+        }) as ISendingLine,
     ),
   };
 };

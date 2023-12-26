@@ -1,8 +1,21 @@
 import React, { useState, useLayoutEffect, useCallback, useMemo, useEffect } from 'react';
-import { View, Text, StyleSheet, ColorValue, Alert, useWindowDimensions, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ColorValue,
+  Alert,
+  useWindowDimensions,
+  TouchableOpacity,
+  StyleProp,
+  ViewStyle,
+  Keyboard,
+  Platform,
+} from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
-import { Badge, Chip, Divider, Searchbar, useTheme } from 'react-native-paper';
+import { Badge, Chip, Divider, MD2Theme, Searchbar, useTheme } from 'react-native-paper';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 import {
   globalStyles as styles,
@@ -14,6 +27,9 @@ import {
   AppActivityIndicator,
   AppScreen,
   Switch,
+  FilterButton,
+  SelectableInput,
+  PrimeButton,
 } from '@lib/mobile-ui';
 import { appActions, docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 
@@ -60,30 +76,50 @@ const SelectGoodScreen = () => {
     }
   }, [syncDate, isDemo]);
 
+  const [paramsVisible, setParamsVisible] = useState(false);
+  const [filterDateBegin, setFilterDateBegin] = useState<string | undefined>(undefined);
+  const [filterDateEnd, setFilterDateEnd] = useState<string | undefined>(undefined);
+
   const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
   const goods = refSelectors.selectByName<IGood>('good').data;
   const refGroup = refSelectors.selectByName<IGoodGroup>('goodGroup');
   const groups = useMemo(() => refGroup.data.concat(UNKNOWN_GROUP), [refGroup.data]);
   const doc = docSelectors.selectByDocId<IOrderDocument>(docId);
   const contactId = doc?.head.contact.id;
+  const outletId = doc?.head.outlet.id;
   const docs = useSelector((state) => state.documents.list) as IOrderDocument[];
-  const prevOrderByContact = useMemo(
+  const prevOrderByOutlet = useMemo(
     () =>
       doc && isShowPrevOrderLines
         ? docs
             .filter(
               (o) =>
                 o.documentType.name === 'order' &&
-                o.head.contact.id === contactId &&
+                o.head.outlet.id === outletId &&
                 o.id !== doc.id &&
-                new Date(o.documentDate).getTime() < new Date(doc.documentDate).getTime(),
+                new Date(o.documentDate).getTime() < new Date(doc.documentDate).getTime() &&
+                (filterDateBegin
+                  ? new Date(o.head.onDate.slice(0, 10)).getTime() >= new Date(filterDateBegin.slice(0, 10)).getTime()
+                  : true) &&
+                (filterDateEnd
+                  ? new Date(o.head.onDate.slice(0, 10)).getTime() <= new Date(filterDateEnd.slice(0, 10)).getTime()
+                  : true),
             )
             .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime())
         : [],
-    [contactId, doc, isShowPrevOrderLines, docs],
+    [doc, isShowPrevOrderLines, docs, outletId, filterDateBegin, filterDateEnd],
   );
 
-  const prevLines = useMemo(() => (prevOrderByContact.length ? prevOrderByContact[0].lines : []), [prevOrderByContact]);
+  const prevLines = useMemo(
+    () =>
+      prevOrderByOutlet.length
+        ? prevOrderByOutlet.reduce((prev: IOrderLine[], cur) => {
+            prev = [...prev, ...cur.lines];
+            return prev;
+          }, [])
+        : [],
+    [prevOrderByOutlet],
+  );
 
   const { parentGroupId } = useSelector((state) => state.app.formParams as IGroupFormParam);
 
@@ -91,7 +127,7 @@ const SelectGoodScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const windowWidth = useWindowDimensions().width;
-  const groupButtonStyle = useMemo(
+  const groupButtonStyle: StyleProp<ViewStyle> = useMemo(
     () => ({
       width: windowWidth > 550 ? '23%' : '31%',
     }),
@@ -152,6 +188,10 @@ const SelectGoodScreen = () => {
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
+        {isShowPrevOrderLines && (
+          <FilterButton onPress={() => setParamsVisible((prev) => !prev)} visible={paramsVisible} />
+        )}
+
         <SearchButton
           onPress={() => {
             setFilterVisible((prev) => !prev);
@@ -160,7 +200,7 @@ const SelectGoodScreen = () => {
         />
       </View>
     ),
-    [filterVisible],
+    [filterVisible, isShowPrevOrderLines, paramsVisible],
   );
 
   useLayoutEffect(() => {
@@ -225,7 +265,41 @@ const SelectGoodScreen = () => {
     setSelectedGood(undefined);
   };
 
-  const { colors } = useTheme();
+  const [showDateBegin, setShowDateBegin] = useState(false);
+
+  const handleApplyDateBegin = (_event: any, selectedDateBegin: Date | undefined) => {
+    setShowDateBegin(false);
+
+    if (selectedDateBegin && _event.type !== 'dismissed') {
+      setFilterDateBegin(selectedDateBegin.toISOString().slice(0, 10));
+    }
+  };
+  const handlePresentDateBegin = () => {
+    Keyboard.dismiss();
+    setShowDateBegin(true);
+  };
+
+  const [showDateEnd, setShowDateEnd] = useState(false);
+
+  const handleApplyDateEnd = (_event: any, selectedDateEnd: Date | undefined) => {
+    setShowDateEnd(false);
+
+    if (selectedDateEnd && _event.type !== 'dismissed') {
+      setFilterDateEnd(selectedDateEnd.toISOString().slice(0, 10));
+    }
+  };
+
+  const handlePresentDateEnd = () => {
+    Keyboard.dismiss();
+    setShowDateEnd(true);
+  };
+
+  const handleCleanParams = () => {
+    setFilterDateBegin('');
+    setFilterDateEnd('');
+  };
+
+  const { colors } = useTheme<MD2Theme>();
 
   const Group = useCallback(
     ({
@@ -247,7 +321,9 @@ const SelectGoodScreen = () => {
             {values.map((item) => {
               const colorStyle = { color: item.id === selectedGroupId ? 'white' : colors.text };
               const backColorStyle = { backgroundColor: item.id === selectedGroupId ? colorSelected : colorBack };
-              const badgeColor = { backgroundColor: item.decoration?.color ? item.decoration.color : 'transparent' };
+              const badgeColor = {
+                backgroundColor: item.decoration?.color ? item.decoration.color : 'transparent',
+              };
               return (
                 <View
                   key={item.id}
@@ -406,7 +482,6 @@ const SelectGoodScreen = () => {
               selectionColor={colors.primary}
             />
           </View>
-
           <ItemSeparator />
         </View>
       )}
@@ -427,6 +502,42 @@ const SelectGoodScreen = () => {
           )}
         </View>
       )}
+      {paramsVisible && (
+        <>
+          <View style={[localStyles.filter, { borderColor: colors.primary }]}>
+            <View style={styles.flexDirectionRow}>
+              <View style={localStyles.width}>
+                <SelectableInput
+                  label="С даты отгрузки"
+                  value={filterDateBegin ? getDateString(filterDateBegin) : ''}
+                  onPress={handlePresentDateBegin}
+                  style={[!filterDateBegin && localStyles.fontSize]}
+                />
+              </View>
+              <View style={localStyles.width}>
+                <SelectableInput
+                  label="По дату отгрузки"
+                  value={filterDateEnd ? getDateString(filterDateEnd || '') : ''}
+                  onPress={handlePresentDateEnd}
+                  style={[!filterDateEnd && localStyles.fontSize, localStyles.marginInput]}
+                />
+              </View>
+            </View>
+
+            <View style={localStyles.container111}>
+              <PrimeButton
+                icon={'delete-outline'}
+                onPress={handleCleanParams}
+                disabled={!(filterDateBegin || filterDateEnd)}
+                style={localStyles.primeButton}
+              >
+                {'Очистить'}
+              </PrimeButton>
+            </View>
+          </View>
+          <ItemSeparator />
+        </>
+      )}
       <FlashList
         data={filterVisible ? goodsByContact : goodModel}
         renderItem={renderGood}
@@ -445,6 +556,24 @@ const SelectGoodScreen = () => {
           onAddLine={handleAddLine}
           onDeleteLine={handleDeleteLine}
           onDismissDialog={hadndleDismissDialog}
+        />
+      )}
+      {showDateBegin && (
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={new Date(filterDateBegin || new Date())}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'inline' : 'default'}
+          onChange={handleApplyDateBegin}
+        />
+      )}
+      {showDateEnd && (
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={new Date(filterDateEnd || new Date())}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'inline' : 'default'}
+          onChange={handleApplyDateEnd}
         />
       )}
     </AppScreen>
@@ -514,4 +643,25 @@ const localStyles = StyleSheet.create({
     fontSize: 20,
     justifyContent: 'space-between',
   },
+  filter: {
+    paddingTop: 5,
+    marginVertical: 5,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderRadius: 2,
+  },
+  width: {
+    width: '50%',
+  },
+  fontSize: {
+    fontSize: 14,
+  },
+  marginInput: {
+    marginLeft: 5,
+  },
+  container111: {
+    alignItems: 'center',
+    marginTop: -10,
+  },
+  primeButton: { height: 40 },
 });

@@ -1,5 +1,5 @@
 # STAGE 1
-FROM node:18.13.0-slim AS builder
+FROM node:20-slim AS builder
 
 WORKDIR /usr/src/koa
 
@@ -47,7 +47,7 @@ RUN cd ./packages/client-config && yarn build
 RUN cd ./apps/web-admin && yarn build-docker
 
 # STAGE 2
-FROM node:18.13.0-alpine3.17 AS release
+FROM node:20-alpine3.19 AS release
 # Create app directory
 WORKDIR /web-admin
 

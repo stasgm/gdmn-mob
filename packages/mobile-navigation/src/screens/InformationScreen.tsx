@@ -1,3 +1,5 @@
+import { GDMN_COMPANY_NAME, GDMN_EMAIL, GDMN_PHONE, GDMN_SITE_ADDRESS, GDMN_TRADEMARK } from '../constants';
+import { InformationStackParamList } from '../navigation/Root/types';
 import React, { useLayoutEffect } from 'react';
 import {
   View,
@@ -9,6 +11,7 @@ import {
   StyleProp,
   TextStyle,
   ScrollView,
+  ViewStyle,
 } from 'react-native';
 import { Avatar, Divider } from 'react-native-paper';
 import { useNavigation, useTheme } from '@react-navigation/native';
@@ -17,9 +20,6 @@ import Constants from 'expo-constants';
 
 import { AppScreen, globalStyles as styles, LargeText, MediumText, navBackDrawer } from '@lib/mobile-ui';
 import { StackNavigationProp } from '@react-navigation/stack';
-
-import { GDMN_COMPANY_NAME, GDMN_EMAIL, GDMN_PHONE, GDMN_SITE_ADDRESS, GDMN_TRADEMARK } from '../constants';
-import { InformationStackParamList } from '../navigation/Root/types';
 
 const dialCall = (number: string) => {
   let phoneNumber = '';
@@ -40,6 +40,25 @@ interface IProfileItem {
   style?: StyleProp<TextStyle>;
 }
 
+const ProfileItem = ({ item, iconStyle }: { item: IProfileItem; iconStyle: StyleProp<ViewStyle> }) => (
+  <>
+    <Divider />
+    <View style={localStyles.profileContainer}>
+      <View style={localStyles.profileIcon}>
+        <Avatar.Icon size={40} icon={item.icon} style={iconStyle} />
+      </View>
+      <View style={localStyles.profileInfo}>
+        <LargeText style={styles.textBold}>{item.title}</LargeText>
+        <TouchableOpacity onPress={item.onPress}>
+          <MediumText selectable={true} style={item.style}>
+            {item.text}
+          </MediumText>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </>
+);
+
 const InformationScreen = () => {
   const { colors } = useTheme();
 
@@ -56,14 +75,14 @@ const InformationScreen = () => {
       id: 'version',
       icon: 'cog-outline',
       title: 'Версия',
-      text: `${Constants.manifest?.extra?.appVesion}-${Constants.manifest?.extra?.buildVersion || 0}`,
+      text: `${Constants.expoConfig?.extra?.appVesion}-${Constants.expoConfig?.extra?.buildVersion || 0}`,
     },
     {
       id: 'doc',
       icon: 'file-document-edit-outline',
       title: 'Документация',
-      text: Constants.manifest?.extra?.name,
-      onPress: () => Linking.openURL(Constants.manifest?.extra?.documentationUrl),
+      text: Constants.expoConfig?.extra?.name,
+      onPress: () => Linking.openURL(Constants.expoConfig?.extra?.documentationUrl),
       style: { textDecorationLine: 'underline' },
     },
     {
@@ -104,36 +123,17 @@ const InformationScreen = () => {
 
   const iconStyle = { backgroundColor: colors.primary };
 
-  const ProfileItem = ({ item }: { item: IProfileItem }) => (
-    <>
-      <Divider />
-      <View style={localStyles.profileContainer}>
-        <View style={localStyles.profileIcon}>
-          <Avatar.Icon size={40} icon={item.icon} style={iconStyle} />
-        </View>
-        <View style={localStyles.profileInfo}>
-          <LargeText style={styles.textBold}>{item.title}</LargeText>
-          <TouchableOpacity onPress={item.onPress}>
-            <MediumText selectable={true} style={item.style}>
-              {item.text}
-            </MediumText>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </>
-  );
-
   return (
     <AppScreen>
       <ScrollView>
         <View style={localStyles.container}>
-          <Text style={styles.title}>Приложение {Constants.manifest?.extra?.name}</Text>
+          <Text style={styles.title}>Приложение {Constants.expoConfig?.extra?.name}</Text>
           {appList.map((item) => (
-            <ProfileItem key={item.id} item={item} />
+            <ProfileItem key={item.id} item={item} iconStyle={iconStyle} />
           ))}
           <Text style={styles.title}>О разработчике</Text>
           {developList.map((item) => (
-            <ProfileItem key={item.id} item={item} />
+            <ProfileItem key={item.id} item={item} iconStyle={iconStyle} />
           ))}
         </View>
       </ScrollView>
@@ -148,10 +148,6 @@ const localStyles = StyleSheet.create({
   container: {
     margin: 10,
   },
-  deviceInfo: {
-    flex: 1,
-    justifyContent: 'center',
-  },
   profileContainer: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -165,12 +161,6 @@ const localStyles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     marginLeft: 4,
-  },
-  title: {
-    alignItems: 'center',
-    fontSize: 18,
-    textAlign: 'center',
-    margin: 10,
   },
   copyright: {
     textAlign: 'center',

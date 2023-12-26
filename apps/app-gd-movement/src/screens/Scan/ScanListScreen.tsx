@@ -175,10 +175,10 @@ export const ScanListScreen = () => {
       status === 'all'
         ? filteredList.list
         : status === 'active'
-        ? filteredList.list.filter((e) => e.status !== 'PROCESSED')
-        : status === 'archive'
-        ? filteredList.list.filter((e) => e.status === 'PROCESSED')
-        : [];
+          ? filteredList.list.filter((e) => e.status !== 'PROCESSED')
+          : status === 'archive'
+            ? filteredList.list.filter((e) => e.status === 'PROCESSED')
+            : [];
 
     return res.map((i) => {
       return {
@@ -187,7 +187,7 @@ export const ScanListScreen = () => {
         documentDate: getDateString(i.documentDate),
         status: i.status,
         documentType: i.documentType.name,
-        lineCount: i.lines.length,
+        lineCount: i.lines?.length,
         errorMessage: i.errorMessage,
       } as IListItemProps;
     });

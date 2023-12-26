@@ -62,7 +62,7 @@ const OrderTotal = ({ order, isGroupVisible = false, onPress }: IItem) => {
     <TouchableOpacity onPress={onPress}>
       <DataTable style={[borderColors, localStyles.table]}>
         <View style={[localStyles.label, labelStyle]}>
-          <IconButton icon={isGroupVisible ? 'chevron-down' : 'chevron-up'} size={18} color={colors.text} />
+          <IconButton icon={isGroupVisible ? 'chevron-down' : 'chevron-up'} size={18} iconColor={colors.text} />
         </View>
         <DataTable.Header style={[localStyles.header, headerStyle]}>
           {['Вес, кг', 'Сумма', 'Сумма с НДC'].map((i) => {
@@ -102,13 +102,13 @@ const OrderTotal = ({ order, isGroupVisible = false, onPress }: IItem) => {
           </DataTable.Row>
           <DataTable.Row style={[localStyles.borderColor, localStyles.total, localStyles.paddingBottom]}>
             <DataTable.Cell textStyle={textBoldStyle} numeric>
-              {formatValue({ type: 'number' }, round(total?.quantity, 3))}
+              {formatValue({ type: 'number' }, round(total?.quantity || 0, 3))}
             </DataTable.Cell>
             <DataTable.Cell textStyle={textBoldStyle} numeric>
-              {formatValue({ type: 'number', decimals: 2 }, round(total?.sum, 2))}
+              {formatValue({ type: 'number', decimals: 2 }, round(total?.sum || 0, 2))}
             </DataTable.Cell>
             <DataTable.Cell textStyle={textBoldStyle} numeric>
-              {formatValue({ type: 'number', decimals: 2 }, round(total?.sumVat, 2))}
+              {formatValue({ type: 'number', decimals: 2 }, round(total?.sumVat || 0, 2))}
             </DataTable.Cell>
           </DataTable.Row>
         </View>

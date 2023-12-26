@@ -18,7 +18,7 @@ import {
   Checkbox,
 } from '@lib/mobile-ui';
 
-import { Searchbar, useTheme } from 'react-native-paper';
+import { MD2Theme, Searchbar, useTheme } from 'react-native-paper';
 
 import { ScrollView } from 'react-native-gesture-handler';
 
@@ -64,7 +64,7 @@ export type SectionDataProps = SectionListData<IListItemProps, OrderListSectionP
 
 export const CellsViewScreen = () => {
   const navigation = useNavigation<StackNavigationProp<CellsStackParamList, 'CellsView'>>();
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   const contactId = useRoute<RouteProp<CellsStackParamList, 'CellsView'>>().params.contactId;
 

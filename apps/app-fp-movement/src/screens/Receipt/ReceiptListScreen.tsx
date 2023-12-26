@@ -59,10 +59,10 @@ export const ReceiptListScreen = () => {
       status === 'all'
         ? list
         : status === 'active'
-        ? list.filter((e) => e.status !== 'PROCESSED')
-        : status === 'archive'
-        ? list.filter((e) => e.status === 'PROCESSED')
-        : [];
+          ? list.filter((e) => e.status !== 'PROCESSED')
+          : status === 'archive'
+            ? list.filter((e) => e.status === 'PROCESSED')
+            : [];
 
     return res.map(
       (i) =>
@@ -83,7 +83,7 @@ export const ReceiptListScreen = () => {
               </MediumText>
             </View>
           ),
-        } as IListItemProps),
+        }) as IListItemProps,
     );
   }, [status, list]);
 

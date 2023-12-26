@@ -50,10 +50,10 @@ export const MovementListScreen = () => {
       status === 'all'
         ? list
         : status === 'active'
-        ? list.filter((e) => e.status !== 'PROCESSED')
-        : status === 'archive'
-        ? list.filter((e) => e.status === 'PROCESSED')
-        : [];
+          ? list.filter((e) => e.status !== 'PROCESSED')
+          : status === 'archive'
+            ? list.filter((e) => e.status === 'PROCESSED')
+            : [];
 
     return res.map(
       (i) =>
@@ -66,7 +66,7 @@ export const MovementListScreen = () => {
           isFromRoute: !!i.head.route,
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
-        } as IListItemProps),
+        }) as IListItemProps,
     );
   }, [status, list]);
 

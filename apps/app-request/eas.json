@@ -1,4 +1,7 @@
 {
+  "cli": {
+    "version": ">= 0.43.0"
+  },
   "build": {
     "development": {
       "developmentClient": true,
@@ -11,5 +14,8 @@
       }
     },
     "production": {"node": "16.14.0"}
+  },
+  "submit": {
+    "production": {}
   }
 }
