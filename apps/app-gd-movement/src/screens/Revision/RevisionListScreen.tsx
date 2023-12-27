@@ -187,7 +187,7 @@ export const RevisionListScreen = () => {
         documentDate: getDateString(i.documentDate),
         status: i.status,
         documentType: i.documentType.name,
-        lineCount: i.lines.length,
+        lineCount: i.lines?.length,
         errorMessage: i.errorMessage,
         sentDate: i.sentDate,
       } as IListItemProps;

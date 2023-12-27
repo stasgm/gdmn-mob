@@ -131,17 +131,20 @@ const RevisionGoodScreen = () => {
       if (!doc) {
         return;
       }
-
-      const line: IRevisionLine = { ...scannedObject, sortOrder: doc.lines?.length + 1 };
-
-      dispatch(documentActions.addDocumentLine({ docId, line }));
-
       if (isWithGood) {
-        setCurrentLineId(line.id);
-        navigation.navigate('SelectRefItem', {
-          refName: 'good',
-          fieldName: 'good',
-        });
+        const line = doc.lines.find((i) => i.barcode === scannedObject.barcode);
+
+        if (line) {
+          setCurrentLineId(line.id);
+          navigation.navigate('SelectRefItem', {
+            refName: 'good',
+            fieldName: 'good',
+          });
+        }
+      } else {
+        const line: IRevisionLine = { ...scannedObject, sortOrder: doc.lines?.length + 1 };
+
+        dispatch(documentActions.addDocumentLine({ docId, line }));
       }
 
       setScaner({ state: 'init' });

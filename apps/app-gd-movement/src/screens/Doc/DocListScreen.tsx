@@ -254,6 +254,7 @@ export const DocListScreen = () => {
         isFromRoute: !!i.head.route,
         lineCount: i.lines?.length,
         errorMessage: i.errorMessage,
+        sentDate: i.sentDate,
       } as IListItemProps;
     });
   }, [date.id, filteredList?.list, status, type?.id]);

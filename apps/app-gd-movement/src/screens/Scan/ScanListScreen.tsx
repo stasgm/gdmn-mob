@@ -189,6 +189,7 @@ export const ScanListScreen = () => {
         documentType: i.documentType.name,
         lineCount: i.lines?.length,
         errorMessage: i.errorMessage,
+        sentDate: i.sentDate,
       } as IListItemProps;
     });
   }, [filteredList.list, status]);

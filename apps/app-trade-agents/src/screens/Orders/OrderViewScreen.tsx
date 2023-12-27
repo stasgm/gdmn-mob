@@ -458,7 +458,7 @@ const OrderViewScreen = () => {
           <View style={styles.directionColumn}>
             <MediumText>Адрес: {address}</MediumText>
             {order.head.road ? <MediumText>Маршрут: {order.head.road.name}</MediumText> : null}
-            <MediumText>{`№ $  {order.number} от ${getDateString(order.documentDate)} на ${getDateString(
+            <MediumText>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
               order.head?.onDate,
             )}`}</MediumText>
             <MediumText style={debtTextStyle}>
