@@ -5,10 +5,8 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 
 import {
   Box,
-  Button,
   Card,
   Checkbox,
-  Grid,
   Table,
   TableBody,
   TableCell,
@@ -16,33 +14,17 @@ import {
   TablePagination,
   TableRow,
   TextField,
-  Divider,
-  Drawer,
-  IconButton,
-  InputAdornment,
 } from '@mui/material';
 
-import { IFileSystem, INamedEntity } from '@lib/types';
+import { IFileSystem } from '@lib/types';
 
-import { Field, FormikProvider, useFormik } from 'formik';
-
-import { X as CloseIcon } from 'react-feather';
-
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-
-import { DesktopDateTimePicker } from '@mui/x-date-pickers/DesktopDateTimePicker';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-
-import ComboBox from '../ComboBox';
+import { useFormik } from 'formik';
 
 import actions from '../../store/file';
 
-import { adminPath, fileFilterValues, fileFiltersDescription } from '../../utils/constants';
-import { IFileFilter, IFilePageParam, IFilterObject, IFilterOption, IPageParam } from '../../types';
-import { useDispatch, useSelector } from '../../store';
-import { getFilesFilters, getFilterObject } from '../../utils/helpers';
-import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
+import { adminPath } from '../../utils/constants';
+import { IFileFilter, IFilePageParam, IPageParam } from '../../types';
+import { useDispatch } from '../../store';
 
 interface IProps {
   files: IFileSystem[];
@@ -58,9 +40,6 @@ interface IProps {
   onSetPageParams: (filesFilters: IPageParam) => void;
   pageParams?: IFilePageParam | undefined;
   height?: number | undefined;
-  onCloseFilters?: () => void;
-  onClearFilters?: () => void;
-  // onSetFilterVisible?: () => void;
 }
 
 const FileListTable = ({
@@ -69,7 +48,6 @@ const FileListTable = ({
   // selectedFiles = [],
   // limitRows = 0,
   isFilterVisible = false,
-  // onSetFilterVisible,
   onSubmit,
   onSelectOne,
   onSelectMany,
@@ -77,82 +55,53 @@ const FileListTable = ({
   onSetPageParams,
   pageParams,
   height,
-  onCloseFilters,
-  onClearFilters,
 }: IProps) => {
   const [limit, setLimit] = useState(
     pageParams?.limit && !isNaN(Number(pageParams?.limit)) ? Number(pageParams?.limit) : 10,
   );
   const [page, setPage] = useState(pageParams?.page && !isNaN(Number(pageParams?.page)) ? Number(pageParams.page) : 0);
 
+  const initialValues = useMemo(() => {
+    return {
+      path: '',
+      id: '',
+      company: '',
+      appSystem: '',
+      producer: '',
+      consumer: '',
+      device: '',
+      uid: '',
+      date: '',
+    };
+  }, []);
+
   const navigate = useNavigate();
-  const maxHeight = useWindowResizeMaxHeight();
 
-  const formik = useFormik<IFilterObject>({
+  const formik = useFormik<IFileFilter>({
     enableReinitialize: true,
-    initialValues: pageParams?.filesFilters ? getFilterObject(pageParams?.filesFilters) : fileFilterValues,
+    initialValues: pageParams?.filesFilters || initialValues,
     onSubmit: (values) => {
-      console.log('values', values);
-      onSubmit(getFilesFilters(values));
-    },
-    onReset: () => {
-      onSetPageParams({ ...pageParams, filesFilters: undefined, page: 0 });
-
-      onClearFilters && onClearFilters();
-      formik.setValues(fileFilterValues);
+      onSubmit(values);
     },
   });
 
-  const { list: companies, loading: loadingCompanies } = useSelector((state) => state.companies);
-  const { list: appSystems, loading: loadingAppSystems } = useSelector((state) => state.appSystems);
-  const { list: users, loading: loadingUsers } = useSelector((state) => state.users);
-  const { list: devices, loading: loadingDevices } = useSelector((state) => state.devices);
-
-  const companyList = companies.map((d) => ({ id: d.id, name: d.name })) || [];
-  const appSystemList = appSystems.map((d) => ({ id: d.id, name: d.name })) || [];
-
-  const userList = companyList.length
-    ? users
-        .filter((i) => companyList.find((c) => c.name === formik.values['company'].value && c.id === i.company?.id))
-        .map((d) => ({ id: d.id, name: d.name }))
-    : [];
-
-  const deviceList = companyList.length
-    ? devices
-        .filter((i) => companyList.find((c) => c.name === formik.values['company'].value && c.id === i.company?.id))
-        .map((d) => ({ id: d.id, name: d.name }))
-    : [];
-
-  // console.log('usersList', usersList);
-
-  const isAuto = (item: string) =>
-    item === 'company' || item === 'appSystem' || item === 'producer' || item === 'consumer' || item === 'device';
-
   useEffect(() => {
     if (!isFilterVisible) {
-      formik.setValues(fileFilterValues);
+      formik.setValues(initialValues);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFilterVisible]);
 
   const handleSearchClick = () => {
-    onSetPageParams({ ...pageParams, filesFilters: getFilesFilters(formik.values), page: 0 });
+    onSetPageParams({ ...pageParams, filesFilters: formik.values, page: 0 });
     setPage(0);
-    // onCloseFilters
   };
 
-  const handleClearFilters = useCallback(() => {
-    onSetPageParams({ ...pageParams, filesFilters: undefined, page: 0 });
-    formik.setValues(fileFilterValues);
-    setPage(0);
-    onClearFilters && onClearFilters();
-  }, [formik, onClearFilters, onSetPageParams, pageParams]);
+  const handleKeyPress = (key: string) => {
+    if (key !== 'Enter') return;
 
-  // const handleKeyPress = (key: string) => {
-  //   if (key !== 'Enter') return;
-
-  //   handleSearchClick();
-  // };
+    handleSearchClick();
+  };
 
   const handleLimitChange = useCallback(
     (event: any) => {
@@ -171,10 +120,10 @@ const FileListTable = ({
   );
 
   // useEffect(() => {
-  //   if (isFilterVisible && formik.values !== fileFilterValues) {
+  //   if (isFilterVisible && formik.values !== initialValues) {
   //     setPageParamLocal({ filesFilters: formik.values });
   //   }
-  // }, [formik.values, fileFilterValues, isFilterVisible, setPageParamLocal]);
+  // }, [formik.values, initialValues, isFilterVisible, setPageParamLocal]);
 
   // useEffect(() => {
   //   if (limitRows > 0) {
@@ -200,22 +149,8 @@ const FileListTable = ({
     }
   };
 
-  // console.log('formik,', formik.values);
-
-  const handleUpdateFormik = useCallback(
-    (field: any, value: INamedEntity) => {
-      // console.log('field', field, 'value', value);
-      formik.setValues({
-        ...formik.values,
-        [field]: { ...formik.values[field], value: value.name },
-      });
-    },
-    [formik],
-  );
-
   const TableRows = () => {
     const fileList = files.slice(page * limit, page * limit + limit).map((file: IFileSystem) => {
-      // const b = ;
       return (
         <TableRow
           hover
@@ -248,19 +183,20 @@ const FileListTable = ({
               value="true"
             />
           </TableCell>
-          <TableCell /*style={{ minWidth: 150 }}*/>{file.folder || 'db'}</TableCell>
-          <TableCell /*style={{ minWidth: 500 }}*/>{getFileName(file.id)}</TableCell>
-          <TableCell /*style={{ minWidth: 150 }}*/>{file.company?.name}</TableCell>
-          <TableCell /*style={{ minWidth: 150 }}*/>{file.appSystem?.name}</TableCell>
-          <TableCell /*style={{ minWidth: 100 }}*/>{file.producer?.name}</TableCell>
-          <TableCell /*style={{ minWidth: 100 }}*/>{file.consumer?.name}</TableCell>
-          <TableCell /*style={{ minWidth: 100 }}*/>{file.device?.name}</TableCell>
-          <TableCell /*style={{ minWidth: 100 }}*/>{file.device?.id}</TableCell>
-          <TableCell /*style={{ minWidth: 100 }}*/>
+          {/* <TableCell /*style={{ minWidth: 150 }}>{file.folder || 'db'}</TableCell> */}
+
+          <TableCell style={{ minWidth: 150 }}>{file.path}</TableCell>
+          <TableCell style={{ minWidth: 500 }}>{getFileName(file.id)}</TableCell>
+          <TableCell style={{ minWidth: 150 }}>{file.company?.name}</TableCell>
+          <TableCell style={{ minWidth: 150 }}>{file.appSystem?.name}</TableCell>
+          <TableCell style={{ minWidth: 100 }}>{file.producer?.name}</TableCell>
+          <TableCell style={{ minWidth: 100 }}>{file.consumer?.name}</TableCell>
+          <TableCell style={{ minWidth: 100 }}>{file.device?.name}</TableCell>
+          <TableCell style={{ minWidth: 100 }}>{file.device?.id}</TableCell>
+          <TableCell style={{ minWidth: 100 }}>
             {new Date(file.date || '').toLocaleString('ru', { hour12: false })}
           </TableCell>
-          <TableCell /*style={{ minWidth: 100 }}*/>{Math.ceil(file.size).toString()} кб</TableCell>
-          <TableCell /*style={{ minWidth: 150 }}*/>{file.path}</TableCell>
+          <TableCell style={{ minWidth: 100 }}>{Math.ceil(file.size).toString()} кб</TableCell>
         </TableRow>
       );
     });
@@ -279,217 +215,79 @@ const FileListTable = ({
     );
   };
 
-  const [ddate, setDate] = useState(new Date());
   return (
-    <FormikProvider value={formik}>
-      <Card>
-        <PerfectScrollbar>
-          <Box
-            sx={{
-              p: 1,
-              overflowX: 'auto',
-              overflowY: 'auto',
-              maxHeight: window.innerHeight - 268,
-              maxWidth: '100%',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Table>
-              <TableHead>
+    <Card>
+      <PerfectScrollbar>
+        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight: window.innerHeight - 268 }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    checked={selectedFileIds.length === files.length}
+                    color="primary"
+                    indeterminate={selectedFileIds.length > 0 && selectedFileIds.length < files.length}
+                    onChange={onSelectMany}
+                  />
+                </TableCell>
+                <TableCell style={{ minWidth: 150 }}>Путь</TableCell>
+                <TableCell style={{ minWidth: 500 }}>Название</TableCell>
+                <TableCell style={{ minWidth: 150 }}>Компания</TableCell>
+                <TableCell style={{ minWidth: 150 }}>Подсистема</TableCell>
+                <TableCell style={{ minWidth: 100 }}>Пользователь</TableCell>
+                <TableCell style={{ minWidth: 100 }}>Получатель</TableCell>
+                <TableCell style={{ minWidth: 100 }}>Устройство</TableCell>
+                <TableCell style={{ minWidth: 100 }}>Идентификатор</TableCell>
+                <TableCell style={{ minWidth: 100 }}>Дата</TableCell>
+                <TableCell style={{ minWidth: 100 }}>Размер</TableCell>
+              </TableRow>
+              {isFilterVisible ? (
                 <TableRow>
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={selectedFileIds.length === files.length}
-                      color="primary"
-                      indeterminate={selectedFileIds.length > 0 && selectedFileIds.length < files.length}
-                      onChange={onSelectMany}
-                    />
-                  </TableCell>
-                  <TableCell>Папка</TableCell>
-                  <TableCell>Название</TableCell>
-                  <TableCell>Компания</TableCell>
-                  <TableCell>Подсистема</TableCell>
-                  <TableCell>Пользователь</TableCell>
-                  <TableCell>Получатель</TableCell>
-                  <TableCell>Устройство</TableCell>
-                  <TableCell>Идентификатор</TableCell>
-                  <TableCell>Дата</TableCell>
-                  <TableCell>Размер</TableCell>
-                  <TableCell>Путь</TableCell>
+                  <TableCell></TableCell>
+                  {Object.keys(initialValues).map((item) => (
+                    <TableCell key={item}>
+                      <TextField
+                        InputProps={{
+                          sx: {
+                            height: 30,
+                            fontSize: 13,
+                            '& .MuiOutlinedInput-input': {
+                              borderWidth: 0,
+                              padding: 0.5,
+                            },
+                          },
+                        }}
+                        fullWidth
+                        name={item}
+                        required
+                        variant="outlined"
+                        type="search"
+                        value={formik.values[item]}
+                        onChange={formik.handleChange}
+                        onKeyPress={(event) => handleKeyPress(event.key)}
+                      />
+                    </TableCell>
+                  ))}
+                  <TableCell></TableCell>
                 </TableRow>
-              </TableHead>
-              <TableBody>
-                <TableRows />
-              </TableBody>
-            </Table>
-          </Box>
-          {isFilterVisible && (
-            <>
-              <Divider orientation="vertical" flexItem />
-              <Drawer
-                ModalProps={{ disableScrollLock: true }}
-                anchor="right"
-                open={isFilterVisible}
-                variant="persistent"
-                PaperProps={{
-                  sx: {
-                    width: 256,
-                    marginBottom: 20,
-                    top: 64,
-                  },
-                }}
-              >
-                <form onSubmit={formik.handleSubmit} onReset={formik.handleReset}>
-                  <Grid container direction="column" spacing={3} sx={{ p: 3, overflowY: 'auto' }}>
-                    <Grid
-                      sx={{
-                        flexDirection: 'row',
-                        justifyContent: 'flex-end',
-                        alignItems: 'flex-end',
-                      }}
-                    >
-                      <IconButton sx={{ justifyContent: 'flex-end' }} onClick={onCloseFilters}>
-                        <CloseIcon fontSize="small" />
-                      </IconButton>
-                    </Grid>
-                    {/* <PerfectScrollbar> */}
-                    {/* <Grid container direction="column" spacing={3} sx={{ p: 3, overflowY: 'visible' }}> */}
-                    {Object.keys(fileFilterValues).map((item) => (
-                      <Grid item key={item}>
-                        {fileFilterValues[item].type === 'select' ? (
-                          <Field
-                            InputProps={{
-                              sx: {
-                                height: 50,
-                                fontSize: 13,
-                                '& .MuiOutlinedInput-input': {
-                                  borderWidth: 0,
-                                  // padding: 0.5,
-                                },
-                                alignItems: 'center',
-                                justifyContent: 'flex-start',
-                              },
-                            }}
-                            component={ComboBox}
-                            id={item}
-                            name={item}
-                            label={fileFilterValues[item].name || ''}
-                            value={formik.values[item].value ? formik.values[item].value : ''}
-                            options={
-                              item === 'company'
-                                ? companyList
-                                : item === 'appSystem'
-                                ? appSystemList
-                                : item === 'producer' || item === 'consumer'
-                                ? userList
-                                : item === 'device'
-                                ? deviceList
-                                : []
-                            }
-                            setFieldValue={handleUpdateFormik}
-                            setTouched={formik.setTouched}
-                            // error={Boolean(formik.touched.company && formik.errors.company)}
-                            // disabled={/* loading || */ loadingCompanies}
-                            fullWidth
-                            getOptionLabel={(option: IFilterOption) =>
-                              (formik.values[item].name === option.name ? option.value : option.name) || ''
-                            }
-                            isOptionEqualToValue={(option: INamedEntity, value: IFilterOption) =>
-                              option.name === value.value
-                            }
-                          />
-                        ) : fileFilterValues[item].type === 'date' ? (
-                          <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DesktopDateTimePicker
-                              label={fileFilterValues[item].name || ''}
-                              inputFormat="DD.MM.YYYY"
-                              value={formik.values[item].value || null}
-                              onChange={(a) => handleUpdateFormik(item, { id: item, name: new Date(a).toISOString() })}
-                              renderInput={(params) => (
-                                <TextField
-                                  {...params}
-                                  // InputProps={{
-                                  //   endAdornment: formik.values.dateTo.value ? (
-                                  //     <InputAdornment position="end" onClick={clearOnClick}>
-                                  //       <IconButton>
-                                  //         <CloseIcon fontSize="small" />
-                                  //       </IconButton>
-                                  //     </InputAdornment>
-                                  //   ) : null,
-                                  // }}
-                                />
-                              )}
-                            />
-                          </LocalizationProvider>
-                        ) : (
-                          // </Grid>
-                          <TextField
-                            InputProps={{
-                              sx: {
-                                height: 50,
-                                fontSize: 13,
-                                '& .MuiOutlinedInput-input': {
-                                  borderWidth: 0,
-                                  // padding: 0.5,
-                                },
-                                alignItems: 'center',
-                                justifyContent: 'flex-start',
-                              },
-                            }}
-                            fullWidth
-                            name={item}
-                            label={fileFilterValues[item].name}
-                            variant="outlined"
-                            type="search"
-                            value={formik.values[item].value}
-                            onChange={formik.handleChange}
-                          />
-                        )}
-                      </Grid>
-                    ))}
-
-                    <Grid item>
-                      <Button
-                        color="primary"
-                        type="submit"
-                        variant="contained"
-                        // sx={{ m: 1 }}
-                        fullWidth
-                        onClick={handleSearchClick}
-                        disabled={!(formik.values['company'].value || formik.values['appSystem'].value)}
-                      >
-                        Применить
-                      </Button>
-                    </Grid>
-                    <Grid item>
-                      <Button
-                        color="secondary"
-                        variant="contained"
-                        onClick={handleClearFilters}
-                        // sx={{ p: 1 }}
-                        fullWidth
-                      >
-                        Очистить
-                      </Button>
-                    </Grid>
-                  </Grid>
-                </form>
-              </Drawer>
-            </>
-          )}
-        </PerfectScrollbar>
-        <TablePagination
-          component="div"
-          count={files.length}
-          onPageChange={handlePageChange}
-          onRowsPerPageChange={handleLimitChange}
-          page={page}
-          rowsPerPage={limit}
-          rowsPerPageOptions={[5, 10, 25]}
-          // sx={{ maxWidth: isFilterVisible ? '70%' : '100%' }}
-        />
-      </Card>
-    </FormikProvider>
+              ) : null}
+            </TableHead>
+            <TableBody>
+              <TableRows />
+            </TableBody>
+          </Table>
+        </Box>
+      </PerfectScrollbar>
+      <TablePagination
+        component="div"
+        count={files.length}
+        onPageChange={handlePageChange}
+        onRowsPerPageChange={handleLimitChange}
+        page={page}
+        rowsPerPage={limit}
+        rowsPerPageOptions={[5, 10, 25]}
+      />
+    </Card>
   );
 };
 

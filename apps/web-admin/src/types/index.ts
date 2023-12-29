@@ -56,11 +56,10 @@ export interface IFilterObject {
   dateFrom: IFilterOption;
   dateTo: IFilterOption;
 }
-
 export interface IFileFilter {
   [fieldName: string]: string;
-  folder: string;
-  fileName: string;
+  path: string;
+  id: string;
   company: string;
   appSystem: string;
   producer: string;
@@ -68,10 +67,7 @@ export interface IFileFilter {
   device: string;
   uid: string;
   date: string;
-  dateFrom: string;
-  dateTo: string;
 }
-
 export interface IFilterOption extends INamedEntity {
   type: 'text' | 'select' | 'date';
   value: string;

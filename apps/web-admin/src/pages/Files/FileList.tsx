@@ -49,10 +49,10 @@ const FileList = () => {
     dispatch(deviceActions.fetchDevices());
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   // Загружаем данные при загрузке компонента.
-  //   fetchFiles(pageParams?.filesFilters);
-  // }, [fetchFiles, pageParams?.filesFilters]);
+  useEffect(() => {
+    // Загружаем данные при загрузке компонента.
+    fetchFiles(pageParams?.filesFilters);
+  }, [fetchFiles, pageParams?.filesFilters]);
 
   console.log('pageParams', pageParams?.filesFilters);
 
@@ -352,8 +352,6 @@ const FileList = () => {
                 selectedFileIds={selectedFileIds}
                 onSetPageParams={handleSetPageParams}
                 pageParams={pageParams}
-                onCloseFilters={() => setFilterVisible(false)}
-                onClearFilters={handleClearFilters}
               />
             </Box>
             // <Box sx={{ pt: 2 }}>
