@@ -116,6 +116,27 @@ export const readTextFile = async <T>(
   }
 };
 
+export const searchInTextFile = async <T>(
+  fileName: string,
+  searchString: string,
+  start: number | undefined,
+  end: number | undefined,
+): Promise<boolean> => {
+  const check = await checkFileExists(fileName);
+  if (!check) return false;
+  try {
+    const streamRead = createReadStream(fileName, { encoding: 'utf8', start: start, end: end });
+    const data = [];
+    for await (const chunk of streamRead) {
+      data.push(chunk);
+      if (data.join('').toString().toLowerCase().indexOf(searchString.toLowerCase()) >= 0) return true;
+    }
+    return false;
+  } catch (err) {
+    return false;
+  }
+};
+
 const finishedPromisify = promisify(finished);
 
 export const writeIterableToFile = async (filename: string, iterable: string, options?: any): Promise<void> => {
