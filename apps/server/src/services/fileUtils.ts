@@ -45,6 +45,24 @@ export const _readDir = async (root: string, excludeFolders: string[] | undefine
   }
 };
 
+export const _readRoot = async (root: string): Promise<string[]> => {
+  try {
+    const files = await readdir(root);
+    const res = await files.reduce(async (arr: Promise<string[]>, curr: string) => {
+      let accum: string[] = await arr;
+      const fullCurr = path.join(root, curr);
+
+      const isDir = (await stat(fullCurr)).isDirectory();
+      if (!isDir) accum = [...accum, fullCurr];
+      return accum;
+    }, Promise.resolve([]));
+    return res;
+  } catch (err) {
+    log.error(`Robust-protocol.errorDirectory: Ошибка чтения директории - ${err}`);
+    return [];
+  }
+};
+
 export const checkFiles = async (): Promise<void> => {
   const defaultExclude = Object.values(collectionNames).map((i) => `${i}.json`);
 
@@ -205,13 +223,15 @@ export const getCompanyIdByName = (name: string): IDBCompany | undefined => {
 export const readListFiles = async (params: Record<string, string | number>): Promise<IFileSystem[]> => {
   const root = getDb().dbPath;
 
-  const fullRoot =
-    'company' in params && 'appSystem' in params
-      ? path.join(root, `db_${getCompanyIdByName(params['company'] as string)?.id}`, params['appSystem'] as string)
-      : root;
+  const fullRoot = !('company' in params)
+    ? root
+    : 'appSystem' in params
+    ? path.join(root, `db_${getCompanyIdByName(params['company'] as string)?.id}`, params['appSystem'] as string)
+    : path.join(root, `db_${getCompanyIdByName(params['company'] as string)?.id}`);
 
   let files: IFileSystem[] = [];
-  const fileStrings = await _readDir(fullRoot, undefined);
+  const fileStrings = 'company' in params ? await _readDir(fullRoot, undefined) : await _readRoot(fullRoot);
+
   for (const file of fileStrings) {
     // eslint-disable-next-line no-await-in-loop
     const fileObj = await splitFilePath(file);
@@ -312,21 +332,24 @@ export const searchFilesList = async (params: Record<string, string | number>): 
   const searchString = params.searchQuery as string;
   const files: IFileSystem[] = await readListFiles(paramsWithout);
   let prev: IFileSystem[] = [];
-  const searchFiles = files.reduce(async (_, cur: IFileSystem) => {
-    const curObj: IFileObject = {
-      id: cur.id,
-      companyId: cur.company?.id,
-      appSystemId: cur.appSystem?.id,
-      folder: cur.folder,
-      ext: cur.ext,
-    };
+  const searchFiles = files.reduce(
+    async (_, cur: IFileSystem) => {
+      const curObj: IFileObject = {
+        id: cur.id,
+        companyId: cur.company?.id,
+        appSystemId: cur.appSystem?.id,
+        folder: cur.folder,
+        ext: cur.ext,
+      };
 
-    const fullName = idObj2fullFileName(curObj);
+      const fullName = idObj2fullFileName(curObj);
 
-    const isInclude = !fullName ? false : await searchInTextFile(fullName, searchString, undefined, undefined);
-    if (isInclude) prev = [...prev, cur as IFileSystem];
-    return prev;
-  }, Promise.resolve([] as IFileSystem[]));
+      const isInclude = !fullName ? false : await searchInTextFile(fullName, searchString, undefined, undefined);
+      if (isInclude) prev = [...prev, cur as IFileSystem];
+      return prev;
+    },
+    Promise.resolve([] as IFileSystem[]),
+  );
   return searchFiles;
 };
 
