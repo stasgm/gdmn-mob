@@ -288,6 +288,10 @@ export const ScanViewScreen = () => {
         return;
       }
 
+      if (isBlocked) {
+        return;
+      }
+
       if (doc.head.isBindGood && doc.lines?.find((l) => l.barcode === brc)) {
         Alert.alert('Внимание!', 'Баркод  уже добавлен', [
           {
@@ -313,7 +317,7 @@ export const ScanViewScreen = () => {
       }
       handleFocus();
     },
-    [dispatch, doc, id, navigation],
+    [dispatch, doc, id, isBlocked, navigation],
   );
 
   const setScan = (brc: string) => {

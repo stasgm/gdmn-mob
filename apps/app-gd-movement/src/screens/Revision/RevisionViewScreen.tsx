@@ -285,7 +285,7 @@ export const RevisionViewScreen = () => {
         dispatch(
           documentActions.updateDocumentLine({
             docId: doc.id,
-            line: { ...currentLine, good } as IRevisionLine,
+            line: { ...currentLine, good, withGood: true } as IRevisionLine,
           }),
         );
         setCurrentLineId('');
@@ -297,6 +297,10 @@ export const RevisionViewScreen = () => {
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!doc) {
+        return;
+      }
+
+      if (isBlocked) {
         return;
       }
 
@@ -333,16 +337,16 @@ export const RevisionViewScreen = () => {
         return;
       }
 
-      const good1 = goods.find((i) => i.barcode === brc);
-      if (good1) {
+      const refGood = goods.find((i) => i.barcode === brc);
+      if (refGood) {
         const line: IRevisionLine = {
-          good: { id: good1.id, name: good1.name },
+          good: { id: refGood.id, name: refGood.name },
           id: generateId(),
           barcode: brc,
           sortOrder: (lines?.length || 0) + 1,
-          price: good1.price || 0,
+          price: refGood.price || 0,
         };
-        Alert.alert(good1.name, `Цена: ${good1.price || 0} р.`, [
+        Alert.alert(refGood.name, `Цена: ${refGood.price || 0} р.`, [
           {
             text: 'Добавить',
             onPress: () => {
@@ -358,7 +362,7 @@ export const RevisionViewScreen = () => {
         return;
       }
 
-      if (!remItem && !good1) {
+      if (!remItem && !refGood) {
         const line = lines?.find((i) => i.barcode === brc);
 
         if (line) {
@@ -421,7 +425,7 @@ export const RevisionViewScreen = () => {
 
       handleFocus();
     },
-    [dispatch, doc, goodRemains, goods, id, lines, navigation],
+    [dispatch, doc, goodRemains, goods, id, isBlocked, lines, navigation],
   );
 
   const setScan = (brc: string) => {

@@ -304,6 +304,10 @@ export const DocViewScreen = () => {
         return;
       }
 
+      if (isBlocked) {
+        return;
+      }
+
       if (!brc) {
         return;
       }
@@ -394,6 +398,7 @@ export const DocViewScreen = () => {
       documentType?.isRemains,
       goodRemains,
       id,
+      isBlocked,
       isInputQuantity,
       lines?.length,
       navigation,

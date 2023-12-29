@@ -113,7 +113,7 @@ const RevisionGoodScreen = () => {
         dispatch(
           documentActions.updateDocumentLine({
             docId: doc.id,
-            line: { ...currentLine, good } as IRevisionLine,
+            line: { ...currentLine, good, withGood: true } as IRevisionLine,
           }),
         );
         setCurrentLineId('');
