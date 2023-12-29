@@ -832,8 +832,8 @@ const ShipmentViewScreen = () => {
             {screenState === 'deleting'
               ? 'Удаление документа...'
               : screenState === 'copying'
-              ? 'Копирование документа...'
-              : 'Отправка документа...'}
+                ? 'Копирование документа...'
+                : 'Отправка документа...'}
           </LargeText>
           <AppActivityIndicator style={{}} />
         </View>
