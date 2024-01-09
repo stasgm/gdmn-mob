@@ -30,6 +30,7 @@ export interface IOrderFormParam extends IFormParam {
   onDate?: string;
   status?: StatusType;
   route?: IReferenceData;
+  road?: IReferenceData;
   comment?: string;
 }
 
@@ -105,6 +106,7 @@ export interface IContact extends INamedEntity, IReferenceData {
   contractDate: string; // Дата договора
   paycond: string; // Условие оплаты
   phoneNumber: string; // Номер телефона
+  limitSum?: string; // Лимит задолженности
 }
 //Магазины
 export interface IOutlet extends INamedEntity, IReferenceData {
@@ -154,6 +156,7 @@ export interface IOrderHead extends IHead {
   contact: IReferenceData; //организация-плательщик
   outlet: IReferenceData; // магазин –подразделение организации плательщика
   route?: IReferenceData; // 	Маршрут
+  road?: IReferenceData; // 	Маршрут
   depart?: IReferenceData; // Необязательное поле склад (подразделение предприятия-производителя)
   onDate: string; //  Дата отгрузки
   takenOrder?: TakeOrderType; //тип взятия заявки

@@ -3,6 +3,7 @@ import { TouchableOpacity, View, StyleSheet } from 'react-native';
 import { MD2Theme, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusType } from '@lib/types';
+import { getDateString } from '@lib/mobile-hooks';
 
 import styles from '../../styles/global';
 
@@ -24,6 +25,7 @@ export interface IListItemProps {
   lineCount?: number;
   children?: ReactNode;
   addInfo?: ReactNode;
+  sentDate?: string;
 }
 
 const ScreenListItem = ({
@@ -34,6 +36,7 @@ const ScreenListItem = ({
   lineCount,
   isFromRoute,
   errorMessage,
+  sentDate,
   onPress,
   onLongPress,
   checked,
@@ -72,6 +75,11 @@ const ScreenListItem = ({
           {children}
           {errorMessage ? (
             <MediumText style={{ color: colors.error }}>Отказано: {errorMessage || ''}</MediumText>
+          ) : null}
+          {sentDate ? (
+            <MediumText>
+              Отправлено: {getDateString(sentDate)} {new Date(sentDate).toLocaleTimeString()}
+            </MediumText>
           ) : null}
         </View>
       </View>

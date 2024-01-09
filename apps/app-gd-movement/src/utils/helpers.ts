@@ -131,3 +131,7 @@ const getRemainsByGoodId = (remains: IRemainsData[], noZeroRemains = false) => {
 };
 
 export { getRemGoodByContact, getRemGoodListByContact };
+
+export const jsonFormat = (str: any) => {
+  return JSON.stringify(str, null, '\t');
+};

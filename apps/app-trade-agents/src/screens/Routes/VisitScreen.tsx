@@ -482,6 +482,11 @@ const VisitScreen = () => {
                   {`Просрочено: ${formatValue({ type: 'currency', decimals: 2 }, saldoDebt ?? 0)}, ${debt.dayLeft} дн.`}
                 </MediumText>
               )}
+              {contact.limitSum ? (
+                <View style={styles.rowCenter}>
+                  <MediumText>Лимит: {formatValue({ type: 'currency', decimals: 2 }, contact.limitSum)}</MediumText>
+                </View>
+              ) : null}
               <Divider />
               {visit && dateBegin && (
                 <View>

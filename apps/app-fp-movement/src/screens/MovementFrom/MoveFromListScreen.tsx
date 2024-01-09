@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { ListRenderItem, SectionList, SectionListData, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 
 import { documentActions, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
@@ -20,6 +20,7 @@ import {
   SimpleDialog,
   SendButton,
   FilterButtons,
+  AppActivityIndicator,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -83,6 +84,7 @@ export const MoveFromListScreen = () => {
               </MediumText>
             </View>
           ),
+          sentDate: i.sentDate,
         }) as IListItemProps,
     );
   }, [status, list]);
@@ -195,6 +197,11 @@ export const MoveFromListScreen = () => {
   const renderSectionHeader = ({ section }: any) => (
     <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   return (
     <AppScreen>

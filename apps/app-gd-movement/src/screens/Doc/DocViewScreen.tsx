@@ -304,6 +304,10 @@ export const DocViewScreen = () => {
         return;
       }
 
+      if (isBlocked) {
+        return;
+      }
+
       if (!brc) {
         return;
       }
@@ -394,6 +398,7 @@ export const DocViewScreen = () => {
       documentType?.isRemains,
       goodRemains,
       id,
+      isBlocked,
       isInputQuantity,
       lines?.length,
       navigation,
@@ -455,6 +460,13 @@ export const DocViewScreen = () => {
             >{`${doc.documentType.toDescription}: ${doc.head.toContact?.name}`}</MediumText>
           )}
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
+          {doc.sentDate ? (
+            <View style={styles.rowCenter}>
+              <MediumText>
+                Отправлено: {getDateString(doc.sentDate)} {new Date(doc.sentDate).toLocaleTimeString()}
+              </MediumText>
+            </View>
+          ) : null}
         </>
       </InfoBlock>
       {isScanerReader ? (

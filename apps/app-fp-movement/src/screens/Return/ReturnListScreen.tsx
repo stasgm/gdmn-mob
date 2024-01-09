@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { ListRenderItem, SectionList, SectionListData, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 
 import { documentActions, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
@@ -19,6 +19,7 @@ import {
   navBackDrawer,
   SimpleDialog,
   SendButton,
+  AppActivityIndicator,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -29,6 +30,7 @@ import { IDelList } from '@lib/mobile-types';
 
 import { IReturnDocument } from '../../store/types';
 import { ReturnStackParamList } from '../../navigation/Root/types';
+import { jsonFormat } from '../../utils/helpers';
 
 export interface ReturnListSectionProps {
   title: string;
@@ -44,6 +46,7 @@ export const ReturnListScreen = () => {
     useSelector((state) => state.documents.list)?.filter((i) => i.documentType?.name === 'return') as IReturnDocument[]
   ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
+  console.log('list', jsonFormat(list));
   const loading = useSelector((state) => state.app.loading);
 
   const [delList, setDelList] = useState<IDelList>({});
@@ -71,6 +74,7 @@ export const ReturnListScreen = () => {
           subtitle: `№ ${i.number} на ${getDateString(i.documentDate)}` || '',
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
+          sentDate: i.sentDate,
         }) as IListItemProps,
     );
   }, [status, list]);
@@ -179,6 +183,11 @@ export const ReturnListScreen = () => {
   const renderSectionHeader = ({ section }: any) => (
     <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   return (
     <AppScreen>

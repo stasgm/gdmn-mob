@@ -46,6 +46,7 @@ import { messageGdMovement } from './src/store/mock';
 
 import RemainsNavigator from './src/navigation/RemainsNavigator';
 import { ScanNavigator } from './src/navigation/ScanNavigator';
+import { RevisionNavigator } from './src/navigation/RevisionNavigator';
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -61,6 +62,12 @@ const Root = () => {
         title: 'Сканирование',
         icon: 'barcode-scan',
         component: ScanNavigator,
+      },
+      {
+        name: 'revision',
+        title: 'Сверка',
+        icon: 'text-box-check-outline',
+        component: RevisionNavigator,
       },
       {
         name: 'Remains',

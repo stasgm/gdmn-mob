@@ -29,8 +29,8 @@ import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@l
 
 import { IDelList } from '@lib/mobile-types';
 
-import { IScanDocument } from '../../store/types';
-import { ScanStackParamList } from '../../navigation/Root/types';
+import { IRevisionDocument } from '../../store/types';
+import { RevisionStackParamList } from '../../navigation/Root/types';
 
 export interface DocListProps {
   orders: IListItemProps[];
@@ -38,16 +38,16 @@ export interface DocListProps {
 
 interface IFilteredList {
   searchQuery: string;
-  list: IScanDocument[];
+  list: IRevisionDocument[];
 }
 
-export interface ScanListSectionProps {
+export interface RevisionListSectionProps {
   title: string;
 }
-export type SectionDataProps = SectionListData<IListItemProps, ScanListSectionProps>[];
+export type SectionDataProps = SectionListData<IListItemProps, RevisionListSectionProps>[];
 
-export const ScanListScreen = () => {
-  const navigation = useNavigation<StackNavigationProp<ScanStackParamList, 'ScanList'>>();
+export const RevisionListScreen = () => {
+  const navigation = useNavigation<StackNavigationProp<RevisionStackParamList, 'RevisionList'>>();
   const docDispatch = useDocThunkDispatch();
 
   const { colors } = useTheme();
@@ -55,7 +55,7 @@ export const ScanListScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
-  const list = useSelector((state) => state.documents.list) as IScanDocument[];
+  const list = useSelector((state) => state.documents.list) as IRevisionDocument[];
 
   const [delList, setDelList] = useState<IDelList>({});
   const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
@@ -72,7 +72,7 @@ export const ScanListScreen = () => {
   }, [delList, docDispatch]);
 
   const handleAddDocument = useCallback(() => {
-    navigation.navigate('ScanEdit');
+    navigation.navigate('RevisionEdit');
   }, [navigation]);
 
   useEffect(() => {
@@ -103,7 +103,7 @@ export const ScanListScreen = () => {
     navigation.setOptions({
       headerLeft: isDelList ? renderLeft : navBackDrawer,
       headerRight: renderRight,
-      title: isDelList ? `Выделено документов: ${Object.values(delList).length}` : 'Сканирование',
+      title: isDelList ? `Выделено документов: ${Object.values(delList).length}` : 'Сверка',
     });
   }, [delList, isDelList, navigation, renderLeft, renderRight]);
 
@@ -118,7 +118,7 @@ export const ScanListScreen = () => {
         setFilteredList({
           searchQuery,
           list: list
-            .filter((i) => i.documentType.name === 'scan')
+            .filter((i) => i.documentType.name === 'revision')
             .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()),
         });
       }
@@ -131,13 +131,13 @@ export const ScanListScreen = () => {
         setFilteredList({
           searchQuery,
           list: list
-            .filter((i) => i.documentType.name === 'scan')
+            .filter((i) => i.documentType.name === 'revision')
             .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()),
         });
       } else {
         const lower = searchQuery.toLowerCase();
 
-        const fn = ({ head, documentDate, number }: IScanDocument) =>
+        const fn = ({ head, documentDate, number }: IRevisionDocument) =>
           head.department?.name?.toLowerCase().includes(lower) ||
           number.toLowerCase().includes(lower) ||
           getDateString(documentDate).toLowerCase().includes(lower);
@@ -152,7 +152,7 @@ export const ScanListScreen = () => {
           gr = filteredList.list.filter(fn);
         } else {
           const newList = list
-            .filter((i) => i.documentType.name === 'scan')
+            .filter((i) => i.documentType.name === 'revision')
             .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
           gr = newList.filter(fn);
         }
@@ -183,7 +183,7 @@ export const ScanListScreen = () => {
     return res.map((i) => {
       return {
         id: i.id,
-        title: i.head.isBindGood ? 'Привязка штрихкодов к ТМЦ' : i.documentType.description || '',
+        title: i.documentType.description || '',
         documentDate: getDateString(i.documentDate),
         status: i.status,
         documentType: i.documentType.name,
@@ -226,7 +226,7 @@ export const ScanListScreen = () => {
         onPress={() =>
           isDelList
             ? setDelList(getDelList(delList, item.id, item.status!))
-            : navigation.navigate('ScanView', { id: item.id })
+            : navigation.navigate('RevisionView', { id: item.id })
         }
         onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
         checked={!!delList[item.id]}

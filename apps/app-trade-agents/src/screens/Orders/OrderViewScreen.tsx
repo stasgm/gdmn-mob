@@ -31,6 +31,7 @@ import { useTheme, MD2Theme } from 'react-native-paper';
 import { FlashList } from '@shopify/flash-list';
 
 import {
+  IContact,
   IDebt,
   IOrderDocument,
   IOrderLine,
@@ -79,6 +80,7 @@ const OrderViewScreen = () => {
   const debtTextStyle = { color: debt?.saldoDebt && debt?.saldoDebt > 0 ? colors.error : colors.text };
 
   const address = refSelectors.selectByRefId<IOutlet>('outlet', order?.head?.outlet.id)?.address;
+  const limitSum = refSelectors.selectByRefId<IContact>('contact', order?.head?.contact.id)?.limitSum;
 
   const handleAddOrderLine = useCallback(() => {
     navigation.navigate('SelectGood', {
@@ -455,6 +457,7 @@ const OrderViewScreen = () => {
         >
           <View style={styles.directionColumn}>
             <MediumText>Адрес: {address}</MediumText>
+            {order.head.road ? <MediumText>Маршрут: {order.head.road.name}</MediumText> : null}
             <MediumText>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
               order.head?.onDate,
             )}`}</MediumText>
@@ -470,9 +473,21 @@ const OrderViewScreen = () => {
                 } дн.`}
               </MediumText>
             )}
+            {limitSum ? (
+              <View style={styles.rowCenter}>
+                <MediumText>Лимит: {formatValue({ type: 'currency', decimals: 2 }, limitSum)}</MediumText>
+              </View>
+            ) : null}
             {order.head.comment ? (
               <View style={styles.rowCenter}>
                 <MediumText>Комментарий: {order.head.comment || ''}</MediumText>
+              </View>
+            ) : null}
+            {order.sentDate ? (
+              <View style={styles.rowCenter}>
+                <MediumText>
+                  Отправлено: {getDateString(order.sentDate)} {new Date(order.sentDate).toLocaleTimeString()}
+                </MediumText>
               </View>
             ) : null}
           </View>
