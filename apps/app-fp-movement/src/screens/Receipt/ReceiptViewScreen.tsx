@@ -664,6 +664,13 @@ export const ReceiptViewScreen = () => {
           <View style={styles.rowCenter}>
             <MediumText>Куда: {doc.head.toDepart?.name || ''}</MediumText>
           </View>
+          {doc.sentDate ? (
+            <View style={styles.rowCenter}>
+              <MediumText>
+                Отправлено: {getDateString(doc.sentDate)} {new Date(doc.sentDate).toLocaleTimeString()}
+              </MediumText>
+            </View>
+          ) : null}
         </>
       </InfoBlock>
       <LineTypes />

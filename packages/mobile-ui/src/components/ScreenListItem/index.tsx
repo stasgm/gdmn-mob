@@ -78,8 +78,7 @@ const ScreenListItem = ({
           ) : null}
           {sentDate ? (
             <MediumText>
-              Отправлено: {getDateString(sentDate)} {new Date(sentDate).getHours()}:{new Date(sentDate).getMinutes()}:
-              {new Date(sentDate).getSeconds()}
+              Отправлено: {getDateString(sentDate)} {new Date(sentDate).toLocaleTimeString()}
             </MediumText>
           ) : null}
         </View>

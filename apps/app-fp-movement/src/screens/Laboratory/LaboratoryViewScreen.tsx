@@ -643,6 +643,13 @@ export const LaboratoryViewScreen = () => {
         <View style={styles.infoBlock}>
           <MediumText>{doc.head.fromDepart?.name || ''}</MediumText>
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
+          {doc.sentDate ? (
+            <View style={styles.rowCenter}>
+              <MediumText>
+                Отправлено: {getDateString(doc.sentDate)} {new Date(doc.sentDate).toLocaleTimeString()}
+              </MediumText>
+            </View>
+          ) : null}
         </View>
       </InfoBlock>
       <LineTypes />

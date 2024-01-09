@@ -486,8 +486,7 @@ const OrderViewScreen = () => {
             {order.sentDate ? (
               <View style={styles.rowCenter}>
                 <MediumText>
-                  Отправлено: {getDateString(order.sentDate)} {new Date(order.sentDate).getHours()}:
-                  {new Date(order.sentDate).getMinutes()}:{new Date(order.sentDate).getSeconds()}
+                  Отправлено: {getDateString(order.sentDate)} {new Date(order.sentDate).toLocaleTimeString()}
                 </MediumText>
               </View>
             ) : null}

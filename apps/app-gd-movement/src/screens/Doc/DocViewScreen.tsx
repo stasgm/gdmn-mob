@@ -463,8 +463,7 @@ export const DocViewScreen = () => {
           {doc.sentDate ? (
             <View style={styles.rowCenter}>
               <MediumText>
-                Отправлено: {getDateString(doc.sentDate)} {new Date(doc.sentDate).getHours()}:
-                {new Date(doc.sentDate).getMinutes()}:{new Date(doc.sentDate).getSeconds()}
+                Отправлено: {getDateString(doc.sentDate)} {new Date(doc.sentDate).toLocaleTimeString()}
               </MediumText>
             </View>
           ) : null}

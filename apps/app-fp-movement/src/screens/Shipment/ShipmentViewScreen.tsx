@@ -861,6 +861,13 @@ const ShipmentViewScreen = () => {
         <View style={styles.infoBlock}>
           <MediumText>{shipment.head.outlet?.name || ''}</MediumText>
           <MediumText>{`№ ${shipment.number} на ${getDateString(shipment.head?.onDate)}`}</MediumText>
+          {shipment.sentDate ? (
+            <View style={styles.rowCenter}>
+              <MediumText>
+                Отправлено: {getDateString(shipment.sentDate)} {new Date(shipment.sentDate).toLocaleTimeString()}
+              </MediumText>
+            </View>
+          ) : null}
         </View>
       </InfoBlock>
       <LineTypes />

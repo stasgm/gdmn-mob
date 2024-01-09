@@ -74,6 +74,7 @@ export const ReturnListScreen = () => {
           subtitle: `№ ${i.number} на ${getDateString(i.documentDate)}` || '',
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
+          sentDate: i.sentDate,
         }) as IListItemProps,
     );
   }, [status, list]);
