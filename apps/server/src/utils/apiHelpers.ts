@@ -46,3 +46,12 @@ export const notOk = (ctx: Context) => {
     status: 400,
   };
 };
+
+export const serverInnerError = (ctx: Context) => {
+  ctx.status = 500;
+  ctx.body = {
+    result: false,
+    type: 'FAILURE',
+    status: 500,
+  };
+};
