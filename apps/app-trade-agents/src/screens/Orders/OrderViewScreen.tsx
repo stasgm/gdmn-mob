@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { Alert, View } from 'react-native';
+import { Alert, View, StyleSheet } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -20,6 +20,7 @@ import {
   ItemSeparator,
   SaveDocument,
   SimpleDialog,
+  globalColors,
 } from '@lib/mobile-ui';
 
 import { formatValue, generateId, getDateString, useSendDocs, keyExtractor, sleep } from '@lib/mobile-hooks';
@@ -36,6 +37,7 @@ import {
   IOrderDocument,
   IOrderLine,
   IOutlet,
+  IPackageGood,
   IRouteDocument,
   IVisitDocument,
   visitDocumentType,
@@ -79,8 +81,12 @@ const OrderViewScreen = () => {
 
   const debtTextStyle = { color: debt?.saldoDebt && debt?.saldoDebt > 0 ? colors.error : colors.text };
 
+  const contact = refSelectors.selectByRefId<IContact>('contact', order?.head?.contact.id);
+
   const address = refSelectors.selectByRefId<IOutlet>('outlet', order?.head?.outlet.id)?.address;
   const limitSum = refSelectors.selectByRefId<IContact>('contact', order?.head?.contact.id)?.limitSum;
+
+  const packages = refSelectors.selectByName<IPackageGood>('packageGood')?.data;
 
   const handleAddOrderLine = useCallback(() => {
     navigation.navigate('SelectGood', {
@@ -405,18 +411,22 @@ const OrderViewScreen = () => {
   const renderItem = useCallback(
     ({ item }: { item: IOrderLine }) => {
       const checkedId = delList.find((i) => i === item.id) || '';
+      const itemPackages = packages?.filter((e) => e.good.id === item.good.id);
+
       return (
-        <OrderItem
-          key={item.id}
-          item={item}
-          onPress={() => handlePressOrderLine(item)}
-          isChecked={checkedId ? true : false}
-          onLongPress={() => !isBlocked && handleAddDeletelList(item.id, checkedId)}
-          isDelList={isDelList}
-        />
+        <View style={!item.package && itemPackages?.length > 0 ? { backgroundColor: globalColors.lavenderLight } : {}}>
+          <OrderItem
+            key={item.id}
+            item={item}
+            onPress={() => handlePressOrderLine(item)}
+            isChecked={checkedId ? true : false}
+            onLongPress={() => !isBlocked && handleAddDeletelList(item.id, checkedId)}
+            isDelList={isDelList}
+          />
+        </View>
       );
     },
-    [delList, handleAddDeletelList, handlePressOrderLine, isBlocked, isDelList],
+    [delList, handleAddDeletelList, handlePressOrderLine, isBlocked, isDelList, packages],
   );
 
   const isFocused = useIsFocused();
@@ -461,6 +471,15 @@ const OrderViewScreen = () => {
             <MediumText>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
               order.head?.onDate,
             )}`}</MediumText>
+            {!routeId && contact ? (
+              <>
+                <LargeText style={localStyles.contract}>{`Договор №${contact?.contractNumber || '-'} от ${getDateString(
+                  contact.contractDate,
+                )}`}</LargeText>
+                <MediumText>{`Условия оплаты: ${contact.paycond}`}</MediumText>
+              </>
+            ) : null}
+
             <MediumText style={debtTextStyle}>
               {(!!debt?.saldo && debt.saldo < 0
                 ? `Предоплата: ${formatValue({ type: 'currency', decimals: 2 }, Math.abs(debt.saldo))}`
@@ -518,3 +537,7 @@ const OrderViewScreen = () => {
 };
 
 export default OrderViewScreen;
+
+const localStyles = StyleSheet.create({
+  contract: { fontWeight: 'bold', opacity: 0.9, fontSize: 15 },
+});

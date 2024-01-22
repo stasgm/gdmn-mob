@@ -9,4 +9,8 @@ export default {
   card: 'rgb(255, 255, 255)',
   border: 'rgb(216, 216, 216)',
   background: 'rgb(242, 242, 242)',
+  blueLight: '#d5dce3',
+  lavenderLight: '#dbd5da',
+  lavenderDark: '#854875',
+  backgroundDark: 'rgb( 204, 204, 204)',
 };

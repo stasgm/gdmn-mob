@@ -114,3 +114,8 @@ export const reports: IListItem[] = [
   { id: 'byGood', value: 'В разрезе товаров' },
   // { id: 'sellBill', value: 'Накладные' },
 ];
+
+export const shipments: IListItem[] = [
+  { id: 'shipment', value: 'Накладные' },
+  { id: 'noShipment', value: 'Недогрузы' },
+];
