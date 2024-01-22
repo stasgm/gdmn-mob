@@ -325,19 +325,18 @@ const SelectGoodScreen = () => {
                 backgroundColor: item.decoration?.color ? item.decoration.color : 'transparent',
               };
               return (
-                <View
+                <TouchableOpacity
                   key={item.id}
+                  onPress={() => onPress(item)}
                   style={[localStyles.button, backColorStyle, styles.flexDirectionRow, groupButtonStyle]}
                 >
-                  <TouchableOpacity key={item.id} onPress={() => onPress(item)}>
-                    <Text style={[localStyles.buttonLabel, colorStyle]}>{shortenString(item.name, 60) || item.id}</Text>
-                  </TouchableOpacity>
+                  <Text style={[localStyles.buttonLabel, colorStyle]}>{shortenString(item.name, 60) || item.id}</Text>
                   {item.decoration?.name && (
                     <Badge style={[localStyles.badge, badgeColor]} size={10}>
                       {item.decoration.name.toUpperCase()}
                     </Badge>
                   )}
-                </View>
+                </TouchableOpacity>
               );
             })}
           </View>
@@ -431,7 +430,7 @@ const SelectGoodScreen = () => {
           values={firstLevelGroups}
           onPress={(item) => handlePressGroup('parentGroupId', item, setSelectedParentGroup)}
           selectedGroupId={selectedParentGroup?.id}
-          colorBack={globalColors.blueLight}
+          colorBack={'#d5dce3'}
           colorSelected={colors.placeholder}
         />
         <Group
@@ -439,8 +438,8 @@ const SelectGoodScreen = () => {
           values={nextLevelGroups}
           onPress={(item) => handlePressGroup('groupId', item, setSelectedGroup)}
           selectedGroupId={selectedGroup?.id}
-          colorBack={globalColors.lavenderLight}
-          colorSelected={globalColors.lavenderDark}
+          colorBack={'#dbd5da'}
+          colorSelected={'#854875'}
         />
       </View>
     ),
