@@ -56,6 +56,15 @@ export interface IReportListFormParam extends IFormParam {
   filterReportStatusList: IListItem[];
 }
 
+export interface IShipmentListFormParam extends IFormParam {
+  shipment: IListItem;
+  filterShipmentContact?: IReferenceData;
+  filterShipmentOutlet?: IReferenceData;
+  filterShipmentDateBegin?: string;
+  filterShipmentDateEnd?: string;
+  filterShipmentGood?: IReferenceData[];
+}
+
 export interface IReportItem {
   address: string;
   onDate: string;
@@ -245,6 +254,47 @@ interface IVisitHead extends IHead {
 }
 
 export type IVisitDocument = MandateProps<IDocument<IVisitHead>, 'head'>;
+
+export interface IShipmentHead {
+  id: string;
+  orderId: string;
+  number: string;
+  contactId: string;
+  outletId: string;
+  documentDate: string;
+}
+
+export interface IShipmentLine {
+  goodId: string;
+  packageId?: string;
+  orderQ: number;
+  sellQ: number;
+  diff: number;
+}
+
+export interface IShipmentLinesRef {
+  [id: string]: IShipmentLine[];
+}
+
+export interface IOrderData {
+  [id: string]: IShipmentLine[];
+}
+
+export interface IContactData {
+  [id: string]: IOutletData;
+}
+
+export interface IOutletData {
+  [id: string]: IOrderData;
+}
+
+export interface IShipmentListItem {
+  [fieldname: string]: any;
+  id: string;
+  lineId?: string;
+  name: string;
+  type: 'contact' | 'outlet' | 'order' | 'good' | 'total';
+}
 
 export const visitDocumentType: IDocumentType = {
   id: 'visit',

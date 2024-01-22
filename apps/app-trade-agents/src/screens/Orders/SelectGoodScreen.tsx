@@ -431,7 +431,7 @@ const SelectGoodScreen = () => {
           values={firstLevelGroups}
           onPress={(item) => handlePressGroup('parentGroupId', item, setSelectedParentGroup)}
           selectedGroupId={selectedParentGroup?.id}
-          colorBack={'#d5dce3'}
+          colorBack={globalColors.blueLight}
           colorSelected={colors.placeholder}
         />
         <Group
@@ -439,8 +439,8 @@ const SelectGoodScreen = () => {
           values={nextLevelGroups}
           onPress={(item) => handlePressGroup('groupId', item, setSelectedGroup)}
           selectedGroupId={selectedGroup?.id}
-          colorBack={'#dbd5da'}
-          colorSelected={'#854875'}
+          colorBack={globalColors.lavenderLight}
+          colorSelected={globalColors.lavenderDark}
         />
       </View>
     ),
