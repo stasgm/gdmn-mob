@@ -401,7 +401,7 @@ export const RevisionViewScreen = () => {
             },
           },
           {
-            text: 'Привязать',
+            text: 'Привязать ТМЦ',
             onPress: () => {
               dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
               setCurrentLineId(newLine.id);

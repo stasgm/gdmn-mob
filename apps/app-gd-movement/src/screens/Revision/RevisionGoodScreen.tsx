@@ -176,7 +176,7 @@ const RevisionGoodScreen = () => {
       barCodeTypes={[]}
       showExtraButton={scannedObject?.good?.id === 'unknown'}
       extraButtonIcon="clipboard-text-search-outline"
-      extraButtonName="Привязать"
+      extraButtonName="Привязать ТМЦ"
       onPressExtraButton={() => handleSaveScannedItem(true)}
     >
       {scannedObject ? (

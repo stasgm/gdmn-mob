@@ -92,7 +92,7 @@ export const RevisionEditScreen = () => {
       if (!revisionType) {
         setScreenState('idle');
 
-        return Alert.alert('Ошибка!', 'Тип документа для сканирования не найден', [{ text: 'OK' }]);
+        return Alert.alert('Ошибка!', 'Тип документа для сверки не найден', [{ text: 'OK' }]);
       }
       if (!docNumber || !docDate || !docDepartment) {
         setScreenState('idle');
