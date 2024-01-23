@@ -19,7 +19,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { FlashList } from '@shopify/flash-list';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { SectionListData, View, StyleSheet, Keyboard, Platform, Alert } from 'react-native';
-import { Divider } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { ShipmentStackParamList } from '../../navigation/Root/types';
@@ -53,7 +52,7 @@ const ShipmentListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ShipmentList'>>();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterVisible, setFilterVisible] = useState(false);
+  const [filterVisible, setFilterVisible] = useState(true);
   const [visibleShipment, setVisibleShipment] = useState(false);
 
   const { colors } = useTheme();
@@ -451,23 +450,22 @@ const ShipmentListScreen = () => {
 
   return (
     <AppScreen style={styles.contentTop}>
-      <Divider />
-      {filterVisible ? (
+      <View style={styles.marginRight12}>
+        <Menu
+          key={'shipment'}
+          options={shipments}
+          onChange={handleShipment}
+          onPress={handlePressShipment}
+          onDismiss={() => setVisibleShipment(false)}
+          title={shipment?.value || ''}
+          visible={visibleShipment}
+          activeOptionId={shipment?.id}
+          style={localStyles.btnTab}
+          iconName={'chevron-down'}
+        />
+      </View>
+      {filterVisible && (
         <View style={[localStyles.filter, { borderColor: colors.primary }]}>
-          <View style={localStyles.report}>
-            <Menu
-              key={'shipment'}
-              options={shipments}
-              onChange={handleShipment}
-              onPress={handlePressShipment}
-              onDismiss={() => setVisibleShipment(false)}
-              title={shipment?.value || ''}
-              visible={visibleShipment}
-              activeOptionId={shipment?.id}
-              style={localStyles.btnTab}
-              iconName={'chevron-down'}
-            />
-          </View>
           <SelectableInput
             label="Организация"
             value={filterShipmentContact?.name || ''}
@@ -507,21 +505,6 @@ const ShipmentListScreen = () => {
               {'Очистить'}
             </PrimeButton>
           </View>
-        </View>
-      ) : (
-        <View style={localStyles.report}>
-          <Menu
-            key={'shipment'}
-            options={shipments}
-            onChange={handleShipment}
-            onPress={handlePressShipment}
-            onDismiss={() => setVisibleShipment(false)}
-            title={shipment?.value || ''}
-            visible={visibleShipment}
-            activeOptionId={shipment?.id}
-            style={localStyles.btnTab}
-            iconName={'chevron-down'}
-          />
         </View>
       )}
 
@@ -582,9 +565,6 @@ const localStyles = StyleSheet.create({
   container: {
     alignItems: 'center',
     marginTop: -4,
-  },
-  report: {
-    marginRight: 12,
   },
   btnTab: {
     alignItems: 'flex-end',

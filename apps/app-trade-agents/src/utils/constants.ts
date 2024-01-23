@@ -53,7 +53,7 @@ export const appSettings: Settings = {
   },
   isShowPrevOrderLines: {
     id: 'isShowPrevOrderLines',
-    description: 'Показывать предыдущую заявку',
+    description: 'Показывать предыдущие заявки',
     data: false,
     type: 'boolean',
     sortOrder: 4,

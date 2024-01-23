@@ -61,6 +61,10 @@ const globalStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
   },
+  containerEnd: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
   input: {
     fontSize: 18,
     height: 50,
@@ -294,6 +298,7 @@ const globalStyles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
   },
+  marginRight12: { marginRight: 12 },
 });
 
 export default globalStyles;

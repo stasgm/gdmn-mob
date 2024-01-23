@@ -26,6 +26,7 @@ export interface IListItemProps {
   children?: ReactNode;
   addInfo?: ReactNode;
   sentDate?: string;
+  erpCreationDate?: string;
 }
 
 const ScreenListItem = ({
@@ -37,6 +38,7 @@ const ScreenListItem = ({
   isFromRoute,
   errorMessage,
   sentDate,
+  erpCreationDate,
   onPress,
   onLongPress,
   checked,
@@ -79,6 +81,11 @@ const ScreenListItem = ({
           {sentDate ? (
             <MediumText>
               Отправлено: {getDateString(sentDate)} {new Date(sentDate).toLocaleTimeString()}
+            </MediumText>
+          ) : null}
+          {erpCreationDate ? (
+            <MediumText>
+              Обработано: {getDateString(erpCreationDate)} {new Date(erpCreationDate).toLocaleTimeString()}
             </MediumText>
           ) : null}
         </View>

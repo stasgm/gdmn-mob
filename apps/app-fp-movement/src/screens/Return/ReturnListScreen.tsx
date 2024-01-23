@@ -30,7 +30,6 @@ import { IDelList } from '@lib/mobile-types';
 
 import { IReturnDocument } from '../../store/types';
 import { ReturnStackParamList } from '../../navigation/Root/types';
-import { jsonFormat } from '../../utils/helpers';
 
 export interface ReturnListSectionProps {
   title: string;
@@ -46,7 +45,6 @@ export const ReturnListScreen = () => {
     useSelector((state) => state.documents.list)?.filter((i) => i.documentType?.name === 'return') as IReturnDocument[]
   ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
-  console.log('list', jsonFormat(list));
   const loading = useSelector((state) => state.app.loading);
 
   const [delList, setDelList] = useState<IDelList>({});
