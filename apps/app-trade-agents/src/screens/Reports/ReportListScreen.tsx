@@ -265,7 +265,7 @@ const ReportListScreen = () => {
     <AppScreen style={styles.contentTop}>
       {filterVisible && (
         <View style={[localStyles.filter, { borderColor: colors.primary }]}>
-          <View style={localStyles.report}>
+          <View style={styles.marginRight12}>
             <Menu
               key={'report'}
               options={reports}
@@ -434,9 +434,6 @@ const localStyles = StyleSheet.create({
     marginHorizontal: 5,
     flexDirection: 'row',
     flexWrap: 'wrap',
-  },
-  report: {
-    marginRight: 12,
   },
   btnTab: {
     alignItems: 'flex-end',

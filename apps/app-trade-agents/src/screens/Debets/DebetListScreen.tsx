@@ -10,7 +10,6 @@ import {
   navBackDrawer,
   SearchButton,
   SimpleDialog,
-  SubTitle,
 } from '@lib/mobile-ui';
 import { refSelectors, useSelector } from '@lib/store';
 import { IReference } from '@lib/types';
@@ -118,10 +117,10 @@ const DebetListScreen = () => {
 
   return (
     <AppScreen>
-      <View style={[styles.rowCenter, styles.containerCenter]}>
-        <SubTitle style={styles.title}>{debetType.value}</SubTitle>
+      <View style={[styles.containerEnd, styles.marginRight12]}>
         <Menu
           key={'MenuType'}
+          title={debetType?.value || ''}
           visible={visibleType}
           onChange={handleApplyType}
           onDismiss={() => setVisibleType(false)}
@@ -129,7 +128,7 @@ const DebetListScreen = () => {
           options={debetTypes}
           activeOptionId={debetType.id}
           iconSize={26}
-          iconName={'menu-down'}
+          iconName={'chevron-down'}
         />
       </View>
       <Divider />

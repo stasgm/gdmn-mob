@@ -69,6 +69,8 @@ const OrderViewScreen = () => {
   const [delList, setDelList] = useState<string[]>([]);
   const isDelList = !!Object.keys(delList).length;
 
+  const [isDateVisible, setIsDateVisible] = useState(false);
+
   const [isGroupVisible, setIsGroupVisible] = useState(false);
   const loading = useSelector((state) => state.app.loading);
   const order = docSelectors.selectByDocId<IOrderDocument>(id);
@@ -460,8 +462,10 @@ const OrderViewScreen = () => {
         <InfoBlock
           colorLabel={getStatusColor(order?.status || 'DRAFT')}
           title={order.head?.outlet?.name}
-          onPress={handleEditOrderHead}
-          disabled={isDelList || !['DRAFT', 'READY'].includes(order.status)}
+          onPress={() =>
+            ['DRAFT', 'READY'].includes(order.status) ? handleEditOrderHead() : setIsDateVisible(!isDateVisible)
+          }
+          disabled={isDelList}
           isBlocked={isBlocked}
           isFromRoute={order.head.route ? true : false}
         >
@@ -502,21 +506,26 @@ const OrderViewScreen = () => {
                 <MediumText>Комментарий: {order.head.comment || ''}</MediumText>
               </View>
             ) : null}
-            {order.sentDate ? (
-              <View style={styles.rowCenter}>
-                <MediumText>
-                  Отправлено: {getDateString(order.sentDate)} {new Date(order.sentDate).toLocaleTimeString()}
-                </MediumText>
-              </View>
-            ) : null}
-            {order.erpCreationDate ? (
-              <View style={styles.rowCenter}>
-                <MediumText>
-                  Обработано: {getDateString(order.erpCreationDate)}{' '}
-                  {new Date(order.erpCreationDate).toLocaleTimeString()}
-                </MediumText>
-              </View>
-            ) : null}
+
+            {isDateVisible && (
+              <>
+                {order.sentDate ? (
+                  <View style={styles.rowCenter}>
+                    <MediumText>
+                      Отправлено: {getDateString(order.sentDate)} {new Date(order.sentDate).toLocaleTimeString()}
+                    </MediumText>
+                  </View>
+                ) : null}
+                {order.erpCreationDate ? (
+                  <View style={styles.rowCenter}>
+                    <MediumText>
+                      Обработано: {getDateString(order.erpCreationDate)}{' '}
+                      {new Date(order.erpCreationDate).toLocaleTimeString()}
+                    </MediumText>
+                  </View>
+                ) : null}
+              </>
+            )}
           </View>
         </InfoBlock>
         <FlashList
