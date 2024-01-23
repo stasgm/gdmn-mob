@@ -65,7 +65,7 @@ const SelectGoodScreen = () => {
   const isShowPrevOrderLines = settings?.isShowPrevOrderLines?.data as boolean;
 
   const [isUseMatrix, setIsUseMatrix] = useState(isUseNetPrice);
-  const [isShowPrev, setIsShowPrev] = useState(false);
+  const [isShowPrev, setParamsVisible] = useState(false);
 
   const syncDate = useSelector((state) => state.app.syncDate);
   const isDemo = useSelector((state) => state.auth.isDemo);
@@ -76,9 +76,13 @@ const SelectGoodScreen = () => {
     }
   }, [syncDate, isDemo]);
 
-  const [paramsVisible, setParamsVisible] = useState(false);
-  const [filterDateBegin, setFilterDateBegin] = useState<string | undefined>(undefined);
-  const [filterDateEnd, setFilterDateEnd] = useState<string | undefined>(undefined);
+  const [filterDateBegin, setFilterDateBegin] = useState<string | undefined>(
+    new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+  );
+
+  const [filterDateEnd, setFilterDateEnd] = useState<string | undefined>(
+    new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+  );
 
   const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
   const goods = refSelectors.selectByName<IGood>('good').data;
@@ -90,7 +94,7 @@ const SelectGoodScreen = () => {
   const docs = useSelector((state) => state.documents.list) as IOrderDocument[];
   const prevOrderByOutlet = useMemo(
     () =>
-      doc && isShowPrevOrderLines
+      doc && isShowPrevOrderLines && isShowPrev && filterDateBegin && filterDateEnd
         ? docs
             .filter(
               (o) =>
@@ -107,7 +111,7 @@ const SelectGoodScreen = () => {
             )
             .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime())
         : [],
-    [doc, isShowPrevOrderLines, docs, outletId, filterDateBegin, filterDateEnd],
+    [doc, isShowPrevOrderLines, isShowPrev, docs, outletId, filterDateBegin, filterDateEnd],
   );
 
   const prevLines = useMemo(
@@ -137,9 +141,15 @@ const SelectGoodScreen = () => {
   const model = useMemo(
     () =>
       (contactId
-        ? getGroupModelByContact(groups, goods, goodMatrix[contactId], isUseMatrix, isShowPrev ? prevLines : [])
+        ? getGroupModelByContact(
+            groups,
+            goods,
+            goodMatrix[contactId],
+            isUseMatrix,
+            isShowPrev || (filterDateBegin && isShowPrev) || (isShowPrev && filterDateEnd) ? prevLines : [],
+          )
         : {}) as IMGroupModel,
-    [contactId, groups, goods, goodMatrix, isUseMatrix, isShowPrev, prevLines],
+    [contactId, groups, goods, goodMatrix, isUseMatrix, isShowPrev, filterDateBegin, filterDateEnd, prevLines],
   );
 
   const firstLevelGroups = useMemo(() => Object.values(model).map((item) => item.parent), [model]);
@@ -189,7 +199,7 @@ const SelectGoodScreen = () => {
     () => (
       <View style={styles.buttons}>
         {isShowPrevOrderLines && (
-          <FilterButton onPress={() => setParamsVisible((prev) => !prev)} visible={paramsVisible} />
+          <FilterButton onPress={() => setParamsVisible((prev) => !prev)} visible={isShowPrev} />
         )}
 
         <SearchButton
@@ -200,7 +210,7 @@ const SelectGoodScreen = () => {
         />
       </View>
     ),
-    [filterVisible, isShowPrevOrderLines, paramsVisible],
+    [filterVisible, isShowPrevOrderLines, isShowPrev],
   );
 
   useLayoutEffect(() => {
@@ -397,7 +407,7 @@ const SelectGoodScreen = () => {
                     <MaterialCommunityIcons name={'page-previous-outline'} size={14} color={colors.placeholder} />
                     {prevLine.map((line) => (
                       <MediumText key={line.id} style={localStyles.prevText}>
-                        {` ${line.quantity} кг, уп.: ${line.package ? line.package.name : 'без упаковки'};`}
+                        {` ${line.quantity} кг, уп: ${line.package ? line.package.name : 'без упаковки'};`}
                       </MediumText>
                     ))}
                   </View>
@@ -493,16 +503,10 @@ const SelectGoodScreen = () => {
               <Switch value={isUseMatrix} onValueChange={() => setIsUseMatrix(!isUseMatrix)} />
             </View>
           )}
-          {contactId && goodMatrix[contactId] && isShowPrevOrderLines && <Divider />}
-          {isShowPrevOrderLines && !!prevLines.length && (
-            <View style={localStyles.switch}>
-              <MediumText>Предыдущая заявка</MediumText>
-              <Switch value={isShowPrev} onValueChange={() => setIsShowPrev(!isShowPrev)} />
-            </View>
-          )}
+          {contactId && goodMatrix[contactId] && isShowPrevOrderLines && isShowPrev && <Divider />}
         </View>
       )}
-      {paramsVisible && (
+      {isShowPrev && (
         <>
           <View style={[localStyles.filter, { borderColor: colors.primary }]}>
             <View style={styles.flexDirectionRow}>
@@ -535,7 +539,6 @@ const SelectGoodScreen = () => {
               </PrimeButton>
             </View>
           </View>
-          <ItemSeparator />
         </>
       )}
       <FlashList
