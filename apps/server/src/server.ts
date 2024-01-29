@@ -5,6 +5,7 @@ import https from 'https';
 
 import Koa from 'koa';
 import cors from '@koa/cors';
+import koaBodyMiddleware from 'koa-body';
 
 import session from 'koa-session';
 import passport from 'koa-passport';
@@ -90,6 +91,12 @@ export async function createServer(server: IServer): Promise<KoaApp> {
     fs.mkdirSync(logPath);
   }
 
+  // // Логи для Erp
+  // const erpLogPath = path.join(process.cwd(), config.ERP_LOG_PATH);
+  // if (!fs.existsSync(erpLogPath)) {
+  //   fs.mkdirSync(erpLogPath);
+  // }
+
   const accessLogStream: RotatingFileStream = createStream('access.log', {
     size: '20M',
     maxFiles: 5,
@@ -126,6 +133,16 @@ export async function createServer(server: IServer): Promise<KoaApp> {
         credentials: true,
       }),
     )
+    // Настройка koa-body для обработки файлов
+    // .use(
+    //   koaBodyMiddleware({
+    //     multipart: true,
+    //     formidable: {
+    //       uploadDir: erpLogPath, // Путь для сохранения файлов
+    //       keepExtensions: true,
+    //     },
+    //   }),
+    // )
     .use(router.routes())
     .use(router.allowedMethods());
   if (process.env.IS_ADMIN_ENABLED === 'true') {

@@ -1,5 +1,7 @@
 import { IDeviceLog, IDeviceLogFiles } from '@lib/types';
 
+import { DataNotFoundException } from '../exceptions';
+
 import { saveDeviceLogFile, getFilesObject, getFile, deleteFileById, deleteManyFiles } from './errorLogUtils';
 
 import { getDb } from './dao/db';
@@ -29,15 +31,15 @@ const addOne = async ({
 }): Promise<void> => {
   const { companies, appSystems, users } = getDb();
   if (!companies.findById(companyId)) {
-    console.error('Компания не найдена');
+    throw new DataNotFoundException('Компания не найдена');
   }
 
   if (!users.findById(producerId)) {
-    console.error('Отправитель не найден');
+    throw new DataNotFoundException('Отправитель не найден');
   }
 
   if (!appSystems.findById(appSystemId)) {
-    console.error('Подсистема не найдена');
+    throw new DataNotFoundException('Подсистема не найдена');
   }
 
   return await saveDeviceLogFile(deviceLog, { companyId, appSystemId }, { producerId, deviceId });

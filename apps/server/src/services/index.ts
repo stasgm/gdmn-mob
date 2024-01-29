@@ -10,6 +10,7 @@ import * as appSystemService from './appSystemService';
 import * as deviceLogService from './deviceLogService';
 import * as fileService from './fileService';
 import * as serverLogService from './serverLogService';
+import * as erpLogService from './erpLogService';
 
 export {
   authService,
@@ -24,4 +25,5 @@ export {
   deviceLogService,
   fileService,
   serverLogService,
+  erpLogService,
 };

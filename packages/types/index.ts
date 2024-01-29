@@ -9,3 +9,4 @@ export * from './src/processes';
 export * from './src/deviceLog';
 export * from './src/files';
 export * from './src/serverLog';
+export * from './src/erpLog';
