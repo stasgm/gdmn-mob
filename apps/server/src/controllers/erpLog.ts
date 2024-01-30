@@ -62,12 +62,16 @@ const getErpLog = async (ctx: ParameterizedContext) => {
   }
 
   if (typeof start !== 'number' || typeof end !== 'number') {
-    throw new InvalidParameterException('Паметры start и end должны быть числами');
+    throw new InvalidParameterException('Параметры start и end должны быть числовыми');
   }
 
   const serverLog = await erpLogService.findOne(companyId, appSystemId, start, end);
 
-  ok(ctx as Context, serverLog, 'getErpLog: ERP log is successfully received');
+  ok(
+    ctx as Context,
+    serverLog,
+    `getErpLog: Log for companyId=${companyId} and appSystemId=${appSystemId} is successfully received`,
+  );
 };
 
 export { addErpLog, getErpLog };
