@@ -1,7 +1,7 @@
 import path from 'path';
 import { readdir, unlink, stat } from 'fs/promises';
 
-import { IPathParams, IFileDeviceLogInfo, IDeviceLog, IDeviceLogFiles, IDeviceLogOptions } from '@lib/types';
+import { IPathParams, IFileDeviceLogInfo, IDeviceLog, IDeviceLogFiles } from '@lib/types';
 
 import {
   checkFileExists,
@@ -13,7 +13,6 @@ import {
   getAppSystemId,
   writeIterableToFile,
   getFoundEntity,
-  getFoundString,
 } from '../utils/fileHelper';
 
 import config from '../../config';
@@ -243,7 +242,7 @@ export const getFilesObject = async (params: Record<string, string | number>): P
   }
 
   fileObjs = fileObjs.filter((item: IDeviceLogFiles) => {
-    const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
+    const newParams = (({ ...others }) => others)(params);
 
     const companyFound = getFoundEntity('company', newParams, item);
     const appSystemFound = getFoundEntity('appSystem', newParams, item);

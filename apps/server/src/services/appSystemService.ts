@@ -114,7 +114,7 @@ const findMany = (params: Record<string, string | number>): IAppSystem[] => {
   }
 
   appSystemList = appSystemList.filter((item) => {
-    const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
+    const newParams = (({ ...others }) => others)(params);
 
     /* filtering data */
     let filteredAppSystems = true;

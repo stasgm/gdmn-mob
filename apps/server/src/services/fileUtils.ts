@@ -204,7 +204,7 @@ export const readListFiles = async (params: Record<string, string | number>): Pr
     }
   }
   files = files.filter((item: IFileSystem) => {
-    const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
+    const newParams = (({ ...others }) => others)(params);
 
     const companyFound = getFoundEntity('company', newParams, item);
     const appSystemFound = getFoundEntity('appSystem', newParams, item);

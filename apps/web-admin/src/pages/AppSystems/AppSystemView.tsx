@@ -88,10 +88,6 @@ const AppSystemView = () => {
     setOpen(false);
   };
 
-  const handleClearError = () => {
-    dispatch(actions.clearError());
-  };
-
   if (!appSystem) {
     return (
       <Box

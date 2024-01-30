@@ -12,7 +12,7 @@ import {
   IconButton,
 } from '@mui/material';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { INamedEntity, IUser, IUserCredentials, NewUser } from '@lib/types';
 import { FormikTouched, useFormik, Field, FormikProvider } from 'formik';

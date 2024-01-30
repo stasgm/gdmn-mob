@@ -21,7 +21,7 @@ import log from '../utils/logger';
 
 import config from '../../config';
 
-import { InnerErrorException, InvalidParameterException } from '../exceptions';
+import { InnerErrorException } from '../exceptions';
 
 import { BYTES_PER_MB, defMaxDataVolume, defMaxFiles, MSEС_IN_MIN } from '../utils/constants';
 
@@ -102,7 +102,7 @@ export const getProcesses = (params: Record<string, string | number>): IProcess[
   // }
 
   const filteredList = processList.filter((item) => {
-    const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
+    const newParams = (({ ...others }) => others)(params);
 
     const appSystem = appSystems.findById(item.appSystemId);
     const company = companies.findById(item.companyId);

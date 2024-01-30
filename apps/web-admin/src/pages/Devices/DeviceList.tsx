@@ -35,7 +35,7 @@ const DeviceList = () => {
   );
 
   const fetchActivationCodes = useCallback(
-    (deviceId?: string) => {
+    (_deviceId?: string) => {
       dispatch(codeActions.fetchActivationCodes()); //TODO Добавить фильтрацию
     },
     [dispatch],

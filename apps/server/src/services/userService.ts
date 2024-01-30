@@ -250,7 +250,7 @@ const findMany = (params: Record<string, string | number>): IUser[] => {
   }
 
   userList = userList.filter((item) => {
-    const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
+    const newParams = (({ ...others }) => others)(params);
 
     let companyFound = true;
 

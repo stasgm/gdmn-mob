@@ -53,7 +53,7 @@ module.exports = {
     '@typescript-eslint/no-use-before-define': 'off',
     '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/restrict-template-expressions': 'off',
-    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': ['warn', { 'argsIgnorePattern': '^_' }],
     // '@typescript-eslint/no-unused-vars': [2, { args: 'none' }],
     // "sonarjs/no-duplicate-string": "off",
     'padded-blocks': ['error', 'never'],
@@ -69,7 +69,7 @@ module.exports = {
     {
       files: ['*.ts', '*.tsx'],
       rules: {
-        '@typescript-eslint/no-unused-vars': 'off',
+        '@typescript-eslint/no-unused-vars': ['warn', { 'argsIgnorePattern': '^_' }],
       },
     },
   ],

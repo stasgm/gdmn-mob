@@ -1,4 +1,4 @@
-import { IDeviceLog, IFileSystem } from '@lib/types';
+import { IFileSystem } from '@lib/types';
 
 export interface IFileQueryResponse {
   type:

@@ -151,7 +151,7 @@ const findMany = (params: Record<string, string | number>): IDevice[] => {
   }
 
   deviceList = deviceList.filter((item: IDBDevice) => {
-    const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
+    const newParams = (({ ...others }) => others)(params);
 
     let companyFound = true;
 

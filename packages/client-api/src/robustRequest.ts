@@ -7,8 +7,6 @@ export type AuthLogOut = () => Promise<any>;
 
 export type CustomRequest = <T>(params: IRequestParams) => Promise<TResponse<T>>;
 
-export type CustomRequestProps = <T>(dispatch: any, actions: any) => CustomRequest;
-
 /** Валидатор проверяет полученные данные на корректность. В случае ошибки генерирует исключение. */
 type Validator = (data: Record<string, unknown>) => void;
 

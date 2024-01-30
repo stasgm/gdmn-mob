@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
@@ -20,11 +20,8 @@ import { IFileSystem } from '@lib/types';
 
 import { useFormik } from 'formik';
 
-import actions from '../../store/file';
-
 import { adminPath } from '../../utils/constants';
 import { IFileFilter, IFilePageParam, IPageParam } from '../../types';
-import { useDispatch } from '../../store';
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
@@ -55,7 +52,6 @@ const FileListTable = ({
   selectedFileIds,
   onSetPageParams,
   pageParams,
-  height,
 }: IProps) => {
   const [limit, setLimit] = useState(
     pageParams?.limit && !isNaN(Number(pageParams?.limit)) ? Number(pageParams?.limit) : 10,

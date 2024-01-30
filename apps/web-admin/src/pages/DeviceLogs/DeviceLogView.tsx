@@ -41,7 +41,7 @@ const DeviceLogView = () => {
   const { loading, errorMessage, logList, pageParams } = useSelector((state) => state.deviceLogs);
 
   const fetchDeviceLogs = useCallback(
-    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+    (_filterText?: string, _fromRecord?: number, _toRecord?: number) => {
       dispatch(deviceLogActions.fetchDeviceLog(id));
     },
     [dispatch, id],
@@ -52,24 +52,24 @@ const DeviceLogView = () => {
     fetchDeviceLogs(pageParams?.filterText as string);
   }, [fetchDeviceLogs, pageParams?.filterText]);
 
-  const process = deviceLogSelectors.deviceLogById(id);
+  const deviceLog = deviceLogSelectors.deviceLogById(id);
 
   const deviceLogsDetails: ILinkedEntity[] = useMemo(
     () =>
-      process
+      deviceLog
         ? [
-            { id: 'Компания', value: process.company, link: `${adminPath}/app/companies/${process.company.id}/` },
+            { id: 'Компания', value: deviceLog.company, link: `${adminPath}/app/companies/${deviceLog.company.id}/` },
             {
               id: 'Подсистема',
-              value: process?.appSystem,
-              link: `${adminPath}/app/appSystems/${process.appSystem.id}/`,
+              value: deviceLog?.appSystem,
+              link: `${adminPath}/app/appSystems/${deviceLog.appSystem.id}/`,
             },
-            { id: 'Устройство', value: process.device, link: `${adminPath}/app/devices/${process.device.id}/` },
-            { id: 'Идентификатор устройства', value: process?.device.id },
-            { id: 'Пользователь', value: process?.contact, link: `${adminPath}/app/users/${process.contact.id}/` },
+            { id: 'Устройство', value: deviceLog.device, link: `${adminPath}/app/devices/${deviceLog.device.id}/` },
+            { id: 'Идентификатор устройства', value: deviceLog?.device.id },
+            { id: 'Пользователь', value: deviceLog?.contact, link: `${adminPath}/app/users/${deviceLog.contact.id}/` },
           ]
         : [],
-    [process],
+    [deviceLog],
   );
 
   const [open, setOpen] = useState(false);
@@ -106,7 +106,7 @@ const DeviceLogView = () => {
     dispatch(deviceLogActions.deviceLogActions.clearError());
   };
 
-  if (!process) {
+  if (!deviceLog) {
     return (
       <Box
         sx={{

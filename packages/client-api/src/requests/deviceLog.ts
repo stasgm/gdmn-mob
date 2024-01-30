@@ -1,7 +1,7 @@
 import { IDeviceLog, IDeviceLogFiles, IFileIds } from '@lib/types';
 
 import { error, deviceLog as types } from '../types';
-import { getParams, response2Log, sleep } from '../utils';
+import { response2Log, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';

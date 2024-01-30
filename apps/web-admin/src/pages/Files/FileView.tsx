@@ -44,10 +44,10 @@ const FileView = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading, errorMessage, file, list, pageParams, folders } = useSelector((state) => state.files);
+  const { loading, errorMessage, file, pageParams, folders } = useSelector((state) => state.files);
 
   const fetchFile = useCallback(
-    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+    (_filterText?: string, _fromRecord?: number, _toRecord?: number) => {
       dispatch(fileActions.fetchFile(id));
     },
     [dispatch, id],

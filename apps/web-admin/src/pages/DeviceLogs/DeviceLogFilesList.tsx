@@ -9,7 +9,7 @@ import { IDeviceLogFiles } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import { IDeviceLogFileFilter, IDeviceLogPageParam, IHeadCells, IPageParam, IToolBarButton } from '../../types';
+import { IDeviceLogFileFilter, IDeviceLogPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
 import DeviceLogFilesListTable from '../../components/deviceLogs/DeviceLogFilesListTable';
@@ -163,14 +163,14 @@ const DeviceLogFilesList = () => {
     },
   ];
 
-  const headCells: IHeadCells<IDeviceLogFiles>[] = [
-    { id: 'company', label: 'Компания', sortEnable: true, filterEnable: true },
-    { id: 'appSystem', label: 'Подсистема', sortEnable: true, filterEnable: true },
-    { id: 'contact', label: 'Пользователь', sortEnable: true, filterEnable: true },
-    { id: 'device', label: 'Утсройство', sortEnable: false, filterEnable: true },
-    { id: 'date', label: 'Дата', sortEnable: true, filterEnable: true },
-    { id: 'size', label: 'Размер', sortEnable: true, filterEnable: false },
-  ];
+  // const headCells: IHeadCells<IDeviceLogFiles>[] = [
+  //   { id: 'company', label: 'Компания', sortEnable: true, filterEnable: true },
+  //   { id: 'appSystem', label: 'Подсистема', sortEnable: true, filterEnable: true },
+  //   { id: 'contact', label: 'Пользователь', sortEnable: true, filterEnable: true },
+  //   { id: 'device', label: 'Устройство', sortEnable: false, filterEnable: true },
+  //   { id: 'date', label: 'Дата', sortEnable: true, filterEnable: true },
+  //   { id: 'size', label: 'Размер', sortEnable: true, filterEnable: false },
+  // ];
 
   return (
     <>

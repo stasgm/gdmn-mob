@@ -10,7 +10,7 @@ import { IFileSystem } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import { IFileFilter, IHeadCells, IFilePageParam, IToolBarButton } from '../../types';
+import { IFileFilter, IFilePageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
 import actions from '../../store/file';

@@ -4,7 +4,7 @@ import { stat } from 'fs/promises';
 
 import { IServerLogFile, IServerLogResponse } from '@lib/types';
 
-import { checkFileExists, readTextFile, writeIterableToFile } from '../utils/fileHelper';
+import { checkFileExists, readTextFile } from '../utils/fileHelper';
 
 import config from '../../config';
 

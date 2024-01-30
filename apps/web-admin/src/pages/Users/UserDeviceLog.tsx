@@ -1,6 +1,6 @@
 import { Box, Container } from '@mui/material';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import { IDeviceLog } from '@lib/types';
 
@@ -23,7 +23,7 @@ const UserDeviceLog = ({ userId, deviceId }: IProps) => {
   const { logList } = useSelector((state) => state.deviceLogs);
 
   const fetchDeviceLogFiles = useCallback(
-    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+    (_filterText?: string, _fromRecord?: number, _toRecord?: number) => {
       dispatch(deviceLogActions.fetchDeviceLogFiles());
     },
     [dispatch],
@@ -37,7 +37,7 @@ const UserDeviceLog = ({ userId, deviceId }: IProps) => {
   const userLogFile = deviceLogSelectors.deviceLogByUserDeviceIds(userId, deviceId);
 
   const fetchDeviceLogFile = useCallback(
-    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+    (_filterText?: string, _fromRecord?: number, _toRecord?: number) => {
       if (userLogFile) {
         dispatch(deviceLogActions.fetchDeviceLog(userLogFile?.id));
       }

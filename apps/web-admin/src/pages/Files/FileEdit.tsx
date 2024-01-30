@@ -22,7 +22,7 @@ const FileEdit = () => {
   const { loading, errorMessage, file, pageParams } = useSelector((state) => state.files);
 
   const fetchFile = useCallback(
-    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+    (_filterText?: string, _fromRecord?: number, _toRecord?: number) => {
       dispatch(fileActions.fetchFile(id));
     },
     [dispatch, id],

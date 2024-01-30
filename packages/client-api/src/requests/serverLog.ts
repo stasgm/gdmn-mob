@@ -1,4 +1,4 @@
-import { IServerLogFile, IServerLogResponse } from '@lib/types';
+import { IServerLogFile } from '@lib/types';
 
 import { error, serverLog as types } from '../types';
 import { response2Log, sleep } from '../utils';

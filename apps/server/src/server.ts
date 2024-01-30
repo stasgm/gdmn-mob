@@ -5,7 +5,6 @@ import https from 'https';
 
 import Koa from 'koa';
 import cors from '@koa/cors';
-import koaBodyMiddleware from 'koa-body';
 
 import session from 'koa-session';
 import passport from 'koa-passport';
@@ -66,14 +65,13 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   //Каждый запрос содержит cookies, по которому passport опознаёт пользователя, и достаёт его данные из сессии.
   //passport сохраняет пользовательские данные
   passport.serializeUser((user: unknown, done) => {
-    // log.info('serializeUser', user);
     done(null, (user as IUser).id);
   });
+
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   //passport достаёт пользовательские данные из сессии
   passport.deserializeUser((id: string, done) => {
     try {
-      // log.info('deserializeUser', id);
       const user = userService.findOne(id);
       done(null, user);
     } catch (err) {
@@ -90,12 +88,6 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   if (!fs.existsSync(logPath)) {
     fs.mkdirSync(logPath);
   }
-
-  // // Логи для Erp
-  // const erpLogPath = path.join(process.cwd(), config.ERP_LOG_PATH);
-  // if (!fs.existsSync(erpLogPath)) {
-  //   fs.mkdirSync(erpLogPath);
-  // }
 
   const accessLogStream: RotatingFileStream = createStream('access.log', {
     size: '20M',
@@ -133,16 +125,6 @@ export async function createServer(server: IServer): Promise<KoaApp> {
         credentials: true,
       }),
     )
-    // Настройка koa-body для обработки файлов
-    // .use(
-    //   koaBodyMiddleware({
-    //     multipart: true,
-    //     formidable: {
-    //       uploadDir: erpLogPath, // Путь для сохранения файлов
-    //       keepExtensions: true,
-    //     },
-    //   }),
-    // )
     .use(router.routes())
     .use(router.allowedMethods());
   if (process.env.IS_ADMIN_ENABLED === 'true') {

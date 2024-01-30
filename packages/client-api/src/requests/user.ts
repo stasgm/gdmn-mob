@@ -150,7 +150,7 @@ class User extends BaseRequest {
     } as error.IServerError;
   };
 
-  getUsers = async (customRequest: CustomRequest, params?: Record<string, string | number>, authFunc?: AuthLogOut) => {
+  getUsers = async (customRequest: CustomRequest, params?: Record<string, string | number>, _authFunc?: AuthLogOut) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 

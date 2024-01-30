@@ -3,7 +3,7 @@ import koaPassport from 'koa-passport';
 import { VerifyFunction } from 'passport-local';
 import { compare } from 'bcrypt';
 
-import { IUser, NewUser, IUserCredentials, DeviceState, IDBUser, NewAccessCode } from '@lib/types';
+import { IUser, NewUser, IUserCredentials, DeviceState, IDBUser } from '@lib/types';
 
 import { DataNotFoundException, UnauthorizedException } from '../exceptions';
 
@@ -169,7 +169,7 @@ const verifyCode = (code: string): string | undefined => {
  * Выход из учетной записи
  * @param userId ИД пользователя
  */
-const logout = (userId: string) => {
+const logout = (_userId: string) => {
   // делаем что надо
 };
 

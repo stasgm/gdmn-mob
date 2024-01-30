@@ -54,10 +54,12 @@ const readableToString = async (readable: any): Promise<string | Error> => {
   let size = 0;
   let start = 0;
   for await (const chunk of readable) {
+    const chunkString = chunk.toString();
     data.push(chunk);
 
-    if (chunk.toString()[0] !== '{' && chunk.toString()[0] !== '[' && start === 0)
+    if (chunkString[0] !== '{' && chunkString[0] !== '[' && start === 0) {
       throw new Error('Неправильный формат файла');
+    }
     start++;
 
     size += Buffer.byteLength(chunk.toString()) / BYTES_PER_MB;
@@ -67,19 +69,29 @@ const readableToString = async (readable: any): Promise<string | Error> => {
   return data.join('');
 };
 
-export const readJsonFile = async <T>(fileName: string): Promise<T | string> => {
-  const check = await checkFileExists(fileName);
+// export const readJsonFile = async <T>(fileName: string): Promise<T | string> => {
+//   const check = await checkFileExists(fileName);
 
+//   try {
+//     const streamRead = createReadStream(fileName, { encoding: 'utf8' });
+//     try {
+//       const result = await readableToString(streamRead);
+
+//       return check ? JSON.parse(result.toString()) : `Ошибка чтения файла ${fileName} `;
+//     } catch (err) {
+//       return `Ошибка чтения файла ${fileName} - ${err} `;
+//     }
+//     //(await readFile(fileName, 'utf-8')).toString()
+//   } catch (err) {
+//     return `Ошибка чтения файла ${fileName} - ${err} `;
+//   }
+// };
+
+export const readJsonFile = async <T>(fileName: string): Promise<T | string> => {
   try {
     const streamRead = createReadStream(fileName, { encoding: 'utf8' });
-    try {
-      const result = await readableToString(streamRead);
-
-      return check ? JSON.parse(result.toString()) : `Ошибка чтения файла ${fileName} `;
-    } catch (err) {
-      return `Ошибка чтения файла ${fileName} - ${err} `;
-    }
-    //(await readFile(fileName, 'utf-8')).toString()
+    const result = await readableToString(streamRead);
+    return JSON.parse(result.toString());
   } catch (err) {
     return `Ошибка чтения файла ${fileName} - ${err} `;
   }
@@ -90,8 +102,6 @@ export const readTextFile = async <T>(
   start: number | undefined,
   end: number | undefined,
 ): Promise<T | string> => {
-  const check = await checkFileExists(fileName);
-
   try {
     const streamRead = createReadStream(fileName, { encoding: 'utf8', start: start, end: end });
     const data = [];

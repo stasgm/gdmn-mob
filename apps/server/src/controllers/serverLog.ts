@@ -4,8 +4,6 @@ import { IServerLogFile } from '@lib/types';
 
 import { serverLogService } from '../services';
 
-import { InvalidParameterException } from '../exceptions';
-
 import { ok } from '../utils/apiHelpers';
 
 const getServerLogs = async (ctx: ParameterizedContext): Promise<void> => {

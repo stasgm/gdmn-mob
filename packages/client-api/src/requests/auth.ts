@@ -1,4 +1,4 @@
-import { DeviceState, IUser, IUserCredentials, NewAccessCode } from '@lib/types';
+import { DeviceState, IUser, IUserCredentials } from '@lib/types';
 import { user as mockUser } from '@lib/mock';
 
 import { error, auth as types } from '../types';

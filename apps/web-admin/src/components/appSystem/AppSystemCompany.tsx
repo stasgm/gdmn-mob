@@ -1,8 +1,7 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@mui/material';
-import { useNavigate } from 'react-router';
+
 import { useCallback, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 
 import CachedIcon from '@mui/icons-material/Cached';
 import { ICompany, IAppSystem } from '@lib/types';
@@ -23,7 +22,7 @@ interface IProps {
 
 const AppSystemCompany = ({ appSystem }: IProps) => {
   const dispatch: AppDispatch = useDispatch();
-  const { loading, errorMessage, pageParams } = useSelector((state) => state.companies);
+  const { loading, pageParams } = useSelector((state) => state.companies);
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
   const list = selectors.companyByAppSystemID(appSystem.id);
 
