@@ -91,10 +91,6 @@ const FileList = () => {
     dispatch(actions.fileSystemActions.clearError());
   };
 
-  const handleClearFilters = () => {
-    dispatch(actions.fileSystemActions.clearFilesFilters());
-  };
-
   const [selectedFileIds, setSelectedFileIds] = useState<IFileSystem[]>([]);
 
   const handleSelectAll = (event: any) => {

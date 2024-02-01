@@ -126,7 +126,7 @@ export const readTextFile = async <T>(
   }
 };
 
-export const searchInTextFile = async <T>(
+export const searchInTextFile = async (
   fileName: string,
   searchString: string,
   start: number | undefined,

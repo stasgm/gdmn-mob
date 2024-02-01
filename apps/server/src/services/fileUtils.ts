@@ -226,8 +226,8 @@ export const readListFiles = async (params: Record<string, string | number>): Pr
   const fullRoot = !('company' in params)
     ? root
     : 'appSystem' in params
-    ? path.join(root, `db_${getCompanyIdByName(params['company'] as string)?.id}`, params['appSystem'] as string)
-    : path.join(root, `db_${getCompanyIdByName(params['company'] as string)?.id}`);
+      ? path.join(root, `db_${getCompanyIdByName(params['company'] as string)?.id}`, params['appSystem'] as string)
+      : path.join(root, `db_${getCompanyIdByName(params['company'] as string)?.id}`);
 
   let files: IFileSystem[] = [];
   const fileStrings = 'company' in params ? await _readDir(fullRoot, undefined) : await _readRoot(fullRoot);
@@ -328,8 +328,10 @@ export const readListFiles = async (params: Record<string, string | number>): Pr
 };
 
 export const searchFilesList = async (params: Record<string, string | number>): Promise<IFileSystem[]> => {
-  const paramsWithout = (({ searchQuery, ...filterParams }) => filterParams)(params);
-  const searchString = params.searchQuery as string;
+  // const paramsWithout = (({ searchQuery, ...filterParams }) => filterParams)(params);
+  //const searchString = params.searchQuery as string;
+  const { searchQuery, ...paramsWithout } = params;
+  const searchString = searchQuery as string;
   const files: IFileSystem[] = await readListFiles(paramsWithout);
   let prev: IFileSystem[] = [];
   const searchFiles = files.reduce(
