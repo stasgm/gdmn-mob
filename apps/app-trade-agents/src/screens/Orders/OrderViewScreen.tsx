@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, View, StyleSheet } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -140,6 +140,9 @@ const OrderViewScreen = () => {
       documentDate: newDocDate,
       creationDate: newDocDate,
       editionDate: newDocDate,
+      sentDate: undefined,
+      errorMessage: undefined,
+      erpCreationDate: undefined,
     };
 
     if (routeId && routeLineId && !orderDocs.length) {
@@ -431,6 +434,8 @@ const OrderViewScreen = () => {
     [delList, handleAddDeletelList, handlePressOrderLine, isBlocked, isDelList, packages],
   );
 
+  const isEditable = useMemo(() => (order ? ['DRAFT', 'READY'].includes(order?.status) : false), [order]);
+
   const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
@@ -462,9 +467,8 @@ const OrderViewScreen = () => {
         <InfoBlock
           colorLabel={getStatusColor(order?.status || 'DRAFT')}
           title={order.head?.outlet?.name}
-          onPress={() =>
-            ['DRAFT', 'READY'].includes(order.status) ? handleEditOrderHead() : setIsDateVisible(!isDateVisible)
-          }
+          onPress={() => (isEditable ? handleEditOrderHead() : setIsDateVisible(!isDateVisible))}
+          isShowAddInfo={!isEditable}
           disabled={isDelList}
           isBlocked={isBlocked}
           isFromRoute={order.head.route ? true : false}
@@ -512,7 +516,8 @@ const OrderViewScreen = () => {
                 {order.sentDate ? (
                   <View style={styles.rowCenter}>
                     <MediumText>
-                      Отправлено: {getDateString(order.sentDate)} {new Date(order.sentDate).toLocaleTimeString()}
+                      Отправлено: {getDateString(order.sentDate)}{' '}
+                      {new Date(order.sentDate).toLocaleTimeString('ru', { hour12: false })}
                     </MediumText>
                   </View>
                 ) : null}
@@ -520,7 +525,7 @@ const OrderViewScreen = () => {
                   <View style={styles.rowCenter}>
                     <MediumText>
                       Обработано: {getDateString(order.erpCreationDate)}{' '}
-                      {new Date(order.erpCreationDate).toLocaleTimeString()}
+                      {new Date(order.erpCreationDate).toLocaleTimeString('ru', { hour12: false })}
                     </MediumText>
                   </View>
                 ) : null}

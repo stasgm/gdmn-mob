@@ -51,15 +51,6 @@ export const appSettings: Settings = {
     visible: true,
     group: mainSettingGroup,
   },
-  isShowPrevOrderLines: {
-    id: 'isShowPrevOrderLines',
-    description: 'Показывать предыдущие заявки',
-    data: false,
-    type: 'boolean',
-    sortOrder: 4,
-    visible: true,
-    group: mainSettingGroup,
-  },
 };
 
 export const viewTypeList: IListItem[] = [

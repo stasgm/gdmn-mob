@@ -60,8 +60,6 @@ export interface IShipmentListFormParam extends IFormParam {
   shipment: IListItem;
   filterShipmentContact?: IReferenceData;
   filterShipmentOutlet?: IReferenceData;
-  filterShipmentDateBegin?: string;
-  filterShipmentDateEnd?: string;
   filterShipmentGood?: IReferenceData[];
 }
 
@@ -262,6 +260,7 @@ export interface IShipmentHead {
   contactId: string;
   outletId: string;
   documentDate: string;
+  sellBillNumber?: string;
 }
 
 export interface IShipmentLine {
