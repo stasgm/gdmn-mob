@@ -19,11 +19,14 @@ import { mobileRequest } from '../mobileRequest';
 
 import { getNextOrder } from './helpers';
 import { useSaveErrors } from './useSaveErrors';
+import { useSendAppSettings } from './useSendAppSettings';
 
 export const useSendDocs = (readyDocs: IDocument[], sendingDocs: IDocument[] = readyDocs) => {
   const docDispatch = useDocThunkDispatch();
   const authDispatch = useAuthThunkDispatch();
   const dispatch = useDispatch();
+
+  const sendAppSettings = useSendAppSettings();
 
   const { user, company, config, appSystem } = useSelector((state) => state.auth);
 
@@ -113,6 +116,7 @@ export const useSendDocs = (readyDocs: IDocument[], sendingDocs: IDocument[] = r
             if (updateDocResponse.type === 'DOCUMENTS/UPDATE_MANY_FAILURE') {
               addError('useSendDocs: updateDocuments', updateDocResponse.payload, tempErrs);
             }
+            sendAppSettings();
           } else {
             addError('useSendDocs: api.message.sendMessages', sendMessageResponse.message, tempErrs);
           }
