@@ -6,6 +6,7 @@ import { useCallback, useEffect } from 'react';
 import FileDetails from '../../components/file/FileDetails';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import fileActions from '../../store/file';
+import fileSelectors from '../../store/file/selectors';
 import SnackBar from '../../components/SnackBar';
 
 export type Params = {
@@ -19,19 +20,26 @@ const FileEdit = () => {
 
   const dispatch: AppDispatch = useDispatch();
 
-  const { loading, errorMessage, file, pageParams } = useSelector((state) => state.files);
+  const { loading, errorMessage, file } = useSelector((state) => state.files);
 
-  const fetchFile = useCallback(
-    (_filterText?: string, _fromRecord?: number, _toRecord?: number) => {
-      dispatch(fileActions.fetchFile(id));
-    },
-    [dispatch, id],
-  );
+  const fileObject = fileSelectors.fileByIdAndFolder(id);
+
+  const fetchFile = useCallback(() => {
+    dispatch(
+      fileActions.fetchFile(
+        id,
+        fileObject?.ext || '',
+        fileObject?.folder || '',
+        fileObject?.appSystem?.id || '',
+        fileObject?.company?.id || '',
+      ),
+    );
+  }, [dispatch, fileObject?.appSystem?.id, fileObject?.company?.id, fileObject?.ext, fileObject?.folder, id]);
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchFile(pageParams?.filterText as string);
-  }, [fetchFile, pageParams?.filterText]);
+    fetchFile();
+  }, [fetchFile]);
 
   const goBack = () => {
     navigate(-1);
@@ -42,7 +50,16 @@ const FileEdit = () => {
   };
 
   const handleSubmit = async (values: any) => {
-    const res = await dispatch(fileActions.updateFile(id, values as any));
+    const res = await dispatch(
+      fileActions.updateFile(
+        id,
+        values as any,
+        fileObject?.ext || '',
+        fileObject?.folder || '',
+        fileObject?.appSystem?.id || '',
+        fileObject?.company?.id || '',
+      ),
+    );
     if (res.type === 'FILE/UPDATE_FILE_SUCCESS') {
       goBack();
     }

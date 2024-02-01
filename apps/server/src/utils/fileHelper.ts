@@ -8,7 +8,7 @@ import { finished } from 'stream';
 
 import { promisify } from 'util';
 
-import { IPathParams, IFileSystem, INamedEntity, IDeviceLogFiles } from '@lib/types';
+import { IPathParams, IFileSystem, INamedEntity, IDeviceLogFiles, IFileObject } from '@lib/types';
 
 import { BYTES_PER_MB, defMaxFilesSize } from '../utils/constants';
 
@@ -31,7 +31,7 @@ export const getPath = (folders: string[], fn = '') => {
 export const getPathSystem = ({ companyId, appSystemId }: IPathParams) =>
   `db_${companyId}/${getDb().appSystems.findById(appSystemId)?.name}`;
 
-export const fullFileName2alias = (fullFileName: string): string | undefined => {
+/*export const fullFileName2alias = (fullFileName: string): string | undefined => {
   const re = /db_(.+)/gi;
   const match = re.exec(fullFileName);
   const fileNameArr = fullFileName.split(getDb().dbPath);
@@ -42,10 +42,22 @@ export const fullFileName2alias = (fullFileName: string): string | undefined => 
     str += i === 0 ? temp : `_D_${temp}`;
     return str;
   }, '');
-};
+};*/
 
-export const alias2fullFileName = (alias: string): string => {
+/* export const alias2fullFileName = (alias: string): string => {
   const match = alias.split('_D_').join(path.sep).split('_EXT_').join('.');
+  return getPath([match]);
+}; */
+
+export const idObj2fullFileName = (idObj: IFileObject): string => {
+  const { appSystems } = getDb();
+  const appSystemName = idObj.appSystemId ? appSystems.findById(idObj.appSystemId)?.name : undefined;
+  const ext = idObj.ext ? `.${idObj.ext}` : '';
+  const match =
+    appSystemName && idObj.companyId && idObj.folder
+      ? // eslint-disable-next-line max-len
+        `db_${idObj.companyId}${path.sep}${appSystemName}${path.sep}${idObj.folder}${path.sep}${idObj.id}${ext}`
+      : `${idObj.id}${ext}`;
   return getPath([match]);
 };
 
@@ -111,6 +123,27 @@ export const readTextFile = async <T>(
     return data.join('').toString();
   } catch (err) {
     return `Ошибка чтения файла ${fileName} - ${err} `;
+  }
+};
+
+export const searchInTextFile = async <T>(
+  fileName: string,
+  searchString: string,
+  start: number | undefined,
+  end: number | undefined,
+): Promise<boolean> => {
+  const check = await checkFileExists(fileName);
+  if (!check) return false;
+  try {
+    const streamRead = createReadStream(fileName, { encoding: 'utf8', start: start, end: end });
+    const data = [];
+    for await (const chunk of streamRead) {
+      data.push(chunk);
+      if (data.join('').toString().toLowerCase().indexOf(searchString.toLowerCase()) >= 0) return true;
+    }
+    return false;
+  } catch (err) {
+    return false;
   }
 };
 

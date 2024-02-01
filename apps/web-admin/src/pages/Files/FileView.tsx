@@ -16,6 +16,7 @@ import CachedIcon from '@mui/icons-material/Cached';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import DriveFileMoveOutlinedIcon from '@mui/icons-material/DriveFileMoveOutlined';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -44,33 +45,39 @@ const FileView = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading, errorMessage, file, pageParams, folders } = useSelector((state) => state.files);
+  const { loading, errorMessage, file, folders } = useSelector((state) => state.files);
 
-  const fetchFile = useCallback(
-    (_filterText?: string, _fromRecord?: number, _toRecord?: number) => {
-      dispatch(fileActions.fetchFile(id));
-    },
-    [dispatch, id],
-  );
+  const fileObject = fileSelectors.fileByIdAndFolder(id);
+
+  const fetchFile = useCallback(() => {
+    dispatch(
+      fileActions.fetchFile(
+        id,
+        fileObject?.ext || '',
+        fileObject?.folder || '',
+        fileObject?.appSystem?.id || '',
+        fileObject?.company?.id || '',
+      ),
+    );
+  }, [dispatch, id, fileObject]);
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchFile(pageParams?.filterText as string);
-  }, [fetchFile, pageParams?.filterText]);
 
-  const process = fileSelectors.fileById(id);
+    fetchFile();
+  }, [fetchFile]);
 
   const fetchFolders = useCallback(() => {
-    if (process && process.company && process.appSystem) {
-      dispatch(fileActions.fetchFolders(process.company.id, process.appSystem.id));
+    if (fileObject && fileObject.company && fileObject.appSystem) {
+      dispatch(fileActions.fetchFolders(fileObject.company.id, fileObject.appSystem.id));
     }
-  }, [dispatch, process]);
+  }, [dispatch, fileObject]);
 
   const [open, setOpen] = useState(false);
   const [openFolder, setOpenFolder] = useState(false);
 
   const handleGetFolders = () => {
-    if (process?.appSystem?.id && process?.company?.id) {
+    if (fileObject?.appSystem?.id && fileObject?.company?.id) {
       setOpenFolder(true);
       fetchFolders();
     }
@@ -84,17 +91,33 @@ const FileView = () => {
     navigate(`${adminPath}/app/files/${id}/edit`);
   };
 
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     setOpen(false);
-    const res = await dispatch(fileActions.removeFile(id));
+    const res = await dispatch(
+      fileActions.removeFile(
+        id,
+        fileObject?.ext || '',
+        fileObject?.folder || '',
+        fileObject?.appSystem?.id || '',
+        fileObject?.company?.id || '',
+      ),
+    );
     if (res.type === 'FILE/REMOVE_FILE_SUCCESS') {
       navigate(-1);
     }
-  };
+  }, [dispatch, fileObject, id, navigate]);
 
   const refreshData = useCallback(() => {
-    dispatch(fileActions.fetchFile(id));
-  }, [dispatch, id]);
+    dispatch(
+      fileActions.fetchFile(
+        id,
+        fileObject?.ext || '',
+        fileObject?.folder || '',
+        fileObject?.appSystem?.id || '',
+        fileObject?.company?.id || '',
+      ),
+    );
+  }, [dispatch, fileObject, id]);
 
   useEffect(() => {
     refreshData();
@@ -112,21 +135,61 @@ const FileView = () => {
     setOpenFolder(false);
   };
 
-  const handleMoveFiles = () => {
+  const [selectedFolder, setSelectedFolder] = useState<string | undefined>(undefined);
+
+  const handleMoveFiles = useCallback(() => {
     setOpenFolder(false);
-    if (selectedFolder && process?.id) {
-      dispatch(fileActions.moveFiles([process?.id], selectedFolder));
+    // console.log('selectedFolder', )
+    if (selectedFolder && fileObject?.id) {
+      console.log('selectedFolder', selectedFolder);
+      dispatch(
+        fileActions.moveFiles(
+          [
+            {
+              id: id,
+              appSystemId: fileObject.appSystem?.id || '',
+              companyId: fileObject.company?.id || '',
+              ext: fileObject.ext || '',
+              folder: fileObject.folder || '',
+            },
+          ],
+          selectedFolder,
+        ),
+      );
     }
     handleCancel();
-  };
-
-  const [selectedFolder, setSelectedFolder] = useState<string | undefined>(undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, fileObject, id, selectedFolder]);
 
   const handleClearError = () => {
     dispatch(fileActions.fileSystemActions.clearError());
   };
 
-  if (!process) {
+  const encode = (s: string) => {
+    const out = [];
+    for (let i = 0; i < s.length; i++) {
+      out[i] = s.charCodeAt(i);
+    }
+    return new Uint16Array(out);
+  };
+
+  const handleDownload = useCallback(async () => {
+    setOpen(false);
+    const fileStr = JSON.stringify(file);
+    const bufferArray = encode(fileStr);
+    const blob = new Blob([bufferArray], {
+      type: 'application/octet-stream',
+    });
+
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${fileObject?.id}.${fileObject?.ext}`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }, [file, fileObject]);
+
+  if (!fileObject) {
     return (
       <Box
         sx={{
@@ -165,6 +228,15 @@ const FileView = () => {
       variant: 'contained',
       onClick: handleGetFolders,
       icon: <DriveFileMoveOutlinedIcon />,
+    },
+    {
+      name: 'Скачать',
+      sx: { marginRight: 1 },
+      disabled: true,
+      color: 'secondary',
+      variant: 'contained',
+      onClick: handleDownload,
+      icon: <ArrowDownwardIcon />,
     },
     {
       name: 'Удалить',
@@ -239,7 +311,7 @@ const FileView = () => {
                 minHeight: '100%',
               }}
             >
-              <FileDetailsView list={process} />
+              <FileDetailsView list={fileObject} />
             </Box>
 
             <Box>

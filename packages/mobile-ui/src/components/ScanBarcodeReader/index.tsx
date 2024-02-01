@@ -114,6 +114,7 @@ const ScanBarcodeReader = ({
     }
   };
 
+  console.log('isErrorTouchable', isErrorTouchable);
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={viewStyle}>
       <View style={styles.camera}>

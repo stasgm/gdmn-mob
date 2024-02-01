@@ -8,6 +8,8 @@ import { InvalidParameterException } from '../exceptions';
 
 import { created, ok } from '../utils/apiHelpers';
 
+import { getFileParams } from './file';
+
 const addDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
   const { action } = ctx.query;
 
@@ -41,25 +43,25 @@ const addDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id } = ctx.params;
+  const params = await getFileParams(ctx);
 
-  const deviceLog = await deviceLogService.findOne(id);
+  const deviceLog = await deviceLogService.findOne(params);
 
   ok(ctx as Context, deviceLog, 'getDeviceLog: DeviceLog is successfully  received');
 };
 
 const removeDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id } = ctx.params;
+  const params = await getFileParams(ctx);
 
-  await deviceLogService.deleteOne(id);
+  await deviceLogService.deleteOne(params);
 
-  ok(ctx as Context, undefined, `removeDeviceLog: DeviceLog '${id}' is successfully removed`);
+  ok(ctx as Context, undefined, `removeDeviceLog: DeviceLog '${params.id}' is successfully removed`);
 };
 
 const getDeviceLogs = async (ctx: ParameterizedContext): Promise<void> => {
   const params: Record<string, string | number> = {};
 
-  const { uid, date, company, appSystem, contact, device, filterText, fromRecord, toRecord } = ctx.query;
+  const { uid, date, company, appSystem, contact, device, filterText, fromRecord, toRecord, mdate } = ctx.query;
 
   if (typeof company === 'string' && company) {
     params.company = company;
@@ -75,6 +77,10 @@ const getDeviceLogs = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (typeof date === 'string' && date) {
     params.date = date;
+  }
+
+  if (typeof mdate === 'string' && mdate) {
+    params.mdate = mdate;
   }
 
   if (typeof appSystem === 'string' && appSystem) {

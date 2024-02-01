@@ -38,21 +38,26 @@ const DeviceLogView = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading, errorMessage, logList, pageParams } = useSelector((state) => state.deviceLogs);
+  const { loading, errorMessage, logList } = useSelector((state) => state.deviceLogs);
 
-  const fetchDeviceLogs = useCallback(
-    (_filterText?: string, _fromRecord?: number, _toRecord?: number) => {
-      dispatch(deviceLogActions.fetchDeviceLog(id));
-    },
-    [dispatch, id],
-  );
+  const deviceLog = deviceLogSelectors.deviceLogById(id);
+
+  const fetchDeviceLogs = useCallback(() => {
+    dispatch(
+      deviceLogActions.fetchDeviceLog(
+        id,
+        deviceLog?.ext || '',
+        deviceLog?.folder || '',
+        deviceLog?.appSystem?.id || '',
+        deviceLog?.company?.id || '',
+      ),
+    );
+  }, [dispatch, id, deviceLog]);
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchDeviceLogs(pageParams?.filterText as string);
-  }, [fetchDeviceLogs, pageParams?.filterText]);
-
-  const deviceLog = deviceLogSelectors.deviceLogById(id);
+    fetchDeviceLogs();
+  }, [fetchDeviceLogs]);
 
   const deviceLogsDetails: ILinkedEntity[] = useMemo(
     () =>
@@ -78,17 +83,33 @@ const DeviceLogView = () => {
     navigate(-1);
   };
 
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     setOpen(false);
-    const res = await dispatch(deviceLogActions.removeDeviceLog(id));
+    const res = await dispatch(
+      deviceLogActions.removeDeviceLog(
+        id,
+        deviceLog?.ext || '',
+        deviceLog?.folder || '',
+        deviceLog?.appSystem?.id || '',
+        deviceLog?.company?.id || '',
+      ),
+    );
     if (res.type === 'DEVICE_LOG/REMOVE_DEVICE_LOG_SUCCESS') {
       navigate(-1);
     }
-  };
+  }, [deviceLog, dispatch, id, navigate]);
 
   const refreshData = useCallback(() => {
-    dispatch(deviceLogActions.fetchDeviceLog(id));
-  }, [dispatch, id]);
+    dispatch(
+      deviceLogActions.fetchDeviceLog(
+        id,
+        deviceLog?.ext || '',
+        deviceLog?.folder || '',
+        deviceLog?.appSystem?.id || '',
+        deviceLog?.company?.id || '',
+      ),
+    );
+  }, [dispatch, id, deviceLog?.appSystem?.id, deviceLog?.company?.id, deviceLog?.ext, deviceLog?.folder]);
 
   useEffect(() => {
     refreshData();

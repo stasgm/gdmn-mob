@@ -43,10 +43,19 @@ const deleteFiles: Config = {
     }),
     type: 'json',
     body: Joi.object({
-      ids: Joi.array().items(Joi.string()).required(),
-      folderName: Joi.string(),
-    }).error(new InvalidParameterException('Некорректный формат списка  файлов')),
+      ids: Joi.array().items(
+        Joi.object({
+          id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор файла')),
+          companyId: Joi.string(),
+          appSystemId: Joi.string(),
+          folder: Joi.string(),
+          ext: Joi.string(),
+        }),
+      ),
+      toFolder: Joi.string(),
+    }).error(new InvalidParameterException('Некорректный формат списка файлов')),
   },
 };
 
+/**/
 export { removeFile, getFile, updateFile, deleteFiles };

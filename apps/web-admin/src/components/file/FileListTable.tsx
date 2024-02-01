@@ -61,7 +61,7 @@ const FileListTable = ({
   const initialValues = useMemo(() => {
     return {
       path: '',
-      fileName: '',
+      id: '',
       company: '',
       appSystem: '',
       producer: '',
@@ -137,6 +137,16 @@ const FileListTable = ({
   //   }
   // }, [limitRows, selectedFileIds.length, selectedFiles]);
 
+  const getFileName = (str: string) => {
+    const beginIndex = str.indexOf('__');
+    if (beginIndex !== -1) {
+      const endIndex = str.indexOf('.json');
+      return str.slice(beginIndex + 2, endIndex);
+    } else {
+      return str;
+    }
+  };
+
   const TableRows = () => {
     const fileList = files.slice(page * limit, page * limit + limit).map((file: IFileSystem) => {
       return (
@@ -171,8 +181,10 @@ const FileListTable = ({
               value="true"
             />
           </TableCell>
+          {/* <TableCell /*style={{ minWidth: 150 }}>{file.folder || 'db'}</TableCell> */}
+
           <TableCell style={{ minWidth: 150 }}>{file.path}</TableCell>
-          <TableCell style={{ minWidth: 500 }}>{file.fileName}</TableCell>
+          <TableCell style={{ minWidth: 500 }}>{getFileName(file.id)}</TableCell>
           <TableCell style={{ minWidth: 150 }}>{file.company?.name}</TableCell>
           <TableCell style={{ minWidth: 150 }}>{file.appSystem?.name}</TableCell>
           <TableCell style={{ minWidth: 100 }}>{file.producer?.name}</TableCell>

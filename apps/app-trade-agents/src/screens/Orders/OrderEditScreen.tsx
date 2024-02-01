@@ -308,7 +308,6 @@ const OrderEditScreen = () => {
       value: docDepart && [docDepart],
     });
   }, [docDepart, isBlocked, navigation]);
-
   const handlePresentRoad = useCallback(() => {
     if (isBlocked) {
       return;
@@ -375,7 +374,6 @@ const OrderEditScreen = () => {
         {road ? (
           <SelectableInput label="Маршрут" value={docRoad?.name} onPress={handlePresentRoad} disabled={isBlocked} />
         ) : null}
-
         <SelectableInput
           label="Склад-магазин"
           value={docDepart?.name}
