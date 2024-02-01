@@ -18,8 +18,7 @@ import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native'
 import { StackNavigationProp } from '@react-navigation/stack';
 import { FlashList } from '@shopify/flash-list';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { SectionListData, View, StyleSheet, Keyboard, Platform, Alert } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { SectionListData, View, StyleSheet, Alert } from 'react-native';
 
 import { ShipmentStackParamList } from '../../navigation/Root/types';
 import {
@@ -81,13 +80,9 @@ const ShipmentListScreen = () => {
 
   const [shipment, setShipment] = useState(shipments[0]);
 
-  const {
-    filterShipmentContact,
-    filterShipmentOutlet,
-    filterShipmentDateBegin,
-    filterShipmentDateEnd,
-    filterShipmentGood,
-  } = useSelector((state) => state.app.formParams as IShipmentListFormParam);
+  const { filterShipmentContact, filterShipmentOutlet, filterShipmentGood } = useSelector(
+    (state) => state.app.formParams as IShipmentListFormParam,
+  );
 
   const filteredShipmentDetails = useMemo(
     () =>
@@ -117,23 +112,9 @@ const ShipmentListScreen = () => {
           (shipment.id === 'shipment' ? true : filteredShipmentDetails[i.id]) &&
           filteredShipmentDetails[i.id] &&
           (filterShipmentContact?.id ? i.contactId === filterShipmentContact.id : true) &&
-          (filterShipmentOutlet?.id ? i.outletId === filterShipmentOutlet.id : true) &&
-          (filterShipmentDateBegin
-            ? new Date(filterShipmentDateBegin).getTime() <= new Date(i.documentDate.slice(0, 10)).getTime()
-            : true) &&
-          (filterShipmentDateEnd
-            ? new Date(filterShipmentDateEnd).getTime() >= new Date(i.documentDate.slice(0, 10)).getTime()
-            : true),
+          (filterShipmentOutlet?.id ? i.outletId === filterShipmentOutlet.id : true),
       ) || [],
-    [
-      filterShipmentContact?.id,
-      filterShipmentDateBegin,
-      filterShipmentDateEnd,
-      filterShipmentOutlet?.id,
-      filteredShipmentDetails,
-      shipment.id,
-      shipmentInfo,
-    ],
+    [filterShipmentContact?.id, filterShipmentOutlet?.id, filteredShipmentDetails, shipment.id, shipmentInfo],
   );
 
   const list: IContactData = filteredShipmentInfo.reduce((prev: IContactData, cur: IShipmentHead) => {
@@ -192,7 +173,7 @@ const ShipmentListScreen = () => {
                   lineId: orderId,
                   name: `Заявка №${refOrder?.number || '-'} ${order?.number ? `(${order?.number}) ` : ''}от ${
                     refOrder?.documentDate ? getDateString(refOrder?.documentDate) : '-'
-                  }`,
+                  } ${refOrder?.sellBillNumber ? `\nТТН №${refOrder?.sellBillNumber}` : ''}`,
                   type: 'order',
                 };
                 orderList = [...orderList, orderLine];
@@ -227,9 +208,9 @@ const ShipmentListScreen = () => {
                   {
                     ...goodList.total,
                     id: generateId(),
-                    name: `Итого по заявке №${refOrder?.number || '-'} (${order?.number || '-'}) от ${
-                      refOrder?.documentDate ? getDateString(refOrder?.documentDate) : '-'
-                    }`,
+                    name: `Итого по заявке №${refOrder?.number || '-'} ${
+                      order?.number ? `(${order?.number}) ` : ''
+                    } от ${refOrder?.documentDate ? getDateString(refOrder?.documentDate) : '-'}`,
                     type: 'total',
                   },
                 ];
@@ -257,8 +238,6 @@ const ShipmentListScreen = () => {
         filterShipmentContact: undefined,
         filterShipmentOutlet: undefined,
         filterShipmentGood: undefined,
-        filterShipmentDateBegin: '',
-        filterShipmentDateEnd: '',
       }),
     );
   }, [dispatch]);
@@ -338,12 +317,7 @@ const ShipmentListScreen = () => {
     handleCleanFormParams();
   }, [handleCleanFormParams]);
 
-  const withParams =
-    !!filterShipmentContact ||
-    !!filterShipmentOutlet ||
-    !!filterShipmentGood ||
-    !!filterShipmentDateBegin ||
-    !!filterShipmentDateEnd;
+  const withParams = !!filterShipmentContact || !!filterShipmentOutlet || !!filterShipmentGood;
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
@@ -399,36 +373,6 @@ const ShipmentListScreen = () => {
     });
   }, [filterShipmentGood, navigation]);
 
-  const [showDateBegin, setShowDateBegin] = useState(false);
-
-  const handleApplyDateBegin = (_event: any, selectedDateBegin: Date | undefined) => {
-    setShowDateBegin(false);
-
-    if (selectedDateBegin && _event.type !== 'dismissed') {
-      dispatch(appActions.setFormParams({ filterShipmentDateBegin: selectedDateBegin.toISOString().slice(0, 10) }));
-    }
-  };
-
-  const handlePresentDateBegin = () => {
-    Keyboard.dismiss();
-    setShowDateBegin(true);
-  };
-
-  const [showDateEnd, setShowDateEnd] = useState(false);
-
-  const handleApplyDateEnd = (_event: any, selectedDateEnd: Date | undefined) => {
-    setShowDateEnd(false);
-
-    if (selectedDateEnd && _event.type !== 'dismissed') {
-      dispatch(appActions.setFormParams({ filterShipmentDateEnd: selectedDateEnd.toISOString().slice(0, 10) }));
-    }
-  };
-
-  const handlePresentDateEnd = () => {
-    Keyboard.dismiss();
-    setShowDateEnd(true);
-  };
-
   const handleShipment = useCallback(
     (option: IListItem) => {
       if (!(option.id === shipment?.id)) {
@@ -457,11 +401,14 @@ const ShipmentListScreen = () => {
           onChange={handleShipment}
           onPress={handlePressShipment}
           onDismiss={() => setVisibleShipment(false)}
-          title={shipment?.value || ''}
+          title={
+            shipment?.id === 'shipment' && syncDate ? `${shipment.value} на ${getDateString(syncDate)}` : shipment.value
+          }
           visible={visibleShipment}
           activeOptionId={shipment?.id}
           style={localStyles.btnTab}
           iconName={'chevron-down'}
+          iconSize={26}
         />
       </View>
       {filterVisible && (
@@ -481,24 +428,6 @@ const ShipmentListScreen = () => {
               onPress={handleSearchGood}
             />
           </View>
-          <View style={[styles.flexDirectionRow, localStyles.marginTop]}>
-            <View style={localStyles.width}>
-              <SelectableInput
-                label="С даты"
-                value={filterShipmentDateBegin ? getDateString(filterShipmentDateBegin) : ''}
-                onPress={handlePresentDateBegin}
-                style={!filterShipmentDateBegin && localStyles.fontSize}
-              />
-            </View>
-            <View style={localStyles.width}>
-              <SelectableInput
-                label="По дату"
-                value={filterShipmentDateEnd ? getDateString(filterShipmentDateEnd || '') : ''}
-                onPress={handlePresentDateEnd}
-                style={[!filterShipmentDateEnd && localStyles.fontSize, localStyles.marginInput]}
-              />
-            </View>
-          </View>
 
           <View style={localStyles.container}>
             <PrimeButton icon={'delete-outline'} onPress={handleCleanFormParams} disabled={!withParams}>
@@ -517,25 +446,6 @@ const ShipmentListScreen = () => {
         keyboardShouldPersistTaps={'handled'}
         ListEmptyComponent={EmptyList}
       />
-
-      {showDateBegin && (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={new Date(filterShipmentDateBegin || new Date())}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'inline' : 'default'}
-          onChange={handleApplyDateBegin}
-        />
-      )}
-      {showDateEnd && (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={new Date(filterShipmentDateEnd || new Date())}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'inline' : 'default'}
-          onChange={handleApplyDateEnd}
-        />
-      )}
     </AppScreen>
   );
 };
@@ -552,15 +462,6 @@ const localStyles = StyleSheet.create({
   },
   marginTop: {
     marginTop: -5,
-  },
-  width: {
-    width: '50%',
-  },
-  fontSize: {
-    fontSize: 14,
-  },
-  marginInput: {
-    marginLeft: 5,
   },
   container: {
     alignItems: 'center',

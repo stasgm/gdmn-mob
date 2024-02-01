@@ -36,6 +36,7 @@ const ProfileScreen = () => {
   const { colors } = useTheme();
 
   const { user, company, device, isDemo, loading, isLogout } = useSelector((state) => state.auth);
+  const appLoading = useSelector((state) => state.app.loading);
 
   const userSettings = useSelector((state) => state.settings.userData);
 
@@ -191,7 +192,7 @@ const ProfileScreen = () => {
         )}
         <Divider />
         <View>
-          <PrimeButton outlined onPress={handleLogout} disabled={loading} loadIcon={loading}>
+          <PrimeButton outlined onPress={handleLogout} disabled={loading || appLoading} loadIcon={loading}>
             {isDemo ? 'Выйти из демо режима' : 'Сменить пользователя'}
           </PrimeButton>
         </View>
