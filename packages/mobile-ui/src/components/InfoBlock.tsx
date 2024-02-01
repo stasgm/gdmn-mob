@@ -17,6 +17,7 @@ interface IProps {
   onSwipeClose?: () => void;
   isSwipeable?: boolean;
   isFromRoute?: boolean;
+  isShowAddInfo?: boolean;
 }
 
 const InfoBlock = ({
@@ -27,6 +28,7 @@ const InfoBlock = ({
   onPress,
   isBlocked = false,
   isFromRoute = false,
+  isShowAddInfo = false,
 }: IProps) => {
   return (
     <View style={[styles.flexDirectionRow, localStyles.box]}>
@@ -45,7 +47,7 @@ const InfoBlock = ({
             <View style={localStyles.childrenView}>{children}</View>
             {isFromRoute && <MaterialCommunityIcons name="routes" size={20} style={localStyles.iconEdit} />}
             {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} style={localStyles.iconEdit} /> : null}
-            {!disabled && onPress ? (
+            {!disabled && !isShowAddInfo && onPress ? (
               <MaterialCommunityIcons name="file-document-edit-outline" size={20} style={localStyles.iconEdit} />
             ) : null}
           </View>

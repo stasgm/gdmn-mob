@@ -299,6 +299,18 @@ const globalStyles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   marginRight12: { marginRight: 12 },
+  viewRight_30: {
+    borderRadius: 46,
+    height: 46,
+    width: 46,
+    marginRight: 4,
+    overflow: 'hidden',
+  },
+  icon_30: {
+    height: 46,
+    width: 46,
+    margin: 0,
+  },
 });
 
 export default globalStyles;
