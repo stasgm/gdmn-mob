@@ -25,6 +25,7 @@ import actions from '../../store/file';
 import { adminPath } from '../../utils/constants';
 import { IFileFilter, IFilePageParam, IPageParam } from '../../types';
 import { useDispatch } from '../../store';
+import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
   files: IFileSystem[];
@@ -76,6 +77,7 @@ const FileListTable = ({
   }, []);
 
   const navigate = useNavigate();
+  const maxHeight = useWindowResizeMaxHeight();
 
   const formik = useFormik<IFileFilter>({
     enableReinitialize: true,
@@ -218,7 +220,7 @@ const FileListTable = ({
   return (
     <Card>
       <PerfectScrollbar>
-        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight: window.innerHeight - 268 }}>
+        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight }}>
           <Table>
             <TableHead>
               <TableRow>

@@ -295,6 +295,31 @@ const ShipmentViewScreen = () => {
     [id, isCurr, navigation],
   );
 
+  const handleCopyDoc = useCallback(async () => {
+    if (!shipment) {
+      return;
+    }
+    setScreenState('copying');
+    await sleep(1);
+    const newId = generateId();
+
+    const newDocDate = new Date().toISOString();
+
+    const newDoc: IShipmentDocument = {
+      ...shipment,
+      id: newId,
+      status: 'DRAFT',
+      documentDate: newDocDate,
+      creationDate: newDocDate,
+      editionDate: newDocDate,
+    };
+
+    docDispatch(documentActions.addDocument(newDoc));
+    navigation.navigate('ShipmentView', { id: newId, isCurr });
+
+    setScreenState('copied');
+  }, [shipment, docDispatch, navigation, isCurr]);
+
   const handleDeleteShipment = useCallback(async () => {
     if (!id) {
       return;
@@ -336,31 +361,72 @@ const ShipmentViewScreen = () => {
   }, [dispatch, fpDispatch, id, shipmentLines, tempOrder]);
 
   const actionsMenu = useCallback(() => {
-    showActionSheet([
-      {
-        title: 'Ввести штрих-код',
-        onPress: handleShowDialog,
-      },
-      {
-        title: 'Отменить последнее сканирование',
-        onPress: hanldeCancelLastScan,
-      },
-      {
-        title: 'Редактировать данные',
-        onPress: handleEditShipmentHead,
-      },
-      {
-        title: 'Удалить документ',
-        type: 'destructive',
-        onPress: handleDeleteShipment,
-      },
-      {
-        title: 'Отмена',
-        type: 'cancel',
-        onPress: handleFocus,
-      },
-    ]);
-  }, [showActionSheet, hanldeCancelLastScan, handleEditShipmentHead, handleDeleteShipment]);
+    showActionSheet(
+      isBlocked
+        ? shipment?.status === 'SENT'
+          ? [
+              {
+                title: 'Копировать документ',
+                onPress: handleCopyDoc,
+              },
+              {
+                title: 'Отмена',
+                type: 'cancel',
+              },
+            ]
+          : [
+              {
+                title: 'Копировать документ',
+                onPress: handleCopyDoc,
+              },
+              {
+                title: 'Удалить документ',
+                type: 'destructive',
+                onPress: handleDeleteShipment,
+              },
+              {
+                title: 'Отмена',
+                type: 'cancel',
+              },
+            ]
+        : [
+            {
+              title: 'Ввести штрих-код',
+              onPress: handleShowDialog,
+            },
+            {
+              title: 'Отменить последнее сканирование',
+              onPress: hanldeCancelLastScan,
+            },
+            {
+              title: 'Редактировать данные',
+              onPress: handleEditShipmentHead,
+            },
+            {
+              title: 'Копировать документ',
+              onPress: handleCopyDoc,
+            },
+            {
+              title: 'Удалить документ',
+              type: 'destructive',
+              onPress: handleDeleteShipment,
+            },
+            {
+              title: 'Отмена',
+              type: 'cancel',
+              onPress: handleFocus,
+            },
+          ],
+    );
+  }, [
+    showActionSheet,
+    isBlocked,
+    shipment?.status,
+    handleCopyDoc,
+    handleDeleteShipment,
+    hanldeCancelLastScan,
+    handleEditShipmentHead,
+  ]);
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
@@ -407,14 +473,15 @@ const ShipmentViewScreen = () => {
     () =>
       isBlocked ? (
         shipment?.status === 'READY' ? (
-          <SendButton
-            onPress={() => setVisibleSendDialog(true)}
-            disabled={screenState !== 'idle' || loading || !shipmentLines?.length}
-          />
+          <View style={styles.buttons}>
+            <SendButton
+              onPress={() => setVisibleSendDialog(true)}
+              disabled={screenState !== 'idle' || loading || !shipmentLines?.length}
+            />
+            <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
+          </View>
         ) : (
-          shipment?.status === 'DRAFT' && (
-            <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
-          )
+          <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         )
       ) : (
         <View style={styles.buttons}>
@@ -658,9 +725,11 @@ const ShipmentViewScreen = () => {
   }, [scanned, ref, visibleDialog]);
 
   useEffect(() => {
-    if (screenState === 'sent' || screenState === 'deleted') {
+    if (screenState === 'sent' || screenState === 'deleted' || screenState === 'copied') {
       setScreenState('idle');
-      navigation.goBack();
+      if (screenState !== 'copied') {
+        navigation.goBack();
+      }
     }
   }, [navigation, screenState]);
 
@@ -755,11 +824,17 @@ const ShipmentViewScreen = () => {
     return <AppActivityIndicator />;
   }
 
-  if (screenState === 'deleting' || screenState === 'sending') {
+  if (screenState === 'deleting' || screenState === 'copying' || screenState === 'sending') {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
-          <LargeText>{screenState === 'deleting' ? 'Удаление документа...' : 'Отправка документа...'}</LargeText>
+          <LargeText>
+            {screenState === 'deleting'
+              ? 'Удаление документа...'
+              : screenState === 'copying'
+                ? 'Копирование документа...'
+                : 'Отправка документа...'}
+          </LargeText>
           <AppActivityIndicator style={{}} />
         </View>
       </View>
@@ -786,6 +861,13 @@ const ShipmentViewScreen = () => {
         <View style={styles.infoBlock}>
           <MediumText>{shipment.head.outlet?.name || ''}</MediumText>
           <MediumText>{`№ ${shipment.number} на ${getDateString(shipment.head?.onDate)}`}</MediumText>
+          {shipment.sentDate ? (
+            <View style={styles.rowCenter}>
+              <MediumText>
+                Отправлено: {getDateString(shipment.sentDate)} {new Date(shipment.sentDate).toLocaleTimeString()}
+              </MediumText>
+            </View>
+          ) : null}
         </View>
       </InfoBlock>
       <LineTypes />

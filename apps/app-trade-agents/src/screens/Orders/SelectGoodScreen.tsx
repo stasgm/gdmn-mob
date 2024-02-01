@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
-import { Badge, Chip, Divider, MD2Theme, Searchbar, useTheme } from 'react-native-paper';
+import { Badge, Chip, Divider, IconButton, MD2Theme, Searchbar, useTheme } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import {
@@ -27,7 +27,6 @@ import {
   AppActivityIndicator,
   AppScreen,
   Switch,
-  FilterButton,
   SelectableInput,
   PrimeButton,
 } from '@lib/mobile-ui';
@@ -60,12 +59,13 @@ const SelectGoodScreen = () => {
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGood'>>().params;
   const dispatch = useDispatch();
 
+  const { colors } = useTheme<MD2Theme>();
+
   const settings = useSelector((state) => state.settings.data);
   const isUseNetPrice = settings?.isUseNetPrice?.data as boolean;
-  const isShowPrevOrderLines = settings?.isShowPrevOrderLines?.data as boolean;
 
   const [isUseMatrix, setIsUseMatrix] = useState(isUseNetPrice);
-  const [isShowPrev, setIsShowPrev] = useState(false);
+  const [isShowPrev, setParamsVisible] = useState(false);
 
   const syncDate = useSelector((state) => state.app.syncDate);
   const isDemo = useSelector((state) => state.auth.isDemo);
@@ -76,9 +76,13 @@ const SelectGoodScreen = () => {
     }
   }, [syncDate, isDemo]);
 
-  const [paramsVisible, setParamsVisible] = useState(false);
-  const [filterDateBegin, setFilterDateBegin] = useState<string | undefined>(undefined);
-  const [filterDateEnd, setFilterDateEnd] = useState<string | undefined>(undefined);
+  const [filterDateBegin, setFilterDateBegin] = useState<string | undefined>(
+    new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+  );
+
+  const [filterDateEnd, setFilterDateEnd] = useState<string | undefined>(
+    new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000).toISOString(),
+  );
 
   const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
   const goods = refSelectors.selectByName<IGood>('good').data;
@@ -90,7 +94,7 @@ const SelectGoodScreen = () => {
   const docs = useSelector((state) => state.documents.list) as IOrderDocument[];
   const prevOrderByOutlet = useMemo(
     () =>
-      doc && isShowPrevOrderLines
+      doc && isShowPrev && (filterDateBegin || filterDateEnd)
         ? docs
             .filter(
               (o) =>
@@ -107,7 +111,7 @@ const SelectGoodScreen = () => {
             )
             .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime())
         : [],
-    [doc, isShowPrevOrderLines, docs, outletId, filterDateBegin, filterDateEnd],
+    [doc, isShowPrev, docs, outletId, filterDateBegin, filterDateEnd],
   );
 
   const prevLines = useMemo(
@@ -136,9 +140,11 @@ const SelectGoodScreen = () => {
 
   const model = useMemo(
     () =>
-      (contactId
-        ? getGroupModelByContact(groups, goods, goodMatrix[contactId], isUseMatrix, isShowPrev ? prevLines : [])
-        : {}) as IMGroupModel,
+      (isShowPrev && !prevLines.length
+        ? {}
+        : contactId
+          ? getGroupModelByContact(groups, goods, goodMatrix[contactId], isUseMatrix, isShowPrev ? prevLines : [])
+          : {}) as IMGroupModel,
     [contactId, groups, goods, goodMatrix, isUseMatrix, isShowPrev, prevLines],
   );
 
@@ -185,13 +191,22 @@ const SelectGoodScreen = () => {
   const [selectedLine, setSelectedLine] = useState<IOrderLine | undefined>(undefined);
   const [selectedGood, setSelectedGood] = useState<IGood | undefined>(undefined);
 
+  const prevIconStyle = useMemo(
+    () => (isShowPrev ? { backgroundColor: colors.background, opacity: 0.8 } : {}),
+    [colors.background, isShowPrev],
+  );
+
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        {isShowPrevOrderLines && (
-          <FilterButton onPress={() => setParamsVisible((prev) => !prev)} visible={paramsVisible} />
-        )}
-
+        <View style={styles.viewRight_30}>
+          <IconButton
+            icon={'page-previous-outline'}
+            size={26}
+            style={[styles.icon_30, prevIconStyle]}
+            onPress={() => setParamsVisible((prev) => !prev)}
+          />
+        </View>
         <SearchButton
           onPress={() => {
             setFilterVisible((prev) => !prev);
@@ -200,7 +215,7 @@ const SelectGoodScreen = () => {
         />
       </View>
     ),
-    [filterVisible, isShowPrevOrderLines, paramsVisible],
+    [filterVisible, prevIconStyle],
   );
 
   useLayoutEffect(() => {
@@ -299,8 +314,6 @@ const SelectGoodScreen = () => {
     setFilterDateEnd('');
   };
 
-  const { colors } = useTheme<MD2Theme>();
-
   const Group = useCallback(
     ({
       values,
@@ -325,19 +338,18 @@ const SelectGoodScreen = () => {
                 backgroundColor: item.decoration?.color ? item.decoration.color : 'transparent',
               };
               return (
-                <View
+                <TouchableOpacity
                   key={item.id}
+                  onPress={() => onPress(item)}
                   style={[localStyles.button, backColorStyle, styles.flexDirectionRow, groupButtonStyle]}
                 >
-                  <TouchableOpacity key={item.id} onPress={() => onPress(item)}>
-                    <Text style={[localStyles.buttonLabel, colorStyle]}>{shortenString(item.name, 60) || item.id}</Text>
-                  </TouchableOpacity>
+                  <Text style={[localStyles.buttonLabel, colorStyle]}>{shortenString(item.name, 60) || item.id}</Text>
                   {item.decoration?.name && (
                     <Badge style={[localStyles.badge, badgeColor]} size={10}>
                       {item.decoration.name.toUpperCase()}
                     </Badge>
                   )}
-                </View>
+                </TouchableOpacity>
               );
             })}
           </View>
@@ -397,7 +409,7 @@ const SelectGoodScreen = () => {
                     <MaterialCommunityIcons name={'page-previous-outline'} size={14} color={colors.placeholder} />
                     {prevLine.map((line) => (
                       <MediumText key={line.id} style={localStyles.prevText}>
-                        {` ${line.quantity} кг, уп.: ${line.package ? line.package.name : 'без упаковки'};`}
+                        {` ${line.quantity} кг, уп: ${line.package ? line.package.name : 'без упаковки'};`}
                       </MediumText>
                     ))}
                   </View>
@@ -485,24 +497,19 @@ const SelectGoodScreen = () => {
           <ItemSeparator />
         </View>
       )}
-      {!filterVisible && (
-        <View>
-          {contactId && goodMatrix[contactId] && (
-            <View style={localStyles.switch}>
-              <MediumText>Использовать матрицы</MediumText>
-              <Switch value={isUseMatrix} onValueChange={() => setIsUseMatrix(!isUseMatrix)} />
-            </View>
-          )}
-          {contactId && goodMatrix[contactId] && isShowPrevOrderLines && <Divider />}
-          {isShowPrevOrderLines && !!prevLines.length && (
-            <View style={localStyles.switch}>
-              <MediumText>Предыдущая заявка</MediumText>
-              <Switch value={isShowPrev} onValueChange={() => setIsShowPrev(!isShowPrev)} />
-            </View>
-          )}
-        </View>
-      )}
-      {paramsVisible && (
+      <View>
+        {contactId && goodMatrix[contactId] && (
+          <View style={localStyles.switch}>
+            <MediumText>Использовать матрицы</MediumText>
+            <Switch value={isUseMatrix} onValueChange={() => setIsUseMatrix(!isUseMatrix)} />
+          </View>
+        )}
+        {contactId && goodMatrix[contactId] && !isShowPrev && filterVisible && (
+          <Divider style={{ backgroundColor: colors.primary }} />
+        )}
+      </View>
+
+      {isShowPrev && (
         <>
           <View style={[localStyles.filter, { borderColor: colors.primary }]}>
             <View style={styles.flexDirectionRow}>
@@ -524,7 +531,7 @@ const SelectGoodScreen = () => {
               </View>
             </View>
 
-            <View style={localStyles.container111}>
+            <View style={localStyles.clearButton}>
               <PrimeButton
                 icon={'delete-outline'}
                 onPress={handleCleanParams}
@@ -535,7 +542,6 @@ const SelectGoodScreen = () => {
               </PrimeButton>
             </View>
           </View>
-          <ItemSeparator />
         </>
       )}
       <FlashList
@@ -642,6 +648,7 @@ const localStyles = StyleSheet.create({
     paddingHorizontal: 12,
     fontSize: 20,
     justifyContent: 'space-between',
+    paddingVertical: 3,
   },
   filter: {
     paddingTop: 5,
@@ -659,7 +666,7 @@ const localStyles = StyleSheet.create({
   marginInput: {
     marginLeft: 5,
   },
-  container111: {
+  clearButton: {
     alignItems: 'center',
     marginTop: -10,
   },

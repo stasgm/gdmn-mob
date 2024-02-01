@@ -74,6 +74,7 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
                   ...(newDoc.head ? newDoc : oldDoc),
                   status: 'PROCESSED' as StatusType,
                   errorMessage: undefined,
+                  erpCreationDate: newDoc.erpCreationDate,
                 }
               : newDoc.status === 'PROCESSED_DEADLOCK' || newDoc.status === 'PROCESSED_INCORRECT'
                 ? {

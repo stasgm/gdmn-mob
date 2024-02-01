@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { ListRenderItem, SectionList, SectionListData, View, StyleSheet } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 
 import { documentActions, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
@@ -19,6 +19,7 @@ import {
   SendButton,
   SimpleDialog,
   AddButton,
+  AppActivityIndicator,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -43,6 +44,8 @@ export const ShipmentListScreen = () => {
   const isCurr = route.name.toLowerCase().includes('curr');
   const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ShipmentList'>>();
   const docDispatch = useDocThunkDispatch();
+
+  const isFocused = useIsFocused();
 
   const dispatch = useDispatch();
 
@@ -86,6 +89,7 @@ export const ShipmentListScreen = () => {
               </MediumText>
             </View>
           ),
+          sentDate: i.sentDate,
         }) as IListItemProps,
     );
   }, [filterStatus, list, sortDateType.id]);
@@ -246,6 +250,10 @@ export const ShipmentListScreen = () => {
   const renderSectionHeader = ({ section }: any) => (
     <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
+
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   return (
     <AppScreen>
