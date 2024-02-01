@@ -38,7 +38,6 @@ import { mobileRequest } from '../mobileRequest';
 
 import { getNextOrder, MULTIPART_ITEM_LIVE_IN_MS, needRequest } from './helpers';
 import { useSaveErrors } from './useSaveErrors';
-import { useSendAppSettings } from './useSendAppSettings';
 
 export const useSync = (onSync?: () => Promise<any>) => {
   const docDispatch = useDocThunkDispatch();
@@ -46,8 +45,6 @@ export const useSync = (onSync?: () => Promise<any>) => {
   const authDispatch = useAuthThunkDispatch();
   const settingsDispatch = useSettingsThunkDispatch();
   const dispatch = useDispatch();
-
-  const sendAppSettings = useSendAppSettings();
 
   const addError = useCallback(
     (name: string, message: string, errs: IDeviceLog[], addErrorNotice = true) => {
@@ -96,7 +93,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
   const docVersion = 1;
   const setVersion = 1;
 
-  const { saveErrors } = useSaveErrors();
+  const saveErrors = useSaveErrors();
 
   const params = useMemo(
     () => (appSystem && company ? { appSystemId: appSystem?.id, companyId: company?.id } : undefined),
@@ -834,10 +831,6 @@ export const useSync = (onSync?: () => Promise<any>) => {
                   if (sendMesAppSettResponse.type === 'SEND_MESSAGE') {
                     dispatch(appActions.addSyncRequest({ cmdName: 'GET_APP_SYSTEM_SETTINGS', date: currentDate }));
                   }
-                }
-
-                if (!connectError) {
-                  sendAppSettings();
                 }
               } else {
                 addError(

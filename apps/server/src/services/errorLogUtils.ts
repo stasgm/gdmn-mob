@@ -1,7 +1,7 @@
 import path from 'path';
 import { readdir, unlink, stat } from 'fs/promises';
 
-import { IPathParams, IFileDeviceLogInfo, IDeviceLog, IDeviceLogFiles } from '@lib/types';
+import { IPathParams, IFileDeviceLogInfo, IDeviceLog, IDeviceLogFiles, Settings, IDeviceData } from '@lib/types';
 
 import {
   checkFileExists,
@@ -39,6 +39,8 @@ export const getDeviceLogFullFileName = (params: IPathParams, fileInfo: IFileDev
  * Inserts an object into the file.
  */
 export const saveDeviceLogFile = async (
+  appVersion: string,
+  appSettings: Settings,
   newDeviceLog: IDeviceLog[],
   pathParams: IPathParams,
   fileInfo: IFileDeviceLogInfo,
@@ -47,20 +49,28 @@ export const saveDeviceLogFile = async (
     const fileName = getDeviceLogFullFileName(pathParams, fileInfo);
     const check = await checkFileExists(fileName);
 
-    const oldDeviceLog: IDeviceLog[] | string = check ? await readJsonFile(fileName) : [];
-    if (typeof oldDeviceLog === 'string') {
-      log.error(oldDeviceLog);
+    const oldDeviceData: IDeviceData | string | undefined = check ? await readJsonFile(fileName) : undefined;
+    if (typeof oldDeviceData === 'string') {
+      log.error(oldDeviceData);
       return;
     }
 
-    const delta = oldDeviceLog.length + newDeviceLog.length - config.DEVICE_LOG_MAX_LINES;
+    const delta = oldDeviceData?.logs.length || 0 + newDeviceLog.length - config.DEVICE_LOG_MAX_LINES;
 
-    if (delta > 0) oldDeviceLog.splice(0, delta);
+    if (delta > 0) oldDeviceData?.logs.splice(0, delta);
 
-    return writeIterableToFile(fileName, JSON.stringify([...oldDeviceLog, ...newDeviceLog], undefined, 2), {
-      encoding: 'utf8',
-      flag: 'a',
-    });
+    return writeIterableToFile(
+      fileName,
+      JSON.stringify(
+        { appVersion, appSettings, logs: [...(oldDeviceData?.logs || []), ...newDeviceLog] },
+        undefined,
+        2,
+      ),
+      {
+        encoding: 'utf8',
+        flag: 'a',
+      },
+    );
   } catch (err) {
     log.error(`Ошибка записи журнала ошибок устройства с uid=${fileInfo.deviceId} в файл - ${err}`);
   }

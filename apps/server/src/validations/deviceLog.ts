@@ -22,6 +22,8 @@ const addDeviceLog: Config = {
             message: Joi.string().required().error(new InvalidParameterException('Не указан текст ошибки')),
           }),
         ),
+        appVersion: Joi.string().optional(),
+        appSettings: Joi.object().optional(),
       }),
       Joi.object({
         ids: Joi.array().items(Joi.string()).required(),

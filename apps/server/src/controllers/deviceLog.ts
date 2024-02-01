@@ -13,7 +13,7 @@ const addDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
 
   // Добавление Лога
   if (!action || action !== 'delete') {
-    const { deviceLog, companyId, appSystemId } = ctx.request.body as IDeviceLogParams;
+    const { appVersion, appSettings, deviceLog, companyId, appSystemId } = ctx.request.body as IDeviceLogParams;
     const deviceId = ctx.query.deviceId;
     const user = ctx.state.user as IUser;
 
@@ -22,6 +22,8 @@ const addDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
     }
 
     deviceLogService.addOne({
+      appVersion: appVersion || '',
+      appSettings: appSettings || {},
       deviceLog,
       producerId: user.id,
       appSystemId,

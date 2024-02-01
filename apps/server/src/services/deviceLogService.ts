@@ -1,4 +1,4 @@
-import { IDeviceLog, IDeviceLogFiles } from '@lib/types';
+import { IDeviceLog, IDeviceLogFiles, Settings } from '@lib/types';
 
 import { DataNotFoundException } from '../exceptions';
 
@@ -17,12 +17,16 @@ import { getDb } from './dao/db';
  * @return void
  * */
 const addOne = async ({
+  appVersion,
+  appSettings,
   deviceLog,
   producerId,
   appSystemId,
   companyId,
   deviceId,
 }: {
+  appVersion: string;
+  appSettings: Settings;
   deviceLog: IDeviceLog[];
   producerId: string;
   appSystemId: string;
@@ -42,7 +46,13 @@ const addOne = async ({
     throw new DataNotFoundException('Подсистема не найдена');
   }
 
-  return await saveDeviceLogFile(deviceLog, { companyId, appSystemId }, { producerId, deviceId });
+  return await saveDeviceLogFile(
+    appVersion,
+    appSettings,
+    deviceLog,
+    { companyId, appSystemId },
+    { producerId, deviceId },
+  );
 };
 
 /**
