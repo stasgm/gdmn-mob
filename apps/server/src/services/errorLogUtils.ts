@@ -48,31 +48,34 @@ export const saveDeviceLogFile = async (
   try {
     const fileName = getDeviceLogFullFileName(pathParams, fileInfo);
     const check = await checkFileExists(fileName);
+    const oldDeviceData = check ? await readJsonFile<IDeviceData | IDeviceLog[]>(fileName) : undefined;
+    const isArray = Array.isArray(oldDeviceData);
+    const isObject = typeof oldDeviceData === 'object' && 'logs' in oldDeviceData;
 
-    const oldDeviceData: IDeviceData | string | undefined = check ? await readJsonFile(fileName) : undefined;
-    if (typeof oldDeviceData === 'string') {
-      log.error(oldDeviceData);
+    // если файл существует, но его содержимое не соответствует ожидаемому формату
+    if (!(isArray || isObject || oldDeviceData === undefined)) {
+      log.error(`Неверный тип лога устройства с uid=${fileInfo.deviceId}. ${oldDeviceData}`);
       return;
     }
 
-    const delta = oldDeviceData?.logs.length || 0 + newDeviceLog.length - config.DEVICE_LOG_MAX_LINES;
+    // если файл содержит массив (старый формат), то берем его, иначе берем поле logs (новый формат)
+    const oldDeviceLogs = isArray ? [...oldDeviceData] : oldDeviceData?.logs || [];
 
-    if (delta > 0) oldDeviceData?.logs.splice(0, delta);
+    const delta = oldDeviceLogs.length + newDeviceLog.length - config.DEVICE_LOG_MAX_LINES;
+
+    // если количество записей превышает максимальное, удаляем старые записи
+    if (delta > 0) oldDeviceLogs.splice(0, delta);
 
     return writeIterableToFile(
       fileName,
-      JSON.stringify(
-        { appVersion, appSettings, logs: [...(oldDeviceData?.logs || []), ...newDeviceLog] },
-        undefined,
-        2,
-      ),
+      JSON.stringify({ appVersion, appSettings, logs: [...oldDeviceLogs, ...newDeviceLog] }, undefined, 2),
       {
         encoding: 'utf8',
         flag: 'a',
       },
     );
   } catch (err) {
-    log.error(`Ошибка записи журнала ошибок устройства с uid=${fileInfo.deviceId} в файл - ${err}`);
+    log.error(`Ошибка записи лога устройства с uid=${fileInfo.deviceId} в файл - ${err}`);
   }
 };
 
