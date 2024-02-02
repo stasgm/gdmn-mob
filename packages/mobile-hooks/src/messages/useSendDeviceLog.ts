@@ -8,7 +8,7 @@ import Constants from 'expo-constants';
 import { mobileRequest } from '../mobileRequest';
 import { generateId } from '../utils';
 
-export const useSaveErrors = () => {
+export const useSendDeviceLog = () => {
   const dispatch = useDispatch();
   const errorLog = useSelector((state) => state.app.errorLog || []);
   const { company, appSystem } = useSelector((state) => state.auth);
@@ -42,7 +42,7 @@ export const useSaveErrors = () => {
       } else {
         errs.push({
           id: generateId(),
-          name: 'useSaveErrors: addDeviceLog',
+          name: 'useSendDeviceLog: addDeviceLog',
           date: new Date().toISOString(),
           message: `Данные по приложению не отправлены на сервер: ${addDeviceLogResponse.message}`,
         });

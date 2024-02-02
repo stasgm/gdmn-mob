@@ -18,21 +18,18 @@ import { generateId } from '../utils';
 import { mobileRequest } from '../mobileRequest';
 
 import { getNextOrder } from './helpers';
-import { useSaveErrors } from './useSaveErrors';
-import { useSendAppSettings } from './useSendAppSettings';
+import { useSendDeviceLog } from './useSendDeviceLog';
 
 export const useSendDocs = (readyDocs: IDocument[], sendingDocs: IDocument[] = readyDocs) => {
   const docDispatch = useDocThunkDispatch();
   const authDispatch = useAuthThunkDispatch();
   const dispatch = useDispatch();
 
-  const sendAppSettings = useSendAppSettings();
-
   const { user, company, config, appSystem } = useSelector((state) => state.auth);
 
   const docVersion = 1;
   const deviceId = config.deviceId!;
-  const { saveErrors } = useSaveErrors();
+  const saveErrors = useSendDeviceLog();
   const appRequest = useMemo(() => mobileRequest(authDispatch, authActions), [authDispatch]);
 
   const addError = (name: string, message: string, tempErrs: IDeviceLog[]) => {
@@ -116,7 +113,6 @@ export const useSendDocs = (readyDocs: IDocument[], sendingDocs: IDocument[] = r
             if (updateDocResponse.type === 'DOCUMENTS/UPDATE_MANY_FAILURE') {
               addError('useSendDocs: updateDocuments', updateDocResponse.payload, tempErrs);
             }
-            sendAppSettings();
           } else {
             addError('useSendDocs: api.message.sendMessages', sendMessageResponse.message, tempErrs);
           }

@@ -18,7 +18,7 @@ import { generateId } from '../utils';
 import { mobileRequest } from '../mobileRequest';
 
 import { getNextOrder, needRequest } from './helpers';
-import { useSaveErrors } from './useSaveErrors';
+import { useSendDeviceLog } from './useSendDeviceLog';
 
 export const useSendRefsRequest = () => {
   const dispatch = useDispatch();
@@ -29,7 +29,7 @@ export const useSendRefsRequest = () => {
   const { user, company, config, appSystem } = useSelector((state) => state.auth);
   const refVersion = 1;
   const deviceId = config.deviceId!;
-  const { saveErrors } = useSaveErrors();
+  const saveErrors = useSendDeviceLog();
 
   const addRequestNotice = (message: string) => {
     dispatch(

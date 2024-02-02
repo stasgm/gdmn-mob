@@ -37,7 +37,7 @@ import { generateId, getDateString, isIMessage, isIReferences, isNumeric } from 
 import { mobileRequest } from '../mobileRequest';
 
 import { getNextOrder, MULTIPART_ITEM_LIVE_IN_MS, needRequest } from './helpers';
-import { useSaveErrors } from './useSaveErrors';
+import { useSendDeviceLog } from './useSendDeviceLog';
 
 export const useSync = (onSync?: () => Promise<any>) => {
   const docDispatch = useDocThunkDispatch();
@@ -93,7 +93,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
   const docVersion = 1;
   const setVersion = 1;
 
-  const saveErrors = useSaveErrors();
+  const saveErrors = useSendDeviceLog();
 
   const params = useMemo(
     () => (appSystem && company ? { appSystemId: appSystem?.id, companyId: company?.id } : undefined),
