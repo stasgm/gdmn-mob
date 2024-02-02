@@ -80,12 +80,13 @@ const ScreenListItem = ({
           ) : null}
           {sentDate ? (
             <MediumText>
-              Отправлено: {getDateString(sentDate)} {new Date(sentDate).toLocaleTimeString()}
+              Отправлено: {getDateString(sentDate)} {new Date(sentDate).toLocaleTimeString('ru', { hour12: false })}
             </MediumText>
           ) : null}
           {erpCreationDate ? (
             <MediumText>
-              Обработано: {getDateString(erpCreationDate)} {new Date(erpCreationDate).toLocaleTimeString()}
+              Обработано: {getDateString(erpCreationDate)}{' '}
+              {new Date(erpCreationDate).toLocaleTimeString('ru', { hour12: false })}
             </MediumText>
           ) : null}
         </View>
