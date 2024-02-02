@@ -1,4 +1,4 @@
-import { IDeviceLog, IDeviceLogFiles, IFileIds, IFileObject } from '@lib/types';
+import { IDeviceLog, IDeviceLogFiles, IFileIds, IFileObject, IDeviceData, Settings } from '@lib/types';
 
 import { error, deviceLog as types } from '../types';
 import { response2Log, sleep } from '../utils';
@@ -16,6 +16,8 @@ class DeviceLog extends BaseRequest {
     companyId: string,
     appSystemId: string,
     deviceLog: IDeviceLog[],
+    appVersion: string,
+    appSettings: Settings,
   ) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
@@ -29,6 +31,8 @@ class DeviceLog extends BaseRequest {
       companyId,
       appSystemId,
       deviceLog,
+      appVersion,
+      appSettings,
     };
 
     const res = await customRequest<void>({
@@ -60,7 +64,7 @@ class DeviceLog extends BaseRequest {
       } as error.IServerError;
     }
 
-    const res = await customRequest<IDeviceLog[]>({
+    const res = await customRequest<IDeviceData>({
       api: this.api.axios,
       method: 'GET',
       url: `/deviceLogs/${params.id}`,

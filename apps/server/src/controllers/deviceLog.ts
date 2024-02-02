@@ -7,6 +7,7 @@ import { deviceLogService } from '../services';
 import { InvalidParameterException } from '../exceptions';
 
 import { created, ok } from '../utils/apiHelpers';
+import { processNumberFields, processStringFields } from '../utils/helpers';
 
 import { getFileParams } from './file';
 
@@ -15,7 +16,7 @@ const addDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
 
   // Добавление Лога
   if (!action || action !== 'delete') {
-    const { deviceLog, companyId, appSystemId } = ctx.request.body as IDeviceLogParams;
+    const { appVersion, appSettings, deviceLog, companyId, appSystemId } = ctx.request.body as IDeviceLogParams;
     const deviceId = ctx.query.deviceId;
     const user = ctx.state.user as IUser;
 
@@ -24,6 +25,8 @@ const addDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
     }
 
     deviceLogService.addOne({
+      appVersion: appVersion || '',
+      appSettings: appSettings || {},
       deviceLog,
       producerId: user.id,
       appSystemId,
@@ -59,49 +62,13 @@ const removeDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getDeviceLogs = async (ctx: ParameterizedContext): Promise<void> => {
+  const stringFields: string[] = ['company', 'contact', 'uid', 'date', 'mdate', 'appSystem', 'device', 'filterText'];
+  const numberFields: string[] = ['fromRecord', 'toRecord'];
+
   const params: Record<string, string | number> = {};
 
-  const { uid, date, company, appSystem, contact, device, filterText, fromRecord, toRecord, mdate } = ctx.query;
-
-  if (typeof company === 'string' && company) {
-    params.company = company;
-  }
-
-  if (typeof contact === 'string' && contact) {
-    params.contact = contact;
-  }
-
-  if (typeof uid === 'string' && uid) {
-    params.uid = uid;
-  }
-
-  if (typeof date === 'string' && date) {
-    params.date = date;
-  }
-
-  if (typeof mdate === 'string' && mdate) {
-    params.mdate = mdate;
-  }
-
-  if (typeof appSystem === 'string' && appSystem) {
-    params.appSystem = appSystem;
-  }
-
-  if (typeof device === 'string' && device) {
-    params.device = device;
-  }
-
-  if (typeof filterText === 'string' && filterText) {
-    params.filterText = filterText;
-  }
-
-  if (typeof fromRecord === 'string' && isFinite(Number(fromRecord))) {
-    params.fromRecord = Number(fromRecord);
-  }
-
-  if (typeof toRecord === 'string' && isFinite(Number(toRecord))) {
-    params.toRecord = Number(toRecord);
-  }
+  processStringFields(params, ctx.query, stringFields);
+  processNumberFields(params, ctx.query, numberFields);
 
   const deviceLogList = await deviceLogService.findMany(params);
 

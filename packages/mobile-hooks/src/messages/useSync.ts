@@ -93,7 +93,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
   const docVersion = 1;
   const setVersion = 1;
 
-  const { saveErrors } = useSaveErrors();
+  const saveErrors = useSaveErrors();
 
   const params = useMemo(
     () => (appSystem && company ? { appSystemId: appSystem?.id, companyId: company?.id } : undefined),

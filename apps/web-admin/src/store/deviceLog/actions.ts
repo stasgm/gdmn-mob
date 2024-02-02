@@ -1,4 +1,4 @@
-import { IDeviceLog, IDeviceLogFiles, IFileObject } from '@lib/types';
+import { IDeviceData, IDeviceLogFiles, IFileObject } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
 import { IDeviceLogPageParam } from '../../types';
@@ -17,7 +17,7 @@ const fetchDeviceLogAsync = createAsyncAction(
   'DEVICE_LOG/FETCH_DEVICE_LOG',
   'DEVICE_LOG/FETCH_DEVICE_LOG_SUCCESS',
   'DEVICE_LOG/FETCH_DEVICE_LOG_FAILURE',
-)<string | undefined, IDeviceLog[], string>();
+)<string | undefined, IDeviceData, string>();
 
 const removeDeviceLogAsync = createAsyncAction(
   'DEVICE_LOG/REMOVE_DEVICE_LOG',

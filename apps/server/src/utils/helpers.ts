@@ -48,4 +48,25 @@ function isIDBMessage(obj: any): obj is IDBMessage {
   return obj['body']['version'] === 1 && isIDBHeadMessage(obj['head']);
 }
 
-export { extraPredicate, getListPart, generateId, isIDBMessage };
+const isNonEmptyString = (value: any): value is string => typeof value === 'string' && value.trim().length > 0;
+
+const isPositiveFiniteNumber = (value: any): value is number =>
+  typeof value === 'string' && isFinite(Number(value)) && Number(value) >= 0;
+
+const processStringFields = (params: Record<string, any>, query: Record<string, any>, fields: string[]) => {
+  fields.forEach((field) => {
+    if (isNonEmptyString(query[field])) {
+      params[field] = query[field];
+    }
+  });
+};
+
+const processNumberFields = (params: Record<string, string | number>, query: Record<string, any>, fields: string[]) => {
+  fields.forEach((field) => {
+    if (isPositiveFiniteNumber(query[field])) {
+      params[field] = Number(query[field]);
+    }
+  });
+};
+
+export { extraPredicate, getListPart, generateId, isIDBMessage, processStringFields, processNumberFields };

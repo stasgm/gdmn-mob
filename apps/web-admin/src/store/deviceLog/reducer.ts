@@ -6,6 +6,8 @@ import { DeviceLogActionType, deviceLogActions } from './actions';
 
 const initialState: Readonly<IDeviceLogState> = {
   logList: [],
+  appVersion: '',
+  appSettings: {},
   filesList: [],
   loading: false,
   errorMessage: '',
@@ -41,12 +43,14 @@ const reducer: Reducer<IDeviceLogState, DeviceLogActionType> = (state = initialS
       };
 
     case getType(deviceLogActions.fetchDeviceLogAsync.request):
-      return { ...state, loading: true, logList: [], errorMessage: '' };
+      return { ...state, loading: true, logList: [], appSettings: {}, appVersion: '', errorMessage: '' };
 
     case getType(deviceLogActions.fetchDeviceLogAsync.success):
       return {
         ...state,
-        logList: action.payload,
+        logList: action.payload.logs,
+        appSettings: action.payload.appSettings,
+        appVersion: action.payload.appVersion,
         loading: false,
       };
 

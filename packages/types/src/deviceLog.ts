@@ -1,4 +1,11 @@
 import { IEntity, INamedEntity } from './common';
+import { Settings } from './settings';
+
+export interface IDeviceData {
+  appVersion: string;
+  appSettings: Settings;
+  logs: IDeviceLog[];
+}
 
 export interface IDeviceLog {
   id: string;
@@ -20,6 +27,8 @@ export interface IPathParams {
 
 export interface IDeviceLogParams extends IPathParams {
   deviceLog: IDeviceLog[];
+  appVersion?: string;
+  appSettings?: Settings;
 }
 
 export interface IDeviceLogFiles extends IEntity {

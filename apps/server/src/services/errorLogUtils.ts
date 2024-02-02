@@ -1,7 +1,15 @@
 import path from 'path';
 import { readdir, unlink, stat } from 'fs/promises';
 
-import { IPathParams, IFileDeviceLogInfo, IDeviceLog, IDeviceLogFiles, IFileObject } from '@lib/types';
+import {
+  IPathParams,
+  IFileDeviceLogInfo,
+  IDeviceLog,
+  IDeviceLogFiles,
+  IFileObject,
+  Settings,
+  IDeviceData,
+} from '@lib/types';
 
 import {
   checkFileExists,
@@ -39,6 +47,8 @@ export const getDeviceLogFullFileName = (params: IPathParams, fileInfo: IFileDev
  * Inserts an object into the file.
  */
 export const saveDeviceLogFile = async (
+  appVersion: string,
+  appSettings: Settings,
   newDeviceLog: IDeviceLog[],
   pathParams: IPathParams,
   fileInfo: IFileDeviceLogInfo,
@@ -46,23 +56,34 @@ export const saveDeviceLogFile = async (
   try {
     const fileName = getDeviceLogFullFileName(pathParams, fileInfo);
     const check = await checkFileExists(fileName);
+    const oldDeviceData = check ? await readJsonFile<IDeviceData | IDeviceLog[]>(fileName) : undefined;
+    const isArray = Array.isArray(oldDeviceData);
+    const isObject = typeof oldDeviceData === 'object' && 'logs' in oldDeviceData;
 
-    const oldDeviceLog: IDeviceLog[] | string = check ? await readJsonFile(fileName) : [];
-    if (typeof oldDeviceLog === 'string') {
-      log.error(oldDeviceLog);
+    // если файл существует, но его содержимое не соответствует ожидаемому формату
+    if (!(isArray || isObject || oldDeviceData === undefined)) {
+      log.error(`Неверный тип лога устройства с uid=${fileInfo.deviceId}. ${oldDeviceData}`);
       return;
     }
 
-    const delta = oldDeviceLog.length + newDeviceLog.length - config.DEVICE_LOG_MAX_LINES;
+    // если файл содержит массив (старый формат), то берем его, иначе берем поле logs (новый формат)
+    const oldDeviceLogs = isArray ? [...oldDeviceData] : oldDeviceData?.logs || [];
 
-    if (delta > 0) oldDeviceLog.splice(0, delta);
+    const delta = oldDeviceLogs.length + newDeviceLog.length - config.DEVICE_LOG_MAX_LINES;
 
-    return writeIterableToFile(fileName, JSON.stringify([...oldDeviceLog, ...newDeviceLog], undefined, 2), {
-      encoding: 'utf8',
-      flag: 'a',
-    });
+    // если количество записей превышает максимальное, удаляем старые записи
+    if (delta > 0) oldDeviceLogs.splice(0, delta);
+
+    return writeIterableToFile(
+      fileName,
+      JSON.stringify({ appVersion, appSettings, logs: [...oldDeviceLogs, ...newDeviceLog] }, undefined, 2),
+      {
+        encoding: 'utf8',
+        flag: 'a',
+      },
+    );
   } catch (err) {
-    log.error(`Ошибка записи журнала ошибок устройства с uid=${fileInfo.deviceId} в файл - ${err}`);
+    log.error(`Ошибка записи лога устройства с uid=${fileInfo.deviceId} в файл - ${err}`);
   }
 };
 
