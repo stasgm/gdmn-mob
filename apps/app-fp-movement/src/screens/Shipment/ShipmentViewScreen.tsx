@@ -136,7 +136,7 @@ const ShipmentViewScreen = () => {
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
   const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
-  const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
+  // const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
   const remainsUse = Boolean(settings.remainsUse?.data);
 
@@ -144,9 +144,9 @@ const ShipmentViewScreen = () => {
 
   const goodRemains = useMemo<IRemGood[]>(() => {
     return shipment?.head?.fromDepart?.id && isFocused && remains
-      ? getRemGoodListByContact(goods, remains[shipment.head.fromDepart.id], docList, shipment.head.fromDepart.id)
+      ? getRemGoodListByContact(goods, remains[shipment.head.fromDepart.id] /*, docList, shipment.head.fromDepart.id*/)
       : [];
-  }, [docList, goods, remains, shipment?.head?.fromDepart?.id, isFocused]);
+  }, [goods, remains, shipment?.head?.fromDepart?.id, isFocused]);
 
   const sound = Audio.Sound.createAsync(require('../../../assets/ok.wav'));
 
@@ -533,6 +533,8 @@ const ShipmentViewScreen = () => {
     });
   }, [navigation, renderLeft, renderRight]);
 
+  const [isDateVisible, setIsDateVisible] = useState(false);
+
   const [scanned, setScanned] = useState(false);
 
   const ref = useRef<TextInput>(null);
@@ -549,6 +551,10 @@ const ShipmentViewScreen = () => {
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!shipment) {
+        return;
+      }
+
+      if (shipment?.status !== 'DRAFT') {
         return;
       }
 
@@ -815,6 +821,8 @@ const ShipmentViewScreen = () => {
 
   const LastLine = useMemo(() => renderShipmentItem, [renderShipmentItem]);
 
+  const isEditable = useMemo(() => (shipment ? ['DRAFT', 'READY'].includes(shipment?.status) : false), [shipment]);
+
   const viewStyle: StyleProp<ViewStyle> = useMemo(
     () => ({ ...styles.container, justifyContent: lineType === 'last' ? 'flex-start' : 'center' }),
     [lineType],
@@ -854,20 +862,33 @@ const ShipmentViewScreen = () => {
       <InfoBlock
         colorLabel={getStatusColor(shipment?.status || 'DRAFT')}
         title={shipment.documentType.description || ''}
-        onPress={handleEditShipmentHead}
-        disabled={!['DRAFT', 'READY'].includes(shipment.status)}
+        onPress={() => (isEditable ? handleEditShipmentHead() : setIsDateVisible(!isDateVisible))}
+        editable={isEditable}
         isBlocked={isBlocked}
       >
         <View style={styles.infoBlock}>
           <MediumText>{shipment.head.outlet?.name || ''}</MediumText>
           <MediumText>{`№ ${shipment.number} на ${getDateString(shipment.head?.onDate)}`}</MediumText>
-          {shipment.sentDate ? (
-            <View style={styles.rowCenter}>
-              <MediumText>
-                Отправлено: {getDateString(shipment.sentDate)} {new Date(shipment.sentDate).toLocaleTimeString()}
-              </MediumText>
-            </View>
-          ) : null}
+          {isDateVisible && (
+            <>
+              {shipment.sentDate ? (
+                <View style={styles.rowCenter}>
+                  <MediumText>
+                    Отправлено: {getDateString(shipment.sentDate)}{' '}
+                    {new Date(shipment.sentDate).toLocaleTimeString('ru', { hour12: false })}
+                  </MediumText>
+                </View>
+              ) : null}
+              {shipment.erpCreationDate ? (
+                <View style={styles.rowCenter}>
+                  <MediumText>
+                    Обработано: {getDateString(shipment.erpCreationDate)}{' '}
+                    {new Date(shipment.erpCreationDate).toLocaleTimeString('ru', { hour12: false })}
+                  </MediumText>
+                </View>
+              ) : null}
+            </>
+          )}
         </View>
       </InfoBlock>
       <LineTypes />

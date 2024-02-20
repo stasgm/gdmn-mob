@@ -11,6 +11,7 @@ export const mainSettingGroup = { id: 'main', name: 'Общие настройк
 export const synchSettingGroup = { id: 'synch', name: 'Синхронизация', sortOrder: 2 };
 export const baseSettingGroup = { id: 'base', name: 'Настройки приложения', sortOrder: 3 };
 export const serverSettingGroup = { id: 'server', name: 'Сервер', sortOrder: 0 };
+export const cleanDocSettingGroup = { id: 'cleanDoc', name: 'Хранение документов', sortOrder: 4 };
 
 const baseSettings: Settings<IBaseSettings> = {
   serverAddress: {
@@ -70,14 +71,41 @@ const baseSettings: Settings<IBaseSettings> = {
     visible: false,
     group: mainSettingGroup,
   },
-  cleanDocTime: {
-    id: 'cleanDocTime',
-    description: 'Хранение документов, дн.',
+  cleanDraftDocTime: {
+    id: 'cleanDraftDocTime',
+    description: 'Черновики, дн.',
     data: 60,
     type: 'number',
-    sortOrder: 3,
+    sortOrder: 4,
     visible: true,
-    group: mainSettingGroup,
+    group: cleanDocSettingGroup,
+  },
+  cleanReadyDocTime: {
+    id: 'cleanReadyDocTime',
+    description: 'Готовые к отправке, дн.',
+    data: 60,
+    type: 'number',
+    sortOrder: 5,
+    visible: true,
+    group: cleanDocSettingGroup,
+  },
+  cleanSentDocTime: {
+    id: 'cleanSentDocTime',
+    description: 'Отправленные, дн.',
+    data: 60,
+    type: 'number',
+    sortOrder: 6,
+    visible: true,
+    group: cleanDocSettingGroup,
+  },
+  cleanDocTime: {
+    id: 'cleanDocTime',
+    description: 'Обработанные/архивные, дн.',
+    data: 60,
+    type: 'number',
+    sortOrder: 7,
+    visible: true,
+    group: cleanDocSettingGroup,
   },
 };
 
@@ -126,7 +154,7 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
     case getType(actions.addSettings): {
       const baseSetts = Object.entries(baseSettings).reduce((setts: Settings, [field, baseSet]) => {
         const storeSet = state.data[field];
-        setts[field] = storeSet ? storeSet : baseSet;
+        setts[field] = storeSet ? { ...baseSet, data: storeSet.data } : baseSet;
         return setts;
       }, {});
 

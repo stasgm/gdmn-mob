@@ -68,6 +68,8 @@ export const ScanViewScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const [isDateVisible, setIsDateVisible] = useState(false);
+
   const ref = useRef<TextInput>(null);
 
   const handleFocus = () => {
@@ -343,6 +345,8 @@ export const ScanViewScreen = () => {
     }
   }, [navigation, screenState]);
 
+  const isEditable = useMemo(() => (doc ? ['DRAFT', 'READY'].includes(doc?.status) : false), [doc]);
+
   const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
@@ -373,8 +377,8 @@ export const ScanViewScreen = () => {
         <InfoBlock
           colorLabel={getStatusColor(doc?.status || 'DRAFT')}
           title={doc.head.isBindGood ? 'Привязка штрихкодов к ТМЦ' : 'Сканирование'}
-          onPress={handleEditDocHead}
-          disabled={isDelList || !['DRAFT', 'READY'].includes(doc.status)}
+          onPress={() => (isEditable ? handleEditDocHead() : setIsDateVisible(!isDateVisible))}
+          disabled={delList.length > 0}
         >
           <>
             {!!doc.head.department && <MediumText>{doc.head.department.name}</MediumText>}
@@ -382,13 +386,27 @@ export const ScanViewScreen = () => {
               <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
               {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
             </View>
-            {doc.sentDate ? (
-              <View style={styles.rowCenter}>
-                <MediumText>
-                  Отправлено: {getDateString(doc.sentDate)} {new Date(doc.sentDate).toLocaleTimeString()}
-                </MediumText>
-              </View>
-            ) : null}
+
+            {isDateVisible && (
+              <>
+                {doc.sentDate ? (
+                  <View style={styles.rowCenter}>
+                    <MediumText>
+                      Отправлено: {getDateString(doc.sentDate)}{' '}
+                      {new Date(doc.sentDate).toLocaleTimeString('ru', { hour12: false })}
+                    </MediumText>
+                  </View>
+                ) : null}
+                {doc.erpCreationDate ? (
+                  <View style={styles.rowCenter}>
+                    <MediumText>
+                      Обработано: {getDateString(doc.erpCreationDate)}{' '}
+                      {new Date(doc.erpCreationDate).toLocaleTimeString('ru', { hour12: false })}
+                    </MediumText>
+                  </View>
+                ) : null}
+              </>
+            )}
           </>
         </InfoBlock>
         <TextInput

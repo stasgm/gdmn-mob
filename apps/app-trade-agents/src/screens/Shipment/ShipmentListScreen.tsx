@@ -91,7 +91,9 @@ const ShipmentListScreen = () => {
             const cur = lines?.filter(
               (i) =>
                 (shipment.id === 'shipment' ? true : i.diff < 0) &&
-                (filterShipmentGood ? filterShipmentGood.find((g) => g.id === i.goodId) : true),
+                (filterShipmentGood && filterShipmentGood?.length > 0
+                  ? filterShipmentGood.find((g) => g.id === i.goodId)
+                  : true),
             );
 
             if (cur.length > 0) {
@@ -173,7 +175,7 @@ const ShipmentListScreen = () => {
                   lineId: orderId,
                   name: `Заявка №${refOrder?.number || '-'} ${order?.number ? `(${order?.number}) ` : ''}от ${
                     refOrder?.documentDate ? getDateString(refOrder?.documentDate) : '-'
-                  } ${refOrder?.sellBillNumber ? `\nТТН №${refOrder?.sellBillNumber}` : ''}`,
+                  } ${refOrder?.shipmentNumber ? `\nТТН №${refOrder?.shipmentNumber}` : ''}`,
                   type: 'order',
                 };
                 orderList = [...orderList, orderLine];

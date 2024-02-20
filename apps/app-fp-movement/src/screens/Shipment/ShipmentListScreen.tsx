@@ -90,6 +90,7 @@ export const ShipmentListScreen = () => {
             </View>
           ),
           sentDate: i.sentDate,
+          erpCreationDate: i.erpCreationDate,
         }) as IListItemProps,
     );
   }, [filterStatus, list, sortDateType.id]);

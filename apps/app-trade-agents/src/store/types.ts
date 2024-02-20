@@ -260,7 +260,7 @@ export interface IShipmentHead {
   contactId: string;
   outletId: string;
   documentDate: string;
-  sellBillNumber?: string;
+  shipmentNumber?: string;
 }
 
 export interface IShipmentLine {

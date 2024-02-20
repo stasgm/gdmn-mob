@@ -41,7 +41,7 @@ const logger = winston.createLogger({
       filename: logECombinedFileName,
       maxSize: '20m',
       datePattern: 'YYYY-MM',
-      maxFiles: 1,
+      maxFiles: 5,
     }),
   ],
 });

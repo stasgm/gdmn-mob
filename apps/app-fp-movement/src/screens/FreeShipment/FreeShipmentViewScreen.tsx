@@ -114,9 +114,9 @@ export const FreeShipmentViewScreen = () => {
 
   const goodRemains = useMemo<IRemGood[]>(() => {
     return doc?.head?.fromDepart?.id && isFocused && remains
-      ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id], docList, doc.head.fromDepart.id)
+      ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id] /*, docList, doc.head.fromDepart.id*/)
       : [];
-  }, [doc?.head?.fromDepart?.id, goods, remains, docList, isFocused]);
+  }, [doc?.head?.fromDepart?.id, goods, remains, isFocused]);
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -503,6 +503,8 @@ export const FreeShipmentViewScreen = () => {
     [doc?.status, handlePressLine, lines?.length],
   );
 
+  const [isDateVisible, setIsDateVisible] = useState(false);
+
   const [scanned, setScanned] = useState(false);
 
   const handleErrorMessage = useCallback((visible: boolean, text: string) => {
@@ -656,6 +658,8 @@ export const FreeShipmentViewScreen = () => {
     }
   }, [navigation, screenState]);
 
+  const isEditable = useMemo(() => (doc ? ['DRAFT', 'READY'].includes(doc?.status) : false), [doc]);
+
   const viewStyle: StyleProp<ViewStyle> = useMemo(
     () => ({ ...styles.container, justifyContent: lineType === 'last' ? 'flex-start' : 'center' }),
     [lineType],
@@ -695,20 +699,33 @@ export const FreeShipmentViewScreen = () => {
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
         title={doc.documentType.description || ''}
-        onPress={handleEditDocHead}
-        disabled={!['DRAFT', 'READY'].includes(doc.status)}
         isBlocked={isBlocked}
+        onPress={() => (isEditable ? handleEditDocHead() : setIsDateVisible(!isDateVisible))}
+        editable={isEditable}
       >
         <View style={styles.infoBlock}>
           <MediumText>{doc.head.fromDepart?.name || ''}</MediumText>
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
-          {doc.sentDate ? (
-            <View style={styles.rowCenter}>
-              <MediumText>
-                Отправлено: {getDateString(doc.sentDate)} {new Date(doc.sentDate).toLocaleTimeString()}
-              </MediumText>
-            </View>
-          ) : null}
+          {isDateVisible && (
+            <>
+              {doc.sentDate ? (
+                <View style={styles.rowCenter}>
+                  <MediumText>
+                    Отправлено: {getDateString(doc.sentDate)}{' '}
+                    {new Date(doc.sentDate).toLocaleTimeString('ru', { hour12: false })}
+                  </MediumText>
+                </View>
+              ) : null}
+              {doc.erpCreationDate ? (
+                <View style={styles.rowCenter}>
+                  <MediumText>
+                    Обработано: {getDateString(doc.erpCreationDate)}{' '}
+                    {new Date(doc.erpCreationDate).toLocaleTimeString('ru', { hour12: false })}
+                  </MediumText>
+                </View>
+              ) : null}
+            </>
+          )}
         </View>
       </InfoBlock>
       <LineTypes />

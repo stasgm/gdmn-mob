@@ -44,6 +44,8 @@ import { IGood, IMGoodData, IMGoodRemain, IRemains } from '../../store/app/types
 
 import { getRemGoodByContact } from '../../utils/helpers';
 
+import { appInventoryActions } from '../../store';
+
 import DocTotal from './components/DocTotal';
 
 export const DocViewScreen = () => {
@@ -66,8 +68,11 @@ export const DocViewScreen = () => {
   const isBlocked = doc?.status !== 'DRAFT';
 
   const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
+  const lineConfirm = useSelector((state) => state.settings?.data?.lineConfirm?.data);
 
   const ref = useRef<TextInput>(null);
+
+  const [isDateVisible, setIsDateVisible] = useState(false);
 
   const handleFocus = () => {
     ref?.current?.focus();
@@ -386,20 +391,39 @@ export const DocViewScreen = () => {
         };
       }
 
-      navigation.navigate('DocLine', {
-        mode: 0,
-        docId: id,
-        item: scannedObject,
-      });
+      if (lineConfirm) {
+        navigation.navigate('DocLine', {
+          mode: 0,
+          docId: id,
+          item: scannedObject,
+        });
+      } else {
+        let newLine = { ...scannedObject, quantity: 1 };
+        if (scannedObject.good.id === 'unknown') {
+          const newLineId = `unknown_${generateId()}`;
+          dispatch(
+            appInventoryActions.addUnknownGood({
+              ...unknownGood,
+              ...scannedObject.good,
+              barcode: scannedObject.barcode,
+              id: newLineId,
+            }),
+          );
+          newLine = { ...newLine, good: { ...newLine.good, id: newLineId } };
+        }
+        dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+      }
     },
 
     [
+      dispatch,
       doc,
       documentType?.isRemains,
       goodRemains,
       id,
       isBlocked,
       isInputQuantity,
+      lineConfirm,
       lines?.length,
       navigation,
       weightSettingsCountCode,
@@ -419,6 +443,8 @@ export const DocViewScreen = () => {
       navigation.goBack();
     }
   }, [navigation, screenState]);
+
+  const isEditable = useMemo(() => (doc ? ['DRAFT', 'READY'].includes(doc?.status) : false), [doc]);
 
   if (screenState === 'deleting' || screenState === 'sending') {
     return (
@@ -444,8 +470,9 @@ export const DocViewScreen = () => {
       <InfoBlock
         colorLabel={getStatusColor(doc.status || 'DRAFT')}
         title={doc.documentType.description || ''}
-        onPress={handleEditDocHead}
-        disabled={delList.length > 0 || !['DRAFT', 'READY'].includes(doc.status)}
+        onPress={() => (isEditable ? handleEditDocHead() : setIsDateVisible(!isDateVisible))}
+        editable={!isEditable}
+        disabled={delList.length > 0}
         isBlocked={isBlocked}
       >
         <>
@@ -460,13 +487,27 @@ export const DocViewScreen = () => {
             >{`${doc.documentType.toDescription}: ${doc.head.toContact?.name}`}</MediumText>
           )}
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
-          {doc.sentDate ? (
-            <View style={styles.rowCenter}>
-              <MediumText>
-                Отправлено: {getDateString(doc.sentDate)} {new Date(doc.sentDate).toLocaleTimeString()}
-              </MediumText>
-            </View>
-          ) : null}
+
+          {isDateVisible && (
+            <>
+              {doc.sentDate ? (
+                <View style={styles.rowCenter}>
+                  <MediumText>
+                    Отправлено: {getDateString(doc.sentDate)}{' '}
+                    {new Date(doc.sentDate).toLocaleTimeString('ru', { hour12: false })}
+                  </MediumText>
+                </View>
+              ) : null}
+              {doc.erpCreationDate ? (
+                <View style={styles.rowCenter}>
+                  <MediumText>
+                    Обработано: {getDateString(doc.erpCreationDate)}{' '}
+                    {new Date(doc.erpCreationDate).toLocaleTimeString('ru', { hour12: false })}
+                  </MediumText>
+                </View>
+              ) : null}
+            </>
+          )}
         </>
       </InfoBlock>
       {isScanerReader ? (

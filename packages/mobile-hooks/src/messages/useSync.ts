@@ -28,6 +28,7 @@ import {
   ISettingsOption,
   IUserSettings,
   Settings,
+  StatusType,
 } from '@lib/types';
 
 import { useCallback, useMemo } from 'react';
@@ -81,6 +82,9 @@ export const useSync = (onSync?: () => Promise<any>) => {
   const settings = useSelector((state) => state.settings.data);
 
   const cleanDocTime = (settings.cleanDocTime as ISettingsOption<number>).data || 0;
+  const cleanDraftDocTime = (settings.cleanDraftDocTime as ISettingsOption<number>)?.data || 0;
+  const cleanReadyDocTime = (settings.cleanReadyDocTime as ISettingsOption<number>)?.data || 0;
+  const cleanSentDocTime = (settings.cleanSentDocTime as ISettingsOption<number>)?.data || 0;
   const refLoadType = (settings.refLoadType as ISettingsOption<boolean>).data;
   const isGetReferences = settings.getReferences?.data;
   const isGetRemains = settings.getRemains?.data;
@@ -732,34 +736,39 @@ export const useSync = (onSync?: () => Promise<any>) => {
                   }
                 }
 
-                if (cleanDocTime > 0) {
-                  //5. Удаляем обработанные документы, которые хранятся больше времени, которое указано в настройках
-                  const maxDocDate = new Date();
-                  maxDocDate.setDate(maxDocDate.getDate() - cleanDocTime);
+                const removeDocumentsByStatus = async (status: StatusType, cleanTime: number, message: string) => {
+                  if (cleanTime > 0) {
+                    const maxDocDate = new Date();
+                    maxDocDate.setDate(maxDocDate.getDate() - cleanTime);
 
-                  const delDocs = documents
-                    .filter(
-                      (d) =>
-                        (d.status === 'PROCESSED' || d.status === 'ARCHIVE') &&
-                        new Date(d.documentDate).getTime() <= maxDocDate.getTime(),
-                    )
-                    .map((d) => d.id);
+                    const delDocs = documents
+                      .filter((d) => d.status === status && new Date(d.documentDate).getTime() <= maxDocDate.getTime())
+                      .map((d) => d.id);
 
-                  if (delDocs.length) {
-                    addRequestNotice(
-                      `Удаление обработанных документов, дата которых менее ${getDateString(maxDocDate)}`,
-                    );
-
-                    const delDocResponse = await docDispatch(documentActions.removeDocuments(delDocs));
-                    if (delDocResponse.type === 'DOCUMENTS/REMOVE_MANY_FAILURE') {
-                      addError(
-                        'useSync: removeDocuments',
-                        `Обработанные документы, дата которых менее ${getDateString(maxDocDate)}, не удалены`,
-                        tempErrs,
+                    if (delDocs.length) {
+                      addRequestNotice(
+                        `Удаление документов со статусом "${message}", дата которых менее ${getDateString(maxDocDate)}`,
                       );
+
+                      const delDocResponse = await docDispatch(documentActions.removeDocuments(delDocs));
+                      if (delDocResponse.type === 'DOCUMENTS/REMOVE_MANY_FAILURE') {
+                        addError(
+                          'useSync: removeDocuments',
+                          `Документы со статусом "${message}", дата которых менее ${getDateString(
+                            maxDocDate,
+                          )}, не удалены`,
+                          tempErrs,
+                        );
+                      }
                     }
                   }
-                }
+                };
+
+                removeDocumentsByStatus('DRAFT', cleanDraftDocTime, 'Черновики');
+                removeDocumentsByStatus('READY', cleanReadyDocTime, 'Готовые к отправке');
+                removeDocumentsByStatus('SENT', cleanSentDocTime, 'Отправленные');
+                removeDocumentsByStatus('PROCESSED', cleanDocTime, 'Обработанные');
+                removeDocumentsByStatus('ARCHIVE', cleanDocTime, 'Архивные');
 
                 if (!connectError && needRequest(syncRequests, 'GET_USER_SETTINGS', currentDate)) {
                   addRequestNotice('Запрос настроек пользователя');
