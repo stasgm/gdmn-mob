@@ -82,9 +82,9 @@ export const useSync = (onSync?: () => Promise<any>) => {
   const settings = useSelector((state) => state.settings.data);
 
   const cleanDocTime = (settings.cleanDocTime as ISettingsOption<number>).data || 0;
-  const cleanDraftDocTime = (settings.cleanDraftDocTime as ISettingsOption<number>).data || 0;
-  const cleanReadyDocTime = (settings.cleanReadyDocTime as ISettingsOption<number>).data || 0;
-  const cleanSentDocTime = (settings.cleanSentDocTime as ISettingsOption<number>).data || 0;
+  const cleanDraftDocTime = (settings.cleanDraftDocTime as ISettingsOption<number>)?.data || 0;
+  const cleanReadyDocTime = (settings.cleanReadyDocTime as ISettingsOption<number>)?.data || 0;
+  const cleanSentDocTime = (settings.cleanSentDocTime as ISettingsOption<number>)?.data || 0;
   const refLoadType = (settings.refLoadType as ISettingsOption<boolean>).data;
   const isGetReferences = settings.getReferences?.data;
   const isGetRemains = settings.getRemains?.data;
@@ -767,8 +767,8 @@ export const useSync = (onSync?: () => Promise<any>) => {
                 removeDocumentsByStatus('SENT', cleanSentDocTime, 'Отправленные');
                 removeDocumentsByStatus('DRAFT', cleanDraftDocTime, 'Черновик');
                 removeDocumentsByStatus('READY', cleanReadyDocTime, 'Готов');
-                removeDocumentsByStatus('PROCESSED', cleanSentDocTime, 'Обработанные');
-                removeDocumentsByStatus('ARCHIVE', cleanSentDocTime, 'Обработанные');
+                removeDocumentsByStatus('PROCESSED', cleanDocTime, 'Обработанные');
+                removeDocumentsByStatus('ARCHIVE', cleanDocTime, 'Обработанные');
 
                 if (!connectError && needRequest(syncRequests, 'GET_USER_SETTINGS', currentDate)) {
                   addRequestNotice('Запрос настроек пользователя');
