@@ -11,6 +11,7 @@ export const mainSettingGroup = { id: 'main', name: 'Общие настройк
 export const synchSettingGroup = { id: 'synch', name: 'Синхронизация', sortOrder: 2 };
 export const baseSettingGroup = { id: 'base', name: 'Настройки приложения', sortOrder: 3 };
 export const serverSettingGroup = { id: 'server', name: 'Сервер', sortOrder: 0 };
+export const cleanDocSettingGroup = { id: 'main', name: 'Хранение документов', sortOrder: 4 };
 
 const baseSettings: Settings<IBaseSettings> = {
   serverAddress: {
@@ -77,7 +78,34 @@ const baseSettings: Settings<IBaseSettings> = {
     type: 'number',
     sortOrder: 3,
     visible: true,
-    group: mainSettingGroup,
+    group: cleanDocSettingGroup,
+  },
+  cleanDraftDocTime: {
+    id: 'cleanDraftDocTime',
+    description: 'Хранение черновиков, дн.',
+    data: 60,
+    type: 'number',
+    sortOrder: 4,
+    visible: true,
+    group: cleanDocSettingGroup,
+  },
+  cleanReadyDocTime: {
+    id: 'cleanReadyDocTime',
+    description: 'Хранение гот. документов, дн.',
+    data: 60,
+    type: 'number',
+    sortOrder: 5,
+    visible: true,
+    group: cleanDocSettingGroup,
+  },
+  cleanSentDocTime: {
+    id: 'cleanSentDocTime',
+    description: 'Хранение отпр. документов, дн.',
+    data: 60,
+    type: 'number',
+    sortOrder: 6,
+    visible: true,
+    group: cleanDocSettingGroup,
   },
 };
 

@@ -81,6 +81,9 @@ export const useSync = (onSync?: () => Promise<any>) => {
   const settings = useSelector((state) => state.settings.data);
 
   const cleanDocTime = (settings.cleanDocTime as ISettingsOption<number>).data || 0;
+  const cleanDraftDocTime = (settings.cleanDraftDocTime as ISettingsOption<number>).data || 0;
+  const cleanReadyDocTime = (settings.cleanReadyDocTime as ISettingsOption<number>).data || 0;
+  const cleanSentDocTime = (settings.cleanSentDocTime as ISettingsOption<number>).data || 0;
   const refLoadType = (settings.refLoadType as ISettingsOption<boolean>).data;
   const isGetReferences = settings.getReferences?.data;
   const isGetRemains = settings.getRemains?.data;
@@ -733,7 +736,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
                 }
 
                 if (cleanDocTime > 0) {
-                  //5. Удаляем обработанные документы, которые хранятся больше времени, которое указано в настройках
+                  //5.1. Удаляем обработанные документы, которые хранятся больше времени, которое указано в настройках
                   const maxDocDate = new Date();
                   maxDocDate.setDate(maxDocDate.getDate() - cleanDocTime);
 
@@ -755,6 +758,81 @@ export const useSync = (onSync?: () => Promise<any>) => {
                       addError(
                         'useSync: removeDocuments',
                         `Обработанные документы, дата которых менее ${getDateString(maxDocDate)}, не удалены`,
+                        tempErrs,
+                      );
+                    }
+                  }
+                }
+
+                if (cleanDraftDocTime > 0) {
+                  //5.2. Удаляем черновики, которые хранятся больше времени, которое указано в настройках
+                  const maxDocDate = new Date();
+                  maxDocDate.setDate(maxDocDate.getDate() - cleanDraftDocTime);
+
+                  const delDocs = documents
+                    .filter((d) => d.status === 'DRAFT' && new Date(d.documentDate).getTime() <= maxDocDate.getTime())
+                    .map((d) => d.id);
+
+                  if (delDocs.length) {
+                    addRequestNotice(
+                      `Удаление документов со статусом "Черновик", дата которых менее ${getDateString(maxDocDate)}`,
+                    );
+
+                    const delDocResponse = await docDispatch(documentActions.removeDocuments(delDocs));
+                    if (delDocResponse.type === 'DOCUMENTS/REMOVE_MANY_FAILURE') {
+                      addError(
+                        'useSync: removeDocuments',
+                        `Документы со статусом "Черновик", дата которых менее ${getDateString(maxDocDate)}, не удалены`,
+                        tempErrs,
+                      );
+                    }
+                  }
+                }
+
+                if (cleanReadyDocTime > 0) {
+                  //5.3. Удаляем готовые документы, которые хранятся больше времени, которое указано в настройках
+                  const maxDocDate = new Date();
+                  maxDocDate.setDate(maxDocDate.getDate() - cleanReadyDocTime);
+
+                  const delDocs = documents
+                    .filter((d) => d.status === 'READY' && new Date(d.documentDate).getTime() <= maxDocDate.getTime())
+                    .map((d) => d.id);
+
+                  if (delDocs.length) {
+                    addRequestNotice(
+                      `Удаление документов со статусом "Готов", дата которых менее ${getDateString(maxDocDate)}`,
+                    );
+
+                    const delDocResponse = await docDispatch(documentActions.removeDocuments(delDocs));
+                    if (delDocResponse.type === 'DOCUMENTS/REMOVE_MANY_FAILURE') {
+                      addError(
+                        'useSync: removeDocuments',
+                        `Документы со статусом "Готов", дата которых менее ${getDateString(maxDocDate)}, не удалены`,
+                        tempErrs,
+                      );
+                    }
+                  }
+                }
+
+                if (cleanSentDocTime > 0) {
+                  //5.4. Удаляем отправленные документы, которые хранятся больше времени, которое указано в настройках
+                  const maxDocDate = new Date();
+                  maxDocDate.setDate(maxDocDate.getDate() - cleanSentDocTime);
+
+                  const delDocs = documents
+                    .filter((d) => d.status === 'SENT' && new Date(d.documentDate).getTime() <= maxDocDate.getTime())
+                    .map((d) => d.id);
+
+                  if (delDocs.length) {
+                    addRequestNotice(
+                      `Удаление отправленных документов, дата которых менее ${getDateString(maxDocDate)}`,
+                    );
+
+                    const delDocResponse = await docDispatch(documentActions.removeDocuments(delDocs));
+                    if (delDocResponse.type === 'DOCUMENTS/REMOVE_MANY_FAILURE') {
+                      addError(
+                        'useSync: removeDocuments',
+                        `Отправленные документы, дата которых менее ${getDateString(maxDocDate)}, не удалены`,
                         tempErrs,
                       );
                     }

@@ -471,7 +471,7 @@ export const DocViewScreen = () => {
         colorLabel={getStatusColor(doc.status || 'DRAFT')}
         title={doc.documentType.description || ''}
         onPress={() => (isEditable ? handleEditDocHead() : setIsDateVisible(!isDateVisible))}
-        isShowAddInfo={!isEditable}
+        editable={!isEditable}
         disabled={delList.length > 0}
         isBlocked={isBlocked}
       >

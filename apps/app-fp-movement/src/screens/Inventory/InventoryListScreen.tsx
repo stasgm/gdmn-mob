@@ -75,6 +75,7 @@ export const InventoryListScreen = () => {
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
           sentDate: i.sentDate,
+          erpCreationDate: i.erpCreationDate,
         }) as IListItemProps,
     );
   }, [status, list]);

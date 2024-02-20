@@ -468,7 +468,7 @@ const OrderViewScreen = () => {
           colorLabel={getStatusColor(order?.status || 'DRAFT')}
           title={order.head?.outlet?.name}
           onPress={() => (isEditable ? handleEditOrderHead() : setIsDateVisible(!isDateVisible))}
-          isShowAddInfo={!isEditable}
+          editable={isEditable}
           disabled={isDelList}
           isBlocked={isBlocked}
           isFromRoute={order.head.route ? true : false}

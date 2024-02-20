@@ -85,6 +85,7 @@ export const MoveToListScreen = () => {
             </View>
           ),
           sentDate: i.sentDate,
+          erpCreationDate: i.erpCreationDate,
         }) as IListItemProps,
     );
   }, [status, list]);
