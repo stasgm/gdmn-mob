@@ -11,7 +11,7 @@ export const mainSettingGroup = { id: 'main', name: 'Общие настройк
 export const synchSettingGroup = { id: 'synch', name: 'Синхронизация', sortOrder: 2 };
 export const baseSettingGroup = { id: 'base', name: 'Настройки приложения', sortOrder: 3 };
 export const serverSettingGroup = { id: 'server', name: 'Сервер', sortOrder: 0 };
-export const cleanDocSettingGroup = { id: 'main', name: 'Хранение документов', sortOrder: 4 };
+export const cleanDocSettingGroup = { id: 'cleanDoc', name: 'Хранение документов', sortOrder: 4 };
 
 const baseSettings: Settings<IBaseSettings> = {
   serverAddress: {

@@ -768,7 +768,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
                 removeDocumentsByStatus('DRAFT', cleanDraftDocTime, 'Черновик');
                 removeDocumentsByStatus('READY', cleanReadyDocTime, 'Готов');
                 removeDocumentsByStatus('PROCESSED', cleanDocTime, 'Обработанные');
-                removeDocumentsByStatus('ARCHIVE', cleanDocTime, 'Обработанные');
+                removeDocumentsByStatus('ARCHIVE', cleanDocTime, 'Архивные');
 
                 if (!connectError && needRequest(syncRequests, 'GET_USER_SETTINGS', currentDate)) {
                   addRequestNotice('Запрос настроек пользователя');
