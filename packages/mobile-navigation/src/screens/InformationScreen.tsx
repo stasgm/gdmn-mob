@@ -137,7 +137,9 @@ const InformationScreen = () => {
           ))}
         </View>
       </ScrollView>
-      <MediumText style={localStyles.copyright}>Copyright © 2024 OOO Ampersant</MediumText>
+      <MediumText style={localStyles.copyright}>
+        Copyright © {new Date().getFullYear().toString()} OOO Ampersant
+      </MediumText>
     </AppScreen>
   );
 };
