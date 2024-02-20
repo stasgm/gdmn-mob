@@ -764,9 +764,9 @@ export const useSync = (onSync?: () => Promise<any>) => {
                   }
                 };
 
+                removeDocumentsByStatus('DRAFT', cleanDraftDocTime, 'Черновики');
+                removeDocumentsByStatus('READY', cleanReadyDocTime, 'Готовые к отправке');
                 removeDocumentsByStatus('SENT', cleanSentDocTime, 'Отправленные');
-                removeDocumentsByStatus('DRAFT', cleanDraftDocTime, 'Черновик');
-                removeDocumentsByStatus('READY', cleanReadyDocTime, 'Готов');
                 removeDocumentsByStatus('PROCESSED', cleanDocTime, 'Обработанные');
                 removeDocumentsByStatus('ARCHIVE', cleanDocTime, 'Архивные');
 
