@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { View, TextInput, Alert, useWindowDimensions } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { appActions, docSelectors, documentActions, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
@@ -22,6 +21,7 @@ import {
   navBackButton,
   SaveDocument,
   SimpleDialog,
+  DateInfo,
 } from '@lib/mobile-ui';
 
 import {
@@ -379,34 +379,15 @@ export const ScanViewScreen = () => {
           title={doc.head.isBindGood ? 'Привязка штрихкодов к ТМЦ' : 'Сканирование'}
           onPress={() => (isEditable ? handleEditDocHead() : setIsDateVisible(!isDateVisible))}
           disabled={delList.length > 0}
+          isBlocked={isBlocked}
         >
           <>
             {!!doc.head.department && <MediumText>{doc.head.department.name}</MediumText>}
             <View style={styles.rowCenter}>
               <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
-              {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
             </View>
 
-            {isDateVisible && (
-              <>
-                {doc.sentDate ? (
-                  <View style={styles.rowCenter}>
-                    <MediumText>
-                      Отправлено: {getDateString(doc.sentDate)}{' '}
-                      {new Date(doc.sentDate).toLocaleTimeString('ru', { hour12: false })}
-                    </MediumText>
-                  </View>
-                ) : null}
-                {doc.erpCreationDate ? (
-                  <View style={styles.rowCenter}>
-                    <MediumText>
-                      Обработано: {getDateString(doc.erpCreationDate)}{' '}
-                      {new Date(doc.erpCreationDate).toLocaleTimeString('ru', { hour12: false })}
-                    </MediumText>
-                  </View>
-                ) : null}
-              </>
-            )}
+            {isDateVisible && <DateInfo sentDate={doc.sentDate} erpCreationDate={doc.erpCreationDate} />}
           </>
         </InfoBlock>
         <TextInput

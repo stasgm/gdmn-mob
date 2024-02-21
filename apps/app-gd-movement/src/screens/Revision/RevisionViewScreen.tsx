@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { View, TextInput, Alert, useWindowDimensions } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import {
   appActions,
@@ -30,6 +29,7 @@ import {
   navBackButton,
   SaveDocument,
   SimpleDialog,
+  DateInfo,
 } from '@lib/mobile-ui';
 
 import {
@@ -323,7 +323,7 @@ export const RevisionViewScreen = () => {
           const newLine: IRevisionLine = {
             good: { id: remItem.good.id, name: remItem.good.name },
             id: generateId(),
-            sortOrder: (lines?.length || 0) + 1,
+            sortOrder: (lines?.[0]?.sortOrder || 0) + 1,
             price: remItem.remains?.length ? remItem.remains[0].price : 0,
             remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
             barcode: remItem.good.barcode || brc || '',
@@ -366,7 +366,7 @@ export const RevisionViewScreen = () => {
             good: { id: refGood.id, name: refGood.name },
             id: generateId(),
             barcode: brc,
-            sortOrder: (lines?.length || 0) + 1,
+            sortOrder: (lines?.[0]?.sortOrder || 0) + 1,
             price: refGood.price || 0,
           };
           Alert.alert(refGood.name, `Цена: ${refGood.price || 0} р.`, [
@@ -417,7 +417,7 @@ export const RevisionViewScreen = () => {
           good: unknownGood,
           id: generateId(),
           barcode: brc,
-          sortOrder: (lines?.length || 0) + 1,
+          sortOrder: (lines?.[0]?.sortOrder || 0) + 1,
         };
         Alert.alert('Товар не найден', brc, [
           {
@@ -512,34 +512,14 @@ export const RevisionViewScreen = () => {
           title={'Сверка'}
           onPress={() => (isEditable ? handleEditDocHead() : setIsDateVisible(!isDateVisible))}
           disabled={delList.length > 0}
+          isBlocked={isBlocked}
         >
           <>
             {!!doc.head.department && <MediumText>{doc.head.department.name}</MediumText>}
             <View style={styles.rowCenter}>
               <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
-              {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
             </View>
-
-            {isDateVisible && (
-              <>
-                {doc.sentDate ? (
-                  <View style={styles.rowCenter}>
-                    <MediumText>
-                      Отправлено: {getDateString(doc.sentDate)}{' '}
-                      {new Date(doc.sentDate).toLocaleTimeString('ru', { hour12: false })}
-                    </MediumText>
-                  </View>
-                ) : null}
-                {doc.erpCreationDate ? (
-                  <View style={styles.rowCenter}>
-                    <MediumText>
-                      Обработано: {getDateString(doc.erpCreationDate)}{' '}
-                      {new Date(doc.erpCreationDate).toLocaleTimeString('ru', { hour12: false })}
-                    </MediumText>
-                  </View>
-                ) : null}
-              </>
-            )}
+            {isDateVisible && <DateInfo sentDate={doc.sentDate} erpCreationDate={doc.erpCreationDate} />}
           </>
         </InfoBlock>
         <TextInput

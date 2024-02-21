@@ -45,6 +45,7 @@ const RevisionGoodScreen = () => {
   }, [navigation]);
 
   const doc = docSelectors.selectByDocId<IRevisionDocument>(docId);
+  const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
 
   const goods = refSelectors.selectByName<IGood>('good')?.data;
 
@@ -158,7 +159,7 @@ const RevisionGoodScreen = () => {
             fieldName: 'good',
           });
         } else {
-          const newLine: IRevisionLine = { ...scannedObject, sortOrder: doc.lines?.length + 1 };
+          const newLine: IRevisionLine = { ...scannedObject, sortOrder: (lines?.[0]?.sortOrder || 0) + 1 };
           dispatch(documentActions.addDocumentLine({ docId, line: newLine }));
 
           setCurrentLineId(newLine.id);
@@ -168,14 +169,14 @@ const RevisionGoodScreen = () => {
           });
         }
       } else {
-        const line: IRevisionLine = { ...scannedObject, sortOrder: doc.lines?.length + 1 };
+        const line: IRevisionLine = { ...scannedObject, sortOrder: (lines?.[0]?.sortOrder || 0) + 1 };
 
         dispatch(documentActions.addDocumentLine({ docId, line }));
       }
 
       setScaner({ state: 'init' });
     },
-    [scannedObject, doc, dispatch, docId, navigation],
+    [scannedObject, doc, navigation, lines, dispatch, docId],
   );
 
   const handleClearScaner = () => {
@@ -198,7 +199,7 @@ const RevisionGoodScreen = () => {
 
   return (
     <ScanBarcode
-      onSave={() => (isButtonBlocked ? handleClearScaner() : handleSaveScannedItem(false))}
+      onSave={() => !isButtonBlocked && handleSaveScannedItem(false)}
       onGetScannedObject={handleGetScannedObject}
       onClearScannedObject={handleClearScaner}
       scaner={scaner}
