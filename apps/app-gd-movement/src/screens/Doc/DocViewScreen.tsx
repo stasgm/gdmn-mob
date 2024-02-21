@@ -21,6 +21,7 @@ import {
   navBackButton,
   SaveDocument,
   SimpleDialog,
+  DateInfo,
 } from '@lib/mobile-ui';
 
 import {
@@ -348,7 +349,7 @@ export const DocViewScreen = () => {
           buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
           barcode: remItem.good.barcode,
-          sortOrder: (lines?.length || 0) + 1,
+          sortOrder: (lines?.[0]?.sortOrder || 0) + 1,
           alias: remItem.good.alias || '',
           weightCode: remItem.good.weightCode?.trim() || '',
         };
@@ -385,7 +386,7 @@ export const DocViewScreen = () => {
           buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
           barcode: remItem.good.barcode,
-          sortOrder: (lines?.length || 0) + 1,
+          sortOrder: (lines?.[0]?.sortOrder || 0) + 1,
           alias: remItem.good.alias || '',
           weightCode: remItem.good.weightCode?.trim() || '',
         };
@@ -424,7 +425,7 @@ export const DocViewScreen = () => {
       isBlocked,
       isInputQuantity,
       lineConfirm,
-      lines?.length,
+      lines,
       navigation,
       weightSettingsCountCode,
       weightSettingsCountWeight,
@@ -487,27 +488,7 @@ export const DocViewScreen = () => {
             >{`${doc.documentType.toDescription}: ${doc.head.toContact?.name}`}</MediumText>
           )}
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
-
-          {isDateVisible && (
-            <>
-              {doc.sentDate ? (
-                <View style={styles.rowCenter}>
-                  <MediumText>
-                    Отправлено: {getDateString(doc.sentDate)}{' '}
-                    {new Date(doc.sentDate).toLocaleTimeString('ru', { hour12: false })}
-                  </MediumText>
-                </View>
-              ) : null}
-              {doc.erpCreationDate ? (
-                <View style={styles.rowCenter}>
-                  <MediumText>
-                    Обработано: {getDateString(doc.erpCreationDate)}{' '}
-                    {new Date(doc.erpCreationDate).toLocaleTimeString('ru', { hour12: false })}
-                  </MediumText>
-                </View>
-              ) : null}
-            </>
-          )}
+          {isDateVisible && <DateInfo sentDate={doc.sentDate} erpCreationDate={doc.erpCreationDate} />}
         </>
       </InfoBlock>
       {isScanerReader ? (
