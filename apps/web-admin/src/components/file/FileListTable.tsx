@@ -33,6 +33,9 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 
 import { DesktopDateTimePicker } from '@mui/x-date-pickers/DesktopDateTimePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 
 import ComboBox from '../ComboBox';
 
@@ -93,12 +96,12 @@ const FileListTable = ({
       console.log('values', values);
       onSubmit(getFilesFilters(values));
     },
-    onReset: () => {
-      onSetPageParams({ ...pageParams, filesFilters: undefined, page: 0 });
+    // onReset: () => {
+    //   onSetPageParams({ ...pageParams, filesFilters: undefined, page: 0 });
 
-      onClearFilters && onClearFilters();
-      formik.setValues(fileFilterValues);
-    },
+    //   onClearFilters && onClearFilters();
+    //   formik.setValues(fileFilterValues);
+    // },
   });
 
   const { list: companies, loading: loadingCompanies } = useSelector((state) => state.companies);
@@ -126,12 +129,15 @@ const FileListTable = ({
   const isAuto = (item: string) =>
     item === 'company' || item === 'appSystem' || item === 'producer' || item === 'consumer' || item === 'device';
 
+  const [iniit, setIniit] = useState(false);
+
   useEffect(() => {
-    if (!isFilterVisible) {
+    if (!isFilterVisible || iniit) {
       formik.setValues(fileFilterValues);
+      setIniit(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFilterVisible]);
+  }, [isFilterVisible, iniit]);
 
   const handleSearchClick = () => {
     onSetPageParams({ ...pageParams, filesFilters: getFilesFilters(formik.values), page: 0 });
@@ -140,8 +146,10 @@ const FileListTable = ({
   };
 
   const handleClearFilters = useCallback(() => {
-    onSetPageParams({ ...pageParams, filesFilters: undefined, page: 0 });
+    // console.log('123');
+    setIniit(true);
     formik.setValues(fileFilterValues);
+    onSetPageParams({ ...pageParams, filesFilters: undefined, page: 0 });
     setPage(0);
     onClearFilters && onClearFilters();
   }, [formik, onClearFilters, onSetPageParams, pageParams]);
@@ -278,6 +286,8 @@ const FileListTable = ({
   };
 
   const [ddate, setDate] = useState(new Date());
+
+  console.log('formik VALUES', formik.values);
   return (
     <FormikProvider value={formik}>
       <Card>
@@ -392,17 +402,25 @@ const FileListTable = ({
                             getOptionLabel={(option: IFilterOption) =>
                               (formik.values[item].name === option.name ? option.value : option.name) || ''
                             }
-                            isOptionEqualToValue={(option: INamedEntity, value: IFilterOption) =>
-                              option.name === value.value
-                            }
+                            isOptionEqualToValue={(option: INamedEntity, value: IFilterOption) => {
+                              // console.log('option.nam', option, 'value', value);
+                              return option.name === value.value;
+                            }}
                           />
                         ) : fileFilterValues[item].type === 'date' ? (
-                          <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <LocalizationProvider
+                            dateAdapter={AdapterMoment}
+                            adapterLocale="ru" /* dateFormats="shortDate"*/
+                          >
                             <DesktopDateTimePicker
                               label={fileFilterValues[item].name || ''}
-                              inputFormat="DD.MM.YYYY"
+                              // inputFormat="DD.MM.YYYY"
+                              inputFormat="DD/MM/YY hh:mm"
                               value={formik.values[item].value || null}
-                              onChange={(a) => handleUpdateFormik(item, { id: item, name: new Date(a).toISOString() })}
+                              onChange={(a, keyboardInputValue) => {
+                                console.log('value', a, 'keyboardInputValue', keyboardInputValue);
+                                handleUpdateFormik(item, { id: item, name: new Date(a).toISOString() });
+                              }}
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
@@ -425,7 +443,7 @@ const FileListTable = ({
                             InputProps={{
                               sx: {
                                 height: 50,
-                                fontSize: 13,
+                                // fontSize: 13,
                                 '& .MuiOutlinedInput-input': {
                                   borderWidth: 0,
                                   // padding: 0.5,
@@ -440,7 +458,8 @@ const FileListTable = ({
                             variant="outlined"
                             type="search"
                             value={formik.values[item].value}
-                            onChange={formik.handleChange}
+                            onChange={(event) => handleUpdateFormik(item, { id: item, name: event.target.value })}
+                            // onChange={formik.handleChange}
                           />
                         )}
                       </Grid>
