@@ -190,6 +190,7 @@ export const RevisionListScreen = () => {
         lineCount: i.lines?.length,
         errorMessage: i.errorMessage,
         sentDate: i.sentDate,
+        erpCreationDate: i.erpCreationDate,
       } as IListItemProps;
     });
   }, [filteredList.list, status]);

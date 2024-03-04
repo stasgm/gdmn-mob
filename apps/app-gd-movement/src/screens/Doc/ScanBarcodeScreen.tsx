@@ -124,7 +124,7 @@ const ScanBarcodeScreen = () => {
           buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
           barcode: remItem.good.barcode,
-          sortOrder: (document?.lines?.length || 0) + 1,
+          sortOrder: (document?.lines?.[0]?.sortOrder || 0) + 1,
           alias: remItem.good.alias || '',
           weightCode: remItem.good.weightCode?.trim() || '',
         };
@@ -166,7 +166,7 @@ const ScanBarcodeScreen = () => {
           buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
           barcode: remItem.good.barcode,
-          sortOrder: (document?.lines?.length || 0) + 1,
+          sortOrder: (document?.lines?.[0]?.sortOrder || 0) + 1,
           alias: remItem.good.alias || '',
           weightCode: remItem.good.weightCode?.trim() || '',
         };
@@ -185,7 +185,7 @@ const ScanBarcodeScreen = () => {
     },
     [
       docId,
-      document?.lines?.length,
+      document?.lines,
       documentType?.isRemains,
       goodRemains,
       isInputQuantity,

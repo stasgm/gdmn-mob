@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { View, TextInput, Alert, useWindowDimensions } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import {
   appActions,
@@ -30,6 +29,7 @@ import {
   navBackButton,
   SaveDocument,
   SimpleDialog,
+  DateInfo,
 } from '@lib/mobile-ui';
 
 import {
@@ -89,6 +89,8 @@ export const RevisionViewScreen = () => {
   }, []);
 
   const ref = useRef<TextInput>(null);
+
+  const [isDateVisible, setIsDateVisible] = useState(false);
 
   const handleFocus = () => {
     ref?.current?.focus();
@@ -304,84 +306,110 @@ export const RevisionViewScreen = () => {
         return;
       }
 
+      const line = lines?.find((i) => i.barcode === brc);
+
       const remItem = goodRemains[brc];
 
       if (remItem) {
-        const line: IRevisionLine = {
-          good: { id: remItem.good.id, name: remItem.good.name },
-          id: generateId(),
-          sortOrder: (lines?.length || 0) + 1,
-          price: remItem.remains?.length ? remItem.remains[0].price : 0,
-          remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
-          barcode: remItem.good.barcode || brc || '',
-        };
+        if (line) {
+          Alert.alert(
+            remItem.good.name,
+            `Цена: ${line.price || 0} р., остаток: ${line.remains || 0} \n\nТовар уже добавлен`,
+            [{ text: 'ОК', onPress: handleFocus }],
+          );
+          setScanned(false);
+          return;
+        } else {
+          const newLine: IRevisionLine = {
+            good: { id: remItem.good.id, name: remItem.good.name },
+            id: generateId(),
+            sortOrder: (lines?.[0]?.sortOrder || 0) + 1,
+            price: remItem.remains?.length ? remItem.remains[0].price : 0,
+            remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
+            barcode: remItem.good.barcode || brc || '',
+          };
 
-        Alert.alert(
-          remItem.good.name,
-          `Цена: ${remItem.remains?.length ? remItem.remains[0].price : 0} р., остаток: ${
-            remItem.remains?.length ? remItem.remains?.[0].q : 0
-          }`,
-          [
-            {
-              text: 'Добавить',
-              onPress: () => {
-                dispatch(documentActions.addDocumentLine({ docId: id, line: line }));
-                handleFocus();
+          Alert.alert(
+            remItem.good.name,
+            `Цена: ${remItem.remains?.length ? remItem.remains[0].price : 0} р., остаток: ${
+              remItem.remains?.length ? remItem.remains?.[0].q : 0
+            }`,
+            [
+              {
+                text: 'Добавить',
+                onPress: () => {
+                  dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+                  handleFocus();
+                },
               },
-            },
-            { text: 'Отмена' },
-          ],
-        );
-        setScanned(false);
+              { text: 'Отмена', onPress: handleFocus },
+            ],
+          );
+          setScanned(false);
 
-        return;
+          return;
+        }
       }
 
       const refGood = goods.find((i) => i.barcode === brc);
       if (refGood) {
-        const line: IRevisionLine = {
-          good: { id: refGood.id, name: refGood.name },
-          id: generateId(),
-          barcode: brc,
-          sortOrder: (lines?.length || 0) + 1,
-          price: refGood.price || 0,
-        };
-        Alert.alert(refGood.name, `Цена: ${refGood.price || 0} р.`, [
-          {
-            text: 'Добавить',
-            onPress: () => {
-              dispatch(documentActions.addDocumentLine({ docId: id, line: line }));
-              handleFocus();
-            },
-          },
-          { text: 'Отмена' },
-        ]);
-
-        setScanned(false);
-
-        return;
-      }
-
-      if (!remItem && !refGood) {
-        const line = lines?.find((i) => i.barcode === brc);
-
         if (line) {
-          Alert.alert(`Штрихкод ${brc} уже привязан`, 'Заменить товар?', [
-            {
-              text: 'Заменить',
-              onPress: () => {
-                setCurrentLineId(line.id);
-                navigation.navigate('SelectRefItem', {
-                  refName: 'good',
-                  fieldName: 'good',
-                });
+          Alert.alert(refGood.name, `Цена: ${line.price || 0} р. \n\nТовар уже добавлен`, [
+            { text: 'ОК', onPress: handleFocus },
+          ]);
 
+          setScanned(false);
+
+          return;
+        } else {
+          const newLine: IRevisionLine = {
+            good: { id: refGood.id, name: refGood.name },
+            id: generateId(),
+            barcode: brc,
+            sortOrder: (lines?.[0]?.sortOrder || 0) + 1,
+            price: refGood.price || 0,
+          };
+          Alert.alert(refGood.name, `Цена: ${refGood.price || 0} р.`, [
+            {
+              text: 'Добавить',
+              onPress: () => {
+                dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
                 handleFocus();
               },
             },
-
             { text: 'Отмена', onPress: handleFocus },
           ]);
+
+          setScanned(false);
+
+          return;
+        }
+      }
+
+      if (!remItem && !refGood) {
+        if (line) {
+          Alert.alert(
+            line.withGood ? `Штрихкод ${brc} уже привязан` : `Штрихкод ${brc} уже добавлен`,
+            line.withGood
+              ? `${line.good?.name || ''}\nЦена: ${line.price || 0} р.\n\nЗаменить товар?`
+              : 'Добавить товар',
+            [
+              {
+                text: line.withGood ? 'Заменить' : 'Добавить',
+                onPress: () => {
+                  setCurrentLineId(line.id);
+                  navigation.navigate('SelectRefItem', {
+                    refName: 'good',
+                    fieldName: 'good',
+                  });
+
+                  handleFocus();
+                },
+              },
+
+              { text: 'Отмена', onPress: handleFocus },
+            ],
+          );
           return;
         }
 
@@ -389,8 +417,7 @@ export const RevisionViewScreen = () => {
           good: unknownGood,
           id: generateId(),
           barcode: brc,
-          sortOrder: (lines?.length || 0) + 1,
-          withGood: true,
+          sortOrder: (lines?.[0]?.sortOrder || 0) + 1,
         };
         Alert.alert('Товар не найден', brc, [
           {
@@ -414,7 +441,7 @@ export const RevisionViewScreen = () => {
               handleFocus();
             },
           },
-          { text: 'Пересканировать' },
+          { text: 'Пересканировать', onPress: handleFocus },
         ]);
 
         setScanned(false);
@@ -451,6 +478,8 @@ export const RevisionViewScreen = () => {
     }
   }, [navigation, screenState]);
 
+  const isEditable = useMemo(() => (doc ? ['DRAFT', 'READY'].includes(doc?.status) : false), [doc]);
+
   const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
@@ -481,22 +510,16 @@ export const RevisionViewScreen = () => {
         <InfoBlock
           colorLabel={getStatusColor(doc?.status || 'DRAFT')}
           title={'Сверка'}
-          onPress={handleEditDocHead}
-          disabled={isDelList || !['DRAFT', 'READY'].includes(doc.status)}
+          onPress={() => (isEditable ? handleEditDocHead() : setIsDateVisible(!isDateVisible))}
+          disabled={delList.length > 0}
+          isBlocked={isBlocked}
         >
           <>
             {!!doc.head.department && <MediumText>{doc.head.department.name}</MediumText>}
             <View style={styles.rowCenter}>
               <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
-              {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
             </View>
-            {doc.sentDate ? (
-              <View style={styles.rowCenter}>
-                <MediumText>
-                  Отправлено: {getDateString(doc.sentDate)} {new Date(doc.sentDate).toLocaleTimeString()}
-                </MediumText>
-              </View>
-            ) : null}
+            {isDateVisible && <DateInfo sentDate={doc.sentDate} erpCreationDate={doc.erpCreationDate} />}
           </>
         </InfoBlock>
         <TextInput

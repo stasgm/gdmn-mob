@@ -75,6 +75,8 @@ export const MoveToViewScreen = () => {
   const [barcode, setBarcode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
+  const [isDateVisible, setIsDateVisible] = useState(false);
+
   const [scanned, setScanned] = useState(false);
 
   const [visibleQuantPackDialog, setVisibleQuantPackDialog] = useState(false);
@@ -135,9 +137,9 @@ export const MoveToViewScreen = () => {
 
   const goodRemains = useMemo<IRemGood[]>(() => {
     return doc?.head?.fromDepart?.id && isFocused && remains
-      ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id], docList, doc.head.fromDepart.id)
+      ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id] /*, docList, doc.head.fromDepart.id*/)
       : [];
-  }, [doc?.head?.fromDepart?.id, docList, goods, isFocused, remains]);
+  }, [doc?.head?.fromDepart?.id, goods, isFocused, remains]);
 
   const handleShowDialog = () => {
     setVisibleDialog(true);
@@ -697,6 +699,8 @@ export const MoveToViewScreen = () => {
     }
   }, [navigation, screenState]);
 
+  const isEditable = useMemo(() => (doc ? ['DRAFT', 'READY'].includes(doc?.status) : false), [doc]);
+
   if (!isFocused) {
     return <AppActivityIndicator />;
   }
@@ -731,8 +735,8 @@ export const MoveToViewScreen = () => {
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
         title={doc.head.subtype.name || ''}
-        onPress={handleEditDocHead}
-        disabled={!['DRAFT', 'READY'].includes(doc.status)}
+        onPress={() => (isEditable ? handleEditDocHead() : setIsDateVisible(!isDateVisible))}
+        editable={isEditable}
         isBlocked={isBlocked}
       >
         <>
@@ -743,13 +747,26 @@ export const MoveToViewScreen = () => {
           <View style={styles.rowCenter}>
             <MediumText>Куда: {doc.head.toDepart?.name || ''}</MediumText>
           </View>
-          {doc.sentDate ? (
-            <View style={styles.rowCenter}>
-              <MediumText>
-                Отправлено: {getDateString(doc.sentDate)} {new Date(doc.sentDate).toLocaleTimeString()}
-              </MediumText>
-            </View>
-          ) : null}
+          {isDateVisible && (
+            <>
+              {doc.sentDate ? (
+                <View style={styles.rowCenter}>
+                  <MediumText>
+                    Отправлено: {getDateString(doc.sentDate)}{' '}
+                    {new Date(doc.sentDate).toLocaleTimeString('ru', { hour12: false })}
+                  </MediumText>
+                </View>
+              ) : null}
+              {doc.erpCreationDate ? (
+                <View style={styles.rowCenter}>
+                  <MediumText>
+                    Обработано: {getDateString(doc.erpCreationDate)}{' '}
+                    {new Date(doc.erpCreationDate).toLocaleTimeString('ru', { hour12: false })}
+                  </MediumText>
+                </View>
+              ) : null}
+            </>
+          )}
         </>
       </InfoBlock>
       <LineTypes />

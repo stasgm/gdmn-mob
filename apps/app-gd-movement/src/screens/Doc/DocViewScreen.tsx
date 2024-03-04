@@ -21,6 +21,7 @@ import {
   navBackButton,
   SaveDocument,
   SimpleDialog,
+  DateInfo,
 } from '@lib/mobile-ui';
 
 import {
@@ -44,6 +45,8 @@ import { IGood, IMGoodData, IMGoodRemain, IRemains } from '../../store/app/types
 
 import { getRemGoodByContact } from '../../utils/helpers';
 
+import { appInventoryActions } from '../../store';
+
 import DocTotal from './components/DocTotal';
 
 export const DocViewScreen = () => {
@@ -66,8 +69,11 @@ export const DocViewScreen = () => {
   const isBlocked = doc?.status !== 'DRAFT';
 
   const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
+  const lineConfirm = useSelector((state) => state.settings?.data?.lineConfirm?.data);
 
   const ref = useRef<TextInput>(null);
+
+  const [isDateVisible, setIsDateVisible] = useState(false);
 
   const handleFocus = () => {
     ref?.current?.focus();
@@ -343,7 +349,7 @@ export const DocViewScreen = () => {
           buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
           barcode: remItem.good.barcode,
-          sortOrder: (lines?.length || 0) + 1,
+          sortOrder: (lines?.[0]?.sortOrder || 0) + 1,
           alias: remItem.good.alias || '',
           weightCode: remItem.good.weightCode?.trim() || '',
         };
@@ -380,27 +386,46 @@ export const DocViewScreen = () => {
           buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
           barcode: remItem.good.barcode,
-          sortOrder: (lines?.length || 0) + 1,
+          sortOrder: (lines?.[0]?.sortOrder || 0) + 1,
           alias: remItem.good.alias || '',
           weightCode: remItem.good.weightCode?.trim() || '',
         };
       }
 
-      navigation.navigate('DocLine', {
-        mode: 0,
-        docId: id,
-        item: scannedObject,
-      });
+      if (lineConfirm) {
+        navigation.navigate('DocLine', {
+          mode: 0,
+          docId: id,
+          item: scannedObject,
+        });
+      } else {
+        let newLine = { ...scannedObject, quantity: 1 };
+        if (scannedObject.good.id === 'unknown') {
+          const newLineId = `unknown_${generateId()}`;
+          dispatch(
+            appInventoryActions.addUnknownGood({
+              ...unknownGood,
+              ...scannedObject.good,
+              barcode: scannedObject.barcode,
+              id: newLineId,
+            }),
+          );
+          newLine = { ...newLine, good: { ...newLine.good, id: newLineId } };
+        }
+        dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+      }
     },
 
     [
+      dispatch,
       doc,
       documentType?.isRemains,
       goodRemains,
       id,
       isBlocked,
       isInputQuantity,
-      lines?.length,
+      lineConfirm,
+      lines,
       navigation,
       weightSettingsCountCode,
       weightSettingsCountWeight,
@@ -419,6 +444,8 @@ export const DocViewScreen = () => {
       navigation.goBack();
     }
   }, [navigation, screenState]);
+
+  const isEditable = useMemo(() => (doc ? ['DRAFT', 'READY'].includes(doc?.status) : false), [doc]);
 
   if (screenState === 'deleting' || screenState === 'sending') {
     return (
@@ -444,8 +471,9 @@ export const DocViewScreen = () => {
       <InfoBlock
         colorLabel={getStatusColor(doc.status || 'DRAFT')}
         title={doc.documentType.description || ''}
-        onPress={handleEditDocHead}
-        disabled={delList.length > 0 || !['DRAFT', 'READY'].includes(doc.status)}
+        onPress={() => (isEditable ? handleEditDocHead() : setIsDateVisible(!isDateVisible))}
+        editable={!isEditable}
+        disabled={delList.length > 0}
         isBlocked={isBlocked}
       >
         <>
@@ -460,13 +488,7 @@ export const DocViewScreen = () => {
             >{`${doc.documentType.toDescription}: ${doc.head.toContact?.name}`}</MediumText>
           )}
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
-          {doc.sentDate ? (
-            <View style={styles.rowCenter}>
-              <MediumText>
-                Отправлено: {getDateString(doc.sentDate)} {new Date(doc.sentDate).toLocaleTimeString()}
-              </MediumText>
-            </View>
-          ) : null}
+          {isDateVisible && <DateInfo sentDate={doc.sentDate} erpCreationDate={doc.erpCreationDate} />}
         </>
       </InfoBlock>
       {isScanerReader ? (
