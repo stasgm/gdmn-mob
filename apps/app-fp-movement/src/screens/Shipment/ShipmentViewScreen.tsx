@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, TouchableHighlight, TextInput, Keyboard } from 'react-native';
+import { View, TouchableHighlight, TextInput, Keyboard, StyleProp, ViewStyle } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Audio } from 'expo-av';
@@ -45,7 +45,7 @@ import { barcodeSettings, IShipmentDocument, IShipmentLine, ITempLine } from '..
 
 import { ShipmentStackParamList } from '../../navigation/Root/types';
 
-import { getStatusColor, lineTypes, ONE_SECOND_IN_MS } from '../../utils/constants';
+import { getStatusColor, shipmentLineTypes, ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import { IBarcode, IGood, IRemains, IRemGood } from '../../store/app/types';
 import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../../store/index';
@@ -83,7 +83,7 @@ const ShipmentViewScreen = () => {
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
   const loading = useSelector((state) => state.app.loading);
 
-  const [lineType, setLineType] = useState(lineTypes[1].id);
+  const [lineType, setLineType] = useState(shipmentLineTypes[2].id);
 
   const shipment = docSelectors.selectByDocId<IShipmentDocument>(id);
   const shipmentLines = useMemo(
@@ -511,6 +511,7 @@ const ShipmentViewScreen = () => {
 
       if (!lineGood.good) {
         setVisibleRequestDialog(true);
+        setScanned(false);
         return;
       }
 
@@ -666,7 +667,7 @@ const ShipmentViewScreen = () => {
   const LineTypes = useCallback(
     () => (
       <View style={styles.containerCenter}>
-        {lineTypes.map((e, i) => {
+        {shipmentLineTypes.map((e, i) => {
           return (
             <TouchableHighlight
               activeOpacity={0.7}
@@ -675,7 +676,7 @@ const ShipmentViewScreen = () => {
               style={[
                 styles.btnTab,
                 i === 0 && styles.firstBtnTab,
-                i === lineTypes.length - 1 && styles.lastBtnTab,
+                i === shipmentLineTypes.length - 1 && styles.lastBtnTab,
                 e.id === lineType && { backgroundColor: colors.primary },
                 { borderColor: colors.primary },
               ]}
@@ -704,9 +705,9 @@ const ShipmentViewScreen = () => {
     ({ item }: { item: IShipmentLine }) => {
       return (
         <ListItemLine
-          key={item.id}
+          // key={item.id}
           readonly={
-            shipment?.status !== 'DRAFT' || item.sortOrder !== shipmentLines?.length || Boolean(item.scannedBarcode)
+            shipment?.status !== 'DRAFT' || item?.sortOrder !== shipmentLines?.length || Boolean(item.scannedBarcode)
           }
           onPress={() => handlePressLine(item.weight)}
         >
@@ -743,6 +744,13 @@ const ShipmentViewScreen = () => {
     );
   }, []);
 
+  const LastLine = useMemo(() => renderShipmentItem, [renderShipmentItem]);
+
+  const viewStyle: StyleProp<ViewStyle> = useMemo(
+    () => ({ ...styles.container, justifyContent: lineType === 'last' ? 'flex-start' : 'center' }),
+    [lineType],
+  );
+
   if (!isFocused) {
     return <AppActivityIndicator />;
   }
@@ -767,7 +775,7 @@ const ShipmentViewScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={viewStyle}>
       <InfoBlock
         colorLabel={getStatusColor(shipment?.status || 'DRAFT')}
         title={shipment.documentType.description || ''}
@@ -804,7 +812,7 @@ const ShipmentViewScreen = () => {
           />
           <ViewTotal quantPack={shipmentLineSum?.quantPack} weight={shipmentLineSum?.weight || 0} />
         </>
-      ) : (
+      ) : lineType === 'order' ? (
         <>
           <FlashList
             key={lineType}
@@ -818,7 +826,12 @@ const ShipmentViewScreen = () => {
           />
           <ViewTotal weight={tempLineSum?.weight || 0} />
         </>
-      )}
+      ) : lineType === 'last' && shipmentLines?.[0] ? (
+        <View style={styles.spaceBetween}>
+          <LastLine item={shipmentLines?.[0]} />
+          <ViewTotal quantPack={shipmentLineSum?.quantPack} weight={shipmentLineSum?.weight || 0} />
+        </View>
+      ) : null}
       <AppDialog
         title="Введите штрих-код"
         visible={visibleDialog}

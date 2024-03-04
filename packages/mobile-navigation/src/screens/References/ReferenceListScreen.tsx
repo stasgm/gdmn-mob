@@ -1,4 +1,7 @@
-import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
+import ReferenceItem, { RefListItem } from './components/ReferenceListItem';
+import { styles } from './styles';
+import { ReferenceStackParamList } from '../../navigation/Root/types';
+import React, { useCallback, useLayoutEffect, useMemo } from 'react';
 import { FlatList, RefreshControl, Text } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
@@ -9,12 +12,6 @@ import { AppScreen, MenuButton, navBackDrawer, useActionSheet } from '@lib/mobil
 
 import { keyExtractorByIndex, useSendRefsRequest } from '@lib/mobile-hooks';
 
-import { ReferenceStackParamList } from '../../navigation/Root/types';
-
-import ReferenceItem, { RefListItem } from './components/ReferenceListItem';
-
-import { styles } from './styles';
-
 type ViewScreenProp = StackNavigationProp<ReferenceStackParamList, 'ReferenceView'>;
 
 const ReferenceListScreen = () => {
@@ -23,7 +20,7 @@ const ReferenceListScreen = () => {
 
   const refData = useMemo(() => {
     return Object.entries(list)
-      .map(([key, value]) => ({ ...value, refName: key } as RefListItem))
+      .map(([key, value]) => ({ ...value, refName: key }) as RefListItem)
       .filter((i) => i.visible !== false)
       .sort((a, b) => ((a?.description || a?.name) < (b?.description || b?.name) ? -1 : 1));
   }, [list]);
@@ -34,9 +31,9 @@ const ReferenceListScreen = () => {
 
   const sendRequest = useSendRefsRequest();
 
-  const handleSendRefsRequest = async () => {
+  const handleSendRefsRequest = useCallback(async () => {
     await sendRequest();
-  };
+  }, [sendRequest]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -49,16 +46,19 @@ const ReferenceListScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, []);
+  }, [handleSendRefsRequest, showActionSheet]);
 
-  const renderRight = useCallback(() => <MenuButton actionsMenu={actionsMenu} disabled={appLoading} />, [appLoading]);
+  const renderRight = useCallback(
+    () => <MenuButton actionsMenu={actionsMenu} disabled={appLoading} />,
+    [actionsMenu, appLoading],
+  );
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackDrawer,
       headerRight: renderRight,
     });
-  }, [navigation, appLoading]);
+  }, [navigation, appLoading, renderRight]);
 
   const renderItem = ({ item }: { item: RefListItem }) => <ReferenceItem item={item} />;
 

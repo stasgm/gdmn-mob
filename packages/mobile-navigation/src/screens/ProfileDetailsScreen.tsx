@@ -14,7 +14,7 @@ const ProfileDetailsScreen = () => {
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
 
-  const handleClearSettings = () => {
+  const handleClearSettings = useCallback(() => {
     Alert.alert('Вы уверены, что хотите удалить настройки пользователя?', '', [
       {
         text: 'Да',
@@ -26,7 +26,7 @@ const ProfileDetailsScreen = () => {
         text: 'Отмена',
       },
     ]);
-  };
+  }, [settingsDispatch]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -42,12 +42,14 @@ const ProfileDetailsScreen = () => {
     ]);
   }, [handleClearSettings, showActionSheet]);
 
+  const headerRight = useCallback(() => <MenuButton actionsMenu={actionsMenu} />, [actionsMenu]);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackButton,
-      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+      headerRight,
     });
-  }, [navigation]);
+  }, [headerRight, navigation]);
 
   const visibleList = userSettings && Object.entries(userSettings).filter(([_, item]) => item.visible);
 
@@ -59,7 +61,7 @@ const ProfileDetailsScreen = () => {
             {visibleList.map(([key, item]) => (
               <View key={key}>
                 <Divider />
-                <DescriptionItem description={item.description} data={item.data}></DescriptionItem>
+                <DescriptionItem description={item.description} data={item.data} />
               </View>
             ))}
           </View>
@@ -81,11 +83,5 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginVertical: 5,
     width: '100%',
-  },
-  title: {
-    alignItems: 'center',
-    fontSize: 18,
-    textAlign: 'center',
-    margin: 10,
   },
 });

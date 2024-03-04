@@ -6,7 +6,9 @@ import config from '../config';
 
 import 'winston-daily-rotate-file';
 
-const myMessage = winston.format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}`);
+const myMessage = winston.format.printf(
+  (info) => `${new Date(info.timestamp).toLocaleString()} ${info.level}: ${info.message}`,
+);
 const logErrorFileName = path.resolve(config.LOG_PATH, `./%DATE%-${path.basename(config.LOG_ERROR_PATH)}`);
 const logECombinedFileName = path.resolve(config.LOG_PATH, `./%DATE%-${path.basename(config.LOG_COMBINED_PATH)}`);
 

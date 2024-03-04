@@ -8,6 +8,7 @@ function useCameraPermission(): PermissionResponse | null {
     (async () => {
       await requestPermission();
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return permission;

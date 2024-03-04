@@ -62,10 +62,10 @@ const ApplListScreen = () => {
       status === 'all'
         ? list
         : status === 'active'
-        ? list.filter((e) => e.status !== 'PROCESSED' && e.status !== 'ARCHIVE')
-        : status === 'archive'
-        ? list.filter((e) => e.status === 'PROCESSED' || e.status === 'ARCHIVE')
-        : [];
+          ? list.filter((e) => e.status !== 'PROCESSED' && e.status !== 'ARCHIVE')
+          : status === 'archive'
+            ? list.filter((e) => e.status === 'PROCESSED' || e.status === 'ARCHIVE')
+            : [];
 
     return res.map(
       (i) =>
@@ -82,7 +82,7 @@ const ApplListScreen = () => {
           description: shortenString(i.head.justification || '', 90),
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
-        } as ApplListRenderItemProps),
+        }) as ApplListRenderItemProps,
     );
   }, [status, list]);
 

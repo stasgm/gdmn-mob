@@ -50,6 +50,8 @@ const OrderEditScreen = () => {
 
   // Подразделение по умолчанию
   const departSetting = useSelector((state) => state.settings?.userData?.depart?.data);
+  const isDepartEditable = useSelector((state) => state.settings?.data?.isDepartEditable?.data);
+
   const defaultDepart = useMemo(() => (isNamedEntity(departSetting) ? departSetting : undefined), [departSetting]);
   const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === docOutlet?.id);
 
@@ -290,7 +292,7 @@ const OrderEditScreen = () => {
   }, [docContact?.id, docOutlet, isBlocked, navigation, order?.head.route?.id]);
 
   const handlePresentDepart = useCallback(() => {
-    if (isBlocked) {
+    if (isDepartEditable ? docStatus !== 'DRAFT' : isBlocked) {
       return;
     }
 
@@ -299,7 +301,7 @@ const OrderEditScreen = () => {
       fieldName: 'depart',
       value: docDepart && [docDepart],
     });
-  }, [docDepart, isBlocked, navigation]);
+  }, [docDepart, docStatus, isBlocked, isDepartEditable, navigation]);
 
   const handleChangeStatus = useCallback(() => {
     dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
@@ -356,7 +358,7 @@ const OrderEditScreen = () => {
           label="Склад-магазин"
           value={docDepart?.name}
           onPress={handlePresentDepart}
-          disabled={isBlocked}
+          disabled={isDepartEditable ? docStatus !== 'DRAFT' : isBlocked}
         />
         <Input
           label="Комментарий"

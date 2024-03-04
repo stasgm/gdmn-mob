@@ -232,8 +232,8 @@ export const ScanViewScreen = () => {
           ? `Выделено позиций: ${delList.length}`
           : `Позиций: ${delList.length}`
         : windowWidth > 320
-        ? 'Документ'
-        : '',
+          ? 'Документ'
+          : '',
     });
   }, [delList.length, isDelList, navigation, renderLeft, renderRight, windowWidth]);
 

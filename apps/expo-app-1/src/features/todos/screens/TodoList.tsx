@@ -26,8 +26,8 @@ const TodoList = () => {
       item.status === TodoStatus.OPEN
         ? TodoStatus.IN_PROGRESS
         : item.status === TodoStatus.IN_PROGRESS
-        ? TodoStatus.DONE
-        : TodoStatus.OPEN;
+          ? TodoStatus.DONE
+          : TodoStatus.OPEN;
     dispatch(setTodoStatus({ id: item.id, status: newStatus }));
   };
   const deleteTask = async (item: Todo) => {
@@ -88,16 +88,16 @@ const TodoList = () => {
                   item.status === TodoStatus.DONE
                     ? 'check-circle'
                     : item.status === TodoStatus.IN_PROGRESS
-                    ? 'radio-button-on'
-                    : 'radio-button-unchecked'
+                      ? 'radio-button-on'
+                      : 'radio-button-unchecked'
                 }
                 size={30}
                 color={
                   item.status === TodoStatus.DONE
                     ? '#28a745'
                     : item.status === TodoStatus.IN_PROGRESS
-                    ? '#0035dd'
-                    : '#dc3545'
+                      ? '#0035dd'
+                      : '#dc3545'
                 }
               />
               <Text

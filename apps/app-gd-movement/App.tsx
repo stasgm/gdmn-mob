@@ -32,11 +32,9 @@ import { ActivityIndicator, Caption, Text } from 'react-native-paper';
 
 import { IDocument, IReferences } from '@lib/types';
 
-import { TouchableOpacity, Linking, View } from 'react-native';
+import { TouchableOpacity, Linking, View, ScrollView } from 'react-native';
 
 import Constants from 'expo-constants';
-
-import { ScrollView } from 'react-native-gesture-handler';
 
 import { DocNavigator } from './src/navigation/DocNavigator';
 
@@ -78,7 +76,7 @@ const Root = () => {
 
   //Загружаем в стор дополнительные настройки приложения
   const isInit = useSelector((state) => state.settings.isInit);
-  const authLoading = useSelector((state) => state.auth.loadingData);
+  const { loadingData: authLoading, user } = useSelector((state) => state.auth);
   const appDataLoading = appSelectors.selectLoading();
   const isLogged = authSelectors.isLoggedWithCompany();
   const invLoading = useInvSelector((state) => state.appInventory.loading);
@@ -135,6 +133,12 @@ const Root = () => {
       setAddSettings('ADDED');
     }
   }, [addSettings, appDataLoading, dispatch]);
+
+  useEffect(() => {
+    if (user) {
+      setAddSettings('INIT');
+    }
+  }, [user]);
 
   useEffect(() => {
     //Для отрисовки при первом подключении
@@ -222,7 +226,7 @@ const Root = () => {
       ) : infoWindow === 3 ? (
         <AppScreen>
           <Text style={styles.textInfo}>{'Подробную информацию об использовании приложения вы найдете в '}</Text>
-          <TouchableOpacity onPress={() => Linking.openURL(Constants.manifest?.extra?.documentationUrl)}>
+          <TouchableOpacity onPress={() => Linking.openURL(Constants.expoConfig?.extra?.documentationUrl)}>
             <Text style={[styles.textInfo, styles.textDecorationLine]}>{'документации.'}</Text>
           </TouchableOpacity>
           <Text style={styles.textInfo}>
