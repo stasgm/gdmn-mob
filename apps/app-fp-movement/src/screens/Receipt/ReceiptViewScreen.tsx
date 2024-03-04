@@ -19,6 +19,7 @@ import {
   ScanButton,
   navBackButton,
   SimpleDialog,
+  DateInfo,
 } from '@lib/mobile-ui';
 
 import {
@@ -668,26 +669,7 @@ export const ReceiptViewScreen = () => {
           <View style={styles.rowCenter}>
             <MediumText>Куда: {doc.head.toDepart?.name || ''}</MediumText>
           </View>
-          {isDateVisible && (
-            <>
-              {doc.sentDate ? (
-                <View style={styles.rowCenter}>
-                  <MediumText>
-                    Отправлено: {getDateString(doc.sentDate)}{' '}
-                    {new Date(doc.sentDate).toLocaleTimeString('ru', { hour12: false })}
-                  </MediumText>
-                </View>
-              ) : null}
-              {doc.erpCreationDate ? (
-                <View style={styles.rowCenter}>
-                  <MediumText>
-                    Обработано: {getDateString(doc.erpCreationDate)}{' '}
-                    {new Date(doc.erpCreationDate).toLocaleTimeString('ru', { hour12: false })}
-                  </MediumText>
-                </View>
-              ) : null}
-            </>
-          )}
+          {isDateVisible && <DateInfo sentDate={doc.sentDate} erpCreationDate={doc.erpCreationDate} />}
         </>
       </InfoBlock>
       <LineTypes />

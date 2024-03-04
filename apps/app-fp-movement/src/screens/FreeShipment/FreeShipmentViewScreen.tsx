@@ -20,6 +20,7 @@ import {
   navBackButton,
   SaveDocument,
   SimpleDialog,
+  DateInfo,
 } from '@lib/mobile-ui';
 
 import {
@@ -706,26 +707,7 @@ export const FreeShipmentViewScreen = () => {
         <View style={styles.infoBlock}>
           <MediumText>{doc.head.fromDepart?.name || ''}</MediumText>
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
-          {isDateVisible && (
-            <>
-              {doc.sentDate ? (
-                <View style={styles.rowCenter}>
-                  <MediumText>
-                    Отправлено: {getDateString(doc.sentDate)}{' '}
-                    {new Date(doc.sentDate).toLocaleTimeString('ru', { hour12: false })}
-                  </MediumText>
-                </View>
-              ) : null}
-              {doc.erpCreationDate ? (
-                <View style={styles.rowCenter}>
-                  <MediumText>
-                    Обработано: {getDateString(doc.erpCreationDate)}{' '}
-                    {new Date(doc.erpCreationDate).toLocaleTimeString('ru', { hour12: false })}
-                  </MediumText>
-                </View>
-              ) : null}
-            </>
-          )}
+          {isDateVisible && <DateInfo sentDate={doc.sentDate} erpCreationDate={doc.erpCreationDate} />}
         </View>
       </InfoBlock>
       <LineTypes />
