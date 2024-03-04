@@ -29,7 +29,7 @@ const SettingsScreen = () => {
       }),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [config]);
 
   //Если группа не указана, подставляем базовую группу
   const settsData = useMemo(

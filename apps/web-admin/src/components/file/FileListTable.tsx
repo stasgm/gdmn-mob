@@ -88,6 +88,7 @@ const FileListTable = ({
   const [page, setPage] = useState(pageParams?.page && !isNaN(Number(pageParams?.page)) ? Number(pageParams.page) : 0);
 
   const navigate = useNavigate();
+  const maxHeight = useWindowResizeMaxHeight();
 
   const formik = useFormik<IFilterObject>({
     enableReinitialize: true,

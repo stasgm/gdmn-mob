@@ -11,10 +11,11 @@ import { IDebt } from '../../../store/types';
 
 export interface IDebtItem {
   item: IDebt;
+  limitSum?: string;
   onPress: () => void;
 }
 
-const DebetItem = ({ item, onPress }: IDebtItem) => {
+const DebetItem = ({ item, limitSum, onPress }: IDebtItem) => {
   const { colors } = useTheme<MD2Theme>();
   const debtTextStyle = { color: item.saldoDebt && item.saldoDebt > 0 ? colors.error : colors.text };
 
@@ -39,6 +40,7 @@ const DebetItem = ({ item, onPress }: IDebtItem) => {
               item.saldoDebt,
             )}, ${item.dayLeft} дн.`}</MediumText>
           )}
+          {limitSum ? <MediumText>Лимит: {formatValue({ type: 'currency', decimals: 2 }, limitSum)}</MediumText> : null}
         </View>
       </View>
     </TouchableOpacity>

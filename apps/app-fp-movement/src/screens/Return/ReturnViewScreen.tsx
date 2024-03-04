@@ -32,7 +32,14 @@ import { barcodeSettings, IReturnDocument, IReturnLine } from '../../store/types
 import { ReturnStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, lineTypes, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { alertWithSound, alertWithSoundMulti, getBarcode, getDocToSend, getUpdatedLine } from '../../utils/helpers';
+import {
+  alertWithSound,
+  alertWithSoundMulti,
+  getBarcode,
+  getDocToSend,
+  getNextDocNumber,
+  getUpdatedLine,
+} from '../../utils/helpers';
 import { IBarcode, IGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
@@ -78,6 +85,10 @@ export const ReturnViewScreen = () => {
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
   const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
+
+  const docList = useSelector((state) => state.documents.list).filter(
+    (i) => i.documentType.name === 'return',
+  ) as IReturnDocument[];
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -172,6 +183,34 @@ export const ReturnViewScreen = () => {
     navigation.navigate('ReturnEdit', { id });
   }, [navigation, id]);
 
+  const handleCopyDoc = useCallback(async () => {
+    if (!doc) {
+      return;
+    }
+    setScreenState('copying');
+    await sleep(1);
+    const newId = generateId();
+
+    const newDocDate = new Date().toISOString();
+
+    const newNumber = getNextDocNumber(docList);
+
+    const newDoc: IReturnDocument = {
+      ...doc,
+      id: newId,
+      number: newNumber,
+      status: 'DRAFT',
+      documentDate: newDocDate,
+      creationDate: newDocDate,
+      editionDate: newDocDate,
+    };
+
+    docDispatch(documentActions.addDocument(newDoc));
+    navigation.navigate('ReturnView', { id: newId });
+
+    setScreenState('copied');
+  }, [doc, docList, docDispatch, navigation]);
+
   const handleDelete = useCallback(() => {
     if (!id) {
       return;
@@ -222,31 +261,64 @@ export const ReturnViewScreen = () => {
   }, [sendDoc]);
 
   const actionsMenu = useCallback(() => {
-    showActionSheet([
-      {
-        title: 'Ввести штрих-код',
-        onPress: handleShowDialog,
-      },
-      {
-        title: 'Отменить последнее сканирование',
-        onPress: hanldeCancelLastScan,
-      },
-      {
-        title: 'Редактировать данные',
-        onPress: handleEditDocHead,
-      },
-      {
-        title: 'Удалить документ',
-        type: 'destructive',
-        onPress: handleDelete,
-      },
-      {
-        title: 'Отмена',
-        type: 'cancel',
-        onPress: handleFocus,
-      },
-    ]);
-  }, [showActionSheet, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
+    showActionSheet(
+      isBlocked
+        ? doc?.status === 'SENT'
+          ? [
+              {
+                title: 'Копировать документ',
+                onPress: handleCopyDoc,
+              },
+              {
+                title: 'Отмена',
+                type: 'cancel',
+              },
+            ]
+          : [
+              {
+                title: 'Копировать документ',
+                onPress: handleCopyDoc,
+              },
+              {
+                title: 'Удалить документ',
+                type: 'destructive',
+                onPress: handleDelete,
+              },
+              {
+                title: 'Отмена',
+                type: 'cancel',
+              },
+            ]
+        : [
+            {
+              title: 'Ввести штрих-код',
+              onPress: handleShowDialog,
+            },
+            {
+              title: 'Отменить последнее сканирование',
+              onPress: hanldeCancelLastScan,
+            },
+            {
+              title: 'Редактировать данные',
+              onPress: handleEditDocHead,
+            },
+            {
+              title: 'Копировать документ',
+              onPress: handleCopyDoc,
+            },
+            {
+              title: 'Удалить документ',
+              type: 'destructive',
+              onPress: handleDelete,
+            },
+            {
+              title: 'Отмена',
+              type: 'cancel',
+              onPress: handleFocus,
+            },
+          ],
+    );
+  }, [showActionSheet, isBlocked, doc?.status, handleCopyDoc, handleDelete, hanldeCancelLastScan, handleEditDocHead]);
 
   const handleSaveDocument = useCallback(() => {
     if (!doc) {
@@ -265,12 +337,15 @@ export const ReturnViewScreen = () => {
     () =>
       isBlocked ? (
         doc?.status === 'READY' ? (
-          <SendButton
-            onPress={() => setVisibleSendDialog(true)}
-            disabled={screenState !== 'idle' || loading || !lines?.length}
-          />
+          <View style={styles.buttons}>
+            <SendButton
+              onPress={() => setVisibleSendDialog(true)}
+              disabled={screenState !== 'idle' || loading || !lines?.length}
+            />
+            <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
+          </View>
         ) : (
-          doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
+          <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         )
       ) : (
         <View style={styles.buttons}>
@@ -486,9 +561,11 @@ export const ReturnViewScreen = () => {
   }, [scanned, ref, visibleDialog]);
 
   useEffect(() => {
-    if (screenState === 'sent' || screenState === 'deleted') {
+    if (screenState === 'sent' || screenState === 'deleted' || screenState === 'copied') {
       setScreenState('idle');
-      navigation.goBack();
+      if (screenState !== 'copied') {
+        navigation.goBack();
+      }
     }
   }, [navigation, screenState]);
 
@@ -497,11 +574,17 @@ export const ReturnViewScreen = () => {
     return <AppActivityIndicator />;
   }
 
-  if (screenState === 'deleting' || screenState === 'sending') {
+  if (screenState === 'deleting' || screenState === 'copying' || screenState === 'sending') {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
-          <LargeText>{screenState === 'deleting' ? 'Удаление документа...' : 'Отправка документа...'}</LargeText>
+          <LargeText>
+            {screenState === 'deleting'
+              ? 'Удаление документа...'
+              : screenState === 'copying'
+                ? 'Копирование документа...'
+                : 'Отправка документа...'}
+          </LargeText>
           <AppActivityIndicator style={{}} />
         </View>
       </View>
@@ -528,6 +611,13 @@ export const ReturnViewScreen = () => {
         <View style={styles.infoBlock}>
           <MediumText>{doc.head.fromDepart?.name || ''}</MediumText>
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
+          {doc.sentDate ? (
+            <View style={styles.rowCenter}>
+              <MediumText>
+                Отправлено: {getDateString(doc.sentDate)} {new Date(doc.sentDate).toLocaleTimeString()}
+              </MediumText>
+            </View>
+          ) : null}
         </View>
       </InfoBlock>
       <LineTypes />

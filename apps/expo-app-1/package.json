@@ -15,7 +15,7 @@
     "prettier:fix": "prettier --write \"src/**/*.ts*\""
   },
   "dependencies": {
-    "@babel/preset-env": "^7.22.15",
+    "@babel/preset-env": "^7.23.8",
     "@expo/vector-icons": "^13.0.0",
     "@lib/mobile-ui": "*",
     "@react-navigation/drawer": "^6.6.6",
