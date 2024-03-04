@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "GDMN Паллета",
+    "slug": "gdmn-pallet",
+    "version": "0.0.1",
+    "githubUrl": "https://github.com/stasgm/gdmn-mob",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "packagerOpts": {
+      "config": "metro.config.js",
+      "sourceExts": ["svg"]
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0,
+      "enabled": false
+    },
+    "assetBundlePatterns": ["**/*", "../../node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.gsbelarus.palletlist",
+      "permissions": ["CAMERA", "VIBRATE"],
+      "versionCode": 1
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "androidStatusBar": {
+      "translucent": false
+    },
+    "plugins": [
+        "react-native-keyevent-expo-config-plugin",
+        [
+          "expo-build-properties",
+          {
+            "android": {
+              "compileSdkVersion": 33,
+              "targetSdkVersion": 33,
+              "buildToolsVersion": "33.0.0",
+              "usesCleartextTraffic": true
+            }
+          }
+        ]
+      ]
+  }
+}
