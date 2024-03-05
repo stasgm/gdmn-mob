@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "GDMN Агент",
-    "slug": "gdmn-sales-representative",
-    "version": "0.13.7",
+    "name": "GDMN Паллета",
+    "slug": "gdmn-pallet",
+    "version": "0.0.3",
     "githubUrl": "https://github.com/stasgm/gdmn-mob",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
@@ -23,26 +23,30 @@
     "ios": {
       "supportsTablet": true
     },
+    "android": {
+      "package": "com.gsbelarus.palletlist",
+      "permissions": ["CAMERA", "VIBRATE"],
+      "versionCode": 3
+    },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "android": {
-      "package": "com.gsbelarus.salesrepresentative2",
-      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "FOREGROUND_SERVICE"],
-      "versionCode": 63
+    "androidStatusBar": {
+      "translucent": false
     },
     "plugins": [
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "compileSdkVersion": 33,
-            "targetSdkVersion": 33,
-            "buildToolsVersion": "33.0.0",
-            "usesCleartextTraffic": true
+        "react-native-keyevent-expo-config-plugin",
+        [
+          "expo-build-properties",
+          {
+            "android": {
+              "compileSdkVersion": 33,
+              "targetSdkVersion": 33,
+              "buildToolsVersion": "33.0.0",
+              "usesCleartextTraffic": true
+            }
           }
-        }
+        ]
       ]
-    ]
   }
 }
