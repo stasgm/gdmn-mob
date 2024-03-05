@@ -2,7 +2,7 @@
   "expo": {
     "name": "GDMN Паллета",
     "slug": "gdmn-pallet",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "githubUrl": "https://github.com/stasgm/gdmn-mob",
     "orientation": "default",
     "icon": "./assets/icon.png",

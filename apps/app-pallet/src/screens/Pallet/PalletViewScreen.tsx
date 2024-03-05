@@ -21,9 +21,20 @@ import {
   SimpleDialog,
   DateInfo,
   AppDialog,
+  DeleteButton,
+  CloseButton,
 } from '@lib/mobile-ui';
 
-import { generateId, getDateString, shortenString, useSendDocs, sleep, keyExtractor } from '@lib/mobile-hooks';
+import {
+  generateId,
+  getDateString,
+  shortenString,
+  useSendDocs,
+  sleep,
+  keyExtractor,
+  deleteSelectedLineItems,
+  getDelLineList,
+} from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
 
@@ -99,6 +110,18 @@ export const PalletViewScreen = () => {
       },
     ]);
   }, [docDispatch, id]);
+
+  const [delList, setDelList] = useState<string[]>([]);
+  const isDelList = !!Object.keys(delList).length;
+
+  const handleDeleteLines = useCallback(() => {
+    const deleteDocs = () => {
+      dispatch(documentActions.removeDocumentLines({ docId: id, lineIds: delList }));
+      setDelList([]);
+    };
+
+    deleteSelectedLineItems(deleteDocs);
+  }, [delList, dispatch, id, setDelList]);
 
   const handleSaveDocument = useCallback(() => {
     if (!doc) {
@@ -178,34 +201,62 @@ export const PalletViewScreen = () => {
         )
       ) : (
         <View style={styles.buttons}>
-          <>
-            {doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />}
-            <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
+          {isDelList ? (
+            <DeleteButton onPress={handleDeleteLines} />
+          ) : (
+            <>
+              {doc?.status === 'DRAFT' && (
+                <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
+              )}
+              <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
 
-            <ScanButton
-              onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('PalletGood', { docId: id }))}
-              disabled={screenState !== 'idle'}
-            />
-            {/* )} */}
-            <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
-          </>
+              <ScanButton
+                onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('PalletGood', { docId: id }))}
+                disabled={screenState !== 'idle'}
+              />
+              {/* )} */}
+              <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
+            </>
+          )}
         </View>
       ),
-    [actionsMenu, doc?.status, handleSaveDocument, id, isBlocked, isScanerReader, loading, navigation, screenState],
+    [
+      actionsMenu,
+      doc?.status,
+      handleDeleteLines,
+      handleSaveDocument,
+      id,
+      isBlocked,
+      isDelList,
+      isScanerReader,
+      loading,
+      navigation,
+      screenState,
+    ],
   );
 
   const windowWidth = useWindowDimensions().width;
 
+  const renderLeft = useCallback(
+    () => !isBlocked && isDelList && <CloseButton onPress={() => setDelList([])} />,
+    [isBlocked, isDelList],
+  );
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: navBackButton,
+      headerLeft: isDelList ? renderLeft : navBackButton,
       headerRight: renderRight,
       title: windowWidth > 320 ? 'Документ' : '',
     });
-  }, [navigation, renderRight, windowWidth]);
+  }, [isDelList, navigation, renderLeft, renderRight, windowWidth]);
 
   const renderItem = ({ item }: { item: IPalletLine }) => (
-    <ListItemLine {...item} readonly={true}>
+    <ListItemLine
+      {...item}
+      // readonly={true}
+      onPress={() => isDelList && setDelList(getDelLineList(delList, item.id))}
+      onLongPress={() => !isBlocked && setDelList(getDelLineList(delList, item.id))}
+      checked={delList.includes(item.id)}
+    >
       <View style={styles.details}>
         <LargeText>{shortenString(item.barcode, 30)}</LargeText>
       </View>
@@ -257,7 +308,7 @@ export const PalletViewScreen = () => {
         return;
       }
 
-      const line: IPalletLine = { id: generateId(), barcode: brc, sortOrder: doc?.lines?.length + 1 };
+      const line: IPalletLine = { id: generateId(), barcode: brc, sortOrder: (lines?.[0]?.sortOrder || 0) + 1 };
       dispatch(documentActions.addDocumentLine({ docId: id, line }));
 
       if (visibleDialog) {
@@ -270,7 +321,7 @@ export const PalletViewScreen = () => {
 
       handleFocus();
     },
-    [dispatch, doc, handleErrorMessage, id, isBlocked, prefixErp, prefixS, visibleDialog],
+    [dispatch, doc, handleErrorMessage, id, isBlocked, lines, prefixErp, prefixS, visibleDialog],
   );
 
   const handleSearchBarcode = () => {
@@ -336,6 +387,7 @@ export const PalletViewScreen = () => {
           title={doc.documentType.description || ''}
           onPress={() => !isEditable && setIsDateVisible(!isDateVisible)}
           isBlocked={isBlocked}
+          disabled={delList.length > 0}
         >
           <>
             <View style={styles.rowCenter}>
@@ -361,7 +413,7 @@ export const PalletViewScreen = () => {
           ItemSeparatorComponent={ItemSeparator}
           keyboardShouldPersistTaps="handled"
           keyExtractor={keyExtractor}
-          extraData={[lines, isBlocked]}
+          extraData={[lines, isBlocked, delList, isDelList]}
         />
         <AppDialog
           title="Введите штрих-код"
