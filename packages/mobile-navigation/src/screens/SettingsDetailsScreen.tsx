@@ -111,6 +111,16 @@ const SettingsDetailsScreen = () => {
         );
       }
     }
+
+    if (value.group?.id === 'cleanDoc' && optionName !== 'cleanDefaultDocTime') {
+      const cleanDefaultDocTime = Object.values(data).find((i) => i?.id === 'cleanDefaultDocTime')?.data || 7;
+
+      if (cleanDefaultDocTime && value.data < cleanDefaultDocTime) {
+        dispatch(settingsActions.updateOption({ optionName, value: { ...value, data: cleanDefaultDocTime } }));
+
+        Alert.alert('Внимание!', 'Время хранения документов не может быть меньше минимального.', [{ text: 'OK' }]);
+      }
+    }
   };
 
   useLayoutEffect(() => {
