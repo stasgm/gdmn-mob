@@ -82,6 +82,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
   const settings = useSelector((state) => state.settings.data);
 
   const cleanDocTime = (settings.cleanDocTime as ISettingsOption<number>).data || 0;
+  const cleanDefaultDocTime = (settings.cleanDefaultDocTime as ISettingsOption<number>)?.data || 0;
   const cleanDraftDocTime = (settings.cleanDraftDocTime as ISettingsOption<number>)?.data || 0;
   const cleanReadyDocTime = (settings.cleanReadyDocTime as ISettingsOption<number>)?.data || 0;
   const cleanSentDocTime = (settings.cleanSentDocTime as ISettingsOption<number>)?.data || 0;
@@ -737,7 +738,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
                 }
 
                 const removeDocumentsByStatus = async (status: StatusType, cleanTime: number, message: string) => {
-                  if (cleanTime > 0) {
+                  if (cleanTime >= cleanDefaultDocTime) {
                     const maxDocDate = new Date();
                     maxDocDate.setDate(maxDocDate.getDate() - cleanTime);
 

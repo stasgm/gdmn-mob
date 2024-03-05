@@ -107,6 +107,16 @@ const baseSettings: Settings<IBaseSettings> = {
     visible: true,
     group: cleanDocSettingGroup,
   },
+  cleanDefaultDocTime: {
+    id: 'cleanDefaultDocTime',
+    description: 'Минимум, дн.',
+    data: 7,
+    type: 'number',
+    sortOrder: 8,
+    visible: true,
+    group: cleanDocSettingGroup,
+    readonly: true,
+  },
 };
 
 export const initialState: Readonly<SettingsState> = {
