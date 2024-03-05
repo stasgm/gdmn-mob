@@ -1,9 +1,9 @@
 import { useDispatch } from 'react-redux';
 import { ThunkDispatch } from 'redux-thunk';
 
-import { AppInventoryActionType } from './actions';
-import { AppInventoryState } from './types';
+import { AppPalletActionType } from './actions';
+import { AppPalletState } from './types';
 
-export type appInventoryDispatch = ThunkDispatch<AppInventoryState, any, AppInventoryActionType>;
+export type appPalletDispatch = ThunkDispatch<AppPalletState, any, AppPalletActionType>;
 
-export const useAppInventoryThunkDispatch = () => useDispatch<appInventoryDispatch>();
+export const useAppPalletThunkDispatch = () => useDispatch<appPalletDispatch>();

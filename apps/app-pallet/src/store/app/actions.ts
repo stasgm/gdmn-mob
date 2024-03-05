@@ -1,12 +1,12 @@
 import { ActionType, createAction } from 'typesafe-actions';
 
-import { AppInventoryState } from './types';
+import { AppPalletState } from './types';
 
-const init = createAction('APP_INVENTORY/INIT')();
-const loadData = createAction('APP_INVENTORY/LOAD_DATA')<AppInventoryState>();
-const setLoading = createAction('APP_INVENTORY/SET_LOADING')<boolean>();
-const setLoadingData = createAction('APP_INVENTORY/SET_LOADING_DATA')<boolean>();
-const setLoadingError = createAction('APP_INVENTORY/SET_LOADING_ERROR')<string>();
+const init = createAction('APP_PALLET/INIT')();
+const loadData = createAction('APP_PALLET/LOAD_DATA')<AppPalletState>();
+const setLoading = createAction('APP_PALLET/SET_LOADING')<boolean>();
+const setLoadingData = createAction('APP_PALLET/SET_LOADING_DATA')<boolean>();
+const setLoadingError = createAction('APP_PALLET/SET_LOADING_ERROR')<string>();
 
 export const actions = {
   init,
@@ -16,4 +16,4 @@ export const actions = {
   setLoadingError,
 };
 
-export type AppInventoryActionType = ActionType<typeof actions>;
+export type AppPalletActionType = ActionType<typeof actions>;

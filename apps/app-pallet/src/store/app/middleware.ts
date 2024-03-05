@@ -25,7 +25,7 @@ export const appInvMiddlewareFactory: PersistedMiddleware =
     if (action.type === getType(appActions.loadSuperDataFromDisc) && store.getState().auth.user?.id) {
       // а здесь мы грузим данные для залогиненого пользователя
       store.dispatch(actions.setLoadingData(true));
-      load('appInventory', store.getState().auth.user?.id)
+      load('appPallet', store.getState().auth.user?.id)
         .then((data: any) => store.dispatch(actions.loadData(data || initialState)))
         .finally(() => {
           store.dispatch(actions.setLoadingData(false));
@@ -48,7 +48,7 @@ export const appInvMiddlewareFactory: PersistedMiddleware =
       switch (action.type) {
         case getType(actions.init): {
           const result = next(action);
-          save('appInventory', store.getState().appInventory, store.getState().auth.user?.id).catch((err) => {
+          save('appPallet', store.getState().appPallet, store.getState().auth.user?.id).catch((err) => {
             if (err instanceof Error) {
               store.dispatch(actions.setLoadingError(err.message));
             } else {

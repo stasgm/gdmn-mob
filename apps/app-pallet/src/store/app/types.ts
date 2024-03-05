@@ -1,6 +1,6 @@
 import { INamedEntity } from '@lib/types';
 
-export type AppInventoryState = {
+export type AppPalletState = {
   readonly loading: boolean;
   readonly loadingData: boolean;
   readonly errorMessage: string;

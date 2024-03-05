@@ -4,17 +4,17 @@ import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { configureStore } from '@lib/store';
 import { loadDataFromDisk, saveDataToDisk } from '@lib/mobile-app';
 
-import appInventoryReducer from './app/reducer';
-import { AppInventoryActionType } from './app/actions';
+import appPalletReducer from './app/reducer';
+import { AppPalletActionType } from './app/actions';
 import { appInvMiddlewareFactory } from './app/middleware';
 
-export { default as appInventoryActions } from './app';
-export { useAppInventoryThunkDispatch } from './app/actions.async';
+export { default as appPalletActions } from './app';
+export { useAppPalletThunkDispatch } from './app/actions.async';
 
-type TActions = AppInventoryActionType;
+type TActions = AppPalletActionType;
 
 export const reducers = {
-  appInventory: appInventoryReducer,
+  appPallet: appPalletReducer,
 };
 
 const appReducer = combineReducers(reducers);

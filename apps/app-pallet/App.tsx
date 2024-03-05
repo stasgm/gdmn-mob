@@ -36,7 +36,7 @@ import { TouchableOpacity, Linking, View, ScrollView } from 'react-native';
 
 import Constants from 'expo-constants';
 
-import { store, useSelector as useInvSelector, appInventoryActions } from './src/store';
+import { store, useSelector as useInvSelector, appPalletActions } from './src/store';
 
 import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
 
@@ -63,7 +63,7 @@ const Root = () => {
   const { loadingData: authLoading, user } = useSelector((state) => state.auth);
   const appDataLoading = appSelectors.selectLoading();
   const isLogged = authSelectors.isLoggedWithCompany();
-  const invLoading = useInvSelector((state) => state.appInventory.loading);
+  const invLoading = useInvSelector((state) => state.appPallet.loading);
   const isDemo = useSelector((state) => state.auth.isDemo);
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
 
@@ -132,7 +132,7 @@ const Root = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const invLoadingError = useInvSelector<string>((state) => state.appInventory.loadingError);
+  const invLoadingError = useInvSelector<string>((state) => state.appPallet.loadingError);
 
   const [infoWindow, setInfoWindow] = useState(0);
 
@@ -151,7 +151,7 @@ const Root = () => {
     }
   }, [isDemo, getMessages, connectionStatus, handleSetInfoWindow_1]);
 
-  const onClearLoadingErrors = () => dispatch(appInventoryActions.setLoadingError(''));
+  const onClearLoadingErrors = () => dispatch(appPalletActions.setLoadingError(''));
 
   return (
     <ErrorBoundary FallbackComponent={AppFallback}>
