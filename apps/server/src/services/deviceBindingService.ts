@@ -1,9 +1,7 @@
 import { IDBDeviceBinding, IDeviceBinding, NewDeviceBinding } from '@lib/types';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
-import { extraPredicate, getListPart } from '../utils/helpers';
-
-import { deviceStates } from '../utils/constants';
+import { extraPredicate, formatDateToLocale, getListPart, deviceStates } from '../utils';
 
 import { getDb } from './dao/db';
 
@@ -130,11 +128,14 @@ const findOne = (id: string): IDeviceBinding => {
  * @param params - параметры
  * @returns
  */
-const findMany = (params: Record<string, string>): IDeviceBinding[] => {
+const findMany = (params: Record<string, string | number>): IDeviceBinding[] => {
   const { devices, deviceBindings } = getDb();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { fromRecord, toRecord, ...newParams } = params;
+
   let deviceBindingList = deviceBindings.data.filter((item) => {
-    const newParams = { ...params };
+    const newParams = { ...params } as Record<string, string>;
 
     let userFound = true;
 
@@ -159,11 +160,10 @@ const findMany = (params: Record<string, string>): IDeviceBinding[] => {
     return userFound && deviceFound && extraPredicate(item, newParams);
   });
 
-  const newParams = { ...params };
-
   if ('companyId' in newParams || 'filterText' in newParams) {
     deviceBindingList = deviceBindingList.filter((i: IDBDeviceBinding) => {
-      const newParams = { ...params };
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { fromRecord, toRecord, ...newParams } = params;
 
       const device = devices.findById(i.deviceId);
       if (!device) {
@@ -187,9 +187,8 @@ const findMany = (params: Record<string, string>): IDeviceBinding[] => {
         if (filterText) {
           const state = deviceStates[i.state].toUpperCase();
           const deviceName = device?.name.toUpperCase();
-          const creationDate = new Date(i.creationDate || '').toLocaleString('ru', { hour12: false });
-          const editionDate = new Date(i.editionDate || '').toLocaleString('ru', { hour12: false });
-
+          const creationDate = formatDateToLocale(i.creationDate);
+          const editionDate = formatDateToLocale(i.editionDate);
           filteredCompanies =
             deviceName.includes(filterText) ||
             state.includes(filterText) ||
@@ -204,7 +203,7 @@ const findMany = (params: Record<string, string>): IDeviceBinding[] => {
     });
   }
 
-  return getListPart(deviceBindingList, params)?.map((i) => makeDeviceBinding(i));
+  return getListPart<IDBDeviceBinding>(deviceBindingList, params)?.map((i) => makeDeviceBinding(i));
 };
 
 export const makeDeviceBinding = (binding: IDBDeviceBinding): IDeviceBinding => {

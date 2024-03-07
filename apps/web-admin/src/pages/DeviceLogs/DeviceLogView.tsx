@@ -86,7 +86,7 @@ const DeviceLogView = () => {
   const handleDelete = useCallback(async () => {
     setOpen(false);
     const res = await dispatch(
-      deviceLogActions.removeDeviceLog(
+      deviceLogActions.deleteDeviceLog(
         id,
         deviceLog?.ext || '',
         deviceLog?.folder || '',

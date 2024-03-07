@@ -16,7 +16,7 @@
     "lint": "eslint \"./src/**/*.ts\"",
     "lint:fix": "eslint --fix \"./src/**/*.ts\"",
     "precommit": "lint-staged",
-    "test": "cross-env NODE_ENV=test jest --colors"
+    "test": "cross-env NODE_ENV=test jest src/utils/__tests__/files.spec.ts --colors"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

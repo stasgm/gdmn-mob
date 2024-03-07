@@ -4,7 +4,7 @@ import { IDevice, INamedEntity, NewDevice } from '@lib/types';
 
 import { deviceService } from '../services';
 
-import { created, ok } from '../utils/apiHelpers';
+import { created, ok, prepareParams } from '../utils';
 
 import { DataNotFoundException } from '../exceptions';
 
@@ -40,7 +40,7 @@ const removeDevice = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: deviceId }: { id: string } = ctx.params;
+  const { id: deviceId } = ctx.params;
 
   const device = deviceService.findOne(deviceId);
 
@@ -52,33 +52,7 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
-  const { companyId, uid, state, filterText, fromRecord, toRecord } = ctx.query;
-
-  const params: Record<string, string | number> = {};
-
-  if (typeof companyId === 'string') {
-    params.companyId = companyId;
-  }
-
-  if (typeof uid === 'string') {
-    params.uid = uid;
-  }
-
-  if (typeof state === 'string') {
-    params.state = state;
-  }
-
-  if (typeof filterText === 'string') {
-    params.filterText = filterText;
-  }
-
-  if (typeof fromRecord === 'string') {
-    params.fromRecord = fromRecord;
-  }
-
-  if (typeof toRecord === 'string') {
-    params.toRecord = toRecord;
-  }
+  const params = prepareParams(ctx.query, ['companyId', 'uid', 'state', 'filterText'], ['fromRecord', 'toRecord']);
 
   const deviceList = deviceService.findMany(params);
 

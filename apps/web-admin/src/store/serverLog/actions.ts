@@ -1,6 +1,6 @@
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
-import { IServerLogFile, IServerLogResponse } from '@lib/types';
+import { ISystemFile, IServerLogResponse } from '@lib/types';
 
 import { IPageParam } from '../../types';
 
@@ -12,7 +12,7 @@ const fetchServerLogsAsync = createAsyncAction(
   'SERVERLOG/FETCH_SERVERLOGS',
   'SERVERLOG/FETCH_SERVERLOGS_SUCCESS',
   'SERVERLOG/FETCH_SERVERLOGS_FAILURE',
-)<string | undefined, IServerLogFile[], string>();
+)<string | undefined, ISystemFile[], string>();
 
 const fetchServerLogAsync = createAsyncAction(
   'SERVERLOG/FETCH_SERVERLOG',

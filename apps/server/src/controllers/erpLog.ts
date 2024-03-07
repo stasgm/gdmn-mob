@@ -2,13 +2,11 @@ import { unlink } from 'fs/promises';
 
 import { Context, ParameterizedContext } from 'koa';
 
-import { IErpLogFileRequest, IErpLogRequestBody } from '@lib/types';
+import { IErpLogFileAddRequest, IErpLogRequestBody, IPathParams } from '@lib/types';
 
-import { created, ok } from '../utils/apiHelpers';
-import { erpLogService } from '../services';
+import { log, created, ok, checkFileExists, prepareParams } from '../utils';
+import { erpLogService, fileUtils } from '../services';
 import { InvalidParameterException } from '../exceptions';
-import log from '../utils/logger';
-import { checkFileExists } from '../utils/fileHelper';
 
 const deleteTempFile = async (filepath: string) => {
   try {
@@ -22,7 +20,7 @@ const deleteTempFile = async (filepath: string) => {
 
 const addErpLog = async (ctx: Context) => {
   const { companyId, appSystemId } = ctx.request.body as IErpLogRequestBody;
-  const file = (ctx.request as unknown as IErpLogFileRequest).files.logFile;
+  const file = (ctx.request as unknown as IErpLogFileAddRequest).files.logFile;
 
   if (!file || !file.filepath) {
     throw new InvalidParameterException('Не указан файл');
@@ -38,7 +36,9 @@ const addErpLog = async (ctx: Context) => {
       throw new InvalidParameterException('Не указан идентификатор подсистемы');
     }
 
-    await erpLogService.addOne(companyId, appSystemId, file);
+    const params = prepareParams<IPathParams>(ctx.query, ['companyId', 'appSystemId']);
+
+    await erpLogService.addOne(params, file);
   } finally {
     await deleteTempFile(file.filepath);
   }
@@ -50,28 +50,16 @@ const addErpLog = async (ctx: Context) => {
   );
 };
 
-const getErpLog = async (ctx: ParameterizedContext) => {
-  const { companyId, appSystemId, start, end } = ctx.query;
+const getErpLogContent = async (ctx: ParameterizedContext) => {
+  const params = await fileUtils.getFileParams(ctx.params, ctx.query);
 
-  if (typeof companyId !== 'string') {
-    throw new InvalidParameterException('Не указан идентификатор компании');
-  }
-
-  if (typeof appSystemId !== 'string') {
-    throw new InvalidParameterException('Не указан идентификатор подсистемы');
-  }
-
-  if (typeof start !== 'number' || typeof end !== 'number') {
-    throw new InvalidParameterException('Параметры start и end должны быть числовыми');
-  }
-
-  const serverLog = await erpLogService.findOne(companyId, appSystemId, start, end);
+  const serverLog = await erpLogService.getContent(params);
 
   ok(
     ctx as Context,
     serverLog,
-    `getErpLog: Log for companyId=${companyId} and appSystemId=${appSystemId} is successfully received`,
+    `getErpLog: Log for companyId=${params.companyId} and appSystemId=${params.appSystemId} is successfully received`,
   );
 };
 
-export { addErpLog, getErpLog };
+export { addErpLog, getErpLogContent as getErpLog };

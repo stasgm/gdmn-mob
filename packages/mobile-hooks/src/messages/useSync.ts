@@ -46,6 +46,8 @@ export const useSync = (onSync?: () => Promise<any>) => {
   const settingsDispatch = useSettingsThunkDispatch();
   const dispatch = useDispatch();
 
+  const clean = 0;
+
   const addError = useCallback(
     (name: string, message: string, errs: IDeviceLog[], addErrorNotice = true) => {
       const err = {

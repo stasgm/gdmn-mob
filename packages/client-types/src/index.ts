@@ -18,4 +18,6 @@ export interface IScannedObject {
   message?: string;
 }
 
+const f = 0;
+
 export type IScannedObjectState = 'init' | 'found' | 'error';

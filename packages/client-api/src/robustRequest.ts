@@ -94,6 +94,8 @@ export const robustRequest: RobustRequest = async ({
 
     let objData = res.data;
 
+    console.log('res.data', res.data);
+
     //Проверка данных validator
     if (res.data.type === 'SUCCESS') {
       const bodyData = res.data.data;
@@ -111,6 +113,7 @@ export const robustRequest: RobustRequest = async ({
 
     return objData;
   } catch (err) {
+    console.log('res.data errrrrr', err);
     clearTimeout(rTimeout);
 
     if (controller.signal.aborted) {
@@ -121,11 +124,17 @@ export const robustRequest: RobustRequest = async ({
 
     if (err instanceof AxiosError) {
       if (err.response?.status) {
+        let errorMessage = '';
+        if (typeof err.response.data === 'string') {
+          errorMessage = err.response.data;
+        } else if (err.response.data && typeof err.response.data.error === 'string') {
+          errorMessage = err.response.data.error;
+        }
         return {
           result: false,
           type: 'FAILURE',
           status: err.response.status || 500,
-          error: err.response.data || '',
+          error: errorMessage || 'Ошибка axious',
         };
       } else {
         return {

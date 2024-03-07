@@ -59,6 +59,6 @@ erpLog.post(
   addErpLog,
 );
 
-erpLog.get('/', erpLogValidation.getErpLog, authMiddleware, deviceMiddleware, getErpLog);
+erpLog.get('/:id/content', erpLogValidation.getErpLog, authMiddleware, deviceMiddleware, getErpLog);
 
 export default erpLog;

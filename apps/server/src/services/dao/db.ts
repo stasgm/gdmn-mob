@@ -13,9 +13,7 @@ import {
 
 import { Collection, Database, CollectionMessage } from '../../utils/json-db';
 
-import { messageFolders, collectionNames } from '../../utils/constants';
-
-import { generateId } from '../../utils/helpers';
+import { messageFolders, collectionNames, generateId } from '../../utils';
 
 import { mkDir } from './utils';
 

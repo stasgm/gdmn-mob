@@ -3,7 +3,7 @@ import { ParameterizedContext, Next, Context } from 'koa';
 import { IUser, IUserCredentials, NewAccessCode, NewActivationCode } from '@lib/types';
 
 import { authService } from '../services';
-import { created, ok } from '../utils/apiHelpers';
+import { created, ok } from '../utils';
 
 /**
  * Регистрация нового пользователя (Администратора компании)

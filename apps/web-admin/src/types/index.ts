@@ -43,23 +43,23 @@ export interface IMessageHead {
 
 export interface IFilterObject {
   [fieldName: string]: IFilterOption;
-  // path: string;
-  folder: IFilterOption;
-  fileName: IFilterOption;
   company: IFilterOption;
   appSystem: IFilterOption;
+  folder: IFilterOption;
+  fileName: IFilterOption;
   producer: IFilterOption;
   consumer: IFilterOption;
-  device: IFilterOption;
   uid: IFilterOption;
+  device: IFilterOption;
   date: IFilterOption;
   dateFrom: IFilterOption;
   dateTo: IFilterOption;
 }
+
 export interface IFileFilter {
   [fieldName: string]: string;
-  path: string;
-  id: string;
+  folder: string;
+  fileName: string;
   company: string;
   appSystem: string;
   producer: string;
@@ -68,6 +68,7 @@ export interface IFileFilter {
   uid: string;
   date: string;
 }
+
 export interface IFilterOption extends INamedEntity {
   type: 'text' | 'select' | 'date';
   value: string;

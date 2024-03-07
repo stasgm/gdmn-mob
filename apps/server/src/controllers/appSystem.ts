@@ -6,7 +6,7 @@ import { appSystemService } from '../services';
 
 import { DataNotFoundException } from '../exceptions';
 
-import { created, ok } from '../utils/apiHelpers';
+import { created, ok } from '../utils';
 
 const addAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
   const { name, description } = ctx.request.body as NewAppSystem;

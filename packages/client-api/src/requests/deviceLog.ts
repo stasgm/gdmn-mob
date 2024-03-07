@@ -1,4 +1,4 @@
-import { IDeviceLog, IDeviceLogFiles, IFileIds, IFileObject, IDeviceData, Settings } from '@lib/types';
+import { IDeviceLog, IDeviceLogFiles, IDeviceData, Settings, IFileParams } from '@lib/types';
 
 import { error, deviceLog as types } from '../types';
 import { response2Log, sleep } from '../utils';
@@ -54,28 +54,28 @@ class DeviceLog extends BaseRequest {
     } as error.IServerError;
   };
 
-  getDeviceLog = async (customRequest: CustomRequest, params: Record<string, string | number>) => {
+  getDeviceLogContent = async (customRequest: CustomRequest, id: string, params: Record<string, string | number>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'ERROR',
-        message: 'Журнал ошибок не найден',
+        message: 'Лог устройства не найден',
       } as error.IServerError;
     }
 
     const res = await customRequest<IDeviceData>({
       api: this.api.axios,
       method: 'GET',
-      url: `/deviceLogs/${params.id}`,
+      url: `/deviceLogs/${id}/content`,
       params,
     });
 
     if (res.type === 'SUCCESS') {
       return {
-        type: 'GET_DEVICELOG',
+        type: 'GET_DEVICELOG_CONTENT',
         deviceLog: res.data,
-      } as types.IGetDeviceLogResponse;
+      } as types.IGetDeviceLogContentResponse;
     }
 
     return {
@@ -114,7 +114,7 @@ class DeviceLog extends BaseRequest {
     } as error.IServerError;
   };
 
-  removeDeviceLog = async (customRequest: CustomRequest, params: Record<string, string | number>) => {
+  deleteDeviceLog = async (customRequest: CustomRequest, id: string, params: Record<string, string | number>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -126,7 +126,7 @@ class DeviceLog extends BaseRequest {
     const res = await customRequest<void>({
       api: this.api.axios,
       method: 'DELETE',
-      url: `/deviceLogs/${params.id}`,
+      url: `/deviceLogs/${id}`,
       params,
     });
 
@@ -142,7 +142,7 @@ class DeviceLog extends BaseRequest {
     } as error.IServerError;
   };
 
-  removeDeviceLogs = async (customRequest: CustomRequest, deviceLogIds: IFileObject[]) => {
+  deleteDeviceLogs = async (customRequest: CustomRequest, files: IFileParams[]) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -151,12 +151,12 @@ class DeviceLog extends BaseRequest {
       } as types.IRemoveDeviceLogsResponse;
     }
 
-    const body: Partial<IFileIds> = { ids: deviceLogIds };
+    const body = { files };
 
     const res = await customRequest<void>({
       api: this.api.axios,
       method: 'POST',
-      url: '/deviceLogs/?action=delete',
+      url: '/deviceLogs/deleteList',
       data: body,
     });
 

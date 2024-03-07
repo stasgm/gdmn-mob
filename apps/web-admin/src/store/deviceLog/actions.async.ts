@@ -3,7 +3,7 @@ import api from '@lib/client-api';
 
 import { authActions } from '@lib/store';
 
-import { IFileObject } from '@lib/types';
+import { IFileParams } from '@lib/types';
 
 import { AppState } from '..';
 
@@ -66,7 +66,7 @@ const fetchDeviceLog = (
   };
 };
 
-const removeDeviceLog = (
+const deleteDeviceLog = (
   id: string,
   ext?: string,
   folder?: string,
@@ -83,7 +83,7 @@ const removeDeviceLog = (
     if (appSystemId) params.appSystemId = appSystemId;
     if (companyId) params.companyId = companyId;
 
-    const response = await api.deviceLog.removeDeviceLog(webRequest(dispatch, authActions), params);
+    const response = await api.deviceLog.deleteDeviceLog(webRequest(dispatch, authActions), params);
 
     if (response.type === 'REMOVE_DEVICELOG') {
       return dispatch(deviceLogActions.removeDeviceLogAsync.success(id));
@@ -93,11 +93,11 @@ const removeDeviceLog = (
   };
 };
 
-const removeDeviceLogs = (deviceLogIds: IFileObject[]): AppThunk => {
+const deleteDeviceLogs = (deviceLogIds: IFileParams[]): AppThunk => {
   return async (dispatch) => {
     dispatch(deviceLogActions.removeDeviceLogsAsync.request(''));
 
-    const response = await api.deviceLog.removeDeviceLogs(webRequest(dispatch, authActions), deviceLogIds);
+    const response = await api.deviceLog.deleteDeviceLogs(webRequest(dispatch, authActions), deviceLogIds);
 
     if (response.type === 'REMOVE_DEVICELOGS') {
       return dispatch(deviceLogActions.removeDeviceLogsAsync.success(deviceLogIds));
@@ -107,4 +107,4 @@ const removeDeviceLogs = (deviceLogIds: IFileObject[]): AppThunk => {
   };
 };
 
-export default { fetchDeviceLogFiles, fetchDeviceLog, removeDeviceLog, removeDeviceLogs };
+export default { fetchDeviceLogFiles, fetchDeviceLog, deleteDeviceLog, deleteDeviceLogs };

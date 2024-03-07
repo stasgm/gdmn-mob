@@ -7,13 +7,8 @@ export interface IErpLogFile {
   filepath: string;
 }
 
-export interface IErpLogFileRequest extends Request {
+export interface IErpLogFileAddRequest extends Request {
   files: {
     logFile: IErpLogFile;
   };
-}
-
-export interface IErpLogResponse {
-  isFinished: boolean;
-  textFile: string;
 }

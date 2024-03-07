@@ -23,23 +23,24 @@ const FileEdit = () => {
   const { loading, errorMessage, file } = useSelector((state) => state.files);
 
   const fileObject = fileSelectors.fileByIdAndFolder(id);
+  console.log('fileObject', fileObject);
 
   const fetchFile = useCallback(() => {
     dispatch(
       fileActions.fetchFile(
         id,
-        fileObject?.ext || '',
+        // fileObject?.ext || '',
         fileObject?.folder || '',
         fileObject?.appSystem?.id || '',
         fileObject?.company?.id || '',
       ),
     );
-  }, [dispatch, fileObject?.appSystem?.id, fileObject?.company?.id, fileObject?.ext, fileObject?.folder, id]);
+  }, [dispatch, fileObject?.appSystem?.id, fileObject?.company?.id, fileObject?.folder, id]);
 
-  useEffect(() => {
-    // Загружаем данные при загрузке компонента.
-    fetchFile();
-  }, [fetchFile]);
+  // useEffect(() => {
+  //   // Загружаем данные при загрузке компонента.
+  //   fetchFile();
+  // }, [fetchFile]);
 
   const goBack = () => {
     navigate(-1);
@@ -54,7 +55,7 @@ const FileEdit = () => {
       fileActions.updateFile(
         id,
         values as any,
-        fileObject?.ext || '',
+        // fileObject?.ext || '',
         fileObject?.folder || '',
         fileObject?.appSystem?.id || '',
         fileObject?.company?.id || '',

@@ -48,12 +48,13 @@ const FileView = () => {
   const { loading, errorMessage, file, folders } = useSelector((state) => state.files);
 
   const fileObject = fileSelectors.fileByIdAndFolder(id);
+  console.log('fileObject', fileObject);
 
   const fetchFile = useCallback(() => {
     dispatch(
       fileActions.fetchFile(
         id,
-        fileObject?.ext || '',
+        // fileObject?.ext || '',
         fileObject?.folder || '',
         fileObject?.appSystem?.id || '',
         fileObject?.company?.id || '',
@@ -94,9 +95,9 @@ const FileView = () => {
   const handleDelete = useCallback(async () => {
     setOpen(false);
     const res = await dispatch(
-      fileActions.removeFile(
+      fileActions.deleteFile(
         id,
-        fileObject?.ext || '',
+        // fileObject?.ext || '',
         fileObject?.folder || '',
         fileObject?.appSystem?.id || '',
         fileObject?.company?.id || '',
@@ -107,21 +108,21 @@ const FileView = () => {
     }
   }, [dispatch, fileObject, id, navigate]);
 
-  const refreshData = useCallback(() => {
-    dispatch(
-      fileActions.fetchFile(
-        id,
-        fileObject?.ext || '',
-        fileObject?.folder || '',
-        fileObject?.appSystem?.id || '',
-        fileObject?.company?.id || '',
-      ),
-    );
-  }, [dispatch, fileObject, id]);
+  // const refreshData = useCallback(() => {
+  //   dispatch(
+  //     fileActions.fetchFile(
+  //       id,
+  //       fileObject?.ext || '',
+  //       fileObject?.folder || '',
+  //       fileObject?.appSystem?.id || '',
+  //       fileObject?.company?.id || '',
+  //     ),
+  //   );
+  // }, [dispatch, fileObject, id]);
 
-  useEffect(() => {
-    refreshData();
-  }, [refreshData]);
+  // useEffect(() => {
+  //   refreshData();
+  // }, [refreshData]);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -149,7 +150,7 @@ const FileView = () => {
               id: id,
               appSystemId: fileObject.appSystem?.id || '',
               companyId: fileObject.company?.id || '',
-              ext: fileObject.ext || '',
+              // ext: fileObject.ext || '',
               folder: fileObject.folder || '',
             },
           ],
@@ -209,7 +210,7 @@ const FileView = () => {
       sx: { marginRight: 1 },
       color: 'primary',
       variant: 'contained',
-      onClick: refreshData,
+      onClick: fetchFile,
       icon: <CachedIcon />,
     },
     {

@@ -9,7 +9,7 @@ import { DataNotFoundException, UnauthorizedException } from '../exceptions';
 
 import config from '../../config';
 
-import { generateId } from '../utils/helpers';
+import { generateId } from '../utils';
 
 import * as userService from './userService';
 import { getDb } from './dao/db';
@@ -22,7 +22,7 @@ import { users as mockUsers } from './data/user';
  * @returns Объект пользователя
  */
 const authenticate = async (ctx: Context, next: Next) => {
-  const { devices, users, deviceBindings } = getDb();
+  const { users, deviceBindings, devices } = getDb();
 
   const { name } = ctx.request.body as IUserCredentials;
 
@@ -42,7 +42,11 @@ const authenticate = async (ctx: Context, next: Next) => {
     // Для пользователей с ролью User проверяем дополнительно DeviceId
     const { deviceId } = ctx.query;
 
-    const device = devices.data.find((el) => el.uid === deviceId);
+    if (!deviceId || typeof deviceId !== 'string') {
+      throw new UnauthorizedException('Неверное id устройства');
+    }
+
+    const device = devices.findByField('uid', deviceId);
 
     if (!device) {
       throw new UnauthorizedException('Устройство не найдено');
@@ -179,7 +183,8 @@ const logout = (_userId: string) => {
  * @returns Статус устройства
  */
 const getDeviceStatus = (uid: string): DeviceState => {
-  const device = getDb().devices.data.find((i) => i.uid === uid);
+  // const device = getDb().devices.data.find((i) => i.uid === uid);
+  const device = getDb().devices.findByField('uid', uid);
 
   if (!device) {
     throw new UnauthorizedException('Устройство не найдено.\nПожалуйста, обратитесь к администратору!');

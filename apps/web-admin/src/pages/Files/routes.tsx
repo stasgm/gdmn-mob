@@ -27,6 +27,8 @@ export default function Files() {
     dispatch(fileSystemActions.clearError());
   };
 
+  console.log('filesErrorMessage', filesErrorMessage);
+
   return (
     <>
       {routeComponent}

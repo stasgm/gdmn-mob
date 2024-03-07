@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -16,25 +16,25 @@ import {
   TextField,
 } from '@mui/material';
 
-import { IFileSystem } from '@lib/types';
+import { ISystemFile } from '@lib/types';
 
 import { useFormik } from 'formik';
 
-import { adminPath } from '../../utils/constants';
+import { adminPath, fileFilterInitialValues } from '../../utils/constants';
 import { IFileFilter, IFilePageParam, IPageParam } from '../../types';
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
-  files: IFileSystem[];
-  selectedFiles?: IFileSystem[];
+  files: ISystemFile[];
+  selectedFiles?: ISystemFile[];
   limitRows?: number;
   onChangeSelectedFiles?: (newSelectedDeviceIds: any[]) => void;
   isFilterVisible?: boolean;
   onSubmit: (values: any) => void;
   onDelete?: (ids?: string[]) => void;
-  onSelectOne: (_event: any, file: IFileSystem) => void;
+  onSelectOne: (_event: any, file: ISystemFile) => void;
   onSelectMany: (event: any) => void;
-  selectedFileIds: IFileSystem[];
+  selectedFileIds: ISystemFile[];
   onSetPageParams: (filesFilters: IPageParam) => void;
   pageParams?: IFilePageParam | undefined;
   height?: number | undefined;
@@ -58,26 +58,26 @@ const FileListTable = ({
   );
   const [page, setPage] = useState(pageParams?.page && !isNaN(Number(pageParams?.page)) ? Number(pageParams.page) : 0);
 
-  const initialValues = useMemo(() => {
-    return {
-      path: '',
-      id: '',
-      company: '',
-      appSystem: '',
-      producer: '',
-      consumer: '',
-      device: '',
-      uid: '',
-      date: '',
-    };
-  }, []);
+  // const initialValues = useMemo(() => {
+  //   return {
+  //     path: '',
+  //     id: '',
+  //     company: '',
+  //     appSystem: '',
+  //     producer: '',
+  //     consumer: '',
+  //     device: '',
+  //     uid: '',
+  //     date: '',
+  //   };
+  // }, []);
 
   const navigate = useNavigate();
   const maxHeight = useWindowResizeMaxHeight();
 
   const formik = useFormik<IFileFilter>({
     enableReinitialize: true,
-    initialValues: pageParams?.filesFilters || initialValues,
+    initialValues: pageParams?.filesFilters || fileFilterInitialValues,
     onSubmit: (values) => {
       onSubmit(values);
     },
@@ -85,7 +85,7 @@ const FileListTable = ({
 
   useEffect(() => {
     if (!isFilterVisible) {
-      formik.setValues(initialValues);
+      formik.setValues(fileFilterInitialValues);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFilterVisible]);
@@ -148,7 +148,7 @@ const FileListTable = ({
   };
 
   const TableRows = () => {
-    const fileList = files.slice(page * limit, page * limit + limit).map((file: IFileSystem) => {
+    const fileList = files.slice(page * limit, page * limit + limit).map((file: ISystemFile) => {
       return (
         <TableRow
           hover
@@ -173,7 +173,7 @@ const FileListTable = ({
             <Checkbox
               checked={
                 selectedFileIds
-                  .map((item: IFileSystem) => {
+                  .map((item: ISystemFile) => {
                     return item.id;
                   })
                   .indexOf(file.id) !== -1
@@ -242,7 +242,7 @@ const FileListTable = ({
               {isFilterVisible ? (
                 <TableRow>
                   <TableCell></TableCell>
-                  {Object.keys(initialValues).map((item) => (
+                  {Object.keys(fileFilterInitialValues).map((item) => (
                     <TableCell key={item}>
                       <TextField
                         InputProps={{

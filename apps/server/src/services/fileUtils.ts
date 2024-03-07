@@ -1,65 +1,201 @@
+/* eslint-disable no-await-in-loop */
 import path from 'path';
 import { readdir, unlink, stat, rename } from 'fs/promises';
 
-import { IFileSystem, IExtraFileInfo, IPathParams, IDBCompany, IFileObject } from '@lib/types';
+import { ISystemFile, IExtraFileInfo, IFileParams, INamedEntity, IFileActionResult, IPathParams } from '@lib/types';
 
-import { BYTES_PER_KB, MSEС_IN_DAY, collectionNames } from '../utils/constants';
-
-import log from '../utils/logger';
+import {
+  log,
+  BYTES_PER_KB,
+  MSEС_IN_DAY,
+  getListPartByParams,
+  isAllParamMatched,
+  prepareParams,
+  readFileByChunks,
+  searchTextInFile,
+  writeFileByChunks,
+  collectionNames,
+} from '../utils';
 
 import config from '../../config';
 
-import { getListPart } from '../utils/helpers';
+import { InnerErrorException, InvalidParameterException } from '../exceptions';
 
-import {
-  getAppSystemId,
-  readJsonFile,
-  writeIterableToFile,
-  getFoundEntity,
-  getFoundString,
-  getPathSystem,
-  idObj2fullFileName,
-  searchInTextFile,
-} from '../utils/fileHelper';
-
-import { checkDeviceLogsFiles } from './errorLogUtils';
+import { IParamsInfo } from '../types';
 
 import { getDb } from './dao/db';
 
-export const _readDir = async (root: string, excludeFolders: string[] | undefined): Promise<string[]> => {
-  try {
-    const dirs = await readdir(root);
-    const exclude: string[] = (excludeFolders ?? []).map((i) => i.toLocaleLowerCase());
-    const subDirs = dirs.filter((item) => !exclude.includes(item.toLocaleLowerCase()));
+export const deviceLogFolder = 'deviceLogs';
+export const erpLogFileName = 'erpLog.txt';
+export const serverLogFolder = 'serverLogs';
 
-    const files = await Promise.all(
-      subDirs.map(async (subDir) => {
-        const res = path.join(root, subDir);
-        return (await stat(res)).isDirectory() ? _readDir(res, excludeFolders) : res;
-      }),
-    );
-    return files.flat();
-  } catch (err) {
-    log.error(`Robust-protocol.errorDirectory: Ошибка чтения директории - ${err}`);
-    return [];
-  }
+export const deviceLogParams: IParamsInfo = {
+  producerId: { itemKey: 'producer', property: 'id', fullMatch: true },
+  deviceId: { itemKey: 'device', property: 'id', fullMatch: true },
+  filterText: { itemKey: 'id' },
+  searchQuery: { itemKey: 'id' },
+  uid: { itemKey: 'uid' },
+  dateFrom: { itemKey: 'date', comparator: (a: number, b: number) => a >= b },
+  dateTo: { itemKey: 'date', comparator: (a: number, b: number) => a <= b },
+  mDateFrom: { itemKey: 'mdate', comparator: (a: number, b: number) => a >= b },
+  mDateTo: { itemKey: 'mdate', comparator: (a: number, b: number) => a <= b },
 };
 
-export const _readRoot = async (root: string): Promise<string[]> => {
+export const fileParams: IParamsInfo = {
+  consumerId: { itemKey: 'consumer', property: 'id', fullMatch: true },
+  producerId: { itemKey: 'producer', property: 'id', fullMatch: true },
+  deviceId: { itemKey: 'device', property: 'id', fullMatch: true },
+  folder: { itemKey: 'folder' },
+  fileName: { itemKey: 'id' },
+  filterText: { itemKey: 'id' },
+  searchQuery: { itemKey: 'id' },
+  uid: { itemKey: 'uid' },
+  dateFrom: { itemKey: 'date', comparator: (a: number, b: number) => a >= b },
+  dateTo: { itemKey: 'date', comparator: (a: number, b: number) => a <= b },
+  mDateFrom: { itemKey: 'mdate', comparator: (a: number, b: number) => a >= b },
+  mDateTo: { itemKey: 'mdate', comparator: (a: number, b: number) => a <= b },
+};
+
+export const serverLogParams: IParamsInfo = {
+  filterText: { itemKey: 'id' },
+  searchQuery: { itemKey: 'id' },
+  dateFrom: { itemKey: 'date', comparator: (a: number, b: number) => a >= b },
+  dateTo: { itemKey: 'date', comparator: (a: number, b: number) => a <= b },
+  mDateFrom: { itemKey: 'mdate', comparator: (a: number, b: number) => a >= b },
+  mDateTo: { itemKey: 'mdate', comparator: (a: number, b: number) => a <= b },
+};
+
+export const readDirectory = async (
+  root: string,
+  recursive = false,
+  excludeFolders: string[] | undefined = undefined,
+) => {
   try {
     const files = await readdir(root);
+    const exclude: string[] = (excludeFolders ?? []).map((i) => i.toLocaleLowerCase());
+
     const res = await files.reduce(async (arr: Promise<string[]>, curr: string) => {
       let accum: string[] = await arr;
       const fullCurr = path.join(root, curr);
 
       const isDir = (await stat(fullCurr)).isDirectory();
-      if (!isDir) accum = [...accum, fullCurr];
+      if (isDir) {
+        if (recursive && !exclude.includes(curr.toLocaleLowerCase())) {
+          const subFiles = await readDirectory(fullCurr, recursive, excludeFolders);
+          accum = [...accum, ...subFiles];
+        }
+      } else {
+        accum = [...accum, fullCurr];
+      }
       return accum;
     }, Promise.resolve([]));
     return res;
   } catch (err) {
-    log.error(`Robust-protocol.errorDirectory: Ошибка чтения директории - ${err}`);
+    log.error(`readDirectory: Ошибка чтения директории - ${err}`);
     return [];
+  }
+};
+
+export const getFilesByParams = async <T>(fileNameList: string[], params: IParamsInfo): Promise<T[]> => {
+  const { searchQuery: { value: searchQuery } = { value: '' } } = params;
+  delete params.searchQuery;
+
+  let files: ISystemFile[] = [];
+
+  // Проверяем каждый файл из списка на соответствие параметрам
+  for (const fileName of fileNameList) {
+    try {
+      const file = await splitFilePath(fileName);
+      if (file) {
+        const { ...fileParams } = params;
+        const matched = isAllParamMatched(file, fileParams);
+        // Если все параметры совпадают
+        if (matched) {
+          const foundText = searchQuery ? await searchTextInFile(fileName, searchQuery as string) : false;
+          // Если есть текст для поиска и он найден или его нет, то добавляем файл в список
+          if (!searchQuery || (searchQuery && foundText)) {
+            files = [...files, file];
+          }
+        }
+      }
+    } catch (err) {
+      log.warn(`Ошибка при обработке файла ${fileName} - ${err}`);
+    }
+  }
+
+  const sortedFiles = files.sort((a, b) => new Date(b.mdate).getTime() - new Date(a.mdate).getTime());
+  return getListPartByParams<T>(sortedFiles, params);
+};
+
+/**
+ * Чтение файла (json или текст)
+ * @param file
+ * @returns
+ */
+export const readFileData = async <T = string | object>(
+  file: IFileParams,
+  start?: number,
+  end?: number,
+): Promise<T> => {
+  const fileName = fileObj2FullFileName(file);
+
+  try {
+    const data = await readFileByChunks(fileName, false, start, end);
+
+    // Попытка преобразования данных из JSON
+    try {
+      return JSON.parse(data) as T;
+    } catch (err) {
+      // Если не удалось преобразовать в JSON, возвращаем как текст
+      return data as T;
+    }
+  } catch (error) {
+    throw new InnerErrorException(`Ошибка чтения файла ${fileName} - ${error}`);
+  }
+};
+
+export const writeDataToFile = async (file: IFileParams, data: any): Promise<void> => {
+  const fileName = fileObj2FullFileName(file);
+  try {
+    return await writeFileByChunks(fileName, typeof data === 'string' ? data : JSON.stringify(data, undefined, 2));
+  } catch (err) {
+    throw new InnerErrorException(`Ошибка записи файла ${fileName} - ${err}`);
+  }
+};
+
+export const checkDeviceLogsFiles = async (): Promise<void> => {
+  const { devices } = getDb();
+  // Берем все файлы из папки логов устройств
+  const files = (await readDirectory(getDb().dbPath, true)).filter((fileName) => {
+    const parts = fileName.split(path.sep);
+    const lastFolder = parts[parts.length - 2];
+    return lastFolder === deviceLogFolder;
+  });
+
+  for (const file of files) {
+    try {
+      const re = /from_(.+)_dev_(.+)\.json/gi;
+      const match = re.exec(file);
+      if (!match) {
+        log.error(`Invalid deviceLogs file name ${file}`);
+        // eslint-disable-next-line no-await-in-loop
+        await unlink(file);
+      } else {
+        const device = devices.findByField('uid', match[2]);
+
+        if (!device) {
+          // eslint-disable-next-line no-await-in-loop
+          const fileStat = await stat(file);
+          const fileDate = fileStat.birthtimeMs;
+          if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > config.FILES_SAVING_PERIOD_IN_DAYS) {
+            // eslint-disable-next-line no-await-in-loop
+            await unlink(file);
+          }
+        }
+      }
+    } catch (err) {
+      log.warn(`Ошибка при удалении старого файла логов-- ${err}`);
+    }
   }
 };
 
@@ -67,19 +203,18 @@ export const checkFiles = async (): Promise<void> => {
   const defaultExclude = Object.values(collectionNames).map((i) => `${i}.json`);
 
   const root = getDb().dbPath;
-  const files = await _readDir(root, [...defaultExclude, 'deviceLogs']);
+  const files = await readDirectory(root, true, [...defaultExclude, deviceLogFolder]);
 
   for (const file of files) {
     try {
-      // eslint-disable-next-line no-await-in-loop
       const fileStat = await stat(file);
       const fileDate = fileStat.birthtimeMs;
       const period =
         file.toUpperCase().indexOf('DOCS') === -1 || file.toUpperCase().indexOf('MESSAGES') > 0
           ? config.FILES_SAVING_PERIOD_IN_DAYS
           : config.DOCS_SAVING_PERIOD_IN_DAYS;
+
       if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > period) {
-        // eslint-disable-next-line no-await-in-loop
         await unlink(file);
       }
     } catch (err) {
@@ -94,360 +229,289 @@ export const checkFiles = async (): Promise<void> => {
   }
 };
 
-const splitFileMessage = async (root: string): Promise<IExtraFileInfo | undefined> => {
-  const { devices, companies, users } = getDb();
-  const isMessageFile = root.includes('from_') && root.includes('_dev_') && root.includes('json');
-  if (!isMessageFile) return undefined;
-  const re = /db_(.+)/gi;
-  const match = re.exec(root);
-  if (!match) return undefined;
-  const arr = match[1].split(path.sep);
-  if (arr.length !== 4) return undefined;
+/**
+ * Получение информации о файле из его имени
+  Если файл-сообщение
+    новый формат сообщения -  _from_producerId_to_consumerId_dev_deviceUid__command.json
+    старый формат сообщения - _from_producerId_to_consumerId_dev_deviceUid.json)
+  то в имени файла полчаем отправителя, получателя и uid устройства
+  Если файл-лог
+    from_producerId_dev_deviceUid.json
+  то в имени файла полчаем отправителя и uid устройства
+  Если файл не соответствует формату, то возвращаем пустой объект
+ * @param fileName
+ * @returns
+ */
+const splitFileName = (fileName: string): IExtraFileInfo => {
+  const isNewMessage = fileName.includes('__');
+  const isMessage = fileName.includes('_to_');
 
-  const appSystemId = await getAppSystemId(arr[1]);
-  const appSystemName = arr[1];
+  const getRx = (): RegExp =>
+    isMessage
+      ? isNewMessage
+        ? /_from_(.+)_to_(.+)_dev_(.+)__(.+)\.json/gi
+        : /_from_(.+)_to_(.+)_dev_(.+)\.json/gi
+      : /from_(.+)_dev_(.+)\.json/gi;
 
-  const companyId = arr[0];
-  const companyName = companies.findById(arr[0])?.name;
+  const reMessage = getRx();
+  const fileNameParts = reMessage.exec(fileName);
 
-  if (!companyName) {
-    log.error('Компания не найдена');
+  if (!fileNameParts) {
+    // Может и не надо в логах писать об этом
+    log.warn(`Неверный формат имени файла ${fileName}`);
+    return {};
   }
 
-  const folder = arr[2];
+  const { devices, users } = getDb();
 
-  const getRx = (str: string): RegExp => {
-    const isNewFormat = str.includes('__');
-    const isMess = str.includes('_to_');
-    if (!isMess) return /from_(.+)_dev_(.+)\.json/gi;
-    if (isNewFormat) return /_from_(.+)_to_(.+)_dev_(.+)__(.+)\.json/gi;
-    return /_from_(.+)_to_(.+)_dev_(.+)\.json/gi;
-  };
+  const producerId = fileNameParts[1];
+  const producer = users.getNamedItem(producerId);
 
-  const reMessage = getRx(arr[3]);
-  const matchMessage = reMessage.exec(arr[3]);
-  if (!matchMessage) {
-    log.error(`Invalid file name ${arr[3]}`);
-    return {
-      company: companyId && companyName ? { id: companyId, name: companyName } : undefined,
-      appSystem: appSystemName && appSystemName ? { id: appSystemId, name: appSystemName } : undefined,
-    };
+  if (!producer?.name) {
+    log.warn(`Отправитель ${producerId} в файле ${fileName} не найден`);
   }
 
-  const producerId = matchMessage[1];
-  const producerName = users.findById(matchMessage[1])?.name;
+  let consumer: INamedEntity | undefined;
+  let uid: string;
 
-  if (!producerName) {
-    log.error('Контакт-отправитель не найден');
+  // Если файл-сообщение, то в имени файла полчаем id получателя и uid устройства
+  // Если файл-лог, то в имени файла полчаем id устройства
+  if (isMessage) {
+    const consumerId = fileNameParts[2];
+    consumer = users.getNamedItem(consumerId);
+
+    if (!consumer?.name) {
+      log.warn(`Получатель ${consumerId} в файле ${fileName} не найден`);
+    }
+
+    uid = fileNameParts[3];
+  } else {
+    uid = fileNameParts[2];
   }
 
-  const consumerId = arr[3].includes('_to_') ? matchMessage[2] : undefined;
-  const consumerName = consumerId ? users.findById(consumerId)?.name : undefined;
+  const deviceByUid = devices.findByField('uid', uid);
+  const device = deviceByUid ? { id: deviceByUid.id, name: deviceByUid.name } : undefined;
 
-  /* matchFileName[3] - uid устройства */
-
-  const deviceUid = arr[3].includes('_to_') ? matchMessage[3] : matchMessage[2];
-
-  const device = devices.data.find((el: any) => el.uid === deviceUid);
-
-  /*if (!device) {
-    log.error(`Устройство ${deviceUid}  не найдено`);
-  }*/
-
-  const deviceName = device?.name;
+  if (!device) {
+    log.warn(`Устройство ${uid} в файле ${fileName} не найдено`);
+  }
 
   return {
-    company: companyId && companyName ? { id: companyId, name: companyName } : undefined,
-    appSystem: appSystemName && appSystemName ? { id: appSystemId, name: appSystemName } : undefined,
-    producer: producerName ? { id: producerId, name: producerName } : undefined,
-    consumer: consumerId && consumerName ? { id: consumerId, name: consumerName } : undefined,
-    device: deviceUid && deviceName ? { id: deviceUid, name: deviceName } : undefined,
-    folder: folder,
+    producer,
+    consumer,
+    device,
+    uid,
   };
 };
 
-const splitFilePath = async (root: string): Promise<IFileSystem | undefined> => {
-  const name = path.basename(root);
-  const ext = path.extname(root);
-  if (!name) {
-    log.error(`Invalid filename ${root}`);
-    return;
-  }
-  const nameWithoutExt = path.basename(root, ext);
-  const subPath = path.dirname(root);
+/**
+ *  Получение информации о файле из его полного пути
+    Если файл-сообщение, то возвращаем информацию о файле, отправителя, получателя и uid устройства
+    Если файл-лог, то возвращаем информацию о файле, отправителе и uid устройства
+    Если файл не соответствует формату, то возвращаем информацию о файле
+ * @param filePath
+ * @returns
+ */
+export const splitFilePath = async (filePath: string): Promise<ISystemFile | undefined> => {
+  const dirName = path.dirname(filePath);
+  const fileName = path.basename(filePath);
+  let fileSystem: ISystemFile | undefined;
+
   try {
-    const fileStat = await stat(root);
-    const fileSize = fileStat.size / BYTES_PER_KB;
-    const fileDate = fileStat.birthtime.toString();
-    const fileModifiedDate = fileStat.mtime.toString();
-
-    //const alias = fullFileName2alias(root);
-
-    const fileInfo = await splitFileMessage(root);
-    if (fileInfo) {
-      return {
-        id: nameWithoutExt,
-        date: fileDate,
-        size: fileSize,
-        path: subPath,
-        ext: ext.slice(1),
-        folder: fileInfo.folder,
-        company: fileInfo.company,
-        appSystem: fileInfo.appSystem,
-        producer: fileInfo.producer,
-        consumer: fileInfo.consumer,
-        device: fileInfo.device,
-        mdate: fileModifiedDate,
-      };
-    }
-
-    return {
-      id: nameWithoutExt,
-      date: fileDate,
-      size: fileSize,
-      path: subPath,
-      ext: ext.slice(1),
-      mdate: fileModifiedDate,
+    const fileStat = await stat(filePath);
+    fileSystem = {
+      id: fileName,
+      date: fileStat.birthtime.toISOString(),
+      size: fileStat.size / BYTES_PER_KB,
+      path: dirName,
+      mdate: fileStat.mtime.toISOString(),
     };
   } catch (err) {
-    log.error(`Invalid filename ${root}: ${err}`);
-    return;
+    throw new Error(`Ошибка получения информации о файле ${filePath} - ${err}`);
   }
+
+  // Папка формата db_companyId/appSystemName/folderName/
+  const re = /db_(.+)/gi;
+  const match = re.exec(filePath);
+
+  const pathParts = match ? match[1].split(path.sep) : undefined;
+
+  if (pathParts?.length !== 4) {
+    return fileSystem;
+  }
+
+  const { companies, appSystems } = getDb();
+
+  const companyId = pathParts[0];
+  const company = companies.getNamedItem(companyId);
+
+  if (!company?.name) {
+    log.warn(`Компания ${companyId} в файле ${filePath} не найдена`);
+  }
+
+  const appSystemName = pathParts[1];
+  const appSystemByName = appSystems.findByField('name', appSystemName);
+  const appSystem = appSystemByName ? { id: appSystemByName.id, name: appSystemByName.name } : undefined;
+
+  if (!appSystem) {
+    log.warn(`Подсистема ${appSystemName} в файле ${filePath} не найдена`);
+  }
+
+  const folder = pathParts[2];
+
+  const fileInfo = splitFileName(fileName);
+
+  return {
+    ...fileSystem,
+    folder,
+    company,
+    appSystem,
+    producer: fileInfo.producer,
+    consumer: fileInfo.consumer,
+    device: fileInfo.device,
+    uid: fileInfo.uid,
+  };
 };
 
-export const getCompanyIdByName = (name: string): IDBCompany | undefined => {
-  const { companies } = getDb();
-  return companies.data.find((item) => item.name.toUpperCase() === name.toUpperCase());
-};
+export const deleteFileById = async (file: IFileParams): Promise<void> => {
+  const fullName = fileObj2FullFileName(file);
 
-export const readListFiles = async (params: Record<string, string | number>): Promise<IFileSystem[]> => {
-  const root = getDb().dbPath;
-
-  const fullRoot = !('company' in params)
-    ? root
-    : 'appSystem' in params
-      ? path.join(root, `db_${getCompanyIdByName(params['company'] as string)?.id}`, params['appSystem'] as string)
-      : path.join(root, `db_${getCompanyIdByName(params['company'] as string)?.id}`);
-
-  let files: IFileSystem[] = [];
-  const fileStrings = 'company' in params ? await _readDir(fullRoot, undefined) : await _readRoot(fullRoot);
-
-  for (const file of fileStrings) {
-    // eslint-disable-next-line no-await-in-loop
-    const fileObj = await splitFilePath(file);
-    if (fileObj) {
-      files = [...files, fileObj];
-    }
-  }
-
-  files = files.filter((item: IFileSystem) => {
-    const newParams = (({ ...others }) => others)(params);
-
-    const companyFound = getFoundEntity('company', newParams, item);
-    const appSystemFound = getFoundEntity('appSystem', newParams, item);
-    const consumerFound = getFoundEntity('consumer', newParams, item);
-    const producerFound = getFoundEntity('producer', newParams, item);
-    const deviceFound = getFoundEntity('device', newParams, item);
-    const pathFound = getFoundString('path', newParams, item);
-    const fileNameFound = getFoundString('fileName', newParams, item);
-    const folderFound = getFoundString('folder', newParams, item);
-
-    let dateFound = true;
-    if ('date' in newParams) {
-      dateFound = false;
-      if (item.date) {
-        const date = new Date(item.date || '').toLocaleString('ru', { hour12: false }).toUpperCase();
-        dateFound = date.includes((newParams.date as string).toUpperCase());
-        delete newParams['date'];
-      }
-    }
-
-    let dateFromFound = true;
-    if ('dateFrom' in newParams) {
-      dateFromFound = false;
-      if (item.date) {
-        const date = new Date(item.date || '').getTime();
-        const dateFrom = new Date((newParams.dateFrom as string) || '').getTime();
-        dateFromFound = date >= dateFrom;
-        delete newParams['dateFrom'];
-      }
-    }
-
-    let dateToFound = true;
-    if ('dateTo' in newParams) {
-      dateToFound = false;
-      if (item.date) {
-        const date = new Date(item.date || '').getTime();
-        const dateTo = new Date((newParams.dateTo as string) || '').getTime();
-        dateToFound = date <= dateTo;
-        delete newParams['dateTo'];
-      }
-    }
-
-    let uidFound = true;
-    if ('uid' in newParams) {
-      uidFound = false;
-      if (item.device) {
-        const uid = item.device.id.toUpperCase();
-        uidFound = uid.includes((newParams.uid as string).toUpperCase());
-        delete newParams['uid'];
-      }
-    }
-
-    /** filtering data */
-    let filteredFiles = true;
-    if ('filterText' in newParams) {
-      const filterText: string = (newParams.filterText as string).toUpperCase();
-
-      if (filterText) {
-        const fileName = item.id.toUpperCase();
-
-        filteredFiles = fileName.includes(filterText);
-      }
-      delete newParams['filterText'];
-    }
-
-    return (
-      companyFound &&
-      appSystemFound &&
-      consumerFound &&
-      producerFound &&
-      deviceFound &&
-      pathFound &&
-      fileNameFound &&
-      dateFound &&
-      dateFromFound &&
-      dateToFound &&
-      folderFound &&
-      uidFound &&
-      filteredFiles
-    );
-  });
-  files = files.sort((a, b) => new Date(b.mdate).getTime() - new Date(a.mdate).getTime());
-  return getListPart(files, params);
-};
-
-export const searchFilesList = async (params: Record<string, string | number>): Promise<IFileSystem[]> => {
-  // const paramsWithout = (({ searchQuery, ...filterParams }) => filterParams)(params);
-  //const searchString = params.searchQuery as string;
-  const { searchQuery, ...paramsWithout } = params;
-  const searchString = searchQuery as string;
-  const files: IFileSystem[] = await readListFiles(paramsWithout);
-  let prev: IFileSystem[] = [];
-  const searchFiles = files.reduce(
-    async (_, cur: IFileSystem) => {
-      const curObj: IFileObject = {
-        id: cur.id,
-        companyId: cur.company?.id,
-        appSystemId: cur.appSystem?.id,
-        folder: cur.folder,
-        ext: cur.ext,
-      };
-
-      const fullName = idObj2fullFileName(curObj);
-
-      const isInclude = !fullName ? false : await searchInTextFile(fullName, searchString, undefined, undefined);
-      if (isInclude) prev = [...prev, cur as IFileSystem];
-      return prev;
-    },
-    Promise.resolve([] as IFileSystem[]),
-  );
-  return searchFiles;
-};
-
-export const getFile = async (fid: IFileObject): Promise<any> => {
-  const fullName = idObj2fullFileName(fid);
-  if (!fullName) {
-    log.error(`Неправильный параметр ID ${fid.id} в запросе`);
-    return undefined;
-  }
-
-  const fileExt = path.extname(fullName);
-
-  if (!fileExt || fileExt.toLowerCase() !== '.json') {
-    log.error(`Файл некорректного формата ${fid.id} в запросе`);
-    return undefined;
-  }
-  const fileJson: any | string = await readJsonFile(fullName);
-  if (typeof fileJson === 'string') {
-    log.error(fileJson);
-    return undefined;
-  }
-  return fileJson;
-};
-
-export const deleteFileById = async (fid: IFileObject): Promise<void> => {
-  const fullName = idObj2fullFileName(fid);
-  if (!fullName) {
-    log.error(`Неправильный параметр ID ${fid.id} в запросе`);
-    return;
-  }
   return await unlink(fullName);
 };
 
-export const deleteManyFiles = async (ids: IFileObject[]): Promise<void> => {
-  await Promise.allSettled(
-    ids.map(async (id) => {
-      const fullName = idObj2fullFileName(id);
-      return await unlink(fullName);
-    }),
-  );
-};
-
-export const updateById = async <T>(id: IFileObject, fileData: Partial<Awaited<T>>): Promise<void> => {
-  const fullName = idObj2fullFileName(id);
-  if (!fullName) {
-    log.error(`Неправильный параметр ID '${id} в запросе`);
-    return;
-  }
-
-  const fileExt = path.extname(fullName);
-
-  if (!fileExt || fileExt.toLowerCase() !== '.json') {
-    log.error(`Файл с некорректного формата '${id} в запросе`);
-    return undefined;
-  }
-
-  try {
-    return writeIterableToFile(fullName, JSON.stringify(fileData, undefined, 2), {
-      encoding: 'utf8',
-      flag: 'a',
-    });
-  } catch (err) {
-    log.error(`Ошибка редактирования файла ${fullName}  - ${err}`);
-  }
-};
-
-export const getListFolders = async (appPathParams: IPathParams): Promise<string[]> => {
-  const pathSystem = path.join(getDb().dbPath, getPathSystem(appPathParams));
+export const getFolderList = async (pathSystem: string): Promise<string[]> => {
   try {
     const files = await readdir(pathSystem);
     const folders = await Promise.all(
       files.map(async (curr: string) => {
         const res = path.join(pathSystem, curr);
-        const folder = res.split(path.sep).pop();
+        const folder = path.basename(res);
         return (await stat(res)).isDirectory() ? folder : undefined;
       }),
     );
 
-    return folders.filter((i) => !!i) as string[];
+    return folders.filter((i) => i !== undefined) as string[];
   } catch (err) {
-    log.error(`Ошибка чтения директории ${pathSystem}  - ${err}`);
-    return [];
+    throw new InnerErrorException(`Ошибка чтения директории ${pathSystem}  - ${err}`);
   }
 };
 
-export const moveManyFiles = async (ids: IFileObject[], toFolder: string): Promise<void> => {
-  try {
-    await Promise.allSettled(
-      ids.map(async (idObj) => {
-        const newId = { ...idObj, folder: toFolder };
-        const name = idObj2fullFileName(idObj);
-        const newName = idObj2fullFileName(newId);
-        return await rename(name, newName);
-      }),
-    );
-  } catch (err) {
-    log.error(`Ошибка перемещения файлов в директорию ${toFolder}  - ${err}`);
+export const moveFiles = async (files: IFileParams[], toFolder: string): Promise<IFileActionResult[]> => {
+  const moveResults: IFileActionResult[] = [];
+
+  await Promise.allSettled(
+    files.map(async (file) => {
+      const result: IFileActionResult = { file: file.id, success: false };
+
+      try {
+        const fileName = fileObj2FullFileName(file);
+        const newFileName = fileObj2FullFileName({ ...file, folder: toFolder });
+        await rename(fileName, newFileName);
+        result.success = true;
+      } catch (err) {
+        result.error = err instanceof Error ? err.message : 'Ошибка перемещения файла';
+      } finally {
+        moveResults.push(result);
+      }
+    }),
+  );
+
+  return moveResults;
+};
+
+export const deleteFiles = async (files: IFileParams[]): Promise<IFileActionResult[]> => {
+  const deleteResults: IFileActionResult[] = [];
+
+  await Promise.allSettled(
+    files.map(async (file) => {
+      const result: IFileActionResult = { file: file.id, success: false };
+
+      try {
+        const fileName = fileObj2FullFileName(file);
+        await unlink(fileName);
+        result.success = true;
+      } catch (err) {
+        result.error = err instanceof Error ? err.message : 'Ошибка удаления файла';
+      } finally {
+        deleteResults.push(result);
+      }
+    }),
+  );
+
+  return deleteResults;
+};
+
+/**
+ * Получение параметров файла из запроса
+   Может быть или только id - имя файла или id и companyId, appSystemId, folder
+ * @param params
+ * @param query
+ * @returns
+ */
+export const getFileParams = async (params: Record<string, string>, query: Record<string, any>) => {
+  const file = prepareParams(query, ['companyId', 'appSystemId', 'folder']);
+
+  return { id: params.id, ...file } as IFileParams;
+};
+
+export const getPath = (folders: string[], fn = '') => {
+  const folderPath = path.join(getDb().dbPath, ...folders);
+  return path.join(folderPath, fn);
+};
+
+export const getPathSystem = ({ companyId, appSystemId }: IPathParams) =>
+  `db_${companyId}/${getDb().appSystems.findById(appSystemId)?.name}`;
+
+/**
+ * Преобразует объект файла в полное имя файла.
+   Если указаны companyId, appSystemId, folder
+   то возвращает в формате db_companyId/appSystemName/folder/fileName
+   иначе возвращает fileName
+ * @param file
+ * @returns
+ */
+export const fileObj2FullFileName = (file: IFileParams): string => {
+  // if (path.extname(file.id) !== '.json') {
+  //   throw new InvalidParameterException(`Неправильное расширение файла ${file.id}`);
+  // }
+
+  if (file.folder === serverLogFolder) {
+    return path.join(process.cwd(), config.LOG_PATH, file.id);
   }
+
+  if (file.appSystemId || file.companyId || file.folder) {
+    if (!file.companyId) {
+      throw new InvalidParameterException('Параметр companyId не задан');
+    }
+
+    if (!file.appSystemId) {
+      throw new InvalidParameterException('Параметр appSystemId не задан');
+    }
+
+    // if (!file.folder) {
+    //   throw new InvalidParameterException('Параметр folder не задан');
+    // }
+
+    const { companies, appSystems } = getDb();
+
+    const company = companies.findById(file.companyId);
+
+    if (!company) {
+      throw new InvalidParameterException(`Компания с id ${file.appSystemId} не найдена`);
+    }
+
+    const appSystemName = appSystems.findById(file.appSystemId)?.name;
+
+    if (!appSystemName) {
+      throw new InvalidParameterException(`Подсистема с id ${file.appSystemId} не найдена`);
+    }
+
+    return getPath([
+      file.folder
+        ? `db_${file.companyId}${path.sep}${appSystemName}${path.sep}${file.folder}${path.sep}${file.id}`
+        : `db_${file.companyId}${path.sep}${appSystemName}${path.sep}${file.id}`,
+    ]);
+  }
+
+  return getPath([file.id]);
 };

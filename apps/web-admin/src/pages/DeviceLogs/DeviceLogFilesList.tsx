@@ -137,7 +137,7 @@ const DeviceLogFilesList = () => {
       };
     });
     if (ids) {
-      dispatch(actions.removeDeviceLogs(ids));
+      dispatch(actions.deleteDeviceLogs(ids));
       setSelectedDeviceLogFileIds([]);
     }
   }, [dispatch, selectedDeviceLogFileIds]);

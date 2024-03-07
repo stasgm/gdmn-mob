@@ -1,4 +1,5 @@
 import { IEntity, INamedEntity } from './common';
+import { IFileParams } from './files';
 import { Settings } from './settings';
 
 export interface IDeviceData {
@@ -31,6 +32,16 @@ export interface IDeviceLogParams extends IPathParams {
   appSettings?: Settings;
 }
 
+export interface INewDeviceLog {
+  appVersion: string;
+  appSettings: Settings;
+  deviceLog: IDeviceLog[];
+  producerId: string;
+  appSystemId: string;
+  companyId: string;
+  deviceId: string;
+}
+
 export interface IDeviceLogFiles extends IEntity {
   [key: string]: unknown;
   company: INamedEntity;
@@ -52,4 +63,8 @@ export interface IDeviceLogOptions {
   device: string;
   uid: string;
   date: string;
+}
+
+export interface IDeleteDeviceLogsRequest {
+  files: IFileParams[];
 }

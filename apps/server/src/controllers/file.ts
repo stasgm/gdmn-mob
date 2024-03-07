@@ -1,185 +1,112 @@
 import { Context, ParameterizedContext } from 'koa';
 
-import { IFileIds, IFileObject } from '@lib/types';
+import { IDeleteFilesRequest, IMoveFilesRequest, IPathParams } from '@lib/types';
 
-import { fileService } from '../services';
+import { fileService, fileUtils } from '../services';
 
-import { ok, notOk } from '../utils/apiHelpers';
+import { notOk, ok, prepareParams } from '../utils';
+import { InvalidParameterException } from '../exceptions';
 
 const getFiles = async (ctx: ParameterizedContext): Promise<void> => {
-  const params: Record<string, string | number> = {};
+  const params = prepareParams(
+    ctx.query,
+    [
+      'companyId',
+      'appSystemId',
+      'fileName',
+      'uid',
+      'consumerId',
+      'producerId',
+      'deviceId',
+      'filterText',
+      'folder',
+      'dateFrom',
+      'dateTo',
+      'mDateFrom',
+      'mDateTo',
+      'searchQuery',
+    ],
+    ['fromRecord', 'toRecord'],
+  );
 
-  const {
-    path,
-    fileName,
-    uid,
-    date,
-    company,
-    appSystem,
-    consumer,
-    producer,
-    device,
-    filterText,
-    fromRecord,
-    toRecord,
-    folder,
-    dateFrom,
-    dateTo,
-    action,
-    searchQuery,
-  } = ctx.query;
+  const fileList = await fileService.findMany(params);
 
-  if (action && (action !== 'search' || !searchQuery)) {
-    notOk(ctx as Context);
-    return;
-  }
-
-  if (typeof company === 'string' && company) {
-    params.company = company;
-  }
-
-  if (typeof fileName === 'string' && fileName) {
-    params.fileName = fileName;
-  }
-
-  if (typeof path === 'string' && path) {
-    params.path = path;
-  }
-
-  if (typeof uid === 'string' && uid) {
-    params.uid = uid;
-  }
-
-  if (typeof date === 'string' && date) {
-    params.date = date;
-  }
-
-  if (typeof appSystem === 'string' && appSystem) {
-    params.appSystem = appSystem;
-  }
-
-  if (typeof consumer === 'string' && consumer) {
-    params.consumer = consumer;
-  }
-
-  if (typeof producer === 'string' && producer) {
-    params.producer = producer;
-  }
-
-  if (typeof device === 'string' && device) {
-    params.device = device;
-  }
-
-  if (typeof filterText === 'string') {
-    params.filterText = filterText;
-  }
-
-  if (typeof fromRecord === 'string' && isFinite(Number(fromRecord))) {
-    params.fromRecord = Number(fromRecord);
-  }
-
-  if (typeof toRecord === 'string' && isFinite(Number(toRecord))) {
-    params.toRecord = Number(toRecord);
-  }
-
-  if (typeof dateFrom === 'string' && dateFrom) {
-    params.dateFrom = dateFrom;
-  }
-
-  if (typeof dateTo === 'string' && dateTo) {
-    params.dateTo = dateTo;
-  }
-
-  if (typeof searchQuery === 'string' && searchQuery) {
-    params.searchQuery = searchQuery;
-  }
-
-  if (typeof folder === 'string' && folder) {
-    params.folder = folder;
-  }
-
-  const filesList = action ? await fileService.searchInFiles(params) : await fileService.findMany(params);
-
-  ok(ctx as Context, filesList, 'getFiles: deviceLogs are successfully received');
+  ok(ctx as Context, fileList, 'getFiles: files are successfully received');
 };
 
-export const getFileParams = async (ctx: ParameterizedContext): Promise<IFileObject> => {
-  const { id } = ctx.request.params;
-  const { companyId, appSystemId, folder, ext } = ctx.query;
+/**
+ * Получение содержимого файла
+   в зависимости от параметров запроса
+ * @param ctx
+ */
+const getFileContent = async (ctx: ParameterizedContext): Promise<void> => {
+  const params = await fileUtils.getFileParams(ctx.params, ctx.query);
 
-  const params: IFileObject = { id: id };
+  const fileContent = await fileService.getContent(params);
 
-  if (typeof companyId === 'string' && companyId) {
-    params.companyId = companyId;
-  }
-
-  if (typeof appSystemId === 'string' && appSystemId) {
-    params.appSystemId = appSystemId;
-  }
-
-  if (typeof folder === 'string' && folder) {
-    params.folder = folder;
-  }
-
-  if (typeof ext === 'string' && ext) {
-    params.ext = ext;
-  }
-
-  return params;
+  ok(ctx as Context, fileContent, 'getFileContent: fileContent is successfully received');
 };
 
-const getFile = async (ctx: ParameterizedContext): Promise<void> => {
-  const params = await getFileParams(ctx);
-  const file = await fileService.findOne(params);
-
-  ok(ctx as Context, file, 'getFile: file is successfully  received');
-};
-
-const removeFile = async (ctx: ParameterizedContext): Promise<void> => {
-  const params = await getFileParams(ctx);
+const deleteFile = async (ctx: ParameterizedContext): Promise<void> => {
+  const params = await fileUtils.getFileParams(ctx.params, ctx.query);
 
   await fileService.deleteOne(params);
 
-  ok(ctx as Context, undefined, 'removeFile: file is successfully  deleted');
+  ok(ctx as Context, undefined, 'deleteFile: file is successfully deleted');
 };
 
-const removeManyFiles = async (ctx: ParameterizedContext): Promise<void> => {
-  const { action } = ctx.query;
+const deleteFiles = async (ctx: ParameterizedContext): Promise<void> => {
+  const { files } = ctx.request.body as IDeleteFilesRequest;
 
-  if (!action || (action !== 'delete' && action !== 'move')) {
-    notOk(ctx as Context);
-    return;
+  const deletedFiles = await fileService.deleteMany(files);
+
+  const hasSuccess = deletedFiles.some((result) => result.success);
+
+  if (hasSuccess) {
+    // Если хотя бы один файл успешно удален, возвращаем список всех файлов со статусом удаления
+    ok(ctx as Context, deletedFiles, 'deleteFiles: files are successfully deleted');
+  } else {
+    // Иначе возвращаем ошибку со списком файлов и описанием ошибки
+    notOk(ctx as Context, 500, 'deleteFiles: files are not deleted', deletedFiles);
   }
-  const { ids, toFolder } = ctx.request.body as IFileIds;
-
-  if (action === 'move' && !toFolder) {
-    notOk(ctx as Context);
-    return;
-  }
-
-  action === 'move' ? await fileService.moveMany(ids, toFolder!) : await fileService.deleteMany(ids);
-  const actionName = action === 'move' ? 'moved' : 'deleted';
-
-  ok(ctx as Context, undefined, `removeManyFiles: files are successfully  ${actionName}`);
 };
 
 const updateFile = async (ctx: ParameterizedContext): Promise<void> => {
-  const params = await getFileParams(ctx);
+  const params = await fileUtils.getFileParams(ctx.params, ctx.query);
 
-  const fileData = ctx.request.body as Partial<any>;
+  const data = ctx.request.body as string;
 
-  const updatedFile = fileService.updateOne(params, fileData);
+  const updatedFile = await fileService.updateOne(params, data);
 
   ok(ctx as Context, updatedFile, `updateFile: file '${params.id}' is successfully updated`);
 };
 
 const getFolders = async (ctx: ParameterizedContext): Promise<void> => {
-  const { companyId, appSystemId } = ctx.request.query;
-  const folderlist = await fileService.getFolders({
-    companyId: companyId as string,
-    appSystemId: appSystemId as string,
-  });
+  const params = prepareParams<IPathParams>(ctx.query, ['companyId', 'appSystemId']);
 
-  ok(ctx as Context, folderlist, 'getfolders: folders is successfully  received');
+  const folderList = await fileService.getFolders(params);
+
+  ok(ctx as Context, folderList, 'getFolders: folders is successfully  received');
 };
-export { getFiles, getFile, removeFile, updateFile, removeManyFiles, getFolders };
+
+const moveFiles = async (ctx: ParameterizedContext): Promise<void> => {
+  const { files, toFolder } = ctx.request.body as IMoveFilesRequest;
+
+  if (!toFolder) {
+    throw new InvalidParameterException('Не указана папка для перемещения файлов');
+  }
+
+  const movedFiles = await fileService.moveMany(files, toFolder);
+
+  const hasSuccess = movedFiles.some((result) => result.success);
+
+  if (hasSuccess) {
+    // Если хотя бы один файл успешно перемещен, возвращаем список всех файлов с результатом перемещения
+    ok(ctx as Context, movedFiles, 'moveFiles: files are successfully moved');
+  } else {
+    // Иначе возвращаем ошибку со списком файлов и описанием ошибки
+    notOk(ctx as Context, 500, 'moveFiles: files are not moved', movedFiles);
+  }
+};
+
+export { getFiles, getFileContent, deleteFile, updateFile, deleteFiles, getFolders, moveFiles as moveFiles };

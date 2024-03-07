@@ -15,7 +15,7 @@ const SnackBar = ({ visible = false, errorMessage, onClearError }: props) => {
     <>
       <Snackbar open={visible} autoHideDuration={6000} onClose={handleClose}>
         <Alert onClose={handleClose} severity="error">
-          {errorMessage}!
+          {errorMessage || 'Ошибка'}!
         </Alert>
       </Snackbar>
     </>

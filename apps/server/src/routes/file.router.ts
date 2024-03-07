@@ -5,23 +5,26 @@ import { permissionMiddleware } from '../middleware/permissionRequired';
 import { roleBasedParamsMiddlware } from '../middleware/roleBasedParams';
 import { fileValidation } from '../validations';
 import { deviceMiddleware } from '../middleware/deviceRequired';
-import { getFiles, getFile, removeFile, updateFile, removeManyFiles, getFolders } from '../controllers/file';
+import {
+  getFiles,
+  getFileContent,
+  deleteFile,
+  updateFile,
+  deleteFiles,
+  getFolders,
+  moveFiles,
+} from '../controllers/file';
+import { superAdminMiddleware } from '../middleware/superAdminRequired';
 
 const file = route();
 
 file.prefix('/files');
-file.get('/folders', authMiddleware, getFolders);
-file.get('/:id', fileValidation.getFile, authMiddleware, deviceMiddleware, getFile);
-file.get('/', authMiddleware, deviceMiddleware, getFiles);
-file.patch(
-  '/:id',
-  fileValidation.updateFile,
-  authMiddleware,
-  permissionMiddleware,
-  roleBasedParamsMiddlware,
-  updateFile,
-);
-file.delete('/:id', fileValidation.removeFile, authMiddleware, removeFile);
-file.post('/', fileValidation.deleteFiles, authMiddleware, removeManyFiles);
+file.get('/folders', fileValidation.getFolders, authMiddleware, superAdminMiddleware, getFolders);
+file.get('/', fileValidation.getFiles, authMiddleware, superAdminMiddleware, getFiles);
+file.get('/:id/content', fileValidation.getFileContent, authMiddleware, superAdminMiddleware, getFileContent);
+file.put('/:id', fileValidation.updateFile, authMiddleware, superAdminMiddleware, updateFile);
+file.delete('/:id', fileValidation.deleteFile, authMiddleware, superAdminMiddleware, deleteFile);
+file.post('/deleteList', fileValidation.deleteFiles, authMiddleware, superAdminMiddleware, deleteFiles);
+file.post('/moveList', fileValidation.moveFiles, authMiddleware, superAdminMiddleware, moveFiles);
 
 export default file;

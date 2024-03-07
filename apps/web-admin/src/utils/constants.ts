@@ -11,22 +11,21 @@ const adminPath = '/admin';
 
 const validPassword = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?([^\w\s]|[_])).{8,}$/);
 
-const fileFiltersDescription = {
-  path: 'Путь',
-  folder: 'Папка',
-  fileName: 'Имя файла',
-  company: 'Компания',
-  appSystem: 'Подсистема',
-  producer: 'Пользователь',
-  consumer: 'Получатель',
-  device: 'Устройство',
-  uid: 'Идентификатор',
-  date: 'Дата',
-};
+// const fileFiltersDescription = {
+//   path: 'Путь',
+//   folder: 'Папка',
+//   fileName: 'Имя файла',
+//   company: 'Компания',
+//   appSystem: 'Подсистема',
+//   producer: 'Пользователь',
+//   consumer: 'Получатель',
+//   device: 'Устройство',
+//   uid: 'Идентификатор',
+//   date: 'Дата',
+// };
 
 const fileFilterValues: IFilterObject = {
   folder: { id: 'folder', name: 'Папка', type: 'text', value: '', visible: true },
-  // path: '',
   fileName: { id: 'fileName', name: 'Имя файла', type: 'text', value: '', visible: true },
   company: { id: 'company', name: 'Компания', type: 'select', value: '', visible: true },
   appSystem: { id: 'appSystem', name: 'Подсистема', type: 'select', value: '', visible: true },
@@ -42,6 +41,7 @@ const fileFilterValues: IFilterObject = {
 const fileFilterInitialValues: IFileFilter = {
   folder: '',
   // path: '',
+  // id: '',
   fileName: '',
   company: '',
   appSystem: '',
@@ -54,4 +54,4 @@ const fileFilterInitialValues: IFileFilter = {
   dateTo: '',
 };
 
-export { deviceStates, adminPath, validPassword, fileFiltersDescription, fileFilterValues, fileFilterInitialValues };
+export { deviceStates, adminPath, validPassword, fileFilterValues, fileFilterInitialValues };

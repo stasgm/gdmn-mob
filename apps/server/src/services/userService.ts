@@ -1,8 +1,7 @@
 import { IDBUser, IUser, NewUser, IUserWithDevice } from '@lib/types';
 
 import { DataNotFoundException, ConflictException, InvalidParameterException, ForbiddenException } from '../exceptions';
-import { hashPassword } from '../utils/crypt';
-import { extraPredicate, getListPart } from '../utils/helpers';
+import { hashPassword, extraPredicate, formatDateToLocale, getListPart } from '../utils';
 
 import { getDb } from './dao/db';
 
@@ -250,7 +249,8 @@ const findMany = (params: Record<string, string | number>): IUser[] => {
   }
 
   userList = userList.filter((item) => {
-    const newParams = (({ ...others }) => others)(params);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { fromRecord, toRecord, ...newParams } = params;
 
     let companyFound = true;
 
@@ -283,8 +283,8 @@ const findMany = (params: Record<string, string | number>): IUser[] => {
         const firstname = typeof item.firstName === 'string' ? item.firstName.toUpperCase() : '';
         const lastName = typeof item.lastName === 'string' ? item.lastName.toUpperCase() : '';
         const middleName = typeof item.middleName === 'string' ? item.middleName.toUpperCase() : '';
-        const creationDate = new Date(item.creationDate || '').toLocaleString('ru', { hour12: false });
-        const editionDate = new Date(item.editionDate || '').toLocaleString('ru', { hour12: false });
+        const creationDate = formatDateToLocale(item.creationDate);
+        const editionDate = formatDateToLocale(item.editionDate);
 
         filteredUsers =
           name.includes(filterText) ||
@@ -306,7 +306,7 @@ const findMany = (params: Record<string, string | number>): IUser[] => {
     );
   });
 
-  return getListPart(userList, params).map((i) => makeUser(i));
+  return getListPart<IDBUser>(userList, params).map((i) => makeUser(i));
 };
 
 /**

@@ -85,7 +85,7 @@ const reducer: Reducer<IDeviceLogState, DeviceLogActionType> = (state = initialS
       return {
         ...state,
         loading: false,
-        filesList: state.filesList.filter((i) => action.payload.indexOf(i.id) === -1),
+        filesList: state.filesList.filter((i) => action.payload.findIndex((fileObj) => fileObj.id === i.id) === -1),
       };
 
     case getType(deviceLogActions.removeDeviceLogsAsync.failure):

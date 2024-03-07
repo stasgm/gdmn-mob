@@ -9,7 +9,7 @@ const addDevice: Config = {
     type: 'json',
     body: Joi.object({
       name: Joi.string().required().error(new InvalidParameterException('Не указано наименование устройства')),
-      state: Joi.string().required().error(new InvalidParameterException('Не указано статус устройства')),
+      state: Joi.string().required().error(new InvalidParameterException('Не указан статус устройства')),
       company: Joi.object().optional(),
     }),
   },

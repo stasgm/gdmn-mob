@@ -4,7 +4,7 @@ import { IUser, NewUser } from '@lib/types';
 
 import { userService } from '../services';
 
-import { created, ok } from '../utils/apiHelpers';
+import { created, ok } from '../utils';
 
 import { DataNotFoundException } from '../exceptions';
 

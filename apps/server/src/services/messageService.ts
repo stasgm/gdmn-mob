@@ -1,7 +1,7 @@
 import { ICmd, IDBMessage, IFileMessageInfo, IMessage, NewMessage } from '@lib/types';
 
 import { DataNotFoundException, InnerErrorException } from '../exceptions';
-import { generateId } from '../utils/helpers';
+import { generateId } from '../utils';
 
 import { getDb } from './dao/db';
 
@@ -47,7 +47,7 @@ const addOne = async ({
     throw new DataNotFoundException('Подсистема не найдена');
   }
 
-  if (!devices.data.find((el: any) => el.uid === deviceId)) {
+  if (!devices.findByField('uid', deviceId)) {
     throw new DataNotFoundException('Устройство не найдено');
   }
 
@@ -97,7 +97,7 @@ const FindMany = async ({
     throw new DataNotFoundException('Получатель не найден');
   }
 
-  if (!devices.data.find((el: any) => el.uid === deviceId)) {
+  if (!devices.findByField('uid', deviceId)) {
     throw new DataNotFoundException('Устройство не найдено');
   }
 
