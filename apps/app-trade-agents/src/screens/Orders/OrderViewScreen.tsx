@@ -21,6 +21,7 @@ import {
   SaveDocument,
   SimpleDialog,
   globalColors,
+  DateInfo,
 } from '@lib/mobile-ui';
 
 import { formatValue, generateId, getDateString, useSendDocs, keyExtractor, sleep } from '@lib/mobile-hooks';
@@ -468,7 +469,7 @@ const OrderViewScreen = () => {
           colorLabel={getStatusColor(order?.status || 'DRAFT')}
           title={order.head?.outlet?.name}
           onPress={() => (isEditable ? handleEditOrderHead() : setIsDateVisible(!isDateVisible))}
-          isShowAddInfo={!isEditable}
+          editable={isEditable}
           disabled={isDelList}
           isBlocked={isBlocked}
           isFromRoute={order.head.route ? true : false}
@@ -510,27 +511,7 @@ const OrderViewScreen = () => {
                 <MediumText>Комментарий: {order.head.comment || ''}</MediumText>
               </View>
             ) : null}
-
-            {isDateVisible && (
-              <>
-                {order.sentDate ? (
-                  <View style={styles.rowCenter}>
-                    <MediumText>
-                      Отправлено: {getDateString(order.sentDate)}{' '}
-                      {new Date(order.sentDate).toLocaleTimeString('ru', { hour12: false })}
-                    </MediumText>
-                  </View>
-                ) : null}
-                {order.erpCreationDate ? (
-                  <View style={styles.rowCenter}>
-                    <MediumText>
-                      Обработано: {getDateString(order.erpCreationDate)}{' '}
-                      {new Date(order.erpCreationDate).toLocaleTimeString('ru', { hour12: false })}
-                    </MediumText>
-                  </View>
-                ) : null}
-              </>
-            )}
+            {isDateVisible && <DateInfo sentDate={order.sentDate} erpCreationDate={order.erpCreationDate} />}
           </View>
         </InfoBlock>
         <FlashList

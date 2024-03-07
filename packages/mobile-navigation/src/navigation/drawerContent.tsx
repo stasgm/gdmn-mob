@@ -64,7 +64,7 @@ export const DrawerContent = ({ onSync, ...props }: Props) => {
             <Caption style={captionStyle}>Синхронизировать</Caption>
             {!!syncDate && (
               <Caption style={[styles.caption, { color: colors.text }]}>
-                {getDateString(syncDate)} {new Date(syncDate).toLocaleTimeString()}
+                {getDateString(syncDate)} {new Date(syncDate).toLocaleTimeString('ru', { hour12: false })}
               </Caption>
             )}
           </View>

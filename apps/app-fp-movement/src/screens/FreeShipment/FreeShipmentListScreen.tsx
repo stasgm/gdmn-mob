@@ -86,6 +86,7 @@ export const FreeShipmentListScreen = () => {
             </View>
           ),
           sentDate: i.sentDate,
+          erpCreationDate: i.erpCreationDate,
         }) as IListItemProps,
     );
   }, [list, status, sortDateType.id]);

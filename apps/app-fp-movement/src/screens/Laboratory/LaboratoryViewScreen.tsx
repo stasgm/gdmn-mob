@@ -20,6 +20,7 @@ import {
   navBackButton,
   SaveDocument,
   SimpleDialog,
+  DateInfo,
 } from '@lib/mobile-ui';
 
 import { generateId, getDateString, keyExtractor, useSendDocs, sleep, useSendOneRefRequest } from '@lib/mobile-hooks';
@@ -105,9 +106,9 @@ export const LaboratoryViewScreen = () => {
 
   const goodRemains = useMemo<IRemGood[]>(() => {
     return doc?.head?.fromDepart?.id && isFocused && remains
-      ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id], docList, doc.head.fromDepart.id)
+      ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id] /*, docList, doc.head.fromDepart.id*/)
       : [];
-  }, [doc?.head?.fromDepart?.id, docList, goods, isFocused, remains]);
+  }, [doc?.head.fromDepart.id, goods, isFocused, remains]);
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -458,6 +459,8 @@ export const LaboratoryViewScreen = () => {
     [doc?.status, lines?.length],
   );
 
+  const [isDateVisible, setIsDateVisible] = useState(false);
+
   const [scanned, setScanned] = useState(false);
 
   const ref = useRef<TextInput>(null);
@@ -597,6 +600,8 @@ export const LaboratoryViewScreen = () => {
     }
   }, [navigation, screenState]);
 
+  const isEditable = useMemo(() => (doc ? ['DRAFT', 'READY'].includes(doc?.status) : false), [doc]);
+
   const viewStyle: StyleProp<ViewStyle> = useMemo(
     () => ({ ...styles.container, justifyContent: lineType === 'last' ? 'flex-start' : 'center' }),
     [lineType],
@@ -636,20 +641,14 @@ export const LaboratoryViewScreen = () => {
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
         title={doc.documentType.description || ''}
-        onPress={handleEditDocHead}
-        disabled={!['DRAFT', 'READY'].includes(doc.status)}
+        onPress={() => (isEditable ? handleEditDocHead() : setIsDateVisible(!isDateVisible))}
+        editable={isEditable}
         isBlocked={isBlocked}
       >
         <View style={styles.infoBlock}>
           <MediumText>{doc.head.fromDepart?.name || ''}</MediumText>
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
-          {doc.sentDate ? (
-            <View style={styles.rowCenter}>
-              <MediumText>
-                Отправлено: {getDateString(doc.sentDate)} {new Date(doc.sentDate).toLocaleTimeString()}
-              </MediumText>
-            </View>
-          ) : null}
+          {isDateVisible && <DateInfo sentDate={doc.sentDate} erpCreationDate={doc.erpCreationDate} />}
         </View>
       </InfoBlock>
       <LineTypes />
