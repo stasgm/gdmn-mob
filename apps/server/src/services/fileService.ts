@@ -1,11 +1,7 @@
 /* eslint-disable no-await-in-loop */
-import path from 'path';
-
 import { ISystemFile, IPathParams, IFileParams, IFileActionResult } from '@lib/types';
 
 import { DataNotFoundException } from '../exceptions';
-
-import { IParamsInfo } from '../types';
 
 import {
   getFolderList,
@@ -15,9 +11,10 @@ import {
   readDirectory,
   deleteFileById,
   readFileData,
-  getPathSystem,
   writeDataToFile,
   fileParams,
+  getSystemFilePath,
+  fileObj2FullFileName,
 } from './fileUtils';
 
 import { getDb } from './dao/db';
@@ -29,44 +26,14 @@ import { getDb } from './dao/db';
    Если нет компании, то возвращаем файлы из папки ./
  * @returns Массив объектов файлов
  */
-const findMany = async (params: Record<string, string>): Promise<ISystemFile[]> => {
-  const { dbPath, companies, appSystems } = getDb();
+const findMany = async (requestParams: Record<string, string>): Promise<ISystemFile[]> => {
+  const { companyId, appSystemId, ...params } = requestParams;
 
-  let fileNameList: string[] = [];
+  const folderPath = fileObj2FullFileName({ companyId, appSystemId });
 
-  if ('companyId' in params) {
-    const company = companies.findById(params['companyId']);
+  const fileNameList = await readDirectory(folderPath, true);
 
-    if (!company) {
-      throw new DataNotFoundException(`Компания с id=${params['companyId']} не найдена`);
-    }
-
-    delete params['companyId'];
-
-    const appSystem = 'appSystemId' in params ? appSystems.findById(params['appSystemId']) : undefined;
-    if ('appSystemId' in params && !appSystem) {
-      throw new DataNotFoundException(`Подсистема с id=${params['appSystemId']} не найдена`);
-    }
-
-    delete params['appSystemId'];
-
-    const folderPath = appSystem
-      ? path.join(dbPath, `db_${company.id}`, appSystem.name || '')
-      : path.join(dbPath, `db_${company.id}`);
-
-    fileNameList = await readDirectory(folderPath, true);
-  } else {
-    fileNameList = await readDirectory(dbPath);
-  }
-
-  const paramsWithValues = Object.entries(params).reduce((prev: IParamsInfo, [key, value]) => {
-    if (value) {
-      return { ...prev, [key]: { ...fileParams[key], value } };
-    }
-    return prev;
-  }, {});
-
-  return await getFilesByParams<ISystemFile>(fileNameList, paramsWithValues);
+  return await getFilesByParams<ISystemFile>(fileNameList, fileParams, params);
 };
 
 /**
@@ -120,7 +87,7 @@ const updateOne = async (file: IFileParams, data: string): Promise<void> => {
  * @returns Массив названий папок
  */
 const getFolders = async (pathParams: IPathParams): Promise<string[]> => {
-  const { dbPath, companies, appSystems } = getDb();
+  const { companies, appSystems } = getDb();
 
   if (!companies.findById(pathParams.companyId)) {
     throw new DataNotFoundException('Компания не найдена');
@@ -132,7 +99,7 @@ const getFolders = async (pathParams: IPathParams): Promise<string[]> => {
     throw new DataNotFoundException('Подсистема не найдена');
   }
 
-  const pathSystem = path.join(dbPath, getPathSystem(pathParams));
+  const pathSystem = getSystemFilePath(pathParams);
 
   return await getFolderList(pathSystem);
 };

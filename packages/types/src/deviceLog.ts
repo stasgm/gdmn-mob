@@ -1,5 +1,5 @@
 import { IEntity, INamedEntity } from './common';
-import { IFileParams } from './files';
+import { IFileParams, IPathParams } from './files';
 import { Settings } from './settings';
 
 export interface IDeviceData {
@@ -19,11 +19,6 @@ export interface IDeviceLog {
 export interface IFileDeviceLogInfo {
   producerId: string;
   deviceId: string;
-}
-
-export interface IPathParams {
-  companyId: string;
-  appSystemId: string;
 }
 
 export interface IDeviceLogParams extends IPathParams {

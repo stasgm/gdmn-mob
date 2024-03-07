@@ -1,28 +1,20 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { rename } from 'fs/promises';
 
 import { IFileParams, IPathParams } from '@lib/types';
 
-import { DataNotFoundException } from '../exceptions';
+import { erpLogFileName, fileObj2FullFileName, readFileData } from './fileUtils';
 
-import { getDb } from './dao/db';
-import { erpLogFileName, getPath, getPathSystem, readFileData } from './fileUtils';
+const addOne = async (requestParams: IPathParams, file: any): Promise<void> => {
+  const { companyId, appSystemId, ...params } = requestParams;
 
-const addOne = async (params: IPathParams, file: any): Promise<void> => {
-  const { companies, appSystems } = getDb();
+  const fullFileName = fileObj2FullFileName({
+    companyId,
+    appSystemId,
+    id: erpLogFileName,
+  });
 
-  if (!companies.findById(params.companyId)) {
-    throw new DataNotFoundException('Компания не найдена');
-  }
-
-  const appSystem = appSystems.findById(params.appSystemId);
-
-  if (!appSystem) {
-    throw new DataNotFoundException('Подсистема не найдена');
-  }
-
-  const destinationPath = getPath([getPathSystem(params)], erpLogFileName);
-  await rename(file.filepath, destinationPath);
-  return;
+  return await rename(file.filepath, fullFileName);
 };
 
 const getContent = async (file: IFileParams): Promise<string | object> => {

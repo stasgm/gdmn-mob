@@ -83,7 +83,7 @@ const getFileContent: Config = {
           ...urlValidation.checkURL,
           companyId: Joi.string().required(),
           appSystemId: Joi.string().required(),
-          folder: Joi.string().required(),
+          folder: Joi.string().optional(),
         }),
       )
       .error(

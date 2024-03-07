@@ -40,7 +40,7 @@ const getFiles = async (ctx: ParameterizedContext): Promise<void> => {
  * @param ctx
  */
 const getFileContent = async (ctx: ParameterizedContext): Promise<void> => {
-  const params = await fileUtils.getFileParams(ctx.params, ctx.query);
+  const params = fileUtils.prepareFileParams(ctx.params.id, ctx.query);
 
   const fileContent = await fileService.getContent(params);
 
@@ -48,7 +48,7 @@ const getFileContent = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const deleteFile = async (ctx: ParameterizedContext): Promise<void> => {
-  const params = await fileUtils.getFileParams(ctx.params, ctx.query);
+  const params = fileUtils.prepareFileParams(ctx.params.id, ctx.query);
 
   await fileService.deleteOne(params);
 
@@ -72,7 +72,7 @@ const deleteFiles = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const updateFile = async (ctx: ParameterizedContext): Promise<void> => {
-  const params = await fileUtils.getFileParams(ctx.params, ctx.query);
+  const params = fileUtils.prepareFileParams(ctx.params.id, ctx.query);
 
   const data = ctx.request.body as string;
 

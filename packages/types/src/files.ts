@@ -18,6 +18,12 @@ export interface ISystemFile extends IEntity, IExtraFileInfo {
   mdate: string;
 }
 
+export interface IPathParams {
+  companyId: string;
+  appSystemId: string;
+  folder?: string;
+}
+
 export interface IFileQueryParams {
   companyId?: string;
   appSystemId?: string;
@@ -26,6 +32,13 @@ export interface IFileQueryParams {
 
 export interface IFileParams extends IFileQueryParams {
   id: string;
+}
+
+export interface ISystemFileParams {
+  companyId: string;
+  appSystemId?: string;
+  id?: string;
+  folder?: string;
 }
 
 export interface IDeleteFilesRequest {

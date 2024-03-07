@@ -2,7 +2,14 @@
 import path from 'path';
 import { readdir, unlink, stat, rename } from 'fs/promises';
 
-import { ISystemFile, IExtraFileInfo, IFileParams, INamedEntity, IFileActionResult, IPathParams } from '@lib/types';
+import {
+  ISystemFile,
+  IExtraFileInfo,
+  IFileParams,
+  INamedEntity,
+  IFileActionResult,
+  ISystemFileParams,
+} from '@lib/types';
 
 import {
   log,
@@ -26,8 +33,10 @@ import { IParamsInfo } from '../types';
 import { getDb } from './dao/db';
 
 export const deviceLogFolder = 'deviceLogs';
+export const uploadErpLogsFolder = path.join(process.cwd(), config.ERP_LOG_PATH);
 export const erpLogFileName = 'erpLog.txt';
-export const serverLogFolder = 'serverLogs';
+
+export const serverLogPath = path.join(process.cwd(), config.LOG_PATH);
 
 export const deviceLogParams: IParamsInfo = {
   producerId: { itemKey: 'producer', property: 'id', fullMatch: true },
@@ -65,11 +74,7 @@ export const serverLogParams: IParamsInfo = {
   mDateTo: { itemKey: 'mdate', comparator: (a: number, b: number) => a <= b },
 };
 
-export const readDirectory = async (
-  root: string,
-  recursive = false,
-  excludeFolders: string[] | undefined = undefined,
-) => {
+export const readDirectory = async (root: string, recursive = false, excludeFolders?: string[]) => {
   try {
     const files = await readdir(root);
     const exclude: string[] = (excludeFolders ?? []).map((i) => i.toLocaleLowerCase());
@@ -96,9 +101,20 @@ export const readDirectory = async (
   }
 };
 
-export const getFilesByParams = async <T>(fileNameList: string[], params: IParamsInfo): Promise<T[]> => {
-  const { searchQuery: { value: searchQuery } = { value: '' } } = params;
-  delete params.searchQuery;
+export const getFilesByParams = async <T>(
+  fileNameList: string[],
+  params: IParamsInfo,
+  values: Record<string, string>,
+): Promise<T[]> => {
+  const paramsWithValues = Object.entries(values).reduce((prev: IParamsInfo, [key, value]) => {
+    if (value) {
+      return { ...prev, [key]: { ...params[key], value } };
+    }
+    return prev;
+  }, {});
+
+  const { searchQuery: { value: searchQuery } = { value: '' } } = paramsWithValues;
+  delete paramsWithValues.searchQuery;
 
   let files: ISystemFile[] = [];
 
@@ -107,7 +123,7 @@ export const getFilesByParams = async <T>(fileNameList: string[], params: IParam
     try {
       const file = await splitFilePath(fileName);
       if (file) {
-        const { ...fileParams } = params;
+        const { ...fileParams } = paramsWithValues;
         const matched = isAllParamMatched(file, fileParams);
         // Если все параметры совпадают
         if (matched) {
@@ -124,7 +140,7 @@ export const getFilesByParams = async <T>(fileNameList: string[], params: IParam
   }
 
   const sortedFiles = files.sort((a, b) => new Date(b.mdate).getTime() - new Date(a.mdate).getTime());
-  return getListPartByParams<T>(sortedFiles, params);
+  return getListPartByParams<T>(sortedFiles, paramsWithValues);
 };
 
 /**
@@ -156,6 +172,7 @@ export const readFileData = async <T = string | object>(
 
 export const writeDataToFile = async (file: IFileParams, data: any): Promise<void> => {
   const fileName = fileObj2FullFileName(file);
+
   try {
     return await writeFileByChunks(fileName, typeof data === 'string' ? data : JSON.stringify(data, undefined, 2));
   } catch (err) {
@@ -265,6 +282,7 @@ const splitFileName = (fileName: string): IExtraFileInfo => {
   const { devices, users } = getDb();
 
   const producerId = fileNameParts[1];
+
   const producer = users.getNamedItem(producerId);
 
   if (!producer?.name) {
@@ -428,6 +446,7 @@ export const deleteFiles = async (files: IFileParams[]): Promise<IFileActionResu
 
       try {
         const fileName = fileObj2FullFileName(file);
+
         await unlink(fileName);
         result.success = true;
       } catch (err) {
@@ -444,74 +463,72 @@ export const deleteFiles = async (files: IFileParams[]): Promise<IFileActionResu
 /**
  * Получение параметров файла из запроса
    Может быть или только id - имя файла или id и companyId, appSystemId, folder
+ * @param id
  * @param params
- * @param query
  * @returns
  */
-export const getFileParams = async (params: Record<string, string>, query: Record<string, any>) => {
-  const file = prepareParams(query, ['companyId', 'appSystemId', 'folder']);
+export const prepareFileParams = (id: string, params: Record<string, any>) => {
+  const file = prepareParams(params, ['companyId', 'appSystemId', 'folder']);
 
-  return { id: params.id, ...file } as IFileParams;
+  return { id, ...file } as IFileParams;
 };
 
-export const getPath = (folders: string[], fn = '') => {
-  const folderPath = path.join(getDb().dbPath, ...folders);
-  return path.join(folderPath, fn);
-};
+export const getFilePath = (folders: string[], fileName = '') => path.join(getDb().dbPath, ...folders, fileName);
 
-export const getPathSystem = ({ companyId, appSystemId }: IPathParams) =>
-  `db_${companyId}/${getDb().appSystems.findById(appSystemId)?.name}`;
+/**
+ * Получение пути относительно корня базы данных по параметрам (companyId, appSystemId, folder, id)
+ * @param param0
+ * @returns
+ */
+export const getSystemFilePath = ({ companyId, appSystemId, folder, id }: ISystemFileParams) => {
+  const { appSystems, dbPath } = getDb();
+
+  return path.join(
+    dbPath,
+    `db_${companyId}`,
+    appSystemId ? appSystems.findById(appSystemId)?.name ?? '' : '',
+    folder ?? '',
+    id || '',
+  );
+};
 
 /**
  * Преобразует объект файла в полное имя файла.
+   Если папка равно serverLogFolder, то возвращает путь к файлу в папке логов сервера
    Если указаны companyId, appSystemId, folder
    то возвращает в формате db_companyId/appSystemName/folder/fileName
    иначе возвращает fileName
  * @param file
  * @returns
  */
-export const fileObj2FullFileName = (file: IFileParams): string => {
-  // if (path.extname(file.id) !== '.json') {
-  //   throw new InvalidParameterException(`Неправильное расширение файла ${file.id}`);
+export const fileObj2FullFileName = (file: ISystemFileParams | IFileParams): string => {
+  // Если папка равно serverLogFolder, то возвращаем путь к файлу в папке логов сервера
+  if (file.folder === serverLogPath) {
+    return path.join(serverLogPath, file.id || '');
+  }
+
+  // Если не указаны companyId, appSystemId, то возвращаем путь к файлу в корне
+  if (!file.companyId && !file.appSystemId) {
+    return getFilePath([], file.id || '');
+  }
+
+  if (!file.companyId) {
+    throw new InvalidParameterException('Параметр companyId не задан');
+  }
+
+  // if ('appSystemId' in file && !file.appSystemId) {
+  //   throw new InvalidParameterException('Параметр appSystemId не задан');
   // }
 
-  if (file.folder === serverLogFolder) {
-    return path.join(process.cwd(), config.LOG_PATH, file.id);
+  const { companies, appSystems } = getDb();
+
+  if (!companies.findById(file.companyId)) {
+    throw new InvalidParameterException(`Компания с id ${file.companyId} не найдена`);
   }
 
-  if (file.appSystemId || file.companyId || file.folder) {
-    if (!file.companyId) {
-      throw new InvalidParameterException('Параметр companyId не задан');
-    }
-
-    if (!file.appSystemId) {
-      throw new InvalidParameterException('Параметр appSystemId не задан');
-    }
-
-    // if (!file.folder) {
-    //   throw new InvalidParameterException('Параметр folder не задан');
-    // }
-
-    const { companies, appSystems } = getDb();
-
-    const company = companies.findById(file.companyId);
-
-    if (!company) {
-      throw new InvalidParameterException(`Компания с id ${file.appSystemId} не найдена`);
-    }
-
-    const appSystemName = appSystems.findById(file.appSystemId)?.name;
-
-    if (!appSystemName) {
-      throw new InvalidParameterException(`Подсистема с id ${file.appSystemId} не найдена`);
-    }
-
-    return getPath([
-      file.folder
-        ? `db_${file.companyId}${path.sep}${appSystemName}${path.sep}${file.folder}${path.sep}${file.id}`
-        : `db_${file.companyId}${path.sep}${appSystemName}${path.sep}${file.id}`,
-    ]);
+  if ('appSystemId' in file && file.appSystemId && !appSystems.findById(file.appSystemId)) {
+    throw new InvalidParameterException(`Подсистема с id ${file.appSystemId} не найдена`);
   }
 
-  return getPath([file.id]);
+  return getSystemFilePath(file as ISystemFileParams);
 };

@@ -5,7 +5,7 @@ import { IDeleteFilesRequest } from '@lib/types';
 import { serverLogService } from '../services';
 
 import { notOk, ok, prepareParams } from '../utils';
-import { getFileParams, serverLogFolder } from '../services/fileUtils';
+import { prepareFileParams, serverLogPath } from '../services/fileUtils';
 
 const getServerLogs = async (ctx: ParameterizedContext): Promise<void> => {
   const params = prepareParams(ctx.query, ['dateFrom', 'dateTo', 'mDateFrom', 'mDateTo', 'filterText', 'searchQuery']);
@@ -16,8 +16,8 @@ const getServerLogs = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getServerLogContent = async (ctx: ParameterizedContext): Promise<void> => {
-  const file = await getFileParams(ctx.params, ctx.query);
-  file.folder = serverLogFolder;
+  const file = prepareFileParams(ctx.params.id, ctx.query);
+  file.folder = serverLogPath;
   const params = prepareParams<Record<string, number>>(ctx.query, undefined, ['start', 'end']);
 
   const serverLog = await serverLogService.getContent(file, params);
@@ -26,8 +26,8 @@ const getServerLogContent = async (ctx: ParameterizedContext): Promise<void> => 
 };
 
 const deleteServerLog = async (ctx: ParameterizedContext): Promise<void> => {
-  const file = await getFileParams(ctx.params, ctx.query);
-  file.folder = serverLogFolder;
+  const file = prepareFileParams(ctx.params.id, ctx.query);
+  file.folder = serverLogPath;
 
   await serverLogService.deleteOne(file);
 
@@ -37,7 +37,7 @@ const deleteServerLog = async (ctx: ParameterizedContext): Promise<void> => {
 const deleteServerLogs = async (ctx: ParameterizedContext): Promise<void> => {
   const { files } = ctx.request.body as IDeleteFilesRequest;
 
-  const deletedFiles = await serverLogService.deleteMany(files.map((file) => ({ ...file, folder: serverLogFolder })));
+  const deletedFiles = await serverLogService.deleteMany(files.map((file) => ({ ...file, folder: serverLogPath })));
 
   const hasSuccess = deletedFiles.some((result) => result.success);
 

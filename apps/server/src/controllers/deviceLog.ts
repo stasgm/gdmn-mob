@@ -2,12 +2,11 @@ import { Context, ParameterizedContext } from 'koa';
 
 import { IDeleteDeviceLogsRequest, IDeviceLogParams, IUser } from '@lib/types';
 
-import { deviceLogService } from '../services';
+import { deviceLogService, fileUtils } from '../services';
 
 import { InvalidParameterException } from '../exceptions';
 
 import { notOk, ok, prepareParams } from '../utils';
-import { deviceLogFolder, getFileParams } from '../services/fileUtils';
 
 const addDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
   const { appVersion, appSettings, deviceLog, companyId, appSystemId } = ctx.request.body as IDeviceLogParams;
@@ -33,8 +32,8 @@ const addDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getDeviceLogContent = async (ctx: ParameterizedContext): Promise<void> => {
-  const params = await getFileParams(ctx.params, ctx.query);
-  params.folder = deviceLogFolder;
+  const params = fileUtils.prepareFileParams(ctx.params.id, ctx.query);
+  params.folder = fileUtils.deviceLogFolder;
 
   const deviceLog = await deviceLogService.getContent(params);
 
@@ -66,8 +65,8 @@ const getDeviceLogs = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const deleteDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
-  const params = await getFileParams(ctx.params, ctx.query);
-  params.folder = deviceLogFolder;
+  const params = fileUtils.prepareFileParams(ctx.params.id, ctx.query);
+  params.folder = fileUtils.deviceLogFolder;
 
   await deviceLogService.deleteOne(params);
 
@@ -77,7 +76,9 @@ const deleteDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
 const deleteDeviceLogs = async (ctx: ParameterizedContext): Promise<void> => {
   const { files } = ctx.request.body as IDeleteDeviceLogsRequest;
 
-  const deletedFiles = await deviceLogService.deleteMany(files.map((file) => ({ ...file, folder: deviceLogFolder })));
+  const deletedFiles = await deviceLogService.deleteMany(
+    files.map((file) => ({ ...file, folder: fileUtils.deviceLogFolder })),
+  );
 
   const hasSuccess = deletedFiles.some((result) => result.success);
 

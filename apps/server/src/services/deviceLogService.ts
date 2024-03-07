@@ -6,14 +6,13 @@ import { DataNotFoundException, InnerErrorException, InvalidParameterException }
 
 import config from '../../config';
 
-import { IParamsInfo } from '../types';
-
 import { getDb } from './dao/db';
 import {
   deleteFileById,
   deleteFiles,
   deviceLogFolder,
   deviceLogParams,
+  fileObj2FullFileName,
   getFilesByParams,
   readDirectory,
   readFileData,
@@ -101,40 +100,22 @@ const getContent = async (file: IFileParams): Promise<IDeviceLog[]> => {
 };
 
 /**
- * Возвращает множество файлов ошибок по указанным параметрам
- * @returns Массив объектов файлов ошибок
+ * Возвращает множество лог-файлов по указанным параметрам
+ * @returns Массив объектов лог-файлов
  */
 const findMany = async (requestParams: Record<string, string>): Promise<IDeviceLogFiles[]> => {
-  const { dbPath, companies, appSystems } = getDb();
+  const { companyId, appSystemId, ...params } = requestParams;
 
-  let fileNameList: string[] = [];
+  const folderPath = fileObj2FullFileName({
+    companyId,
+    appSystemId,
+    folder: appSystemId ? deviceLogFolder : '',
+  });
 
-  if (!('companyId' in requestParams)) {
-    throw new DataNotFoundException('Не указан идентификатор компании');
-  }
-  const company = companies.findById(requestParams['companyId']);
-
-  if (!company) {
-    throw new DataNotFoundException(`Компания с id=${requestParams['companyId']} не найдена`);
-  }
-
-  delete requestParams['companyId'];
-
-  const appSystem = 'appSystemId' in requestParams ? appSystems.findById(requestParams['appSystemId']) : undefined;
-  if ('appSystemId' in requestParams && !appSystem) {
-    throw new DataNotFoundException(`Подсистема с id=${requestParams['appSystemId']} не найдена`);
-  }
-
-  delete requestParams['appSystemId'];
-
-  const folderPath = appSystem
-    ? path.join(dbPath, `db_${company.id}`, appSystem.name || '', deviceLogFolder)
-    : path.join(dbPath, `db_${company.id}`);
-
-  fileNameList = await readDirectory(folderPath, true, undefined);
+  let fileNameList = await readDirectory(folderPath, true);
 
   // Если не укаказана подсистема, то возьмем файлы только из папок логов устройств
-  if (!appSystem) {
+  if (!appSystemId) {
     fileNameList = fileNameList.filter((fileName) => {
       const parts = fileName.split(path.sep);
       const lastFolder = parts[parts.length - 2];
@@ -142,14 +123,7 @@ const findMany = async (requestParams: Record<string, string>): Promise<IDeviceL
     });
   }
 
-  const params = Object.entries(requestParams).reduce((prev: IParamsInfo, [key, value]) => {
-    if (value) {
-      return { ...prev, [key]: { ...deviceLogParams[key], value } };
-    }
-    return prev;
-  }, {});
-
-  return await getFilesByParams<IDeviceLogFiles>(fileNameList, params);
+  return await getFilesByParams<IDeviceLogFiles>(fileNameList, deviceLogParams, params);
 };
 
 /**
