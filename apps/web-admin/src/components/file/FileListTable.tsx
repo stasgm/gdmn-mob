@@ -12,6 +12,7 @@ import {
   Drawer,
   Grid,
   IconButton,
+  InputAdornment,
   Table,
   TableBody,
   TableCell,
@@ -52,7 +53,6 @@ interface IProps {
   selectedFileIds: IFileSystem[];
   onSetPageParams: (filesFilters: IPageParam) => void;
   pageParams?: IFilePageParam | undefined;
-
   onCloseFilters?: () => void;
   onClearFilters?: () => void;
 }
@@ -124,12 +124,7 @@ const FileListTable = ({
   const handleClearFilters = useCallback(() => {
     setIniit(true);
 
-    // Object.entries(fileFilterValues).forEach((it) => {
-    //   formik.setFieldValue(it[0], '');
-    // });
     formik.setValues(fileFilterValues);
-    // formik.resetForm(fileFilterValues);
-
     onSetPageParams({ ...pageParams, filesFilters: undefined, page: 0 });
     setPage(0);
     onClearFilters && onClearFilters();
@@ -312,6 +307,8 @@ const FileListTable = ({
                         <CloseIcon fontSize="small" />
                       </IconButton>
                     </Grid>
+                    {/* <PerfectScrollbar> */}
+                    {/* <Grid container direction="column" spacing={3} sx={{ p: 3, overflowY: 'visible' }}> */}
                     {Object.keys(fileFilterValues).map((item) => (
                       <Grid item key={item}>
                         {fileFilterValues[item].type === 'select' ? (
@@ -366,7 +363,12 @@ const FileListTable = ({
                               value={formik.values[item]?.value || null}
                               onChange={(a, keyboardInputValue) => {
                                 console.log('value', a, 'keyboardInputValue', keyboardInputValue);
-                                handleUpdateFormik(item, { id: item, name: new Date(a || '').toISOString() });
+                                handleUpdateFormik(item, { id: item, name: a ? new Date(a).toISOString() : '' });
+                              }}
+                              componentsProps={{
+                                actionBar: {
+                                  actions: ['clear'],
+                                },
                               }}
                               renderInput={(params) => <TextField {...params} />}
                             />
@@ -385,6 +387,16 @@ const FileListTable = ({
                                 alignItems: 'center',
                                 justifyContent: 'flex-start',
                               },
+                              endAdornment: formik.values[item]?.value ? (
+                                <InputAdornment
+                                  position="end"
+                                  onClick={() => handleUpdateFormik(item, { id: item, name: '' })}
+                                >
+                                  <IconButton>
+                                    <CloseIcon size="20" />
+                                  </IconButton>
+                                </InputAdornment>
+                              ) : null,
                             }}
                             fullWidth
                             name={item}
@@ -393,6 +405,7 @@ const FileListTable = ({
                             type="search"
                             value={formik.values[item]?.value}
                             onChange={(event) => handleUpdateFormik(item, { id: item, name: event.target.value })}
+                            // onChange={formik.handleChange}
                           />
                         )}
                       </Grid>
@@ -406,6 +419,7 @@ const FileListTable = ({
                         // sx={{ m: 1 }}
                         fullWidth
                         onClick={handleSearchClick}
+                        // disabled={!(formik.values['company'].value || formik.values['appSystem'].value)}
                       >
                         Применить
                       </Button>
