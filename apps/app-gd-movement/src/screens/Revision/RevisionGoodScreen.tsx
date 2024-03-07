@@ -29,6 +29,8 @@ const RevisionGoodScreen = () => {
   const [scaner, setScaner] = useState<IScannedObject>({ state: 'init' });
   const [scannedObject, setScannedObject] = useState<IRevisionLine>();
 
+  const [isButtonBlocked, setIsButtonBlocked] = useState(false);
+
   useEffect(() => {
     return () => {
       dispatch(appActions.clearFormParams());
@@ -43,6 +45,7 @@ const RevisionGoodScreen = () => {
   }, [navigation]);
 
   const doc = docSelectors.selectByDocId<IRevisionDocument>(docId);
+  const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
 
   const goods = refSelectors.selectByName<IGood>('good')?.data;
 
@@ -63,15 +66,21 @@ const RevisionGoodScreen = () => {
       //   return;
       // }
 
+      if (!doc) {
+        return;
+      }
+
       const scannedGood = {
         id: generateId(),
         barcode: brc,
       };
 
+      const line = doc.lines.find((i) => i.barcode === brc);
+
       const remItem = goodRemains[brc];
 
       if (remItem) {
-        setScaner({ state: 'found' });
+        setScaner({ state: line ? 'error' : 'found' });
         setScannedObject({
           ...scannedGood,
           good: { id: remItem.good.id, name: remItem.good.name },
@@ -79,28 +88,37 @@ const RevisionGoodScreen = () => {
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
         });
 
+        if (line) {
+          setIsButtonBlocked(true);
+        }
+
         return;
       } else {
         const good = goods.find((i) => i.barcode === brc);
 
         if (good) {
-          setScaner({ state: 'found' });
-          setScannedObject({ ...scannedGood, good: { id: good.id, name: good.name }, price: good.price || 0 });
-        } else {
-          // if (doc?.lines?.find((l) => l.barcode === brc)) {
-          //   setScaner({
-          //     state: 'error',
-          //     message: 'Баркод  уже добавлен',
-          //   });
-          //   return;
-          // }
+          setScaner({ state: line ? 'error' : 'found' });
 
-          setScannedObject({ ...scannedGood, good: { id: unknownGood.id, name: unknownGood.name } });
+          setScannedObject({ ...scannedGood, good: { id: good.id, name: good.name }, price: good.price || 0 });
+
+          if (line) {
+            setIsButtonBlocked(true);
+          }
+        } else {
+          if (line) {
+            setIsButtonBlocked(true);
+            setScannedObject({
+              ...scannedGood,
+              good: { id: unknownGood.id, name: line.good?.name || unknownGood.name },
+            });
+          } else {
+            setScannedObject({ ...scannedGood, good: { id: unknownGood.id, name: unknownGood.name } });
+          }
           setScaner({ state: 'error' });
         }
       }
     },
-    [goodRemains, goods],
+    [doc, goodRemains, goods],
   );
 
   const [currentLineId, setCurrentLineId] = useState('');
@@ -140,19 +158,31 @@ const RevisionGoodScreen = () => {
             refName: 'good',
             fieldName: 'good',
           });
+        } else {
+          const newLine: IRevisionLine = { ...scannedObject, sortOrder: (lines?.[0]?.sortOrder || 0) + 1 };
+          dispatch(documentActions.addDocumentLine({ docId, line: newLine }));
+
+          setCurrentLineId(newLine.id);
+          navigation.navigate('SelectRefItem', {
+            refName: 'good',
+            fieldName: 'good',
+          });
         }
       } else {
-        const line: IRevisionLine = { ...scannedObject, sortOrder: doc.lines?.length + 1 };
+        const line: IRevisionLine = { ...scannedObject, sortOrder: (lines?.[0]?.sortOrder || 0) + 1 };
 
         dispatch(documentActions.addDocumentLine({ docId, line }));
       }
 
       setScaner({ state: 'init' });
     },
-    [scannedObject, doc, dispatch, docId, navigation],
+    [scannedObject, doc, navigation, lines, dispatch, docId],
   );
 
-  const handleClearScaner = () => setScaner({ state: 'init' });
+  const handleClearScaner = () => {
+    setScaner({ state: 'init' });
+    setIsButtonBlocked(false);
+  };
 
   const isFocused = useIsFocused();
   if (!isFocused) {
@@ -169,7 +199,7 @@ const RevisionGoodScreen = () => {
 
   return (
     <ScanBarcode
-      onSave={() => handleSaveScannedItem(false)}
+      onSave={() => !isButtonBlocked && handleSaveScannedItem(false)}
       onGetScannedObject={handleGetScannedObject}
       onClearScannedObject={handleClearScaner}
       scaner={scaner}
@@ -192,11 +222,19 @@ const RevisionGoodScreen = () => {
                   цена: {scannedObject?.price || 0} р.
                   {scannedObject?.remains || scannedObject?.remains === 0 ? `, остаток: ${scannedObject?.remains}` : ''}
                 </Text>
+                {doc?.lines?.find((l) => l.barcode === scannedObject.barcode) ? (
+                  <Text style={localStyles.goodName} numberOfLines={3}>
+                    Баркод уже добавлен
+                  </Text>
+                ) : null}
               </>
             ) : (
               <>
                 <Text style={localStyles.goodName} numberOfLines={3}>
                   {scannedObject?.barcode}
+                </Text>
+                <Text style={localStyles.barcode} numberOfLines={3}>
+                  {scannedObject?.good?.name || ''}
                 </Text>
                 {doc?.lines?.find((l) => l.barcode === scannedObject.barcode) ? (
                   <Text style={localStyles.goodName} numberOfLines={3}>

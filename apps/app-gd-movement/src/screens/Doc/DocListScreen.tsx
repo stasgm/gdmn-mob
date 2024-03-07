@@ -255,6 +255,7 @@ export const DocListScreen = () => {
         lineCount: i.lines?.length,
         errorMessage: i.errorMessage,
         sentDate: i.sentDate,
+        erpCreationDate: i.erpCreationDate,
       } as IListItemProps;
     });
   }, [date.id, filteredList?.list, status, type?.id]);

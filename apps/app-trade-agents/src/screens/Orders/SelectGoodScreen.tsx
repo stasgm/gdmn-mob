@@ -648,7 +648,7 @@ const localStyles = StyleSheet.create({
     paddingHorizontal: 12,
     fontSize: 20,
     justifyContent: 'space-between',
-    paddingVertical: 3,
+    paddingVertical: 5,
   },
   filter: {
     paddingTop: 5,

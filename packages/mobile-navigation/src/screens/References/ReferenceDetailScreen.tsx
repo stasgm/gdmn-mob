@@ -42,7 +42,7 @@ const ReferenceDetailScreen = () => {
 
   const list = ref?.data.find((e) => e.id === id);
 
-  const meta = ref.metadata;
+  const meta = ref?.metadata;
 
   const refData: IProperty[] = useMemo(() => {
     if (!list) {

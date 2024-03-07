@@ -20,6 +20,7 @@ import {
   navBackButton,
   SaveDocument,
   SimpleDialog,
+  DateInfo,
 } from '@lib/mobile-ui';
 
 import { generateId, getDateString, keyExtractor, useSendDocs, sleep, round, isNumeric } from '@lib/mobile-hooks';
@@ -436,6 +437,8 @@ export const InventoryViewScreen = () => {
     [doc?.head.fromDepart?.isAddressStore, doc?.status, handlePressLine, lines?.length],
   );
 
+  const [isDateVisible, setIsDateVisible] = useState(false);
+
   const [scanned, setScanned] = useState(false);
 
   const ref = useRef<TextInput>(null);
@@ -582,6 +585,8 @@ export const InventoryViewScreen = () => {
     }
   }, [navigation, screenState]);
 
+  const isEditable = useMemo(() => (doc ? ['DRAFT', 'READY'].includes(doc?.status) : false), [doc]);
+
   const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
@@ -617,20 +622,14 @@ export const InventoryViewScreen = () => {
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
         title={doc.documentType.description || ''}
-        onPress={handleEditDocHead}
-        disabled={!['DRAFT', 'READY'].includes(doc.status)}
+        onPress={() => (isEditable ? handleEditDocHead() : setIsDateVisible(!isDateVisible))}
+        editable={isEditable}
         isBlocked={isBlocked}
       >
         <View style={styles.infoBlock}>
           <MediumText>{doc.head.fromDepart?.name || ''}</MediumText>
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
-          {doc.sentDate ? (
-            <View style={styles.rowCenter}>
-              <MediumText>
-                Отправлено: {getDateString(doc.sentDate)} {new Date(doc.sentDate).toLocaleTimeString()}
-              </MediumText>
-            </View>
-          ) : null}
+          {isDateVisible && <DateInfo sentDate={doc.sentDate} erpCreationDate={doc.erpCreationDate} />}
         </View>
       </InfoBlock>
       <LineTypes />
