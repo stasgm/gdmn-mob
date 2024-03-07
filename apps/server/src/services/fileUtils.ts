@@ -480,7 +480,7 @@ export const getFilePath = (folders: string[], fileName = '') => path.join(getDb
  * @param param0
  * @returns
  */
-export const getSystemFilePath = ({ companyId, appSystemId, folder, id }: ISystemFileParams) => {
+export const getSystemFilePath = ({ companyId, appSystemId, folder, id }: IFileParams | ISystemFileParams) => {
   const { appSystems, dbPath } = getDb();
 
   return path.join(
@@ -530,5 +530,5 @@ export const fileObj2FullFileName = (file: ISystemFileParams | IFileParams): str
     throw new InvalidParameterException(`Подсистема с id ${file.appSystemId} не найдена`);
   }
 
-  return getSystemFilePath(file as ISystemFileParams);
+  return getSystemFilePath(file);
 };
