@@ -348,6 +348,7 @@ const FileList = () => {
                 selectedFileIds={selectedFileIds}
                 onSetPageParams={handleSetPageParams}
                 pageParams={pageParams}
+                onCloseFilters={() => setFilterVisible(false)}
               />
             </Box>
             // <Box sx={{ pt: 2 }}>

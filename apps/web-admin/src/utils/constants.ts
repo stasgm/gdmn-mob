@@ -32,10 +32,9 @@ const fileFilterValues: IFilterObject = {
   producer: { id: 'producer', name: 'Пользователь', type: 'select', value: '', visible: true },
   consumer: { id: 'consumer', name: 'Получатель', type: 'select', value: '', visible: true },
   device: { id: 'device', name: 'Устройство', type: 'select', value: '', visible: true },
-  uid: { id: 'uid', name: 'Идентификатор', type: 'text', value: '', visible: true },
-  date: { id: 'date', name: 'Дата', type: 'date', value: '', visible: true },
+  uid: { id: 'uid', name: 'Номер устройства', type: 'text', value: '', visible: true },
   dateFrom: { id: 'dateFrom', name: 'Дата начала', type: 'date', value: '', visible: true },
-  dateTo: { id: 'dateTo', name: 'Дата конца', type: 'date', value: '', visible: true },
+  dateTo: { id: 'dateTo', name: 'Дата окончания', type: 'date', value: '', visible: true },
 };
 
 const fileFilterInitialValues: IFileFilter = {
@@ -49,7 +48,6 @@ const fileFilterInitialValues: IFileFilter = {
   consumer: '',
   device: '',
   uid: '',
-  date: '',
   dateFrom: '',
   dateTo: '',
 };

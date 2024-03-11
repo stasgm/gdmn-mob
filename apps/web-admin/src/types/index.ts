@@ -50,8 +50,6 @@ export interface IFilterObject {
   producer: IFilterOption;
   consumer: IFilterOption;
   uid: IFilterOption;
-  device: IFilterOption;
-  date: IFilterOption;
   dateFrom: IFilterOption;
   dateTo: IFilterOption;
 }
@@ -66,7 +64,8 @@ export interface IFileFilter {
   consumer: string;
   device: string;
   uid: string;
-  date: string;
+  dateFrom: string;
+  dateTo: string;
 }
 
 export interface IFilterOption extends INamedEntity {
