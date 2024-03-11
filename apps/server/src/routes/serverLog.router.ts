@@ -1,18 +1,20 @@
 import route from 'koa-joi-router';
 
-import { authMiddleware } from '../middleware/authRequired';
+import { authMiddleware, superAdminMiddleware } from '../middleware';
 import { serverLogValidation } from '../validations';
 import { getServerLogs, getServerLog, deleteServerLog, deleteServerLogs } from '../controllers/serverLog';
-import { superAdminMiddleware } from '../middleware/superAdminRequired';
 
 const serverLog = route();
 
 serverLog.prefix('/serverLogs');
-serverLog.get('/:id/content', serverLogValidation.getServerLog, authMiddleware, superAdminMiddleware, getServerLog);
+
 serverLog.get('/', serverLogValidation.getServerLogs, authMiddleware, superAdminMiddleware, getServerLogs);
+serverLog.get('/:id', serverLogValidation.getServerLog, authMiddleware, superAdminMiddleware, getServerLog);
 serverLog.delete('/:id', serverLogValidation.deleteServerLog, authMiddleware, superAdminMiddleware, deleteServerLog);
+
+// Маршрут для массового удаления логов сервера
 serverLog.post(
-  '/deleteList',
+  '/actions/deleteList',
   serverLogValidation.deleteServerLogs,
   authMiddleware,
   superAdminMiddleware,

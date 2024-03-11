@@ -10,10 +10,7 @@ import {
   getProcesses,
   deleteProcess,
 } from '../controllers/process';
-import { authMiddleware } from '../middleware/authRequired';
-import { deviceMiddleware } from '../middleware/deviceRequired';
-import { processParamsMiddlware } from '../middleware/processParams';
-import { getProcessParamsMiddlware } from '../middleware/getProcessParams';
+import { authMiddleware, deviceMiddleware, processParamsMiddlware, getProcessParamsMiddlware } from '../middleware';
 import { processValidation } from '../validations';
 
 const processes = router();

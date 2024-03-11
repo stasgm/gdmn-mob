@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 
-import { IFileActionResult, IFileParams, ISystemFile } from '@lib/types';
+import { IFileActionResult, IFileParams, IServerLogFile } from '@lib/types';
 
 import { checkFileExists } from '../utils';
 
@@ -18,14 +18,14 @@ import {
  * Возвращает множество файлов логов сервера
  * @returns Массив объектов файлов ошибок
  */
-const findMany = async (requestParams: Record<string, string>): Promise<ISystemFile[]> => {
+const findMany = async (requestParams: Record<string, string>): Promise<IServerLogFile[]> => {
   if (!(await checkFileExists(serverLogPath))) {
     throw new Error(`${serverLogPath} не существует или не доступна для чтения.`);
   }
 
   const fileNameList = await readDirectory(serverLogPath, false);
 
-  return await getFilesByParams<ISystemFile>(fileNameList, serverLogParams, requestParams);
+  return await getFilesByParams<IServerLogFile>(fileNameList, serverLogParams, requestParams);
 };
 
 /**
@@ -33,8 +33,8 @@ const findMany = async (requestParams: Record<string, string>): Promise<ISystemF
  * @param id ИД сформированный из названия файла
  * @returns содержание найденного файла
  **/
-const getContent = async (file: IFileParams, { start, end }: Record<string, number>): Promise<string> => {
-  return await readFileData<string>(file, start, end);
+const getOne = async (file: IFileParams): Promise<string> => {
+  return await readFileData<string>(file);
 };
 
 /**
@@ -53,4 +53,4 @@ const deleteMany = async (files: IFileParams[]): Promise<IFileActionResult[]> =>
   return await deleteFiles(files);
 };
 
-export { findMany, getContent, deleteOne, deleteMany };
+export { findMany, getOne, deleteOne, deleteMany };

@@ -123,7 +123,7 @@ const ServerLogListTable = ({
               value="true"
             />
           </TableCell>
-          <TableCell style={{ padding: '0 16px' }}>{serverLog.fileName}</TableCell>
+          <TableCell style={{ padding: '0 16px' }}>{serverLog.id}</TableCell>
           <TableCell>{serverLog.path}</TableCell>
           <TableCell> {new Date(serverLog.date || '').toLocaleString('ru', { hour12: false })}</TableCell>
           <TableCell> {new Date(serverLog.mdate || '').toLocaleString('ru', { hour12: false })}</TableCell>

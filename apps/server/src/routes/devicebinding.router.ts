@@ -7,9 +7,7 @@ import {
   removeDeviceBinding,
   updateDeviceBinding,
 } from '../controllers/deviceBinding';
-import { authMiddleware } from '../middleware/authRequired';
-import { permissionMiddleware } from '../middleware/permissionRequired';
-import { roleBasedParamsMiddlware } from '../middleware/roleBasedParams';
+import { authMiddleware, permissionMiddleware, roleBasedParamsMiddlware } from '../middleware';
 
 import { deviceBindingValidation } from '../validations';
 

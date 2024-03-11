@@ -43,6 +43,7 @@ const fileFilterInitialValues: IFileFilter = {
   // id: '',
   fileName: '',
   company: '',
+  companyId: '',
   appSystem: '',
   producer: '',
   consumer: '',

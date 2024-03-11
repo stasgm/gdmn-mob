@@ -68,7 +68,7 @@ const getFiles: Config = {
   },
 };
 
-const getFileContent: Config = {
+const getFile: Config = {
   validate: {
     params: Joi.object({
       ...urlValidation.checkURL,
@@ -192,4 +192,4 @@ const moveFiles: Config = {
   },
 };
 
-export { getFolders, getFiles, getFileContent, updateFile, deleteFile, deleteFiles, moveFiles };
+export { getFolders, getFiles, getFile, updateFile, deleteFile, deleteFiles, moveFiles };

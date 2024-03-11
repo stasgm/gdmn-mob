@@ -39,12 +39,12 @@ const getFiles = async (ctx: ParameterizedContext): Promise<void> => {
    в зависимости от параметров запроса
  * @param ctx
  */
-const getFileContent = async (ctx: ParameterizedContext): Promise<void> => {
+const getFile = async (ctx: ParameterizedContext): Promise<void> => {
   const params = fileUtils.prepareFileParams(ctx.params.id, ctx.query);
 
-  const fileContent = await fileService.getContent(params);
+  const file = await fileService.getOne(params);
 
-  ok(ctx as Context, fileContent, 'getFileContent: fileContent is successfully received');
+  ok(ctx as Context, file, 'getFile: file is successfully received');
 };
 
 const deleteFile = async (ctx: ParameterizedContext): Promise<void> => {
@@ -109,4 +109,4 @@ const moveFiles = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
-export { getFiles, getFileContent, deleteFile, updateFile, deleteFiles, getFolders, moveFiles as moveFiles };
+export { getFiles, getFile, deleteFile, updateFile, deleteFiles, getFolders, moveFiles as moveFiles };

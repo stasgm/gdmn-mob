@@ -21,18 +21,17 @@ const fetchFiles = (
   fromRecord?: number,
   toRecord?: number,
 ): AppThunk => {
-  console.log('fetchFiles filesFilters', filesFilters);
   const params: Record<string, string | number> = filesFilters ? filesFilters : {};
 
   if (filterText) params.filterText = filterText;
   if (fromRecord) params.fromRecord = fromRecord;
   if (toRecord) params.toRecord = toRecord;
 
+  console.log('fetchFiles', params);
+
   return async (dispatch) => {
     dispatch(fileSystemActions.fetchFilesAsync.request(''));
-    console.log('params', params);
     const response = await api.file.getFiles(webRequest(dispatch, authActions), params);
-    console.log('response', response);
 
     if (response.type === 'GET_FILES') {
       return dispatch(fileSystemActions.fetchFilesAsync.success(response.files));
@@ -130,9 +129,8 @@ const moveFiles = (fileIds: IFileParams[], folderName: string): AppThunk => {
   return async (dispatch) => {
     dispatch(fileSystemActions.moveFilesAsync.request(''));
 
-    console.log('fileIds', fileIds);
     const response = await api.file.moveFiles(webRequest(dispatch, authActions), fileIds, folderName);
-    console.log('foldername', folderName);
+
     if (response.type === 'MOVE_FILES') {
       return dispatch(fileSystemActions.moveFilesAsync.success(fileIds));
     }

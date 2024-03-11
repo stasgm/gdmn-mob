@@ -30,8 +30,9 @@ const findMany = async (requestParams: Record<string, string>): Promise<ISystemF
   const { companyId, appSystemId, ...params } = requestParams;
 
   const folderPath = fileObj2FullFileName({ companyId, appSystemId });
+  console.log('findMany', params);
 
-  const fileNameList = await readDirectory(folderPath, true);
+  const fileNameList = await readDirectory(folderPath, !!companyId);
 
   return await getFilesByParams<ISystemFile>(fileNameList, fileParams, params);
 };
@@ -41,7 +42,7 @@ const findMany = async (requestParams: Record<string, string>): Promise<ISystemF
  * @param file
  * @returns
  */
-const getContent = async (file: IFileParams): Promise<string | object> => {
+const getOne = async (file: IFileParams): Promise<string | object> => {
   return await readFileData(file);
 };
 
@@ -104,4 +105,4 @@ const getFolders = async (pathParams: IPathParams): Promise<string[]> => {
   return await getFolderList(pathSystem);
 };
 
-export { findMany, getContent, deleteOne, updateOne, deleteMany, getFolders, moveMany };
+export { findMany, getOne, deleteOne, updateOne, deleteMany, getFolders, moveMany };

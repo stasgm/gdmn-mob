@@ -1,9 +1,7 @@
 import router from 'koa-joi-router';
 
 import { newMessage, getMessages, removeMessage, clear } from '../controllers/message';
-import { authMiddleware } from '../middleware/authRequired';
-import { deviceMiddleware } from '../middleware/deviceRequired';
-import { messageMiddleware } from '../middleware/messageRequired';
+import { authMiddleware, deviceMiddleware, messageMiddleware } from '../middleware';
 import { messageValidation } from '../validations';
 
 const messages = router();

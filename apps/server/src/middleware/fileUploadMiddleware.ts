@@ -17,7 +17,6 @@ export const fileUploadMiddleware = () => {
       uploadDir: uploadErpLogsFolder, // Путь для сохранения файлов
       keepExtensions: true,
       onFileBegin: (name, file) => {
-        console.log('onFileBegin', name, file);
         if (name !== 'logFile') {
           throw new InvalidParameterException('Неверно указан параметр для файла');
         }

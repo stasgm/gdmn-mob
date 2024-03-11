@@ -1,7 +1,7 @@
 import { IDeviceData, IDeviceLogFiles, IFileActionResult } from '@lib/types';
 
 export interface IDeviceLogQueryResponse {
-  type: 'GET_DEVICELOGS' | 'GET_DEVICELOG_CONTENT' | 'ADD_DEVICELOG' | 'REMOVE_DEVICELOG' | 'REMOVE_DEVICELOGS';
+  type: 'GET_DEVICELOGS' | 'GET_DEVICELOG' | 'ADD_DEVICELOG' | 'REMOVE_DEVICELOG' | 'REMOVE_DEVICELOGS';
 }
 
 export interface IGetDeviceLogFilesResponse extends IDeviceLogQueryResponse {
@@ -9,8 +9,8 @@ export interface IGetDeviceLogFilesResponse extends IDeviceLogQueryResponse {
   deviceLogs: IDeviceLogFiles[];
 }
 
-export interface IGetDeviceLogContentResponse extends IDeviceLogQueryResponse {
-  type: 'GET_DEVICELOG_CONTENT';
+export interface IGetDeviceLogResponse extends IDeviceLogQueryResponse {
+  type: 'GET_DEVICELOG';
   deviceLog: IDeviceData;
 }
 

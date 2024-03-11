@@ -1,10 +1,8 @@
 import { NewCompany, ICompany } from '@lib/types';
 import { user as mockUser, companies as mockCompanies } from '@lib/mock';
 
-import { error, company as types } from '../types';
+import { error, company as types, BaseApi, BaseRequest } from '../types';
 import { generateId, response2Log, sleep } from '../utils';
-import { BaseApi } from '../types/BaseApi';
-import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
 
 class Company extends BaseRequest {

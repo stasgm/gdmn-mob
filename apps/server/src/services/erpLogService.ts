@@ -17,8 +17,8 @@ const addOne = async (requestParams: IPathParams, file: any): Promise<void> => {
   return await rename(file.filepath, fullFileName);
 };
 
-const getContent = async (file: IFileParams): Promise<string | object> => {
+const getOne = async (file: IFileParams): Promise<string | object> => {
   return await readFileData(file);
 };
 
-export { addOne, getContent };
+export { addOne, getOne };

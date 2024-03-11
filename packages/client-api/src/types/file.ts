@@ -1,9 +1,9 @@
-import { IFileActionResult, IFileSystem } from '@lib/types';
+import { IFileActionResult, ISystemFile } from '@lib/types';
 
 export interface IFileQueryResponse {
   type:
     | 'GET_FILES'
-    | 'GET_FILE_CONTENT'
+    | 'GET_FILE'
     | 'ADD_FILE'
     | 'UPDATE_FILE'
     | 'REMOVE_FILE'
@@ -14,11 +14,11 @@ export interface IFileQueryResponse {
 
 export interface IGetFilesResponse extends IFileQueryResponse {
   type: 'GET_FILES';
-  files: IFileSystem[];
+  files: ISystemFile[];
 }
 
-export interface IGetFileContentResponse extends IFileQueryResponse {
-  type: 'GET_FILE_CONTENT';
+export interface IGetFileResponse extends IFileQueryResponse {
+  type: 'GET_FILE';
   file: any;
 }
 

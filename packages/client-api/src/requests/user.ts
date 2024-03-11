@@ -1,11 +1,9 @@
 import { AuthLogOut, IUser, NewUser } from '@lib/types';
 import { user as mockUser, users as mockUsers } from '@lib/mock';
 
-import { error, user as types } from '../types';
+import { error, user as types, BaseApi, BaseRequest } from '../types';
 import { generateId, response2Log, sleep } from '../utils';
-import { BaseApi } from '../types/BaseApi';
 
-import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
 
 class User extends BaseRequest {

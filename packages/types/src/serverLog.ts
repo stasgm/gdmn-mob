@@ -1,9 +1,3 @@
-export interface IServerLogResponse {
-  isFinished: boolean;
-  textFile: string;
-}
+import { ISystemFile } from './files';
 
-export interface IServerLogParams {
-  start: number;
-  end: number;
-}
+export type IServerLogFile = ISystemFile;

@@ -1,33 +1,21 @@
 import route from 'koa-joi-router';
 
-import { authMiddleware } from '../middleware/authRequired';
+import { authMiddleware, deviceMiddleware, superAdminMiddleware } from '../middleware';
 import { deviceLogValidation } from '../validations';
-import { deviceMiddleware } from '../middleware/deviceRequired';
-import {
-  addDeviceLog,
-  getDeviceLogs,
-  getDeviceLogContent,
-  deleteDeviceLog,
-  deleteDeviceLogs,
-} from '../controllers/deviceLog';
-import { permissionMiddleware } from '../middleware/permissionRequired';
-import { superAdminMiddleware } from '../middleware/superAdminRequired';
+import { addDeviceLog, getDeviceLogs, getDeviceLog, deleteDeviceLog, deleteDeviceLogs } from '../controllers/deviceLog';
 
 const deviceLog = route();
 
 deviceLog.prefix('/deviceLogs');
+
 deviceLog.post('/', deviceLogValidation.addDeviceLog, authMiddleware, deviceMiddleware, addDeviceLog);
-deviceLog.get(
-  '/:id/content',
-  deviceLogValidation.getDeviceLogContent,
-  authMiddleware,
-  superAdminMiddleware,
-  getDeviceLogContent,
-);
 deviceLog.get('/', deviceLogValidation.getDeviceLogs, authMiddleware, superAdminMiddleware, getDeviceLogs);
+deviceLog.get('/:id', deviceLogValidation.getDeviceLog, authMiddleware, superAdminMiddleware, getDeviceLog);
 deviceLog.delete('/:id', deviceLogValidation.deleteDeviceLog, authMiddleware, superAdminMiddleware, deleteDeviceLog);
+
+// Маршрут для массового удаления логов устройств
 deviceLog.post(
-  '/deleteList',
+  '/actions/deleteList',
   deviceLogValidation.deleteDeviceLogs,
   authMiddleware,
   superAdminMiddleware,

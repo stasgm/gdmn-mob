@@ -1,10 +1,7 @@
 import router from 'koa-joi-router';
 
 import { getActivationCode, getActivationCodes } from '../controllers/activationCode';
-import { authMiddleware } from '../middleware/authRequired';
-import { deviceMiddleware } from '../middleware/deviceRequired';
-import { permissionMiddleware } from '../middleware/permissionRequired';
-import { roleBasedParamsMiddlware } from '../middleware/roleBasedParams';
+import { authMiddleware, deviceMiddleware, permissionMiddleware, roleBasedParamsMiddlware } from '../middleware';
 
 const codes = router();
 

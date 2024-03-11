@@ -1,9 +1,7 @@
-import { IDeviceLog, IDeviceLogFiles, IDeviceData, Settings, IFileParams } from '@lib/types';
+import { IDeviceLog, IDeviceLogFiles, IDeviceData, Settings, IFileParams, IFileActionResult } from '@lib/types';
 
-import { error, deviceLog as types } from '../types';
+import { error, deviceLog as types, BaseApi, BaseRequest } from '../types';
 import { response2Log, sleep } from '../utils';
-import { BaseApi } from '../types/BaseApi';
-import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
 
 class DeviceLog extends BaseRequest {
@@ -54,7 +52,7 @@ class DeviceLog extends BaseRequest {
     } as error.IServerError;
   };
 
-  getDeviceLogContent = async (customRequest: CustomRequest, id: string, params: Record<string, string | number>) => {
+  getDeviceLog = async (customRequest: CustomRequest, id: string, params: Record<string, string | number>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -67,15 +65,15 @@ class DeviceLog extends BaseRequest {
     const res = await customRequest<IDeviceData>({
       api: this.api.axios,
       method: 'GET',
-      url: `/deviceLogs/${id}/content`,
+      url: `/deviceLogs/${id}`,
       params,
     });
 
     if (res.type === 'SUCCESS') {
       return {
-        type: 'GET_DEVICELOG_CONTENT',
+        type: 'GET_DEVICELOG',
         deviceLog: res.data,
-      } as types.IGetDeviceLogContentResponse;
+      } as types.IGetDeviceLogResponse;
     }
 
     return {
@@ -153,16 +151,17 @@ class DeviceLog extends BaseRequest {
 
     const body = { files };
 
-    const res = await customRequest<void>({
+    const res = await customRequest<IFileActionResult[]>({
       api: this.api.axios,
       method: 'POST',
-      url: '/deviceLogs/deleteList',
+      url: '/deviceLogs/actions/deleteList',
       data: body,
     });
 
     if (res.type === 'SUCCESS') {
       return {
         type: 'REMOVE_DEVICELOGS',
+        deletedFiles: res?.data || [],
       } as types.IRemoveDeviceLogsResponse;
     }
 

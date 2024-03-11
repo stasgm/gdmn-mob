@@ -1,9 +1,7 @@
-import { IFileParams, IFileSystem } from '@lib/types';
+import { IFileActionResult, IFileParams, ISystemFile } from '@lib/types';
 
-import { error, file as types } from '../types';
+import { error, file as types, BaseApi, BaseRequest } from '../types';
 import { response2Log, sleep } from '../utils';
-import { BaseApi } from '../types/BaseApi';
-import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
 
 class File extends BaseRequest {
@@ -20,7 +18,7 @@ class File extends BaseRequest {
       } as types.IGetFilesResponse;
     }
 
-    const res = await customRequest<IFileSystem[]>({
+    const res = await customRequest<ISystemFile[]>({
       api: this.api.axios,
       method: 'GET',
       url: '/files',
@@ -40,7 +38,7 @@ class File extends BaseRequest {
     } as error.IServerError;
   };
 
-  getFileContent = async (customRequest: CustomRequest, id: string, params: Record<string, string | number>) => {
+  getFile = async (customRequest: CustomRequest, id: string, params: Record<string, string | number>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -53,15 +51,15 @@ class File extends BaseRequest {
     const res = await customRequest<any>({
       api: this.api.axios,
       method: 'GET',
-      url: `/files/${id}/content`,
+      url: `/files/${id}`,
       params,
     });
 
     if (res.type === 'SUCCESS') {
       return {
-        type: 'GET_FILE_CONTENT',
+        type: 'GET_FILE',
         file: res?.data,
-      } as types.IGetFileContentResponse;
+      } as types.IGetFileResponse;
     }
 
     return {
@@ -129,16 +127,17 @@ class File extends BaseRequest {
       } as types.IRemoveFilesResponse;
     }
 
-    const res = await customRequest<void>({
+    const res = await customRequest<IFileActionResult[]>({
       api: this.api.axios,
       method: 'POST',
-      url: '/deleteList',
+      url: '/actions/deleteList',
       data: { files },
     });
 
     if (res.type === 'SUCCESS') {
       return {
         type: 'REMOVE_FILES',
+        deletedFiles: res?.data || [],
       } as types.IRemoveFilesResponse;
     }
 
@@ -157,16 +156,17 @@ class File extends BaseRequest {
       } as types.IMoveFilesResponse;
     }
 
-    const res = await customRequest<void>({
+    const res = await customRequest<IFileActionResult[]>({
       api: this.api.axios,
       method: 'POST',
-      url: '/files/moveList',
+      url: '/files/actions/moveList',
       data: { files, toFolder },
     });
 
     if (res.type === 'SUCCESS') {
       return {
         type: 'MOVE_FILES',
+        movedFiles: res?.data || [],
       } as types.IMoveFilesResponse;
     }
 

@@ -54,16 +54,16 @@ const addErpLog = async (ctx: Context) => {
   );
 };
 
-const getErpLogContent = async (ctx: ParameterizedContext) => {
+const getErpLog = async (ctx: ParameterizedContext) => {
   const params = fileUtils.prepareFileParams(ctx.params.id, ctx.query);
 
-  const serverLog = await erpLogService.getContent(params);
+  const erpLog = await erpLogService.getOne(params);
 
   ok(
     ctx as Context,
-    serverLog,
+    erpLog,
     `getErpLog: Log for companyId=${params.companyId} and appSystemId=${params.appSystemId} is successfully received`,
   );
 };
 
-export { addErpLog, getErpLogContent };
+export { addErpLog, getErpLog };

@@ -31,11 +31,11 @@ const addDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
   return;
 };
 
-const getDeviceLogContent = async (ctx: ParameterizedContext): Promise<void> => {
+const getDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
   const params = fileUtils.prepareFileParams(ctx.params.id, ctx.query);
   params.folder = fileUtils.deviceLogFolder;
 
-  const deviceLog = await deviceLogService.getContent(params);
+  const deviceLog = await deviceLogService.getOne(params);
 
   ok(ctx as Context, deviceLog, 'getDeviceLog: DeviceLog is successfully  received');
 };
@@ -91,4 +91,4 @@ const deleteDeviceLogs = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
-export { addDeviceLog, getDeviceLogs, getDeviceLogContent, deleteDeviceLog, deleteDeviceLogs };
+export { addDeviceLog, getDeviceLogs, getDeviceLog, deleteDeviceLog, deleteDeviceLogs };

@@ -25,7 +25,7 @@ import koaConfig from '../config/koa';
 import config from '../config';
 
 import { validateAuthCreds } from './services/authService';
-import { errorHandler } from './middleware/errorHandler';
+import { errorHandler } from './middleware';
 import { userService, processList } from './services';
 import router from './routes';
 import { createDb } from './services/dao/db';

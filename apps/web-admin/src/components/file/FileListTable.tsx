@@ -85,10 +85,10 @@ const FileListTable = ({
     },
   });
 
-  const { list: companies, loading: loadingCompanies } = useSelector((state) => state.companies);
-  const { list: appSystems, loading: loadingAppSystems } = useSelector((state) => state.appSystems);
-  const { list: users, loading: loadingUsers } = useSelector((state) => state.users);
-  const { list: devices, loading: loadingDevices } = useSelector((state) => state.devices);
+  const { list: companies } = useSelector((state) => state.companies);
+  const { list: appSystems } = useSelector((state) => state.appSystems);
+  const { list: users } = useSelector((state) => state.users);
+  const { list: devices } = useSelector((state) => state.devices);
 
   const companyList = companies.map((d) => ({ id: d.id, name: d.name })) || [];
   const appSystemList = appSystems.map((d) => ({ id: d.id, name: d.name })) || [];
@@ -213,7 +213,7 @@ const FileListTable = ({
           <TableCell>{file.device?.id}</TableCell>
           <TableCell>{new Date(file.date || '').toLocaleString('ru', { hour12: false })}</TableCell>
           <TableCell>{Math.ceil(file.size).toString()} кб</TableCell>
-          <TableCell>{file.path}</TableCell>
+          {/* <TableCell>{file.path}</TableCell> */}
         </TableRow>
       );
     });
@@ -270,7 +270,7 @@ const FileListTable = ({
                   <TableCell>Идентификатор</TableCell>
                   <TableCell>Дата</TableCell>
                   <TableCell>Размер</TableCell>
-                  <TableCell>Путь</TableCell>
+                  {/* <TableCell>Путь</TableCell> */}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -361,8 +361,7 @@ const FileListTable = ({
                               // inputFormat="DD.MM.YYYY"
                               inputFormat="DD/MM/YY hh:mm"
                               value={formik.values[item]?.value || null}
-                              onChange={(a, keyboardInputValue) => {
-                                console.log('value', a, 'keyboardInputValue', keyboardInputValue);
+                              onChange={(a) => {
                                 handleUpdateFormik(item, { id: item, name: a ? new Date(a).toISOString() : '' });
                               }}
                               componentsProps={{

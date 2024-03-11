@@ -1,4 +1,4 @@
-import { ISystemFile, IServerLogResponse } from '@lib/types';
+import { IServerLogFile } from '@lib/types';
 
 export interface IServerLogQueryResponse {
   type: 'GET_SERVERLOGS' | 'GET_SERVERLOG';
@@ -6,10 +6,10 @@ export interface IServerLogQueryResponse {
 
 export interface IGetServerLogsResponse extends IServerLogQueryResponse {
   type: 'GET_SERVERLOGS';
-  serverLogs: ISystemFile[];
+  serverLogs: IServerLogFile[];
 }
 
 export interface IGetServerLogResponse extends IServerLogQueryResponse {
   type: 'GET_SERVERLOG';
-  serverLog: IServerLogResponse;
+  serverLog: string;
 }

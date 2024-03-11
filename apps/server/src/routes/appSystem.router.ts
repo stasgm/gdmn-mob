@@ -1,10 +1,7 @@
 import route from 'koa-joi-router';
 
 import { getAppSystem, addAppSystem, getAppSystems, removeAppSystem, updateAppSystem } from '../controllers/appSystem';
-import { authMiddleware } from '../middleware/authRequired';
-import { companyMiddleware } from '../middleware/companyRequired';
-import { superAdminMiddleware } from '../middleware/superAdminRequired';
-import { roleBasedParamsMiddlware } from '../middleware/roleBasedParams';
+import { authMiddleware, companyMiddleware, superAdminMiddleware, roleBasedParamsMiddlware } from '../middleware';
 import { appSystemValidation } from '../validations';
 
 const appSystems = route();

@@ -59,6 +59,7 @@ export interface IFileFilter {
   folder: string;
   fileName: string;
   company: string;
+  companyId: string;
   appSystem: string;
   producer: string;
   consumer: string;

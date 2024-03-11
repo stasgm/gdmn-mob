@@ -65,7 +65,7 @@ const deleteDeviceLogs: Config = {
   },
 };
 
-const getDeviceLogContent: Config = {
+const getDeviceLog: Config = {
   validate: {
     params: Joi.object({
       ...urlValidation.checkURL,
@@ -125,4 +125,4 @@ const getDeviceLogs: Config = {
   },
 };
 
-export { addDeviceLog, deleteDeviceLog, getDeviceLogContent, deleteDeviceLogs, getDeviceLogs };
+export { addDeviceLog, deleteDeviceLog, getDeviceLog, deleteDeviceLogs, getDeviceLogs };

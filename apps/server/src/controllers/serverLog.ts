@@ -15,12 +15,11 @@ const getServerLogs = async (ctx: ParameterizedContext): Promise<void> => {
   ok(ctx as Context, serverLogList, 'getServerLogs: serverLogs are successfully received');
 };
 
-const getServerLogContent = async (ctx: ParameterizedContext): Promise<void> => {
+const getServerLog = async (ctx: ParameterizedContext): Promise<void> => {
   const file = prepareFileParams(ctx.params.id, ctx.query);
   file.folder = serverLogPath;
-  const params = prepareParams<Record<string, number>>(ctx.query, undefined, ['start', 'end']);
 
-  const serverLog = await serverLogService.getContent(file, params);
+  const serverLog = await serverLogService.getOne(file);
 
   ok(ctx as Context, serverLog, 'getServerLog: ServerLog is successfully  received');
 };
@@ -50,4 +49,4 @@ const deleteServerLogs = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
-export { getServerLogs, getServerLogContent as getServerLog, deleteServerLog, deleteServerLogs };
+export { getServerLogs, getServerLog as getServerLog, deleteServerLog, deleteServerLogs };

@@ -54,8 +54,6 @@ const FileList = () => {
     fetchFiles(pageParams?.filesFilters);
   }, [fetchFiles, pageParams?.filesFilters]);
 
-  console.log('pageParams', pageParams?.filesFilters);
-
   const [pageParamLocal, setPageParamLocal] = useState<IFilePageParam | undefined>(pageParams);
 
   const [filterVisible, setFilterVisible] = useState(pageParams?.filesFilters ? true : false);
@@ -133,7 +131,7 @@ const FileList = () => {
 
   //   if (selectedFileIds.length === 0) {
   //     if (selectedFiles.length > 0) {
-  //       const newSelectedFileIds = selectedFiles.map((file: IFileSystem) => file);
+  //       const newSelectedFileIds = selectedFiles.map((file: ISystemFile) => file);
 
   //       setSelectedFileIds(newSelectedFileIds);
   //     }

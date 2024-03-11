@@ -117,7 +117,7 @@ const ServerLogView = () => {
                 minHeight: '100%',
               }}
             >
-              <ServerLogDetailsView serverLog={serverLog} title={log?.fileName} />
+              <ServerLogDetailsView serverLog={serverLog} title={log?.id} />
             </Box>
           </>
         ) : (

@@ -60,7 +60,7 @@ export const robustRequest: RobustRequest = async ({
 
   const controller = new AbortController();
 
-  const rTimeout = setTimeout(() => {
+  const rTimeout: NodeJS.Timeout = setTimeout(() => {
     controller.abort();
   }, timeout);
 
@@ -94,8 +94,6 @@ export const robustRequest: RobustRequest = async ({
 
     let objData = res.data;
 
-    console.log('res.data', res.data);
-
     //Проверка данных validator
     if (res.data.type === 'SUCCESS') {
       const bodyData = res.data.data;
@@ -113,7 +111,6 @@ export const robustRequest: RobustRequest = async ({
 
     return objData;
   } catch (err) {
-    console.log('res.data errrrrr', err);
     clearTimeout(rTimeout);
 
     if (controller.signal.aborted) {

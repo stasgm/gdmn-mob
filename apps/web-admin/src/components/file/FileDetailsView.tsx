@@ -22,7 +22,7 @@ const FileDetailsView = ({ list }: IProps) => {
             </Grid>
             <Grid item md={10} xs={6}>
               <Typography variant="subtitle1" gutterBottom>
-                {list.fileName}
+                {list.id}
               </Typography>
             </Grid>
             <Grid item md={2} xs={6}>

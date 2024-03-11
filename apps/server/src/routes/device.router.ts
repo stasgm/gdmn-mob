@@ -1,10 +1,7 @@
 import router from 'koa-joi-router';
 
 import { addDevice, getDevices, updateDevice, removeDevice, getDevice } from '../controllers/device';
-import { authMiddleware } from '../middleware/authRequired';
-import { deviceMiddleware } from '../middleware/deviceRequired';
-import { permissionMiddleware } from '../middleware/permissionRequired';
-import { roleBasedParamsMiddlware } from '../middleware/roleBasedParams';
+import { authMiddleware, deviceMiddleware, permissionMiddleware, roleBasedParamsMiddlware } from '../middleware';
 
 import { deviceValidation } from '../validations';
 

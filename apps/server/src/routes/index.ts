@@ -5,7 +5,7 @@ import Company from './company.router';
 import Device from './device.router';
 import User from './user.router';
 import Message from './message.router';
-import DeviceBinding from './devicebinding.router';
+import DeviceBinding from './deviceBinding.router';
 import ActivationCode from './activationCode.router';
 import TestServer from './test.router';
 import Process from './process.router';

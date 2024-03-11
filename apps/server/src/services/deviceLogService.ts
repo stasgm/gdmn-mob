@@ -90,7 +90,7 @@ const deleteOne = async (file: IFileParams): Promise<void> => {
  * @param id ИД сформированный из названия файла
  * @returns Объект из JSON  найденного файла
  **/
-const getContent = async (file: IFileParams): Promise<IDeviceLog[]> => {
+const getOne = async (file: IFileParams): Promise<IDeviceLog[]> => {
   const ext = path.extname(file.id);
   if (ext !== '.json') {
     throw new InvalidParameterException(`Неподдерживаемое расширение файла: ${ext}`);
@@ -134,4 +134,4 @@ const deleteMany = async (files: IFileParams[]): Promise<IFileActionResult[]> =>
   return await deleteFiles(files);
 };
 
-export { addOne, findMany, getContent, deleteOne, deleteMany };
+export { addOne, findMany, getOne, deleteOne, deleteMany };

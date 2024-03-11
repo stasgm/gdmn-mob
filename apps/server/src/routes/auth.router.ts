@@ -10,10 +10,8 @@ import {
   checkAccessCode,
 } from '../controllers/auth';
 
-import { authMiddleware } from '../middleware/authRequired';
-import { deviceMiddleware } from '../middleware/deviceRequired';
+import { authMiddleware, deviceMiddleware, adminMiddleware } from '../middleware';
 import { authValidation } from '../validations';
-import { adminMiddleware } from '../middleware/adminRequired';
 
 const auth = router();
 

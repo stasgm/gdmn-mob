@@ -1,10 +1,9 @@
-import { IServerLogResponse } from '@lib/types';
 import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@mui/material';
 
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
-  serverLog: IServerLogResponse;
+  serverLog: string;
   title?: string;
 }
 
@@ -20,7 +19,7 @@ const ServerLogDetailsView = ({ serverLog, title }: IProps) => {
             <Grid item>
               <pre>
                 <Typography variant="subtitle1" gutterBottom>
-                  {serverLog.textFile}
+                  {serverLog}
                 </Typography>
               </pre>
             </Grid>

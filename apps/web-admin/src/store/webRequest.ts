@@ -6,8 +6,6 @@ export const webRequest =
     dispatch(actions.setErrorMessage(''));
     const res = await robustRequest(params);
 
-    console.log('res 22222222', res);
-
     switch (res.type) {
       case 'FAILURE': {
         //Если пришел ответ, что не пройдена авторизация
