@@ -1,10 +1,10 @@
-import { IDeviceLog, IDeviceLogFiles, Settings } from '@lib/types';
+import { IDeviceLogEntry, IDeviceLogFile, Settings } from '@lib/types';
 
 import { IDeviceLogPageParam } from '../../types';
 
 export type IDeviceLogState = {
-  readonly filesList: IDeviceLogFiles[];
-  readonly logList: IDeviceLog[];
+  readonly fileList: IDeviceLogFile[];
+  readonly deviceLog: IDeviceLogEntry[];
   readonly appVersion: string;
   readonly appSettings: Settings;
   readonly loading: boolean;

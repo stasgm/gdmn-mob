@@ -8,7 +8,7 @@ const deviceLog = route();
 
 deviceLog.prefix('/deviceLogs');
 
-deviceLog.post('/', deviceLogValidation.addDeviceLog, authMiddleware, deviceMiddleware, addDeviceLog);
+deviceLog.put('/', deviceLogValidation.addDeviceLog, authMiddleware, deviceMiddleware, addDeviceLog);
 deviceLog.get('/', deviceLogValidation.getDeviceLogs, authMiddleware, superAdminMiddleware, getDeviceLogs);
 deviceLog.get('/:id', deviceLogValidation.getDeviceLog, authMiddleware, superAdminMiddleware, getDeviceLog);
 deviceLog.delete('/:id', deviceLogValidation.deleteDeviceLog, authMiddleware, superAdminMiddleware, deleteDeviceLog);

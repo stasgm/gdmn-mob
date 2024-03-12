@@ -48,13 +48,11 @@ const FileView = () => {
   const { loading, errorMessage, file, folders } = useSelector((state) => state.files);
 
   const fileObject = fileSelectors.fileByIdAndFolder(id);
-  console.log('fileObject', fileObject);
 
   const fetchFile = useCallback(() => {
     dispatch(
       fileActions.fetchFile(
         id,
-        // fileObject?.ext || '',
         fileObject?.folder || '',
         fileObject?.appSystem?.id || '',
         fileObject?.company?.id || '',
@@ -97,7 +95,6 @@ const FileView = () => {
     const res = await dispatch(
       fileActions.deleteFile(
         id,
-        // fileObject?.ext || '',
         fileObject?.folder || '',
         fileObject?.appSystem?.id || '',
         fileObject?.company?.id || '',
@@ -150,7 +147,6 @@ const FileView = () => {
               id: id,
               appSystemId: fileObject.appSystem?.id || '',
               companyId: fileObject.company?.id || '',
-              // ext: fileObject.ext || '',
               folder: fileObject.folder || '',
             },
           ],
@@ -185,7 +181,7 @@ const FileView = () => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${fileObject?.id}.${fileObject?.ext}`;
+    a.download = fileObject?.id || '';
     a.click();
     window.URL.revokeObjectURL(url);
   }, [file, fileObject]);

@@ -34,7 +34,7 @@ const findMany = async (requestParams: Record<string, string>): Promise<IServerL
  * @returns содержание найденного файла
  **/
 const getOne = async (file: IFileParams): Promise<string> => {
-  return await readFileData<string>(file);
+  return await readFileData<string>(file, false);
 };
 
 /**

@@ -8,7 +8,7 @@ import {
   RootState,
 } from '@lib/store';
 
-import { ICmdParams, IDeviceLog, IMessage } from '@lib/types';
+import { ICmdParams, IDeviceLogEntry, IMessage } from '@lib/types';
 import api, { isConnectError } from '@lib/client-api';
 
 import { useMemo } from 'react';
@@ -40,7 +40,7 @@ export const useSendOneRefRequest = (description: string, params: ICmdParams) =>
     );
   };
 
-  const addError = (name: string, message: string, tempErrs: IDeviceLog[]) => {
+  const addError = (name: string, message: string, tempErrs: IDeviceLogEntry[]) => {
     const err = {
       id: generateId(),
       name,
@@ -55,7 +55,7 @@ export const useSendOneRefRequest = (description: string, params: ICmdParams) =>
     dispatch(appActions.setLoading(true));
     dispatch(appActions.clearRequestNotice());
     dispatch(appActions.clearErrorNotice());
-    const tempErrs: IDeviceLog[] = [];
+    const tempErrs: IDeviceLogEntry[] = [];
     let connectError = false;
 
     if (!user || !company || !appSystem || !user.erpUser) {

@@ -16,7 +16,7 @@ import {
   TextField,
 } from '@mui/material';
 
-import { IDeviceLogFiles } from '@lib/types';
+import { IDeviceLogFile } from '@lib/types';
 
 import { useFormik } from 'formik';
 
@@ -25,14 +25,14 @@ import { IDeviceLogFileFilter, IDeviceLogPageParam, IPageParam } from '../../typ
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
-  deviceLogFiles: IDeviceLogFiles[];
-  selectedDeviceLogFiles: IDeviceLogFiles[];
+  deviceLogFiles: IDeviceLogFile[];
+  selectedDeviceLogFiles: IDeviceLogFile[];
   limitRows?: number;
   // onChangeSelectedDeviceLogFiles: (newSelectedDeviceIds: any[]) => void;
   isFilterVisible?: boolean;
   onSubmit: (values: any) => void;
   onDelete?: (ids?: string[]) => void;
-  onSelectOne: (_event: any, file: IDeviceLogFiles) => void;
+  onSelectOne: (_event: any, file: IDeviceLogFile) => void;
   onSelectMany: (event: any) => void;
   onSetPageParams: (logFilters: IPageParam) => void;
   pageParams?: IDeviceLogPageParam | undefined;
@@ -62,7 +62,7 @@ const DeviceLogFilesListTable = ({
     return {
       company: '',
       appSystem: '',
-      contact: '',
+      producer: '',
       device: '',
       uid: '',
       date: '',
@@ -133,7 +133,7 @@ const DeviceLogFilesListTable = ({
   const TableRows = () => {
     const deviceLogFileList = deviceLogFiles
       .slice(page * limit, page * limit + limit)
-      .map((deviceLogFile: IDeviceLogFiles) => {
+      .map((deviceLogFile: IDeviceLogFile) => {
         return (
           <TableRow
             hover
@@ -155,7 +155,7 @@ const DeviceLogFilesListTable = ({
               <Checkbox
                 checked={
                   selectedDeviceLogFiles
-                    ?.map((item: IDeviceLogFiles) => {
+                    ?.map((item: IDeviceLogFile) => {
                       return item.id;
                     })
                     .indexOf(deviceLogFile.id) !== -1
@@ -166,7 +166,7 @@ const DeviceLogFilesListTable = ({
             </TableCell>
             <TableCell>{deviceLogFile.company.name}</TableCell>
             <TableCell>{deviceLogFile.appSystem.name}</TableCell>
-            <TableCell>{deviceLogFile.contact.name}</TableCell>
+            <TableCell>{deviceLogFile.producer.name}</TableCell>
             <TableCell>{deviceLogFile.device.name}</TableCell>
             <TableCell>{deviceLogFile.device.id}</TableCell>
             <TableCell>{new Date(deviceLogFile.date || '').toLocaleString('ru', { hour12: false })}</TableCell>

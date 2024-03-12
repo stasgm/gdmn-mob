@@ -30,7 +30,6 @@ const findMany = async (requestParams: Record<string, string>): Promise<ISystemF
   const { companyId, appSystemId, ...params } = requestParams;
 
   const folderPath = fileObj2FullFileName({ companyId, appSystemId });
-  console.log('findMany', params);
 
   const fileNameList = await readDirectory(folderPath, !!companyId);
 

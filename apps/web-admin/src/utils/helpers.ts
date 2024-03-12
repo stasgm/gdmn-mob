@@ -32,7 +32,6 @@ export const getFilterObject = (filesFilters: IFileFilter) => {
 
 export const getFilesFilters = (filesFilters: IFilterObject) => {
   const newFilters: IFileFilter = Object.entries(filesFilters).reduce((prev, [name, value]) => {
-    console.log('getFilesFilters', name, value);
     prev[name] = value.value;
     return prev;
   }, fileFilterInitialValues);

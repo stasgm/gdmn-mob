@@ -1,6 +1,6 @@
 import api from '@lib/client-api';
 import { appActions, authActions, useDispatch, useSelector } from '@lib/store';
-import { IDeviceLog } from '@lib/types';
+import { IDeviceLogEntry } from '@lib/types';
 import { useCallback } from 'react';
 
 import Constants from 'expo-constants';
@@ -15,7 +15,7 @@ export const useSendDeviceLog = () => {
   const settings = useSelector((state) => state.settings.data);
 
   return useCallback(
-    async (errs: IDeviceLog[] = []) => {
+    async (errs: IDeviceLogEntry[] = []) => {
       // Неотправленные ошибки, если есть, передаем на сервер
       const sendingErrors = errorLog.filter((err) => err.isSent !== true);
 

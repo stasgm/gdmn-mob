@@ -10,13 +10,13 @@ console.log('files');
 
 file.prefix('/files');
 
+// Маршрут для получения списка папок
+file.get('/folders', fileValidation.getFolders, authMiddleware, superAdminMiddleware, getFolders);
+
 file.get('/', fileValidation.getFiles, authMiddleware, superAdminMiddleware, getFiles);
 file.get('/:id', fileValidation.getFile, authMiddleware, superAdminMiddleware, getFile);
 file.put('/:id', fileValidation.updateFile, authMiddleware, superAdminMiddleware, updateFile);
 file.delete('/:id', fileValidation.deleteFile, authMiddleware, superAdminMiddleware, deleteFile);
-
-// Маршрут для получения списка папок
-file.get('/folders', fileValidation.getFolders, authMiddleware, superAdminMiddleware, getFolders);
 
 // Маршруты для массовых операций с файлами
 file.post('/actions/deleteList', fileValidation.deleteFiles, authMiddleware, superAdminMiddleware, deleteFiles);

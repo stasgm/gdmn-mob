@@ -1,6 +1,13 @@
 import path from 'path';
 
-import { IDeviceData, IDeviceLog, IDeviceLogFiles, IFileActionResult, IFileParams, INewDeviceLog } from '@lib/types';
+import {
+  IAddDeviceLogParams,
+  IDeviceData,
+  IDeviceLogEntry,
+  IDeviceLogFile,
+  IFileActionResult,
+  IFileParams,
+} from '@lib/types';
 
 import { DataNotFoundException, InnerErrorException, InvalidParameterException } from '../exceptions';
 
@@ -22,7 +29,7 @@ import {
 /**
  * Добавляет запись с ошибкой в файл
  * по пользователю и устройству
- * @param {IDeviceLog} deviceLog - сообщение с ошибкой
+ * @param {IDeviceLogEntry} deviceLog - сообщение с ошибкой
  * @param {string} producerId - идентификатор отправителя
  * @param {string} appSystemId - идентификатор системы
  * @param {string} companyId - идентификатор организация
@@ -37,7 +44,7 @@ const addOne = async ({
   appSystemId,
   companyId,
   deviceId,
-}: INewDeviceLog): Promise<void> => {
+}: IAddDeviceLogParams): Promise<void> => {
   const { companies, appSystems, users } = getDb();
   if (!companies.findById(companyId)) {
     throw new DataNotFoundException('Компания не найдена');
@@ -52,29 +59,29 @@ const addOne = async ({
   }
 
   const file = { id: `from_${producerId}_dev_${deviceId}.json`, companyId, appSystemId, folder: deviceLogFolder };
-  let oldDeviceLogs: IDeviceLog[] = [];
+  let oldDeviceLog: IDeviceLogEntry[] = [];
 
   try {
-    const oldDeviceData = await readFileData<IDeviceData | IDeviceLog[]>(file);
+    const oldDeviceData = await readFileData<IDeviceData | IDeviceLogEntry[]>(file);
     const isArray = Array.isArray(oldDeviceData);
-    const isObject = typeof oldDeviceData === 'object' && 'logs' in oldDeviceData;
+    const isObject = typeof oldDeviceData === 'object' && 'deviceLog' in oldDeviceData;
 
     // если файл существует, но его содержимое не соответствует ожидаемому формату
     if (!(isArray || isObject || oldDeviceData === undefined)) {
       throw new InnerErrorException(`Файл ${file.id} содержит неверный формат данных`);
     }
 
-    // если файл содержит массив (старый формат), то берем его, иначе берем поле logs (новый формат)
-    oldDeviceLogs = isArray ? [...oldDeviceData] : oldDeviceData?.logs || [];
+    // если файл содержит массив (старый формат), то берем его, иначе берем поле deviceLog (новый формат)
+    oldDeviceLog = isArray ? [...oldDeviceData] : oldDeviceData?.deviceLog || [];
   } catch (err) {
     //Если файл не найден, то значит дальше создадим новый
   }
-  const delta = oldDeviceLogs.length + deviceLog.length - config.DEVICE_LOG_MAX_LINES;
+  const delta = oldDeviceLog.length + deviceLog.length - config.DEVICE_LOG_MAX_LINES;
 
   // если количество записей превышает максимальное, удаляем старые записи
-  if (delta > 0) oldDeviceLogs.splice(0, delta);
+  if (delta > 0) oldDeviceLog.splice(0, delta);
 
-  return await writeDataToFile(file, { appVersion, appSettings, logs: [...oldDeviceLogs, ...deviceLog] });
+  return await writeDataToFile(file, { appVersion, appSettings, deviceLog: [...oldDeviceLog, ...deviceLog] });
 };
 
 /**
@@ -90,20 +97,31 @@ const deleteOne = async (file: IFileParams): Promise<void> => {
  * @param id ИД сформированный из названия файла
  * @returns Объект из JSON  найденного файла
  **/
-const getOne = async (file: IFileParams): Promise<IDeviceLog[]> => {
+const getOne = async (file: IFileParams): Promise<IDeviceData | IDeviceLogEntry[]> => {
   const ext = path.extname(file.id);
+
   if (ext !== '.json') {
     throw new InvalidParameterException(`Неподдерживаемое расширение файла: ${ext}`);
   }
 
-  return await readFileData<IDeviceLog[]>(file);
+  const data = await readFileData<IDeviceData | IDeviceLogEntry[]>(file);
+  const isArray = Array.isArray(data);
+  const isObject = typeof data === 'object' && 'deviceLog' in data;
+
+  // если файл существует, но его содержимое не соответствует ожидаемому формату
+  if (!(isArray || isObject)) {
+    throw new InnerErrorException(`Файл ${file.id} содержит неверный формат данных`);
+  }
+  const deviceLog: IDeviceData = isObject ? data : { appVersion: '0.0.1', appSettings: {}, deviceLog: data };
+
+  return deviceLog;
 };
 
 /**
  * Возвращает множество лог-файлов по указанным параметрам
  * @returns Массив объектов лог-файлов
  */
-const findMany = async (requestParams: Record<string, string>): Promise<IDeviceLogFiles[]> => {
+const findMany = async (requestParams: Record<string, string>): Promise<IDeviceLogFile[]> => {
   const { companyId, appSystemId, ...params } = requestParams;
 
   const folderPath = fileObj2FullFileName({
@@ -123,7 +141,9 @@ const findMany = async (requestParams: Record<string, string>): Promise<IDeviceL
     });
   }
 
-  return await getFilesByParams<IDeviceLogFiles>(fileNameList, deviceLogParams, params);
+  return (await getFilesByParams<IDeviceLogFile>(fileNameList, deviceLogParams, params)).filter(
+    (file) => !!file.device && !!file.company && !!file.appSystem && !!file.producer,
+  );
 };
 
 /**

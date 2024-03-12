@@ -52,7 +52,6 @@ const FileEdit = () => {
       fileActions.updateFile(
         id,
         values as any,
-        // fileObject?.ext || '',
         fileObject?.folder || '',
         fileObject?.appSystem?.id || '',
         fileObject?.company?.id || '',

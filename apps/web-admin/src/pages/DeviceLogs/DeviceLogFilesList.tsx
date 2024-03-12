@@ -5,7 +5,7 @@ import CachedIcon from '@mui/icons-material/Cached';
 import FilterIcon from '@mui/icons-material/FilterAltOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 
-import { IDeviceLogFiles } from '@lib/types';
+import { IDeviceLogFile } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
@@ -18,7 +18,7 @@ import actions from '../../store/deviceLog';
 const DeviceLogFilesList = () => {
   const dispatch = useDispatch();
 
-  const { filesList, loading, errorMessage, pageParams } = useSelector((state) => state.deviceLogs);
+  const { fileList: filesList, loading, errorMessage, pageParams } = useSelector((state) => state.deviceLogs);
 
   const fetchDeviceLogFiles = useCallback(
     (logFilters?: IDeviceLogFileFilter, filterText?: string, fromRecord?: number, toRecord?: number) => {
@@ -81,7 +81,7 @@ const DeviceLogFilesList = () => {
     dispatch(actions.deviceLogActions.clearError());
   };
 
-  const [selectedDeviceLogFileIds, setSelectedDeviceLogFileIds] = useState<IDeviceLogFiles[]>([]);
+  const [selectedDeviceLogFileIds, setSelectedDeviceLogFileIds] = useState<IDeviceLogFile[]>([]);
 
   const handleSelectAll = (event: any) => {
     let newSelectedDeviceLogFileIds;
@@ -95,10 +95,10 @@ const DeviceLogFilesList = () => {
     setSelectedDeviceLogFileIds(newSelectedDeviceLogFileIds);
   };
 
-  const handleSelectOne = (_event: any, deviceLogFile: IDeviceLogFiles) => {
-    const selectedIndex = selectedDeviceLogFileIds.map((item: IDeviceLogFiles) => item.id).indexOf(deviceLogFile.id);
+  const handleSelectOne = (_event: any, deviceLogFile: IDeviceLogFile) => {
+    const selectedIndex = selectedDeviceLogFileIds.map((item: IDeviceLogFile) => item.id).indexOf(deviceLogFile.id);
 
-    let newSelectedDeviceLogFileIds: IDeviceLogFiles[] = [];
+    let newSelectedDeviceLogFileIds: IDeviceLogFile[] = [];
 
     if (selectedIndex === -1) {
       newSelectedDeviceLogFileIds = newSelectedDeviceLogFileIds.concat(selectedDeviceLogFileIds, deviceLogFile);
@@ -132,7 +132,6 @@ const DeviceLogFilesList = () => {
         id: i.id,
         appSystemId: i.appSystem?.id || '',
         companyId: i.company?.id || '',
-        ext: i.ext || '',
         folder: i.folder || '',
       };
     });

@@ -177,7 +177,6 @@ const FileList = () => {
         id: i.id,
         appSystemId: i.appSystem?.id || '',
         companyId: i.company?.id || '',
-        ext: i.ext || '',
         folder: i.folder || '',
       };
     });
@@ -244,7 +243,6 @@ const FileList = () => {
           id: i.id,
           appSystemId: i.appSystem?.id || '',
           companyId: i.company?.id || '',
-          ext: i.ext || '',
           folder: i.folder || '',
         };
       });

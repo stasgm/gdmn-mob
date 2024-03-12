@@ -150,6 +150,7 @@ export const getFilesByParams = async <T>(
  */
 export const readFileData = async <T = string | object>(
   file: IFileParams,
+  convertToJson = true,
   start?: number,
   end?: number,
 ): Promise<T> => {
@@ -157,6 +158,10 @@ export const readFileData = async <T = string | object>(
 
   try {
     const data = await readFileByChunks(fileName, false, start, end);
+
+    if (typeof data === 'string' && !convertToJson) {
+      return data as T;
+    }
 
     // Попытка преобразования данных из JSON
     try {

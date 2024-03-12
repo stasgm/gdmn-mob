@@ -1,4 +1,4 @@
-import { IDeviceLog, IDeviceLogFiles, IDeviceData, Settings, IFileParams, IFileActionResult } from '@lib/types';
+import { IDeviceLogEntry, IDeviceLogFile, IDeviceData, Settings, IFileParams, IFileActionResult } from '@lib/types';
 
 import { error, deviceLog as types, BaseApi, BaseRequest } from '../types';
 import { response2Log, sleep } from '../utils';
@@ -13,7 +13,7 @@ class DeviceLog extends BaseRequest {
     customRequest: CustomRequest,
     companyId: string,
     appSystemId: string,
-    deviceLog: IDeviceLog[],
+    deviceLog: IDeviceLogEntry[],
     appVersion: string,
     appSettings: Settings,
   ) => {
@@ -72,7 +72,7 @@ class DeviceLog extends BaseRequest {
     if (res.type === 'SUCCESS') {
       return {
         type: 'GET_DEVICELOG',
-        deviceLog: res.data,
+        deviceLogData: res.data,
       } as types.IGetDeviceLogResponse;
     }
 
@@ -88,11 +88,11 @@ class DeviceLog extends BaseRequest {
 
       return {
         type: 'GET_DEVICELOGS',
-        deviceLogs: [],
+        deviceLogFiles: [],
       } as types.IGetDeviceLogFilesResponse;
     }
 
-    const res = await customRequest<IDeviceLogFiles[]>({
+    const res = await customRequest<IDeviceLogFile[]>({
       api: this.api.axios,
       method: 'GET',
       url: '/deviceLogs',
@@ -102,7 +102,7 @@ class DeviceLog extends BaseRequest {
     if (res.type === 'SUCCESS') {
       return {
         type: 'GET_DEVICELOGS',
-        deviceLogs: res.data || [],
+        deviceLogFiles: res.data || [],
       } as types.IGetDeviceLogFilesResponse;
     }
 

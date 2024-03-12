@@ -21,7 +21,7 @@ import {
 import api, { isConnectError } from '@lib/client-api';
 import {
   BodyType,
-  IDeviceLog,
+  IDeviceLogEntry,
   IDocument,
   IMessage,
   IReferences,
@@ -50,7 +50,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
   const clean = 0;
 
   const addError = useCallback(
-    (name: string, message: string, errs: IDeviceLog[], addErrorNotice = true) => {
+    (name: string, message: string, errs: IDeviceLogEntry[], addErrorNotice = true) => {
       const err = {
         id: generateId(),
         name,
@@ -108,7 +108,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
   );
 
   const processMessage = useCallback(
-    async (msg: IMessage, tempErrs: IDeviceLog[], multipartId?: string) => {
+    async (msg: IMessage, tempErrs: IDeviceLogEntry[], multipartId?: string) => {
       if (!msg || !params) {
         return;
       }
@@ -438,7 +438,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
     dispatch(appActions.setLoading(true));
     dispatch(appActions.clearRequestNotice());
     dispatch(appActions.clearErrorNotice());
-    const tempErrs: IDeviceLog[] = [];
+    const tempErrs: IDeviceLogEntry[] = [];
     let connectError = false;
 
     try {

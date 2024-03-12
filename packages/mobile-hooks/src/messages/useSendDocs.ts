@@ -8,7 +8,7 @@ import {
   useAuthThunkDispatch,
 } from '@lib/store';
 
-import { IDeviceLog, IDocument, IMessage } from '@lib/types';
+import { IDeviceLogEntry, IDocument, IMessage } from '@lib/types';
 import api, { isConnectError } from '@lib/client-api';
 
 import { useMemo } from 'react';
@@ -32,7 +32,7 @@ export const useSendDocs = (readyDocs: IDocument[], sendingDocs: IDocument[] = r
   const saveErrors = useSendDeviceLog();
   const appRequest = useMemo(() => mobileRequest(authDispatch, authActions), [authDispatch]);
 
-  const addError = (name: string, message: string, tempErrs: IDeviceLog[]) => {
+  const addError = (name: string, message: string, tempErrs: IDeviceLogEntry[]) => {
     const err = {
       id: generateId(),
       name,
@@ -56,7 +56,7 @@ export const useSendDocs = (readyDocs: IDocument[], sendingDocs: IDocument[] = r
     dispatch(appActions.setLoading(true));
     dispatch(appActions.clearRequestNotice());
     dispatch(appActions.clearErrorNotice());
-    const tempErrs: IDeviceLog[] = [];
+    const tempErrs: IDeviceLogEntry[] = [];
     let connectError = false;
 
     if (!user || !company || !appSystem || !user.erpUser) {

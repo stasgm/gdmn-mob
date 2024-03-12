@@ -2,7 +2,7 @@ import { Box, Container } from '@mui/material';
 
 import { useCallback, useEffect } from 'react';
 
-import { IDeviceLog } from '@lib/types';
+import { IDeviceLogEntry } from '@lib/types';
 
 import { IHeadCells } from '../../types';
 
@@ -20,7 +20,7 @@ interface IProps {
 const UserDeviceLog = ({ userId, deviceId }: IProps) => {
   const dispatch = useDispatch();
 
-  const { logList } = useSelector((state) => state.deviceLogs);
+  const { deviceLog } = useSelector((state) => state.deviceLogs);
 
   const fetchDeviceLogFiles = useCallback(
     (_filterText?: string, _fromRecord?: number, _toRecord?: number) => {
@@ -34,7 +34,7 @@ const UserDeviceLog = ({ userId, deviceId }: IProps) => {
     fetchDeviceLogFiles();
   }, [fetchDeviceLogFiles]);
 
-  const userLogFile = deviceLogSelectors.deviceLogByUserDeviceIds(userId, deviceId);
+  const userLogFile = deviceLogSelectors.deviceLogFileByUserAndDevice(userId, deviceId);
 
   const fetchDeviceLogFile = useCallback(
     (_filterText?: string, _fromRecord?: number, _toRecord?: number) => {
@@ -50,7 +50,7 @@ const UserDeviceLog = ({ userId, deviceId }: IProps) => {
     fetchDeviceLogFile();
   }, [fetchDeviceLogFile, userLogFile?.id]);
 
-  const headCells: IHeadCells<IDeviceLog>[] = [
+  const headCells: IHeadCells<IDeviceLogEntry>[] = [
     { id: 'name', label: 'Функция', sortEnable: true, filterEnable: true },
     { id: 'message', label: 'Сообщение', sortEnable: true, filterEnable: true },
     { id: 'date', label: 'Дата', sortEnable: true, filterEnable: true },
@@ -65,7 +65,7 @@ const UserDeviceLog = ({ userId, deviceId }: IProps) => {
     >
       <Container maxWidth={false}>
         <Box sx={{ pt: 2 }}>
-          <SortableTable<IDeviceLog> headCells={headCells} data={logList} path={'/app/deviceLogs/'} />
+          <SortableTable<IDeviceLogEntry> headCells={headCells} data={deviceLog} path={'/app/deviceLogs/'} />
         </Box>
       </Container>
     </Box>

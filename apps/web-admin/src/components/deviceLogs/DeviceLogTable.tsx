@@ -3,12 +3,12 @@ import { useState, useEffect } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
 import { Box, Card, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@mui/material';
-import { IDeviceLog } from '@lib/types';
+import { IDeviceLogEntry } from '@lib/types';
 
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
-  deviceLog: IDeviceLog[];
+  deviceLog: IDeviceLogEntry[];
   limitRows?: number;
 }
 
@@ -32,7 +32,7 @@ const DeviceLogTable = ({ deviceLog = [], limitRows = 0 }: IProps) => {
   }, [limitRows]);
 
   const TableRows = () => {
-    const deviceLogList = deviceLog.slice(page * limit, page * limit + limit).map((log: IDeviceLog) => {
+    const deviceLogList = deviceLog.slice(page * limit, page * limit + limit).map((log: IDeviceLogEntry) => {
       return (
         <TableRow hover key={log.id}>
           <TableCell>{log.name}</TableCell>

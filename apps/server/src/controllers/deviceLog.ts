@@ -1,6 +1,6 @@
 import { Context, ParameterizedContext } from 'koa';
 
-import { IDeleteDeviceLogsRequest, IDeviceLogParams, IUser } from '@lib/types';
+import { DeleteDeviceLogsRequest, IUser, IAddDeviceLogParams } from '@lib/types';
 
 import { deviceLogService, fileUtils } from '../services';
 
@@ -9,7 +9,7 @@ import { InvalidParameterException } from '../exceptions';
 import { notOk, ok, prepareParams } from '../utils';
 
 const addDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
-  const { appVersion, appSettings, deviceLog, companyId, appSystemId } = ctx.request.body as IDeviceLogParams;
+  const { appVersion, appSettings, deviceLog, companyId, appSystemId } = ctx.request.body as IAddDeviceLogParams;
   const deviceId = ctx.query.deviceId as string;
   const user = ctx.state.user as IUser;
 
@@ -74,7 +74,7 @@ const deleteDeviceLog = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const deleteDeviceLogs = async (ctx: ParameterizedContext): Promise<void> => {
-  const { files } = ctx.request.body as IDeleteDeviceLogsRequest;
+  const { files } = ctx.request.body as DeleteDeviceLogsRequest;
 
   const deletedFiles = await deviceLogService.deleteMany(
     files.map((file) => ({ ...file, folder: fileUtils.deviceLogFolder })),

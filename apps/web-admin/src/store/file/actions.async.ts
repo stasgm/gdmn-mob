@@ -27,8 +27,6 @@ const fetchFiles = (
   if (fromRecord) params.fromRecord = fromRecord;
   if (toRecord) params.toRecord = toRecord;
 
-  console.log('fetchFiles', params);
-
   return async (dispatch) => {
     dispatch(fileSystemActions.fetchFilesAsync.request(''));
     const response = await api.file.getFiles(webRequest(dispatch, authActions), params);
@@ -47,7 +45,6 @@ const fetchFile = (id: string, folder?: string, appSystemId?: string, companyId?
 
     const params: Record<string, string | number> = {};
 
-    // if (ext) params.ext = ext;
     if (folder) params.folder = folder;
     if (appSystemId) params.appSystemId = appSystemId;
     if (companyId) params.companyId = companyId;
@@ -62,20 +59,12 @@ const fetchFile = (id: string, folder?: string, appSystemId?: string, companyId?
   };
 };
 
-const updateFile = (
-  id: string,
-  file: any,
-  // ext?: string,
-  folder?: string,
-  appSystemId?: string,
-  companyId?: string,
-): AppThunk => {
+const updateFile = (id: string, file: any, folder?: string, appSystemId?: string, companyId?: string): AppThunk => {
   return async (dispatch) => {
     dispatch(fileSystemActions.updateFileAsync.request('Обновление файла'));
 
     const params: Record<string, string | number> = {};
 
-    // if (ext) params.ext = ext;
     if (folder) params.folder = folder;
     if (appSystemId) params.appSystemId = appSystemId;
     if (companyId) params.companyId = companyId;
@@ -96,7 +85,6 @@ const deleteFile = (id: string, folder?: string, appSystemId?: string, companyId
 
     const params: Record<string, string | number> = {};
 
-    // if (ext) params.ext = ext;
     if (folder) params.folder = folder;
     if (appSystemId) params.appSystemId = appSystemId;
     if (companyId) params.companyId = companyId;

@@ -83,7 +83,7 @@ export interface IDeviceLogFileFilter {
   [fieldName: string]: string;
   company: string;
   appSystem: string;
-  contact: string;
+  producer: string;
   device: string;
   uid: string;
   date: string;
