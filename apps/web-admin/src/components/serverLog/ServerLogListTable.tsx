@@ -5,15 +5,15 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 
 import { Box, Card, Checkbox, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@mui/material';
 
-import { IServerLogFile } from '@lib/types';
+import { ServerLogFile } from '@lib/types';
 
 import { adminPath } from '../../utils/constants';
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 import { IPageParam } from '../../types';
 
 interface IProps {
-  serverLogs: IServerLogFile[];
-  selectedServerLogs?: IServerLogFile[];
+  serverLogs: ServerLogFile[];
+  selectedServerLogs?: ServerLogFile[];
   limitRows?: number;
   onChangeSelectedDevices?: (newSelectedDeviceIds: any[]) => void;
   onSetPageParams?: (pageParams: IPageParam) => void;
@@ -30,7 +30,7 @@ const ServerLogListTable = ({
 }: IProps) => {
   const navigate = useNavigate();
 
-  const [selectedServerLogsIds, setSelectedServerLogsIds] = useState<IServerLogFile[]>(selectedServerLogs);
+  const [selectedServerLogsIds, setSelectedServerLogsIds] = useState<ServerLogFile[]>(selectedServerLogs);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
   const maxHeight = useWindowResizeMaxHeight();
@@ -48,10 +48,10 @@ const ServerLogListTable = ({
     onChangeSelectedDevices && onChangeSelectedDevices(newSelectedServerLogIds);
   };
 
-  const handleSelectOne = (_event: any, serverLog: IServerLogFile) => {
-    const selectedIndex = selectedServerLogsIds.map((item: IServerLogFile) => item.name).indexOf(serverLog.name);
+  const handleSelectOne = (_event: any, serverLog: ServerLogFile) => {
+    const selectedIndex = selectedServerLogsIds.map((item: ServerLogFile) => item.name).indexOf(serverLog.name);
 
-    let newSelectedServerLogIds: IServerLogFile[] = [];
+    let newSelectedServerLogIds: ServerLogFile[] = [];
 
     if (selectedIndex === -1) {
       newSelectedServerLogIds = newSelectedServerLogIds.concat(selectedServerLogsIds, serverLog);
@@ -88,7 +88,7 @@ const ServerLogListTable = ({
 
     if (selectedServerLogsIds.length === 0) {
       if (selectedServerLogs.length > 0) {
-        const newSelectedServerLogIds = selectedServerLogs.map((serverLog: IServerLogFile) => serverLog);
+        const newSelectedServerLogIds = selectedServerLogs.map((serverLog: ServerLogFile) => serverLog);
 
         setSelectedServerLogsIds(newSelectedServerLogIds);
       }
@@ -96,7 +96,7 @@ const ServerLogListTable = ({
   }, [limitRows, selectedServerLogsIds.length, selectedServerLogs]);
 
   const TableRows = () => {
-    const serverLogList = serverLogs.slice(page * limit, page * limit + limit).map((serverLog: IServerLogFile) => {
+    const serverLogList = serverLogs.slice(page * limit, page * limit + limit).map((serverLog: ServerLogFile) => {
       return (
         <TableRow
           hover
@@ -114,7 +114,7 @@ const ServerLogListTable = ({
             <Checkbox
               checked={
                 selectedServerLogsIds
-                  .map((item: IServerLogFile) => {
+                  .map((item: ServerLogFile) => {
                     return item.name;
                   })
                   .indexOf(serverLog.name) !== -1

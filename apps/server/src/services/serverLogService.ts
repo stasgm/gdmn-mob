@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 
-import { IFileActionResult, IFileParams, IServerLogFile } from '@lib/types';
+import { IFileActionResult, IFileParams, ServerLogFile } from '@lib/types';
 
 import { checkFileExists } from '../utils';
 
@@ -18,14 +18,14 @@ import {
  * Возвращает множество файлов логов сервера
  * @returns Массив объектов файлов ошибок
  */
-const findMany = async (requestParams: Record<string, string>): Promise<IServerLogFile[]> => {
+const findMany = async (requestParams: Record<string, string>): Promise<ServerLogFile[]> => {
   if (!(await checkFileExists(serverLogPath))) {
     throw new Error(`${serverLogPath} не существует или не доступна для чтения.`);
   }
 
   const fileNameList = await readDirectory(serverLogPath, false);
 
-  return await getFilesByParams<IServerLogFile>(fileNameList, serverLogParams, requestParams);
+  return await getFilesByParams<ServerLogFile>(fileNameList, serverLogParams, requestParams);
 };
 
 /**

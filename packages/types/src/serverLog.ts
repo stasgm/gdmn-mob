@@ -1,3 +1,3 @@
 import { ISystemFile } from './files';
 
-export type IServerLogFile = ISystemFile;
+export type ServerLogFile = ISystemFile;
