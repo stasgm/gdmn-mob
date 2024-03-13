@@ -1,10 +1,12 @@
+import { IUser } from '@lib/types';
 import { Context, Next } from 'koa';
 
-import { UnauthorizedException } from '../exceptions';
+import { ForbiddenException } from '../exceptions';
 
 export const adminMiddleware = async (ctx: Context, next: Next) => {
-  if (!ctx.state.user.creator) {
-    throw new UnauthorizedException(`Не определен администратор пользователя ${ctx.state.user.name}`);
+  if ((ctx.state.user as IUser)?.role === 'User') {
+    // TODO сделать гибкую систему прав
+    throw new ForbiddenException('Нет прав на операцию');
   }
 
   await next();

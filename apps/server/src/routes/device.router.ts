@@ -1,37 +1,30 @@
 import router from 'koa-joi-router';
 
-import { addDevice, getDevices, updateDevice, removeDevice, getDevice } from '../controllers/device';
-import { authMiddleware, deviceMiddleware, permissionMiddleware, roleBasedParamsMiddlware } from '../middleware';
+import { addDevice, getDevice, getDevices, removeDevice, updateDevice } from '../controllers/device';
+import { authMiddleware, deviceMiddleware, adminMiddleware, setCompanyIdMiddleware } from '../middleware';
 
 import { deviceValidation } from '../validations';
 
 const devices = router();
 
 devices.prefix('/devices');
-devices.post(
-  '/',
-  deviceValidation.addDevice,
-  authMiddleware,
-  permissionMiddleware,
-  roleBasedParamsMiddlware,
-  addDevice,
-);
-devices.get('/', authMiddleware, deviceMiddleware, roleBasedParamsMiddlware, getDevices);
-devices.get('/:id', deviceValidation.getDevice, deviceMiddleware, roleBasedParamsMiddlware, getDevice);
+devices.post('/', deviceValidation.addDevice, authMiddleware, adminMiddleware, setCompanyIdMiddleware, addDevice);
+devices.get('/', authMiddleware, deviceMiddleware, setCompanyIdMiddleware, getDevices);
+devices.get('/:id', deviceValidation.getDevice, deviceMiddleware, setCompanyIdMiddleware, getDevice);
 devices.patch(
   '/:id',
   deviceValidation.updateDevice,
   authMiddleware,
-  permissionMiddleware,
-  roleBasedParamsMiddlware,
+  adminMiddleware,
+  setCompanyIdMiddleware,
   updateDevice,
 );
 devices.delete(
   '/:id',
   deviceValidation.removeDevice,
   authMiddleware,
-  permissionMiddleware,
-  roleBasedParamsMiddlware,
+  adminMiddleware,
+  setCompanyIdMiddleware,
   removeDevice,
 );
 

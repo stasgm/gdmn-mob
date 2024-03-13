@@ -2,12 +2,12 @@ import router from 'koa-joi-router';
 
 import {
   addDeviceBinding,
-  getDeviceBindings,
   getDeviceBinding,
+  getDeviceBindings,
   removeDeviceBinding,
   updateDeviceBinding,
 } from '../controllers/deviceBinding';
-import { authMiddleware, permissionMiddleware, roleBasedParamsMiddlware } from '../middleware';
+import { authMiddleware, adminMiddleware, setCompanyIdMiddleware } from '../middleware';
 
 import { deviceBindingValidation } from '../validations';
 
@@ -18,27 +18,27 @@ deviceBindings.post(
   '/',
   deviceBindingValidation.bindingDevice,
   authMiddleware,
-  permissionMiddleware,
-  roleBasedParamsMiddlware,
+  adminMiddleware,
+  setCompanyIdMiddleware,
   addDeviceBinding,
 );
-deviceBindings.get('/', authMiddleware, permissionMiddleware, roleBasedParamsMiddlware, getDeviceBindings);
+deviceBindings.get('/', authMiddleware, adminMiddleware, setCompanyIdMiddleware, getDeviceBindings);
 deviceBindings.get(
   '/:id',
   deviceBindingValidation.getDeviceBinding,
   authMiddleware,
-  permissionMiddleware,
-  roleBasedParamsMiddlware,
+  adminMiddleware,
+  setCompanyIdMiddleware,
   getDeviceBinding,
 );
 deviceBindings.patch(
   '/:id',
   deviceBindingValidation.updateDeviceBinding,
   authMiddleware,
-  permissionMiddleware,
-  roleBasedParamsMiddlware,
+  adminMiddleware,
+  setCompanyIdMiddleware,
   updateDeviceBinding,
 );
-deviceBindings.delete('/:id', authMiddleware, permissionMiddleware, roleBasedParamsMiddlware, removeDeviceBinding);
+deviceBindings.delete('/:id', authMiddleware, adminMiddleware, setCompanyIdMiddleware, removeDeviceBinding);
 
 export default deviceBindings;

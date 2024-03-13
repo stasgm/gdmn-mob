@@ -2,15 +2,15 @@ import router from 'koa-joi-router';
 
 import {
   addProcess,
-  updateProcess,
-  prepareProcess,
-  completeProcess,
   cancelProcess,
-  interruptProcess,
-  getProcesses,
+  completeProcess,
   deleteProcess,
+  getProcesses,
+  interruptProcess,
+  prepareProcess,
+  updateProcess,
 } from '../controllers/process';
-import { authMiddleware, deviceMiddleware, processParamsMiddlware, getProcessParamsMiddlware } from '../middleware';
+import { authMiddleware, deviceMiddleware, processParamsMiddlware, setCompanyIdMiddleware } from '../middleware';
 import { processValidation } from '../validations';
 
 const processes = router();
@@ -33,7 +33,7 @@ processes.get(
   processValidation.getProcesses,
   authMiddleware,
   deviceMiddleware,
-  getProcessParamsMiddlware,
+  setCompanyIdMiddleware,
   getProcesses,
 );
 processes.delete('/:id', processValidation.deleteProcess, authMiddleware, deviceMiddleware, deleteProcess);

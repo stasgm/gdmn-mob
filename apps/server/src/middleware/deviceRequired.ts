@@ -1,5 +1,5 @@
-import { Context, Next } from 'koa';
 import { IUser } from '@lib/types';
+import { Context, Next } from 'koa';
 
 import { InvalidParameterException, UnauthorizedException } from '../exceptions';
 import { getDb } from '../services/dao/db';
@@ -7,10 +7,6 @@ import { getDb } from '../services/dao/db';
 export const deviceMiddleware = async (ctx: Context, next: Next) => {
   // Проверяем идентификатор только у пользователей с правами User
   const user = ctx.state.user as IUser;
-
-  // if (!user) {
-  //   throw new UnauthorizedException('Не пройдена аутентификация');
-  // }
 
   if (user?.role === 'User') {
     const deviceId = ctx.query.deviceId;
