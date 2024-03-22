@@ -6,11 +6,11 @@ import FilterIcon from '@mui/icons-material/FilterAltOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import DriveFileMoveOutlinedIcon from '@mui/icons-material/DriveFileMoveOutlined';
 
-import { IFileObject, IFileSystem } from '@lib/types';
+import { IFileObject, IFileSystem, INamedEntity, IUser } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import { IFileFilter, IHeadCells, IFilePageParam, IToolBarButton } from '../../types';
+import { IFileFilter, IFilePageParam, IHeadCells, IListOption, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
 import actions from '../../store/file';
@@ -20,6 +20,7 @@ import companyActions from '../../store/company';
 import userActions from '../../store/user';
 import appSystemActions from '../../store/appSystem';
 import deviceActions from '../../store/device';
+import { useWindowResizeWidth } from '../../utils/useWindowResizeMaxWidth';
 
 const FileList = () => {
   const dispatch = useDispatch();
@@ -27,6 +28,8 @@ const FileList = () => {
   const { list, loading, errorMessage, pageParams, folders } = useSelector((state) => state.files);
 
   const sortedList = useMemo(() => list.sort((a, b) => (a.path < b.path ? -1 : 1)), [list]);
+
+  const maxWidth = useWindowResizeWidth(0.8);
 
   const fetchFiles = useCallback(
     (filesFilters?: IFileFilter, filterText?: string, fromRecord?: number, toRecord?: number) => {
@@ -53,6 +56,53 @@ const FileList = () => {
     // Загружаем данные при загрузке компонента.
     fetchFiles(pageParams?.filesFilters);
   }, [fetchFiles, pageParams?.filesFilters]);
+
+  const { list: companies, loading: loadingCompanies } = useSelector((state) => state.companies);
+  const { list: appSystems, loading: loadingAppSystems } = useSelector((state) => state.appSystems);
+  const { list: users, loading: loadingUsers } = useSelector((state) => state.users);
+  const { list: devices, loading: loadingDevices } = useSelector((state) => state.devices);
+
+  const companyList = companies.map((d) => ({ id: d.id, name: d.name })) || [];
+  const appSystemList = appSystems.map((d) => ({ id: d.id, name: d.name })) || [];
+
+  const userList = companyList.length
+    ? users
+        .filter((i) => companyList.find((c) => c.name === formikCompany?.name && c.id === i.company?.id))
+        .map((d) => ({ id: d.id, name: d.name }))
+    : [];
+
+  const deviceList = companyList.length
+    ? devices
+        .filter((i) => companyList.find((c) => c.name === formikCompany?.name && c.id === i.company?.id))
+        .map((d) => ({ id: d.id, name: d.name }))
+    : [];
+
+  const foldersList = folders.map((i) => ({ id: i, name: i })) || [];
+
+  const listOptions: IListOption = {
+    company: companyList,
+    appSystem: appSystemList,
+    producer: userList,
+    consumer: userList,
+    device: deviceList,
+    folder: foldersList,
+  };
+  useEffect(() => {
+    if (pageParams?.filesFilters?.company && pageParams?.filesFilters?.appSystem) {
+      const companyId = companies.find((i) => i.name === pageParams?.filesFilters?.company)?.id;
+      const appSystemId = appSystems.find((i) => i.name === pageParams?.filesFilters?.appSystem)?.id;
+      if (companyId && appSystemId) {
+        dispatch(actions.fetchFolders(companyId, appSystemId));
+      }
+    }
+  }, [appSystems, companies, dispatch, pageParams?.filesFilters?.appSystem, pageParams?.filesFilters?.company]);
+
+  const [formikCompany, setFormikCompany] = useState<INamedEntity | undefined>(
+    // pageParams?.filesFilters?.company
+    //   ? companyList.find((c) => c.name === pageParams?.filesFilters?.company)
+    //   : undefined,
+    undefined,
+  );
 
   console.log('pageParams', pageParams?.filesFilters);
 
@@ -170,11 +220,11 @@ const FileList = () => {
   const handleFilter = useCallback(() => {
     if (filterVisible) {
       setFilterVisible(false);
-      dispatch(actions.fileSystemActions.setPageParam({ filesFilters: undefined, page: 0 }));
+      // dispatch(actions.fileSystemActions.setPageParam({ filesFilters: undefined, page: 0 }));
     } else {
       setFilterVisible(true);
     }
-  }, [dispatch, filterVisible]);
+  }, [filterVisible]);
 
   const handleDelete = useCallback(() => {
     setOpen(false);
@@ -289,6 +339,20 @@ const FileList = () => {
     },
   ];
 
+  const headCells: IHeadCells<IFileSystem>[] = [
+    { id: 'folder', label: 'Папка', sortEnable: true, value: 'db' },
+    { id: 'id', label: 'Название', sortEnable: true },
+    { id: 'company', label: 'Компания', sortEnable: true, fieldName: 'name' },
+    { id: 'appSystem', label: 'Подсистема', sortEnable: false, fieldName: 'name' },
+    { id: 'producer', label: 'Пользователь', sortEnable: true, fieldName: 'name' },
+    { id: 'consumer', label: 'Получатель', sortEnable: true, fieldName: 'name' },
+    { id: 'device', label: 'Устройство', sortEnable: true, fieldName: 'name' },
+    { id: 'device', label: 'Номер устройства', sortEnable: true, fieldName: 'id' },
+    { id: 'date', label: 'Дата', sortEnable: true },
+    { id: 'size', label: 'Размер', sortEnable: true },
+    { id: 'path', label: 'Путь', sortEnable: true },
+  ];
+
   return (
     <>
       <Helmet>
@@ -324,6 +388,7 @@ const FileList = () => {
         sx={{
           backgroundColor: 'background.default',
           minHeight: '100%',
+          maxWidth: filterVisible ? maxWidth : '100%',
           py: 3,
         }}
       >
@@ -343,6 +408,7 @@ const FileList = () => {
           ) : (
             <Box sx={{ pt: 2 }}>
               <FileListTable
+                headCells={headCells}
                 files={sortedList}
                 isFilterVisible={filterVisible}
                 onSubmit={fetchFiles}
@@ -353,6 +419,9 @@ const FileList = () => {
                 onSetPageParams={handleSetPageParams}
                 pageParams={pageParams}
                 onCloseFilters={() => setFilterVisible(false)}
+                company={formikCompany}
+                setCompany={(value: INamedEntity) => setFormikCompany(value)}
+                listOptions={listOptions}
               />
             </Box>
             // <Box sx={{ pt: 2 }}>

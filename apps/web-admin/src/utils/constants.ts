@@ -25,14 +25,14 @@ const fileFiltersDescription = {
 };
 
 const fileFilterValues: IFilterObject = {
-  folder: { id: 'folder', name: 'Папка', type: 'text', value: '', visible: true },
+  company: { id: 'company', name: 'Компания', type: 'select', value: '', visible: true, data: [] },
+  appSystem: { id: 'appSystem', name: 'Подсистема', type: 'select', value: '', visible: true, data: [] },
+  folder: { id: 'folder', name: 'Папка', type: 'select', value: '', visible: true, data: [] },
   // path: '',
   fileName: { id: 'fileName', name: 'Имя файла', type: 'text', value: '', visible: true },
-  company: { id: 'company', name: 'Компания', type: 'select', value: '', visible: true },
-  appSystem: { id: 'appSystem', name: 'Подсистема', type: 'select', value: '', visible: true },
-  producer: { id: 'producer', name: 'Пользователь', type: 'select', value: '', visible: true },
-  consumer: { id: 'consumer', name: 'Получатель', type: 'select', value: '', visible: true },
-  device: { id: 'device', name: 'Устройство', type: 'select', value: '', visible: true },
+  producer: { id: 'producer', name: 'Пользователь', type: 'select', value: '', visible: true, data: [] },
+  consumer: { id: 'consumer', name: 'Получатель', type: 'select', value: '', visible: true, data: [] },
+  device: { id: 'device', name: 'Устройство', type: 'select', value: '', visible: true, data: [] },
   uid: { id: 'uid', name: 'Номер устройства', type: 'text', value: '', visible: true },
   dateFrom: { id: 'dateFrom', name: 'Дата начала', type: 'date', value: '', visible: true },
   dateTo: { id: 'dateTo', name: 'Дата окончания', type: 'date', value: '', visible: true },

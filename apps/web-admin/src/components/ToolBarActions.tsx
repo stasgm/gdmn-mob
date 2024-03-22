@@ -56,7 +56,7 @@ const ToolBarActions = ({ buttons }: props) => {
     },
   }));
 
-  const MyMenuItem = (props: MenuItemProps) => <StyledMenuItem />;
+  const MyMenuItem = (props: MenuItemProps) => <StyledMenuItem {...props} />;
 
   const buttonsList = (
     <Box>

@@ -28,6 +28,9 @@ export interface IHeadCells<T> {
   label: string;
   sortEnable?: boolean;
   filterEnable?: boolean;
+  fieldName?: string;
+  value?: string;
+  type?: 'number' | 'date';
 }
 
 export interface IMessageHead {
@@ -71,6 +74,15 @@ export interface IFilterOption extends INamedEntity {
   type: 'text' | 'select' | 'date';
   value: string;
   visible: boolean;
+  data?: [];
+}
+
+export interface IFilterTable {
+  [fieldName: string]: string;
+}
+
+export interface IListOption {
+  [fieldName: string]: INamedEntity[];
 }
 
 export interface IFilePageParam extends IPageParam {
