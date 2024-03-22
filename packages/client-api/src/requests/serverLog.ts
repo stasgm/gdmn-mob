@@ -1,4 +1,4 @@
-import { IServerLogFile } from '@lib/types';
+import { ServerLogFile } from '@lib/types';
 
 import { error, serverLog as types, BaseApi, BaseRequest } from '../types';
 import { response2Log, sleep } from '../utils';
@@ -48,7 +48,7 @@ class ServerLog extends BaseRequest {
       } as types.IGetServerLogsResponse;
     }
 
-    const res = await customRequest<IServerLogFile[]>({
+    const res = await customRequest<ServerLogFile[]>({
       api: this.api.axios,
       method: 'GET',
       url: '/serverLogs',
