@@ -3,7 +3,7 @@ import { IUser } from '@lib/types';
 
 import { ForbiddenException } from '../exceptions';
 
-export const appSystemMiddleware = async (ctx: Context, next: Next) => {
+export const superAdminMiddleware = async (ctx: Context, next: Next) => {
   if ((ctx.state.user as IUser).role !== 'SuperAdmin') {
     throw new ForbiddenException('Нет прав на операцию');
   }

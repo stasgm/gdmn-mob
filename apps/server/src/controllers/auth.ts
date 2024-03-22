@@ -3,12 +3,12 @@ import { ParameterizedContext, Next, Context } from 'koa';
 import { IUser, IUserCredentials, NewAccessCode, NewActivationCode } from '@lib/types';
 
 import { authService } from '../services';
-import { created, ok } from '../utils/apiHelpers';
+import { created, ok } from '../utils';
 
 /**
  * Регистрация нового пользователя (Администратора компании)
  * */
-export const signup = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
+export const signup = async (ctx: ParameterizedContext): Promise<void> => {
   const { name, password, email } = ctx.request.body as IUserCredentials;
 
   authService.signup({
@@ -33,7 +33,7 @@ export const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void
 /**
  * Проверка текущего пользователя в сессии koa
  * */
-export const getCurrentUser = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
+export const getCurrentUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { user } = ctx.state;
 
   delete user.password;
@@ -41,7 +41,7 @@ export const getCurrentUser = async (ctx: ParameterizedContext, next: Next): Pro
   ok(ctx as Context, user, `getCurrentUser: user '${user.name}' (${user.id}) authenticated`);
 };
 
-export const logout = async (ctx: Context, next: Next): Promise<void> => {
+export const logout = async (ctx: Context): Promise<void> => {
   if (ctx.state.user) {
     const user = ctx.state.user as IUser;
 
@@ -56,7 +56,7 @@ export const logout = async (ctx: Context, next: Next): Promise<void> => {
   }
 };
 
-export const verifyCode = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
+export const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
   const { code } = ctx.request.body as NewActivationCode;
 
   const uid = authService.verifyCode(code);
@@ -64,7 +64,7 @@ export const verifyCode = async (ctx: ParameterizedContext, next: Next): Promise
   ok(ctx as Context, uid, `verifyCode device '${uid}': ok`);
 };
 
-export const getDeviceStatus = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
+export const getDeviceStatus = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: uid } = ctx.params;
 
   const deviceStatus = authService.getDeviceStatus(uid);
@@ -72,7 +72,7 @@ export const getDeviceStatus = async (ctx: ParameterizedContext, next: Next): Pr
   ok(ctx as Context, deviceStatus, `getDeviceStatus device '${uid}': ok`);
 };
 
-export const checkAccessCode = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
+export const checkAccessCode = async (ctx: ParameterizedContext): Promise<void> => {
   const { code } = ctx.request.body as NewAccessCode;
 
   const uid = authService.checkAccessCode(ctx.state.user.creator.id, code);

@@ -24,16 +24,13 @@ import koaConfig from '../config/koa';
 
 import config from '../config';
 
-import log from './utils/logger';
-
 import { validateAuthCreds } from './services/authService';
-import { errorHandler } from './middleware/errorHandler';
-import { userService } from './services';
+import { errorHandler } from './middleware';
+import { userService, processList } from './services';
 import router from './routes';
 import { createDb } from './services/dao/db';
-import { checkProcessList, loadProcessListFromDisk } from './services/processList';
 import { checkFiles } from './services/fileUtils';
-import { MSEС_IN_MIN, MSEС_IN_DAY } from './utils/constants';
+import { log, MSEС_IN_MIN, MSEС_IN_DAY } from './utils';
 
 interface IServer {
   name: string;
@@ -51,11 +48,11 @@ export async function createServer(server: IServer): Promise<KoaApp> {
 
   app.context.db = await createDb(server.dbPath, server.dbName);
 
-  loadProcessListFromDisk();
-  checkProcessList(true);
+  processList.loadProcessListFromDisk();
+  processList.checkProcessList(true);
   checkFiles();
 
-  timerId = setInterval(checkProcessList, config.PROCESS_CHECK_PERIOD_IN_MIN * MSEС_IN_MIN);
+  timerId = setInterval(processList.checkProcessList, config.PROCESS_CHECK_PERIOD_IN_MIN * MSEС_IN_MIN);
   timerFileId = setInterval(checkFiles, config.FILES_CHECK_PERIOD_IN_DAYS * MSEС_IN_DAY);
 
   const sessions = app.context.db.sessionId.data;
@@ -65,14 +62,13 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   //Каждый запрос содержит cookies, по которому passport опознаёт пользователя, и достаёт его данные из сессии.
   //passport сохраняет пользовательские данные
   passport.serializeUser((user: unknown, done) => {
-    // log.info('serializeUser', user);
     done(null, (user as IUser).id);
   });
+
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   //passport достаёт пользовательские данные из сессии
   passport.deserializeUser((id: string, done) => {
     try {
-      // log.info('deserializeUser', id);
       const user = userService.findOne(id);
       done(null, user);
     } catch (err) {

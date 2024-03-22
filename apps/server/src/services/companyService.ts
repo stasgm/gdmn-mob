@@ -1,6 +1,6 @@
 import { ICompany, IDBCompany, NewCompany as NewCompanyData, IAppSystem } from '@lib/types';
 
-import { extraPredicate, getListPart } from '../utils/helpers';
+import { extraPredicate, formatDateToLocale, getListPart } from '../utils';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
 
@@ -170,7 +170,8 @@ const findMany = (params: Record<string, string | number>): ICompany[] => {
   }
 
   companyList = companyList.filter((item) => {
-    const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { fromRecord, toRecord, ...newParams } = params;
 
     let companyIdFound = true;
 
@@ -186,8 +187,8 @@ const findMany = (params: Record<string, string | number>): ICompany[] => {
 
       if (filterText) {
         const name = item.name.toUpperCase();
-        const creationDate = new Date(item.creationDate || '').toLocaleString('ru', { hour12: false });
-        const editionDate = new Date(item.editionDate || '').toLocaleString('ru', { hour12: false });
+        const creationDate = formatDateToLocale(item.creationDate);
+        const editionDate = formatDateToLocale(item.editionDate);
 
         filteredCompanies =
           name.includes(filterText) || creationDate.includes(filterText) || editionDate.includes(filterText);
@@ -198,7 +199,7 @@ const findMany = (params: Record<string, string | number>): ICompany[] => {
     return companyIdFound && filteredCompanies && extraPredicate(item, newParams as Record<string, string>);
   });
 
-  return getListPart(companyList, params)?.map((company) => makeCompany(company));
+  return getListPart<IDBCompany>(companyList, params)?.map((company) => makeCompany(company));
 };
 
 export const makeCompany = (company: IDBCompany): ICompany => {

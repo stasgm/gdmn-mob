@@ -7,7 +7,6 @@ import { useSelector, useDispatch, AppDispatch } from '../../store';
 import bindingActions from '../../store/deviceBinding';
 import actions from '../../store/user';
 import selectors from '../../store/user/selectors';
-import deviceSlectors from '../../store/device/selectors';
 import DeviceBindingDetails from '../../components/deviceBinding/DeviceBindingDetails';
 
 export type Params = {

@@ -7,14 +7,19 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
+      "name": "Debug server",
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "program": "${workspaceFolder}\\apps\\server\\src\\controllers\\auth.ts",
+      "program": "${workspaceFolder}\\apps\\server\\src\\index.ts",
+      "runtimeExecutable": "node",
       "outFiles": [
         "${workspaceFolder}/**/*.js"
-      ]
+      ],
+      "sourceMaps": true,
+      "env": {
+        "NODE_ENV": "development"
+      }
     }
   ]
 }

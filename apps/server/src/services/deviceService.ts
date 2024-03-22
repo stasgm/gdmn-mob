@@ -2,9 +2,7 @@ import { IDBDevice, IDevice, NewDevice } from '@lib/types';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
 
-import { extraPredicate, getListPart } from '../utils/helpers';
-
-import { deviceStates } from '../utils/constants';
+import { extraPredicate, formatDateToLocale, getListPart, deviceStates } from '../utils';
 
 import { getDb } from './dao/db';
 
@@ -98,7 +96,7 @@ const updateOne = (id: string, deviceData: Partial<IDevice>, params?: Record<str
 const deleteOne = (id: string) => {
   const { devices, codes, deviceBindings } = getDb();
 
-  if (!devices.data.find((device) => device.id === id)) {
+  if (!devices.findById(id)) {
     throw new DataNotFoundException('Устройство не найдено');
   }
 
@@ -128,7 +126,7 @@ const findOne = (id: string): IDevice => {
  * @returns объект устройства
  */
 const findOneByUid = (uid: string) => {
-  const device = getDb().devices.data.find((i) => i.uid === uid);
+  const device = getDb().devices.findByField('uid', uid);
 
   if (!device) return;
 
@@ -151,7 +149,7 @@ const findMany = (params: Record<string, string | number>): IDevice[] => {
   }
 
   deviceList = deviceList.filter((item: IDBDevice) => {
-    const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
+    const newParams = { ...params };
 
     let companyFound = true;
 
@@ -170,8 +168,8 @@ const findMany = (params: Record<string, string | number>): IDevice[] => {
         const uid = typeof item.uid === 'string' ? item.uid.toUpperCase() : '';
         const newState = deviceStates[item.state];
         const state = typeof newState === 'string' ? newState.toUpperCase() : '';
-        const creationDate = new Date(item.creationDate || '').toLocaleString('ru', { hour12: false });
-        const editionDate = new Date(item.editionDate || '').toLocaleString('ru', { hour12: false });
+        const creationDate = formatDateToLocale(item.creationDate);
+        const editionDate = formatDateToLocale(item.editionDate);
 
         filteredDevices =
           name.includes(filterText) ||
@@ -186,7 +184,7 @@ const findMany = (params: Record<string, string | number>): IDevice[] => {
     return companyFound && filteredDevices && extraPredicate(item, newParams as Record<string, string>);
   });
 
-  return getListPart(deviceList, params)?.map((i) => makeDevice(i));
+  return getListPart<IDBDevice>(deviceList, params)?.map((i) => makeDevice(i));
 };
 
 /* TODO В звависимости от прав возвращать разный набор полей */

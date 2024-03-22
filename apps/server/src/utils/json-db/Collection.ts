@@ -104,6 +104,13 @@ export class Collection<T extends CollectionItem> {
     return item! && { id: item.id, name: typeof item === 'object' && 'name' in item ? item.name : '' };
   }
 
+  public findByField(field: string, value: string): T | undefined {
+    const upperValue = value.toUpperCase();
+    return this._data.find((item: any) =>
+      typeof item === 'object' && field in item ? item[field].toUpperCase() === upperValue : false,
+    );
+  }
+
   public pendingWrite() {
     return this._currWrite;
   }

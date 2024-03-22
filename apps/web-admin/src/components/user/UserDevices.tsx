@@ -44,7 +44,7 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
   );
 
   const fetchActivationCodes = useCallback(
-    (deviceId?: string) => {
+    (_deviceId?: string) => {
       dispatch(codeActions.fetchActivationCodes()); //TODO Добавить фильтрацию
     },
     [dispatch],

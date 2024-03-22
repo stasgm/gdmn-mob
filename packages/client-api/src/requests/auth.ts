@@ -1,10 +1,8 @@
-import { DeviceState, IUser, IUserCredentials, NewAccessCode } from '@lib/types';
+import { DeviceState, IUser, IUserCredentials } from '@lib/types';
 import { user as mockUser } from '@lib/mock';
 
-import { error, auth as types } from '../types';
+import { error, auth as types, BaseApi, BaseRequest } from '../types';
 import { response2Log, sleep } from '../utils';
-import { BaseApi } from '../types/BaseApi';
-import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
 
 class Auth extends BaseRequest {

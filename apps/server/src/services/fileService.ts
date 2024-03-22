@@ -1,96 +1,107 @@
-import { IFileSystem, IPathParams, IFileObject } from '@lib/types';
+/* eslint-disable no-await-in-loop */
+import { ISystemFile, IPathParams, IFileParams, IFileActionResult } from '@lib/types';
 
 import { DataNotFoundException } from '../exceptions';
 
 import {
-  readListFiles,
-  getFile,
+  getFolderList,
+  moveFiles,
+  deleteFiles,
+  getFilesByParams,
+  readDirectory,
   deleteFileById,
-  updateById,
-  deleteManyFiles,
-  getListFolders,
-  moveManyFiles,
-  searchFilesList,
+  readFileData,
+  writeDataToFile,
+  fileParams,
+  getSystemFilePath,
+  fileObj2FullFileName,
 } from './fileUtils';
 
 import { getDb } from './dao/db';
 
 /**
  * Возвращает множество файлов
+   Если есть компания и подсистема, то возвращаем файлы из папки ./db_companyId/appSystemName
+   Если есть компания, но нет подсистемы, то возвращаем файлы из папки ./db_companyId
+   Если нет компании, то возвращаем файлы из папки ./
  * @returns Массив объектов файлов
  */
-const findMany = async (params: Record<string, string | number>): Promise<IFileSystem[]> => {
-  return await readListFiles(params);
+const findMany = async (requestParams: Record<string, string>): Promise<ISystemFile[]> => {
+  const { companyId, appSystemId, ...params } = requestParams;
+
+  const folderPath = fileObj2FullFileName({ companyId, appSystemId });
+
+  const fileNameList = await readDirectory(folderPath, !!companyId);
+
+  return await getFilesByParams<ISystemFile>(fileNameList, fileParams, params);
 };
 
 /**
- * Возвращает множество файлов
- * @returns Массив объектов файлов
+ * Возвращает содержимое файла
+ * @param file
+ * @returns
  */
-const searchInFiles = async (params: Record<string, string | number>): Promise<IFileSystem[]> => {
-  return await searchFilesList(params);
-};
-
-//**
-//  * Возвращает содержание файла  по ИД
-//  * @param id ИД сформированный из названия файла
-//  * @returns Объект из JSON  найденного файла
-//  */
-const findOne = async (idObj: IFileObject): Promise<any> => {
-  return await getFile(idObj);
+const getOne = async (file: IFileParams): Promise<string | object> => {
+  return await readFileData(file);
 };
 
 /**
-/* Удаляет  файл по ИД
-/* @param id ИД файла
-*/
-const deleteOne = async (idObj: IFileObject): Promise<void> => {
-  return await deleteFileById(idObj);
+ * Удаляет файл по имени файла, сформированного из параметров
+ * @param file
+ */
+const deleteOne = async (file: IFileParams): Promise<void> => {
+  await deleteFileById(file);
 };
 
 /**
-/* Удаляет множество файлов по массиву ИД
-/* @param id ИД файла
-*/
-const deleteMany = async (ids: IFileObject[]): Promise<void> => {
-  return await deleteManyFiles(ids);
+ * Удаляет множество файлов по именам файлов
+ * @param files
+ * @returns
+ */
+const deleteMany = async (files: IFileParams[]): Promise<IFileActionResult[]> => {
+  return await deleteFiles(files);
 };
 
 /**
-/* Перемещает множество файлов по массиву ИД и названию папаки
-/* @param ids ИД файла массив
-/* @param toFolder наименование папки, в которую перемещаем
-*/
-const moveMany = async (ids: IFileObject[], toFolder: string): Promise<void> => {
-  return await moveManyFiles(ids, toFolder);
+ * Перемещает множество файлов в папку
+ * @param files
+ * @param toFolder
+ * @returns
+ */
+const moveMany = async (files: IFileParams[], toFolder: string): Promise<IFileActionResult[]> => {
+  return await moveFiles(files, toFolder);
 };
 
 /**
-/* Редактирует  файл по ИД
-/* @param id ИД файла
- * @param fileData Новые данные файла
-*/
-const updateOne = async (idObj: IFileObject, fileData: any): Promise<void> => {
-  return await updateById(idObj, fileData);
+ * Редактирует файл
+ * @param file
+ * @param data
+ * @returns
+ */
+const updateOne = async (file: IFileParams, data: string): Promise<void> => {
+  return await writeDataToFile(file, data);
 };
 
 /**
  * Возвращает массив папок по компании и подсистеме
  * @returns Массив названий папок
  */
-const getFolders = async (appPathParams: IPathParams): Promise<string[]> => {
+const getFolders = async (pathParams: IPathParams): Promise<string[]> => {
   const { companies, appSystems } = getDb();
 
-  if (!companies.findById(appPathParams.companyId)) {
+  if (!companies.findById(pathParams.companyId)) {
     throw new DataNotFoundException('Компания не найдена');
   }
 
-  const appSystem = appSystems.findById(appPathParams.appSystemId);
+  const appSystem = appSystems.findById(pathParams.appSystemId);
 
   if (!appSystem) {
     throw new DataNotFoundException('Подсистема не найдена');
   }
-  return await getListFolders(appPathParams);
+
+  const pathSystem = getSystemFilePath(pathParams);
+
+  return await getFolderList(pathSystem);
 };
 
-export { findMany, findOne, deleteOne, updateOne, deleteMany, getFolders, moveMany, searchInFiles };
+export { findMany, getOne, deleteOne, updateOne, deleteMany, getFolders, moveMany };

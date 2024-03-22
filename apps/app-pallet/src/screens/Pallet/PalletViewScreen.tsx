@@ -43,7 +43,6 @@ import { FlashList } from '@shopify/flash-list';
 import { IPalletDocument, IPalletLine } from '../../store/types';
 import { PalletStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
-import { jsonFormat } from '../../utils/helpers';
 
 import { BarcodeImage } from './components/Barcode';
 
@@ -376,8 +375,6 @@ export const PalletViewScreen = () => {
       </View>
     );
   }
-
-  console.log('doc', jsonFormat(doc));
 
   return (
     <>

@@ -1,27 +1,25 @@
 import route from 'koa-joi-router';
 
-import { authMiddleware } from '../middleware/authRequired';
-import { permissionMiddleware } from '../middleware/permissionRequired';
-import { roleBasedParamsMiddlware } from '../middleware/roleBasedParams';
+import { authMiddleware, superAdminMiddleware } from '../middleware';
 import { fileValidation } from '../validations';
-import { deviceMiddleware } from '../middleware/deviceRequired';
-import { getFiles, getFile, removeFile, updateFile, removeManyFiles, getFolders } from '../controllers/file';
+import { getFiles, getFile, deleteFile, updateFile, deleteFiles, getFolders, moveFiles } from '../controllers/file';
 
 const file = route();
 
+console.log('files');
+
 file.prefix('/files');
-file.get('/folders', authMiddleware, getFolders);
-file.get('/:id', fileValidation.getFile, authMiddleware, deviceMiddleware, getFile);
-file.get('/', authMiddleware, deviceMiddleware, getFiles);
-file.patch(
-  '/:id',
-  fileValidation.updateFile,
-  authMiddleware,
-  permissionMiddleware,
-  roleBasedParamsMiddlware,
-  updateFile,
-);
-file.delete('/:id', fileValidation.removeFile, authMiddleware, removeFile);
-file.post('/', fileValidation.deleteFiles, authMiddleware, removeManyFiles);
+
+// Маршрут для получения списка папок
+file.get('/folders', fileValidation.getFolders, authMiddleware, superAdminMiddleware, getFolders);
+
+file.get('/', fileValidation.getFiles, authMiddleware, superAdminMiddleware, getFiles);
+file.get('/:id', fileValidation.getFile, authMiddleware, superAdminMiddleware, getFile);
+file.put('/:id', fileValidation.updateFile, authMiddleware, superAdminMiddleware, updateFile);
+file.delete('/:id', fileValidation.deleteFile, authMiddleware, superAdminMiddleware, deleteFile);
+
+// Маршруты для массовых операций с файлами
+file.post('/actions/deleteList', fileValidation.deleteFiles, authMiddleware, superAdminMiddleware, deleteFiles);
+file.post('/actions/moveList', fileValidation.moveFiles, authMiddleware, superAdminMiddleware, moveFiles);
 
 export default file;

@@ -1,32 +1,18 @@
-import { AxiosError } from 'axios';
+export { AxiosError } from 'axios';
 
-import * as auth from './auth';
-import * as user from './user';
-import * as company from './company';
-import * as device from './device';
-import * as activationCode from './activationCode';
-import * as deviceBinding from './deviceBinding';
-import * as message from './message';
-import * as error from './error';
-import * as process from './process';
-import * as appSystem from './appSystem';
-import * as deviceLog from './deviceLog';
-import * as file from './file';
-import * as serverLog from './serverLog';
-
-export {
-  auth,
-  user,
-  message,
-  company,
-  device,
-  activationCode,
-  deviceBinding,
-  error,
-  process,
-  appSystem,
-  AxiosError,
-  deviceLog,
-  file,
-  serverLog,
-};
+export * as auth from './auth';
+export * as user from './user';
+export * as company from './company';
+export * as device from './device';
+export * as activationCode from './activationCode';
+export * as deviceBinding from './deviceBinding';
+export * as message from './message';
+export * as error from './error';
+export * as process from './process';
+export * as appSystem from './appSystem';
+export * as deviceLog from './deviceLog';
+export * as file from './file';
+export * as serverLog from './serverLog';
+export * as erpLog from './erpLog';
+export { BaseApi } from './BaseApi';
+export { BaseRequest } from './BaseRequest';

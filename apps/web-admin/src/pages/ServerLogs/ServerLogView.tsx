@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Box, CardHeader, IconButton, CircularProgress, Grid, Typography } from '@mui/material';
 import CachedIcon from '@mui/icons-material/Cached';
 
@@ -9,13 +9,10 @@ import { useSelector, useDispatch } from '../../store';
 import { IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 
-import fileSelectors from '../../store/file/selectors';
 import SnackBar from '../../components/SnackBar';
 
-import FileContentView from '../../components/file/FileContentView';
 import serverLogActions from '../../store/serverLog';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-import { adminPath } from '../../utils/constants';
 import ServerLogDetailsView from '../../components/serverLog/ServerLogDetailsView';
 import serverLogSelectors from '../../store/serverLog/selectors';
 
@@ -29,7 +26,7 @@ const ServerLogView = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading, errorMessage, serverLog, list } = useSelector((state) => state.serverLogs);
+  const { loading, errorMessage, serverLog } = useSelector((state) => state.serverLogs);
 
   const fetchServerLog = useCallback(() => {
     dispatch(serverLogActions.fetchServerLog(id));
@@ -41,8 +38,6 @@ const ServerLogView = () => {
   }, [fetchServerLog]);
 
   const log = serverLogSelectors.serverLogById(id);
-
-  const [open, setOpen] = useState(false);
 
   const handleCancel = () => {
     navigate(-1);
@@ -122,7 +117,7 @@ const ServerLogView = () => {
                 minHeight: '100%',
               }}
             >
-              <ServerLogDetailsView serverLog={serverLog} title={log?.fileName} />
+              <ServerLogDetailsView serverLog={serverLog} title={log?.id} />
             </Box>
           </>
         ) : (

@@ -4,7 +4,7 @@ import { AddProcess, InterruptProcess, CancelProcess, UpdateProcess, PrepareProc
 
 import { processService } from '../services';
 
-import { created, ok } from '../utils/apiHelpers';
+import { created, ok } from '../utils';
 import { InvalidParameterException } from '../exceptions';
 
 /**

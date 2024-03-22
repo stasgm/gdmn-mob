@@ -1,10 +1,8 @@
 import { IProcess } from '@lib/types';
 import { processes as mockProcesses } from '@lib/mock';
 
-import { error, process as types } from '../types';
+import { error, process as types, BaseApi, BaseRequest } from '../types';
 import { response2Log, sleep } from '../utils';
-import { BaseApi } from '../types/BaseApi';
-import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
 
 class Process extends BaseRequest {

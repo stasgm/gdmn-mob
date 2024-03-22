@@ -1,5 +1,3 @@
-import { IDeviceBinding } from '@lib/types';
-
 import { useSelector } from '../';
 
 const bindingById = (id?: string) => {

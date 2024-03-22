@@ -20,7 +20,7 @@ const CompanyList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch: AppDispatch = useDispatch();
-  const { list, loading, errorMessage, pageParams } = useSelector((state) => state.companies);
+  const { list, loading, pageParams } = useSelector((state) => state.companies);
   const { user: authUser } = useSelector((state) => state.auth);
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
   const maxHeight = useWindowResizeMaxHeight();
@@ -65,9 +65,9 @@ const CompanyList = () => {
     fetchCompanies();
   };
 
-  const handleClearError = () => {
-    dispatch(actions.companyActions.clearError());
-  };
+  // const handleClearError = () => {
+  //   dispatch(actions.companyActions.clearError());
+  // };
 
   const handleAddCompany = () => {
     if (list.length && !(authUser?.role === 'SuperAdmin')) {

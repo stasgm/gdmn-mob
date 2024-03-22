@@ -1,15 +1,3 @@
-import { IEntity } from './common';
+import { ISystemFile } from './files';
 
-export interface IServerLogFile extends IEntity {
-  [key: string]: unknown;
-  date: string;
-  size: number;
-  fileName: string;
-  path: string;
-  mdate: string;
-}
-
-export interface IServerLogResponse {
-  isFinished: boolean;
-  textFile: string;
-}
+export type ServerLogFile = ISystemFile;

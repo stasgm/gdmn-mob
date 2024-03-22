@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
@@ -64,9 +64,9 @@ interface IProps<T extends IEntity> {
   isFilterVisible?: boolean;
   onSubmit: (values: any) => void;
   onDelete?: (ids?: string[]) => void;
-  onSelectOne: (_event: any, file: IFileSystem) => void;
+  onSelectOne: (_event: any, file: ISystemFile) => void;
   onSelectMany: (event: any) => void;
-  selectedFileIds: IFileSystem[];
+  selectedFileIds: ISystemFile[];
   onSetPageParams: (filesFilters: IPageParam) => void;
   pageParams?: IFilePageParam | undefined;
   onCloseFilters?: () => void;

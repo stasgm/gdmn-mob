@@ -35,4 +35,6 @@ export default {
   FILES_SAVING_PERIOD_IN_DAYS: 7,
   /** Период хранения файлов документов, в днях */
   DOCS_SAVING_PERIOD_IN_DAYS: 7,
+  /** Путь к папке, содержащий временные файлы для ERP логов, относительно пути сервера*/
+  ERP_LOG_PATH: './erpLogs',
 };

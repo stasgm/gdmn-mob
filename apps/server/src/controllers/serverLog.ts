@@ -1,36 +1,52 @@
 import { Context, ParameterizedContext } from 'koa';
 
-import { IServerLogFile } from '@lib/types';
+import { IDeleteFilesRequest } from '@lib/types';
 
 import { serverLogService } from '../services';
 
-import { InvalidParameterException } from '../exceptions';
-
-import { ok } from '../utils/apiHelpers';
+import { notOk, ok, prepareParams } from '../utils';
+import { prepareFileParams, serverLogPath } from '../services/fileUtils';
 
 const getServerLogs = async (ctx: ParameterizedContext): Promise<void> => {
-  const params: Record<string, string | number> = {};
+  const params = prepareParams(ctx.query, ['dateFrom', 'dateTo', 'mDateFrom', 'mDateTo', 'filterText', 'searchQuery']);
 
-  const { filterText } = ctx.query;
-
-  if (typeof filterText === 'string') {
-    params.filterText = filterText;
-  }
-
-  const serverLogList: IServerLogFile[] = await serverLogService.findMany(params);
+  const serverLogList = await serverLogService.findMany(params);
 
   ok(ctx as Context, serverLogList, 'getServerLogs: serverLogs are successfully received');
 };
 
 const getServerLog = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id } = ctx.params;
-  const { start, end } = ctx.query;
-  const paramStart = typeof start === 'string' && isFinite(Number(start)) ? Number(start) : undefined;
-  const paramEnd = typeof end === 'string' && isFinite(Number(end)) ? Number(end) : undefined;
+  const file = prepareFileParams(ctx.params.id, ctx.query);
+  file.folder = serverLogPath;
 
-  const serverLog = await serverLogService.findOne(id, paramStart, paramEnd);
+  const serverLog = await serverLogService.getOne(file);
 
   ok(ctx as Context, serverLog, 'getServerLog: ServerLog is successfully  received');
 };
 
-export { getServerLogs, getServerLog };
+const deleteServerLog = async (ctx: ParameterizedContext): Promise<void> => {
+  const file = prepareFileParams(ctx.params.id, ctx.query);
+  file.folder = serverLogPath;
+
+  await serverLogService.deleteOne(file);
+
+  ok(ctx as Context, undefined, `deleteServerLog: '${ctx.params.id}' is successfully removed`);
+};
+
+const deleteServerLogs = async (ctx: ParameterizedContext): Promise<void> => {
+  const { files } = ctx.request.body as IDeleteFilesRequest;
+
+  const deletedFiles = await serverLogService.deleteMany(files.map((file) => ({ ...file, folder: serverLogPath })));
+
+  const hasSuccess = deletedFiles.some((result) => result.success);
+
+  if (hasSuccess) {
+    // Если хотя бы один файл успешно удален, возвращаем список всех файлов со статусом удаления
+    ok(ctx as Context, deletedFiles, 'deleteServerogs: files are successfully deleted');
+  } else {
+    // Иначе возвращаем ошибку со списком файлов и описанием ошибки
+    notOk(ctx as Context, 500, 'deleteServerLogs: files are not deleted', deletedFiles);
+  }
+};
+
+export { getServerLogs, getServerLog as getServerLog, deleteServerLog, deleteServerLogs };

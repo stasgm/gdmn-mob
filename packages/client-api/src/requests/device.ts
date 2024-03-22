@@ -1,10 +1,8 @@
 import { IDevice, NewDevice } from '@lib/types';
 import { device as mockDevice } from '@lib/mock';
 
-import { error, device as types } from '../types';
+import { error, device as types, BaseApi, BaseRequest } from '../types';
 import { generateId, response2Log, sleep } from '../utils';
-import { BaseApi } from '../types/BaseApi';
-import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
 
 class Device extends BaseRequest {

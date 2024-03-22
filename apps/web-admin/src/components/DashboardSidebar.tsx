@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import { Avatar, Box, Divider, Drawer, List, Typography } from '@mui/material';
+import { Box, Divider, Drawer, List } from '@mui/material';
 import {
   BarChart as BarChartIcon,
   Settings as SettingsIcon,
@@ -18,18 +17,16 @@ import { useSelector } from '@lib/store';
 
 import { adminPath } from '../utils/constants';
 
-import { useDispatch } from '../store';
-
 import NavItem from './NavItem';
 import NavToggle from './NavToggle';
 
-const avatar1 = require('../../assets/images/avatar1.svg');
+// const avatar1 = require('../../assets/images/avatar1.svg');
 
-const userInfo = {
-  avatar: avatar1,
-  jobTitle: 'User',
-  name: 'Katarina Smith',
-};
+// const userInfo = {
+//   avatar: avatar1,
+//   jobTitle: 'User',
+//   name: 'Katarina Smith',
+// };
 
 interface IProps {
   onMobileClose: () => void;

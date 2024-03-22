@@ -1,6 +1,5 @@
-import { Avatar, Box, Card, CardContent, Grid, Typography } from '@mui/material';
+import { Avatar, Card, CardContent, Grid, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import ArrowDowndIcon from '@mui/icons-material/ArrowDownward';
 import DevicesIcon from '@mui/icons-material/Devices';
 
 interface IProps {

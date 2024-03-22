@@ -16,7 +16,7 @@ import * as yup from 'yup';
 
 import { IUserCredentials } from '@lib/types';
 
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { authActions, useSelector, useDispatch, useAuthThunkDispatch } from '@lib/store';
 

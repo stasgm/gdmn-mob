@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -45,7 +45,6 @@ const DeviceView = () => {
   const { id: deviceId } = useParams<keyof Params>() as Params;
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
   const { loading } = useSelector((state) => state.devices);
 

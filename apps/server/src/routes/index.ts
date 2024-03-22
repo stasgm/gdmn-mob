@@ -5,7 +5,7 @@ import Company from './company.router';
 import Device from './device.router';
 import User from './user.router';
 import Message from './message.router';
-import DeviceBinding from './devicebinding.router';
+import DeviceBinding from './deviceBinding.router';
 import ActivationCode from './activationCode.router';
 import TestServer from './test.router';
 import Process from './process.router';
@@ -13,6 +13,7 @@ import AppSystem from './appSystem.router';
 import DeviceLog from './deviceLog.router';
 import File from './file.router';
 import ServerLog from './serverLog.router';
+import ErpLog from './erpLog.router';
 
 const rootRouter = new Router();
 
@@ -37,6 +38,7 @@ rootRouter
   .use(AppSystem.middleware())
   .use(File.middleware())
   .use(DeviceLog.middleware())
-  .use(ServerLog.middleware());
+  .use(ServerLog.middleware())
+  .use(ErpLog.middleware());
 
 export default rootRouter;

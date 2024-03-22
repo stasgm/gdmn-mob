@@ -1,10 +1,8 @@
 import { IActivationCode } from '@lib/types';
 import { activationCodes as mockActivationCodes } from '@lib/mock';
 
-import { error, activationCode as types } from '../types';
+import { error, activationCode as types, BaseApi, BaseRequest } from '../types';
 import { response2Log, sleep } from '../utils';
-import { BaseApi } from '../types/BaseApi';
-import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
 
 class ActivationCode extends BaseRequest {

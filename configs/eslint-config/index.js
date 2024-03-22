@@ -1,12 +1,10 @@
 module.exports = {
   parser: '@typescript-eslint/parser', // Specifies the ESLint parser
-  // plugins: ['import', 'promise', '@typescript-eslint', 'prettier', 'sonarjs'],
   plugins: ['import', 'promise', '@typescript-eslint', 'prettier'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:promise/recommended',
-    // 'plugin:sonarjs/recommended',
     'plugin:prettier/recommended',
     'plugin:import/errors',
     'plugin:import/warnings',
@@ -54,7 +52,7 @@ module.exports = {
     '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/restrict-template-expressions': 'off',
     'no-unused-vars': 'off',
-    // '@typescript-eslint/no-unused-vars': [2, { args: 'none' }],
+    '@typescript-eslint/no-unused-vars': ['warn', { 'argsIgnorePattern': '^_|^_$' }],
     // "sonarjs/no-duplicate-string": "off",
     'padded-blocks': ['error', 'never'],
     'no-await-in-loop': 'error',
@@ -69,7 +67,8 @@ module.exports = {
     {
       files: ['*.ts', '*.tsx'],
       rules: {
-        '@typescript-eslint/no-unused-vars': 'off',
+        'no-unused-vars': 'off',
+        '@typescript-eslint/no-unused-vars': ['warn', { 'argsIgnorePattern': '^_|^_$' }],
       },
     },
   ],

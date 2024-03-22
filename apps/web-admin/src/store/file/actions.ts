@@ -1,4 +1,4 @@
-import { IFileObject, IFileSystem } from '@lib/types';
+import { IFileParams, ISystemFile } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
 import { IFilePageParam } from '../../types';
@@ -9,7 +9,7 @@ const setError = createAction('FILE/SET_ERROR')<string>();
 
 const fetchFilesAsync = createAsyncAction('FILE/FETCH__FILES', 'FILE/FETCH_FILES_SUCCESS', 'FILE/FETCH_FILES_FAILURE')<
   string | undefined,
-  IFileSystem[],
+  ISystemFile[],
   string
 >();
 
@@ -33,13 +33,13 @@ const removeFileAsync = createAsyncAction('FILE/REMOVE_FILE', 'FILE/REMOVE_FILE_
 
 const removeFilesAsync = createAsyncAction('FILE/REMOVE_MANY', 'FILE/REMOVE_MANY_SUCCESS', 'FILE/REMOVE_MANY_FAILURE')<
   string | undefined,
-  IFileObject[],
+  IFileParams[],
   string
 >();
 
 const moveFilesAsync = createAsyncAction('FILE/MOVE_MANY', 'FILE/MOVE_MANY_SUCCESS', 'FILE/MOVE_MANY_FAILURE')<
   string | undefined,
-  IFileObject[],
+  IFileParams[],
   string
 >();
 

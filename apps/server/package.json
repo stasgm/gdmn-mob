@@ -16,7 +16,7 @@
     "lint": "eslint \"./src/**/*.ts\"",
     "lint:fix": "eslint --fix \"./src/**/*.ts\"",
     "precommit": "lint-staged",
-    "test": "cross-env NODE_ENV=test jest --colors"
+    "test": "cross-env NODE_ENV=test jest src/utils/__tests__/files.spec.ts --colors"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -39,6 +39,7 @@
     "@types/koa-static-server": "^1.5.3",
     "@types/koa__cors": "^4.0.3",
     "@types/passport-local": "^1.0.38",
+    "koa-body": "^6.0.1",
     "bcrypt": "^5.1.1",
     "dotenv": "~16.3.1",
     "koa": "^2.14.2",

@@ -5,11 +5,12 @@ export type SuccessResponse<T> = {
   data: T;
 };
 
-export type FailureResponse = {
+export type FailureResponse<T = any> = {
   result: false;
   type: 'FAILURE';
   status: number;
   error: string;
+  data?: T;
 };
 
 export type NoConnection = {

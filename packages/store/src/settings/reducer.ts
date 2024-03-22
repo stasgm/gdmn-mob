@@ -186,6 +186,7 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
 
     case getType(actions.deleteOption): {
       const removeProps = action.payload;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [removeProps]: remove, ...rest } = state.data;
       return { ...state, data: rest };
     }

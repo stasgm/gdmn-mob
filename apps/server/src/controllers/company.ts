@@ -3,7 +3,7 @@ import { Context, ParameterizedContext } from 'koa';
 import { ICompany, IUser, NewCompany } from '@lib/types';
 
 import { companyService } from '../services';
-import { created, ok } from '../utils/apiHelpers';
+import { created, ok, prepareParams } from '../utils';
 import { DataNotFoundException } from '../exceptions';
 
 const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
@@ -54,32 +54,8 @@ const getCompany = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getCompanies = async (ctx: ParameterizedContext): Promise<void> => {
-  const { companyId, filterText, fromRecord, toRecord, adminId, name } = ctx.query;
-  const params: Record<string, string> = {};
+  const params = prepareParams(ctx.query, ['companyId', 'adminId', 'name', 'filterText'], ['fromRecord', 'toRecord']);
 
-  if (companyId && typeof companyId === 'string') {
-    params.companyId = companyId;
-  }
-
-  if (adminId && typeof adminId === 'string') {
-    params.adminId = adminId;
-  }
-
-  if (typeof filterText === 'string') {
-    params.filterText = filterText;
-  }
-
-  if (typeof fromRecord === 'string') {
-    params.fromRecord = fromRecord;
-  }
-
-  if (typeof toRecord === 'string') {
-    params.toRecord = toRecord;
-  }
-
-  if (name && typeof name === 'string') {
-    params.name = name;
-  }
   const companyList = companyService.findMany(params);
 
   ok(ctx as Context, companyList, 'getCompanies: companies are successfully received');
