@@ -47,10 +47,6 @@ module.exports = {
       nodeModules: false,
     }),
   ],
-  externals: {
-    react: 'React',
-    'react-dom': 'ReactDOM',
-  },
   performance: {
     hints: false,
   },

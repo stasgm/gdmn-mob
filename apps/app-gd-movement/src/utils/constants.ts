@@ -114,6 +114,15 @@ export const appSettings: Settings = {
     visible: true,
     group: scanSettings,
   },
+  lineConfirm: {
+    id: 'lineConfirm',
+    sortOrder: 38,
+    description: 'Подтверждать позицию',
+    data: true,
+    type: 'boolean',
+    visible: true,
+    group: mainSettingGroup,
+  },
   barcodeTypes: {
     id: 'barcodeTypes',
     sortOrder: 31,

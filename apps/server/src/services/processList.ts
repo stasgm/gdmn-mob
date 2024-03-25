@@ -192,8 +192,8 @@ export const cleanupProcess = (process: IDBProcess) => {
         mes.status === 'PROCESSED' || mes.status === 'READY'
           ? getPathLog(process, requestFN)
           : mes.status === 'PROCESSED_INCORRECT'
-          ? getPathError(process, requestFN)
-          : undefined;
+            ? getPathError(process, requestFN)
+            : undefined;
 
       if (toPath && requestFN) {
         try {
@@ -239,8 +239,8 @@ export const unknownProcess = (process: IDBProcess) => {
         mes.status === 'PROCESSED' || mes.status === 'READY'
           ? getPathUnknown(process, requestFN)
           : mes.status === 'PROCESSED_INCORRECT'
-          ? getPathError(process, requestFN)
-          : undefined;
+            ? getPathError(process, requestFN)
+            : undefined;
 
       if (toPath && requestFN) {
         try {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleProp, TouchableOpacity, View, ViewStyle } from 'react-native';
-import { useTheme } from 'react-native-paper';
+import { MD2Theme, useTheme } from 'react-native-paper';
 
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 
@@ -14,7 +14,7 @@ interface IProps {
 }
 
 const RoundButton = ({ onPress, style, icon, disabled }: IProps) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   return (
     <TouchableOpacity

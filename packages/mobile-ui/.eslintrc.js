@@ -2,7 +2,7 @@ module.exports = {
   env: {
     node: true,
   },
-  extends: ['@config/eslint-config'],
+  extends: ['@config/eslint-config', '@config/eslint-config-react-native'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: ['./tsconfig.eslint.json'],
@@ -14,5 +14,6 @@ module.exports = {
         extensions: ['.ts', '.tsx', '.json'],
       },
     },
+    'import/ignore': ['react-native'],
   },
 };

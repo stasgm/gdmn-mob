@@ -8,10 +8,14 @@
         }
       }
     ],
-    "@babel/preset-react",
+    [
+      "@babel/preset-react",
+      {
+        "runtime": "automatic"
+      }
+    ],
     "@babel/preset-typescript"
   ],
-  "plugins": ["react-hot-loader/babel"],
   "env": {
     "production": {
       "presets": ["minify"]

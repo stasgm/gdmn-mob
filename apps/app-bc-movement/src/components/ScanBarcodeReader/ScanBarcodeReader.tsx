@@ -117,14 +117,14 @@ export const ScanBarcodeReader = ({ onSave, getScannedObject }: IProps) => {
                   setItemLine(undefined);
                 }}
               >
-                <IconButton icon="barcode-scan" color={'#FFF'} size={30} />
+                <IconButton icon="barcode-scan" iconColor={'#FFF'} size={30} />
                 <Text style={styles.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
             {scanned && itemLine?.barcode === '-1' && (
               <View style={styles.infoContainer}>
                 <View style={[styles.buttons, styles.btnNotFind]}>
-                  <IconButton icon={'information-outline'} color={'#FFF'} size={30} />
+                  <IconButton icon={'information-outline'} iconColor={'#FFF'} size={30} />
                   <View>
                     <Text style={styles.error}>{'Данный штрихкод уже существует'}</Text>
                   </View>
@@ -141,7 +141,7 @@ export const ScanBarcodeReader = ({ onSave, getScannedObject }: IProps) => {
                     setItemLine(undefined);
                   }}
                 >
-                  <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
+                  <IconButton icon={'checkbox-marked-circle-outline'} iconColor={'#FFF'} size={30} />
                   <View>
                     <Text style={styles.text}>{barcode}</Text>
                   </View>
@@ -153,7 +153,7 @@ export const ScanBarcodeReader = ({ onSave, getScannedObject }: IProps) => {
         {!scanned && (
           <View style={styles.footer}>
             <>
-              <IconButton icon={'barcode-scan'} color={'#FFF'} size={40} />
+              <IconButton icon={'barcode-scan'} iconColor={'#FFF'} size={40} />
               <Text style={styles.text}>Отсканируйте штрихкод</Text>
             </>
           </View>

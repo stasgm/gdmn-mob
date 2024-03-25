@@ -18,16 +18,11 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 
 import { IHeadCells } from '../types';
 import { deviceStates, adminPath } from '../utils/constants';
 
 type Order = 'asc' | 'desc';
-
-const useStyles = makeStyles(() => ({
-  row: { height: 53 },
-}));
 
 interface IProps<T extends { id: string }> {
   headCells: IHeadCells<T>[];
@@ -48,7 +43,6 @@ function SortableTable<T extends { id: string }>({
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof T>(); //headCells[0].id
-  const classes = useStyles();
 
   const handleSelectAll = (event: any) => {
     let newSelectedItemIds;
@@ -139,11 +133,13 @@ function SortableTable<T extends { id: string }>({
     return value;
   }
 
+  const rowStyle = { height: 53 };
+
   const TableRows = () => {
     const itemList = SortedTableRows<T>(data)
       .slice(page * limit, page * limit + limit)
       .map((item: T) => (
-        <TableRow className={classes.row} hover key={item.id} selected={selectedItemIds.indexOf(item.id) !== -1}>
+        <TableRow hover key={item.id} selected={selectedItemIds.indexOf(item.id) !== -1} sx={rowStyle}>
           <TableCell padding="checkbox">
             <Checkbox
               checked={selectedItemIds.indexOf(item.id) !== -1}

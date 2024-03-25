@@ -1,6 +1,18 @@
-import { Box, Card, CardContent, Grid, TextField, Divider, Button, Checkbox, Tooltip } from '@mui/material';
+import {
+  Box,
+  Card,
+  CardContent,
+  Grid,
+  TextField,
+  Divider,
+  Button,
+  Checkbox,
+  Tooltip,
+  InputAdornment,
+  IconButton,
+} from '@mui/material';
 
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { INamedEntity, IUser, IUserCredentials, NewUser } from '@lib/types';
 import { FormikTouched, useFormik, Field, FormikProvider } from 'formik';
@@ -8,6 +20,9 @@ import * as yup from 'yup';
 
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import RefreshIcon from '@mui/icons-material/Refresh';
+
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 import ComboBox from '../ComboBox';
 import { useSelector } from '../../store';
@@ -30,6 +45,13 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
 
   const { list: companies, loading: loadingСompanies } = useSelector((state) => state.companies);
   const { list: users, loading: loadingUsers } = useSelector((state) => state.users);
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const [showVerifyPassword, setShowVerifyPassword] = useState(false);
+  const handleClickShowVerifyPassword = () => setShowVerifyPassword((show) => !show);
 
   const { user: authUser } = useSelector((state) => state.auth);
 
@@ -406,10 +428,19 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                     variant="outlined"
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
-                    type="password"
                     disabled={loading}
                     value={(formik.values as NewUser | IUserCredentials).password.trim()}
                     autoComplete="new-password"
+                    type={showPassword ? 'text' : 'password'}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={handleClickShowPassword}>
+                            {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
                 <Grid item md={6} xs={12} display={open ? 'block' : 'none'}>
@@ -425,10 +456,19 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                     variant="outlined"
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
-                    type="password"
                     disabled={loading}
                     value={(formik.values as NewUser | IUserCredentials).verifyPassword?.trim()}
                     autoComplete="new-password"
+                    type={showVerifyPassword ? 'text' : 'password'}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={handleClickShowVerifyPassword}>
+                            {showVerifyPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
                 {passwordCondition && (

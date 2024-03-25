@@ -76,6 +76,12 @@ const reducer: Reducer<FpMovementState, FpMovementActionType> = (state = initial
         list: state.list.filter((i) => i.id !== action.payload),
       };
 
+    case getType(actions.removeTempOrders):
+      return {
+        ...state,
+        list: state.list.filter((i) => action.payload.indexOf(i.id) === -1),
+      };
+
     default:
       return state;
   }

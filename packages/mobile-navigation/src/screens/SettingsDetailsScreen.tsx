@@ -1,3 +1,4 @@
+import { SettingsStackParamList } from '../navigation/Root/types';
 import React, { useLayoutEffect, useState } from 'react';
 import { Alert, StyleSheet } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -8,7 +9,6 @@ import { ISettingsOption } from '@lib/types';
 
 import { mobileRequest } from '@lib/mobile-hooks';
 
-import { SettingsStackParamList } from '../navigation/Root/types';
 const SettingsDetailsScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -111,6 +111,16 @@ const SettingsDetailsScreen = () => {
         );
       }
     }
+
+    if (value.group?.id === 'cleanDoc' && optionName !== 'cleanDefaultDocTime') {
+      const cleanDefaultDocTime = Object.values(data).find((i) => i?.id === 'cleanDefaultDocTime')?.data || 7;
+
+      if (cleanDefaultDocTime && value.data < cleanDefaultDocTime) {
+        dispatch(settingsActions.updateOption({ optionName, value: { ...value, data: cleanDefaultDocTime } }));
+
+        Alert.alert('Внимание!', 'Время хранения документов не может быть меньше минимального.', [{ text: 'OK' }]);
+      }
+    }
   };
 
   useLayoutEffect(() => {
@@ -118,7 +128,7 @@ const SettingsDetailsScreen = () => {
       headerLeft: navBackButton,
       title: groupName,
     });
-  }, [navigation]);
+  }, [groupName, navigation]);
 
   return (
     <AppScreen>

@@ -8,6 +8,7 @@ const addTempOrders = createAction('APP_FP_MOVEMENT/ADD_MANY')<ITempDocument[]>(
 const updateTempOrderLine = createAction('APP_FP_MOVEMENT/UPDATE_LINE_ONE')<{ docId: string; line: ITempLine }>();
 const removeTempOrderLine = createAction('APP_FP_MOVEMENT/REMOVE_LINE_ONE')<{ docId: string; lineId: string }>();
 const removeTempOrder = createAction('APP_FP_MOVEMENT/REMOVE_ONE')<string>();
+const removeTempOrders = createAction('APP_FP_MOVEMENT/REMOVE_MANY')<string[]>();
 
 const loadData = createAction('APP_FP_MOVEMENT/LOAD_DATA')<FpMovementState>();
 const setLoading = createAction('APP_FP_MOVEMENT/SET_LOADING')<boolean>();
@@ -25,6 +26,7 @@ export const actions = {
   updateTempOrderLine,
   removeTempOrderLine,
   removeTempOrder,
+  removeTempOrders,
 };
 
 export type FpMovementActionType = ActionType<typeof actions>;

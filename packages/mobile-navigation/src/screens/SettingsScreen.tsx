@@ -1,3 +1,4 @@
+import { SettingsStackParamList } from '../navigation/Root/types';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -7,8 +8,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { baseSettingGroup, settingsActions, useDispatch, useSelector } from '@lib/store';
 import { MenuButton, useActionSheet, SettingsGroup, AppScreen, MediumText, navBackDrawer } from '@lib/mobile-ui';
 import { INamedEntity, ISettingsOption, Settings, SettingValue } from '@lib/types';
-
-import { SettingsStackParamList } from '../navigation/Root/types';
 
 const SettingsScreen = () => {
   const navigation = useNavigation<StackNavigationProp<SettingsStackParamList, 'Settings'>>();
@@ -29,7 +28,8 @@ const SettingsScreen = () => {
         } as ISettingsOption,
       }),
     );
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config]);
 
   //Если группа не указана, подставляем базовую группу
   const settsData = useMemo(
@@ -84,12 +84,14 @@ const SettingsScreen = () => {
     ]);
   }, [handleReset, showActionSheet]);
 
+  const headerRight = useCallback(() => <MenuButton actionsMenu={actionsMenu} />, [actionsMenu]);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackDrawer,
-      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+      headerRight,
     });
-  }, [navigation, actionsMenu]);
+  }, [navigation, actionsMenu, headerRight]);
 
   return (
     <AppScreen>
@@ -115,7 +117,7 @@ const SettingsScreen = () => {
                         <View style={localStyles.details}>
                           <MediumText>{group.name}</MediumText>
                         </View>
-                        <IconButton icon="chevron-right" color={colors.text} />
+                        <IconButton icon="chevron-right" iconColor={colors.text} />
                       </View>
                     </TouchableOpacity>
                   </View>

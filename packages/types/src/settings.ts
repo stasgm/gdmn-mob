@@ -22,6 +22,9 @@ interface IBaseSettings {
   autoSync: boolean;
   refLoadType: boolean;
   cleanDocTime: number;
+  cleanDraftDocTime: number;
+  cleanReadyDocTime: number;
+  cleanSentDocTime: number;
   getReferences: boolean;
   synchPeriod: number;
   [name: string]: SettingValue;

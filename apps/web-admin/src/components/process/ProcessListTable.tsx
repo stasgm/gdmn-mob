@@ -19,6 +19,7 @@ import {
 import { IProcess, ICompany } from '@lib/types';
 
 import { adminPath } from '../../utils/constants';
+import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
   processes: IProcess[];
@@ -37,6 +38,7 @@ const ProcessListTable = ({
   const [selectedProcessIds, setSelectedProcessIds] = useState<IProcess[]>(selectedProcesses);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
+  const maxHeight = useWindowResizeMaxHeight();
 
   const handleSelectAll = (event: any) => {
     let newSelectedProcessIds;
@@ -157,7 +159,7 @@ const ProcessListTable = ({
   return (
     <Card>
       <PerfectScrollbar>
-        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight: window.innerHeight - 268 }}>
+        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight }}>
           <Table>
             <TableHead>
               <TableRow>

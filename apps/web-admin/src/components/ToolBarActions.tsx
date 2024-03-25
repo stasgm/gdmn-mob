@@ -1,24 +1,23 @@
 import React from 'react';
-import { Button, Box, IconButton, Toolbar, Menu, MenuProps, Icon } from '@mui/material';
+import { Button, Box, IconButton, Toolbar, Menu, MenuProps, MenuItemProps, Icon, styled } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemText from '@mui/material/ListItemText';
-
-import { withStyles } from '@mui/styles';
 
 import { IToolBarButton } from '../types';
 interface props {
   buttons: IToolBarButton[];
 }
 
-const StyledMenu = withStyles({
+const StyledMenu = styled(Menu)(({ theme }) => ({
   paper: {
     border: '1px solid #d3d4d5',
   },
-})((props: MenuProps) => (
-  <Menu
+}));
+
+const MyMenu = (props: MenuProps) => (
+  <StyledMenu
     elevation={0}
-    /*getContentAnchorEl={null}*/
     anchorOrigin={{
       vertical: 'bottom',
       horizontal: 'center',
@@ -29,9 +28,9 @@ const StyledMenu = withStyles({
     }}
     {...props}
   />
-));
+);
 
-const ToolBarActions = ({ buttons /*, onButtonsOpen */ }: props) => {
+const ToolBarActions = ({ buttons }: props) => {
   const buttonList = (
     <>
       {buttons.map((button: IToolBarButton) => (
@@ -49,23 +48,25 @@ const ToolBarActions = ({ buttons /*, onButtonsOpen */ }: props) => {
     </>
   );
 
-  const StyledMenuItem = withStyles((theme) => ({
+  const StyledMenuItem = styled(MenuItem)(({ theme }) => ({
     root: {
       '&:focus': {
         backgroundColor: theme.palette.primary.main,
       },
     },
-  }))(MenuItem);
+  }));
+
+  const MyMenuItem = (props: MenuItemProps) => <StyledMenuItem />;
 
   const buttonsList = (
     <Box>
       {buttons.map((button: IToolBarButton) => (
-        <StyledMenuItem key={button.name} color="primary" onClick={button.onClick}>
+        <MyMenuItem key={button.name} color="primary" onClick={button.onClick}>
           <Icon color="primary" sx={{ display: 'flex', marginRight: 1 }}>
             {button.icon}
           </Icon>
           <ListItemText primary={button.name} />
-        </StyledMenuItem>
+        </MyMenuItem>
       ))}
     </Box>
   );
@@ -93,26 +94,16 @@ const ToolBarActions = ({ buttons /*, onButtonsOpen */ }: props) => {
   return (
     <Toolbar>
       <Box sx={{ background: 'transparent', border: 'none', display: { sm: 'none', xs: 'block' } }}>
-        <IconButton
-          aria-controls="customized-menu"
-          aria-haspopup="true"
-          // /* variant="contained"*/
-          color="primary"
-          onClick={handleClick}
-        >
+        <IconButton aria-controls="customized-menu" aria-haspopup="true" color="primary" onClick={handleClick}>
           <MoreVertIcon />
         </IconButton>
       </Box>
-      <Box
-        // component="button"
-        sx={{ background: 'transparent', border: 'none', display: { md: 'none', sm: 'block', xs: 'none' } }}
-      >
+      <Box sx={{ background: 'transparent', border: 'none', display: { md: 'none', sm: 'block', xs: 'none' } }}>
         {iconButtonList}
       </Box>
 
       <Box
         sx={{
-          /*background: 'transparent',*/
           border: 'none',
           display: { xs: 'none', md: 'block' },
         }}
@@ -121,7 +112,6 @@ const ToolBarActions = ({ buttons /*, onButtonsOpen */ }: props) => {
       </Box>
       <Box
         sx={{
-          /*background: 'transparent',*/
           border: 'none',
           display: 'flex',
           flexDirection: 'column',
@@ -134,9 +124,9 @@ const ToolBarActions = ({ buttons /*, onButtonsOpen */ }: props) => {
             display: { xl: 'none', md: 'none', sm: 'none', xs: 'block' },
           }}
         >
-          <StyledMenu anchorEl={anchorEl} open={!!anchorEl} onClose={handleClose} onMouseLeave={handleClose}>
+          <MyMenu anchorEl={anchorEl} open={!!anchorEl} onClose={handleClose} onMouseLeave={handleClose}>
             {buttonsList}
-          </StyledMenu>
+          </MyMenu>
         </Box>
       </Box>
     </Toolbar>

@@ -59,7 +59,7 @@ const QuantDialog = ({
           right={
             !!textPack && (
               <TextInput.Icon
-                name="close"
+                icon="close"
                 size={20}
                 style={localStyles.marginTop}
                 onPress={() => onChangeTextPack('')}
@@ -88,7 +88,7 @@ const QuantDialog = ({
               right={
                 !!textPallet && (
                   <TextInput.Icon
-                    name="close"
+                    icon="close"
                     size={20}
                     style={localStyles.marginTop}
                     onPress={() => onChangeTextPallet('')}

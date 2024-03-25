@@ -66,6 +66,13 @@ export const messageGdMovement: IMessage<MessageType>[] = [
               sortOrder: 3,
               subtype: 'scan',
             },
+            {
+              id: '189912364',
+              name: 'revision',
+              description: 'Сверка',
+              sortOrder: 4,
+              subtype: 'scarevisionn',
+            },
           ],
         },
         good: {

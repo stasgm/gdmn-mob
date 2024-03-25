@@ -55,7 +55,7 @@ const GoodLineScreen = () => {
               title: value?.name,
               visible: value?.visible !== false,
               value: key === 'goodId' ? matrixItem.id : matrixItem[key],
-            } as IProperty),
+            }) as IProperty,
         )
         .filter((i) => i.visible && i.name !== 'goodName')
         .sort((a, b) => (a.sortOrder < b.sortOrder ? -1 : 1)),

@@ -10,7 +10,6 @@ import {
   navBackDrawer,
   SearchButton,
   SimpleDialog,
-  SubTitle,
 } from '@lib/mobile-ui';
 import { refSelectors, useSelector } from '@lib/store';
 import { IReference } from '@lib/types';
@@ -22,7 +21,7 @@ import { SectionListData, View } from 'react-native';
 import { Divider, Searchbar } from 'react-native-paper';
 
 import { DebetStackParamList } from '../../navigation/Root/types';
-import { IDebt } from '../../store/types';
+import { IContact, IDebt } from '../../store/types';
 import { debetTypes } from '../../utils/constants';
 
 import DebetItem from './components/DebetItem';
@@ -50,6 +49,7 @@ const DebetListScreen = () => {
   const { colors } = useTheme();
 
   const debets = refSelectors.selectByName<IDebt>('debt')?.data;
+  const contacts = refSelectors.selectByName<IContact>('contact')?.data;
 
   const handleApplyType = (option: IListItem) => {
     setVisibleType(false);
@@ -96,8 +96,11 @@ const DebetListScreen = () => {
   }, []);
 
   const renderItem = useCallback(
-    ({ item }: { item: IDebt }) => <DebetItem item={item} onPress={() => handlePressItem(item.id)} />,
-    [handlePressItem],
+    ({ item }: { item: IDebt }) => {
+      const limitSum = contacts.find((i) => i.id === item.id)?.limitSum;
+      return <DebetItem item={item} limitSum={limitSum} onPress={() => handlePressItem(item.id)} />;
+    },
+    [contacts, handlePressItem],
   );
 
   const sendRequest = useSendOneRefRequest('Дебиторская задолженность', { name: 'debt', contactId });
@@ -114,10 +117,10 @@ const DebetListScreen = () => {
 
   return (
     <AppScreen>
-      <View style={[styles.rowCenter, styles.containerCenter]}>
-        <SubTitle style={styles.title}>{debetType.value}</SubTitle>
+      <View style={[styles.containerEnd, styles.marginRight12]}>
         <Menu
           key={'MenuType'}
+          title={debetType?.value || ''}
           visible={visibleType}
           onChange={handleApplyType}
           onDismiss={() => setVisibleType(false)}
@@ -125,7 +128,7 @@ const DebetListScreen = () => {
           options={debetTypes}
           activeOptionId={debetType.id}
           iconSize={26}
-          iconName={'menu-down'}
+          iconName={'chevron-down'}
         />
       </View>
       <Divider />

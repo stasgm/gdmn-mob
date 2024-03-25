@@ -19,6 +19,7 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     position: 'relative',
   },
+  marginTop: { marginTop: 14 },
 });
 
 export default styles;

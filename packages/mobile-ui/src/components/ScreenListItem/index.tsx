@@ -1,8 +1,9 @@
 import React, { ReactNode } from 'react';
 import { TouchableOpacity, View, StyleSheet } from 'react-native';
-import { useTheme } from 'react-native-paper';
+import { MD2Theme, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusType } from '@lib/types';
+import { getDateString } from '@lib/mobile-hooks';
 
 import styles from '../../styles/global';
 
@@ -24,6 +25,8 @@ export interface IListItemProps {
   lineCount?: number;
   children?: ReactNode;
   addInfo?: ReactNode;
+  sentDate?: string;
+  erpCreationDate?: string;
 }
 
 const ScreenListItem = ({
@@ -34,12 +37,14 @@ const ScreenListItem = ({
   lineCount,
   isFromRoute,
   errorMessage,
+  sentDate,
+  erpCreationDate,
   onPress,
   onLongPress,
   checked,
   addInfo,
 }: IListItemProps) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   return (
     <TouchableOpacity onPress={onPress} onLongPress={onLongPress}>
@@ -72,6 +77,17 @@ const ScreenListItem = ({
           {children}
           {errorMessage ? (
             <MediumText style={{ color: colors.error }}>Отказано: {errorMessage || ''}</MediumText>
+          ) : null}
+          {sentDate ? (
+            <MediumText>
+              Отправлено: {getDateString(sentDate)} {new Date(sentDate).toLocaleTimeString('ru', { hour12: false })}
+            </MediumText>
+          ) : null}
+          {erpCreationDate ? (
+            <MediumText>
+              Обработано: {getDateString(erpCreationDate)}{' '}
+              {new Date(erpCreationDate).toLocaleTimeString('ru', { hour12: false })}
+            </MediumText>
           ) : null}
         </View>
       </View>

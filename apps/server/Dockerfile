@@ -1,6 +1,6 @@
 # Using multi-stage build (supported Docker 17 and later)
 # ------ Stage 1 (build) --------
-FROM node:18.13.0-slim AS builder
+FROM node:lts-alpine3.19 AS builder
 # Create app directory
 WORKDIR /usr/src/gdmn-mob
 
@@ -22,7 +22,7 @@ COPY ./apps/server/src ./apps/server/src
 RUN cd ./apps/server && yarn build
 
 # # ------ Stage 2 (release) ------
-FROM node:18.13.0-alpine3.17 AS release
+FROM node:lts-alpine3.19 AS release
 # Create app directory
 WORKDIR /server
 # Copy dist files
@@ -30,4 +30,3 @@ COPY --from=builder /usr/src/gdmn-mob/apps/server/dist ./dist
 COPY --from=builder /usr/src/gdmn-mob/node_modules ./node_modules
 
 ENTRYPOINT node ./dist/src/index.js
-

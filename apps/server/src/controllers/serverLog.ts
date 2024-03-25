@@ -9,7 +9,15 @@ import { InvalidParameterException } from '../exceptions';
 import { ok } from '../utils/apiHelpers';
 
 const getServerLogs = async (ctx: ParameterizedContext): Promise<void> => {
-  const serverLogList: IServerLogFile[] = await serverLogService.findMany();
+  const params: Record<string, string | number> = {};
+
+  const { filterText } = ctx.query;
+
+  if (typeof filterText === 'string') {
+    params.filterText = filterText;
+  }
+
+  const serverLogList: IServerLogFile[] = await serverLogService.findMany(params);
 
   ok(ctx as Context, serverLogList, 'getServerLogs: serverLogs are successfully received');
 };

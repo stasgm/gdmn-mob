@@ -72,3 +72,11 @@ export type ScanParamList = RefParamList & {
 };
 
 export type ScanStackParamList = { ScanList: undefined } & ScanParamList;
+
+export type RevisionParamList = RefParamList & {
+  RevisionView: { id: string; docType?: string };
+  RevisionEdit: { id: string; docType?: string } | undefined; //itemId: string;
+  RevisionGood: { docId: string };
+};
+
+export type RevisionStackParamList = { RevisionList: undefined } & RevisionParamList;

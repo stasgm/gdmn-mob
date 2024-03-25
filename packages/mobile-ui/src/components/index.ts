@@ -11,6 +11,7 @@ export {
   ScanButton,
   SendButton,
   SaveDocument,
+  EditDocument,
   FilterButton,
   InfoButton,
 } from './AppBar';
@@ -43,3 +44,4 @@ export { navBackButton, navBackDrawer } from './NavigationButtons';
 export { SimpleDialog } from './SimpleDialog';
 export { NumberKeypad } from './NumberKeypad';
 export { default as Checkbox } from './Checkbox';
+export { default as DateInfo } from './DateInfo';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleProp, TextStyle, View } from 'react-native';
-import { IconButton, TextInput, useTheme } from 'react-native-paper';
+import { IconButton, MD2Theme, TextInput, useTheme } from 'react-native-paper';
 
 import buttonStyles from '../../styles/buttonRippleStyle';
 
@@ -20,7 +20,7 @@ interface Props {
 const truncate = (str: string, l: number | undefined = 40) => (str.length > l ? `${str.substring(0, l)}...` : str);
 
 const SelectableInput = ({ value, onPress, label, placeholder, editable = false, disabled, style }: Props) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   return (
     <View style={styles.container}>

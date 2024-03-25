@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleProp, Text, TouchableHighlight, View, ViewStyle, StyleSheet } from 'react-native';
-import { useTheme } from 'react-native-paper';
+import { MD2Theme, useTheme } from 'react-native-paper';
 
 import styles from '../styles/global';
 
@@ -33,7 +33,7 @@ interface IProps {
 export type Status = 'all' | 'active' | 'archive';
 
 const FilterButtons = ({ status, onPress, style }: IProps) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   return (
     <View style={[styles.containerCenter, localStyles.container, style]}>
@@ -52,7 +52,7 @@ const FilterButtons = ({ status, onPress, style }: IProps) => {
             ]}
             onPress={() => onPress(e.status)}
           >
-            <Text style={[{ color: e.status === status ? colors.background : colors.text }, { fontSize: 17 }]}>
+            <Text style={[{ color: e.status === status ? colors.background : colors.text }, localStyles.fontSize]}>
               {e.name}
             </Text>
           </TouchableHighlight>
@@ -68,4 +68,5 @@ const localStyles = StyleSheet.create({
   container: {
     marginBottom: 5,
   },
+  fontSize: { fontSize: 17 },
 });

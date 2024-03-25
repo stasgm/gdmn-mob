@@ -51,6 +51,7 @@ export const appFpMiddlewareFactory: PersistedMiddleware =
         case getType(actions.updateTempOrderLine):
         case getType(actions.removeTempOrderLine):
         case getType(actions.removeTempOrder):
+        case getType(actions.removeTempOrders):
         case getType(actions.init): {
           const result = next(action);
 

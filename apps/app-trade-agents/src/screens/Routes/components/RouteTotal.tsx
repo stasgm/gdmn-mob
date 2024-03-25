@@ -73,7 +73,7 @@ const RouteTotal = ({ routeId, onPress, isGroupVisible = false }: IItem) => {
       <DataTable style={[borderColors, localStyles.table]}>
         <View style={[localStyles.label, labelStyle]}>
           {!!orderLines.length && (
-            <IconButton icon={isGroupVisible ? 'chevron-down' : 'chevron-up'} size={18} color={colors.text} />
+            <IconButton icon={isGroupVisible ? 'chevron-down' : 'chevron-up'} size={18} iconColor={colors.text} />
           )}
         </View>
         <DataTable.Header style={[localStyles.header, headerStyle]}>

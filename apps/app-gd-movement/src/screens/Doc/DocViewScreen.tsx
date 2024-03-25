@@ -21,6 +21,7 @@ import {
   navBackButton,
   SaveDocument,
   SimpleDialog,
+  DateInfo,
 } from '@lib/mobile-ui';
 
 import {
@@ -44,6 +45,8 @@ import { IGood, IMGoodData, IMGoodRemain, IRemains } from '../../store/app/types
 
 import { getRemGoodByContact } from '../../utils/helpers';
 
+import { appInventoryActions } from '../../store';
+
 import DocTotal from './components/DocTotal';
 
 export const DocViewScreen = () => {
@@ -66,8 +69,15 @@ export const DocViewScreen = () => {
   const isBlocked = doc?.status !== 'DRAFT';
 
   const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
+  const lineConfirm = useSelector((state) => state.settings?.data?.lineConfirm?.data);
 
   const ref = useRef<TextInput>(null);
+
+  const [isDateVisible, setIsDateVisible] = useState(false);
+
+  const handleFocus = () => {
+    ref?.current?.focus();
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -114,6 +124,7 @@ export const DocViewScreen = () => {
       },
       {
         text: 'Отмена',
+        onPress: () => handleFocus(),
       },
     ]);
   }, [docDispatch, id]);
@@ -166,6 +177,7 @@ export const DocViewScreen = () => {
       {
         title: 'Отмена',
         type: 'cancel',
+        onPress: handleFocus,
       },
     ]);
   }, [showActionSheet, handleAddDocLine, handleDelete, handleEditDocHead]);
@@ -201,7 +213,11 @@ export const DocViewScreen = () => {
                 <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
               )}
               <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
-              {!isScanerReader && <ScanButton onPress={handleDoScan} disabled={screenState !== 'idle'} />}
+              <ScanButton
+                onPress={() => (isScanerReader ? handleFocus() : handleDoScan())}
+                disabled={screenState !== 'idle'}
+              />
+
               <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
             </>
           )}
@@ -294,6 +310,10 @@ export const DocViewScreen = () => {
         return;
       }
 
+      if (isBlocked) {
+        return;
+      }
+
       if (!brc) {
         return;
       }
@@ -316,6 +336,7 @@ export const DocViewScreen = () => {
               text: 'ОК',
             },
           ]);
+          handleFocus();
 
           return;
         }
@@ -328,7 +349,7 @@ export const DocViewScreen = () => {
           buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
           barcode: remItem.good.barcode,
-          sortOrder: (lines?.length || 0) + 1,
+          sortOrder: (lines?.[0]?.sortOrder || 0) + 1,
           alias: remItem.good.alias || '',
           weightCode: remItem.good.weightCode?.trim() || '',
         };
@@ -352,6 +373,8 @@ export const DocViewScreen = () => {
               text: 'ОК',
             },
           ]);
+          handleFocus();
+
           return;
         }
 
@@ -363,26 +386,46 @@ export const DocViewScreen = () => {
           buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
           barcode: remItem.good.barcode,
-          sortOrder: (lines?.length || 0) + 1,
+          sortOrder: (lines?.[0]?.sortOrder || 0) + 1,
           alias: remItem.good.alias || '',
           weightCode: remItem.good.weightCode?.trim() || '',
         };
       }
 
-      navigation.navigate('DocLine', {
-        mode: 0,
-        docId: id,
-        item: scannedObject,
-      });
+      if (lineConfirm) {
+        navigation.navigate('DocLine', {
+          mode: 0,
+          docId: id,
+          item: scannedObject,
+        });
+      } else {
+        let newLine = { ...scannedObject, quantity: 1 };
+        if (scannedObject.good.id === 'unknown') {
+          const newLineId = `unknown_${generateId()}`;
+          dispatch(
+            appInventoryActions.addUnknownGood({
+              ...unknownGood,
+              ...scannedObject.good,
+              barcode: scannedObject.barcode,
+              id: newLineId,
+            }),
+          );
+          newLine = { ...newLine, good: { ...newLine.good, id: newLineId } };
+        }
+        dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+      }
     },
 
     [
+      dispatch,
       doc,
       documentType?.isRemains,
       goodRemains,
       id,
+      isBlocked,
       isInputQuantity,
-      lines?.length,
+      lineConfirm,
+      lines,
       navigation,
       weightSettingsCountCode,
       weightSettingsCountWeight,
@@ -401,6 +444,8 @@ export const DocViewScreen = () => {
       navigation.goBack();
     }
   }, [navigation, screenState]);
+
+  const isEditable = useMemo(() => (doc ? ['DRAFT', 'READY'].includes(doc?.status) : false), [doc]);
 
   if (screenState === 'deleting' || screenState === 'sending') {
     return (
@@ -426,8 +471,9 @@ export const DocViewScreen = () => {
       <InfoBlock
         colorLabel={getStatusColor(doc.status || 'DRAFT')}
         title={doc.documentType.description || ''}
-        onPress={handleEditDocHead}
-        disabled={delList.length > 0 || !['DRAFT', 'READY'].includes(doc.status)}
+        onPress={() => (isEditable ? handleEditDocHead() : setIsDateVisible(!isDateVisible))}
+        editable={!isEditable}
+        disabled={delList.length > 0}
         isBlocked={isBlocked}
       >
         <>
@@ -442,6 +488,7 @@ export const DocViewScreen = () => {
             >{`${doc.documentType.toDescription}: ${doc.head.toContact?.name}`}</MediumText>
           )}
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
+          {isDateVisible && <DateInfo sentDate={doc.sentDate} erpCreationDate={doc.erpCreationDate} />}
         </>
       </InfoBlock>
       {isScanerReader ? (
@@ -464,7 +511,7 @@ export const DocViewScreen = () => {
         keyExtractor={keyExtractor}
         extraData={[goods, delList, isDelList, isBlocked, navigation, id]}
       />
-      {doc.lines.length ? (
+      {doc.lines?.length ? (
         <DocTotal lineCount={doc.lines?.length || 0} sum={docLineSum} quantity={docLineQuantity} />
       ) : null}
       <SimpleDialog

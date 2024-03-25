@@ -11,4 +11,5 @@ const selectByRefId = <T>(name: string, id?: string) => {
     | T
     | undefined;
 };
+
 export default { selectByName, selectByRefId };

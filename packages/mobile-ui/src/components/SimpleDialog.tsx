@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Dialog, useTheme } from 'react-native-paper';
+import { Button, Dialog, MD2Theme, useTheme } from 'react-native-paper';
 
 import globalStyles from '../styles/global';
 
@@ -16,7 +16,7 @@ interface IProps {
 }
 
 export const SimpleDialog = ({ visible, text, onOk, onCancel, okLabel = 'Да', okDisabled = false, title }: IProps) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   return (
     <Dialog visible={visible} onDismiss={onCancel}>

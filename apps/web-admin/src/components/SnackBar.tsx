@@ -8,7 +8,7 @@ interface props {
 }
 
 const SnackBar = ({ visible = false, errorMessage, onClearError }: props) => {
-  const handleClose = (_event?: React.SyntheticEvent) => {
+  const handleClose = (_event?: Event | React.SyntheticEvent<any, Event>) => {
     onClearError();
   };
 

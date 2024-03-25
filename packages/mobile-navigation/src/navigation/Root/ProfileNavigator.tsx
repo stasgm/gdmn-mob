@@ -1,11 +1,8 @@
+import { ProfileStackParamList } from './types';
+import ProfileScreen from '../../screens/ProfileScreen';
+import ProfileDetailsScreen from '../../screens/ProfileDetailsScreen';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-
-import ProfileScreen from '../../screens/ProfileScreen';
-
-import ProfileDetailsScreen from '../../screens/ProfileDetailsScreen';
-
-import { ProfileStackParamList } from './types';
 
 const Stack = createStackNavigator<ProfileStackParamList>();
 

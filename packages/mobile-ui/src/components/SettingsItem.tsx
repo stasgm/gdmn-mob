@@ -110,22 +110,10 @@ const localStyles = StyleSheet.create({
     paddingTop: 6,
     width: '100%',
   },
-  input: {
-    height: 32,
-  },
-  subHeading: {
-    width: '85%',
-    fontSize: 15,
-  },
   status: {
     margin: 5,
     flexDirection: 'row',
     flexWrap: 'wrap',
-  },
-  border: {
-    borderWidth: 1,
-    borderRadius: 2,
-    marginHorizontal: 5,
   },
   title: {
     margin: 3,

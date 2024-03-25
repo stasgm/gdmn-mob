@@ -14,6 +14,7 @@ import actions from '../../store/company';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
 import SortableTable from '../../components/SortableTable';
+import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 const CompanyList = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const CompanyList = () => {
   const { list, loading, errorMessage, pageParams } = useSelector((state) => state.companies);
   const { user: authUser } = useSelector((state) => state.auth);
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
+  const maxHeight = useWindowResizeMaxHeight();
 
   const fetchCompanies = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
@@ -144,7 +146,7 @@ const CompanyList = () => {
                 path={'/app/companies/'}
                 onSetPageParams={handleSetPageParams}
                 pageParams={pageParams}
-                style={{ overflowY: 'auto', maxHeight: window.innerHeight - 268 }}
+                style={{ overflowY: 'auto', maxHeight }}
               />
             </Box>
           )}

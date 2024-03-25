@@ -8,6 +8,8 @@ import { ContactListScreen, GoodListScreen, GoodLineScreen } from '../../screens
 
 import { ScanListScreen, ScanViewScreen, ScanEditScreen, ScanGoodScreen } from '../../screens/Scan';
 
+import { RevisionGoodScreen, RevisionEditScreen, RevisionListScreen, RevisionViewScreen } from '../../screens/Revision';
+
 export const docScreens = {
   DocEdit: { title: 'Документ', component: DocEditScreen },
   DocView: { title: '', component: DocViewScreen },
@@ -39,4 +41,15 @@ export const scanScreens = {
   ScanEdit: { title: 'Документ', component: ScanEditScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
   ScanGood: { title: 'Сканер', component: ScanGoodScreen },
+};
+
+export const revisionListScreens = {
+  RevisionList: { title: 'Сверка', component: RevisionListScreen },
+};
+
+export const revisionScreens = {
+  RevisionView: { title: 'Документ', component: RevisionViewScreen },
+  RevisionEdit: { title: 'Документ', component: RevisionEditScreen },
+  SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
+  RevisionGood: { title: 'Сканер', component: RevisionGoodScreen },
 };

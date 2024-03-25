@@ -32,7 +32,7 @@ const OrderLine = ({ item, packages, onSetLine }: IProps) => {
   // Если упаковка только одна, то ставим ее по умолчанию, иначе
   // если есть упаковка с признаком 'по умолчанию', то подставляем ее
   const defaultPack = useMemo(
-    () => (packages.length === 1 ? packages[0].package : packages.find((i) => i.isDefault)?.package),
+    () => (packages?.length === 1 ? packages?.[0].package : packages?.find((i) => i.isDefault)?.package),
     [packages],
   );
 
@@ -45,7 +45,7 @@ const OrderLine = ({ item, packages, onSetLine }: IProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pack]);
 
-  const textStyle = [styles.number, styles.field, { color: colors.text, blackgroundColor: 'transparent' }];
+  const textStyle = [styles.number, styles.field, { color: colors.text, backgroundColor: 'transparent' }];
 
   return (
     <View style={localStyles.container}>
@@ -67,9 +67,9 @@ const OrderLine = ({ item, packages, onSetLine }: IProps) => {
         <View style={localStyles.item}>
           <View style={styles.details}>
             <Text style={styles.name}>Упаковка</Text>
-            {packages.length > 0 ? (
+            {packages?.length > 0 ? (
               <View style={localStyles.packages}>
-                {packages.map((elem) => (
+                {packages?.map((elem) => (
                   <Checkbox
                     key={elem.package.id}
                     title={elem.package.name}

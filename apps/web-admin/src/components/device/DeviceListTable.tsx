@@ -25,6 +25,7 @@ import { IDevice, IActivationCode } from '@lib/types';
 
 import { deviceStates, adminPath } from '../../utils/constants';
 import { IPageParam } from '../../types';
+import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
   devices: IDevice[];
@@ -50,6 +51,8 @@ const DeviceListTable = ({
   pageParams,
 }: IProps) => {
   const [selectedDeviceIds, setSelectedDeviceIds] = useState<IDevice[]>(selectedDevices);
+
+  const maxHeight = useWindowResizeMaxHeight();
 
   const [limit, setLimit] = useState(
     pageParams?.limit && !isNaN(Number(pageParams?.limit)) ? Number(pageParams?.limit) : 10,
@@ -210,7 +213,7 @@ const DeviceListTable = ({
   return (
     <Card>
       <PerfectScrollbar>
-        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight: window.innerHeight - 268 }}>
+        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight }}>
           <Table>
             <TableHead>
               <TableRow>

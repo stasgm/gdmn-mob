@@ -1,9 +1,7 @@
+import { ReferenceStackParamList } from './types';
+import { ReferenceDetailScreen, ReferenceListScreen, ReferenceViewScreen } from '../../screens/References';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-
-import { ReferenceDetailScreen, ReferenceListScreen, ReferenceViewScreen } from '../../screens/References';
-
-import { ReferenceStackParamList } from './types';
 
 const Stack = createStackNavigator<ReferenceStackParamList>();
 

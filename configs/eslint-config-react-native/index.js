@@ -31,5 +31,6 @@ module.exports = {
         extensions: ['.ts', '.tsx', '.json', '.native.js'],
       },
     },
+    'import/ignore': ['react-native'],
   },
 };

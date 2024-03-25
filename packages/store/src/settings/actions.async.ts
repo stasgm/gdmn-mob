@@ -33,4 +33,4 @@ const setUserSettings = (
   };
 };
 
-export default { setUserSettings };
+export default { setUserSettings, useSettingsThunkDispatch };

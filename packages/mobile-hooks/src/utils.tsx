@@ -144,7 +144,7 @@ const getDelList = (delList: IDelList, lineId: string, lineStatus: string) => {
 const getDelLineList = (delList: string[], lineId: string) =>
   delList.includes(lineId) ? delList.filter((i) => i !== lineId) : [...delList, lineId];
 
-const deleteSelectedItems = (delList: IDelList, deleteDocs: () => void) => {
+const deleteSelectedItems = (delList: IDelList, deleteDocs: () => void, noDraftMessage?: boolean) => {
   if (Object.values(delList).find((i) => i === 'SENT')) {
     Alert.alert('Внимание!', 'Среди выделенных документов есть отправленные. Удаление невозможно.', [
       {
@@ -161,7 +161,7 @@ const deleteSelectedItems = (delList: IDelList, deleteDocs: () => void) => {
         text: 'Отмена',
       },
     ]);
-  } else {
+  } else if (!noDraftMessage) {
     Alert.alert('Вы уверены, что хотите удалить документы?', '', [
       {
         text: 'Да',
@@ -171,6 +171,8 @@ const deleteSelectedItems = (delList: IDelList, deleteDocs: () => void) => {
         text: 'Отмена',
       },
     ]);
+  } else {
+    deleteDocs();
   }
 };
 

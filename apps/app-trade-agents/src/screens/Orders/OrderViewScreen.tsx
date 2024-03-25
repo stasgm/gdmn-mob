@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { Alert, View } from 'react-native';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { Alert, View, StyleSheet } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -20,21 +20,25 @@ import {
   ItemSeparator,
   SaveDocument,
   SimpleDialog,
+  globalColors,
+  DateInfo,
 } from '@lib/mobile-ui';
 
 import { formatValue, generateId, getDateString, useSendDocs, keyExtractor, sleep } from '@lib/mobile-hooks';
 
 import { INamedEntity, ScreenState } from '@lib/types';
 
-import { useTheme } from 'react-native-paper';
+import { useTheme, MD2Theme } from 'react-native-paper';
 
 import { FlashList } from '@shopify/flash-list';
 
 import {
+  IContact,
   IDebt,
   IOrderDocument,
   IOrderLine,
   IOutlet,
+  IPackageGood,
   IRouteDocument,
   IVisitDocument,
   visitDocumentType,
@@ -66,6 +70,8 @@ const OrderViewScreen = () => {
   const [delList, setDelList] = useState<string[]>([]);
   const isDelList = !!Object.keys(delList).length;
 
+  const [isDateVisible, setIsDateVisible] = useState(false);
+
   const [isGroupVisible, setIsGroupVisible] = useState(false);
   const loading = useSelector((state) => state.app.loading);
   const order = docSelectors.selectByDocId<IOrderDocument>(id);
@@ -74,11 +80,16 @@ const OrderViewScreen = () => {
 
   const debt = refSelectors.selectByRefId<IDebt>('debt', order?.head?.contact.id);
 
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   const debtTextStyle = { color: debt?.saldoDebt && debt?.saldoDebt > 0 ? colors.error : colors.text };
 
+  const contact = refSelectors.selectByRefId<IContact>('contact', order?.head?.contact.id);
+
   const address = refSelectors.selectByRefId<IOutlet>('outlet', order?.head?.outlet.id)?.address;
+  const limitSum = refSelectors.selectByRefId<IContact>('contact', order?.head?.contact.id)?.limitSum;
+
+  const packages = refSelectors.selectByName<IPackageGood>('packageGood')?.data;
 
   const handleAddOrderLine = useCallback(() => {
     navigation.navigate('SelectGood', {
@@ -130,6 +141,9 @@ const OrderViewScreen = () => {
       documentDate: newDocDate,
       creationDate: newDocDate,
       editionDate: newDocDate,
+      sentDate: undefined,
+      errorMessage: undefined,
+      erpCreationDate: undefined,
     };
 
     if (routeId && routeLineId && !orderDocs.length) {
@@ -403,19 +417,25 @@ const OrderViewScreen = () => {
   const renderItem = useCallback(
     ({ item }: { item: IOrderLine }) => {
       const checkedId = delList.find((i) => i === item.id) || '';
+      const itemPackages = packages?.filter((e) => e.good.id === item.good.id);
+
       return (
-        <OrderItem
-          key={item.id}
-          item={item}
-          onPress={() => handlePressOrderLine(item)}
-          isChecked={checkedId ? true : false}
-          onLongPress={() => !isBlocked && handleAddDeletelList(item.id, checkedId)}
-          isDelList={isDelList}
-        />
+        <View style={!item.package && itemPackages?.length > 0 ? { backgroundColor: globalColors.lavenderLight } : {}}>
+          <OrderItem
+            key={item.id}
+            item={item}
+            onPress={() => handlePressOrderLine(item)}
+            isChecked={checkedId ? true : false}
+            onLongPress={() => !isBlocked && handleAddDeletelList(item.id, checkedId)}
+            isDelList={isDelList}
+          />
+        </View>
       );
     },
-    [delList, handleAddDeletelList, handlePressOrderLine, isBlocked, isDelList],
+    [delList, handleAddDeletelList, handlePressOrderLine, isBlocked, isDelList, packages],
   );
+
+  const isEditable = useMemo(() => (order ? ['DRAFT', 'READY'].includes(order?.status) : false), [order]);
 
   const isFocused = useIsFocused();
   if (!isFocused) {
@@ -448,16 +468,27 @@ const OrderViewScreen = () => {
         <InfoBlock
           colorLabel={getStatusColor(order?.status || 'DRAFT')}
           title={order.head?.outlet?.name}
-          onPress={handleEditOrderHead}
-          disabled={isDelList || !['DRAFT', 'READY'].includes(order.status)}
+          onPress={() => (isEditable ? handleEditOrderHead() : setIsDateVisible(!isDateVisible))}
+          editable={isEditable}
+          disabled={isDelList}
           isBlocked={isBlocked}
           isFromRoute={order.head.route ? true : false}
         >
           <View style={styles.directionColumn}>
-            <MediumText>Адрес: {address}</MediumText>
+            {address ? <MediumText>Адрес: {address}</MediumText> : null}
+            {order.head.road ? <MediumText>Маршрут: {order.head.road.name}</MediumText> : null}
             <MediumText>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
               order.head?.onDate,
             )}`}</MediumText>
+            {!routeId && contact ? (
+              <>
+                <LargeText style={localStyles.contract}>{`Договор №${contact?.contractNumber || '-'} от ${getDateString(
+                  contact.contractDate,
+                )}`}</LargeText>
+                <MediumText>{`Условия оплаты: ${contact.paycond}`}</MediumText>
+              </>
+            ) : null}
+
             <MediumText style={debtTextStyle}>
               {(!!debt?.saldo && debt.saldo < 0
                 ? `Предоплата: ${formatValue({ type: 'currency', decimals: 2 }, Math.abs(debt.saldo))}`
@@ -470,11 +501,17 @@ const OrderViewScreen = () => {
                 } дн.`}
               </MediumText>
             )}
+            {limitSum ? (
+              <View style={styles.rowCenter}>
+                <MediumText>Лимит: {formatValue({ type: 'currency', decimals: 2 }, limitSum)}</MediumText>
+              </View>
+            ) : null}
             {order.head.comment ? (
               <View style={styles.rowCenter}>
                 <MediumText>Комментарий: {order.head.comment || ''}</MediumText>
               </View>
             ) : null}
+            {isDateVisible && <DateInfo sentDate={order.sentDate} erpCreationDate={order.erpCreationDate} />}
           </View>
         </InfoBlock>
         <FlashList
@@ -503,3 +540,7 @@ const OrderViewScreen = () => {
 };
 
 export default OrderViewScreen;
+
+const localStyles = StyleSheet.create({
+  contract: { fontWeight: 'bold', opacity: 0.9, fontSize: 15 },
+});

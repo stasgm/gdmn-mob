@@ -1,11 +1,11 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@mui/material';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import CachedIcon from '@mui/icons-material/Cached';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import { IFileFilter, IToolBarButton } from '../../types';
+import { IFileFilter, IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
 import actions from '../../store/serverLog';
@@ -15,32 +15,36 @@ import ServerLogListTable from '../../components/serverLog/ServerLogListTable';
 const ServerLogList = () => {
   const dispatch = useDispatch();
 
-  const { list, loading, errorMessage } = useSelector((state) => state.serverLogs);
+  const { list, loading, errorMessage, pageParams } = useSelector((state) => state.serverLogs);
+
+  const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
   const fetchServerLogs = useCallback(
-    (filesFilters?: IFileFilter, filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(actions.fetchServerLogs());
+    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+      dispatch(actions.fetchServerLogs(filterText));
     },
     [dispatch],
   );
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchServerLogs();
-  }, [fetchServerLogs]);
+    fetchServerLogs(pageParams?.filterText);
+  }, [fetchServerLogs, pageParams?.filterText]);
 
   const handleUpdateInput = (value: string) => {
     const inputValue: string = value;
 
-    // setPageParamLocal({ filterText: value });
+    setPageParamLocal({ filterText: value });
 
     if (inputValue) return;
 
-    // fetchDevices('');
+    fetchServerLogs('');
   };
 
   const handleSearchClick = () => {
-    fetchServerLogs();
+    dispatch(actions.serverLogActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
+
+    fetchServerLogs(pageParamLocal?.filterText);
   };
 
   const handleKeyPress = (key: string) => {
@@ -54,8 +58,22 @@ const ServerLogList = () => {
   };
 
   const handleClearSearch = () => {
+    dispatch(actions.serverLogActions.setPageParam({ filterText: undefined, page: 0 }));
+    setPageParamLocal({ filterText: undefined });
     fetchServerLogs();
   };
+
+  const handleSetPageParams = useCallback(
+    (pageParams: IPageParam) => {
+      dispatch(
+        actions.serverLogActions.setPageParam({
+          page: pageParams.page,
+          limit: pageParams.limit,
+        }),
+      );
+    },
+    [dispatch],
+  );
 
   const buttons: IToolBarButton[] = [
     {
@@ -86,14 +104,14 @@ const ServerLogList = () => {
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
-            value={''}
+            value={(pageParamLocal?.filterText as undefined) || ''}
             clearOnClick={handleClearSearch}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <ServerLogListTable serverLogs={list} />
+              <ServerLogListTable serverLogs={list} onSetPageParams={handleSetPageParams} pageParams={pageParams} />
             </Box>
             // <Box sx={{ pt: 2 }}>
             //   <SortableFilterTable<IDeviceLogFiles>

@@ -18,7 +18,7 @@ import { getListFiles } from './errorLogUtils';
  * Возвращает множество файлов логов сервера
  * @returns Массив объектов файлов ошибок
  */
-const findMany = async (): Promise<IServerLogFile[]> => {
+const findMany = async (params: Record<string, string | number>): Promise<IServerLogFile[]> => {
   const logPath = path.join(process.cwd(), config.LOG_PATH);
   let files: string[] = [];
   try {
@@ -26,14 +26,24 @@ const findMany = async (): Promise<IServerLogFile[]> => {
       const fileArr = await getListFiles(logPath);
       files = [...files, ...fileArr];
     }
+    const filterText: string | undefined =
+      'filterText' in params ? (params.filterText as string).toUpperCase() : undefined;
+
+    files = files.filter((item: string) => {
+      let filteredFiles = true;
+
+      if (filterText) {
+        const fileName = path.basename(item).toUpperCase();
+        filteredFiles = fileName.includes(filterText);
+      }
+
+      return filteredFiles;
+    });
     let fileObjs: IServerLogFile[] = [];
     for (const item of files) {
-      const extName = path.extname(item).toLowerCase();
-      if (extName === '.log') {
-        // eslint-disable-next-line no-await-in-loop
-        const fileObj = await fileInfoToObj(item);
-        if (fileObj) fileObjs = [...fileObjs, fileObj];
-      }
+      // eslint-disable-next-line no-await-in-loop
+      const fileObj = await fileInfoToObj(item);
+      if (fileObj) fileObjs = [...fileObjs, fileObj];
     }
 
     return fileObjs;
