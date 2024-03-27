@@ -11,6 +11,7 @@ export {
   ScanButton,
   SendButton,
   SaveDocument,
+  EditDocument,
   FilterButton,
   InfoButton,
 } from './AppBar';

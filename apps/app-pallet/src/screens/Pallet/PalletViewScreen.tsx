@@ -23,6 +23,7 @@ import {
   AppDialog,
   DeleteButton,
   CloseButton,
+  EditDocument,
 } from '@lib/mobile-ui';
 
 import {
@@ -135,6 +136,19 @@ export const PalletViewScreen = () => {
     navigation.goBack();
   }, [dispatch, id, doc, navigation]);
 
+  const handleEditDocument = useCallback(() => {
+    if (!doc) {
+      return;
+    }
+    dispatch(
+      documentActions.updateDocument({
+        docId: id,
+        document: { ...doc, status: 'DRAFT' },
+      }),
+    );
+    navigation.goBack();
+  }, [dispatch, id, doc, navigation]);
+
   const hanldeCancelLastPallet = useCallback(() => {
     const lastId = doc?.lines?.[0]?.id;
 
@@ -194,7 +208,10 @@ export const PalletViewScreen = () => {
     () =>
       isBlocked ? (
         doc?.status === 'READY' ? (
-          <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
+          <View style={styles.buttons}>
+            <EditDocument onPress={handleEditDocument} disabled={screenState !== 'idle'} />
+            <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
+          </View>
         ) : (
           doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
         )
@@ -213,7 +230,6 @@ export const PalletViewScreen = () => {
                 onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('PalletGood', { docId: id }))}
                 disabled={screenState !== 'idle'}
               />
-              {/* )} */}
               <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
             </>
           )}
@@ -223,6 +239,7 @@ export const PalletViewScreen = () => {
       actionsMenu,
       doc?.status,
       handleDeleteLines,
+      handleEditDocument,
       handleSaveDocument,
       id,
       isBlocked,
@@ -251,7 +268,6 @@ export const PalletViewScreen = () => {
   const renderItem = ({ item }: { item: IPalletLine }) => (
     <ListItemLine
       {...item}
-      // readonly={true}
       onPress={() => isDelList && setDelList(getDelLineList(delList, item.id))}
       onLongPress={() => !isBlocked && setDelList(getDelLineList(delList, item.id))}
       checked={delList.includes(item.id)}
