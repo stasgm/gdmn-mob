@@ -183,7 +183,6 @@ const logout = (_userId: string) => {
  * @returns Статус устройства
  */
 const getDeviceStatus = (uid: string): DeviceState => {
-  // const device = getDb().devices.data.find((i) => i.uid === uid);
   const device = getDb().devices.findByField('uid', uid);
 
   if (!device) {

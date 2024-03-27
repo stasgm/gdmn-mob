@@ -78,6 +78,12 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
         errorLog: [...state.errorLog, ...action.payload],
       };
 
+    case getType(appActions.addError):
+      return {
+        ...state,
+        errorLog: [...state.errorLog, action.payload],
+      };
+
     case getType(appActions.setSentErrors):
       return {
         ...state,
