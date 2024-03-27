@@ -21,6 +21,7 @@ const addDeviceLog: Config = {
           date: Joi.string().required().error(new InvalidParameterException('Не указана дата ошибки')),
           id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор')),
           message: Joi.string().required().error(new InvalidParameterException('Не указан текст ошибки')),
+          processId: Joi.string().optional(),
         }),
       ),
       appVersion: Joi.string().optional(),

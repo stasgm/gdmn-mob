@@ -164,13 +164,13 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
     case getType(actions.addSettings): {
       const baseSetts = Object.entries(baseSettings).reduce((setts: Settings, [field, baseSet]) => {
         const storeSet = state.data[field];
-        setts[field] = storeSet ? { ...baseSet, data: storeSet.data } : baseSet;
+        setts[field] = storeSet ? { ...baseSet, data: storeSet.data, readonly: storeSet.readonly } : baseSet;
         return setts;
       }, {});
 
       const newSetts = Object.entries(action.payload).reduce((setts: Settings, [field, newSet]) => {
         const oldRef = state.data[field];
-        setts[field] = oldRef ? { ...newSet, data: oldRef.data } : newSet;
+        setts[field] = oldRef ? { ...newSet, data: oldRef.data, readonly: oldRef.readonly } : newSet;
         return setts;
       }, {});
 

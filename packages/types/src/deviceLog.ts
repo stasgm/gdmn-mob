@@ -11,9 +11,10 @@ export interface IDeviceData {
 export interface IDeviceLogEntry {
   id: string;
   name: string;
-  date: string;
   message: string;
+  date: string;
   isSent?: boolean;
+  processId?: string;
 }
 
 export interface IDeviceLogParams extends IPathParams {

@@ -1,5 +1,5 @@
 import { Linking, ScrollView, TouchableOpacity, View } from 'react-native';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { dialCall, sleep } from '@lib/mobile-hooks';
@@ -49,88 +49,20 @@ import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
 import { messageAgent } from './src/store/mock';
 import ReportsNavigator from './src/navigation/Root/ReportsNavigator';
 
+const navItems: INavItem[] = [
+  { name: 'RoutesNav', title: 'Маршруты', icon: 'routes', component: RoutesNavigator },
+  { name: 'OrdersNav', title: 'Заявки', icon: 'clipboard-list-outline', component: OrdersNavigator },
+  { name: 'ReportsNav', title: 'Отчёты', icon: 'text-box-search-outline', component: ReportsNavigator },
+  { name: 'ShipmentNav', title: 'Отгрузка', icon: 'truck-outline', component: ShipmentNavigator },
+  { name: 'DebetsNav', title: 'Задолженности', icon: 'currency-usd', component: DebetsNavigator },
+  { name: 'GoodMatrixNav', title: 'Матрицы', icon: 'tag-text-outline', component: GoodMatrixNavigator },
+  { name: 'MapNav', title: 'Карта', icon: 'map-outline', component: MapNavigator },
+];
+
 const Root = () => {
-  const navItems: INavItem[] = useMemo(
-    () => [
-      {
-        name: 'RoutesNav',
-        title: 'Маршруты',
-        icon: 'routes',
-        component: RoutesNavigator,
-      },
-      {
-        name: 'OrdersNav',
-        title: 'Заявки',
-        icon: 'clipboard-list-outline',
-        component: OrdersNavigator,
-      },
-      {
-        name: 'ReportsNav',
-        title: 'Отчёты',
-        icon: 'text-box-search-outline',
-        component: ReportsNavigator,
-      },
-      {
-        name: 'ShipmentNav',
-        title: 'Отгрузка',
-        icon: 'truck-outline',
-        component: ShipmentNavigator,
-      },
-      {
-        name: 'DebetsNav',
-        title: 'Задолженности',
-        icon: 'currency-usd',
-        component: DebetsNavigator,
-      },
-      {
-        name: 'GoodMatrixNav',
-        title: 'Матрицы',
-        icon: 'tag-text-outline',
-        component: GoodMatrixNavigator,
-      },
-      {
-        name: 'MapNav',
-        title: 'Карта',
-        icon: 'map-outline',
-        component: MapNavigator,
-      },
-    ],
-    [],
-  );
-
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(appActions.loadGlobalDataFromDisc());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  //Загружаем в стор дополнительные настройки приложения
-  const isInit = useSelector((state) => state.settings.isInit);
-  const isDemo = useSelector((state) => state.auth.isDemo);
-
   const refDispatch = useRefThunkDispatch();
   const docDispatch = useDocThunkDispatch();
-
-  //Для получения демо данных в useSync
-  const getMessages = useCallback(async () => {
-    await sleep(ONE_SECOND_IN_MS);
-    await refDispatch(
-      referenceActions.setReferences(messageAgent.find((m) => m.body.type === 'REFS')?.body.payload as IReferences),
-    );
-    await docDispatch(
-      documentActions.setDocuments(messageAgent.find((m) => m.body.type === 'DOCS')?.body.payload as IDocument[]),
-    );
-  }, [docDispatch, refDispatch]);
-
-  useEffect(() => {
-    //isInit - true при открытии приложения или при ручном сбросе настроек
-    //До загрузки данных пользователя устанавливаем настройки по умолчанию
-    if (appSettings && isInit) {
-      dispatch(settingsActions.addSettings(appSettings));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isInit]);
 
   const appDataLoading = appSelectors.selectLoading();
   const { loadingData: authLoading, user } = useSelector((state) => state.auth);
@@ -141,6 +73,26 @@ const Root = () => {
 
   const [loading, setLoading] = useState(true);
   const [addSettings, setAddSettings] = useState('INIT');
+
+  const [infoWindow, setInfoWindow] = useState(0);
+
+  useEffect(() => {
+    dispatch(appActions.loadGlobalDataFromDisc());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  //Загружаем в стор дополнительные настройки приложения
+  const isInit = useSelector((state) => state.settings.isInit);
+  const isDemo = useSelector((state) => state.auth.isDemo);
+
+  useEffect(() => {
+    //isInit - true при открытии приложения или при ручном сбросе настроек
+    //До загрузки данных пользователя устанавливаем настройки по умолчанию
+    if (appSettings && isInit) {
+      dispatch(settingsActions.addSettings(appSettings));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInit]);
 
   useEffect(() => {
     if (isLogged) {
@@ -175,24 +127,30 @@ const Root = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const [infoWindow, setInfoWindow] = useState(0);
-
-  const handleSetInfoWindow_0 = useCallback(() => setInfoWindow(0), []);
-  const handleSetInfoWindow_1 = useCallback(() => setInfoWindow(1), []);
-  const handleSetInfoWindow_2 = useCallback(() => setInfoWindow(2), []);
-  const handleSetInfoWindow_3 = useCallback(() => setInfoWindow(3), []);
-
   useEffect(() => {
     if (isDemo) {
       //Если включен демо режим, то запускаем получение данных из мока
-      getMessages();
+      (async () => {
+        await sleep(ONE_SECOND_IN_MS);
+        await refDispatch(
+          referenceActions.setReferences(messageAgent.find((m) => m.body.type === 'REFS')?.body.payload as IReferences),
+        );
+        await docDispatch(
+          documentActions.setDocuments(messageAgent.find((m) => m.body.type === 'DOCS')?.body.payload as IDocument[]),
+        );
+      })();
+
       if (connectionStatus === 'connected') {
-        handleSetInfoWindow_1();
+        setInfoWindow(1);
       }
     }
-  }, [isDemo, getMessages, connectionStatus, handleSetInfoWindow_1]);
+  }, [isDemo, connectionStatus, refDispatch, docDispatch]);
 
   const onClearLoadingErrors = () => dispatch(appTradeActions.setLoadingError(''));
+
+  const handleSetInfoWindow = useCallback((value: number) => {
+    setInfoWindow(value);
+  }, []);
 
   return authLoading || loading || tradeLoading || appDataLoading ? (
     <AppScreen>
@@ -217,13 +175,13 @@ const Root = () => {
       <View style={styles.infoButtons}>
         <TouchableOpacity
           onPress={() => {
-            setInfoWindow(0);
+            handleSetInfoWindow(0);
             dispatch(appActions.loadGlobalDataFromDisc());
           }}
         >
           <Text style={styles.textInfo}>{'« Назад'}</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleSetInfoWindow_2}>
+        <TouchableOpacity onPress={() => handleSetInfoWindow(2)}>
           <Text style={styles.textInfo}>{'Далее »'}</Text>
         </TouchableOpacity>
       </View>
@@ -245,10 +203,10 @@ const Root = () => {
         <Text style={[styles.textInfo, styles.textReference]}>{GDMN_SITE_ADDRESS}</Text>
       </TouchableOpacity>
       <View style={styles.infoButtons}>
-        <TouchableOpacity onPress={handleSetInfoWindow_1}>
+        <TouchableOpacity onPress={() => handleSetInfoWindow(1)}>
           <Text style={styles.textInfo}>{'« Назад'}</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleSetInfoWindow_3}>
+        <TouchableOpacity onPress={() => handleSetInfoWindow(3)}>
           <Text style={styles.textInfo}>{'Далее »'}</Text>
         </TouchableOpacity>
       </View>
@@ -265,11 +223,11 @@ const Root = () => {
         }
       </Text>
       <View style={styles.infoButtons}>
-        <TouchableOpacity onPress={handleSetInfoWindow_2}>
+        <TouchableOpacity onPress={() => handleSetInfoWindow(2)}>
           <Text style={styles.textInfo}>{'« Назад'}</Text>
         </TouchableOpacity>
       </View>
-      <PrimeButton icon={'presentation-play'} onPress={handleSetInfoWindow_0}>
+      <PrimeButton icon={'presentation-play'} onPress={() => handleSetInfoWindow(0)}>
         Начать работу
       </PrimeButton>
     </AppScreen>

@@ -6,8 +6,6 @@ import { getFiles, getFile, deleteFile, updateFile, deleteFiles, getFolders, mov
 
 const file = route();
 
-console.log('files');
-
 file.prefix('/files');
 
 // Маршрут для получения списка папок
