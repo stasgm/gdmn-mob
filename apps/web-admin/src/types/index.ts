@@ -46,12 +46,12 @@ export interface IMessageHead {
 
 export interface IFilterObject {
   [fieldName: string]: IFilterOption;
-  company: IFilterOption;
-  appSystem: IFilterOption;
+  companyId: IFilterOption;
+  appSystemId: IFilterOption;
   folder: IFilterOption;
   fileName: IFilterOption;
-  producer: IFilterOption;
-  consumer: IFilterOption;
+  producerId: IFilterOption;
+  consumerId: IFilterOption;
   uid: IFilterOption;
   dateFrom: IFilterOption;
   dateTo: IFilterOption;
@@ -61,12 +61,11 @@ export interface IFileFilter {
   [fieldName: string]: string;
   folder: string;
   fileName: string;
-  company: string;
   companyId: string;
-  appSystem: string;
-  producer: string;
-  consumer: string;
-  device: string;
+  appSystemId: string;
+  producerId: string;
+  consumerId: string;
+  deviceId: string;
   uid: string;
   dateFrom: string;
   dateTo: string;
@@ -74,9 +73,10 @@ export interface IFileFilter {
 
 export interface IFilterOption extends INamedEntity {
   type: 'text' | 'select' | 'date';
-  value: string;
+  value: INamedEntity | string;
   visible: boolean;
   data?: [];
+  valueId?: string;
 }
 
 export interface IFilterTable {

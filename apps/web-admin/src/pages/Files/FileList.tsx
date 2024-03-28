@@ -6,11 +6,11 @@ import FilterIcon from '@mui/icons-material/FilterAltOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import DriveFileMoveOutlinedIcon from '@mui/icons-material/DriveFileMoveOutlined';
 
-import { IFileObject, IFileSystem, INamedEntity, IUser } from '@lib/types';
+import { /*IFileObject,*/ IFileParams, INamedEntity, ISystemFile, IUser } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import { IFileFilter, IFilePageParam, IHeadCells, IListOption, IToolBarButton } from '../../types';
+import { IFileFilter, IFilePageParam, IFilterTable, IHeadCells, IListOption, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
 import actions from '../../store/file';
@@ -27,13 +27,25 @@ const FileList = () => {
 
   const { list, loading, errorMessage, pageParams, folders } = useSelector((state) => state.files);
 
+  // console.log('list', list);
+
   const sortedList = useMemo(() => list.sort((a, b) => (a.path < b.path ? -1 : 1)), [list]);
 
   const maxWidth = useWindowResizeWidth(0.8);
 
   const fetchFiles = useCallback(
     (filesFilters?: IFileFilter, filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(actions.fetchFiles(filesFilters, filterText, fromRecord, toRecord));
+      if (filesFilters) {
+        const ff: IFilterTable = Object.entries(filesFilters).reduce((prev: IFilterTable, [item, value]) => {
+          if (value) {
+            prev[item] = value;
+          }
+          return prev;
+        }, {});
+        dispatch(actions.fetchFiles(ff, filterText, fromRecord, toRecord));
+      } else {
+        dispatch(actions.fetchFiles(filesFilters, filterText, fromRecord, toRecord));
+      }
     },
     [dispatch],
   );
@@ -57,6 +69,13 @@ const FileList = () => {
     fetchFiles(pageParams?.filesFilters);
   }, [fetchFiles, pageParams?.filesFilters]);
 
+  const [formikCompany, setFormikCompany] = useState<INamedEntity | undefined>(
+    // pageParams?.filesFilters?.company
+    //   ? companyList.find((c) => c.name === pageParams?.filesFilters?.company)
+    //   : undefined,
+    undefined,
+  );
+
   const { list: companies, loading: loadingCompanies } = useSelector((state) => state.companies);
   const { list: appSystems, loading: loadingAppSystems } = useSelector((state) => state.appSystems);
   const { list: users, loading: loadingUsers } = useSelector((state) => state.users);
@@ -67,44 +86,40 @@ const FileList = () => {
 
   const userList = companyList.length
     ? users
-        .filter((i) => companyList.find((c) => c.name === formikCompany?.name && c.id === i.company?.id))
+        .filter((i) => companyList.find((c) => c.id === formikCompany?.id && c.id === i.company?.id))
         .map((d) => ({ id: d.id, name: d.name }))
     : [];
 
   const deviceList = companyList.length
     ? devices
-        .filter((i) => companyList.find((c) => c.name === formikCompany?.name && c.id === i.company?.id))
+        .filter((i) => companyList.find((c) => c.id === formikCompany?.id && c.id === i.company?.id))
         .map((d) => ({ id: d.id, name: d.name }))
     : [];
 
   const foldersList = folders.map((i) => ({ id: i, name: i })) || [];
 
   const listOptions: IListOption = {
-    company: companyList,
-    appSystem: appSystemList,
-    producer: userList,
-    consumer: userList,
-    device: deviceList,
+    companyId: companyList,
+    appSystemId: appSystemList,
+    producerId: userList,
+    consumerId: userList,
+    deviceId: deviceList,
     folder: foldersList,
   };
   useEffect(() => {
-    if (pageParams?.filesFilters?.company && pageParams?.filesFilters?.appSystem) {
-      const companyId = companies.find((i) => i.name === pageParams?.filesFilters?.company)?.id;
-      const appSystemId = appSystems.find((i) => i.name === pageParams?.filesFilters?.appSystem)?.id;
-      if (companyId && appSystemId) {
-        dispatch(actions.fetchFolders(companyId, appSystemId));
-      }
+    if (pageParams?.filesFilters?.companyId && pageParams?.filesFilters?.appSystemId) {
+      // const companyId = companies.find((i) => i.id === pageParams?.filesFilters?.companyId)?.id;
+      // const appSystemId = appSystems.find((i) => i.id === pageParams?.filesFilters?.appSystemId)?.id;
+
+      // if (companyId && appSystemId) {
+      dispatch(actions.fetchFolders(pageParams?.filesFilters?.companyId, pageParams?.filesFilters?.appSystemId));
+      // }
     }
-  }, [appSystems, companies, dispatch, pageParams?.filesFilters?.appSystem, pageParams?.filesFilters?.company]);
+  }, [appSystems, companies, dispatch, pageParams?.filesFilters?.appSystemId, pageParams?.filesFilters?.companyId]);
 
-  const [formikCompany, setFormikCompany] = useState<INamedEntity | undefined>(
-    // pageParams?.filesFilters?.company
-    //   ? companyList.find((c) => c.name === pageParams?.filesFilters?.company)
-    //   : undefined,
-    undefined,
-  );
+  console.log('formikCompany', formikCompany);
 
-  console.log('pageParams', pageParams?.filesFilters);
+  // console.log('pageParams', pageParams?.filesFilters);
 
   const [pageParamLocal, setPageParamLocal] = useState<IFilePageParam | undefined>(pageParams);
 
@@ -333,7 +348,7 @@ const FileList = () => {
     },
   ];
 
-  const headCells: IHeadCells<IFileSystem>[] = [
+  const headCells: IHeadCells<ISystemFile>[] = [
     { id: 'folder', label: 'Папка', sortEnable: true, value: 'db' },
     { id: 'id', label: 'Название', sortEnable: true },
     { id: 'company', label: 'Компания', sortEnable: true, fieldName: 'name' },
@@ -413,7 +428,6 @@ const FileList = () => {
                 onSetPageParams={handleSetPageParams}
                 pageParams={pageParams}
                 onCloseFilters={() => setFilterVisible(false)}
-                company={formikCompany}
                 setCompany={(value: INamedEntity) => setFormikCompany(value)}
                 listOptions={listOptions}
               />

@@ -23,6 +23,7 @@ export const getFilterObject = (filesFilters: IFileFilter) => {
   const newFilters: IFilterObject = Object.entries(filesFilters).reduce(
     (prev, [name, value]) => {
       prev[name] = { ...prev[name], value };
+      // prev[name] = name.indexOf('Id') === -1 ? { ...prev[name], value } : value;
       return prev;
     },
     { ...fileFilterValues },
@@ -31,9 +32,16 @@ export const getFilterObject = (filesFilters: IFileFilter) => {
 };
 
 export const getFilesFilters = (filesFilters: IFilterObject) => {
-  const newFilters: IFileFilter = Object.entries(filesFilters).reduce((prev, [name, value]) => {
-    prev[name] = value.value;
-    return prev;
-  }, fileFilterInitialValues);
+  const newFilters: IFileFilter = Object.entries(filesFilters).reduce(
+    (prev, [name, value]) => {
+      prev[name] = typeof value === 'string' ? value : value.value;
+      // prev[name] =  value.value ? value.value : value;
+
+      // prev[name] = value.type === 'select' && value.valueId ? value.valueId : value.value;
+      // prev[name] = value.type === 'select' && value.valueId ? value.valueId : value.value;
+      return prev;
+    },
+    { ...fileFilterInitialValues },
+  );
   return newFilters;
 };

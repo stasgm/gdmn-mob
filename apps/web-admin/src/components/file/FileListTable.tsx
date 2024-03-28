@@ -23,7 +23,7 @@ import {
   TextField,
 } from '@mui/material';
 
-import { IEntity, IFileSystem, INamedEntity } from '@lib/types';
+import { IEntity, INamedEntity, ISystemFile } from '@lib/types';
 
 import { Field, FormikProvider, useFormik } from 'formik';
 
@@ -52,13 +52,14 @@ import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 import { useWindowResizeWidth } from '../../utils/useWindowResizeMaxWidth';
 import { getFilesFilters, getFilterObject } from '../../utils/helpers';
 import ComboBox from '../ComboBox';
+import { useDrawerResizeMaxHeight } from '../../utils/useDrawerResizeMaxHeight';
 
 type Order = 'asc' | 'desc';
 
 interface IProps<T extends IEntity> {
   headCells: IHeadCells<T>[];
-  files: IFileSystem[];
-  selectedFiles?: IFileSystem[];
+  files: ISystemFile[];
+  selectedFiles?: ISystemFile[];
   limitRows?: number;
   onChangeSelectedFiles?: (newSelectedDeviceIds: any[]) => void;
   isFilterVisible?: boolean;
@@ -71,7 +72,6 @@ interface IProps<T extends IEntity> {
   pageParams?: IFilePageParam | undefined;
   onCloseFilters?: () => void;
   onClearFilters?: () => void;
-  company?: INamedEntity;
   setCompany: (value: INamedEntity) => void;
   listOptions: IListOption;
 }
@@ -93,7 +93,6 @@ function FileListTable<T extends IEntity>({
   pageParams,
   onCloseFilters,
   onClearFilters,
-  company,
   setCompany,
   listOptions,
 }: IProps<T>) {
@@ -108,6 +107,8 @@ function FileListTable<T extends IEntity>({
   const navigate = useNavigate();
   const maxHeight = useWindowResizeMaxHeight();
   const width = useWindowResizeWidth(0.2);
+
+  const drawerHeight = useDrawerResizeMaxHeight();
 
   const formik = useFormik<IFilterObject>({
     enableReinitialize: true,
@@ -159,7 +160,7 @@ function FileListTable<T extends IEntity>({
 
   //   if (selectedFileIds.length === 0) {
   //     if (selectedFiles.length > 0) {
-  //       const newSelectedFileIds = selectedFiles.map((file: IFileSystem) => file);
+  //       const newSelectedFileIds = selectedFiles.map((file: ISystemFile) => file);
 
   //       setSelectedFileIds(newSelectedFileIds);
   //     }
@@ -180,9 +181,12 @@ function FileListTable<T extends IEntity>({
     (field: any, value: INamedEntity) => {
       formik.setValues({
         ...formik.values,
-        [field]: { ...formik.values[field], value: value ? value.name : '' },
+        [field]: {
+          ...formik.values[field],
+          value: value ? (formik.values[field].type === 'select' ? value.id : value.name) : '',
+        },
       });
-      if (field === 'company' && value) {
+      if (field === 'companyId' && value) {
         setCompany(value);
       }
     },
@@ -258,10 +262,16 @@ function FileListTable<T extends IEntity>({
     }
   }
 
+  const getValue = (id: string | INamedEntity, data?: INamedEntity[]) => {
+    // console.log('data', data, 'id', id);
+    // console.log('data.find((i) => i.id === id)?.name || ', data?.find((i) => i.id === id)?.name || '');
+    return data?.find((i) => i.id === id)?.name || '';
+  };
+
   const TableRows = () => {
     const fileList = SortedTableRows(/*<T>*/ files)
       .slice(page * limit, page * limit + limit)
-      .map((file: IFileSystem) => {
+      .map((file: ISystemFile) => {
         return (
           <TableRow
             hover
@@ -286,7 +296,7 @@ function FileListTable<T extends IEntity>({
               <Checkbox
                 checked={
                   selectedFileIds
-                    .map((item: IFileSystem) => {
+                    .map((item: ISystemFile) => {
                       return item.id;
                     })
                     .indexOf(file.id) !== -1
@@ -365,10 +375,19 @@ function FileListTable<T extends IEntity>({
             </Table>
           </Box>
           {isFilterVisible && (
-            <>
+            <Box
+            // sx={{
+            // top: 64,
+            // width,
+            // paddingBottom: 5,
+            // overflow: 'visible',
+            // height: drawerHeight,
+            // maxHeight: drawerHeight,
+            // }}
+            >
               <Divider orientation="vertical" flexItem />
               <Drawer
-                ModalProps={{ disableScrollLock: true }}
+                // ModalProps={{ disableScrollLock: true }}
                 anchor="right"
                 open={isFilterVisible}
                 variant="persistent"
@@ -376,7 +395,14 @@ function FileListTable<T extends IEntity>({
                   sx: {
                     top: 64,
                     width,
-                    paddingBottom: 5,
+                    // paddingBottom: 5,
+                    // overflow: 'visible',
+                    // height: drawerHeight,
+                    // maxHeight: drawerHeight,
+                    height: 'calc(100% - 64px)',
+                    transitionProperty: 'width, transform !important',
+                    transitionDuration: '0.3s !important',
+                    transitionTimingFunction: 'cubic-bezier(0.4, 0, 1, 1) !important',
                   },
                 }}
               >
@@ -395,8 +421,13 @@ function FileListTable<T extends IEntity>({
                   </Box>
 
                   <Box
-                    maxHeight={'85%'}
-                    sx={{ p: 3, /*overflowY: 'scroll',*/ flexDirection: 'column', maxHeight: '85%', overflowY: 'auto' }}
+                    // maxHeight={'85%'}
+                    sx={{
+                      p: 3,
+                      /*overflowY: 'scroll',*/ flexDirection: 'column',
+                      // maxHeight: '85%',
+                      overflowY: 'auto',
+                    }}
                   >
                     {Object.keys(fileFilterValues).map((item) => (
                       <Grid item key={item} marginBottom={3}>
@@ -418,19 +449,25 @@ function FileListTable<T extends IEntity>({
                             id={item}
                             name={item}
                             label={fileFilterValues[item].name || ''}
-                            value={formik.values[item]?.value ? formik.values[item]?.value : ''}
+                            value={
+                              formik.values[item]?.value ? getValue(formik.values[item]?.value, listOptions[item]) : ''
+                            }
                             options={listOptions[item] || []}
                             setFieldValue={handleUpdateFormik}
                             setTouched={formik.setTouched}
                             error={Boolean(formik.touched[item] && formik.errors[item])}
                             fullWidth
-                            getOptionLabel={(option: IFilterOption) =>
-                              (formik.values[item]?.name === option.name ? option.value : option.name) || ''
+                            getOptionLabel={
+                              (option: IFilterOption) =>
+                                (formik.values[item]?.name === option.name
+                                  ? getValue(option.value, listOptions[item])
+                                  : option.name) || ''
+                              // (formik.values[item]?.name === option.name ? option.value : option.name) || ''
                             }
                             isOptionEqualToValue={(option: INamedEntity, value: IFilterOption) =>
-                              option.name === value.value
+                              option.name === getValue(value.value, listOptions[item])
                             }
-                            disabled={item === 'company' ? false : !formik.values['company'].value}
+                            disabled={item === 'companyId' ? false : !formik.values['companyId'].value}
                           />
                         ) : fileFilterValues[item].type === 'date' ? (
                           <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale="ru">
@@ -447,7 +484,7 @@ function FileListTable<T extends IEntity>({
                                 },
                               }}
                               renderInput={(params) => <TextField {...params} fullWidth />}
-                              disabled={!formik.values['company'].value}
+                              disabled={!formik.values['companyId'].value}
                             />
                           </LocalizationProvider>
                         ) : (
@@ -477,15 +514,26 @@ function FileListTable<T extends IEntity>({
                             type="text"
                             value={formik.values[item]?.value}
                             onChange={(event) => handleUpdateFormik(item, { id: item, name: event.target.value })}
-                            disabled={!formik.values['company'].value}
+                            disabled={!formik.values['companyId'].value}
                             error={Boolean(formik.touched[item] && formik.errors[item])}
                           />
                         )}
                       </Grid>
                     ))}
                   </Box>
-                  <Box sx={{ p: 3, flexDirection: 'row', maxHeight: '10%' }}>
-                    <Grid item>
+                  <Box
+                    sx={{
+                      p: 3,
+                      flexDirection: 'row',
+                      maxHeight: '10%',
+                      justifyContent: 'space-between',
+                      // minWidth: '100%',
+                      display: 'flex',
+                    }}
+                  >
+                    {/* <Grid item> */}
+                    {/* sx={{maxWidth: '50%'}} */}
+                    <Box>
                       <Button
                         color="primary"
                         type="submit"
@@ -496,22 +544,24 @@ function FileListTable<T extends IEntity>({
                       >
                         Применить
                       </Button>
-                    </Grid>
-                    <Grid item>
+                    </Box>
+                    {/* </Grid> */}
+                    {/* <Grid item> */}
+                    <Box /*sx={{ paddingRight: 2 }}*/>
                       <Button
                         color="secondary"
                         variant="contained"
                         onClick={handleClearFilters}
-                        // sx={{ p: 1 }}
                         // fullWidth
                       >
                         Очистить
                       </Button>
-                    </Grid>
+                    </Box>
+                    {/* </Grid> */}
                   </Box>
                 </form>
               </Drawer>
-            </>
+            </Box>
           )}
         </PerfectScrollbar>
         <TablePagination
