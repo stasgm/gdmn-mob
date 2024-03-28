@@ -19,10 +19,11 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  TableSortLabel,
   TextField,
 } from '@mui/material';
 
-import { INamedEntity, ISystemFile } from '@lib/types';
+import { IEntity, INamedEntity, ISystemFile } from '@lib/types';
 
 import { Field, FormikProvider, useFormik } from 'formik';
 
@@ -33,14 +34,30 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDateTimePicker } from '@mui/x-date-pickers/DesktopDateTimePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 
+import actions from '../../store/file';
+
 import { adminPath, fileFilterValues } from '../../utils/constants';
-import { IFilePageParam, IFilterObject, IFilterOption, IPageParam } from '../../types';
-import { useSelector } from '../../store';
+import {
+  IFileFilter,
+  IFilePageParam,
+  IFilterObject,
+  IFilterOption,
+  IFilterTable,
+  IHeadCells,
+  IListOption,
+  IPageParam,
+} from '../../types';
+import { useDispatch, useSelector } from '../../store';
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
+import { useWindowResizeWidth } from '../../utils/useWindowResizeMaxWidth';
 import { getFilesFilters, getFilterObject } from '../../utils/helpers';
 import ComboBox from '../ComboBox';
+import { useDrawerResizeMaxHeight } from '../../utils/useDrawerResizeMaxHeight';
 
-interface IProps {
+type Order = 'asc' | 'desc';
+
+interface IProps<T extends IEntity> {
+  headCells: IHeadCells<T>[];
   files: ISystemFile[];
   selectedFiles?: ISystemFile[];
   limitRows?: number;
@@ -55,10 +72,18 @@ interface IProps {
   pageParams?: IFilePageParam | undefined;
   onCloseFilters?: () => void;
   onClearFilters?: () => void;
+  setCompany: (value: INamedEntity) => void;
+  listOptions: IListOption;
 }
 
-const FileListTable = ({
+// const FileListTable: T = ({
+function FileListTable<T extends IEntity>({
   files = [],
+  headCells = [],
+
+  // onChangeSelectedFiles,
+  // selectedFiles = [],
+  // limitRows = 0,
   isFilterVisible = false,
   onSubmit,
   onSelectOne,
@@ -68,14 +93,22 @@ const FileListTable = ({
   pageParams,
   onCloseFilters,
   onClearFilters,
-}: IProps) => {
+  setCompany,
+  listOptions,
+}: IProps<T>) {
+  // }: IProps<T>) => {
   const [limit, setLimit] = useState(
     pageParams?.limit && !isNaN(Number(pageParams?.limit)) ? Number(pageParams?.limit) : 10,
   );
   const [page, setPage] = useState(pageParams?.page && !isNaN(Number(pageParams?.page)) ? Number(pageParams.page) : 0);
+  const [order, setOrder] = useState<Order>('asc');
+  const [orderBy, setOrderBy] = useState<keyof T>(); //headCells[0].id
 
   const navigate = useNavigate();
   const maxHeight = useWindowResizeMaxHeight();
+  const width = useWindowResizeWidth(0.2);
+
+  const drawerHeight = useDrawerResizeMaxHeight();
 
   const formik = useFormik<IFilterObject>({
     enableReinitialize: true,
@@ -85,36 +118,6 @@ const FileListTable = ({
     },
   });
 
-  const { list: companies } = useSelector((state) => state.companies);
-  const { list: appSystems } = useSelector((state) => state.appSystems);
-  const { list: users } = useSelector((state) => state.users);
-  const { list: devices } = useSelector((state) => state.devices);
-
-  const companyList = companies.map((d) => ({ id: d.id, name: d.name })) || [];
-  const appSystemList = appSystems.map((d) => ({ id: d.id, name: d.name })) || [];
-
-  const userList = companyList.length
-    ? users
-        .filter((i) => companyList.find((c) => c.name === formik.values['company'].value && c.id === i.company?.id))
-        .map((d) => ({ id: d.id, name: d.name }))
-    : [];
-
-  const deviceList = companyList.length
-    ? devices
-        .filter((i) => companyList.find((c) => c.name === formik.values['company'].value && c.id === i.company?.id))
-        .map((d) => ({ id: d.id, name: d.name }))
-    : [];
-
-  const [iniit, setIniit] = useState(false);
-
-  useEffect(() => {
-    if (!isFilterVisible || iniit) {
-      formik.setValues(fileFilterValues);
-      setIniit(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFilterVisible, iniit]);
-
   const handleSearchClick = () => {
     onSetPageParams({ ...pageParams, filesFilters: getFilesFilters(formik.values), page: 0 });
     setPage(0);
@@ -122,8 +125,6 @@ const FileListTable = ({
   };
 
   const handleClearFilters = useCallback(() => {
-    setIniit(true);
-
     formik.setValues(fileFilterValues);
     onSetPageParams({ ...pageParams, filesFilters: undefined, page: 0 });
     setPage(0);
@@ -146,6 +147,26 @@ const FileListTable = ({
     [onSetPageParams, pageParams],
   );
 
+  // useEffect(() => {
+  //   if (isFilterVisible && formik.values !== fileFilterValues) {
+  //     setPageParamLocal({ filesFilters: formik.values });
+  //   }
+  // }, [formik.values, fileFilterValues, isFilterVisible, setPageParamLocal]);
+
+  // useEffect(() => {
+  //   if (limitRows > 0) {
+  //     setLimit(limitRows);
+  //   }
+
+  //   if (selectedFileIds.length === 0) {
+  //     if (selectedFiles.length > 0) {
+  //       const newSelectedFileIds = selectedFiles.map((file: ISystemFile) => file);
+
+  //       setSelectedFileIds(newSelectedFileIds);
+  //     }
+  //   }
+  // }, [limitRows, selectedFileIds.length, selectedFiles]);4
+
   const getFileName = (str: string) => {
     const beginIndex = str.indexOf('__');
     if (beginIndex !== -1) {
@@ -160,63 +181,139 @@ const FileListTable = ({
     (field: any, value: INamedEntity) => {
       formik.setValues({
         ...formik.values,
-        [field]: { ...formik.values[field], value: value ? value.name : '' },
+        [field]: {
+          ...formik.values[field],
+          value: value ? (formik.values[field].type === 'select' ? value.id : value.name) : '',
+        },
       });
+      if (field === 'companyId' && value) {
+        setCompany(value);
+      }
     },
-    [formik],
+    [formik, setCompany],
   );
 
+  const handleSortRequest = (cellId: keyof T) => {
+    const isAsc = orderBy === cellId && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(cellId);
+  };
+
+  function descendingComparator<T>(a: T, b: T, o: keyof T) {
+    if (b[o] < a[o]) {
+      return -1;
+    }
+    if (b[o] > a[o]) {
+      return 1;
+    }
+    if (!b[o]) {
+      return -1;
+    }
+    if (!a[o]) {
+      return 1;
+    }
+    return 0;
+  }
+
+  function comporator<T>(a: T, b: T, ord: keyof T) {
+    return order === 'desc' ? descendingComparator(a, b, ord) : -descendingComparator(a, b, ord);
+  }
+
+  function SortedTableRows<T>(array: T[]) {
+    const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
+    stabilizedThis.sort((a, b) => {
+      const order = comporator<T>(a[0], b[0], orderBy as keyof T);
+      if (order !== 0) return order;
+      return a[1] - b[1];
+    });
+    return stabilizedThis.map((el) => el[0]);
+  }
+
+  function DeserializeProp<T>(propName: keyof T, value: any, fieldName?: string) {
+    /** Если в наименовании содержится цифра, то значение преобразоывается в дату */
+    if (!value) {
+      return '';
+    } else {
+      if (propName === 'name') return value;
+
+      if (propName === 'id') return getFileName(value);
+
+      // if (typeof value === 'object' && 'name' in value) {
+      //   return value.name;
+      // }
+
+      if (fieldName) {
+        return value[fieldName];
+      }
+
+      // if (propName === 'state') {
+      //   return deviceStates[value as DeviceState];
+      // } // для поля Состояние в устройстве
+
+      if (propName === 'size') {
+        return `${Math.ceil(value).toString()} кб`;
+      } // для поля Размер в файлах и логах
+
+      if (!isNaN(new Date(value).getDate())) {
+        return new Date(value || '').toLocaleString('ru', { hour12: false });
+      }
+
+      return value;
+    }
+  }
+
+  const getValue = (id: string | INamedEntity, data?: INamedEntity[]) => {
+    // console.log('data', data, 'id', id);
+    // console.log('data.find((i) => i.id === id)?.name || ', data?.find((i) => i.id === id)?.name || '');
+    return data?.find((i) => i.id === id)?.name || '';
+  };
+
   const TableRows = () => {
-    const fileList = files.slice(page * limit, page * limit + limit).map((file: ISystemFile) => {
-      return (
-        <TableRow
-          hover
-          key={file.id}
-          selected={selectedFileIds.findIndex((d) => d.id === file?.id) !== -1}
-          onClick={(event) => {
-            event.preventDefault();
-            navigate(`${adminPath}/app/files/${file.id}`);
-          }}
-          sx={{
-            backgroundColor: file.appSystem && file.producer && !file.device ? '#ffcfd1' : 'white',
-            cursor: 'pointer',
-          }}
-        >
-          <TableCell
-            padding="checkbox"
+    const fileList = SortedTableRows(/*<T>*/ files)
+      .slice(page * limit, page * limit + limit)
+      .map((file: ISystemFile) => {
+        return (
+          <TableRow
+            hover
+            key={file.id}
+            selected={selectedFileIds.findIndex((d) => d.id === file?.id) !== -1}
             onClick={(event) => {
-              event.stopPropagation();
-              onSelectOne(event, file);
+              event.preventDefault();
+              navigate(`${adminPath}/app/files/${file.id}`);
+            }}
+            sx={{
+              backgroundColor: file.appSystem && file.producer && !file.device ? '#ffcfd1' : 'white',
+              cursor: 'pointer',
             }}
           >
-            <Checkbox
-              checked={
-                selectedFileIds
-                  .map((item: ISystemFile) => {
-                    return item.id;
-                  })
-                  .indexOf(file.id) !== -1
-              }
-              value="true"
-            />
-          </TableCell>
-          {/* {Object.values(formikList).map((item) => {
-            return <TableCell>{item}</TableCell>;
-          })} */}
-          <TableCell>{file.folder || 'db'}</TableCell>
-          <TableCell>{getFileName(file.id)}</TableCell>
-          <TableCell>{file.company?.name}</TableCell>
-          <TableCell>{file.appSystem?.name}</TableCell>
-          <TableCell>{file.producer?.name}</TableCell>
-          <TableCell>{file.consumer?.name}</TableCell>
-          <TableCell>{file.device?.name}</TableCell>
-          <TableCell>{file.device?.id}</TableCell>
-          <TableCell>{new Date(file.date || '').toLocaleString('ru', { hour12: false })}</TableCell>
-          <TableCell>{Math.ceil(file.size).toString()} кб</TableCell>
-          {/* <TableCell>{file.path}</TableCell> */}
-        </TableRow>
-      );
-    });
+            <TableCell
+              padding="checkbox"
+              onClick={(event) => {
+                event.stopPropagation();
+                onSelectOne(event, file);
+              }}
+            >
+              <Checkbox
+                checked={
+                  selectedFileIds
+                    .map((item: ISystemFile) => {
+                      return item.id;
+                    })
+                    .indexOf(file.id) !== -1
+                }
+                value="true"
+              />
+            </TableCell>
+            {headCells.map((item) => {
+              return (
+                <TableCell key={item.label}>
+                  {DeserializeProp<T>(item.id, file[item.id] || item.value, item.fieldName || '')}
+                </TableCell>
+              );
+            })}
+          </TableRow>
+        );
+      });
 
     const emptyRows = limit - Math.min(limit, files.length - page * limit);
 
@@ -242,7 +339,7 @@ const FileListTable = ({
               overflowX: 'auto',
               overflowY: 'auto',
               maxHeight,
-              maxWidth: '100%',
+              // maxWidth: '100%',
               justifyContent: 'space-between',
             }}
           >
@@ -257,20 +354,19 @@ const FileListTable = ({
                       onChange={onSelectMany}
                     />
                   </TableCell>
-                  {/* {Object.keys(formikList).map((item) => {
-                    return <TableCell key={item}>{item}</TableCell>;
-                  })} */}
-                  <TableCell>Папка</TableCell>
-                  <TableCell>Название</TableCell>
-                  <TableCell>Компания</TableCell>
-                  <TableCell>Подсистема</TableCell>
-                  <TableCell>Пользователь</TableCell>
-                  <TableCell>Получатель</TableCell>
-                  <TableCell>Устройство</TableCell>
-                  <TableCell>Идентификатор</TableCell>
-                  <TableCell>Дата</TableCell>
-                  <TableCell>Размер</TableCell>
-                  {/* <TableCell>Путь</TableCell> */}
+                  {headCells.map((item) => {
+                    return (
+                      <TableCell key={item.label} sortDirection={orderBy === item.id ? order : false}>
+                        <TableSortLabel
+                          active={orderBy === item.id}
+                          direction={orderBy === item.id ? order : 'asc'}
+                          onClick={item.sortEnable ? () => handleSortRequest(item.id) : undefined}
+                        >
+                          {item.label}
+                        </TableSortLabel>
+                      </TableCell>
+                    );
+                  })}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -279,38 +375,62 @@ const FileListTable = ({
             </Table>
           </Box>
           {isFilterVisible && (
-            <>
+            <Box
+            // sx={{
+            // top: 64,
+            // width,
+            // paddingBottom: 5,
+            // overflow: 'visible',
+            // height: drawerHeight,
+            // maxHeight: drawerHeight,
+            // }}
+            >
               <Divider orientation="vertical" flexItem />
               <Drawer
-                ModalProps={{ disableScrollLock: true }}
+                // ModalProps={{ disableScrollLock: true }}
                 anchor="right"
                 open={isFilterVisible}
                 variant="persistent"
                 PaperProps={{
                   sx: {
-                    width: 256,
-                    marginBottom: 20,
                     top: 64,
+                    width,
+                    // paddingBottom: 5,
+                    // overflow: 'visible',
+                    // height: drawerHeight,
+                    // maxHeight: drawerHeight,
+                    height: 'calc(100% - 64px)',
+                    transitionProperty: 'width, transform !important',
+                    transitionDuration: '0.3s !important',
+                    transitionTimingFunction: 'cubic-bezier(0.4, 0, 1, 1) !important',
                   },
                 }}
               >
                 <form onSubmit={formik.handleSubmit} onReset={formik.handleReset}>
-                  <Grid container direction="column" spacing={3} sx={{ p: 3, overflowY: 'auto' }}>
-                    <Grid
-                      sx={{
-                        flexDirection: 'row',
-                        justifyContent: 'flex-end',
-                        alignItems: 'flex-end',
-                      }}
-                    >
-                      <IconButton sx={{ justifyContent: 'flex-end' }} onClick={onCloseFilters}>
-                        <CloseIcon fontSize="small" />
-                      </IconButton>
-                    </Grid>
-                    {/* <PerfectScrollbar> */}
-                    {/* <Grid container direction="column" spacing={3} sx={{ p: 3, overflowY: 'visible' }}> */}
+                  <Box
+                    sx={{
+                      flexDirection: 'row',
+                      justifyContent: 'flex-end',
+                      alignItems: 'flex-end',
+                    }}
+                    maxHeight={'5%'}
+                  >
+                    <IconButton sx={{ justifyContent: 'flex-end' }} onClick={onCloseFilters}>
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+
+                  <Box
+                    // maxHeight={'85%'}
+                    sx={{
+                      p: 3,
+                      /*overflowY: 'scroll',*/ flexDirection: 'column',
+                      // maxHeight: '85%',
+                      overflowY: 'auto',
+                    }}
+                  >
                     {Object.keys(fileFilterValues).map((item) => (
-                      <Grid item key={item}>
+                      <Grid item key={item} marginBottom={3}>
                         {fileFilterValues[item].type === 'select' ? (
                           <Field
                             InputProps={{
@@ -329,60 +449,50 @@ const FileListTable = ({
                             id={item}
                             name={item}
                             label={fileFilterValues[item].name || ''}
-                            value={formik.values[item]?.value ? formik.values[item]?.value : ''}
-                            options={
-                              item === 'company'
-                                ? companyList
-                                : item === 'appSystem'
-                                  ? appSystemList
-                                  : item === 'producer' || item === 'consumer'
-                                    ? userList
-                                    : item === 'device'
-                                      ? deviceList
-                                      : []
+                            value={
+                              formik.values[item]?.value ? getValue(formik.values[item]?.value, listOptions[item]) : ''
                             }
+                            options={listOptions[item] || []}
                             setFieldValue={handleUpdateFormik}
                             setTouched={formik.setTouched}
+                            error={Boolean(formik.touched[item] && formik.errors[item])}
                             fullWidth
-                            getOptionLabel={(option: IFilterOption) =>
-                              (formik.values[item]?.name === option.name ? option.value : option.name) || ''
+                            getOptionLabel={
+                              (option: IFilterOption) =>
+                                (formik.values[item]?.name === option.name
+                                  ? getValue(option.value, listOptions[item])
+                                  : option.name) || ''
+                              // (formik.values[item]?.name === option.name ? option.value : option.name) || ''
                             }
-                            isOptionEqualToValue={(option: INamedEntity, value: IFilterOption) => {
-                              return option.name === value.value;
-                            }}
+                            isOptionEqualToValue={(option: INamedEntity, value: IFilterOption) =>
+                              option.name === getValue(value.value, listOptions[item])
+                            }
+                            disabled={item === 'companyId' ? false : !formik.values['companyId'].value}
                           />
                         ) : fileFilterValues[item].type === 'date' ? (
-                          <LocalizationProvider
-                            dateAdapter={AdapterMoment}
-                            adapterLocale="ru" /* dateFormats="shortDate"*/
-                          >
+                          <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale="ru">
                             <DesktopDateTimePicker
                               label={fileFilterValues[item].name || ''}
-                              // inputFormat="DD.MM.YYYY"
                               inputFormat="DD/MM/YY hh:mm"
                               value={formik.values[item]?.value || null}
-                              onChange={(a) => {
-                                handleUpdateFormik(item, { id: item, name: a ? new Date(a).toISOString() : '' });
-                              }}
+                              onChange={(date) =>
+                                handleUpdateFormik(item, { id: item, name: date ? new Date(date).toISOString() : '' })
+                              }
                               componentsProps={{
                                 actionBar: {
                                   actions: ['clear'],
                                 },
                               }}
-                              renderInput={(params) => <TextField {...params} />}
+                              renderInput={(params) => <TextField {...params} fullWidth />}
+                              disabled={!formik.values['companyId'].value}
                             />
                           </LocalizationProvider>
                         ) : (
-                          // </Grid>
                           <TextField
                             InputProps={{
                               sx: {
                                 height: 50,
-                                // fontSize: 13,
-                                '& .MuiOutlinedInput-input': {
-                                  borderWidth: 0,
-                                  // padding: 0.5,
-                                },
+                                '& .MuiOutlinedInput-input': { borderWidth: 0 },
                                 alignItems: 'center',
                                 justifyContent: 'flex-start',
                               },
@@ -401,43 +511,57 @@ const FileListTable = ({
                             name={item}
                             label={fileFilterValues[item].name}
                             variant="outlined"
-                            type="search"
+                            type="text"
                             value={formik.values[item]?.value}
                             onChange={(event) => handleUpdateFormik(item, { id: item, name: event.target.value })}
-                            // onChange={formik.handleChange}
+                            disabled={!formik.values['companyId'].value}
+                            error={Boolean(formik.touched[item] && formik.errors[item])}
                           />
                         )}
                       </Grid>
                     ))}
-
-                    <Grid item>
+                  </Box>
+                  <Box
+                    sx={{
+                      p: 3,
+                      flexDirection: 'row',
+                      maxHeight: '10%',
+                      justifyContent: 'space-between',
+                      // minWidth: '100%',
+                      display: 'flex',
+                    }}
+                  >
+                    {/* <Grid item> */}
+                    {/* sx={{maxWidth: '50%'}} */}
+                    <Box>
                       <Button
                         color="primary"
                         type="submit"
                         variant="contained"
                         // sx={{ m: 1 }}
-                        fullWidth
+                        // fullWidth
                         onClick={handleSearchClick}
-                        // disabled={!(formik.values['company'].value || formik.values['appSystem'].value)}
                       >
                         Применить
                       </Button>
-                    </Grid>
-                    <Grid item>
+                    </Box>
+                    {/* </Grid> */}
+                    {/* <Grid item> */}
+                    <Box /*sx={{ paddingRight: 2 }}*/>
                       <Button
                         color="secondary"
                         variant="contained"
                         onClick={handleClearFilters}
-                        // sx={{ p: 1 }}
-                        fullWidth
+                        // fullWidth
                       >
                         Очистить
                       </Button>
-                    </Grid>
-                  </Grid>
+                    </Box>
+                    {/* </Grid> */}
+                  </Box>
                 </form>
               </Drawer>
-            </>
+            </Box>
           )}
         </PerfectScrollbar>
         <TablePagination
@@ -452,6 +576,6 @@ const FileListTable = ({
       </Card>
     </FormikProvider>
   );
-};
+}
 
 export default FileListTable;
