@@ -13,6 +13,7 @@ const setLoading = createAction('APP/SET_LOADING')<boolean>();
 const setAutoSync = createAction('APP/SET_AUTO_SYNC')<boolean>();
 const setLoadedWithError = createAction('APP/SET_LOADED_WITH_ERROR')<boolean>();
 const addErrors = createAction('APP/ADD_ERROR_MANY')<IDeviceLogEntry[]>();
+const addError = createAction('APP/ADD_ERROR_ONE')<IDeviceLogEntry>();
 const setSentErrors = createAction('APP/SET_SENT_ERROR')<string[]>();
 const clearErrors = createAction('APP/CLEAR_ERROR')<'all' | 'old'>();
 const setSyncDate = createAction('APP/SET_SYNC_DATE')<Date>();
@@ -62,6 +63,7 @@ export const appActions = {
   setLoadedWithError,
   setAutoSync,
   addErrors,
+  addError,
   setSentErrors,
   clearErrors,
   setSyncDate,

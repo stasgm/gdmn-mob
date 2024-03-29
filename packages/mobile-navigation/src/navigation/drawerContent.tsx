@@ -5,7 +5,6 @@ import { useTheme } from '@react-navigation/native';
 import { Avatar, Caption, Divider, Drawer, Title } from 'react-native-paper';
 import Animated from 'react-native-reanimated';
 import { useSelector } from '@lib/store';
-
 import { PrimeButton } from '@lib/mobile-ui';
 import { getDateString } from '@lib/mobile-hooks';
 
@@ -16,12 +15,28 @@ interface ICutsomProps {
 
 type Props = DrawerContentComponentProps & ICutsomProps;
 
+const SyncBtn = ({ onSync }: { onSync?: () => void }) => {
+  const { colors } = useTheme();
+  const { syncDate } = useSelector((state) => state.app);
+  const captionStyle = { color: colors.text, fontSize: 16 };
+
+  return (
+    <PrimeButton icon="cloud-sync-outline" onPress={onSync} outlined>
+      <View>
+        <Caption style={captionStyle}>Синхронизировать</Caption>
+        {!!syncDate && (
+          <Caption style={[styles.caption, { color: colors.text }]}>
+            {getDateString(syncDate)} {new Date(syncDate).toLocaleTimeString('ru', { hour12: false })}
+          </Caption>
+        )}
+      </View>
+    </PrimeButton>
+  );
+};
+
 export const DrawerContent = ({ onSync, ...props }: Props) => {
   const { colors } = useTheme();
   const { user, company, isDemo } = useSelector((state) => state.auth);
-  const syncDate = useSelector((state) => state.app.syncDate) as Date;
-
-  const captionStyle = { color: colors.text, fontSize: 16 };
 
   return (
     <>
@@ -58,18 +73,7 @@ export const DrawerContent = ({ onSync, ...props }: Props) => {
           </Drawer.Section>
         </Animated.View>
       </DrawerContentScrollView>
-      {!isDemo && (
-        <PrimeButton icon="cloud-sync-outline" onPress={onSync} outlined>
-          <View>
-            <Caption style={captionStyle}>Синхронизировать</Caption>
-            {!!syncDate && (
-              <Caption style={[styles.caption, { color: colors.text }]}>
-                {getDateString(syncDate)} {new Date(syncDate).toLocaleTimeString('ru', { hour12: false })}
-              </Caption>
-            )}
-          </View>
-        </PrimeButton>
-      )}
+      {!isDemo && <SyncBtn onSync={onSync} />}
     </>
   );
 };

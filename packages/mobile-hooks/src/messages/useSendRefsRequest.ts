@@ -1,138 +1,91 @@
-import {
-  useDispatch,
-  useSelector,
-  appActions,
-  authActions,
-  useAuthThunkDispatch,
-  useAppStore,
-  RootState,
-} from '@lib/store';
+import { useDispatch, useSelector, appActions, authActions, useAuthThunkDispatch } from '@lib/store';
 
-import { IDeviceLogEntry, IMessage } from '@lib/types';
-import api, { isConnectError } from '@lib/client-api';
+import { IMessage } from '@lib/types';
+import api from '@lib/client-api';
 
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
-import { generateId } from '../utils';
+import { addError, addRequestNotice } from '../utils';
 
 import { mobileRequest } from '../mobileRequest';
 
+import { useCheckDeviceStatus } from '../useCheckDeviceStatus';
+
 import { getNextOrder, needRequest } from './helpers';
-import { useSendDeviceLog } from './useSendDeviceLog';
 
 export const useSendRefsRequest = () => {
   const dispatch = useDispatch();
   const authDispatch = useAuthThunkDispatch();
   const appRequest = useMemo(() => mobileRequest(authDispatch, authActions), [authDispatch]);
-  const store = useAppStore();
+  const checkDeviceStatus = useCheckDeviceStatus();
 
   const { user, company, config, appSystem } = useSelector((state) => state.auth);
-  const refVersion = 1;
-  const deviceId = config.deviceId!;
-  const saveErrors = useSendDeviceLog();
+  const syncRequests = useSelector((state) => state.app.syncRequests);
 
-  const addRequestNotice = (message: string) => {
-    dispatch(
-      appActions.addRequestNotice({
-        started: new Date(),
-        message,
-      }),
-    );
-  };
+  return useCallback(async () => {
+    try {
+      dispatch(appActions.setLoading(true));
+      dispatch(appActions.clearRequestNotice());
+      dispatch(appActions.clearErrorNotice());
 
-  const addError = (name: string, message: string, tempErrs: IDeviceLogEntry[]) => {
-    const err = {
-      id: generateId(),
-      name,
-      date: new Date().toISOString(),
-      message,
-    };
-    dispatch(appActions.addErrorNotice(err));
-    tempErrs.push(err);
-  };
-
-  return async () => {
-    dispatch(appActions.setLoading(true));
-    dispatch(appActions.clearRequestNotice());
-    dispatch(appActions.clearErrorNotice());
-    const tempErrs: IDeviceLogEntry[] = [];
-    let connectError = false;
-
-    if (!user || !company || !appSystem || !user.erpUser) {
-      addError(
-        'useSendRefsRequest',
-        `Не определены данные: пользователь ${user?.name}, компания ${company?.name}, подсистема ${appSystem?.name}, пользователь ERP ${user?.erpUser?.name}`,
-        tempErrs,
-      );
-    } else {
-      addRequestNotice('Проверка статуса устройства');
-      const statusRespone = await api.auth.getDeviceStatus(appRequest, deviceId);
-      if (statusRespone.type !== 'GET_DEVICE_STATUS') {
-        addError(
-          'useSendRefsRequest: getDeviceStatus',
-          `Статус устройства не получен. ${statusRespone.message}`,
-          tempErrs,
-        );
-        connectError = isConnectError(statusRespone.type);
-      } else {
-        authDispatch(
-          authActions.setConnectionStatus(statusRespone.status === 'ACTIVE' ? 'connected' : 'not-activated'),
+      if (!user || !company || !appSystem || !user.erpUser || !config.deviceId) {
+        throw new Error(
+          `Не определены данные: пользователь ${user?.name}, компания ${company?.name}, подсистема ${appSystem?.name}, пользователь ERP ${user?.erpUser?.name}, id устройства ${config.deviceId}`,
         );
       }
-      if (!tempErrs.length) {
-        const state = store.getState() as RootState;
-        const currentDate = new Date();
-        const syncRequests = state.app.syncRequests || [];
-        //Если запрос такого типа не был отправлен или время запроса меньше текущего на час, то отправляем
-        if (needRequest(syncRequests, 'GET_REF', currentDate)) {
-          addRequestNotice('Запрос на получение справочников');
-          const messageCompany = { id: company.id, name: company.name };
-          const consumer = user.erpUser;
 
-          //Формируем запрос на получение справочников
-          const messageGetRef: IMessage['body'] = {
-            type: 'CMD',
-            version: refVersion,
-            payload: {
-              name: 'GET_REF',
-            },
-          };
+      addRequestNotice(dispatch, 'Проверка статуса устройства');
+      await checkDeviceStatus();
 
-          //Отправляем запрос на получение справочников
-          const sendMesRefResponse = await api.message.sendMessages(
-            appRequest,
-            appSystem,
-            messageCompany,
-            consumer,
-            messageGetRef,
-            getNextOrder(),
-            deviceId,
+      const currentDate = new Date();
+      //Если запрос такого типа не был отправлен или время запроса меньше текущего на час, то отправляем
+      if (needRequest(syncRequests, 'GET_REF', currentDate)) {
+        addRequestNotice(dispatch, 'Запрос на получение справочников');
+
+        //Формируем запрос на получение справочников
+        const messageGetRef: IMessage['body'] = {
+          type: 'CMD',
+          version: 1,
+          payload: {
+            name: 'GET_REF',
+          },
+        };
+
+        //Отправляем запрос на получение справочников
+        const sendMesRefResponse = await api.message.sendMessages(
+          appRequest,
+          appSystem,
+          { id: company.id, name: company.name },
+          user.erpUser,
+          messageGetRef,
+          getNextOrder(),
+          config.deviceId,
+        );
+
+        if (sendMesRefResponse?.type !== 'SEND_MESSAGE') {
+          throw new Error(`Запрос за справочниками не выполнен: ${sendMesRefResponse.message}`);
+        } else if (sendMesRefResponse.type === 'SEND_MESSAGE') {
+          //Добавляем запрос в список запросов, чтобы не отправлять его повторно
+          dispatch(
+            appActions.addSyncRequest({
+              cmdName: 'GET_REF',
+              date: currentDate,
+            }),
           );
-
-          if (sendMesRefResponse?.type !== 'SEND_MESSAGE') {
-            addError('useSendRefsRequest: api.message.sendMessages', sendMesRefResponse.message, tempErrs);
-          } else if (sendMesRefResponse.type === 'SEND_MESSAGE') {
-            dispatch(
-              appActions.addSyncRequest({
-                cmdName: 'GET_REF',
-                date: currentDate,
-              }),
-            );
-          }
         }
       }
-    }
+    } catch (error: any) {
+      addError(
+        dispatch,
+        'useSendRefsRequest:',
+        typeof error.message === 'string' ? error.message : 'Ошибка отправки запроса за справочниками',
+        'useSendRefsRequest',
+        false,
+      );
 
-    if (tempErrs.length) {
       dispatch(appActions.setShowSyncInfo(true));
+    } finally {
+      dispatch(appActions.setLoading(false));
     }
-
-    if (!connectError) {
-      saveErrors(tempErrs);
-    } else if (tempErrs.length) {
-      dispatch(appActions.addErrors(tempErrs));
-    }
-
-    dispatch(appActions.setLoading(false));
-  };
+  }, [appRequest, appSystem, checkDeviceStatus, company, config.deviceId, dispatch, syncRequests, user]);
 };

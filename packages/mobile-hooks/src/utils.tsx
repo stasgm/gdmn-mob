@@ -6,6 +6,10 @@ import { customAlphabet } from 'nanoid';
 
 import { IDelList } from '@lib/mobile-types';
 
+import { RootState, appActions } from '@lib/store';
+
+import { Store } from 'redux';
+
 const sleep = (ms: number): Promise<undefined> => new Promise((resolve) => setTimeout(resolve, ms));
 
 const truncate = (str: string, l: number | undefined = 40) => (str.length > l ? `${str.substring(0, l)}...` : str);
@@ -231,6 +235,35 @@ const isIMessage = (obj: any): obj is IMessage =>
   'body' in obj &&
   isIMessageBody(obj.body);
 
+const addError = (dispatch: any, name: string, message: string, processId?: string, isAddErrorNotice = true) => {
+  const err = {
+    id: generateId(),
+    name,
+    date: new Date().toISOString(),
+    message,
+    processId,
+  };
+
+  dispatch(appActions.addError(err));
+
+  if (isAddErrorNotice) {
+    dispatch(appActions.addErrorNotice(err));
+  }
+};
+
+const addRequestNotice = (dispatch: any, message: string) => {
+  dispatch(
+    appActions.addRequestNotice({
+      started: new Date(),
+      message,
+    }),
+  );
+};
+
+const getRootState = (store: Store<any, any>) => {
+  return store.getState() as RootState;
+};
+
 export {
   truncate,
   log,
@@ -255,4 +288,7 @@ export {
   isIHeadMessage,
   isIMessage,
   isIMessageBody,
+  addError,
+  addRequestNotice,
+  getRootState,
 };

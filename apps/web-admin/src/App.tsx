@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useRoutes } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import { Provider } from 'react-redux';
-import { createBrowserHistory } from 'history';
 
 import { appActions, authActions, authSelectors, useDispatch, useSelector } from '@lib/store';
 
@@ -12,34 +11,33 @@ import { store } from './store';
 
 import GlobalStyles from './components/GlobalStyles';
 import theme from './theme';
-import routes from './routes';
 
 import useClearPageParams from './utils/useClearPageParams';
 import { getNumber } from './utils/helpers';
+import AppRoutes from './routes';
 
 const Router = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const browserHistory = createBrowserHistory();
+  const location = useLocation();
 
   const isLogged = authSelectors.isLogged();
-
-  const [history, setHistory] = useState('');
-  const [loadingData, setLoadingData] = useState(false);
   const config = useSelector((state) => state.auth.config);
 
   useEffect(() => {
-    //Если пользователь logged, но идет загрузка данных из локального хранилища,
-    //то переходим на страницу, которая была перед обновлением страницы
-    if (isLogged && loadingData) {
-      navigate(history);
-      setLoadingData(false);
-    }
-  }, [history, isLogged, loadingData, navigate]);
+    api.config = { ...api.config, ...config };
+  }, [config]);
 
   useEffect(() => {
-    setLoadingData(true);
-    setHistory(browserHistory.location.pathname);
+    window.localStorage.setItem('lastPath', location.pathname);
+  }, [dispatch, location.pathname]);
+
+  useEffect(() => {
+    const lastPath = window.localStorage.getItem('lastPath');
+    if (lastPath) {
+      navigate(lastPath);
+    }
+
     dispatch(appActions.loadGlobalDataFromDisc());
 
     const fetchEnv = async () => {
@@ -65,12 +63,8 @@ const Router = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    api.config = { ...api.config, ...config };
-  }, [config]);
-
   useClearPageParams();
-  return useRoutes(routes(isLogged));
+  return <AppRoutes isLoggedIn={isLogged} />;
 };
 
 const App = () => {

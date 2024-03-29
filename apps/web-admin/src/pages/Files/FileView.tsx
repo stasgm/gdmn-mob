@@ -137,9 +137,8 @@ const FileView = () => {
 
   const handleMoveFiles = useCallback(() => {
     setOpenFolder(false);
-    // console.log('selectedFolder', )
+
     if (selectedFolder && fileObject?.id) {
-      console.log('selectedFolder', selectedFolder);
       dispatch(
         fileActions.moveFiles(
           [
