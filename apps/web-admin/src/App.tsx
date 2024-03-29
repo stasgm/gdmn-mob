@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import { Provider } from 'react-redux';
@@ -22,15 +22,9 @@ const Router = () => {
   const location = useLocation();
 
   const isLogged = authSelectors.isLogged();
-  const config = useSelector((state) => state.auth.config);
+  const { config, loadingData } = useSelector((state) => state.auth);
 
-  useEffect(() => {
-    api.config = { ...api.config, ...config };
-  }, [config]);
-
-  useEffect(() => {
-    window.localStorage.setItem('lastPath', location.pathname);
-  }, [dispatch, location.pathname]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const lastPath = window.localStorage.getItem('lastPath');
@@ -54,8 +48,10 @@ const Router = () => {
             server: envs.host,
           }),
         );
+        setLoading(false);
       } catch (error) {
         // console.error('Ошибка при выполнении запроса:', error);
+        setLoading(false);
       }
     };
 
@@ -63,8 +59,16 @@ const Router = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    api.config = { ...api.config, ...config };
+  }, [config]);
+
+  useEffect(() => {
+    window.localStorage.setItem('lastPath', location.pathname);
+  }, [dispatch, location.pathname]);
+
   useClearPageParams();
-  return <AppRoutes isLoggedIn={isLogged} />;
+  return loading || loadingData ? null : <AppRoutes isLoggedIn={isLogged} />;
 };
 
 const App = () => {
