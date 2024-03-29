@@ -73,6 +73,7 @@ interface IProps<T extends IEntity> {
   onCloseFilters?: () => void;
   onClearFilters?: () => void;
   setCompany: (value: INamedEntity) => void;
+
   listOptions: IListOption;
 }
 
@@ -435,7 +436,6 @@ function FileListTable<T extends IEntity>({
                           <Field
                             InputProps={{
                               sx: {
-                                height: 50,
                                 fontSize: 13,
                                 '& .MuiOutlinedInput-input': {
                                   borderWidth: 0,
@@ -468,6 +468,7 @@ function FileListTable<T extends IEntity>({
                               option.name === getValue(value.value, listOptions[item])
                             }
                             disabled={item === 'companyId' ? false : !formik.values['companyId'].value}
+                            size="small"
                           />
                         ) : fileFilterValues[item].type === 'date' ? (
                           <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale="ru">
@@ -483,7 +484,7 @@ function FileListTable<T extends IEntity>({
                                   actions: ['clear'],
                                 },
                               }}
-                              renderInput={(params) => <TextField {...params} fullWidth />}
+                              renderInput={(params) => <TextField {...params} fullWidth size="small" />}
                               disabled={!formik.values['companyId'].value}
                             />
                           </LocalizationProvider>
@@ -491,7 +492,6 @@ function FileListTable<T extends IEntity>({
                           <TextField
                             InputProps={{
                               sx: {
-                                height: 50,
                                 '& .MuiOutlinedInput-input': { borderWidth: 0 },
                                 alignItems: 'center',
                                 justifyContent: 'flex-start',
@@ -516,6 +516,8 @@ function FileListTable<T extends IEntity>({
                             onChange={(event) => handleUpdateFormik(item, { id: item, name: event.target.value })}
                             disabled={!formik.values['companyId'].value}
                             error={Boolean(formik.touched[item] && formik.errors[item])}
+                            size="small"
+                            multiline={Boolean(formik.values[item]?.multi)}
                           />
                         )}
                       </Grid>
@@ -523,41 +525,25 @@ function FileListTable<T extends IEntity>({
                   </Box>
                   <Box
                     sx={{
-                      p: 3,
+                      paddingLeft: 3,
+                      paddingRight: 3,
                       flexDirection: 'row',
-                      maxHeight: '10%',
+                      // maxHeight: '10%',
                       justifyContent: 'space-between',
                       // minWidth: '100%',
                       display: 'flex',
                     }}
                   >
-                    {/* <Grid item> */}
-                    {/* sx={{maxWidth: '50%'}} */}
-                    <Box>
-                      <Button
-                        color="primary"
-                        type="submit"
-                        variant="contained"
-                        // sx={{ m: 1 }}
-                        // fullWidth
-                        onClick={handleSearchClick}
-                      >
+                    <Box sx={{ width: '47%' }}>
+                      <Button color="primary" type="submit" variant="contained" fullWidth onClick={handleSearchClick}>
                         Применить
                       </Button>
                     </Box>
-                    {/* </Grid> */}
-                    {/* <Grid item> */}
-                    <Box /*sx={{ paddingRight: 2 }}*/>
-                      <Button
-                        color="secondary"
-                        variant="contained"
-                        onClick={handleClearFilters}
-                        // fullWidth
-                      >
+                    <Box sx={{ width: '47%' }}>
+                      <Button color="secondary" variant="contained" onClick={handleClearFilters} fullWidth>
                         Очистить
                       </Button>
                     </Box>
-                    {/* </Grid> */}
                   </Box>
                 </form>
               </Drawer>

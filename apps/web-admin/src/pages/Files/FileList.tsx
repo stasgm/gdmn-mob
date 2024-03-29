@@ -82,17 +82,25 @@ const FileList = () => {
   const { list: devices, loading: loadingDevices } = useSelector((state) => state.devices);
 
   const companyList = companies.map((d) => ({ id: d.id, name: d.name })) || [];
-  const appSystemList = appSystems.map((d) => ({ id: d.id, name: d.name })) || [];
+  const appSystemList =
+    appSystems
+      .filter((i) =>
+        companies.find(
+          // (c) => formikCompanyId && c.id === formikCompanyId && c.appSystems?.find((a) => a.id === i.id),
+          (c) => formikCompany && c.id === formikCompany?.id && c.appSystems?.find((a) => a.id === i.id),
+        ),
+      )
+      .map((d) => ({ id: d.id, name: d.name })) || [];
 
   const userList = companyList.length
     ? users
-        .filter((i) => companyList.find((c) => c.id === formikCompany?.id && c.id === i.company?.id))
+        .filter((i) => companyList.find((c) => formikCompany && c.id === formikCompany?.id && c.id === i.company?.id))
         .map((d) => ({ id: d.id, name: d.name }))
     : [];
 
   const deviceList = companyList.length
     ? devices
-        .filter((i) => companyList.find((c) => c.id === formikCompany?.id && c.id === i.company?.id))
+        .filter((i) => companyList.find((c) => formikCompany && c.id === formikCompany?.id && c.id === i.company?.id))
         .map((d) => ({ id: d.id, name: d.name }))
     : [];
 
@@ -116,8 +124,6 @@ const FileList = () => {
       // }
     }
   }, [appSystems, companies, dispatch, pageParams?.filesFilters?.appSystemId, pageParams?.filesFilters?.companyId]);
-
-  console.log('formikCompany', formikCompany);
 
   // console.log('pageParams', pageParams?.filesFilters);
 
@@ -316,6 +322,7 @@ const FileList = () => {
       dispatch(actions.moveFiles(ids, selectedFolder));
       dispatch(actions.fetchFiles());
       handleClearSearch();
+      setSelectedFileIds([]);
     }
   };
 

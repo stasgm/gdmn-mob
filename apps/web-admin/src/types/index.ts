@@ -55,6 +55,7 @@ export interface IFilterObject {
   uid: IFilterOption;
   dateFrom: IFilterOption;
   dateTo: IFilterOption;
+  searchQuery: IFilterOption;
 }
 
 export interface IFileFilter {
@@ -69,20 +70,27 @@ export interface IFileFilter {
   uid: string;
   dateFrom: string;
   dateTo: string;
+  searchQuery: string;
 }
 
 export interface IFilterOption extends INamedEntity {
   type: 'text' | 'select' | 'date';
   value: INamedEntity | string;
   visible: boolean;
-  data?: [];
-  valueId?: string;
+  // data?: [];
+  multi?: boolean;
 }
 
 export interface IFilterTable {
   [fieldName: string]: string;
+  // appSystemId?: string;
+  // companyId?: string;
 }
 
+export interface IFolderProps {
+  appSystemId: string;
+  companyId: string;
+}
 export interface IListOption {
   [fieldName: string]: INamedEntity[];
 }
