@@ -46,6 +46,7 @@ import { PalletStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import { BarcodeImage } from './components/Barcode';
+import ViewTotal from './components/ViewTotal';
 
 export const PalletViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -428,6 +429,7 @@ export const PalletViewScreen = () => {
           keyExtractor={keyExtractor}
           extraData={[lines, isBlocked, delList, isDelList]}
         />
+        {lines?.length ? <ViewTotal total={lines?.length || 0} /> : null}
         <AppDialog
           title="Введите штрих-код"
           visible={visibleDialog}
