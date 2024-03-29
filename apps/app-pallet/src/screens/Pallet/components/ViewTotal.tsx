@@ -16,17 +16,12 @@ const ViewTotal = ({ total }: IItem) => {
   return (
     <View>
       <Divider style={{ backgroundColor: colors.primary }} />
-      <View style={styles.itemNoMargin}>
-        <View style={styles.details}>
-          <View style={styles.directionRow}>
-            <View style={localStyles.groupWidth}>
-              <MediumText style={styles.textTotal}>Итого: </MediumText>
-            </View>
-
-            <View style={localStyles.quantity}>
-              <MediumText>{total || 0}</MediumText>
-            </View>
-          </View>
+      <View style={[localStyles.total, styles.directionRow]}>
+        <View style={localStyles.groupWidth}>
+          <MediumText style={styles.textTotal}>Итого: </MediumText>
+        </View>
+        <View style={localStyles.quantity}>
+          <MediumText>{total || 0}</MediumText>
         </View>
       </View>
     </View>
@@ -42,5 +37,9 @@ const localStyles = StyleSheet.create({
   quantity: {
     alignItems: 'flex-end',
     width: '35%',
+  },
+  total: {
+    margin: 5,
+    alignItems: 'center',
   },
 });
