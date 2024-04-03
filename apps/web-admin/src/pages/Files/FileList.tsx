@@ -340,6 +340,7 @@ const FileList = () => {
       sx: { mx: 1 },
       onClick: handleFilter,
       icon: <FilterIcon />,
+      variant: filterVisible ? 'outlined' : 'text',
     },
     {
       name: 'Переместить',

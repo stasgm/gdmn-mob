@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const getMaxHeight = () => window.innerHeight - 64;
+const getMaxHeight = () => window.innerHeight - 144;
 
 export const useDrawerResizeMaxHeight = () => {
   const [maxHeight, setMaxHeight] = useState(getMaxHeight());

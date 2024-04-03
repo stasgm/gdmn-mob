@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -264,8 +264,6 @@ function FileListTable<T extends IEntity>({
   }
 
   const getValue = (id: string | INamedEntity, data?: INamedEntity[]) => {
-    // console.log('data', data, 'id', id);
-    // console.log('data.find((i) => i.id === id)?.name || ', data?.find((i) => i.id === id)?.name || '');
     return data?.find((i) => i.id === id)?.name || '';
   };
 
@@ -334,16 +332,7 @@ function FileListTable<T extends IEntity>({
     <FormikProvider value={formik}>
       <Card>
         <PerfectScrollbar>
-          <Box
-            sx={{
-              p: 1,
-              overflowX: 'auto',
-              overflowY: 'auto',
-              maxHeight,
-              // maxWidth: '100%',
-              justifyContent: 'space-between',
-            }}
-          >
+          <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight, justifyContent: 'space-between' }}>
             <Table>
               <TableHead>
                 <TableRow>
@@ -376,19 +365,9 @@ function FileListTable<T extends IEntity>({
             </Table>
           </Box>
           {isFilterVisible && (
-            <Box
-            // sx={{
-            // top: 64,
-            // width,
-            // paddingBottom: 5,
-            // overflow: 'visible',
-            // height: drawerHeight,
-            // maxHeight: drawerHeight,
-            // }}
-            >
+            <Box>
               <Divider orientation="vertical" flexItem />
               <Drawer
-                // ModalProps={{ disableScrollLock: true }}
                 anchor="right"
                 open={isFilterVisible}
                 variant="persistent"
@@ -396,10 +375,6 @@ function FileListTable<T extends IEntity>({
                   sx: {
                     top: 64,
                     width,
-                    // paddingBottom: 5,
-                    // overflow: 'visible',
-                    // height: drawerHeight,
-                    // maxHeight: drawerHeight,
                     height: 'calc(100% - 64px)',
                     transitionProperty: 'width, transform !important',
                     transitionDuration: '0.3s !important',
@@ -409,140 +384,139 @@ function FileListTable<T extends IEntity>({
               >
                 <form onSubmit={formik.handleSubmit} onReset={formik.handleReset}>
                   <Box
-                    sx={{
-                      flexDirection: 'row',
-                      justifyContent: 'flex-end',
-                      alignItems: 'flex-end',
-                    }}
-                    maxHeight={'5%'}
+                    sx={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'flex-end', maxHeight: '40px' }}
                   >
                     <IconButton sx={{ justifyContent: 'flex-end' }} onClick={onCloseFilters}>
                       <CloseIcon fontSize="small" />
                     </IconButton>
                   </Box>
-
-                  <Box
-                    // maxHeight={'85%'}
-                    sx={{
-                      p: 3,
-                      /*overflowY: 'scroll',*/ flexDirection: 'column',
-                      // maxHeight: '85%',
-                      overflowY: 'auto',
-                    }}
-                  >
-                    {Object.keys(fileFilterValues).map((item) => (
-                      <Grid item key={item} marginBottom={3}>
-                        {fileFilterValues[item].type === 'select' ? (
-                          <Field
-                            InputProps={{
-                              sx: {
-                                fontSize: 13,
-                                '& .MuiOutlinedInput-input': {
-                                  borderWidth: 0,
-                                  // padding: 0.5,
-                                },
-                                alignItems: 'center',
-                                justifyContent: 'flex-start',
-                              },
-                            }}
-                            component={ComboBox}
-                            id={item}
-                            name={item}
-                            label={fileFilterValues[item].name || ''}
-                            value={
-                              formik.values[item]?.value ? getValue(formik.values[item]?.value, listOptions[item]) : ''
-                            }
-                            options={listOptions[item] || []}
-                            setFieldValue={handleUpdateFormik}
-                            setTouched={formik.setTouched}
-                            error={Boolean(formik.touched[item] && formik.errors[item])}
-                            fullWidth
-                            getOptionLabel={
-                              (option: IFilterOption) =>
-                                (formik.values[item]?.name === option.name
-                                  ? getValue(option.value, listOptions[item])
-                                  : option.name) || ''
-                              // (formik.values[item]?.name === option.name ? option.value : option.name) || ''
-                            }
-                            isOptionEqualToValue={(option: INamedEntity, value: IFilterOption) =>
-                              option.name === getValue(value.value, listOptions[item])
-                            }
-                            disabled={item === 'companyId' ? false : !formik.values['companyId'].value}
-                            size="small"
-                          />
-                        ) : fileFilterValues[item].type === 'date' ? (
-                          <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale="ru">
-                            <DesktopDateTimePicker
-                              label={fileFilterValues[item].name || ''}
-                              inputFormat="DD/MM/YY hh:mm"
-                              value={formik.values[item]?.value || null}
-                              onChange={(date) =>
-                                handleUpdateFormik(item, { id: item, name: date ? new Date(date).toISOString() : '' })
-                              }
-                              componentsProps={{
-                                actionBar: {
-                                  actions: ['clear'],
+                  <Box justifyContent={'space-between'} flexDirection={'column'}>
+                    <Box
+                      sx={{
+                        // p: 3,
+                        paddingX: 3,
+                        paddingTop: 1,
+                        flexDirection: 'column',
+                        overflowY: 'auto',
+                        maxHeight: drawerHeight,
+                        display: 'flex',
+                      }}
+                    >
+                      {Object.keys(fileFilterValues).map((item) => (
+                        <Grid item key={item} marginBottom={3}>
+                          {fileFilterValues[item].type === 'select' ? (
+                            <Field
+                              InputProps={{
+                                sx: {
+                                  fontSize: 13,
+                                  '& .MuiOutlinedInput-input': {
+                                    borderWidth: 0,
+                                    // padding: 0.5,
+                                  },
+                                  alignItems: 'center',
+                                  justifyContent: 'flex-start',
                                 },
                               }}
-                              renderInput={(params) => <TextField {...params} fullWidth size="small" />}
-                              disabled={!formik.values['companyId'].value}
+                              component={ComboBox}
+                              id={item}
+                              name={item}
+                              label={fileFilterValues[item].name || ''}
+                              value={
+                                formik.values[item]?.value
+                                  ? getValue(formik.values[item]?.value, listOptions[item])
+                                  : ''
+                              }
+                              options={listOptions[item] || []}
+                              setFieldValue={handleUpdateFormik}
+                              setTouched={formik.setTouched}
+                              error={Boolean(formik.touched[item] && formik.errors[item])}
+                              fullWidth
+                              getOptionLabel={
+                                (option: IFilterOption) =>
+                                  (formik.values[item]?.name === option.name
+                                    ? getValue(option.value, listOptions[item])
+                                    : option.name) || ''
+                                // (formik.values[item]?.name === option.name ? option.value : option.name) || ''
+                              }
+                              isOptionEqualToValue={(option: INamedEntity, value: IFilterOption) =>
+                                option.name === getValue(value.value, listOptions[item])
+                              }
+                              disabled={item === 'companyId' ? false : !formik.values['companyId'].value}
+                              size="small"
                             />
-                          </LocalizationProvider>
-                        ) : (
-                          <TextField
-                            InputProps={{
-                              sx: {
-                                '& .MuiOutlinedInput-input': { borderWidth: 0 },
-                                alignItems: 'center',
-                                justifyContent: 'flex-start',
-                              },
-                              endAdornment: formik.values[item]?.value ? (
-                                <InputAdornment
-                                  position="end"
-                                  onClick={() => handleUpdateFormik(item, { id: item, name: '' })}
-                                >
-                                  <IconButton>
-                                    <CloseIcon size="20" />
-                                  </IconButton>
-                                </InputAdornment>
-                              ) : null,
-                            }}
-                            fullWidth
-                            name={item}
-                            label={fileFilterValues[item].name}
-                            variant="outlined"
-                            type="text"
-                            value={formik.values[item]?.value}
-                            onChange={(event) => handleUpdateFormik(item, { id: item, name: event.target.value })}
-                            disabled={!formik.values['companyId'].value}
-                            error={Boolean(formik.touched[item] && formik.errors[item])}
-                            size="small"
-                            multiline={Boolean(formik.values[item]?.multi)}
-                          />
-                        )}
-                      </Grid>
-                    ))}
-                  </Box>
-                  <Box
-                    sx={{
-                      paddingLeft: 3,
-                      paddingRight: 3,
-                      flexDirection: 'row',
-                      // maxHeight: '10%',
-                      justifyContent: 'space-between',
-                      // minWidth: '100%',
-                      display: 'flex',
-                    }}
-                  >
-                    <Box sx={{ width: '47%' }}>
-                      <Button color="primary" type="submit" variant="contained" fullWidth onClick={handleSearchClick}>
-                        Применить
-                      </Button>
+                          ) : fileFilterValues[item].type === 'date' ? (
+                            <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale="ru">
+                              <DesktopDateTimePicker
+                                label={fileFilterValues[item].name || ''}
+                                inputFormat="DD/MM/YY hh:mm"
+                                value={formik.values[item]?.value || null}
+                                onChange={(date) =>
+                                  handleUpdateFormik(item, { id: item, name: date ? new Date(date).toISOString() : '' })
+                                }
+                                componentsProps={{
+                                  actionBar: {
+                                    actions: ['clear'],
+                                  },
+                                }}
+                                renderInput={(params) => <TextField {...params} fullWidth size="small" />}
+                                disabled={!formik.values['companyId'].value}
+                              />
+                            </LocalizationProvider>
+                          ) : (
+                            <TextField
+                              InputProps={{
+                                sx: {
+                                  '& .MuiOutlinedInput-input': { borderWidth: 0 },
+                                  alignItems: 'center',
+                                  justifyContent: 'flex-start',
+                                },
+                                endAdornment: formik.values[item]?.value ? (
+                                  <InputAdornment
+                                    position="end"
+                                    onClick={() => handleUpdateFormik(item, { id: item, name: '' })}
+                                  >
+                                    <IconButton>
+                                      <CloseIcon size="20" />
+                                    </IconButton>
+                                  </InputAdornment>
+                                ) : null,
+                              }}
+                              fullWidth
+                              name={item}
+                              label={fileFilterValues[item].name}
+                              variant="outlined"
+                              type="text"
+                              value={formik.values[item]?.value}
+                              onChange={(event) => handleUpdateFormik(item, { id: item, name: event.target.value })}
+                              disabled={!formik.values['companyId'].value}
+                              error={Boolean(formik.touched[item] && formik.errors[item])}
+                              size="small"
+                              multiline={Boolean(formik.values[item]?.multi)}
+                            />
+                          )}
+                        </Grid>
+                      ))}
                     </Box>
-                    <Box sx={{ width: '47%' }}>
-                      <Button color="secondary" variant="contained" onClick={handleClearFilters} fullWidth>
-                        Очистить
-                      </Button>
+                    <Box
+                      sx={{
+                        paddingLeft: 3,
+                        paddingRight: 3,
+                        flexDirection: 'row',
+                        maxHeight: '40px',
+                        justifyContent: 'space-between',
+                        display: 'flex',
+                      }}
+                    >
+                      <Box sx={{ width: '47%' }}>
+                        <Button color="primary" type="submit" variant="contained" fullWidth onClick={handleSearchClick}>
+                          Применить
+                        </Button>
+                      </Box>
+                      <Box sx={{ width: '47%' }}>
+                        <Button color="secondary" variant="contained" onClick={handleClearFilters} fullWidth>
+                          Очистить
+                        </Button>
+                      </Box>
                     </Box>
                   </Box>
                 </form>
