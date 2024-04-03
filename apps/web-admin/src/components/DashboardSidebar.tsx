@@ -74,7 +74,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
           {
             href: `${adminPath}/app/deviceLogs`,
             icon: AlertIcon,
-            title: 'Журнал ошибок',
+            title: 'Журналы ошибок',
           },
           {
             href: `${adminPath}/app/files`,

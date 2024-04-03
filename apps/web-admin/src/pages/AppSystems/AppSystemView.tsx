@@ -9,6 +9,8 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import CachedIcon from '@mui/icons-material/Cached';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -21,14 +23,13 @@ import { useSelector, useDispatch } from '../../store';
 import { ILinkedEntity, IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 
-import appSystemSelectors from '../../store/appSystem/selectors';
-
-import actions from '../../store/appSystem';
+import { appSystemActions, appSystemSelectors } from '../../store/appSystem';
 
 import { adminPath } from '../../utils/constants';
 import DetailsView from '../../components/DetailsView';
 
 import AppSystemCompany from '../../components/appSystem/AppSystemCompany';
+import TabPanel from '../../components/TabPanel';
 
 export type Params = {
   id: string;
@@ -36,20 +37,26 @@ export type Params = {
 
 const AppSystemView = () => {
   const { id } = useParams<keyof Params>() as Params;
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const { loading } = useSelector((state) => state.appSystems);
-
   const appSystem = appSystemSelectors.appSystemById(id);
 
   const [open, setOpen] = useState(false);
+  const [tabValue, setTabValue] = useState(0);
+
+  const handleChangeTab = (event: any, newValue: number) => {
+    setTabValue(newValue);
+  };
 
   const appSystemDetails: ILinkedEntity[] = useMemo(
     () =>
       appSystem
         ? [
-            { id: 'Наименование', value: appSystem },
+            { id: 'Подсистема', value: appSystem },
+            { id: 'Идентификатор', value: appSystem?.id },
             { id: 'Описание', value: appSystem?.description },
           ]
         : [],
@@ -60,20 +67,20 @@ const AppSystemView = () => {
     navigate(-1);
   };
 
-  const handleEdit = () => {
+  const handleEdit = useCallback(() => {
     navigate(`${adminPath}/app/appSystems/${id}/edit`);
-  };
+  }, [navigate, id]);
 
   const handleDelete = async () => {
     setOpen(false);
-    const res = await dispatch(actions.removeAppSystem(id));
+    const res = await dispatch(appSystemActions.removeAppSystem(id));
     if (res.type === 'APP_SYSTEM/REMOVE_SUCCESS') {
       navigate(-1);
     }
   };
 
   const refreshData = useCallback(() => {
-    dispatch(actions.fetchAppSystemById(id));
+    dispatch(appSystemActions.fetchAppSystemById(id));
   }, [dispatch, id]);
 
   useEffect(() => {
@@ -88,6 +95,48 @@ const AppSystemView = () => {
     setOpen(false);
   };
 
+  const buttons: IToolBarButton[] = useMemo(() => {
+    return tabValue === 0
+      ? [
+          {
+            name: 'Обновить',
+            sx: { marginRight: 1 },
+            color: 'secondary',
+
+            variant: 'contained',
+            onClick: refreshData,
+            icon: <CachedIcon />,
+          },
+          {
+            name: 'Редактировать',
+            sx: { marginRight: 1 },
+            disabled: true,
+            color: 'primary',
+            variant: 'contained',
+            onClick: handleEdit,
+            icon: <EditIcon />,
+          },
+          {
+            name: 'Удалить',
+            disabled: true,
+            color: 'secondary',
+            variant: 'contained',
+            onClick: handleClickOpen,
+            icon: <DeleteIcon />,
+          },
+        ]
+      : [
+          {
+            name: 'Обновить',
+            sx: { marginRight: 1 },
+            color: 'secondary',
+            variant: 'contained',
+            onClick: refreshData,
+            icon: <CachedIcon />,
+          },
+        ];
+  }, [handleEdit, refreshData, tabValue]);
+
   if (!appSystem) {
     return (
       <Box
@@ -101,34 +150,6 @@ const AppSystemView = () => {
       </Box>
     );
   }
-
-  const buttons: IToolBarButton[] = [
-    {
-      name: 'Обновить',
-      sx: { marginRight: 1 },
-      color: 'primary',
-      variant: 'contained',
-      onClick: refreshData,
-      icon: <CachedIcon />,
-    },
-    {
-      name: 'Редактировать',
-      sx: { marginRight: 1 },
-      disabled: true,
-      color: 'secondary',
-      variant: 'contained',
-      onClick: handleEdit,
-      icon: <EditIcon />,
-    },
-    {
-      name: 'Удалить',
-      disabled: true,
-      color: 'secondary',
-      variant: 'contained',
-      onClick: handleClickOpen,
-      icon: <DeleteIcon />,
-    },
-  ];
 
   return (
     <>
@@ -159,7 +180,7 @@ const AppSystemView = () => {
             justifyContent: 'space-between',
           }}
         >
-          <Box sx={{ display: 'inline-flex', marginBottom: 1 }}>
+          <Box sx={{ display: 'inline-flex' }}>
             <IconButton color="primary" onClick={handleCancel}>
               <ArrowBackIcon />
             </IconButton>
@@ -174,18 +195,18 @@ const AppSystemView = () => {
             <ToolBarAction buttons={buttons} />
           </Box>
         </Box>
-        <Box
-          sx={{
-            backgroundColor: 'background.default',
-            minHeight: '100%',
-          }}
-        >
-          <DetailsView details={appSystemDetails} />
+        <Box>
+          <Tabs value={tabValue} onChange={handleChangeTab}>
+            <Tab label="Общая информация" />
+            <Tab label="Компании" />
+          </Tabs>
+          <TabPanel value={tabValue} index={0}>
+            <DetailsView details={appSystemDetails} />
+          </TabPanel>
+          <TabPanel value={tabValue} index={1}>
+            <AppSystemCompany appSystem={appSystem} />
+          </TabPanel>
         </Box>
-      </Box>
-      <Box>
-        <CardHeader title={'Компании'} sx={{ mx: 2 }} />
-        <AppSystemCompany appSystem={appSystem} />
       </Box>
     </>
   );

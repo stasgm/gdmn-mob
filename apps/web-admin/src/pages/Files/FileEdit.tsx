@@ -3,9 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import FileDetails from '../../components/file/FileDetails';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import fileActions from '../../store/file';
-import fileSelectors from '../../store/file/selectors';
-import SnackBar from '../../components/SnackBar';
+import { fileActions, fileSelectors } from '../../store/file';
 
 export type Params = {
   id: string;
@@ -18,7 +16,7 @@ const FileEdit = () => {
 
   const dispatch: AppDispatch = useDispatch();
 
-  const { loading, errorMessage, file } = useSelector((state) => state.files);
+  const { loading, file } = useSelector((state) => state.files);
 
   const fileObject = fileSelectors.fileByIdAndFolder(id);
 
@@ -41,10 +39,6 @@ const FileEdit = () => {
 
   const goBack = () => {
     navigate(-1);
-  };
-
-  const handleClearError = () => {
-    dispatch(fileActions.fileSystemActions.clearError());
   };
 
   const handleSubmit = async (values: any) => {
@@ -92,7 +86,6 @@ const FileEdit = () => {
         {loading && <CircularProgress size={40} />}
       </Box>
       <FileDetails file={file} loading={loading} onSubmit={handleSubmit} onCancel={goBack} />
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </Box>
   );
 };

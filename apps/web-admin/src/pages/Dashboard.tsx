@@ -9,9 +9,9 @@ import TotalCompanies from '../components/dashboard/Totalcompanies';
 import TotalUsers from '../components/dashboard/Totalusers';
 import TotalDevices from '../components/dashboard/Totaldevices';
 
-import companyActions from '../store/company';
-import userActions from '../store/user';
-import deviceActions from '../store/device';
+import { companyActions } from '../store/company';
+import { userActions } from '../store/user';
+import { deviceActions } from '../store/device';
 import CircularProgressWithContent from '../components/CircularProgressWidthContent';
 
 const Dashboard = () => {

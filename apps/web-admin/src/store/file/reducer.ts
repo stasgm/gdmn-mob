@@ -1,10 +1,10 @@
 import { Reducer } from 'redux';
 import { getType } from 'typesafe-actions';
 
-import { IFileSystemState } from './types';
-import { FileSystemActionType, fileSystemActions } from './actions';
+import { ISystemFileState } from './types';
+import { SystemFileActionType, systemFileActions } from './actions';
 
-const initialState: Readonly<IFileSystemState> = {
+const initialState: Readonly<ISystemFileState> = {
   list: [],
   file: undefined,
   folders: [],
@@ -13,38 +13,38 @@ const initialState: Readonly<IFileSystemState> = {
   pageParams: undefined,
 };
 
-const reducer: Reducer<IFileSystemState, FileSystemActionType> = (state = initialState, action): IFileSystemState => {
+const reducer: Reducer<ISystemFileState, SystemFileActionType> = (state = initialState, action): ISystemFileState => {
   switch (action.type) {
-    case getType(fileSystemActions.init):
+    case getType(systemFileActions.init):
       return initialState;
 
-    case getType(fileSystemActions.clearError):
+    case getType(systemFileActions.clearError):
       return { ...state, errorMessage: '' };
 
-    case getType(fileSystemActions.setError):
+    case getType(systemFileActions.setError):
       return { ...state, errorMessage: action.payload };
 
-    case getType(fileSystemActions.fetchFilesAsync.request):
+    case getType(systemFileActions.fetchFilesAsync.request):
       return { ...state, loading: true, list: [], errorMessage: '' };
 
-    case getType(fileSystemActions.fetchFilesAsync.success):
+    case getType(systemFileActions.fetchFilesAsync.success):
       return {
         ...state,
         list: action.payload,
         loading: false,
       };
 
-    case getType(fileSystemActions.fetchFilesAsync.failure):
+    case getType(systemFileActions.fetchFilesAsync.failure):
       return {
         ...state,
         loading: false,
         errorMessage: action.payload || 'error',
       };
 
-    case getType(fileSystemActions.fetchFileAsync.request):
+    case getType(systemFileActions.fetchFileAsync.request):
       return { ...state, loading: true, errorMessage: '' };
 
-    case getType(fileSystemActions.fetchFileAsync.success):
+    case getType(systemFileActions.fetchFileAsync.success):
       return {
         ...state,
         file: action.payload,
@@ -52,103 +52,103 @@ const reducer: Reducer<IFileSystemState, FileSystemActionType> = (state = initia
         loading: false,
       };
 
-    case getType(fileSystemActions.fetchFileAsync.failure):
+    case getType(systemFileActions.fetchFileAsync.failure):
       return {
         ...state,
         loading: false,
         errorMessage: action.payload || 'error',
       };
 
-    case getType(fileSystemActions.updateFileAsync.request):
+    case getType(systemFileActions.updateFileAsync.request):
       return { ...state, loading: true, errorMessage: '' };
 
-    case getType(fileSystemActions.updateFileAsync.success):
+    case getType(systemFileActions.updateFileAsync.success):
       return {
         ...state,
         list: [...(state.list?.filter(({ id }) => id !== action.payload.id) || []), action.payload],
         loading: false,
       };
 
-    case getType(fileSystemActions.updateFileAsync.failure):
+    case getType(systemFileActions.updateFileAsync.failure):
       return {
         ...state,
         loading: false,
         errorMessage: action.payload || 'error',
       };
 
-    case getType(fileSystemActions.removeFileAsync.request):
+    case getType(systemFileActions.removeFileAsync.request):
       return { ...state, loading: true, list: [], errorMessage: '' };
 
-    case getType(fileSystemActions.removeFileAsync.success):
+    case getType(systemFileActions.removeFileAsync.success):
       return {
         ...state,
         list: state.list.filter((i) => i.id !== action.payload),
         loading: false,
       };
 
-    case getType(fileSystemActions.removeFileAsync.failure):
+    case getType(systemFileActions.removeFileAsync.failure):
       return {
         ...state,
         loading: false,
         errorMessage: action.payload || 'error',
       };
 
-    case getType(fileSystemActions.removeFilesAsync.request):
+    case getType(systemFileActions.removeFilesAsync.request):
       return { ...state, loading: true, errorMessage: '' };
 
-    case getType(fileSystemActions.removeFilesAsync.success):
+    case getType(systemFileActions.removeFilesAsync.success):
       return {
         ...state,
         loading: false,
         list: state.list.filter((i) => action.payload.findIndex((fileObj) => fileObj.id === i.id) === -1),
       };
 
-    case getType(fileSystemActions.removeFilesAsync.failure):
+    case getType(systemFileActions.removeFilesAsync.failure):
       return { ...state, loading: false, errorMessage: action.payload || 'error' };
 
-    case getType(fileSystemActions.moveFilesAsync.request):
+    case getType(systemFileActions.moveFilesAsync.request):
       return { ...state, loading: true, errorMessage: '' };
 
-    case getType(fileSystemActions.moveFilesAsync.success):
+    case getType(systemFileActions.moveFilesAsync.success):
       return {
         ...state,
         loading: false,
         folders: [],
       };
 
-    case getType(fileSystemActions.moveFilesAsync.failure):
+    case getType(systemFileActions.moveFilesAsync.failure):
       return { ...state, loading: false, errorMessage: action.payload || 'error' };
 
-    case getType(fileSystemActions.fetchFoldersAsync.request):
+    case getType(systemFileActions.fetchFoldersAsync.request):
       return { ...state, loading: true, folders: [], errorMessage: '' };
 
-    case getType(fileSystemActions.fetchFoldersAsync.success):
+    case getType(systemFileActions.fetchFoldersAsync.success):
       return {
         ...state,
         folders: action.payload,
         loading: false,
       };
 
-    case getType(fileSystemActions.fetchFoldersAsync.failure):
+    case getType(systemFileActions.fetchFoldersAsync.failure):
       return {
         ...state,
         loading: false,
         errorMessage: action.payload || 'error',
       };
 
-    case getType(fileSystemActions.setPageParam):
+    case getType(systemFileActions.setPageParam):
       return {
         ...state,
         pageParams: { ...state.pageParams, ...action.payload },
       };
 
-    case getType(fileSystemActions.clearPageParams):
+    case getType(systemFileActions.clearPageParams):
       return {
         ...state,
         pageParams: undefined,
       };
 
-    case getType(fileSystemActions.clearFilesFilters):
+    case getType(systemFileActions.clearFilesFilters):
       return {
         ...state,
         pageParams: undefined,

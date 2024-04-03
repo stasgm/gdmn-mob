@@ -226,7 +226,7 @@ const DeviceListTable = ({
                   />
                 </TableCell>
                 <TableCell>Наименование</TableCell>
-                <TableCell>ID</TableCell>
+                <TableCell>Идентификатор</TableCell>
                 <TableCell>Номер</TableCell>
                 <TableCell>Состояние</TableCell>
                 <TableCell>Код активации</TableCell>

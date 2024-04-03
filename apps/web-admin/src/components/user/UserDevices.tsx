@@ -1,33 +1,39 @@
-import { Box, Container } from '@mui/material';
+import { Box } from '@mui/material';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
-import { IDeviceBinding } from '@lib/types';
 
 import { useCallback, useEffect, useState } from 'react';
 
 import { authActions, useAuthThunkDispatch } from '@lib/store';
 
+import { useNavigate } from 'react-router';
+
 import { IToolBarButton, IPageParam } from '../../types';
 import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
 import { useDispatch, useSelector } from '../../store';
-import actionsBinding from '../../store/deviceBinding';
-import deviceActions from '../../store/device';
-import codeActions from '../../store/activationCode';
+import { bindingActions, bindingSelectors } from '../../store/deviceBinding';
+import { deviceActions } from '../../store/device';
+import { codeActions } from '../../store/activationCode';
 import DeviceBindingListTable from '../deviceBinding/DeviceBindingListTable';
 import { webRequest } from '../../store/webRequest';
+import { adminPath } from '../../utils/constants';
 
 interface IProps {
   userId: string;
-  userBindingDevices: IDeviceBinding[];
-  onAddDevice: () => void;
 }
 
-const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
+const UserDevices = ({ userId }: IProps) => {
   const dispatch = useDispatch();
   const authDispatch = useAuthThunkDispatch();
+  const navigate = useNavigate();
   const { pageParams } = useSelector((state) => state.deviceBindings);
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
   const { list: activationCodes } = useSelector((state) => state.activationCodes);
   const { list: devices } = useSelector((state) => state.devices);
+  const userBindingDevices = bindingSelectors.bindingsByUserId(userId);
+
+  const handleAddDevice = () => {
+    navigate(`${adminPath}/app/users/${userId}/binding/new`);
+  };
 
   const fetchDevices = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
@@ -38,7 +44,7 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
 
   const fetchDeviceBindings = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(actionsBinding.fetchDeviceBindings(userId, filterText, fromRecord, toRecord));
+      dispatch(bindingActions.fetchDeviceBindings(userId, filterText, fromRecord, toRecord));
     },
     [dispatch, userId],
   );
@@ -65,7 +71,6 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
 
   const handleUpdateInput = (value: string) => {
     const inputValue: string = value;
-
     setPageParamLocal({ filterText: value });
 
     if (inputValue) return;
@@ -74,7 +79,7 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
   };
 
   const handleSearchClick = () => {
-    dispatch(actionsBinding.deviceBindingActions.setPageParam({ filterText: pageParamLocal?.filterText }));
+    dispatch(bindingActions.setPageParam({ filterText: pageParamLocal?.filterText }));
 
     fetchDeviceBindings(pageParamLocal?.filterText as string);
   };
@@ -87,7 +92,7 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
 
   const handleClearSearch = () => {
     dispatch(deviceActions.setPageParam({ filterText: undefined }));
-    dispatch(actionsBinding.deviceBindingActions.setPageParam({ filterText: undefined }));
+    dispatch(bindingActions.setPageParam({ filterText: undefined }));
     setPageParamLocal({ filterText: undefined });
     fetchDevices();
     fetchDeviceBindings();
@@ -103,39 +108,32 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
       name: 'Добавить',
       color: 'primary',
       variant: 'contained',
-      onClick: onAddDevice,
+      onClick: handleAddDevice,
       icon: <LibraryAddCheckIcon />,
     },
   ];
 
   return (
-    <Box
-      sx={{
-        backgroundColor: 'background.default',
-        minHeight: '100%',
-      }}
-    >
-      <Container maxWidth={false}>
-        <ToolbarActionsWithSearch
-          buttons={deviceButtons}
-          searchTitle={'Найти устройство'}
-          updateInput={handleUpdateInput}
-          searchOnClick={handleSearchClick}
-          keyPress={handleKeyPress}
-          value={(pageParamLocal?.filterText as undefined) || ''}
-          clearOnClick={handleClearSearch}
+    <Box>
+      <ToolbarActionsWithSearch
+        buttons={deviceButtons}
+        searchTitle={'Найти устройство'}
+        updateInput={handleUpdateInput}
+        searchOnClick={handleSearchClick}
+        keyPress={handleKeyPress}
+        value={(pageParamLocal?.filterText as undefined) || ''}
+        clearOnClick={handleClearSearch}
+      />
+      <Box sx={{ pt: 2 }}>
+        <DeviceBindingListTable
+          devices={devices}
+          deviceBindings={userBindingDevices}
+          activationCodes={activationCodes}
+          onCreateCode={handleCreateCode}
+          onCreateUid={handleCreateUid}
+          limitRows={5}
         />
-        <Box sx={{ pt: 2 }}>
-          <DeviceBindingListTable
-            devices={devices}
-            deviceBindings={userBindingDevices}
-            activationCodes={activationCodes}
-            onCreateCode={handleCreateCode}
-            onCreateUid={handleCreateUid}
-            limitRows={5}
-          />
-        </Box>
-      </Container>
+      </Box>
     </Box>
   );
 };

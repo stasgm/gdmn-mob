@@ -4,9 +4,8 @@ import { IDeviceBinding, NewDeviceBinding } from '@lib/types';
 import { useEffect } from 'react';
 
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import bindingActions from '../../store/deviceBinding';
-import actions from '../../store/user';
-import selectors from '../../store/user/selectors';
+import { bindingActions } from '../../store/deviceBinding';
+import { userActions, userSelectors } from '../../store/user';
 import DeviceBindingDetails from '../../components/deviceBinding/DeviceBindingDetails';
 
 export type Params = {
@@ -18,10 +17,10 @@ const UserDeviceCreate = () => {
   const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch();
   const { loading } = useSelector((state) => state.deviceBindings);
-  const user = selectors.userById(userId);
+  const user = userSelectors.userById(userId);
 
   useEffect(() => {
-    dispatch(actions.fetchUserById(userId));
+    dispatch(userActions.fetchUserById(userId));
   }, [dispatch, userId]);
 
   const goBack = () => {

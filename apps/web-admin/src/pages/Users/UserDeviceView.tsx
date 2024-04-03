@@ -9,6 +9,8 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import CachedIcon from '@mui/icons-material/Cached';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -16,20 +18,23 @@ import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
-import { useSelector, useDispatch } from '../../store';
-import bindingActions from '../../store/deviceBinding';
-import deviceActions from '../../store/device';
-import { ILinkedEntity, IToolBarButton } from '../../types';
-import ToolBarAction from '../../components/ToolBarActions';
+import { useDispatch, useSelector } from '../../store';
+import { bindingActions, bindingSelectors } from '../../store/deviceBinding';
+import { deviceActions, deviceSelectors } from '../../store/device';
 
-import deviceBindingSelectors from '../../store/deviceBinding/selectors';
-import deviceSelectors from '../../store/device/selectors';
+import { deviceLogActions } from '../../store/deviceLog';
+
+import { ILinkedEntity, IToolBarButton } from '../../types';
 
 import { adminPath, deviceStates } from '../../utils/constants';
 
 import DetailsView from '../../components/DetailsView';
+import ToolBarAction from '../../components/ToolBarActions';
+
+import TabPanel from '../../components/TabPanel';
 
 import UserDeviceLog from './UserDeviceLog';
+import UserDeviceSettings from './UserDeviceSettings';
 
 export type Params = {
   bindingid: string;
@@ -40,18 +45,19 @@ const UserDeviceView = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => state.devices);
-  const deviceBinding = deviceBindingSelectors.bindingById(bindingid);
+  const deviceBinding = bindingSelectors.bindingById(bindingid);
   const device = deviceSelectors.deviceById(deviceBinding?.device.id);
-  const [open, setOpen] = useState(false);
-
   const { user } = useSelector((state) => state.auth);
+  const { fileList, deviceLog, appSettings } = useSelector((state) => state.deviceLogs);
+
+  const [open, setOpen] = useState(false);
 
   const deviceBindingDetails: ILinkedEntity[] = useMemo(
     () =>
       deviceBinding
         ? [
             {
-              id: 'Наименование',
+              id: 'Устройство',
               value: deviceBinding.device,
               link: `${adminPath}/app/devices/${deviceBinding.device.id}`,
             },
@@ -79,13 +85,15 @@ const UserDeviceView = () => {
     setOpen(false);
     const res = await dispatch(bindingActions.removeDeviceBinding(bindingid));
     if (res.type === 'DEVICEBINDING/REMOVE_SUCCES') {
-      navigate(-1);
+      handleCancel();
     }
   };
 
   const refreshData = useCallback(() => {
     dispatch(bindingActions.fetchDeviceBindings());
     dispatch(deviceActions.fetchDevices());
+    //Получаем логи и настройки здесь, потому что используются в 2 вкладках
+    dispatch(deviceLogActions.fetchDeviceLogFiles());
   }, [dispatch]);
 
   useEffect(() => {
@@ -99,6 +107,24 @@ const UserDeviceView = () => {
   const handleClose = () => {
     setOpen(false);
   };
+
+  const userLogFile = useMemo(() => {
+    if (!device || !deviceBinding) {
+      return;
+    }
+
+    return fileList.find((i) => i.producer.id === deviceBinding.user.id && i.device.id === device.id);
+  }, [device, deviceBinding, fileList]);
+
+  useEffect(() => {
+    if (!userLogFile) {
+      return;
+    }
+    // Загружаем данные при загрузке компонента.
+    dispatch(
+      deviceLogActions.fetchDeviceLog(userLogFile.id, undefined, userLogFile.appSystem.id, userLogFile.company.id),
+    );
+  }, [dispatch, userLogFile]);
 
   const buttons: IToolBarButton[] = [
     {
@@ -127,6 +153,11 @@ const UserDeviceView = () => {
       icon: <DeleteIcon />,
     },
   ];
+
+  const [value, setValue] = useState(0);
+  const handleChange = (event: any, newValue: number) => {
+    setValue(newValue);
+  };
 
   if (!deviceBinding) {
     return (
@@ -162,6 +193,7 @@ const UserDeviceView = () => {
       <Box
         sx={{
           p: 3,
+          pb: 0,
         }}
       >
         <Box
@@ -171,7 +203,7 @@ const UserDeviceView = () => {
             justifyContent: 'space-between',
           }}
         >
-          <Box sx={{ display: 'inline-flex', marginBottom: 1 }}>
+          <Box sx={{ display: 'inline-flex' }}>
             <IconButton color="primary" onClick={handleCancel}>
               <ArrowBackIcon />
             </IconButton>
@@ -186,21 +218,30 @@ const UserDeviceView = () => {
             <ToolBarAction buttons={buttons} />
           </Box>
         </Box>
-        <Box
-          sx={{
-            backgroundColor: 'background.default',
-            minHeight: '100%',
-          }}
-        >
-          <DetailsView details={deviceBindingDetails} />
-        </Box>
       </Box>
-      {user?.role === 'SuperAdmin' ? (
-        <Box>
-          <CardHeader title={'Журнал ошибок устройства пользователя'} sx={{ mx: 2 }} />
-          <UserDeviceLog deviceId={device?.uid} userId={deviceBinding.user.id} />
-        </Box>
-      ) : null}
+      <Box
+        sx={{
+          p: 3,
+          pt: 0,
+        }}
+      >
+        <Tabs value={value} onChange={handleChange}>
+          <Tab label="Общая информация" />
+          {user?.role === 'SuperAdmin' && <Tab label="Журнал ошибок" />}
+          <Tab label="Настройки" />
+        </Tabs>
+        <TabPanel value={value} index={0}>
+          <DetailsView details={deviceBindingDetails} />
+        </TabPanel>
+        {user?.role === 'SuperAdmin' && (
+          <TabPanel value={value} index={1}>
+            <UserDeviceLog deviceLog={deviceLog} />
+          </TabPanel>
+        )}
+        <TabPanel value={value} index={2}>
+          <UserDeviceSettings appSettings={appSettings} />
+        </TabPanel>
+      </Box>
     </>
   );
 };

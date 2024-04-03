@@ -10,8 +10,8 @@ import { authActions, useAuthThunkDispatch } from '@lib/store';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import deviceActions from '../../store/device';
-import codeActions from '../../store/activationCode';
+import { deviceActions } from '../../store/device';
+import { codeActions } from '../../store/activationCode';
 import { IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import DeviceListTable from '../../components/device/DeviceListTable';

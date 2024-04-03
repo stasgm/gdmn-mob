@@ -10,7 +10,7 @@ import { ICompany } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import actions from '../../store/company';
+import { companyActions } from '../../store/company';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
 import SortableTable from '../../components/SortableTable';
@@ -27,7 +27,7 @@ const CompanyList = () => {
 
   const fetchCompanies = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(actions.fetchCompanies(filterText, fromRecord, toRecord));
+      dispatch(companyActions.fetchCompanies(filterText, fromRecord, toRecord));
     },
     [dispatch],
   );
@@ -48,7 +48,7 @@ const CompanyList = () => {
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.companyActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
+    dispatch(companyActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
 
     fetchCompanies(pageParamLocal?.filterText);
   };
@@ -60,18 +60,14 @@ const CompanyList = () => {
   };
 
   const handleClearSearch = () => {
-    dispatch(actions.companyActions.setPageParam({ filterText: undefined, page: 0 }));
+    dispatch(companyActions.setPageParam({ filterText: undefined, page: 0 }));
     setPageParamLocal({ filterText: undefined });
     fetchCompanies();
   };
 
-  // const handleClearError = () => {
-  //   dispatch(actions.companyActions.clearError());
-  // };
-
   const handleAddCompany = () => {
     if (list.length && !(authUser?.role === 'SuperAdmin')) {
-      dispatch(actions.companyActions.setError('Компания уже существует'));
+      dispatch(companyActions.setError('Компания уже существует'));
     } else {
       return navigate(`${location.pathname}/new`);
     }
@@ -80,7 +76,7 @@ const CompanyList = () => {
   const handleSetPageParams = useCallback(
     (pageParams: IPageParam) => {
       dispatch(
-        actions.companyActions.setPageParam({
+        companyActions.setPageParam({
           page: pageParams.page,
           limit: pageParams.limit,
         }),
@@ -107,7 +103,7 @@ const CompanyList = () => {
 
   const headCells: IHeadCells<ICompany>[] = [
     { id: 'name', label: 'Наименование', sortEnable: true },
-    { id: 'id', label: 'ID', sortEnable: true },
+    { id: 'id', label: 'Идентификатор', sortEnable: true },
     { id: 'admin', label: 'Администратор', sortEnable: true },
     { id: 'creationDate', label: 'Дата создания', sortEnable: true },
     { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },

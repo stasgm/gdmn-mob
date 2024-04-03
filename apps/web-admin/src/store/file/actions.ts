@@ -54,7 +54,7 @@ const clearPageParams = createAction('FILE/CLEAR_PARAMS')();
 
 const clearFilesFilters = createAction('FILE/CLEAR_FILES_FILTERS')();
 
-export const fileSystemActions = {
+export const systemFileActions = {
   fetchFilesAsync,
   fetchFileAsync,
   updateFileAsync,
@@ -70,4 +70,4 @@ export const fileSystemActions = {
   setError,
 };
 
-export type FileSystemActionType = ActionType<typeof fileSystemActions>;
+export type SystemFileActionType = ActionType<typeof systemFileActions>;

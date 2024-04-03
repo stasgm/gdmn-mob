@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -9,8 +9,8 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  Grid,
-  Typography,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import CachedIcon from '@mui/icons-material/Cached';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -25,15 +25,13 @@ import { useSelector, useDispatch } from '../../store';
 import { IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 
-import fileSelectors from '../../store/file/selectors';
-import SnackBar from '../../components/SnackBar';
-
 import FileDetailsView from '../../components/file/FileDetailsView';
 import FileContentView from '../../components/file/FileContentView';
-import fileActions from '../../store/file';
+import { fileActions, fileSelectors } from '../../store/file';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import { adminPath } from '../../utils/constants';
 import RadioGroup from '../../components/RadioGoup';
+import TabPanel from '../../components/TabPanel';
 
 export type Params = {
   id: string;
@@ -45,7 +43,13 @@ const FileView = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading, errorMessage, file, folders } = useSelector((state) => state.files);
+  const { loading, file, folders } = useSelector((state) => state.files);
+
+  const [tabValue, setTabValue] = useState(0);
+
+  const handleChangeTab = (event: any, newValue: number) => {
+    setTabValue(newValue);
+  };
 
   const fileObject = fileSelectors.fileByIdAndFolder(id);
 
@@ -75,20 +79,20 @@ const FileView = () => {
   const [open, setOpen] = useState(false);
   const [openFolder, setOpenFolder] = useState(false);
 
-  const handleGetFolders = () => {
+  const handleGetFolders = useCallback(() => {
     if (fileObject?.appSystem?.id && fileObject?.company?.id) {
       setOpenFolder(true);
       fetchFolders();
     }
-  };
+  }, [fileObject, fetchFolders]);
 
   const handleCancel = () => {
     navigate(-1);
   };
 
-  const handleEdit = () => {
+  const handleEdit = useCallback(() => {
     navigate(`${adminPath}/app/files/${id}/edit`);
-  };
+  }, [navigate, id]);
 
   const handleDelete = useCallback(async () => {
     setOpen(false);
@@ -157,9 +161,9 @@ const FileView = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, fileObject, id, selectedFolder]);
 
-  const handleClearError = () => {
-    dispatch(fileActions.fileSystemActions.clearError());
-  };
+  // const handleClearError = () => {
+  //   dispatch(fileActions.clearError());
+  // };
 
   const encode = (s: string) => {
     const out = [];
@@ -185,6 +189,65 @@ const FileView = () => {
     window.URL.revokeObjectURL(url);
   }, [file, fileObject]);
 
+  const buttons: IToolBarButton[] = useMemo(() => {
+    return tabValue === 0
+      ? [
+          {
+            name: 'Обновить',
+            sx: { marginRight: 1 },
+            color: 'secondary',
+            variant: 'contained',
+            onClick: fetchFile,
+            icon: <CachedIcon />,
+          },
+
+          {
+            name: 'Переместить',
+            sx: { marginRight: 1 },
+            color: 'secondary',
+            variant: 'contained',
+            onClick: handleGetFolders,
+            icon: <DriveFileMoveOutlinedIcon />,
+          },
+          {
+            name: 'Скачать',
+            sx: { marginRight: 1 },
+            disabled: true,
+            color: 'secondary',
+            variant: 'contained',
+            onClick: handleDownload,
+            icon: <ArrowDownwardIcon />,
+          },
+          {
+            name: 'Удалить',
+            disabled: true,
+            color: 'secondary',
+            variant: 'contained',
+            onClick: handleClickOpen,
+            icon: <DeleteIcon />,
+          },
+        ]
+      : [
+          {
+            name: 'Обновить',
+            sx: { marginRight: 1 },
+            color: 'secondary',
+            variant: 'contained',
+            onClick: fetchFile,
+            icon: <CachedIcon />,
+          },
+          {
+            name: 'Редактировать',
+            sx: { marginRight: 1 },
+            disabled: true,
+            color: 'primary',
+            variant: 'contained',
+            onClick: handleEdit,
+            icon: <EditIcon />,
+          },
+        ];
+  }, [fetchFile, handleDownload, handleEdit, handleGetFolders, tabValue]);
+
   if (!fileObject) {
     return (
       <Box
@@ -198,51 +261,6 @@ const FileView = () => {
       </Box>
     );
   }
-
-  const buttons: IToolBarButton[] = [
-    {
-      name: 'Обновить',
-      sx: { marginRight: 1 },
-      color: 'primary',
-      variant: 'contained',
-      onClick: fetchFile,
-      icon: <CachedIcon />,
-    },
-    {
-      name: 'Редактировать',
-      sx: { marginRight: 1 },
-      disabled: true,
-      color: 'secondary',
-      variant: 'contained',
-      onClick: handleEdit,
-      icon: <EditIcon />,
-    },
-    {
-      name: 'Переместить',
-      sx: { marginRight: 1 },
-      color: 'secondary',
-      variant: 'contained',
-      onClick: handleGetFolders,
-      icon: <DriveFileMoveOutlinedIcon />,
-    },
-    {
-      name: 'Скачать',
-      sx: { marginRight: 1 },
-      disabled: true,
-      color: 'secondary',
-      variant: 'contained',
-      onClick: handleDownload,
-      icon: <ArrowDownwardIcon />,
-    },
-    {
-      name: 'Удалить',
-      disabled: true,
-      color: 'secondary',
-      variant: 'contained',
-      onClick: handleClickOpen,
-      icon: <DeleteIcon />,
-    },
-  ];
 
   return (
     <>
@@ -299,35 +317,19 @@ const FileView = () => {
             <ToolBarAction buttons={buttons} />
           </Box>
         </Box>
-        {file ? (
-          <>
-            <Box
-              sx={{
-                backgroundColor: 'background.default',
-                minHeight: '100%',
-              }}
-            >
-              <FileDetailsView list={fileObject} />
-            </Box>
-
-            <Box>
-              <CardHeader sx={{ mx: 2 }} />
-              <FileContentView file={file} />
-            </Box>
-          </>
-        ) : (
-          <Box>
-            <CardHeader sx={{ mx: 2 }} />
-            <Grid item>
-              <Typography variant="subtitle1" gutterBottom>
-                Данный файл не является файлом формата JSON
-              </Typography>
-            </Grid>
-          </Box>
-        )}
+        <Box>
+          <Tabs value={tabValue} onChange={handleChangeTab}>
+            <Tab label="Общая информация" />
+            <Tab label="Содержимое" />
+          </Tabs>
+          <TabPanel value={tabValue} index={0}>
+            <FileDetailsView list={fileObject} />
+          </TabPanel>
+          <TabPanel value={tabValue} index={1}>
+            {file && <FileContentView file={file} />}
+          </TabPanel>
+        </Box>
       </Box>
-
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

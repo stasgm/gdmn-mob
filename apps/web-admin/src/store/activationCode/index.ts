@@ -1,4 +1,5 @@
 import asyncActions from './actions.async';
-import * as actions from './actions';
+import { activationCodeActions as actions } from './actions';
 
-export default { ...asyncActions, ...actions };
+export { default as codeSelectors } from './selectors';
+export const codeActions = { ...asyncActions, ...actions };

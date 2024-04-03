@@ -8,6 +8,8 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import CachedIcon from '@mui/icons-material/Cached';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -17,16 +19,15 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import actions from '../../store/company';
-import userActions from '../../store/user';
+import { companyActions, companySelectors } from '../../store/company';
+import { userActions, userSelectors } from '../../store/user';
 import CompanyUsers from '../../components/company/CompanyUsers';
 import { ILinkedEntity, IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
-import companySelectors from '../../store/company/selectors';
-import userSelectors from '../../store/user/selectors';
 
 import { adminPath } from '../../utils/constants';
 import DetailsView from '../../components/DetailsView';
+import TabPanel from '../../components/TabPanel';
 
 export type Params = {
   id: string;
@@ -41,12 +42,18 @@ const CompanyView = () => {
   const users = userSelectors.usersByCompanyId(companyId);
   const [open, setOpen] = useState(false);
 
+  const [tabValue, setTabValue] = useState(0);
+
+  const handleChangeTab = (event: any, newValue: number) => {
+    setTabValue(newValue);
+  };
+
   const companyDetails: ILinkedEntity[] = useMemo(
     () =>
       company
         ? [
-            { id: 'Наименование', value: company },
-            { id: 'ID', value: company?.id },
+            { id: 'Компания', value: company },
+            { id: 'Идентификатор', value: company?.id },
             { id: 'Город', value: company?.city },
             { id: 'Администратор', value: company?.admin, link: `${adminPath}/app/users/${company.admin.id}/` },
             { id: 'Подсистемы', value: company?.appSystems },
@@ -55,17 +62,13 @@ const CompanyView = () => {
     [company],
   );
 
-  const handleCancel = () => {
-    navigate(-1);
-  };
-
-  const handleEdit = () => {
+  const handleEdit = useCallback(() => {
     navigate(`${adminPath}/app/companies/${companyId}/edit`);
-  };
+  }, [navigate, companyId]);
 
   const handleDelete = async () => {
     setOpen(false);
-    const res = await dispatch(actions.removeCompany(companyId));
+    const res = await dispatch(companyActions.removeCompany(companyId));
     if (res.type === 'COMPANY/REMOVE_SUCCESS') {
       navigate(-1);
     }
@@ -79,14 +82,59 @@ const CompanyView = () => {
     setOpen(false);
   };
 
+  const handleCancel = () => {
+    navigate(-1);
+  };
+
   const refreshData = useCallback(() => {
-    dispatch(actions.fetchCompanyById(companyId));
+    dispatch(companyActions.fetchCompanyById(companyId));
     dispatch(userActions.fetchUsers(companyId));
   }, [dispatch, companyId]);
 
   useEffect(() => {
     refreshData();
   }, [refreshData]);
+
+  const buttons: IToolBarButton[] = useMemo(() => {
+    return tabValue === 0
+      ? [
+          {
+            name: 'Обновить',
+            sx: { marginRight: 1 },
+            color: 'secondary',
+            variant: 'contained',
+            onClick: refreshData,
+            icon: <CachedIcon />,
+          },
+          {
+            name: 'Редактировать',
+            sx: { marginRight: 1 },
+            disabled: true,
+            color: 'primary',
+            variant: 'contained',
+            onClick: handleEdit,
+            icon: <EditIcon />,
+          },
+          {
+            name: 'Удалить',
+            disabled: true,
+            color: 'secondary',
+            variant: 'contained',
+            onClick: handleClickOpen,
+            icon: <DeleteIcon />,
+          },
+        ]
+      : [
+          {
+            name: 'Обновить',
+            sx: { marginRight: 1 },
+            color: 'secondary',
+            variant: 'contained',
+            onClick: refreshData,
+            icon: <CachedIcon />,
+          },
+        ];
+  }, [handleEdit, refreshData, tabValue]);
 
   if (!company) {
     return (
@@ -101,34 +149,6 @@ const CompanyView = () => {
       </Box>
     );
   }
-
-  const buttons: IToolBarButton[] = [
-    {
-      name: 'Обновить',
-      sx: { marginRight: 1 },
-      color: 'primary',
-      variant: 'contained',
-      onClick: refreshData,
-      icon: <CachedIcon />,
-    },
-    {
-      name: 'Редактировать',
-      sx: { marginRight: 1 },
-      disabled: true,
-      color: 'secondary',
-      variant: 'contained',
-      onClick: handleEdit,
-      icon: <EditIcon />,
-    },
-    {
-      name: 'Удалить',
-      disabled: true,
-      color: 'secondary',
-      variant: 'contained',
-      onClick: handleClickOpen,
-      icon: <DeleteIcon />,
-    },
-  ];
 
   return (
     <>
@@ -159,7 +179,7 @@ const CompanyView = () => {
             justifyContent: 'space-between',
           }}
         >
-          <Box sx={{ display: 'inline-flex', marginBottom: 1 }}>
+          <Box sx={{ display: 'inline-flex' }}>
             <IconButton color="primary" onClick={handleCancel}>
               <ArrowBackIcon />
             </IconButton>
@@ -174,18 +194,18 @@ const CompanyView = () => {
             <ToolBarAction buttons={buttons} />
           </Box>
         </Box>
-        <Box
-          sx={{
-            backgroundColor: 'background.default',
-            minHeight: '100%',
-          }}
-        >
-          <DetailsView details={companyDetails} />
+        <Box>
+          <Tabs value={tabValue} onChange={handleChangeTab}>
+            <Tab label="Общая информация" />
+            <Tab label="Пользователи" />
+          </Tabs>
+          <TabPanel value={tabValue} index={0}>
+            <DetailsView details={companyDetails} />
+          </TabPanel>
+          <TabPanel value={tabValue} index={1}>
+            <CompanyUsers users={users} />
+          </TabPanel>
         </Box>
-      </Box>
-      <Box>
-        <CardHeader title={'Пользователи компании'} sx={{ mx: 2 }} />
-        <CompanyUsers users={users} />
       </Box>
     </>
   );

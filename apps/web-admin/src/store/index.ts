@@ -21,7 +21,7 @@ import { DeviceBindingActionType } from './deviceBinding/actions';
 import { AppSystemActionType } from './appSystem/actions';
 import { ProcessActionType } from './process/actions';
 import { DeviceLogActionType } from './deviceLog/actions';
-import { FileSystemActionType } from './file/actions';
+import { SystemFileActionType } from './file/actions';
 import { ServerLogActionType } from './serverLog/actions';
 import { loadDataFromDisk, saveDataToDisk } from './appStorageWeb';
 
@@ -47,7 +47,7 @@ type TActions =
   | AppSystemActionType
   | ProcessActionType
   | DeviceLogActionType
-  | FileSystemActionType
+  | SystemFileActionType
   | ServerLogActionType;
 
 const appReducer = combineReducers(reducers);

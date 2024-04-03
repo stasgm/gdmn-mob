@@ -7,21 +7,20 @@ import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch'
 import { useSelector, useDispatch } from '../../store';
 import { IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-import SnackBar from '../../components/SnackBar';
-import actions from '../../store/serverLog';
+import { serverLogActions } from '../../store/serverLog';
 
 import ServerLogListTable from '../../components/serverLog/ServerLogListTable';
 
 const ServerLogList = () => {
   const dispatch = useDispatch();
 
-  const { list, loading, errorMessage, pageParams } = useSelector((state) => state.serverLogs);
+  const { list, loading, pageParams } = useSelector((state) => state.serverLogs);
 
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
   const fetchServerLogs = useCallback(
     (filterText?: string, _fromRecord?: number, _toRecord?: number) => {
-      dispatch(actions.fetchServerLogs(filterText));
+      dispatch(serverLogActions.fetchServerLogs(filterText));
     },
     [dispatch],
   );
@@ -42,7 +41,7 @@ const ServerLogList = () => {
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.serverLogActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
+    dispatch(serverLogActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
 
     fetchServerLogs(pageParamLocal?.filterText);
   };
@@ -53,12 +52,8 @@ const ServerLogList = () => {
     handleSearchClick();
   };
 
-  const handleClearError = () => {
-    dispatch(actions.serverLogActions.clearError());
-  };
-
   const handleClearSearch = () => {
-    dispatch(actions.serverLogActions.setPageParam({ filterText: undefined, page: 0 }));
+    dispatch(serverLogActions.setPageParam({ filterText: undefined, page: 0 }));
     setPageParamLocal({ filterText: undefined });
     fetchServerLogs();
   };
@@ -66,7 +61,7 @@ const ServerLogList = () => {
   const handleSetPageParams = useCallback(
     (pageParams: IPageParam) => {
       dispatch(
-        actions.serverLogActions.setPageParam({
+        serverLogActions.setPageParam({
           page: pageParams.page,
           limit: pageParams.limit,
         }),
@@ -124,7 +119,6 @@ const ServerLogList = () => {
           )}
         </Container>
       </Box>
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

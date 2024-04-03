@@ -9,6 +9,8 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import CachedIcon from '@mui/icons-material/Cached';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -21,13 +23,18 @@ import { useSelector, useDispatch } from '../../store';
 import { IHeadCells, ILinkedEntity, IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 
-import deviceLogSelectors from '../../store/deviceLog/selectors';
-import SnackBar from '../../components/SnackBar';
-import deviceLogActions from '../../store/deviceLog';
+import { deviceLogActions, deviceLogSelectors } from '../../store/deviceLog';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SortableTable from '../../components/SortableTable';
 import DetailsView from '../../components/DetailsView';
 import { adminPath } from '../../utils/constants';
+import TabPanel from '../../components/TabPanel';
+
+const headCells: IHeadCells<IDeviceLogEntry>[] = [
+  { id: 'name', label: 'Функция', sortEnable: true, filterEnable: true },
+  { id: 'message', label: 'Сообщение', sortEnable: true, filterEnable: true },
+  { id: 'date', label: 'Дата', sortEnable: true, filterEnable: true },
+];
 
 export type Params = {
   id: string;
@@ -38,9 +45,15 @@ const DeviceLogView = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading, errorMessage, deviceLog } = useSelector((state) => state.deviceLogs);
+  const { loading, deviceLog } = useSelector((state) => state.deviceLogs);
 
   const deviceLogFile = deviceLogSelectors.deviceLogFileById(id);
+
+  const [tabValue, setTabValue] = useState(0);
+
+  const handleChangeTab = (event: any, newValue: number) => {
+    setTabValue(newValue);
+  };
 
   const fetchDeviceLog = useCallback(() => {
     dispatch(
@@ -132,9 +145,37 @@ const DeviceLogView = () => {
     setOpen(false);
   };
 
-  const handleClearError = () => {
-    dispatch(deviceLogActions.deviceLogActions.clearError());
-  };
+  const buttons: IToolBarButton[] = useMemo(() => {
+    return tabValue === 0
+      ? [
+          {
+            name: 'Обновить',
+            sx: { marginRight: 1 },
+            color: 'secondary',
+            variant: 'contained',
+            onClick: refreshData,
+            icon: <CachedIcon />,
+          },
+          {
+            name: 'Удалить',
+            disabled: true,
+            color: 'secondary',
+            variant: 'contained',
+            onClick: handleClickOpen,
+            icon: <DeleteIcon />,
+          },
+        ]
+      : [
+          {
+            name: 'Обновить',
+            sx: { marginRight: 1 },
+            color: 'secondary',
+            variant: 'contained',
+            onClick: refreshData,
+            icon: <CachedIcon />,
+          },
+        ];
+  }, [refreshData, tabValue]);
 
   if (!deviceLogFile) {
     return (
@@ -149,31 +190,6 @@ const DeviceLogView = () => {
       </Box>
     );
   }
-
-  const buttons: IToolBarButton[] = [
-    {
-      name: 'Обновить',
-      sx: { marginRight: 1 },
-      color: 'primary',
-      variant: 'contained',
-      onClick: refreshData,
-      icon: <CachedIcon />,
-    },
-    {
-      name: 'Удалить',
-      disabled: true,
-      color: 'secondary',
-      variant: 'contained',
-      onClick: handleClickOpen,
-      icon: <DeleteIcon />,
-    },
-  ];
-
-  const headCells: IHeadCells<IDeviceLogEntry>[] = [
-    { id: 'name', label: 'Функция', sortEnable: true, filterEnable: true },
-    { id: 'message', label: 'Сообщение', sortEnable: true, filterEnable: true },
-    { id: 'date', label: 'Дата', sortEnable: true, filterEnable: true },
-  ];
 
   return (
     <>
@@ -204,7 +220,7 @@ const DeviceLogView = () => {
             justifyContent: 'space-between',
           }}
         >
-          <Box sx={{ display: 'inline-flex', marginBottom: 1 }}>
+          <Box sx={{ display: 'inline-flex' }}>
             <IconButton color="primary" onClick={handleCancel}>
               <ArrowBackIcon />
             </IconButton>
@@ -219,20 +235,19 @@ const DeviceLogView = () => {
             <ToolBarAction buttons={buttons} />
           </Box>
         </Box>
-        <Box
-          sx={{
-            backgroundColor: 'background.default',
-            minHeight: '100%',
-          }}
-        >
-          <DetailsView details={deviceLogsDetails} />
-        </Box>
-        <Box sx={{ pt: 2 }}>
-          <SortableTable<IDeviceLogEntry> headCells={headCells} data={deviceLog} />
+        <Box>
+          <Tabs value={tabValue} onChange={handleChangeTab}>
+            <Tab label="Общая информация" />
+            <Tab label="Содержимое" />
+          </Tabs>
+          <TabPanel value={tabValue} index={0}>
+            <DetailsView details={deviceLogsDetails} />
+          </TabPanel>
+          <TabPanel value={tabValue} index={1}>
+            <SortableTable<IDeviceLogEntry> headCells={headCells} data={deviceLog} />
+          </TabPanel>
         </Box>
       </Box>
-
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

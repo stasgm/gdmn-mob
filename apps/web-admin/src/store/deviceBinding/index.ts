@@ -1,4 +1,5 @@
 import asyncActions from './actions.async';
-import * as actions from './actions';
+import { deviceBindingActions as actions } from './actions';
 
-export default { ...asyncActions, ...actions };
+export { default as bindingSelectors } from './selectors';
+export const bindingActions = { ...asyncActions, ...actions };

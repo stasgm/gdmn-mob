@@ -9,12 +9,9 @@ import { useSelector, useDispatch } from '../../store';
 import { IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 
-import SnackBar from '../../components/SnackBar';
-
-import serverLogActions from '../../store/serverLog';
+import { serverLogActions, serverLogSelectors } from '../../store/serverLog';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import ServerLogDetailsView from '../../components/serverLog/ServerLogDetailsView';
-import serverLogSelectors from '../../store/serverLog/selectors';
 
 export type Params = {
   id: string;
@@ -26,7 +23,7 @@ const ServerLogView = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading, errorMessage, serverLog } = useSelector((state) => state.serverLogs);
+  const { loading, serverLog } = useSelector((state) => state.serverLogs);
 
   const fetchServerLog = useCallback(() => {
     dispatch(serverLogActions.fetchServerLog(id));
@@ -50,10 +47,6 @@ const ServerLogView = () => {
   useEffect(() => {
     refreshData();
   }, [refreshData]);
-
-  const handleClearError = () => {
-    dispatch(serverLogActions.serverLogActions.clearError());
-  };
 
   if (!serverLog) {
     return (
@@ -131,8 +124,6 @@ const ServerLogView = () => {
           </Box>
         )}
       </Box>
-
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

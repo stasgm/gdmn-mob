@@ -358,7 +358,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                         }
                         fullWidth
                         required={userERP || (user.role && user.role !== 'User') || isAdmin ? false : true}
-                        label="ID из ERP системы"
+                        label="Идентификатор из ERP"
                         name="externalId"
                         variant="outlined"
                         onBlur={formik.handleBlur}

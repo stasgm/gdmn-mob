@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { IUserCredentials } from '@lib/types';
 
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { authActions, useAuthThunkDispatch, useSelector } from '@lib/store';
 

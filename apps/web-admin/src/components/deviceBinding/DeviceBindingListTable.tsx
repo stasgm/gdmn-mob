@@ -149,6 +149,7 @@ const DeviceBindingListTable = ({
               </NavLink>
             </Box>
           </TableCell>
+          <TableCell>{binding.device.id}</TableCell>
           <TableCell>
             <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
               <Box>
@@ -214,6 +215,7 @@ const DeviceBindingListTable = ({
                   />
                 </TableCell>
                 <TableCell>Наименование</TableCell>
+                <TableCell>Идентификатор</TableCell>
                 <TableCell>Номер</TableCell>
                 <TableCell>Состояние</TableCell>
                 <TableCell>Код активации</TableCell>

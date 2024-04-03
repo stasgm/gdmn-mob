@@ -5,6 +5,8 @@ export const webRequest =
   async (params: IRequestParams) => {
     dispatch(actions.setErrorMessage(''));
     const res = await robustRequest(params);
+    // console.log('res params', params);
+    window.localStorage.setItem('lastParams', params.params ? JSON.stringify(params.params) : '');
 
     switch (res.type) {
       case 'FAILURE': {

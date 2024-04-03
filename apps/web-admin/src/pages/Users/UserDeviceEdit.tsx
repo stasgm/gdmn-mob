@@ -5,8 +5,7 @@ import { useEffect } from 'react';
 
 import DeviceBindingDetails from '../../components/deviceBinding/DeviceBindingDetails';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import actions from '../../store/deviceBinding';
-import selectors from '../../store/deviceBinding/selectors';
+import { bindingActions, bindingSelectors } from '../../store/deviceBinding';
 
 export type Params = {
   bindingid: string;
@@ -19,10 +18,10 @@ const UserDeviceEdit = () => {
   const dispatch: AppDispatch = useDispatch();
 
   const { loading } = useSelector((state) => state.deviceBindings);
-  const binding = selectors.bindingById(bindingid);
+  const binding = bindingSelectors.bindingById(bindingid);
 
   useEffect(() => {
-    dispatch(actions.fetchDeviceBindingById(bindingid));
+    dispatch(bindingActions.fetchDeviceBindingById(bindingid));
   }, [dispatch, bindingid]);
 
   const goBack = () => {
@@ -30,7 +29,7 @@ const UserDeviceEdit = () => {
   };
 
   const handleSubmit = async (values: NewDeviceBinding | IDeviceBinding) => {
-    const res = await dispatch(actions.updateDeviceBinding(values as IDeviceBinding));
+    const res = await dispatch(bindingActions.updateDeviceBinding(values as IDeviceBinding));
     if (res.type === 'DEVICEBINDING/UPDATE_SUCCES') {
       goBack();
     }

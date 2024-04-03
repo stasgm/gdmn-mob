@@ -12,7 +12,7 @@ import SortableTable from '../../components/SortableTable';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import actions from '../../store/user';
+import { userActions } from '../../store/user';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import { IToolBarButton, IHeadCells, IPageParam } from '../../types';
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
@@ -29,7 +29,7 @@ const UserList = () => {
 
   const fetchUsers = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(actions.fetchUsers('', filterText, fromRecord, toRecord));
+      dispatch(userActions.fetchUsers('', filterText, fromRecord, toRecord));
     },
     [dispatch],
   );
@@ -50,12 +50,12 @@ const UserList = () => {
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.userActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
+    dispatch(userActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
     fetchUsers(pageParamLocal?.filterText);
   };
 
   const handleClearSearch = () => {
-    dispatch(actions.userActions.setPageParam({ filterText: undefined, page: 0 }));
+    dispatch(userActions.setPageParam({ filterText: undefined, page: 0 }));
     setPageParamLocal({ filterText: undefined });
     fetchUsers();
   };
@@ -69,7 +69,7 @@ const UserList = () => {
   const handleSetPageParams = useCallback(
     (pageParams: IPageParam) => {
       dispatch(
-        actions.userActions.setPageParam({
+        userActions.setPageParam({
           page: pageParams.page,
           limit: pageParams.limit,
         }),
@@ -96,10 +96,10 @@ const UserList = () => {
 
   const headCells: IHeadCells<IUser>[] = [
     { id: 'name', label: 'Пользователь', sortEnable: true },
+    { id: 'id', label: 'Идентификатор', sortEnable: false },
     { id: 'lastName', label: 'Фамилия', sortEnable: true },
     { id: 'firstName', label: 'Имя', sortEnable: true },
-    { id: 'id', label: 'ID', sortEnable: false },
-    { id: 'externalId', label: 'ID из ERP системы', sortEnable: false },
+    { id: 'externalId', label: 'Идентификатор из ERP', sortEnable: false },
     { id: 'erpUser', label: 'Пользователь ERP', sortEnable: true },
     { id: 'appSystem', label: 'Подсистема', sortEnable: true },
     { id: 'creationDate', label: 'Дата создания', sortEnable: true },

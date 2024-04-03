@@ -4,14 +4,14 @@ import { useEffect, useState } from 'react';
 
 import { useDispatch } from '../store';
 
-import appSystemActions from '../store/appSystem';
-import companyActions from '../store/company';
-import deviceActions from '../store/device';
-import deviceBindingActions from '../store/deviceBinding';
-import deviceLogActions from '../store/deviceLog';
-import fileActions from '../store/file';
-import processActions from '../store/process';
-import userActions from '../store/user';
+import { appSystemActions } from '../store/appSystem';
+import { companyActions } from '../store/company';
+import { deviceActions } from '../store/device';
+import { bindingActions } from '../store/deviceBinding';
+import { deviceLogActions } from '../store/deviceLog';
+import { fileActions } from '../store/file';
+import { processActions } from '../store/process';
+import { userActions } from '../store/user';
 
 import { adminPath } from './constants';
 
@@ -34,20 +34,20 @@ const useClearPageParams = () => {
           break;
         }
         case 'companies': {
-          dispatch(companyActions.companyActions.clearPageParams());
+          dispatch(companyActions.clearPageParams());
           break;
         }
         case 'devices': {
           dispatch(deviceActions.clearPageParams());
-          dispatch(deviceBindingActions.deviceBindingActions.clearPageParams());
+          dispatch(bindingActions.clearPageParams());
           break;
         }
         case 'deviceLogs': {
-          dispatch(deviceLogActions.deviceLogActions.clearPageParams());
+          dispatch(deviceLogActions.clearPageParams());
           break;
         }
         case 'files': {
-          dispatch(fileActions.fileSystemActions.clearPageParams());
+          dispatch(fileActions.clearPageParams());
           break;
         }
         case 'processes': {
@@ -55,8 +55,8 @@ const useClearPageParams = () => {
           break;
         }
         case 'users': {
-          dispatch(userActions.userActions.clearPageParams());
-          dispatch(deviceBindingActions.deviceBindingActions.clearPageParams());
+          dispatch(userActions.clearPageParams());
+          dispatch(bindingActions.clearPageParams());
           break;
         }
       }

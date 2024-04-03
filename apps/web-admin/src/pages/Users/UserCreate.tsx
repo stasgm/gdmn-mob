@@ -9,8 +9,8 @@ import { authActions, useAuthThunkDispatch } from '@lib/store';
 import UserDetails from '../../components/user/UserDetails';
 
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import appSystemActions from '../../store/appSystem';
-import userActions from '../../store/user';
+import { appSystemActions } from '../../store/appSystem';
+import { userActions } from '../../store/user';
 import { webRequest } from '../../store/webRequest';
 
 const UserCreate = () => {

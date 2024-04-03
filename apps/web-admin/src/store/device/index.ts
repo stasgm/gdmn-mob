@@ -1,4 +1,5 @@
 import asyncActions from './actions.async';
-import { deviceActions } from './actions';
+import { deviceActions as actions } from './actions';
 
-export default { ...asyncActions, ...deviceActions };
+export { default as deviceSelectors } from './selectors';
+export const deviceActions = { ...asyncActions, ...actions };

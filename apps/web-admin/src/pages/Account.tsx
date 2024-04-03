@@ -7,25 +7,24 @@ import { useSelector } from '@lib/store';
 
 import { useCallback, useEffect, useState } from 'react';
 
-import actions from '../store/user';
+import { userActions } from '../store/user';
 
 import { useDispatch, useSelector as userSelector } from '../store/';
 
 import AccountProfile from '../components/account/AccountProfile';
 import AccountProfileDetails from '../components/account/AccountProfileDetails';
-import SnackBar from '../components/SnackBar';
 import CircularProgressWithContent from '../components/CircularProgressWidthContent';
 
 const Account = () => {
   const dispatch = useDispatch();
   const [user, setUser] = useState<IUser | undefined>();
   const { user: account } = useSelector((state) => state.auth);
-  const { errorMessage, loading } = userSelector((state) => state.users);
+  const { loading } = userSelector((state) => state.users);
 
   const fetchUser = useCallback(
     async (id: string) => {
       if (account?.id) {
-        const res = await dispatch(actions.fetchUserById(id));
+        const res = await dispatch(userActions.fetchUserById(id));
 
         if (res.type === 'USER/FETCH_USER_SUCCESS') {
           setUser(res.payload);
@@ -42,14 +41,10 @@ const Account = () => {
   }, [fetchUser, account]);
 
   const handleSaveUser = async (user: IUser) => {
-    const res = await dispatch(actions.updateUser(user));
+    const res = await dispatch(userActions.updateUser(user));
     if (res.type === 'USER/UPDATE_SUCCESS') {
       fetchUser(res.payload.id);
     }
-  };
-
-  const handleClearError = () => {
-    dispatch(actions.userActions.clearError());
   };
 
   return (
@@ -88,7 +83,6 @@ const Account = () => {
             </Grid>
           )}
         </Container>
-        <SnackBar visible={!!errorMessage} errorMessage={errorMessage} onClearError={handleClearError} />
       </Box>
     </>
   );

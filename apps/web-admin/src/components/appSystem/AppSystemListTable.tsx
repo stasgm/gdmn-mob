@@ -170,7 +170,7 @@ const AppSystemListTable = ({
                   />
                 </TableCell>
                 <TableCell>Наименование</TableCell>
-                <TableCell>ID</TableCell>
+                <TableCell>Идентификатор</TableCell>
                 <TableCell>Описание</TableCell>
                 <TableCell>Дата создания</TableCell>
                 <TableCell>Дата редактирования</TableCell>

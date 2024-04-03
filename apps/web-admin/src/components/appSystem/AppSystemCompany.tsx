@@ -1,20 +1,25 @@
-import { Helmet } from 'react-helmet';
-import { Box, Container } from '@mui/material';
+import { Box } from '@mui/material';
 
 import { useCallback, useEffect, useState } from 'react';
 
-import CachedIcon from '@mui/icons-material/Cached';
 import { ICompany, IAppSystem } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import actions from '../../store/company';
+import { companyActions, companySelectors } from '../../store/company';
 import CircularProgressWithContent from '../CircularProgressWidthContent';
 import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
 import SortableTable from '../SortableTable';
 
-import selectors from '../../store/company/selectors';
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
+
+const headCells: IHeadCells<ICompany>[] = [
+  { id: 'name', label: 'Наименование', sortEnable: true },
+  { id: 'id', label: 'Идентификатор', sortEnable: true },
+  { id: 'admin', label: 'Администратор', sortEnable: true },
+  { id: 'creationDate', label: 'Дата создания', sortEnable: true },
+  { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },
+];
 
 interface IProps {
   appSystem: IAppSystem;
@@ -24,13 +29,13 @@ const AppSystemCompany = ({ appSystem }: IProps) => {
   const dispatch: AppDispatch = useDispatch();
   const { loading, pageParams } = useSelector((state) => state.companies);
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
-  const list = selectors.companyByAppSystemID(appSystem.id);
+  const list = companySelectors.companyByAppSystemID(appSystem.id);
 
   const maxHeight = useWindowResizeMaxHeight();
 
   const fetchCompanies = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(actions.fetchCompanies(filterText, fromRecord, toRecord));
+      dispatch(companyActions.fetchCompanies(filterText, fromRecord, toRecord));
     },
     [dispatch],
   );
@@ -51,7 +56,7 @@ const AppSystemCompany = ({ appSystem }: IProps) => {
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.companyActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
+    dispatch(companyActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
 
     fetchCompanies(pageParamLocal?.filterText);
   };
@@ -63,7 +68,7 @@ const AppSystemCompany = ({ appSystem }: IProps) => {
   };
 
   const handleClearSearch = () => {
-    dispatch(actions.companyActions.setPageParam({ filterText: undefined, page: 0 }));
+    dispatch(companyActions.setPageParam({ filterText: undefined, page: 0 }));
     setPageParamLocal({ filterText: undefined });
     fetchCompanies();
   };
@@ -71,7 +76,7 @@ const AppSystemCompany = ({ appSystem }: IProps) => {
   const handleSetPageParams = useCallback(
     (pageParams: IPageParam) => {
       dispatch(
-        actions.companyActions.setPageParam({
+        companyActions.setPageParam({
           page: pageParams.page,
           limit: pageParams.limit,
         }),
@@ -80,61 +85,33 @@ const AppSystemCompany = ({ appSystem }: IProps) => {
     [dispatch],
   );
 
-  const buttons: IToolBarButton[] = [
-    {
-      name: 'Обновить',
-      sx: { mx: 1 },
-      onClick: () => fetchCompanies(),
-      icon: <CachedIcon />,
-    },
-  ];
-
-  const headCells: IHeadCells<ICompany>[] = [
-    { id: 'name', label: 'Наименование', sortEnable: true },
-    { id: 'id', label: 'ID', sortEnable: true },
-    { id: 'admin', label: 'Администратор', sortEnable: true },
-    { id: 'creationDate', label: 'Дата создания', sortEnable: true },
-    { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },
-  ];
+  const buttons: IToolBarButton[] = [];
 
   return (
     <>
-      <Helmet>
-        <title>Компании</title>
-      </Helmet>
-      <Box
-        sx={{
-          backgroundColor: 'background.default',
-          minHeight: '100%',
-          py: 3,
-        }}
-      >
-        <Container maxWidth={false}>
-          <ToolbarActionsWithSearch
-            buttons={buttons}
-            searchTitle={'Найти компанию'}
-            updateInput={handleUpdateInput}
-            searchOnClick={handleSearchClick}
-            keyPress={handleKeyPress}
-            value={(pageParamLocal?.filterText as undefined) || ''}
-            clearOnClick={handleClearSearch}
+      <ToolbarActionsWithSearch
+        buttons={buttons}
+        searchTitle={'Найти компанию'}
+        updateInput={handleUpdateInput}
+        searchOnClick={handleSearchClick}
+        keyPress={handleKeyPress}
+        value={(pageParamLocal?.filterText as undefined) || ''}
+        clearOnClick={handleClearSearch}
+      />
+      {loading ? (
+        <CircularProgressWithContent content={'Идет загрузка данных...'} />
+      ) : (
+        <Box sx={{ pt: 2 }}>
+          <SortableTable<ICompany>
+            headCells={headCells}
+            data={list}
+            path={'/app/companies/'}
+            onSetPageParams={handleSetPageParams}
+            pageParams={pageParams}
+            style={{ overflowY: 'auto', maxHeight }}
           />
-          {loading ? (
-            <CircularProgressWithContent content={'Идет загрузка данных...'} />
-          ) : (
-            <Box sx={{ pt: 2 }}>
-              <SortableTable<ICompany>
-                headCells={headCells}
-                data={list}
-                path={'/app/companies/'}
-                onSetPageParams={handleSetPageParams}
-                pageParams={pageParams}
-                style={{ overflowY: 'auto', maxHeight }}
-              />
-            </Box>
-          )}
-        </Container>
-      </Box>
+        </Box>
+      )}
     </>
   );
 };

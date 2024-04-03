@@ -1,4 +1,3 @@
-import { Helmet } from 'react-helmet';
 import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import CachedIcon from '@mui/icons-material/Cached';
@@ -11,18 +10,17 @@ import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch'
 import { useSelector, useDispatch } from '../../store';
 import { IDeviceLogFileFilter, IDeviceLogPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-import SnackBar from '../../components/SnackBar';
 import DeviceLogFilesListTable from '../../components/deviceLogs/DeviceLogFilesListTable';
-import actions from '../../store/deviceLog';
+import { deviceLogActions } from '../../store/deviceLog';
 
 const DeviceLogFilesList = () => {
   const dispatch = useDispatch();
 
-  const { fileList: filesList, loading, errorMessage, pageParams } = useSelector((state) => state.deviceLogs);
+  const { fileList: filesList, loading, pageParams } = useSelector((state) => state.deviceLogs);
 
   const fetchDeviceLogFiles = useCallback(
     (logFilters?: IDeviceLogFileFilter, filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(actions.fetchDeviceLogFiles(logFilters, filterText, fromRecord, toRecord));
+      dispatch(deviceLogActions.fetchDeviceLogFiles(logFilters, filterText, fromRecord, toRecord));
     },
     [dispatch],
   );
@@ -45,7 +43,7 @@ const DeviceLogFilesList = () => {
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.deviceLogActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
+    dispatch(deviceLogActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
     fetchDeviceLogFiles(pageParams?.logFilters ? pageParams?.logFilters : undefined, pageParamLocal?.filterText);
   };
 
@@ -58,7 +56,7 @@ const DeviceLogFilesList = () => {
   const handleSetPageParams = useCallback(
     (logPageParams: IDeviceLogPageParam) => {
       dispatch(
-        actions.deviceLogActions.setPageParam({
+        deviceLogActions.setPageParam({
           logFilters: logPageParams.logFilters,
           page: logPageParams.page,
           limit: logPageParams.limit,
@@ -71,15 +69,11 @@ const DeviceLogFilesList = () => {
   const handleFilter = useCallback(() => {
     if (filterVisible) {
       setFilterVisible(false);
-      dispatch(actions.deviceLogActions.setPageParam({ logFilters: undefined, page: 0 }));
+      dispatch(deviceLogActions.setPageParam({ logFilters: undefined, page: 0 }));
     } else {
       setFilterVisible(true);
     }
   }, [dispatch, filterVisible]);
-
-  const handleClearError = () => {
-    dispatch(actions.deviceLogActions.clearError());
-  };
 
   const [selectedDeviceLogFileIds, setSelectedDeviceLogFileIds] = useState<IDeviceLogFile[]>([]);
 
@@ -136,13 +130,13 @@ const DeviceLogFilesList = () => {
       };
     });
     if (ids) {
-      dispatch(actions.deleteDeviceLogs(ids));
+      dispatch(deviceLogActions.deleteDeviceLogs(ids));
       setSelectedDeviceLogFileIds([]);
     }
   }, [dispatch, selectedDeviceLogFileIds]);
 
   const handleClearSearch = () => {
-    dispatch(actions.deviceLogActions.setPageParam({ filterText: undefined, page: 0 }));
+    dispatch(deviceLogActions.setPageParam({ filterText: undefined, page: 0 }));
     setPageParamLocal({ filterText: undefined });
     fetchDeviceLogFiles(pageParamLocal?.logFilters || undefined);
   };
@@ -168,20 +162,11 @@ const DeviceLogFilesList = () => {
     },
   ];
 
-  // const headCells: IHeadCells<IDeviceLogFiles>[] = [
-  //   { id: 'company', label: 'Компания', sortEnable: true, filterEnable: true },
-  //   { id: 'appSystem', label: 'Подсистема', sortEnable: true, filterEnable: true },
-  //   { id: 'contact', label: 'Пользователь', sortEnable: true, filterEnable: true },
-  //   { id: 'device', label: 'Устройство', sortEnable: false, filterEnable: true },
-  //   { id: 'date', label: 'Дата', sortEnable: true, filterEnable: true },
-  //   { id: 'size', label: 'Размер', sortEnable: true, filterEnable: false },
-  // ];
-
   return (
     <>
-      <Helmet>
+      {/* <Helmet>
         <title>Журнал ошибок</title>
-      </Helmet>
+      </Helmet> */}
       <Box>
         <Dialog open={open} onClose={handleClose}>
           <DialogContent>
@@ -230,18 +215,9 @@ const DeviceLogFilesList = () => {
                 pageParams={pageParams}
               />
             </Box>
-            // <Box sx={{ pt: 2 }}>
-            //   <SortableFilterTable<IDeviceLogFiles>
-            //     headCells={headCells}
-            //     data={filesList}
-            //     path={'/app/deviceLogs/'}
-            //     isFiltered={filterVisible}
-            //   />
-            // </Box>
           )}
         </Container>
       </Box>
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

@@ -8,6 +8,8 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import CachedIcon from '@mui/icons-material/Cached';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -17,17 +19,14 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useSelector, useDispatch } from '../../store';
-import actions from '../../store/user';
-import selectors from '../../store/user/selectors';
-import bindingSelectors from '../../store/deviceBinding/selectors';
-import bindingActions from '../../store/deviceBinding';
-import codeActions from '../../store/activationCode';
+import { userActions, userSelectors } from '../../store/user';
 import { ILinkedEntity, IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 import UserDevices from '../../components/user/UserDevices';
 
 import { adminPath } from '../../utils/constants';
 import DetailsView from '../../components/DetailsView';
+import TabPanel from '../../components/TabPanel';
 
 export type Params = {
   id: string;
@@ -38,23 +37,28 @@ const UserView = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => state.users);
-  const user = selectors.userById(userId);
-  const userBindingDevices = bindingSelectors.bindingsByUserId(userId);
+  const user = userSelectors.userById(userId);
   const [open, setOpen] = useState(false);
+  const [tabValue, setTabValue] = useState(0);
+
+  const handleChangeTab = (event: any, newValue: number) => {
+    setTabValue(newValue);
+  };
 
   const userDetails: ILinkedEntity[] = useMemo(
     () =>
       user
         ? [
             { id: 'Пользователь', value: user },
+            { id: 'Идентификатор', value: user.id },
             { id: 'Фамилия', value: user.lastName },
             { id: 'Имя', value: user.firstName },
             { id: 'Отчество', value: user.middleName },
             { id: 'Телефон', value: user.phoneNumber },
             { id: 'Email', value: user.email },
-            { id: 'ID из ERP системы', value: user.externalId },
+            { id: 'Идентификатор из ERP', value: user.externalId },
             user.appSystem
-              ? { id: 'Подсистема', value: user.appSystem?.name }
+              ? { id: 'Подсистема', value: user.appSystem.name }
               : { id: 'Пользователь ERP', value: user.erpUser?.name },
             { id: 'Компания', value: user.company, link: `${adminPath}/app/companies/${user.company?.id}/` },
           ]
@@ -62,22 +66,14 @@ const UserView = () => {
     [user],
   );
 
-  const handleCancel = () => {
-    navigate(-1);
-  };
-
-  const handleEdit = () => {
+  const handleEdit = useCallback(() => {
     navigate(`${adminPath}/app/users/${userId}/edit`);
-  };
-
-  const handleAddDevice = () => {
-    navigate(`${adminPath}/app/users/${userId}/binding/new`);
-  };
+  }, [navigate, userId]);
 
   const refreshData = useCallback(() => {
-    dispatch(actions.fetchUserById(userId));
-    dispatch(bindingActions.fetchDeviceBindings(userId));
-    dispatch(codeActions.fetchActivationCodes());
+    dispatch(userActions.fetchUserById(userId));
+    // dispatch(bindingActions.fetchDeviceBindings(userId));
+    // dispatch(codeActions.fetchActivationCodes());
   }, [dispatch, userId]);
 
   useEffect(() => {
@@ -87,7 +83,7 @@ const UserView = () => {
 
   const handleDelete = async () => {
     setOpen(false);
-    const res = await dispatch(actions.removeUser(userId));
+    const res = await dispatch(userActions.removeUser(userId));
     if (res.type === 'USER/REMOVE_SUCCESS') {
       navigate(-1);
     }
@@ -100,6 +96,51 @@ const UserView = () => {
   const handleClose = () => {
     setOpen(false);
   };
+
+  const handleCancel = () => {
+    navigate(-1);
+  };
+
+  const buttons: IToolBarButton[] = useMemo(() => {
+    return tabValue === 0
+      ? [
+          {
+            name: 'Обновить',
+            sx: { marginRight: 1 },
+            color: 'secondary',
+            variant: 'contained',
+            onClick: () => refreshData(),
+            icon: <CachedIcon />,
+          },
+          {
+            name: 'Редактировать',
+            sx: { marginRight: 1 },
+            disabled: true,
+            color: 'primary',
+            variant: 'contained',
+            onClick: () => handleEdit(),
+            icon: <EditIcon />,
+          },
+          {
+            name: 'Удалить',
+            disabled: true,
+            color: 'secondary',
+            variant: 'contained',
+            onClick: () => handleClickOpen(),
+            icon: <DeleteIcon />,
+          },
+        ]
+      : [
+          {
+            name: 'Обновить',
+            sx: { marginRight: 1 },
+            color: 'secondary',
+            variant: 'contained',
+            onClick: () => refreshData(),
+            icon: <CachedIcon />,
+          },
+        ];
+  }, [handleEdit, refreshData, tabValue]);
 
   if (!user) {
     return (
@@ -114,34 +155,6 @@ const UserView = () => {
       </Box>
     );
   }
-
-  const buttons: IToolBarButton[] = [
-    {
-      name: 'Обновить',
-      sx: { marginRight: 1 },
-      color: 'primary',
-      variant: 'contained',
-      onClick: () => refreshData(),
-      icon: <CachedIcon />,
-    },
-    {
-      name: 'Редактировать',
-      sx: { marginRight: 1 },
-      disabled: true,
-      color: 'secondary',
-      variant: 'contained',
-      onClick: () => handleEdit(),
-      icon: <EditIcon />,
-    },
-    {
-      name: 'Удалить',
-      disabled: true,
-      color: 'secondary',
-      variant: 'contained',
-      onClick: () => handleClickOpen(),
-      icon: <DeleteIcon />,
-    },
-  ];
 
   return (
     <>
@@ -176,7 +189,7 @@ const UserView = () => {
             justifyContent: 'space-between',
           }}
         >
-          <Box sx={{ display: 'inline-flex', marginBottom: 1 }}>
+          <Box sx={{ display: 'inline-flex' }}>
             <IconButton color="primary" onClick={handleCancel}>
               <ArrowBackIcon />
             </IconButton>
@@ -191,18 +204,18 @@ const UserView = () => {
             <ToolBarAction buttons={buttons} />
           </Box>
         </Box>
-        <Box
-          sx={{
-            backgroundColor: 'background.default',
-            minHeight: '100%',
-          }}
-        >
-          <DetailsView details={userDetails} />
+        <Box>
+          <Tabs value={tabValue} onChange={handleChangeTab}>
+            <Tab label="Общая информация" />
+            <Tab label="Устройства" />
+          </Tabs>
+          <TabPanel value={tabValue} index={0}>
+            <DetailsView details={userDetails} />
+          </TabPanel>
+          <TabPanel value={tabValue} index={1}>
+            <UserDevices userId={userId} />
+          </TabPanel>
         </Box>
-      </Box>
-      <Box>
-        <CardHeader title={'Устройства пользователя'} sx={{ mx: 2 }} />
-        <UserDevices userId={userId} userBindingDevices={userBindingDevices} onAddDevice={handleAddDevice} />
       </Box>
     </>
   );

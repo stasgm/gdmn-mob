@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 
 import MultipleAutocomplete from '../MultipleAutocomplete';
 import { useDispatch, useSelector } from '../../store';
-import appSystemsActions from '../../store/appSystem';
+import { appSystemActions } from '../../store/appSystem';
 import ComboBox from '../ComboBox';
 
 interface IProps {
@@ -31,7 +31,7 @@ const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(appSystemsActions.fetchAppSystems());
+    dispatch(appSystemActions.fetchAppSystems());
   }, [dispatch]);
 
   const formik = useFormik<ICompany | NewCompany>({

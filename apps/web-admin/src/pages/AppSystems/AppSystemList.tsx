@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import actions from '../../store/appSystem';
+import { appSystemActions } from '../../store/appSystem';
 import { IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import AppSystemListTable from '../../components/appSystem/AppSystemListTable';
@@ -21,7 +21,7 @@ const AppSystemList = () => {
 
   const fetchAppSystems = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(actions.fetchAppSystems(filterText, fromRecord, toRecord));
+      dispatch(appSystemActions.fetchAppSystems(filterText, fromRecord, toRecord));
     },
     [dispatch],
   );
@@ -38,7 +38,7 @@ const AppSystemList = () => {
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
+    dispatch(appSystemActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
     fetchAppSystems(pageParamLocal?.filterText);
   };
 
@@ -49,7 +49,7 @@ const AppSystemList = () => {
   };
 
   const handleClearSearch = () => {
-    dispatch(actions.setPageParam({ filterText: undefined, page: 0 }));
+    dispatch(appSystemActions.setPageParam({ filterText: undefined, page: 0 }));
     setPageParamLocal({ filterText: undefined });
     fetchAppSystems();
   };

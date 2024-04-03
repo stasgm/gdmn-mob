@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -9,6 +9,8 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import CachedIcon from '@mui/icons-material/Cached';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -17,15 +19,12 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { useSelector, useDispatch } from '../../store';
 import { IToolBarButton } from '../../types';
+import { processActions, processSelectors } from '../../store/process';
 import ToolBarAction from '../../components/ToolBarActions';
-
-import processSelectors from '../../store/process/selectors';
-
 import ProcessDetailsView from '../../components/process/ProcessDetailsView';
-import processActions from '../../store/process';
-import ProcessFiles from '../../components/process/ProcessFiles';
 import ProcessFilesProcessed from '../../components/process/ProcessFilesProcessed';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
+import TabPanel from '../../components/TabPanel';
 
 export type Params = {
   id: string;
@@ -38,6 +37,12 @@ const ProcessView = () => {
   const { loading } = useSelector((state) => state.processes);
   const process = processSelectors.processById(id);
   const [open, setOpen] = useState(false);
+
+  const [tabValue, setTabValue] = useState(0);
+
+  const handleChangeTab = (event: any, newValue: number) => {
+    setTabValue(newValue);
+  };
 
   const handleCancel = () => {
     navigate(-1);
@@ -67,6 +72,38 @@ const ProcessView = () => {
     setOpen(false);
   };
 
+  const buttons: IToolBarButton[] = useMemo(() => {
+    return tabValue === 0
+      ? [
+          {
+            name: 'Обновить',
+            sx: { marginRight: 1 },
+            color: 'secondary',
+            variant: 'contained',
+            onClick: refreshData,
+            icon: <CachedIcon />,
+          },
+          {
+            name: 'Удалить',
+            disabled: true,
+            color: 'secondary',
+            variant: 'contained',
+            onClick: handleClickOpen,
+            icon: <DeleteIcon />,
+          },
+        ]
+      : [
+          {
+            name: 'Обновить',
+            sx: { marginRight: 1 },
+            color: 'secondary',
+            variant: 'contained',
+            onClick: refreshData,
+            icon: <CachedIcon />,
+          },
+        ];
+  }, [refreshData, tabValue]);
+
   if (!process) {
     return (
       <Box
@@ -80,25 +117,6 @@ const ProcessView = () => {
       </Box>
     );
   }
-
-  const buttons: IToolBarButton[] = [
-    {
-      name: 'Обновить',
-      sx: { marginRight: 1 },
-      color: 'primary',
-      variant: 'contained',
-      onClick: refreshData,
-      icon: <CachedIcon />,
-    },
-    {
-      name: 'Удалить',
-      disabled: true,
-      color: 'secondary',
-      variant: 'contained',
-      onClick: handleClickOpen,
-      icon: <DeleteIcon />,
-    },
-  ];
 
   return (
     <>
@@ -144,21 +162,17 @@ const ProcessView = () => {
             <ToolBarAction buttons={buttons} />
           </Box>
         </Box>
-        <Box
-          sx={{
-            backgroundColor: 'background.default',
-            minHeight: '100%',
-          }}
-        >
-          <ProcessDetailsView process={process} />
-        </Box>
         <Box>
-          <CardHeader sx={{ mx: 2 }} />
-          <ProcessFiles files={process.files} />
-        </Box>
-        <Box>
-          <CardHeader sx={{ mx: 2 }} />
-          <ProcessFilesProcessed processedFilesList={process.processedFiles} />
+          <Tabs value={tabValue} onChange={handleChangeTab}>
+            <Tab label="Общая информация" />
+            <Tab label="Файлы" />
+          </Tabs>
+          <TabPanel value={tabValue} index={0}>
+            <ProcessDetailsView process={process} />
+          </TabPanel>
+          <TabPanel value={tabValue} index={1}>
+            <ProcessFilesProcessed processedFilesList={process.processedFiles} />
+          </TabPanel>
         </Box>
       </Box>
     </>

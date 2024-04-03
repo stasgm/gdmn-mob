@@ -1,4 +1,5 @@
 import asyncActions from './actions.async';
-import * as actions from './actions';
+import { userActions as actions } from './actions';
 
-export default { ...asyncActions, ...actions };
+export { default as userSelectors } from './selectors';
+export const userActions = { ...asyncActions, ...actions };

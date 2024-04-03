@@ -7,9 +7,9 @@ import { useEffect } from 'react';
 import CompanyDetails from '../../components/company/CompanyDetails';
 
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import actions from '../../store/company';
-import appSystemActions from '../../store/appSystem';
-import userActions from '../../store/user';
+import { companyActions } from '../../store/company';
+import { appSystemActions } from '../../store/appSystem';
+import { userActions } from '../../store/user';
 
 const CompanyCreate = () => {
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ const CompanyCreate = () => {
   };
 
   const handleSubmit = async (values: ICompany | NewCompany) => {
-    const res = await dispatch(actions.addCompany(values as NewCompany));
+    const res = await dispatch(companyActions.addCompany(values as NewCompany));
     if (res.type === 'COMPANY/ADD_SUCCESS') {
       handleGoBack();
     }

@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router';
 import ComboBox from '../ComboBox';
 import { adminPath, deviceStates } from '../../utils/constants';
 import { useDispatch, useSelector } from '../../store';
-import deviceActions from '../../store/device';
+import { deviceActions } from '../../store/device';
 import FieldWithIcon from '../FiledWithIcon';
 
 interface IProps {

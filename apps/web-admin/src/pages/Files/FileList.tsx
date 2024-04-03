@@ -6,28 +6,25 @@ import FilterIcon from '@mui/icons-material/FilterAltOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import DriveFileMoveOutlinedIcon from '@mui/icons-material/DriveFileMoveOutlined';
 
-import { /*IFileObject,*/ IFileParams, INamedEntity, ISystemFile, IUser } from '@lib/types';
+import { IFileParams, INamedEntity, ISystemFile } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
 import { IFileFilter, IFilePageParam, IFilterTable, IHeadCells, IListOption, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-import SnackBar from '../../components/SnackBar';
-import actions from '../../store/file';
+import { fileActions } from '../../store/file';
 import FileListTable from '../../components/file/FileListTable';
 import RadioGroup from '../../components/RadioGoup';
-import companyActions from '../../store/company';
-import userActions from '../../store/user';
-import appSystemActions from '../../store/appSystem';
-import deviceActions from '../../store/device';
+import { companyActions } from '../../store/company';
+import { userActions } from '../../store/user';
+import { appSystemActions } from '../../store/appSystem';
+import { deviceActions } from '../../store/device';
 import { useWindowResizeWidth } from '../../utils/useWindowResizeMaxWidth';
 
 const FileList = () => {
   const dispatch = useDispatch();
 
-  const { list, loading, errorMessage, pageParams, folders } = useSelector((state) => state.files);
-
-  // console.log('list', list);
+  const { list, loading, pageParams, folders } = useSelector((state) => state.files);
 
   const sortedList = useMemo(() => list.sort((a, b) => (a.path < b.path ? -1 : 1)), [list]);
 
@@ -42,9 +39,9 @@ const FileList = () => {
           }
           return prev;
         }, {});
-        dispatch(actions.fetchFiles(ff, filterText, fromRecord, toRecord));
+        dispatch(fileActions.fetchFiles(ff as IFileFilter, filterText, fromRecord, toRecord));
       } else {
-        dispatch(actions.fetchFiles(filesFilters, filterText, fromRecord, toRecord));
+        dispatch(fileActions.fetchFiles(filesFilters, filterText, fromRecord, toRecord));
       }
     },
     [dispatch],
@@ -52,7 +49,7 @@ const FileList = () => {
 
   const fetchFolders = useCallback(
     (companyId: string, appSystemId: string) => {
-      dispatch(actions.fetchFolders(companyId, appSystemId));
+      dispatch(fileActions.fetchFolders(companyId, appSystemId));
     },
     [dispatch],
   );
@@ -76,10 +73,10 @@ const FileList = () => {
     undefined,
   );
 
-  const { list: companies, loading: loadingCompanies } = useSelector((state) => state.companies);
-  const { list: appSystems, loading: loadingAppSystems } = useSelector((state) => state.appSystems);
-  const { list: users, loading: loadingUsers } = useSelector((state) => state.users);
-  const { list: devices, loading: loadingDevices } = useSelector((state) => state.devices);
+  const { list: companies } = useSelector((state) => state.companies);
+  const { list: appSystems } = useSelector((state) => state.appSystems);
+  const { list: users } = useSelector((state) => state.users);
+  const { list: devices } = useSelector((state) => state.devices);
 
   const companyList = companies.map((d) => ({ id: d.id, name: d.name })) || [];
   const appSystemList = appSystems.map((d) => ({ id: d.id, name: d.name })) || [];
@@ -112,7 +109,7 @@ const FileList = () => {
       // const appSystemId = appSystems.find((i) => i.id === pageParams?.filesFilters?.appSystemId)?.id;
 
       // if (companyId && appSystemId) {
-      dispatch(actions.fetchFolders(pageParams?.filesFilters?.companyId, pageParams?.filesFilters?.appSystemId));
+      dispatch(fileActions.fetchFolders(pageParams?.filesFilters?.companyId, pageParams?.filesFilters?.appSystemId));
       // }
     }
   }, [appSystems, companies, dispatch, pageParams?.filesFilters?.appSystemId, pageParams?.filesFilters?.companyId]);
@@ -142,7 +139,7 @@ const FileList = () => {
   // }, [fetchFiles, pageParams?.filesFilters]);
 
   const handleSearchClick = () => {
-    dispatch(actions.fileSystemActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
+    dispatch(fileActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
     fetchFiles(pageParamLocal?.filesFilters ? pageParamLocal?.filesFilters : undefined, pageParamLocal?.filterText);
   };
 
@@ -150,10 +147,6 @@ const FileList = () => {
     if (key !== 'Enter') return;
 
     handleSearchClick();
-  };
-
-  const handleClearError = () => {
-    dispatch(actions.fileSystemActions.clearError());
   };
 
   const [selectedFileIds, setSelectedFileIds] = useState<ISystemFile[]>([]);
@@ -208,7 +201,7 @@ const FileList = () => {
   const handleSetPageParams = useCallback(
     (pageParams: IFilePageParam) => {
       dispatch(
-        actions.fileSystemActions.setPageParam({
+        fileActions.setPageParam({
           filesFilters: pageParams.filesFilters,
           page: pageParams.page,
           limit: pageParams.limit,
@@ -248,23 +241,23 @@ const FileList = () => {
       };
     });
     if (ids) {
-      dispatch(actions.deleteFiles(ids));
+      dispatch(fileActions.deleteFiles(ids));
       setSelectedFileIds([]);
     }
   }, [dispatch, selectedFileIds]);
 
   const handleClearSearch = () => {
-    dispatch(actions.fileSystemActions.setPageParam({ filterText: undefined }));
+    dispatch(fileActions.setPageParam({ filterText: undefined }));
     setPageParamLocal({ filterText: undefined });
     fetchFiles(pageParamLocal?.filesFilters || undefined);
-    dispatch(actions.fileSystemActions.setPageParam({ page: 0 }));
+    dispatch(fileActions.setPageParam({ page: 0 }));
   };
 
   const [openFolder, setOpenFolder] = useState(false);
 
   const handleGetFolders = () => {
     if (!selectedFileIds.length) {
-      dispatch(actions.fileSystemActions.setError('Файлы не выбраны'));
+      dispatch(fileActions.setError('Файлы не выбраны'));
 
       return;
     }
@@ -273,7 +266,7 @@ const FileList = () => {
       const inaccessibleFile = selectedFileIds.find((i) => !i.appSystem?.id || !i.company?.id);
 
       if (inaccessibleFile) {
-        dispatch(actions.fileSystemActions.setError('Выбранные файлы недоступны для перемещения'));
+        dispatch(fileActions.setError('Выбранные файлы недоступны для перемещения'));
 
         return;
       }
@@ -282,7 +275,7 @@ const FileList = () => {
       );
 
       if (differentId) {
-        dispatch(actions.fileSystemActions.setError('Выбранные файлы относятся к разным подсистемам или компаниям'));
+        dispatch(fileActions.setError('Выбранные файлы относятся к разным подсистемам или компаниям'));
 
         return;
       }
@@ -313,8 +306,8 @@ const FileList = () => {
           folder: i.folder || '',
         };
       });
-      dispatch(actions.moveFiles(ids, selectedFolder));
-      dispatch(actions.fetchFiles());
+      dispatch(fileActions.moveFiles(ids, selectedFolder));
+      dispatch(fileActions.fetchFiles());
       handleClearSearch();
     }
   };
@@ -443,7 +436,6 @@ const FileList = () => {
           )}
         </Container>
       </Box>
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };
