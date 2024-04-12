@@ -7,6 +7,8 @@ import SnackBar from '../../components/SnackBar';
 
 import { companyActions } from '../../store/company/actions';
 
+import ErpLogView from '../../components/erpLog/ErpLogView';
+
 import CompanyView from './CompanyView';
 import CompanyEdit from './CompanyEdit';
 import CompanyCreate from './CompanyCreate';
@@ -17,6 +19,7 @@ const routes: RouteObject[] = [
   { path: '/new', element: <CompanyCreate /> },
   { path: '/:id', element: <CompanyView /> },
   { path: '/:id/edit', element: <CompanyEdit /> },
+  { path: '/:id/appSystems/:appSystemId/erpLog', element: <ErpLogView /> },
   { path: '*', element: <Navigate to="/" /> },
 ];
 

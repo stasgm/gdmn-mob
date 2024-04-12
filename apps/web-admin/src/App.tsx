@@ -48,9 +48,9 @@ const Router = () => {
             server: envs.host,
           }),
         );
-        setLoading(false);
       } catch (error) {
         // console.error('Ошибка при выполнении запроса:', error);
+      } finally {
         setLoading(false);
       }
     };
@@ -68,6 +68,7 @@ const Router = () => {
   }, [dispatch, location.pathname]);
 
   useClearPageParams();
+
   return loading || loadingData ? null : <AppRoutes isLoggedIn={isLogged} />;
 };
 

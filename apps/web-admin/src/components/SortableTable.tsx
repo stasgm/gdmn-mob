@@ -20,6 +20,7 @@ import {
 
 import { IHeadCells, IPageParam } from '../types';
 import { deviceStates, adminPath } from '../utils/constants';
+import { useWindowResizeMaxHeight } from '../utils/useWindowResizeMaxHeight';
 
 type Order = 'asc' | 'desc';
 
@@ -29,27 +30,30 @@ interface IProps<T extends { id: string }> {
   headCells: IHeadCells<T>[];
   data: T[];
   path?: string;
+  endPath?: string;
   onSetPageParams?: (pageParams: IPageParam) => void;
   pageParams?: IPageParam | undefined;
-  style?: any;
+  byMaxHeight?: boolean;
+  minusHeight?: number;
 }
 
 function SortableTable<T extends { id: string }>({
   data = [],
   headCells = [],
   path,
+  endPath,
   onSetPageParams,
   pageParams,
-  style = {},
+  byMaxHeight = false,
+  minusHeight = 0,
   ...rest
 }: IProps<T>) {
-  const [selectedItemIds, setSelectedItemIds] = useState<any>([]);
-  const [limit, setLimit] = useState(
-    pageParams?.limit && !isNaN(Number(pageParams?.limit)) ? Number(pageParams?.limit) : 10,
-  );
-  const [page, setPage] = useState(pageParams?.page && !isNaN(Number(pageParams?.page)) ? Number(pageParams.page) : 0);
+  const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
+  const [limit, setLimit] = useState(pageParams?.limit || 10);
+  const [page, setPage] = useState(pageParams?.page || 0);
   const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof T>(); //headCells[0].id
+  const [orderBy, setOrderBy] = useState<keyof T>();
+  const maxHeight = useWindowResizeMaxHeight();
 
   const handleSelectAll = (event: any) => {
     let newSelectedItemIds;
@@ -64,20 +68,13 @@ function SortableTable<T extends { id: string }>({
   };
 
   const handleSelectOne = (_event: any, id: any) => {
-    const selectedIndex = selectedItemIds.indexOf(id);
-    let newSelectedItemIds: any = [];
+    const isSelected = selectedItemIds.findIndex((selId) => selId === id) !== -1;
+    let newSelectedItemIds: string[] = [];
 
-    if (selectedIndex === -1) {
+    if (!isSelected) {
       newSelectedItemIds = newSelectedItemIds.concat(selectedItemIds, id);
-    } else if (selectedIndex === 0) {
-      newSelectedItemIds = newSelectedItemIds.concat(selectedItemIds.slice(1));
-    } else if (selectedIndex === selectedItemIds.length - 1) {
-      newSelectedItemIds = newSelectedItemIds.concat(selectedItemIds.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelectedItemIds = newSelectedItemIds.concat(
-        selectedItemIds.slice(0, selectedIndex),
-        selectedItemIds.slice(selectedIndex + 1),
-      );
+    } else {
+      newSelectedItemIds = newSelectedItemIds.filter((selectedId) => selectedId !== id);
     }
 
     setSelectedItemIds(newSelectedItemIds);
@@ -142,6 +139,8 @@ function SortableTable<T extends { id: string }>({
     return value;
   }
 
+  const end = endPath ? `/${endPath}/` : '';
+
   const TableRows = () => {
     const itemList = SortedTableRows<T>(data)
       .slice(page * limit, page * limit + limit)
@@ -167,7 +166,7 @@ function SortableTable<T extends { id: string }>({
                   }}
                 >
                   {path ? (
-                    <NavLink to={`${adminPath}${path}${item.id}`}>
+                    <NavLink to={`${adminPath}${path}${item.id}${end}`}>
                       <Typography color="textPrimary" variant="body1" key={item.id}>
                         {DeserializeProp<T>(headCell.id, item[headCell.id])}
                       </Typography>
@@ -198,7 +197,11 @@ function SortableTable<T extends { id: string }>({
     );
   };
 
-  const tableStyle = { ...style, p: 1, overflowX: 'auto' };
+  const tableStyle = {
+    p: 1,
+    overflowX: 'auto',
+    ...(byMaxHeight ? { overflowY: 'auto', maxHeight: maxHeight - minusHeight } : {}),
+  };
 
   return (
     <Card {...rest}>

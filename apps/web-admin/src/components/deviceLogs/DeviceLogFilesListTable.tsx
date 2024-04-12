@@ -28,7 +28,6 @@ interface IProps {
   deviceLogFiles: IDeviceLogFile[];
   selectedDeviceLogFiles: IDeviceLogFile[];
   limitRows?: number;
-  // onChangeSelectedDeviceLogFiles: (newSelectedDeviceIds: any[]) => void;
   isFilterVisible?: boolean;
   onSubmit: (values: any) => void;
   onDelete?: (ids?: string[]) => void;
@@ -40,9 +39,6 @@ interface IProps {
 
 const DeviceLogFilesListTable = ({
   deviceLogFiles = [],
-  // onChangeSelectedDeviceLogFiles,
-  // selectedDeviceLogFiles = [],
-  // limitRows = 0,
   isFilterVisible = false,
   onSubmit,
   onSelectOne,
@@ -114,22 +110,6 @@ const DeviceLogFilesListTable = ({
     [onSetPageParams, pageParams],
   );
 
-  // useEffect(() => {
-  //   if (limitRows > 0) {
-  //     setLimit(limitRows);
-  //   }
-
-  //   if (selectedDeviceLogFileIds.length === 0) {
-  //     if (selectedDeviceLogFiles.length > 0) {
-  //       const newSelectedDeviceLogFileIds = selectedDeviceLogFiles.map(
-  //         (deviceLogFile: IDeviceLogFiles) => deviceLogFile,
-  //       );
-
-  //       setSelectedDeviceLogFileIds(newSelectedDeviceLogFileIds);
-  //     }
-  //   }
-  // }, [limitRows, selectedDeviceLogFileIds.length, selectedDeviceLogFiles]);
-
   const TableRows = () => {
     const deviceLogFileList = deviceLogFiles
       .slice(page * limit, page * limit + limit)
@@ -141,7 +121,10 @@ const DeviceLogFilesListTable = ({
             selected={selectedDeviceLogFiles?.findIndex((d) => d.id === deviceLogFile?.id) !== -1}
             onClick={(event) => {
               event.preventDefault();
-              navigate(`${adminPath}/app/deviceLogs/${deviceLogFile.id}`);
+              navigate(
+                // eslint-disable-next-line max-len
+                `${adminPath}/app/deviceLogs/${deviceLogFile.id}`,
+              );
             }}
             sx={{ cursor: 'pointer' }}
           >

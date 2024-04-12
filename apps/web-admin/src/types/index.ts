@@ -10,10 +10,6 @@ export interface IToolBarButton {
   disabled?: boolean;
 }
 
-// export interface IPageParams<T = IPageParam> {
-//   [name: string]: T;
-// }
-
 export interface IPageParam {
   [name: string]: unknown;
   filterText?: string;
@@ -21,6 +17,7 @@ export interface IPageParam {
   toRecord?: number;
   page?: number;
   limit?: number;
+  tab?: number;
 }
 
 export interface IHeadCells<T> {
@@ -108,4 +105,9 @@ export interface IDeviceLogPageParam extends IPageParam {
 export interface ILinkedEntity extends IEntity {
   value: string | number | INamedEntity | INamedEntity[] | undefined;
   link?: string;
+}
+
+export interface ITabPanel {
+  name: string;
+  component: React.ReactNode;
 }

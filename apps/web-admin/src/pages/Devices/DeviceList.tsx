@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@mui/material';
 import { useNavigate } from 'react-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import CachedIcon from '@mui/icons-material/Cached';
@@ -22,17 +22,21 @@ const DeviceList = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const authDispatch = useAuthThunkDispatch();
+
   const { list, loading, pageParams } = useSelector((state) => state.devices);
   const { list: activationCodes } = useSelector((state) => state.activationCodes);
-  const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
-  const fetchDevices = useCallback(
-    (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(deviceActions.fetchDevices(filterText, fromRecord, toRecord));
-      dispatch(codeActions.fetchActivationCodes()); //TODO Добавить фильтрацию
-    },
-    [dispatch],
-  );
+  const [filterText, setFilterText] = useState(pageParams?.filterText || '');
+  const prevFilterTextRef = useRef<string | undefined | null>(null);
+
+  useEffect(() => {
+    dispatch(deviceActions.setPageParam({ tab: 0 }));
+  }, [dispatch]);
+
+  const fetchDevices = useCallback(() => {
+    dispatch(deviceActions.fetchDevices(pageParams?.filterText));
+    dispatch(codeActions.fetchActivationCodes());
+  }, [dispatch, pageParams?.filterText]);
 
   const fetchActivationCodes = useCallback(
     (_deviceId?: string) => {
@@ -42,22 +46,22 @@ const DeviceList = () => {
   );
 
   useEffect(() => {
-    fetchDevices(pageParams?.filterText);
+    // Загружаем данные при первой загрузке компонента или при изменении фильтра
+    if (prevFilterTextRef.current !== pageParams?.filterText) {
+      prevFilterTextRef.current = pageParams?.filterText;
+      fetchDevices();
+    }
   }, [fetchDevices, pageParams?.filterText]);
 
   const handleUpdateInput = (value: string) => {
-    const inputValue: string = value;
+    setFilterText(value);
+    if (value) return;
 
-    setPageParamLocal({ filterText: value });
-
-    if (inputValue) return;
-
-    fetchDevices('');
+    dispatch(deviceActions.setPageParam({ filterText: '', page: 0 }));
   };
 
   const handleSearchClick = () => {
-    dispatch(deviceActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
-    fetchDevices(pageParamLocal?.filterText);
+    dispatch(deviceActions.setPageParam({ filterText, page: 0 }));
   };
 
   const handleKeyPress = (key: string) => {
@@ -67,9 +71,8 @@ const DeviceList = () => {
   };
 
   const handleClearSearch = () => {
-    dispatch(deviceActions.setPageParam({ filterText: undefined, page: 0 }));
-    setPageParamLocal({ filterText: undefined });
-    fetchDevices();
+    dispatch(deviceActions.setPageParam({ filterText: '', page: 0 }));
+    setFilterText('');
   };
 
   const handleCreateCode = (deviceId: string) => {
@@ -98,7 +101,7 @@ const DeviceList = () => {
   const buttons: IToolBarButton[] = [
     {
       name: 'Обновить',
-      sx: { mx: 1 },
+      sx: { mr: 1 },
       onClick: () => fetchDevices(),
       icon: <CachedIcon />,
     },
@@ -130,22 +133,21 @@ const DeviceList = () => {
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
-            value={(pageParamLocal?.filterText as undefined) || ''}
+            value={filterText}
             clearOnClick={handleClearSearch}
+            disabled={loading}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
-            <Box sx={{ pt: 2 }}>
-              <DeviceListTable
-                devices={list}
-                activationCodes={activationCodes}
-                onCreateCode={handleCreateCode}
-                onCreateUid={handleCreateUid}
-                onSetPageParams={handleSetPageParams}
-                pageParams={pageParams}
-              />
-            </Box>
+            <DeviceListTable
+              devices={list}
+              activationCodes={activationCodes}
+              onCreateCode={handleCreateCode}
+              onCreateUid={handleCreateUid}
+              onSetPageParams={handleSetPageParams}
+              pageParams={pageParams}
+            />
           )}
         </Container>
       </Box>

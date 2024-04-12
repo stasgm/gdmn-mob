@@ -211,7 +211,7 @@ const DeviceListTable = ({
   };
 
   return (
-    <Card>
+    <Card sx={{ mt: 2 }}>
       <PerfectScrollbar>
         <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight }}>
           <Table>

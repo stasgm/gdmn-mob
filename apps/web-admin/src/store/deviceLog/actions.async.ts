@@ -39,7 +39,7 @@ const fetchDeviceLogFiles = (
   };
 };
 
-const fetchDeviceLog = (id: string, folder?: string, appSystemId?: string, companyId?: string): AppThunk => {
+const fetchDeviceLog = (id: string, appSystemId?: string, companyId?: string): AppThunk => {
   return async (dispatch) => {
     dispatch(deviceLogActions.fetchDeviceLogAsync.request(''));
 

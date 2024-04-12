@@ -1,11 +1,10 @@
-import { createBrowserHistory } from 'history';
-
 import { useEffect, useState } from 'react';
+
+import { useLocation } from 'react-router';
 
 import { useDispatch } from '../store';
 
 import { appSystemActions } from '../store/appSystem';
-import { companyActions } from '../store/company';
 import { deviceActions } from '../store/device';
 import { bindingActions } from '../store/deviceBinding';
 import { deviceLogActions } from '../store/deviceLog';
@@ -21,20 +20,20 @@ const cutPathName = (str: string) => {
 };
 
 const useClearPageParams = () => {
-  const browserHistory = createBrowserHistory();
-  const [history, setHistory] = useState(browserHistory.location.pathname);
+  const location = useLocation();
+  const [history, setHistory] = useState(location.pathname);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (cutPathName(history) !== cutPathName(browserHistory.location.pathname)) {
+    if (cutPathName(history) !== cutPathName(location.pathname)) {
       switch (cutPathName(history)) {
         case 'appSystems': {
           dispatch(appSystemActions.clearPageParams());
           break;
         }
         case 'companies': {
-          dispatch(companyActions.clearPageParams());
+          dispatch(userActions.clearPageParams());
           break;
         }
         case 'devices': {
@@ -60,9 +59,9 @@ const useClearPageParams = () => {
           break;
         }
       }
-      setHistory(browserHistory.location.pathname);
+      setHistory(location.pathname);
     }
-  }, [dispatch, browserHistory.location.pathname, history]);
+  }, [dispatch, location.pathname, history]);
 };
 
 export default useClearPageParams;

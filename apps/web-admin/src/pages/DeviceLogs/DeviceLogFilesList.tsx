@@ -1,4 +1,4 @@
-import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
+import { Box, Container } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import CachedIcon from '@mui/icons-material/Cached';
 import FilterIcon from '@mui/icons-material/FilterAltOutlined';
@@ -12,6 +12,7 @@ import { IDeviceLogFileFilter, IDeviceLogPageParam, IToolBarButton } from '../..
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import DeviceLogFilesListTable from '../../components/deviceLogs/DeviceLogFilesListTable';
 import { deviceLogActions } from '../../store/deviceLog';
+import ConfirmDialog from '../../components/ConfirmDialog';
 
 const DeviceLogFilesList = () => {
   const dispatch = useDispatch();
@@ -136,7 +137,7 @@ const DeviceLogFilesList = () => {
   }, [dispatch, selectedDeviceLogFileIds]);
 
   const handleClearSearch = () => {
-    dispatch(deviceLogActions.setPageParam({ filterText: undefined, page: 0 }));
+    dispatch(deviceLogActions.setPageParam({ filterText: '', page: 0 }));
     setPageParamLocal({ filterText: undefined });
     fetchDeviceLogFiles(pageParamLocal?.logFilters || undefined);
   };
@@ -145,7 +146,7 @@ const DeviceLogFilesList = () => {
     {
       name: 'Обновить',
       sx: { mx: 1 },
-      onClick: () => fetchDeviceLogFiles(),
+      onClick: fetchDeviceLogFiles,
       icon: <CachedIcon />,
     },
     {
@@ -164,24 +165,12 @@ const DeviceLogFilesList = () => {
 
   return (
     <>
-      {/* <Helmet>
-        <title>Журнал ошибок</title>
-      </Helmet> */}
-      <Box>
-        <Dialog open={open} onClose={handleClose}>
-          <DialogContent>
-            <DialogContentText color="black">Вы действительно хотите удалить файлы?</DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDelete} color="primary" variant="contained">
-              Удалить
-            </Button>
-            <Button onClick={handleClose} color="secondary" variant="contained">
-              Отмена
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
+      <ConfirmDialog
+        open={open}
+        handleClose={handleClose}
+        handleDelete={handleDelete}
+        questionText={'Вы действительно хотите удалить файлы?'}
+      />
       <Box
         sx={{
           backgroundColor: 'background.default',
@@ -198,6 +187,7 @@ const DeviceLogFilesList = () => {
             keyPress={handleKeyPress}
             value={(pageParamLocal?.filterText as undefined) || ''}
             clearOnClick={handleClearSearch}
+            disabled={loading}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />

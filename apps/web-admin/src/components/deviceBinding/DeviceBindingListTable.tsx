@@ -22,6 +22,8 @@ import { IDeviceBinding, IActivationCode, IDevice } from '@lib/types';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
 import { deviceStates, adminPath } from '../../utils/constants';
+import { IPageParam } from '../../types';
+import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
   deviceBindings?: IDeviceBinding[];
@@ -30,8 +32,9 @@ interface IProps {
   onCreateCode?: (deviceId: string) => void;
   onCreateUid?: (code: string, deviceId: string) => void;
   selectedDevices?: IDeviceBinding[];
-  limitRows?: number;
   onChangeSelectedDevices?: (newSelectedDeviceIds: any[]) => void;
+  onSetPageParams?: (pageParams: IPageParam) => void;
+  pageParams?: IPageParam | undefined;
 }
 
 const DeviceBindingListTable = ({
@@ -42,11 +45,13 @@ const DeviceBindingListTable = ({
   onCreateUid,
   onChangeSelectedDevices,
   selectedDevices = [],
-  limitRows = 0,
+  onSetPageParams,
+  pageParams,
 }: IProps) => {
   const [selectedDeviceIds, setSelectedDeviceIds] = useState<IDeviceBinding[]>(selectedDevices);
-  const [limit, setLimit] = useState(10);
-  const [page, setPage] = useState(0);
+  const [limit, setLimit] = useState(pageParams?.limit || 10);
+  const [page, setPage] = useState(pageParams?.page || 0);
+  const maxHeight = useWindowResizeMaxHeight() - 112;
 
   const handleSelectAll = (event: any) => {
     let newSelectedDeviceIds;
@@ -61,22 +66,17 @@ const DeviceBindingListTable = ({
     onChangeSelectedDevices && onChangeSelectedDevices(newSelectedDeviceIds);
   };
 
+  const isBindSelected = (binding: IDeviceBinding) => selectedDeviceIds.findIndex((d) => d.id === binding?.id) !== -1;
+
   const handleSelectOne = (_event: any, binding: IDeviceBinding) => {
-    const selectedIndex = selectedDeviceIds.map((item: IDeviceBinding) => item.id).indexOf(binding.id);
+    const isSelected = isBindSelected(binding);
 
     let newSelectedDeviceIds: IDeviceBinding[] = [];
 
-    if (selectedIndex === -1) {
+    if (!isSelected) {
       newSelectedDeviceIds = newSelectedDeviceIds.concat(selectedDeviceIds, binding);
-    } else if (selectedIndex === 0) {
-      newSelectedDeviceIds = newSelectedDeviceIds.concat(selectedDeviceIds.slice(1));
-    } else if (selectedIndex === selectedDeviceIds.length - 1) {
-      newSelectedDeviceIds = newSelectedDeviceIds.concat(selectedDeviceIds.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelectedDeviceIds = newSelectedDeviceIds.concat(
-        selectedDeviceIds.slice(0, selectedIndex),
-        selectedDeviceIds.slice(selectedIndex + 1),
-      );
+    } else {
+      newSelectedDeviceIds = selectedDeviceIds.filter((item) => item.id !== binding.id);
     }
 
     setSelectedDeviceIds(newSelectedDeviceIds);
@@ -86,17 +86,15 @@ const DeviceBindingListTable = ({
 
   const handleLimitChange = (event: any) => {
     setLimit(event.target.value);
+    onSetPageParams && onSetPageParams({ limit: event.target.value });
   };
 
   const handlePageChange = (_event: any, newPage: any) => {
     setPage(newPage);
+    onSetPageParams && onSetPageParams({ page: newPage });
   };
 
   useEffect(() => {
-    if (limitRows > 0) {
-      setLimit(limitRows);
-    }
-
     if (selectedDeviceIds.length === 0) {
       if (selectedDevices.length > 0) {
         const newSelectedDeviceIds = selectedDevices.map((binding: IDeviceBinding) => binding);
@@ -104,24 +102,14 @@ const DeviceBindingListTable = ({
         setSelectedDeviceIds(newSelectedDeviceIds);
       }
     }
-  }, [limitRows, selectedDeviceIds.length, selectedDevices]);
+  }, [selectedDeviceIds.length, selectedDevices]);
 
   const TableRows = () => {
     const deviceList = deviceBindings.slice(page * limit, page * limit + limit).map((binding: IDeviceBinding) => {
       const code = activationCodes.find((a) => a.device.id === binding.device.id)?.code;
       const device = devices.find((a) => a.id === binding.device.id);
       return (
-        <TableRow
-          hover
-          key={binding.id}
-          selected={
-            selectedDeviceIds
-              .map((item: IDeviceBinding) => {
-                return item.id;
-              })
-              .indexOf(binding.id) !== -1
-          }
-        >
+        <TableRow hover key={binding.id} selected={isBindSelected(binding)}>
           <TableCell padding="checkbox">
             <Checkbox
               checked={
@@ -202,7 +190,7 @@ const DeviceBindingListTable = ({
   return (
     <Card>
       <PerfectScrollbar>
-        <Box sx={{ p: 1, overflowX: 'auto' }}>
+        <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight }}>
           <Table>
             <TableHead>
               <TableRow>

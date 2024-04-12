@@ -14,7 +14,6 @@ export type AppThunk = ThunkAction<Promise<DeviceActionType>, AppState, null, De
 const fetchDeviceById = (id: string): AppThunk => {
   return async (dispatch) => {
     dispatch(deviceActions.fetchDeviceAsync.request(''));
-
     const response = await api.device.getDevice(webRequest(dispatch, authActions), id);
 
     if (response.type === 'GET_DEVICE') {

@@ -1,5 +1,3 @@
-import { Box } from '@mui/material';
-
 import { IDeviceLogEntry } from '@lib/types';
 
 import { IHeadCells } from '../../types';
@@ -17,16 +15,7 @@ const headCells: IHeadCells<IDeviceLogEntry>[] = [
 ];
 
 const UserDeviceLog = ({ deviceLog }: IProps) => {
-  return (
-    <Box
-      sx={{
-        backgroundColor: 'background.default',
-        minHeight: '100%',
-      }}
-    >
-      <SortableTable<IDeviceLogEntry> headCells={headCells} data={deviceLog} path={'/app/deviceLogs/'} />
-    </Box>
-  );
+  return <SortableTable<IDeviceLogEntry> headCells={headCells} data={deviceLog} />;
 };
 
 export default UserDeviceLog;

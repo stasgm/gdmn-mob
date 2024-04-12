@@ -20,11 +20,13 @@ import { IAppSystem } from '@lib/types';
 
 import { adminPath } from '../../utils/constants';
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
+import { IPageParam } from '../../types';
 
 interface IProps {
   appSystems: IAppSystem[];
   selectedAppSystems?: IAppSystem[];
-  limitRows?: number;
+  onSetPageParams?: (pageParams: IPageParam) => void;
+  pageParams?: IPageParam | undefined;
   onChangeSelectedAppSystems?: (newSelectedDeviceIds: any[]) => void;
 }
 
@@ -32,14 +34,17 @@ const AppSystemListTable = ({
   appSystems = [],
   onChangeSelectedAppSystems,
   selectedAppSystems = [],
-  limitRows = 0,
+  onSetPageParams,
+  pageParams,
 }: IProps) => {
   const [selectedAppSystemIds, setSelectedAppSystemIds] = useState<IAppSystem[]>(selectedAppSystems);
-  const [limit, setLimit] = useState(10);
-  const [page, setPage] = useState(0);
+  const [limit, setLimit] = useState(
+    pageParams?.limit && !isNaN(Number(pageParams?.limit)) ? Number(pageParams?.limit) : 10,
+  );
+  const [page, setPage] = useState(pageParams?.page && !isNaN(Number(pageParams?.page)) ? Number(pageParams.page) : 0);
   const maxHeight = useWindowResizeMaxHeight();
 
-  const handleSelectAll = (event: any) => {
+  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
     let newSelectedAppSystemIds;
 
     if (event.target.checked) {
@@ -52,21 +57,19 @@ const AppSystemListTable = ({
     onChangeSelectedAppSystems && onChangeSelectedAppSystems(newSelectedAppSystemIds);
   };
 
-  const handleSelectOne = (_event: any, appSystem: IAppSystem) => {
-    const selectedIndex = selectedAppSystemIds.map((item: IAppSystem) => item.id).indexOf(appSystem.id);
+  const isAppSystemSelected = (appSystem: IAppSystem) =>
+    selectedAppSystemIds.findIndex((d) => d.id === appSystem?.id) !== -1;
+
+  const handleSelectOne = (_event: React.ChangeEvent<HTMLInputElement>, appSystem: IAppSystem) => {
+    const isSelected = isAppSystemSelected(appSystem);
 
     let newSelectedAppSystemIds: IAppSystem[] = [];
 
-    if (selectedIndex === -1) {
+    if (!isSelected) {
       newSelectedAppSystemIds = newSelectedAppSystemIds.concat(selectedAppSystemIds, appSystem);
-    } else if (selectedIndex === 0) {
-      newSelectedAppSystemIds = newSelectedAppSystemIds.concat(selectedAppSystemIds.slice(1));
-    } else if (selectedIndex === selectedAppSystemIds.length - 1) {
-      newSelectedAppSystemIds = newSelectedAppSystemIds.concat(selectedAppSystemIds.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelectedAppSystemIds = newSelectedAppSystemIds.concat(
-        selectedAppSystemIds.slice(0, selectedIndex),
-        selectedAppSystemIds.slice(selectedIndex + 1),
+    } else {
+      newSelectedAppSystemIds = selectedAppSystemIds.filter(
+        (selectedAppSystem) => selectedAppSystem.id !== appSystem.id,
       );
     }
 
@@ -77,17 +80,15 @@ const AppSystemListTable = ({
 
   const handleLimitChange = (event: any) => {
     setLimit(event.target.value);
+    onSetPageParams && onSetPageParams({ ...pageParams, limit: event.target.value });
   };
 
-  const handlePageChange = (_event: any, newPage: any) => {
+  const handlePageChange = (_event: any, newPage: number) => {
     setPage(newPage);
+    onSetPageParams && onSetPageParams({ ...pageParams, page: newPage });
   };
 
   useEffect(() => {
-    if (limitRows > 0) {
-      setLimit(limitRows);
-    }
-
     if (selectedAppSystemIds.length === 0) {
       if (selectedAppSystems.length > 0) {
         const newSelectedAppSystemIds = selectedAppSystems.map((appSystem: IAppSystem) => appSystem);
@@ -95,25 +96,15 @@ const AppSystemListTable = ({
         setSelectedAppSystemIds(newSelectedAppSystemIds);
       }
     }
-  }, [limitRows, selectedAppSystemIds.length, selectedAppSystems]);
+  }, [selectedAppSystemIds.length, selectedAppSystems]);
 
   const TableRows = () => {
     const appSystemList = appSystems.slice(page * limit, page * limit + limit).map((appSystem: IAppSystem) => {
       return (
-        <TableRow
-          hover
-          key={appSystem.id}
-          selected={selectedAppSystemIds.findIndex((d) => d.id === appSystem?.id) !== -1}
-        >
+        <TableRow hover key={appSystem.id} selected={isAppSystemSelected(appSystem)}>
           <TableCell padding="checkbox">
             <Checkbox
-              checked={
-                selectedAppSystemIds
-                  .map((item: IAppSystem) => {
-                    return item.id;
-                  })
-                  .indexOf(appSystem.id) !== -1
-              }
+              checked={isAppSystemSelected(appSystem)}
               onChange={(event) => handleSelectOne(event, appSystem)}
               value="true"
             />
@@ -155,7 +146,7 @@ const AppSystemListTable = ({
   };
 
   return (
-    <Card>
+    <Card sx={{ mt: 2 }}>
       <PerfectScrollbar>
         <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight }}>
           <Table>

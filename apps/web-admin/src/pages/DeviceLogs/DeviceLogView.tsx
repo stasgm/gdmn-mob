@@ -1,34 +1,20 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Box,
-  Button,
-  CardHeader,
-  IconButton,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  Tabs,
-  Tab,
-} from '@mui/material';
+import { Box } from '@mui/material';
 import CachedIcon from '@mui/icons-material/Cached';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate, useParams } from 'react-router-dom';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { IDeviceLogEntry } from '@lib/types';
 
 import { useSelector, useDispatch } from '../../store';
 import { IHeadCells, ILinkedEntity, IToolBarButton } from '../../types';
-import ToolBarAction from '../../components/ToolBarActions';
 
 import { deviceLogActions, deviceLogSelectors } from '../../store/deviceLog';
-import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SortableTable from '../../components/SortableTable';
 import DetailsView from '../../components/DetailsView';
 import { adminPath } from '../../utils/constants';
-import TabPanel from '../../components/TabPanel';
+import ConfirmDialog from '../../components/ConfirmDialog';
+import ViewContainer from '../../components/ViewContainer';
 
 const headCells: IHeadCells<IDeviceLogEntry>[] = [
   { id: 'name', label: 'Функция', sortEnable: true, filterEnable: true },
@@ -41,13 +27,13 @@ export type Params = {
 };
 
 const DeviceLogView = () => {
-  const { id } = useParams<keyof Params>() as Params;
+  const { id: logFileId } = useParams<keyof Params>() as Params;
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const { loading, deviceLog } = useSelector((state) => state.deviceLogs);
-
-  const deviceLogFile = deviceLogSelectors.deviceLogFileById(id);
+  const deviceLogFile = deviceLogSelectors.deviceLogFileById(logFileId);
 
   const [tabValue, setTabValue] = useState(0);
 
@@ -55,21 +41,20 @@ const DeviceLogView = () => {
     setTabValue(newValue);
   };
 
-  const fetchDeviceLog = useCallback(() => {
-    dispatch(
-      deviceLogActions.fetchDeviceLog(
-        id,
-        deviceLogFile?.folder || '',
-        deviceLogFile?.appSystem?.id || '',
-        deviceLogFile?.company?.id || '',
-      ),
-    );
-  }, [dispatch, id, deviceLogFile]);
+  const fetchDeviceLogs = useCallback(() => {
+    dispatch(deviceLogActions.fetchDeviceLogFiles());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (deviceLogFile) {
+      dispatch(deviceLogActions.fetchDeviceLog(logFileId, deviceLogFile.appSystem.id, deviceLogFile.company.id));
+    }
+  }, [deviceLogFile, dispatch, logFileId]);
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchDeviceLog();
-  }, [fetchDeviceLog]);
+    fetchDeviceLogs();
+  }, [fetchDeviceLogs]);
 
   const deviceLogsDetails: ILinkedEntity[] = useMemo(
     () =>
@@ -111,7 +96,7 @@ const DeviceLogView = () => {
     setOpen(false);
     const res = await dispatch(
       deviceLogActions.deleteDeviceLog(
-        id,
+        logFileId,
         deviceLogFile?.folder || '',
         deviceLogFile?.appSystem?.id || '',
         deviceLogFile?.company?.id || '',
@@ -120,22 +105,22 @@ const DeviceLogView = () => {
     if (res.type === 'DEVICE_LOG/REMOVE_DEVICE_LOG_SUCCESS') {
       navigate(-1);
     }
-  }, [deviceLogFile, dispatch, id, navigate]);
+  }, [deviceLogFile, dispatch, navigate, logFileId]);
 
-  const refreshData = useCallback(() => {
-    dispatch(
-      deviceLogActions.fetchDeviceLog(
-        id,
-        deviceLogFile?.folder || '',
-        deviceLogFile?.appSystem?.id || '',
-        deviceLogFile?.company?.id || '',
-      ),
-    );
-  }, [dispatch, id, deviceLogFile?.appSystem?.id, deviceLogFile?.company?.id, deviceLogFile?.folder]);
+  // const refreshData = useCallback(() => {
+  //   dispatch(
+  //     deviceLogActions.fetchDeviceLog(
+  //       logFileId,
+  //       deviceLogFile?.folder || '',
+  //       deviceLogFile?.appSystem?.id || '',
+  //       deviceLogFile?.company?.id || '',
+  //     ),
+  //   );
+  // }, [dispatch, logFileId, deviceLogFile?.appSystem?.id, deviceLogFile?.company?.id, deviceLogFile?.folder]);
 
-  useEffect(() => {
-    refreshData();
-  }, [refreshData]);
+  // useEffect(() => {
+  //   refreshData();
+  // }, [refreshData]);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -145,39 +130,34 @@ const DeviceLogView = () => {
     setOpen(false);
   };
 
+  const tabs = [
+    { name: 'Общая информация', component: <DetailsView details={deviceLogsDetails} /> },
+    { name: 'Содержимое', component: <SortableTable<IDeviceLogEntry> headCells={headCells} data={deviceLog} /> },
+  ];
+
   const buttons: IToolBarButton[] = useMemo(() => {
     return tabValue === 0
       ? [
           {
             name: 'Обновить',
-            sx: { marginRight: 1 },
+            sx: { mr: 1 },
             color: 'secondary',
             variant: 'contained',
-            onClick: refreshData,
+            onClick: fetchDeviceLogs,
             icon: <CachedIcon />,
           },
           {
             name: 'Удалить',
-            disabled: true,
             color: 'secondary',
             variant: 'contained',
             onClick: handleClickOpen,
             icon: <DeleteIcon />,
           },
         ]
-      : [
-          {
-            name: 'Обновить',
-            sx: { marginRight: 1 },
-            color: 'secondary',
-            variant: 'contained',
-            onClick: refreshData,
-            icon: <CachedIcon />,
-          },
-        ];
-  }, [refreshData, tabValue]);
+      : [];
+  }, [fetchDeviceLogs, tabValue]);
 
-  if (!deviceLogFile) {
+  if (!deviceLogFile && !loading) {
     return (
       <Box
         sx={{
@@ -186,68 +166,27 @@ const DeviceLogView = () => {
           p: 3,
         }}
       >
-        {loading ? <CircularProgressWithContent content={'Идет загрузка данных...'} /> : 'Сообщение не найдено'}
+        Сообщение не найдено
       </Box>
     );
   }
 
   return (
     <>
-      <Box>
-        <Dialog open={open} onClose={handleClose}>
-          <DialogContent>
-            <DialogContentText color="black">Вы действительно хотите удалить журнал ошибок?</DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDelete} color="primary" variant="contained">
-              Удалить
-            </Button>
-            <Button onClick={handleClose} color="secondary" variant="contained">
-              Отмена
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
-      <Box
-        sx={{
-          p: 3,
-        }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Box sx={{ display: 'inline-flex' }}>
-            <IconButton color="primary" onClick={handleCancel}>
-              <ArrowBackIcon />
-            </IconButton>
-            <CardHeader title={'Назад'} />
-            {loading && <CircularProgress size={40} />}
-          </Box>
-          <Box
-            sx={{
-              justifyContent: 'right',
-            }}
-          >
-            <ToolBarAction buttons={buttons} />
-          </Box>
-        </Box>
-        <Box>
-          <Tabs value={tabValue} onChange={handleChangeTab}>
-            <Tab label="Общая информация" />
-            <Tab label="Содержимое" />
-          </Tabs>
-          <TabPanel value={tabValue} index={0}>
-            <DetailsView details={deviceLogsDetails} />
-          </TabPanel>
-          <TabPanel value={tabValue} index={1}>
-            <SortableTable<IDeviceLogEntry> headCells={headCells} data={deviceLog} />
-          </TabPanel>
-        </Box>
-      </Box>
+      <ConfirmDialog
+        open={open}
+        handleClose={handleClose}
+        handleDelete={handleDelete}
+        questionText={'Вы действительно хотите удалить журнал ошибок?'}
+      />
+      <ViewContainer
+        handleCancel={handleCancel}
+        buttons={buttons}
+        loading={loading}
+        tabValue={tabValue}
+        handleChangeTab={handleChangeTab}
+        tabs={tabs}
+      />
     </>
   );
 };

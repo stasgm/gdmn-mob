@@ -9,12 +9,12 @@ import ToolBarActions from './ToolBarActions';
 interface IProps {
   buttons: IToolBarButton[];
   searchTitle: string;
-  //valueRef: any;
   updateInput: (value: string) => void;
   searchOnClick: () => void;
   clearOnClick?: () => void;
   keyPress: (key: string) => void;
   value?: string;
+  disabled?: boolean;
 }
 
 const ToolbarActionsWithSearch = ({
@@ -25,6 +25,7 @@ const ToolbarActionsWithSearch = ({
   clearOnClick,
   keyPress,
   value,
+  disabled = false,
 }: IProps) => {
   return (
     <Card>
@@ -33,6 +34,7 @@ const ToolbarActionsWithSearch = ({
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'space-between',
+          pointerEvents: disabled ? 'none' : 'auto',
         }}
       >
         <Box sx={{ maxWidth: 500, minWidth: 200, flexGrow: 1, alignSelf: 'center' }}>
@@ -58,7 +60,7 @@ const ToolbarActionsWithSearch = ({
             placeholder={searchTitle}
             variant="outlined"
             onChange={(event) => updateInput(event.target.value)}
-            onKeyPress={(event) => keyPress(event.key)}
+            onKeyDown={(event) => keyPress(event.key)}
             type="text"
             id="search"
             name="search"

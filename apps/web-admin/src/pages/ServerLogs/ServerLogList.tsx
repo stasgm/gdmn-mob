@@ -53,7 +53,7 @@ const ServerLogList = () => {
   };
 
   const handleClearSearch = () => {
-    dispatch(serverLogActions.setPageParam({ filterText: undefined, page: 0 }));
+    dispatch(serverLogActions.setPageParam({ filterText: '', page: 0 }));
     setPageParamLocal({ filterText: undefined });
     fetchServerLogs();
   };
@@ -95,12 +95,12 @@ const ServerLogList = () => {
           <ToolbarActionsWithSearch
             buttons={buttons}
             searchTitle={'Найти файл'}
-            //valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
             value={(pageParamLocal?.filterText as undefined) || ''}
             clearOnClick={handleClearSearch}
+            disabled={loading}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />

@@ -42,6 +42,7 @@ const ToolBarActions = ({ buttons }: props) => {
           onClick={button.onClick}
           sx={button.sx}
           startIcon={button.icon}
+          disabled={button.disabled || false}
         >
           {button.name}
         </Button>

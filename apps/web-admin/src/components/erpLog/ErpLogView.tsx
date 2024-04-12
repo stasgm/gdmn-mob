@@ -7,46 +7,37 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from '../../store';
 import { IToolBarButton } from '../../types';
 
-import { serverLogActions, serverLogSelectors } from '../../store/serverLog';
-import ServerLogDetailsView from '../../components/serverLog/ServerLogDetailsView';
+import { erpLogActions } from '../../store/erpLog';
+import ErpLogDetailsView from '../../components/erpLog/ErpLogDetailsView';
 import ViewContainer from '../../components/ViewContainer';
 
 export type Params = {
   id: string;
+  appSystemId: string;
 };
 
-const ServerLogView = () => {
-  const { id } = useParams<keyof Params>() as Params;
+const ErpLogView = () => {
+  const { id: companyId, appSystemId } = useParams<keyof Params>() as Params;
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading, serverLog } = useSelector((state) => state.serverLogs);
+  const { loading, erpLog } = useSelector((state) => state.erpLogs);
 
   const fetchServerLog = useCallback(() => {
-    dispatch(serverLogActions.fetchServerLog(id));
-  }, [dispatch, id]);
+    dispatch(erpLogActions.fetchErpLog(companyId, appSystemId));
+  }, [appSystemId, companyId, dispatch]);
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
     fetchServerLog();
   }, [fetchServerLog]);
 
-  const log = serverLogSelectors.serverLogById(id);
-
   const handleCancel = () => {
     navigate(-1);
   };
 
-  const refreshData = useCallback(() => {
-    dispatch(serverLogActions.fetchServerLog(id));
-  }, [dispatch, id]);
-
-  useEffect(() => {
-    refreshData();
-  }, [refreshData]);
-
-  if (!serverLog && !loading) {
+  if (!erpLog && !loading) {
     return (
       <Box
         sx={{
@@ -55,7 +46,7 @@ const ServerLogView = () => {
           p: 3,
         }}
       >
-        Сообщение не найдено
+        Лог не найден
       </Box>
     );
   }
@@ -63,17 +54,17 @@ const ServerLogView = () => {
   const buttons: IToolBarButton[] = [
     {
       name: 'Обновить',
-      sx: { marginRight: 1 },
+      sx: { mx: 1 },
       color: 'primary',
       variant: 'contained',
-      onClick: refreshData,
+      onClick: fetchServerLog,
       icon: <CachedIcon />,
     },
   ];
 
-  const tabs = [{ name: log?.id || 'Содержание', component: <ServerLogDetailsView serverLog={serverLog!} /> }];
+  const tabs = [{ name: 'erpLog.txt', component: <ErpLogDetailsView erpLog={erpLog!} /> }];
 
   return <ViewContainer handleCancel={handleCancel} buttons={buttons} loading={loading} tabValue={0} tabs={tabs} />;
 };
 
-export default ServerLogView;
+export default ErpLogView;

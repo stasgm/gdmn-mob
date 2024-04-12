@@ -1,30 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Box,
-  Button,
-  CardHeader,
-  IconButton,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  Tabs,
-  Tab,
-} from '@mui/material';
+import { Box } from '@mui/material';
 import CachedIcon from '@mui/icons-material/Cached';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate, useParams } from 'react-router-dom';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { useSelector, useDispatch } from '../../store';
 import { IToolBarButton } from '../../types';
 import { processActions, processSelectors } from '../../store/process';
-import ToolBarAction from '../../components/ToolBarActions';
 import ProcessDetailsView from '../../components/process/ProcessDetailsView';
 import ProcessFilesProcessed from '../../components/process/ProcessFilesProcessed';
-import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-import TabPanel from '../../components/TabPanel';
+
+import ConfirmDialog from '../../components/ConfirmDialog';
+import ViewContainer from '../../components/ViewContainer';
 
 export type Params = {
   id: string;
@@ -77,7 +64,7 @@ const ProcessView = () => {
       ? [
           {
             name: 'Обновить',
-            sx: { marginRight: 1 },
+            sx: { mr: 1 },
             color: 'secondary',
             variant: 'contained',
             onClick: refreshData,
@@ -85,7 +72,6 @@ const ProcessView = () => {
           },
           {
             name: 'Удалить',
-            disabled: true,
             color: 'secondary',
             variant: 'contained',
             onClick: handleClickOpen,
@@ -95,7 +81,7 @@ const ProcessView = () => {
       : [
           {
             name: 'Обновить',
-            sx: { marginRight: 1 },
+            sx: { mr: 1 },
             color: 'secondary',
             variant: 'contained',
             onClick: refreshData,
@@ -104,7 +90,7 @@ const ProcessView = () => {
         ];
   }, [refreshData, tabValue]);
 
-  if (!process) {
+  if (!process && !loading) {
     return (
       <Box
         sx={{
@@ -113,69 +99,35 @@ const ProcessView = () => {
           p: 3,
         }}
       >
-        {loading ? <CircularProgressWithContent content={'Идет загрузка данных...'} /> : 'Процесс не найден'}
+        Процесс не найден
       </Box>
     );
   }
 
+  const tabs = process
+    ? [
+        { name: 'Общая информация', component: <ProcessDetailsView process={process} /> },
+        { name: 'Файлы', component: <ProcessFilesProcessed processedFilesList={process.processedFiles} /> },
+      ]
+    : [];
+
   return (
-    <>
-      <Box>
-        <Dialog open={open} onClose={handleClose}>
-          <DialogContent>
-            <DialogContentText color="black">Вы действительно хотите удалить процесс?</DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDelete} color="primary" variant="contained">
-              Удалить
-            </Button>
-            <Button onClick={handleClose} color="secondary" variant="contained">
-              Отмена
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
-      <Box
-        sx={{
-          p: 3,
-        }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Box sx={{ display: 'inline-flex', marginBottom: 1 }}>
-            <IconButton color="primary" onClick={handleCancel}>
-              <ArrowBackIcon />
-            </IconButton>
-            <CardHeader title={'Назад'} />
-            {loading && <CircularProgress size={40} />}
-          </Box>
-          <Box
-            sx={{
-              justifyContent: 'right',
-            }}
-          >
-            <ToolBarAction buttons={buttons} />
-          </Box>
-        </Box>
-        <Box>
-          <Tabs value={tabValue} onChange={handleChangeTab}>
-            <Tab label="Общая информация" />
-            <Tab label="Файлы" />
-          </Tabs>
-          <TabPanel value={tabValue} index={0}>
-            <ProcessDetailsView process={process} />
-          </TabPanel>
-          <TabPanel value={tabValue} index={1}>
-            <ProcessFilesProcessed processedFilesList={process.processedFiles} />
-          </TabPanel>
-        </Box>
-      </Box>
-    </>
+    <Box>
+      <ConfirmDialog
+        open={open}
+        handleClose={handleClose}
+        handleDelete={handleDelete}
+        questionText={'Вы действительно хотите удалить процесс?'}
+      />
+      <ViewContainer
+        handleCancel={handleCancel}
+        buttons={buttons}
+        loading={loading}
+        tabValue={tabValue}
+        handleChangeTab={handleChangeTab}
+        tabs={tabs}
+      />
+    </Box>
   );
 };
 

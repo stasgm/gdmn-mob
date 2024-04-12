@@ -1,8 +1,9 @@
 import { Box } from '@mui/material';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import CachedIcon from '@mui/icons-material/Cached';
 
-import { ICompany, IAppSystem } from '@lib/types';
+import { ICompany } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
@@ -10,8 +11,6 @@ import { companyActions, companySelectors } from '../../store/company';
 import CircularProgressWithContent from '../CircularProgressWidthContent';
 import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
 import SortableTable from '../SortableTable';
-
-import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 const headCells: IHeadCells<ICompany>[] = [
   { id: 'name', label: 'Наименование', sortEnable: true },
@@ -22,43 +21,37 @@ const headCells: IHeadCells<ICompany>[] = [
 ];
 
 interface IProps {
-  appSystem: IAppSystem;
+  appSystemId: string;
 }
 
-const AppSystemCompany = ({ appSystem }: IProps) => {
+const AppSystemCompanies = ({ appSystemId }: IProps) => {
   const dispatch: AppDispatch = useDispatch();
   const { loading, pageParams } = useSelector((state) => state.companies);
-  const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
-  const list = companySelectors.companyByAppSystemID(appSystem.id);
+  const list = companySelectors.companyByAppSystemId(appSystemId);
 
-  const maxHeight = useWindowResizeMaxHeight();
+  const [filterText, setFilterText] = useState(pageParams?.filterText || '');
+  const prevFilterTextRef = useRef<string | undefined | null>(null);
 
-  const fetchCompanies = useCallback(
-    (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(companyActions.fetchCompanies(filterText, fromRecord, toRecord));
-    },
-    [dispatch],
-  );
+  const fetchCompanies = useCallback(() => {
+    dispatch(companyActions.fetchCompanies(pageParams?.filterText));
+  }, [dispatch, pageParams?.filterText]);
 
   useEffect(() => {
-    // Загружаем данные при загрузке компонента.
-    fetchCompanies(pageParams?.filterText);
+    // Загружаем данные при первой загрузке компонента или при изменении фильтра
+    if (prevFilterTextRef.current !== pageParams?.filterText) {
+      prevFilterTextRef.current = pageParams?.filterText;
+      fetchCompanies();
+    }
   }, [fetchCompanies, pageParams?.filterText]);
 
   const handleUpdateInput = (value: string) => {
-    const inputValue: string = value;
-
-    setPageParamLocal({ filterText: value });
-
-    if (inputValue) return;
-
-    fetchCompanies('');
+    setFilterText(value);
+    if (value) return;
+    dispatch(companyActions.setPageParam({ filterText: '', page: 0 }));
   };
 
   const handleSearchClick = () => {
-    dispatch(companyActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
-
-    fetchCompanies(pageParamLocal?.filterText);
+    dispatch(companyActions.setPageParam({ filterText, page: 0 }));
   };
 
   const handleKeyPress = (key: string) => {
@@ -68,9 +61,8 @@ const AppSystemCompany = ({ appSystem }: IProps) => {
   };
 
   const handleClearSearch = () => {
-    dispatch(companyActions.setPageParam({ filterText: undefined, page: 0 }));
-    setPageParamLocal({ filterText: undefined });
-    fetchCompanies();
+    dispatch(companyActions.setPageParam({ filterText: '', page: 0 }));
+    setFilterText('');
   };
 
   const handleSetPageParams = useCallback(
@@ -85,7 +77,14 @@ const AppSystemCompany = ({ appSystem }: IProps) => {
     [dispatch],
   );
 
-  const buttons: IToolBarButton[] = [];
+  const buttons: IToolBarButton[] = [
+    {
+      name: 'Обновить',
+      sx: { mx: 1 },
+      onClick: fetchCompanies,
+      icon: <CachedIcon />,
+    },
+  ];
 
   return (
     <>
@@ -95,8 +94,9 @@ const AppSystemCompany = ({ appSystem }: IProps) => {
         updateInput={handleUpdateInput}
         searchOnClick={handleSearchClick}
         keyPress={handleKeyPress}
-        value={(pageParamLocal?.filterText as undefined) || ''}
+        value={filterText}
         clearOnClick={handleClearSearch}
+        disabled={loading}
       />
       {loading ? (
         <CircularProgressWithContent content={'Идет загрузка данных...'} />
@@ -108,7 +108,8 @@ const AppSystemCompany = ({ appSystem }: IProps) => {
             path={'/app/companies/'}
             onSetPageParams={handleSetPageParams}
             pageParams={pageParams}
-            style={{ overflowY: 'auto', maxHeight }}
+            byMaxHeight={true}
+            minusHeight={112}
           />
         </Box>
       )}
@@ -116,4 +117,4 @@ const AppSystemCompany = ({ appSystem }: IProps) => {
   );
 };
 
-export default AppSystemCompany;
+export default AppSystemCompanies;

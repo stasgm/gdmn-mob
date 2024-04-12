@@ -1,17 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Box,
-  Button,
-  CardHeader,
-  IconButton,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  Tabs,
-  Tab,
-} from '@mui/material';
+import { Box } from '@mui/material';
 import CachedIcon from '@mui/icons-material/Cached';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -19,19 +7,17 @@ import DriveFileMoveOutlinedIcon from '@mui/icons-material/DriveFileMoveOutlined
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
 import { useNavigate, useParams } from 'react-router-dom';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { useSelector, useDispatch } from '../../store';
 import { IToolBarButton } from '../../types';
-import ToolBarAction from '../../components/ToolBarActions';
 
 import FileDetailsView from '../../components/file/FileDetailsView';
 import FileContentView from '../../components/file/FileContentView';
 import { fileActions, fileSelectors } from '../../store/file';
-import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import { adminPath } from '../../utils/constants';
 import RadioGroup from '../../components/RadioGoup';
-import TabPanel from '../../components/TabPanel';
+import ConfirmDialog from '../../components/ConfirmDialog';
+import ViewContainer from '../../components/ViewContainer';
 
 export type Params = {
   id: string;
@@ -53,22 +39,21 @@ const FileView = () => {
 
   const fileObject = fileSelectors.fileByIdAndFolder(id);
 
-  const fetchFile = useCallback(() => {
-    dispatch(
-      fileActions.fetchFile(
-        id,
-        fileObject?.folder || '',
-        fileObject?.appSystem?.id || '',
-        fileObject?.company?.id || '',
-      ),
-    );
+  const fetchFiles = useCallback(() => {
+    dispatch(fileActions.fetchFiles());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (fileObject) {
+      dispatch(fileActions.fetchFile(id, fileObject.folder, fileObject.appSystem?.id, fileObject.company?.id));
+    }
   }, [dispatch, id, fileObject]);
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
 
-    fetchFile();
-  }, [fetchFile]);
+    fetchFiles();
+  }, [fetchFiles]);
 
   const fetchFolders = useCallback(() => {
     if (fileObject && fileObject.company && fileObject.appSystem) {
@@ -194,16 +179,16 @@ const FileView = () => {
       ? [
           {
             name: 'Обновить',
-            sx: { marginRight: 1 },
+            sx: { mr: 1 },
             color: 'secondary',
             variant: 'contained',
-            onClick: fetchFile,
+            onClick: fetchFiles,
             icon: <CachedIcon />,
           },
 
           {
             name: 'Переместить',
-            sx: { marginRight: 1 },
+            sx: { mr: 1 },
             color: 'secondary',
             variant: 'contained',
             onClick: handleGetFolders,
@@ -211,8 +196,7 @@ const FileView = () => {
           },
           {
             name: 'Скачать',
-            sx: { marginRight: 1 },
-            disabled: true,
+            sx: { mr: 1 },
             color: 'secondary',
             variant: 'contained',
             onClick: handleDownload,
@@ -220,7 +204,6 @@ const FileView = () => {
           },
           {
             name: 'Удалить',
-            disabled: true,
             color: 'secondary',
             variant: 'contained',
             onClick: handleClickOpen,
@@ -230,25 +213,24 @@ const FileView = () => {
       : [
           {
             name: 'Обновить',
-            sx: { marginRight: 1 },
+            sx: { mr: 1 },
             color: 'secondary',
             variant: 'contained',
-            onClick: fetchFile,
+            onClick: fetchFiles,
             icon: <CachedIcon />,
           },
           {
             name: 'Редактировать',
             sx: { marginRight: 1 },
-            disabled: true,
             color: 'primary',
             variant: 'contained',
             onClick: handleEdit,
             icon: <EditIcon />,
           },
         ];
-  }, [fetchFile, handleDownload, handleEdit, handleGetFolders, tabValue]);
+  }, [fetchFiles, handleDownload, handleEdit, handleGetFolders, tabValue]);
 
-  if (!fileObject) {
+  if (!fileObject && !loading) {
     return (
       <Box
         sx={{
@@ -257,28 +239,24 @@ const FileView = () => {
           p: 3,
         }}
       >
-        {loading ? <CircularProgressWithContent content={'Идет загрузка данных...'} /> : 'Сообщение не найдено'}
+        Сообщение не найдено
       </Box>
     );
   }
 
+  const tabs = [
+    { name: 'Общая информация', component: <FileDetailsView list={fileObject!} /> },
+    { name: 'Содержимое', component: <FileContentView file={file} /> },
+  ];
+
   return (
-    <>
-      <Box>
-        <Dialog open={open} onClose={handleClose}>
-          <DialogContent>
-            <DialogContentText color="black">Вы действительно хотите удалить файл?</DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDelete} color="primary" variant="contained">
-              Удалить
-            </Button>
-            <Button onClick={handleClose} color="secondary" variant="contained">
-              Отмена
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
+    <Box>
+      <ConfirmDialog
+        open={open}
+        handleClose={handleClose}
+        handleDelete={handleDelete}
+        questionText={'Вы действительно хотите удалить файл?'}
+      />
       <RadioGroup
         contentText="Выберите нужную папку:"
         checked={selectedFolder || undefined}
@@ -290,47 +268,15 @@ const FileView = () => {
         onOk={handleMoveFiles}
         values={folders}
       />
-      <Box
-        sx={{
-          p: 3,
-        }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Box sx={{ display: 'inline-flex', marginBottom: 1 }}>
-            <IconButton color="primary" onClick={handleCancel}>
-              <ArrowBackIcon />
-            </IconButton>
-            <CardHeader title={'Назад'} />
-            {loading && <CircularProgress size={40} />}
-          </Box>
-          <Box
-            sx={{
-              justifyContent: 'right',
-            }}
-          >
-            <ToolBarAction buttons={buttons} />
-          </Box>
-        </Box>
-        <Box>
-          <Tabs value={tabValue} onChange={handleChangeTab}>
-            <Tab label="Общая информация" />
-            <Tab label="Содержимое" />
-          </Tabs>
-          <TabPanel value={tabValue} index={0}>
-            <FileDetailsView list={fileObject} />
-          </TabPanel>
-          <TabPanel value={tabValue} index={1}>
-            {file && <FileContentView file={file} />}
-          </TabPanel>
-        </Box>
-      </Box>
-    </>
+      <ViewContainer
+        handleCancel={handleCancel}
+        buttons={buttons}
+        loading={loading}
+        tabValue={tabValue}
+        handleChangeTab={handleChangeTab}
+        tabs={tabs}
+      />
+    </Box>
   );
 };
 

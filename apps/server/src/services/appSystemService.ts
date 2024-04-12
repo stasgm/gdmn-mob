@@ -117,6 +117,15 @@ const findMany = (params: Record<string, string | number>): IAppSystem[] => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { fromRecord, toRecord, ...newParams } = params;
 
+    let companyFound = true;
+
+    if ('companyId' in newParams) {
+      companyFound = !!getDb().companies.data.find(
+        (company) => company.id === newParams.companyId && company.appSystemIds?.includes(item.id),
+      );
+      delete newParams['companyId'];
+    }
+
     /* filtering data */
     let filteredAppSystems = true;
     if ('filterText' in newParams) {
@@ -137,7 +146,7 @@ const findMany = (params: Record<string, string | number>): IAppSystem[] => {
       delete newParams['filterText'];
     }
 
-    return filteredAppSystems && extraPredicate(item, newParams as Record<string, string>);
+    return filteredAppSystems && companyFound && extraPredicate(item, newParams as Record<string, string>);
   });
 
   return getListPart<IAppSystem>(appSystemList, params);

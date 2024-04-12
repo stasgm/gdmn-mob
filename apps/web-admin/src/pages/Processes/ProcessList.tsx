@@ -59,7 +59,7 @@ const ProcessList = () => {
   };
 
   const handleClearSearch = () => {
-    dispatch(processActions.setPageParam({ filterText: undefined, page: 0 }));
+    dispatch(processActions.setPageParam({ filterText: '', page: 0 }));
     setPageParamLocal({ filterText: undefined });
     fetchProcesses();
   };
@@ -94,6 +94,7 @@ const ProcessList = () => {
             keyPress={handleKeyPress}
             value={(pageParamLocal?.filterText as undefined) || ''}
             clearOnClick={handleClearSearch}
+            disabled={loading}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />

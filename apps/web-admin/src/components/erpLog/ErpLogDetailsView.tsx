@@ -3,10 +3,11 @@ import { CardContent, Typography, Card, Grid } from '@mui/material';
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
-  serverLog: string;
+  erpLog: string;
+  title?: string;
 }
 
-const ServerLogDetailsView = ({ serverLog }: IProps) => {
+const ServerLogDetailsView = ({ erpLog }: IProps) => {
   const maxHeight = useWindowResizeMaxHeight();
 
   return (
@@ -17,7 +18,7 @@ const ServerLogDetailsView = ({ serverLog }: IProps) => {
             <Grid item>
               <pre>
                 <Typography variant="subtitle1" gutterBottom>
-                  {serverLog}
+                  {erpLog}
                 </Typography>
               </pre>
             </Grid>

@@ -1,9 +1,10 @@
 import { Box } from '@mui/material';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { authActions, useAuthThunkDispatch } from '@lib/store';
+import CachedIcon from '@mui/icons-material/Cached';
 
 import { useNavigate } from 'react-router';
 
@@ -16,6 +17,7 @@ import { codeActions } from '../../store/activationCode';
 import DeviceBindingListTable from '../deviceBinding/DeviceBindingListTable';
 import { webRequest } from '../../store/webRequest';
 import { adminPath } from '../../utils/constants';
+import CircularProgressWithContent from '../CircularProgressWidthContent';
 
 interface IProps {
   userId: string;
@@ -25,63 +27,53 @@ const UserDevices = ({ userId }: IProps) => {
   const dispatch = useDispatch();
   const authDispatch = useAuthThunkDispatch();
   const navigate = useNavigate();
-  const { pageParams } = useSelector((state) => state.deviceBindings);
-  const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
-  const { list: activationCodes } = useSelector((state) => state.activationCodes);
-  const { list: devices } = useSelector((state) => state.devices);
+
+  const { list: codes, loading: codeLoading } = useSelector((state) => state.activationCodes);
+  const { list: devices, loading: deviceLoading } = useSelector((state) => state.devices);
+  const { loading: bindingLoading } = useSelector((state) => state.deviceBindings);
   const userBindingDevices = bindingSelectors.bindingsByUserId(userId);
+
+  const { pageParams } = useSelector((state) => state.deviceBindings);
+  const [filterText, setFilterText] = useState(pageParams?.filterText || '');
+  const prevFilterTextRef = useRef<string | undefined | null>(null);
 
   const handleAddDevice = () => {
     navigate(`${adminPath}/app/users/${userId}/binding/new`);
   };
 
-  const fetchDevices = useCallback(
-    (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(deviceActions.fetchDevices(filterText, fromRecord, toRecord));
-    },
-    [dispatch],
-  );
-
-  const fetchDeviceBindings = useCallback(
-    (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(bindingActions.fetchDeviceBindings(userId, filterText, fromRecord, toRecord));
-    },
-    [dispatch, userId],
-  );
-
-  const fetchActivationCodes = useCallback(
-    (_deviceId?: string) => {
-      dispatch(codeActions.fetchActivationCodes()); //TODO Добавить фильтрацию
-    },
-    [dispatch],
-  );
+  const fetchData = useCallback(() => {
+    dispatch(codeActions.fetchActivationCodes());
+    dispatch(deviceActions.fetchDevices());
+  }, [dispatch]);
 
   useEffect(() => {
-    /* Загружаем данные при загрузке компонента */
-    fetchActivationCodes();
-    fetchDevices(pageParams?.filterText);
-    fetchDeviceBindings(pageParams?.filterText);
-  }, [fetchActivationCodes, fetchDeviceBindings, fetchDevices, pageParams?.filterText]);
+    // Загружаем данные при первой загрузке компонента
+    fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    // Загружаем данные при первой загрузке компонента или при изменении фильтра
+    if (prevFilterTextRef.current !== pageParams?.filterText) {
+      prevFilterTextRef.current = pageParams?.filterText;
+      dispatch(bindingActions.fetchDeviceBindings(userId, pageParams?.filterText));
+    }
+  }, [dispatch, pageParams?.filterText, userId]);
 
   const handleCreateUid = async (code: string, deviceId: string) => {
     await authDispatch(authActions.activateDevice(webRequest(authDispatch, authActions), code));
     dispatch(deviceActions.fetchDeviceById(deviceId));
-    fetchActivationCodes(deviceId);
+    dispatch(codeActions.fetchActivationCodes(deviceId));
   };
 
   const handleUpdateInput = (value: string) => {
-    const inputValue: string = value;
-    setPageParamLocal({ filterText: value });
+    setFilterText(value);
+    if (value) return;
 
-    if (inputValue) return;
-
-    fetchDeviceBindings('');
+    dispatch(bindingActions.setPageParam({ filterText: '', page: 0 }));
   };
 
   const handleSearchClick = () => {
-    dispatch(bindingActions.setPageParam({ filterText: pageParamLocal?.filterText }));
-
-    fetchDeviceBindings(pageParamLocal?.filterText as string);
+    dispatch(bindingActions.setPageParam({ filterText }));
   };
 
   const handleKeyPress = (key: string) => {
@@ -91,19 +83,35 @@ const UserDevices = ({ userId }: IProps) => {
   };
 
   const handleClearSearch = () => {
-    dispatch(deviceActions.setPageParam({ filterText: undefined }));
-    dispatch(bindingActions.setPageParam({ filterText: undefined }));
-    setPageParamLocal({ filterText: undefined });
-    fetchDevices();
-    fetchDeviceBindings();
+    dispatch(deviceActions.setPageParam({ filterText: '', page: 0 }));
+    dispatch(bindingActions.setPageParam({ filterText: '', page: 0 }));
+    setFilterText('');
   };
 
   const handleCreateCode = (deviceId: string) => {
     dispatch(codeActions.createActivationCode(deviceId));
-    fetchActivationCodes(deviceId);
+    dispatch(codeActions.fetchActivationCodes(deviceId));
   };
 
+  const handleSetPageParams = useCallback(
+    (pageParams: IPageParam) => {
+      dispatch(
+        bindingActions.setPageParam({
+          page: pageParams.page,
+          limit: pageParams.limit,
+        }),
+      );
+    },
+    [dispatch],
+  );
+
   const deviceButtons: IToolBarButton[] = [
+    {
+      name: 'Обновить',
+      sx: { mx: 1 },
+      onClick: fetchData,
+      icon: <CachedIcon />,
+    },
     {
       name: 'Добавить',
       color: 'primary',
@@ -121,19 +129,25 @@ const UserDevices = ({ userId }: IProps) => {
         updateInput={handleUpdateInput}
         searchOnClick={handleSearchClick}
         keyPress={handleKeyPress}
-        value={(pageParamLocal?.filterText as undefined) || ''}
+        value={filterText}
         clearOnClick={handleClearSearch}
+        disabled={deviceLoading || bindingLoading || codeLoading}
       />
-      <Box sx={{ pt: 2 }}>
-        <DeviceBindingListTable
-          devices={devices}
-          deviceBindings={userBindingDevices}
-          activationCodes={activationCodes}
-          onCreateCode={handleCreateCode}
-          onCreateUid={handleCreateUid}
-          limitRows={5}
-        />
-      </Box>
+      {deviceLoading || bindingLoading || codeLoading ? (
+        <CircularProgressWithContent content={'Идет загрузка данных...'} />
+      ) : (
+        <Box sx={{ pt: 2 }}>
+          <DeviceBindingListTable
+            devices={devices}
+            deviceBindings={userBindingDevices}
+            activationCodes={codes}
+            onCreateCode={handleCreateCode}
+            onCreateUid={handleCreateUid}
+            onSetPageParams={handleSetPageParams}
+            pageParams={pageParams}
+          />
+        </Box>
+      )}
     </Box>
   );
 };

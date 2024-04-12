@@ -184,29 +184,6 @@ const isAllParamMatched = (item: any, paramsInfo: IParamsInfo) => {
   return true;
 };
 
-// const isAllParamMatched = (newParams: Record<string, string>, item: any, paramsInfo: IParamsInfo) => {
-//   for (const [key, value] of Object.entries(newParams)) {
-//     if (!(key in paramsInfo)) continue;
-
-//     const { itemKey, property, fullMatch, comparator } = paramsInfo[key];
-//     const itemValue = ((property ? item[itemKey]?.[property] : item[itemKey]) || '').toUpperCase();
-//     const compareValue = value.toUpperCase();
-//     if (comparator) {
-//       const date = new Date(formatDateToLocale(itemValue)).getTime();
-//       const dateParam = new Date(formatDateToLocale(compareValue)).getTime();
-//       if (!comparator(date, dateParam)) {
-//         return false;
-//       }
-//     } else {
-//       const isIdFound = fullMatch ? itemValue === compareValue : itemValue?.includes(compareValue);
-//       if (!isIdFound) {
-//         return false;
-//       }
-//     }
-//   }
-//   return true;
-// };
-
 export {
   extraPredicate,
   getListPart,

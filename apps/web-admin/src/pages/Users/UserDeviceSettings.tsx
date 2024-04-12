@@ -22,6 +22,7 @@ const UserDeviceSettings = ({ appSettings }: IProps) => {
   const groupedSettings = Object.values(appSettings).reduce((groups: { [key: string]: any }, setting) => {
     const groupId = setting.group?.id;
     if (!groupId) return groups;
+
     const group = groups[groupId] || { ...setting.group, settings: [] };
     group.settings.push(setting);
     groups[groupId] = group;

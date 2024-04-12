@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@mui/material';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import CachedIcon from '@mui/icons-material/Cached';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
@@ -17,29 +17,35 @@ const AppSystemList = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { list, loading, pageParams } = useSelector((state) => state.appSystems);
-  const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
-  const fetchAppSystems = useCallback(
-    (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(appSystemActions.fetchAppSystems(filterText, fromRecord, toRecord));
-    },
-    [dispatch],
-  );
+  const [filterText, setFilterText] = useState(pageParams?.filterText || '');
+  const prevFilterTextRef = useRef<string | undefined | null>(null);
 
   useEffect(() => {
-    // Загружаем данные при загрузке компонента.
-    fetchAppSystems(pageParams?.filterText);
+    dispatch(appSystemActions.setPageParam({ tab: 0 }));
+  }, [dispatch]);
+
+  const fetchAppSystems = useCallback(() => {
+    dispatch(appSystemActions.fetchAppSystems(undefined, pageParams?.filterText));
+  }, [dispatch, pageParams?.filterText]);
+
+  useEffect(() => {
+    // Загружаем данные при первой загрузке компонента или при изменении фильтра
+    if (prevFilterTextRef.current !== pageParams?.filterText) {
+      prevFilterTextRef.current = pageParams?.filterText;
+      fetchAppSystems();
+    }
   }, [fetchAppSystems, pageParams?.filterText]);
 
   const handleUpdateInput = (value: string) => {
-    const inputValue: string = value;
-    setPageParamLocal({ filterText: value });
-    if (inputValue) return;
+    setFilterText(value);
+    if (value) return;
+
+    dispatch(appSystemActions.setPageParam({ filterText: '', page: 0 }));
   };
 
   const handleSearchClick = () => {
-    dispatch(appSystemActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
-    fetchAppSystems(pageParamLocal?.filterText);
+    dispatch(appSystemActions.setPageParam({ filterText, page: 0 }));
   };
 
   const handleKeyPress = (key: string) => {
@@ -49,10 +55,21 @@ const AppSystemList = () => {
   };
 
   const handleClearSearch = () => {
-    dispatch(appSystemActions.setPageParam({ filterText: undefined, page: 0 }));
-    setPageParamLocal({ filterText: undefined });
-    fetchAppSystems();
+    dispatch(appSystemActions.setPageParam({ filterText: '', page: 0 }));
+    setFilterText('');
   };
+
+  const handleSetPageParams = useCallback(
+    (params: IPageParam) => {
+      dispatch(
+        appSystemActions.setPageParam({
+          page: params.page,
+          limit: params.limit,
+        }),
+      );
+    },
+    [dispatch],
+  );
 
   const buttons: IToolBarButton[] = [
     {
@@ -89,15 +106,14 @@ const AppSystemList = () => {
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
-            value={(pageParamLocal?.filterText as undefined) || ''}
+            value={filterText}
             clearOnClick={handleClearSearch}
+            disabled={loading}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
-            <Box sx={{ pt: 2 }}>
-              <AppSystemListTable appSystems={list} />
-            </Box>
+            <AppSystemListTable appSystems={list} onSetPageParams={handleSetPageParams} pageParams={pageParams} />
           )}
         </Container>
       </Box>

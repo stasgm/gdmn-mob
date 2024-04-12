@@ -1,58 +1,58 @@
 import { Box } from '@mui/material';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { IUser } from '@lib/types';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { IAppSystem } from '@lib/types';
 import CachedIcon from '@mui/icons-material/Cached';
 
-import SortableTable from '../../components/SortableTable';
+import SortableTable from '../SortableTable';
 import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
 import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
 import { useDispatch, useSelector } from '../../store';
-import { userActions, userSelectors } from '../../store/user';
 import CircularProgressWithContent from '../CircularProgressWidthContent';
+import { appSystemActions, appSystemSelectors } from '../../store/appSystem';
 
-const headCells: IHeadCells<IUser>[] = [
-  { id: 'name', label: 'Пользователь', sortEnable: true },
+const headCells: IHeadCells<IAppSystem>[] = [
+  { id: 'name', label: 'Подсистема', sortEnable: true },
   { id: 'id', label: 'Идентификатор', sortEnable: true },
-  { id: 'lastName', label: 'Фамилия', sortEnable: true },
-  { id: 'firstName', label: 'Имя', sortEnable: true },
-  { id: 'phoneNumber', label: 'Телефон', sortEnable: false },
-  { id: 'creationDate', label: 'Дата создания', sortEnable: true },
-  { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },
+  { id: 'description', label: 'Описание', sortEnable: true },
 ];
 
 interface IProps {
   companyId: string;
 }
 
-const CompanyUsers = ({ companyId }: IProps) => {
+const CompanyAppSystems = ({ companyId }: IProps) => {
   const dispatch = useDispatch();
-  const { loading, pageParams } = useSelector((state) => state.users);
-  const users = userSelectors.usersByCompanyId(companyId);
+  const appSystems = appSystemSelectors.appSystemsByCompanyId(companyId);
+  const { loading, pageParams } = useSelector((state) => state.appSystems);
   const [filterText, setFilterText] = useState(pageParams?.filterText || '');
-
   const prevFilterTextRef = useRef<string | undefined | null>(null);
 
-  const fetchUsers = useCallback(() => {
-    dispatch(userActions.fetchUsers(companyId, pageParams?.filterText));
+  useEffect(() => {
+    if (!pageParams) {
+      setFilterText('');
+    }
+  }, [pageParams]);
+
+  const fetchAppSystems = useCallback(() => {
+    dispatch(appSystemActions.fetchAppSystems(companyId, pageParams?.filterText));
   }, [companyId, dispatch, pageParams?.filterText]);
 
   useEffect(() => {
     // Загружаем данные при первой загрузке компонента или при изменении фильтра
     if (prevFilterTextRef.current !== pageParams?.filterText) {
       prevFilterTextRef.current = pageParams?.filterText;
-      fetchUsers();
+      fetchAppSystems();
     }
-  }, [fetchUsers, pageParams?.filterText]);
+  }, [fetchAppSystems, pageParams?.filterText]);
 
   const handleUpdateInput = (value: string) => {
     setFilterText(value);
     if (value) return;
-
-    dispatch(userActions.setPageParam({ filterText: '', page: 0 }));
+    dispatch(appSystemActions.setPageParam({ filterText: '', page: 0 }));
   };
 
   const handleSearchClick = () => {
-    dispatch(userActions.setPageParam({ filterText, page: 0 }));
+    dispatch(appSystemActions.setPageParam({ filterText, page: 0 }));
   };
 
   const handleKeyPress = (key: string) => {
@@ -61,14 +61,14 @@ const CompanyUsers = ({ companyId }: IProps) => {
   };
 
   const handleClearSearch = () => {
-    dispatch(userActions.setPageParam({ filterText: '', page: 0 }));
+    dispatch(appSystemActions.setPageParam({ filterText: '', page: 0 }));
     setFilterText('');
   };
 
   const handleSetPageParams = useCallback(
     (newParams: IPageParam) => {
       dispatch(
-        userActions.setPageParam({
+        appSystemActions.setPageParam({
           page: newParams.page,
           limit: newParams.limit,
         }),
@@ -77,14 +77,18 @@ const CompanyUsers = ({ companyId }: IProps) => {
     [dispatch],
   );
 
-  const userButtons: IToolBarButton[] = [
-    {
-      name: 'Обновить',
-      sx: { mx: 1 },
-      onClick: fetchUsers,
-      icon: <CachedIcon />,
-    },
-  ];
+  const userButtons: IToolBarButton[] = useMemo(
+    () => [
+      {
+        name: 'Обновить',
+        sx: { mx: 1 },
+        onClick: fetchAppSystems,
+        icon: <CachedIcon />,
+        disablde: loading,
+      },
+    ],
+    [fetchAppSystems, loading],
+  );
 
   return (
     <Box
@@ -95,7 +99,7 @@ const CompanyUsers = ({ companyId }: IProps) => {
     >
       <ToolbarActionsWithSearch
         buttons={userButtons}
-        searchTitle={'Найти пользователя'}
+        searchTitle={'Найти подсистему'}
         updateInput={handleUpdateInput}
         searchOnClick={handleSearchClick}
         keyPress={handleKeyPress}
@@ -107,10 +111,11 @@ const CompanyUsers = ({ companyId }: IProps) => {
         <CircularProgressWithContent content={'Идет загрузка данных...'} />
       ) : (
         <Box sx={{ pt: 2 }}>
-          <SortableTable<IUser>
+          <SortableTable<IAppSystem>
             headCells={headCells}
-            data={users}
-            path={'/app/users/'}
+            data={appSystems}
+            path={`/app/companies/${companyId}/appSystems/`}
+            endPath={'erpLog'}
             onSetPageParams={handleSetPageParams}
             pageParams={pageParams}
             byMaxHeight={true}
@@ -122,4 +127,4 @@ const CompanyUsers = ({ companyId }: IProps) => {
   );
 };
 
-export default CompanyUsers;
+export default CompanyAppSystems;

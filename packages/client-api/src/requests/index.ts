@@ -9,3 +9,4 @@ export { default as appSystem } from './appSystem';
 export { default as deviceLog } from './deviceLog';
 export { default as file } from './file';
 export { default as serverLog } from './serverLog';
+export { default as erpLog } from './erpLog';

@@ -247,7 +247,7 @@ const FileList = () => {
   }, [dispatch, selectedFileIds]);
 
   const handleClearSearch = () => {
-    dispatch(fileActions.setPageParam({ filterText: undefined }));
+    dispatch(fileActions.setPageParam({ filterText: '' }));
     setPageParamLocal({ filterText: undefined });
     fetchFiles(pageParamLocal?.filesFilters || undefined);
     dispatch(fileActions.setPageParam({ page: 0 }));
@@ -398,12 +398,12 @@ const FileList = () => {
           <ToolbarActionsWithSearch
             buttons={buttons}
             searchTitle={'Найти файл'}
-            //valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
             value={(pageParamLocal?.filterText as undefined) || ''}
             clearOnClick={handleClearSearch}
+            disabled={loading}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />

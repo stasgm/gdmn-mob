@@ -7,7 +7,7 @@ class ErpLog extends BaseRequest {
     super(api);
   }
 
-  getErpLog = async (customRequest: CustomRequest, id: string) => {
+  getErpLog = async (customRequest: CustomRequest, id: string, params: Record<string, string | number>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -21,6 +21,7 @@ class ErpLog extends BaseRequest {
       api: this.api.axios,
       method: 'GET',
       url: `/erpLogs/${id}`,
+      params,
     });
 
     if (res.type === 'SUCCESS') {

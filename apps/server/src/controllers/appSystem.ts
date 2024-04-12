@@ -6,7 +6,7 @@ import { appSystemService } from '../services';
 
 import { DataNotFoundException } from '../exceptions';
 
-import { created, ok } from '../utils';
+import { created, ok, prepareParams } from '../utils';
 
 const addAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
   const { name, description } = ctx.request.body as NewAppSystem;
@@ -37,29 +37,7 @@ const removeAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getAppSystems = async (ctx: ParameterizedContext): Promise<void> => {
-  const { appSystemId, name, filterText, fromRecord, toRecord } = ctx.query;
-
-  const params: Record<string, string> = {};
-
-  if (appSystemId && typeof appSystemId === 'string') {
-    params.appSystemId = appSystemId;
-  }
-
-  if (name && typeof name === 'string') {
-    params.name = name;
-  }
-
-  if (typeof filterText === 'string') {
-    params.filterText = filterText;
-  }
-
-  if (typeof fromRecord === 'string') {
-    params.fromRecord = fromRecord;
-  }
-
-  if (typeof toRecord === 'string') {
-    params.toRecord = toRecord;
-  }
+  const params = prepareParams(ctx.query, ['companyId', 'name', 'filterText'], ['fromRecord', 'toRecord']);
 
   const appSystemList = appSystemService.findMany(params);
 
