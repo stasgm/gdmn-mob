@@ -57,6 +57,7 @@ const CompanyAppSystems = ({ companyId }: IProps) => {
 
   const handleKeyPress = (key: string) => {
     if (key !== 'Enter') return;
+
     handleSearchClick();
   };
 

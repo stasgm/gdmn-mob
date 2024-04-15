@@ -11,7 +11,7 @@ export interface IToolBarButton {
 }
 
 export interface IPageParam {
-  [name: string]: unknown;
+  [name: string]: any;
   filterText?: string;
   fromRecord?: number;
   toRecord?: number;

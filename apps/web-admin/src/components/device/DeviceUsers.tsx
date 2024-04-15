@@ -53,11 +53,11 @@ const DeviceUsers = ({ companyId, deviceId }: IProps) => {
   const handleUpdateInput = (value: string) => {
     setFilterText(value);
     if (value) return;
-    dispatch(companyActions.setPageParam({ filterText: '', page: 0 }));
+    dispatch(userActions.setPageParam({ filterText: '', page: 0 }));
   };
 
   const handleSearchClick = () => {
-    dispatch(companyActions.setPageParam({ filterText, page: 0 }));
+    dispatch(userActions.setPageParam({ filterText, page: 0 }));
   };
 
   const handleKeyPress = (key: string) => {
@@ -67,14 +67,14 @@ const DeviceUsers = ({ companyId, deviceId }: IProps) => {
   };
 
   const handleClearSearch = () => {
-    dispatch(companyActions.setPageParam({ filterText: '', page: 0 }));
+    dispatch(userActions.setPageParam({ filterText: '', page: 0 }));
     setFilterText('');
   };
 
   const handleSetPageParams = useCallback(
     (pageParams: IPageParam) => {
       dispatch(
-        companyActions.setPageParam({
+        userActions.setPageParam({
           page: pageParams.page,
           limit: pageParams.limit,
         }),
