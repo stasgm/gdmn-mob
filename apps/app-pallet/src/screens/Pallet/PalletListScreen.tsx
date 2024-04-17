@@ -112,7 +112,7 @@ export const PalletListScreen = () => {
     navigation.setOptions({
       headerLeft: isDelList ? renderLeft : navBackDrawer,
       headerRight: renderRight,
-      title: isDelList ? `Выделено документов: ${Object.values(delList).length}` : 'Сканирование',
+      title: isDelList ? `Выделено: ${Object.values(delList).length}` : 'Паллетный лист',
     });
   }, [delList, isDelList, navigation, renderLeft, renderRight]);
 

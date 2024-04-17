@@ -48,7 +48,7 @@ const Root = () => {
     () => [
       {
         name: 'Scan',
-        title: 'Сканирование',
+        title: 'Паллетный лист',
         icon: 'barcode-scan',
         component: PalletNavigator,
       },
