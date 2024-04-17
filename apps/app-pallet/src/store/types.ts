@@ -8,7 +8,7 @@ export interface IPalletFormParam extends IFormParam {
   number?: string;
   documentDate?: string;
   status?: StatusType;
-  boxWeight?: number;
+  boxWeight?: string;
 }
 
 //Подразделения-склады

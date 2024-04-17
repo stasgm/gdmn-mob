@@ -18,7 +18,7 @@ import {
 } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
-import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks';
+import { generateId, getDateString, isNumeric, useFilteredDocList } from '@lib/mobile-hooks';
 
 import { IDocumentType, IReference, ScreenState } from '@lib/types';
 
@@ -66,7 +66,7 @@ export const PalletEditScreen = () => {
           number: doc.number,
           documentDate: doc.documentDate,
           status: doc.status,
-          boxWeight: doc.head.boxWeight,
+          boxWeight: doc.head.boxWeight.toString(),
         }),
       );
     } else {
@@ -89,12 +89,16 @@ export const PalletEditScreen = () => {
       if (!palletType) {
         setScreenState('idle');
 
-        return Alert.alert('Ошибка!', 'Тип документа для сверки не найден', [{ text: 'OK' }]);
+        return Alert.alert('Ошибка!', 'Тип документа для паллетного листа не найден', [{ text: 'OK' }]);
       }
       if (!docBoxWeight || !docNumber || !docDate) {
         setScreenState('idle');
 
         return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
+      }
+
+      if (!isNumeric(docBoxWeight)) {
+        return Alert.alert('Ошибка!', 'Неправильный формат веса коробки.', [{ text: 'OK' }]);
       }
 
       const docId = !id ? generateId() : id;
@@ -111,7 +115,7 @@ export const PalletEditScreen = () => {
           status: 'DRAFT',
           head: {
             palletId,
-            boxWeight: docBoxWeight,
+            boxWeight: Number(docBoxWeight),
           },
           lines: [],
           creationDate: createdDate,
@@ -135,7 +139,7 @@ export const PalletEditScreen = () => {
           status: docStatus || 'DRAFT',
           head: {
             ...doc.head,
-            boxWeight: docBoxWeight,
+            boxWeight: Number(docBoxWeight),
           },
           creationDate: doc.creationDate || updatedDate,
           editionDate: updatedDate,
@@ -214,7 +218,7 @@ export const PalletEditScreen = () => {
 
           <Input
             label="Вес коробки"
-            value={docBoxWeight === 0 ? '' : docBoxWeight?.toString()}
+            value={docBoxWeight || ''}
             onChangeText={(text) => {
               dispatch(appActions.setFormParams({ boxWeight: text || '' }));
             }}

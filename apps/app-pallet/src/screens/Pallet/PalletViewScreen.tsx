@@ -45,8 +45,8 @@ import { IPalletDocument, IPalletLine } from '../../store/types';
 import { PalletStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import ViewTotal from './components/ViewTotal';
 import { BarcodeImage } from './components/Barcode';
+import ViewTotal from './components/ViewTotal';
 
 export const PalletViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -411,7 +411,7 @@ export const PalletViewScreen = () => {
               <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
             </View>
             <View style={styles.rowCenter}>
-              <MediumText>Вес коробки: {(doc.head.boxWeight || 0).toString()}</MediumText>
+              <MediumText>Вес коробки: {(doc.head.boxWeight || 0).toString()} кг</MediumText>
             </View>
             <BarcodeImage barcode={doc?.head.palletId} />
 
