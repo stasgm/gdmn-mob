@@ -8,9 +8,7 @@ export interface IPalletFormParam extends IFormParam {
   number?: string;
   documentDate?: string;
   status?: StatusType;
-  department?: Department;
-  comment?: string;
-  isBindGood?: boolean;
+  boxWeight?: number;
 }
 
 //Подразделения-склады
@@ -27,6 +25,7 @@ export interface IContact extends INamedEntity, IReferenceData {
 
 export interface IPalletHead extends IHead {
   palletId: string;
+  boxWeight: number;
   // department?: Department;
   // isBindGood?: boolean;
   // comment?: string;

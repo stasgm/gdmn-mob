@@ -16,16 +16,18 @@ export const BarcodeImage = ({ barcode }: IProps) => {
 
   return (
     <ViewShot style={localStyles.barcodeView}>
-      <Barcode
-        format="EAN13"
-        value={barcode}
-        text={barcode}
-        style={localStyles.marginTop5}
-        background={colors.background}
-        lineColor="black"
-        height={40}
-        width={2}
-      />
+      {barcode ? (
+        <Barcode
+          format="EAN13"
+          value={barcode}
+          text={barcode}
+          style={localStyles.marginTop5}
+          background={colors.background}
+          lineColor="black"
+          height={40}
+          width={2}
+        />
+      ) : null}
     </ViewShot>
   );
 };
