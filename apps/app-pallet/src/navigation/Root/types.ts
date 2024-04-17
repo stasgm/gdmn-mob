@@ -18,6 +18,7 @@ export type RefParamList = {
 export type PalletParamList = RefParamList & {
   PalletView: { id: string; docType?: string };
   PalletGood: { docId: string };
+  PalletEdit: { id: string; docType?: string } | undefined;
 };
 
 export type PalletStackParamList = { PalletList: undefined } & PalletParamList;

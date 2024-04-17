@@ -45,8 +45,8 @@ import { IPalletDocument, IPalletLine } from '../../store/types';
 import { PalletStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { BarcodeImage } from './components/Barcode';
 import ViewTotal from './components/ViewTotal';
+import { BarcodeImage } from './components/Barcode';
 
 export const PalletViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -226,7 +226,6 @@ export const PalletViewScreen = () => {
                 <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
               )}
               <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
-
               <ScanButton
                 onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('PalletGood', { docId: id }))}
                 disabled={screenState !== 'idle'}
@@ -251,6 +250,10 @@ export const PalletViewScreen = () => {
       screenState,
     ],
   );
+
+  const handleEditPalletHead = useCallback(() => {
+    navigation.navigate('PalletEdit', { id });
+  }, [navigation, id]);
 
   const windowWidth = useWindowDimensions().width;
 
@@ -399,7 +402,7 @@ export const PalletViewScreen = () => {
         <InfoBlock
           colorLabel={getStatusColor(doc?.status || 'DRAFT')}
           title={doc.documentType.description || ''}
-          onPress={() => !isEditable && setIsDateVisible(!isDateVisible)}
+          onPress={() => (isEditable ? handleEditPalletHead() : setIsDateVisible(!isDateVisible))}
           isBlocked={isBlocked}
           disabled={delList.length > 0}
         >
@@ -407,7 +410,11 @@ export const PalletViewScreen = () => {
             <View style={styles.rowCenter}>
               <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
             </View>
+            <View style={styles.rowCenter}>
+              <MediumText>Вес коробки: {(doc.head.boxWeight || 0).toString()}</MediumText>
+            </View>
             <BarcodeImage barcode={doc?.head.palletId} />
+
             {isDateVisible && <DateInfo sentDate={doc.sentDate} erpCreationDate={doc.erpCreationDate} />}
           </>
         </InfoBlock>

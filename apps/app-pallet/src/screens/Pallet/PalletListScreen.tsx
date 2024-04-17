@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import { SectionList, ListRenderItem, SectionListData, View, Alert } from 'react-native';
+import { SectionList, ListRenderItem, SectionListData, View } from 'react-native';
 import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
 import { Searchbar } from 'react-native-paper';
 
@@ -21,19 +21,16 @@ import {
   navBackDrawer,
 } from '@lib/mobile-ui';
 
-import { documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
+import { documentActions, useDocThunkDispatch, useSelector } from '@lib/store';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { deleteSelectedItems, generateId, getDateString, getDelList, keyExtractor } from '@lib/mobile-hooks';
+import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@lib/mobile-hooks';
 
 import { IDelList } from '@lib/mobile-types';
 
-import { IDocumentType, IReference } from '@lib/types';
-
 import { IPalletDocument } from '../../store/types';
 import { PalletStackParamList } from '../../navigation/Root/types';
-import { getEan13Barcode, getNextDocNumber } from '../../utils/helpers';
 
 import { BarcodeImage } from './components/Barcode';
 
@@ -55,8 +52,6 @@ export const PalletListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<PalletStackParamList, 'PalletList'>>();
   const docDispatch = useDocThunkDispatch();
 
-  const dispatch = useDispatch();
-
   const { colors } = useTheme();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -71,7 +66,6 @@ export const PalletListScreen = () => {
   // ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
   const list = useSelector((state) => state.documents.list) as IPalletDocument[];
 
-  const newNumber = useMemo(() => getNextDocNumber(list), [list]);
   const [delList, setDelList] = useState<IDelList>({});
   const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
 
@@ -86,42 +80,9 @@ export const PalletListScreen = () => {
     deleteSelectedItems(delList, deleteDocs);
   }, [delList, docDispatch]);
 
-  const scanType = refSelectors
-    .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data.find((t) => t.name === 'pallet');
-
   const handleAddDocument = useCallback(() => {
-    if (!scanType) {
-      Alert.alert('Ошибка!', 'Тип документа не найден!', [
-        {
-          text: 'ОК',
-        },
-      ]);
-      return;
-    } else {
-      const docId = generateId();
-      const palletId = getEan13Barcode();
-
-      const createdDate = new Date().toISOString();
-
-      const newDoc: IPalletDocument = {
-        id: docId,
-        documentType: scanType,
-        number: newNumber.trim(),
-        documentDate: createdDate,
-        status: 'DRAFT',
-        head: {
-          palletId,
-        },
-        lines: [],
-        creationDate: createdDate,
-        editionDate: createdDate,
-      };
-      dispatch(documentActions.addDocument(newDoc));
-
-      navigation.navigate('PalletView', { id: newDoc.id });
-    }
-  }, [dispatch, navigation, newNumber, scanType]);
+    navigation.navigate('PalletEdit');
+  }, [navigation]);
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
