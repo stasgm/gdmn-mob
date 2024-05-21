@@ -273,6 +273,7 @@ export const DocViewScreen = () => {
             </MediumText>
             {!!item.barcode && <MediumText style={[styles.number, styles.flexDirectionRow]}>{item.barcode}</MediumText>}
           </View>
+          <MediumText>НДС {(item.sumWNds || 0).toString()} р.</MediumText>
         </View>
       </ListItemLine>
     );
