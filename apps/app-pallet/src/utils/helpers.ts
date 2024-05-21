@@ -1,6 +1,9 @@
-// import { log } from '@lib/mobile-hooks';
 import { IDocument } from '@lib/types';
 import { customAlphabet } from 'nanoid';
+
+import { Audio } from 'expo-av';
+
+import { Alert } from 'react-native';
 
 import { IBarcodeSum } from '../store/app/types';
 
@@ -34,4 +37,14 @@ export const getEan13Barcode = () => {
   const res =
     barcode + (Math.ceil((arr.evenSum * 3 + arr.oddSum) / 10) * 10 - (arr.evenSum * 3 + arr.oddSum)).toString();
   return res;
+};
+
+export const alertWithSound = (label: string, text: string, onClose?: () => void) => {
+  const playSound = async () => {
+    const { sound } = await Audio.Sound.createAsync(require('../../assets/error.wav'));
+    await sound.playAsync();
+  };
+
+  playSound();
+  Alert.alert(label, text, [{ text: 'OK', onPress: onClose }]);
 };

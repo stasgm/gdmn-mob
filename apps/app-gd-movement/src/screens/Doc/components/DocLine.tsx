@@ -30,9 +30,10 @@ interface IProps {
   item: IMovementLine;
   onSetLine: (value: IMovementLine) => void;
   onSetDisabledSave: (value: boolean) => void;
+  isSumWNds?: boolean;
 }
 
-export const DocLine = ({ item, onSetLine, onSetDisabledSave }: IProps) => {
+export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProps) => {
   const { colors } = useTheme();
 
   const [goodEID, setGoodEID] = useState<string | undefined>(item?.EID?.toString());
@@ -50,6 +51,8 @@ export const DocLine = ({ item, onSetLine, onSetDisabledSave }: IProps) => {
   const isScreenKeyboard = settings.screenKeyboard?.data as boolean;
 
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(isScreenKeyboard);
+
+  const [isQuantity, setIsQuantity] = useState(true);
 
   useEffect(() => {
     !visibleDialog &&
@@ -126,10 +129,15 @@ export const DocLine = ({ item, onSetLine, onSetDisabledSave }: IProps) => {
       const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
       const q = validNumber.test(newValue) ? newValue : quantity;
       setQuantity(q);
-      onSetLine({ ...item, quantity: parseFloat(q || '0') });
+      onSetLine(isQuantity ? { ...item, quantity: parseFloat(q || '0') } : { ...item, sumWNds: parseFloat(q || '0') });
     },
-    [isKeyboardOpen, item, onSetLine, quantity],
+    [isKeyboardOpen, isQuantity, item, onSetLine, quantity],
   );
+
+  const handleChangeQuantity = useCallback(() => {
+    setIsQuantity(!isQuantity);
+    setQuantity(isQuantity ? item.quantity.toString() : (item.sumWNds || 0).toString());
+  }, [isQuantity, item.quantity, item.sumWNds]);
 
   const contentStyle = useMemo(
     () =>
@@ -207,10 +215,26 @@ export const DocLine = ({ item, onSetLine, onSetDisabledSave }: IProps) => {
             </View>
           </View>
           <ItemSeparator />
-          <View style={localStyles.item}>
-            <MediumText>Покупная цена:</MediumText>
-            <LargeText style={localStyles.value}>{buyingPrice.toString()}</LargeText>
-          </View>
+
+          {isSumWNds ? (
+            <View style={localStyles.item}>
+              <View style={localStyles.eIdView}>
+                <MediumText>{isQuantity ? 'Сумма с НДС:' : 'Количество:'}</MediumText>
+                <LargeText style={localStyles.value}>{item?.sumWNds?.toString() || '0'}</LargeText>
+              </View>
+              <View style={localStyles.button}>
+                <TouchableOpacity>
+                  <IconButton icon="pencil-outline" size={24} onPress={handleChangeQuantity} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : (
+            <View style={localStyles.item}>
+              <MediumText>Покупная цена:</MediumText>
+              <LargeText style={localStyles.value}>{buyingPrice.toString()}</LargeText>
+            </View>
+          )}
+
           <ItemSeparator />
           <View style={localStyles.item}>
             <View style={localStyles.eIdView}>
@@ -235,7 +259,7 @@ export const DocLine = ({ item, onSetLine, onSetDisabledSave }: IProps) => {
         <View style={localStyles.quant}>
           <ItemSeparator />
           <View style={localStyles.item}>
-            <MediumText>Количество:</MediumText>
+            <MediumText>{isQuantity ? 'Количество:' : 'Сумма с НДС:'}</MediumText>
             <TextInput
               style={localStyles.quantitySize}
               showSoftInputOnFocus={false}
@@ -262,7 +286,9 @@ export const DocLine = ({ item, onSetLine, onSetDisabledSave }: IProps) => {
           <NumberKeypad
             oldValue={quantity}
             onApply={(value) => {
-              onSetLine({ ...item, quantity: parseFloat(value) });
+              onSetLine(
+                isQuantity ? { ...item, quantity: parseFloat(value) } : { ...item, sumWNds: parseFloat(value) },
+              );
               setQuantity(value);
             }}
             decDigitsForTotal={3}
@@ -316,7 +342,6 @@ const localStyles = StyleSheet.create({
   eIdView: {
     flexDirection: 'row',
     width: '80%',
-    paddingVertical: 8,
   },
   quantitySize: {
     fontSize: 30,

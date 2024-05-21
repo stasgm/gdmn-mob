@@ -24,7 +24,15 @@ import {
   DateInfo,
 } from '@lib/mobile-ui';
 
-import { formatValue, generateId, getDateString, useSendDocs, keyExtractor, sleep } from '@lib/mobile-hooks';
+import {
+  formatValue,
+  generateId,
+  getDateString,
+  useSendDocs,
+  keyExtractor,
+  sleep,
+  useSendOneRefRequest,
+} from '@lib/mobile-hooks';
 
 import { INamedEntity, ScreenState } from '@lib/types';
 
@@ -35,6 +43,7 @@ import { FlashList } from '@shopify/flash-list';
 import {
   IContact,
   IDebt,
+  IGood,
   IOrderDocument,
   IOrderLine,
   IOutlet,
@@ -57,6 +66,12 @@ import { getCurrentPosition } from '../../utils/expoFunctions';
 import OrderItem from './components/OrderItem';
 import OrderTotal from './components/OrderTotal';
 import OrderLineEdit, { IOrderItemLine } from './components/OrderLineEdit';
+import { OrderCopyDialog } from './components/OrderCopyDialog';
+
+export type ICheckedLines = {
+  copyLines: IOrderLine[];
+  absentLines: IOrderLine[];
+};
 
 const OrderViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -90,6 +105,7 @@ const OrderViewScreen = () => {
   const limitSum = refSelectors.selectByRefId<IContact>('contact', order?.head?.contact.id)?.limitSum;
 
   const packages = refSelectors.selectByName<IPackageGood>('packageGood')?.data;
+  const goods = refSelectors.selectByName<IGood>('good')?.data;
 
   const handleAddOrderLine = useCallback(() => {
     navigation.navigate('SelectGood', {
@@ -109,10 +125,31 @@ const OrderViewScreen = () => {
 
   const visit = docSelectors.selectByDocType<IVisitDocument>('visit')?.find((e) => e.head.routeLineId === routeLineId);
 
+  const [visibleDebtDialog, setVisibleDebtDialog] = useState(false);
+
+  const sendRequest = useSendOneRefRequest('Дебиторская задолженность', {
+    name: 'debt',
+    contactId: order?.head?.contact?.id,
+  });
+
+  const handleSendDebtRequest = useCallback(async () => {
+    setVisibleDebtDialog(false);
+    await sendRequest();
+  }, [sendRequest]);
+
+  const handleOpenDebtDialog = () => {
+    setVisibleDebtDialog(true);
+  };
+
+  const [visibleCopyDialog, setVisibleCopyDialog] = useState(false);
+  const [absentLines, setAbsentLines] = useState<IOrderLine[]>([]);
+  const [copyLines, setCopyLines] = useState<IOrderLine[]>([]);
+
   const handleCopyOrder = useCallback(async () => {
     if (!order) {
       return;
     }
+
     setScreenState('copying');
     await sleep(1);
     const newId = generateId();
@@ -138,6 +175,7 @@ const OrderViewScreen = () => {
         route: routeId ? ({ id: routeId, name: '' } as INamedEntity) : undefined,
         onDate: newOnDate,
       },
+      lines: absentLines?.length ? copyLines : order.lines,
       documentDate: newDocDate,
       creationDate: newDocDate,
       editionDate: newDocDate,
@@ -203,7 +241,45 @@ const OrderViewScreen = () => {
       navigation.navigate('OrderView', { id: newId, routeId });
     }
     setScreenState('copied');
-  }, [order, routeId, orderList, routeLineId, navigation, visit, dispatch, docDispatch]);
+  }, [
+    order,
+    routeId,
+    orderList,
+    absentLines?.length,
+    copyLines,
+    routeLineId,
+    navigation,
+    visit,
+    dispatch,
+    docDispatch,
+  ]);
+
+  const handleCheckLines = useCallback(async () => {
+    if (!order) {
+      return;
+    }
+
+    const linesList: ICheckedLines = order.lines?.reduce(
+      (prev: ICheckedLines, cur) => {
+        const good = goods.find((g) => g.id === cur.good.id);
+        if (good) {
+          prev = { ...prev, copyLines: [...prev.copyLines, cur] };
+        } else {
+          prev = { ...prev, absentLines: [...prev.absentLines, cur] };
+        }
+        return prev;
+      },
+      { copyLines: [], absentLines: [] },
+    );
+
+    if (linesList.absentLines?.length) {
+      setAbsentLines(linesList.absentLines);
+      setCopyLines(linesList.copyLines);
+      setVisibleCopyDialog(true);
+    } else {
+      handleCopyOrder();
+    }
+  }, [goods, handleCopyOrder, order]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
@@ -299,7 +375,7 @@ const OrderViewScreen = () => {
           ? [
               {
                 title: 'Копировать заявку',
-                onPress: handleCopyOrder,
+                onPress: handleCheckLines,
               },
               {
                 title: 'Отмена',
@@ -309,7 +385,7 @@ const OrderViewScreen = () => {
           : [
               {
                 title: 'Копировать заявку',
-                onPress: handleCopyOrder,
+                onPress: handleCheckLines,
               },
               {
                 title: 'Удалить заявку',
@@ -331,8 +407,12 @@ const OrderViewScreen = () => {
               onPress: handleEditOrderHead,
             },
             {
+              title: 'Отправить запрос за дебиторской задолженностью',
+              onPress: handleOpenDebtDialog,
+            },
+            {
               title: 'Копировать заявку',
-              onPress: handleCopyOrder,
+              onPress: handleCheckLines,
             },
             {
               title: 'Удалить заявку',
@@ -350,7 +430,7 @@ const OrderViewScreen = () => {
     isBlocked,
     order?.status,
     readonly,
-    handleCopyOrder,
+    handleCheckLines,
     handleDelete,
     handleAddOrderLine,
     handleEditOrderHead,
@@ -534,6 +614,23 @@ const OrderViewScreen = () => {
         onCancel={() => setVisibleSendDialog(false)}
         onOk={handleSendDocument}
         okDisabled={loading}
+      />
+      <SimpleDialog
+        visible={visibleDebtDialog}
+        title={'Внимание!'}
+        text={'Отправить запрос на получение дебиторской задолженности?'}
+        onCancel={() => setVisibleDebtDialog(false)}
+        onOk={handleSendDebtRequest}
+        okDisabled={loading}
+      />
+      <OrderCopyDialog
+        lines={absentLines}
+        visible={visibleCopyDialog}
+        onOk={() => {
+          setVisibleCopyDialog(false);
+          handleCopyOrder();
+        }}
+        onCancel={() => setVisibleCopyDialog(false)}
       />
     </>
   );

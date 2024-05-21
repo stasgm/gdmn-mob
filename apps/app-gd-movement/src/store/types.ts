@@ -67,7 +67,7 @@ export interface IMovementLine extends IEntity {
   good: INamedEntity;
   quantity: number;
   price?: number;
-  buyingPrice?: number;
+  buyingPrice?: number; // покупная цена
   remains?: number;
   barcode?: string;
   EID?: string;
@@ -75,6 +75,7 @@ export interface IMovementLine extends IEntity {
   weightCode?: string;
   alias?: string;
   sortOrder?: number; // порядок сортировки
+  sumWNds?: number; // сумма с ндс
 }
 
 export type IMovementDocument = MandateProps<IDocument<IMovementHead, IMovementLine>, 'head' | 'lines'>;

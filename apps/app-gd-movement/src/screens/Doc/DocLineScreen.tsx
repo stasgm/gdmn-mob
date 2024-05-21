@@ -141,7 +141,12 @@ export const DocLineScreen = () => {
 
   return (
     <AppInputScreen>
-      <DocLine item={line} onSetLine={setLine} onSetDisabledSave={setDisabledSave} />
+      <DocLine
+        item={line}
+        onSetLine={setLine}
+        onSetDisabledSave={setDisabledSave}
+        isSumWNds={Boolean(document?.documentType.isSumWNds)}
+      />
     </AppInputScreen>
   );
 };
