@@ -46,6 +46,7 @@ export const PalletEditScreen = () => {
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {
     boxWeight: docBoxWeight,
+    palletWeight: docPalletWeight,
     number: docNumber,
     status: docStatus,
     documentDate: docDate,
@@ -67,6 +68,7 @@ export const PalletEditScreen = () => {
           documentDate: doc.documentDate,
           status: doc.status,
           boxWeight: doc.head.boxWeight.toString(),
+          palletWeight: doc.head.palletWeight.toString(),
         }),
       );
     } else {
@@ -91,13 +93,19 @@ export const PalletEditScreen = () => {
 
         return Alert.alert('Ошибка!', 'Тип документа для паллетного листа не найден', [{ text: 'OK' }]);
       }
-      if (!docBoxWeight || !docNumber || !docDate) {
+      if (!docBoxWeight || !docPalletWeight || !docNumber || !docDate) {
         setScreenState('idle');
 
         return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
       }
 
-      if (!isNumeric(docBoxWeight)) {
+      const boxWeight = docBoxWeight.includes(',') ? docBoxWeight.replace(',', '.') : docBoxWeight;
+      if (!isNumeric(boxWeight)) {
+        return Alert.alert('Ошибка!', 'Неправильный формат веса коробки.', [{ text: 'OK' }]);
+      }
+
+      const palletWeight = docPalletWeight.includes(',') ? docPalletWeight.replace(',', '.') : docPalletWeight;
+      if (!isNumeric(palletWeight)) {
         return Alert.alert('Ошибка!', 'Неправильный формат веса коробки.', [{ text: 'OK' }]);
       }
 
@@ -115,7 +123,8 @@ export const PalletEditScreen = () => {
           status: 'DRAFT',
           head: {
             palletId,
-            boxWeight: Number(docBoxWeight),
+            boxWeight: Number(boxWeight),
+            palletWeight: Number(palletWeight),
           },
           lines: [],
           creationDate: createdDate,
@@ -139,7 +148,8 @@ export const PalletEditScreen = () => {
           status: docStatus || 'DRAFT',
           head: {
             ...doc.head,
-            boxWeight: Number(docBoxWeight),
+            boxWeight: Number(boxWeight),
+            palletWeight: Number(palletWeight),
           },
           creationDate: doc.creationDate || updatedDate,
           editionDate: updatedDate,
@@ -151,7 +161,19 @@ export const PalletEditScreen = () => {
         navigation.navigate('PalletView', { id });
       }
     }
-  }, [palletType, docNumber, id, dispatch, navigation, doc, docStatus, screenState, docBoxWeight, docDate]);
+  }, [
+    palletType,
+    docNumber,
+    id,
+    dispatch,
+    navigation,
+    doc,
+    docStatus,
+    screenState,
+    docBoxWeight,
+    docDate,
+    docPalletWeight,
+  ]);
 
   const renderRight = useCallback(
     () => <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />,
@@ -215,12 +237,22 @@ export const PalletEditScreen = () => {
             keyboardType="url"
           />
           <SelectableInput label="Дата" value={getDateString(docDate || '')} disabled={true} />
-
           <Input
             label="Вес коробки"
             value={docBoxWeight || ''}
             onChangeText={(text) => {
               dispatch(appActions.setFormParams({ boxWeight: text || '' }));
+            }}
+            keyboardType={'numeric'}
+            clearInput={true}
+            autoCapitalize="none"
+            disabled={docStatus !== 'DRAFT'}
+          />
+          <Input
+            label="Вес поддона"
+            value={docPalletWeight || ''}
+            onChangeText={(text) => {
+              dispatch(appActions.setFormParams({ palletWeight: text || '' }));
             }}
             keyboardType={'numeric'}
             clearInput={true}

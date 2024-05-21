@@ -200,7 +200,16 @@ export const PalletListScreen = () => {
         errorMessage: i.errorMessage,
         sentDate: i.sentDate,
         erpCreationDate: i.erpCreationDate,
-        children: <BarcodeImage barcode={i?.head.palletId} />,
+        children: (
+          <BarcodeImage
+            barcode={i?.head.palletId}
+            isPrint={true}
+            printText={` <h1 style="font-size: 22px; font-family: Helvetica Neue; font-weight: normal;">
+        ${`№ ${i?.number || '-'} от ${getDateString(i?.documentDate || '')}` || ''}</h1>
+        <h1 style="font-size: 30px; font-family: Helvetica Neue; font-weight: normal;">${i?.head.palletId || ''}</h1>
+      `}
+          />
+        ),
       } as IListItemProps;
     });
   }, [filteredList.list, status]);

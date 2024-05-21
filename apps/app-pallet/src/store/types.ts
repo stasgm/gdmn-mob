@@ -9,6 +9,7 @@ export interface IPalletFormParam extends IFormParam {
   documentDate?: string;
   status?: StatusType;
   boxWeight?: string;
+  palletWeight?: string;
 }
 
 //Подразделения-склады
@@ -26,6 +27,7 @@ export interface IContact extends INamedEntity, IReferenceData {
 export interface IPalletHead extends IHead {
   palletId: string;
   boxWeight: number;
+  palletWeight: number;
   // department?: Department;
   // isBindGood?: boolean;
   // comment?: string;
