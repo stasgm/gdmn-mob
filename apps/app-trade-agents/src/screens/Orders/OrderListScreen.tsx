@@ -35,6 +35,8 @@ import { IDelList, IListItem } from '@lib/mobile-types';
 
 import { Searchbar } from 'react-native-paper';
 
+import { StatusTypes } from '@lib/mobile-ui/src/components/FilterButtons';
+
 import { IDebt, IOrderDocument, IOrderListFormParam, IOutlet } from '../../store/types';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
@@ -168,7 +170,9 @@ const OrderListScreen = () => {
           ? filteredOrderList.filter((e) => e.status !== 'PROCESSED')
           : status === 'archive'
             ? filteredOrderList.filter((e) => e.status === 'PROCESSED')
-            : [];
+            : status === 'refuse'
+              ? filteredOrderList.filter((e) => e.status === 'DRAFT' && e.errorMessage)
+              : [];
 
     return res.map((i) => {
       const address = outlets?.find((o) => i?.head?.outlet.id === o.id)?.address;
@@ -372,9 +376,27 @@ const OrderListScreen = () => {
     return <AppActivityIndicator />;
   }
 
+  const statusList: StatusTypes[] = [
+    {
+      name: 'Все',
+      status: 'all',
+    },
+    {
+      name: 'Текущие',
+      status: 'active',
+    },
+    {
+      name: 'Отказ',
+      status: 'refuse',
+    },
+    {
+      name: 'Архив',
+      status: 'archive',
+    },
+  ];
   return (
     <AppScreen>
-      <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} />
+      <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} statusList={statusList} />
       {filterVisible && (
         <>
           <View style={styles.flexDirectionRow}>

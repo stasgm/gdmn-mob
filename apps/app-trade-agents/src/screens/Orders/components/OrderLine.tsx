@@ -64,6 +64,17 @@ const OrderLine = ({ item, packages, onSetLine }: IProps) => {
           </View>
         </View>
         <ItemSeparator />
+        {item.good.scale ? (
+          <>
+            <View style={styles.item}>
+              <View style={styles.details}>
+                <Text style={styles.name}>Коэффициент перевода</Text>
+                <Text style={textStyle}>{item.good.scale.toString()}</Text>
+              </View>
+            </View>
+            <ItemSeparator />
+          </>
+        ) : null}
         <View style={localStyles.item}>
           <View style={styles.details}>
             <Text style={styles.name}>Упаковка</Text>
