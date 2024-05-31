@@ -162,6 +162,15 @@ export const appSettings: Settings = {
     group: scanSettings,
     groupInGroup: goodGroup,
   },
+  prefixGtin: {
+    id: 'prefixGtin',
+    sortOrder: 36,
+    description: 'Префикс ГТИН',
+    data: '01',
+    type: 'string',
+    visible: true,
+    group: scanSettings,
+  },
   screenKeyboard: {
     id: 'screenKeyboard',
     sortOrder: 8,

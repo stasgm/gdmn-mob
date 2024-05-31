@@ -26,6 +26,11 @@ import { IMovementLine } from '../../../store/types';
 
 import { ONE_SECOND_IN_MS } from '../../../utils/constants';
 
+interface IQuantity {
+  quantity?: string;
+  sumWNds?: string;
+}
+
 interface IProps {
   item: IMovementLine;
   onSetLine: (value: IMovementLine) => void;
@@ -53,6 +58,7 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(isScreenKeyboard);
 
   const [isQuantity, setIsQuantity] = useState(true);
+  const [changeOldValue, setChangeOldValue] = useState(true);
 
   useEffect(() => {
     !visibleDialog &&
@@ -116,29 +122,39 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
   const buyingPrice = item?.buyingPrice || 0;
   const barcode = item?.barcode || '';
 
-  const [quantity, setQuantity] = useState(item.quantity.toString());
+  const [keypadValue, setKeypadValue] = useState<IQuantity>({ quantity: item.quantity.toString() });
+
+  const getValue = useCallback(
+    (obj: any, value?: string | number) => {
+      return isQuantity ? { ...obj, quantity: value } : { ...obj, sumWNds: value };
+    },
+    [isQuantity],
+  );
 
   const handleChangeText = useCallback(
     (text: string) => {
       if (isKeyboardOpen) {
         setIsKeyboardOpen(false);
       }
+      setChangeOldValue(false);
       let newValue = text.replace(',', '.');
       newValue = !newValue.includes('.') ? parseFloat(newValue).toString() : newValue;
       newValue = Number.isNaN(parseFloat(newValue)) ? '0' : newValue;
       const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
-      const q = validNumber.test(newValue) ? newValue : quantity;
-      setQuantity(q);
-      onSetLine(isQuantity ? { ...item, quantity: parseFloat(q || '0') } : { ...item, sumWNds: parseFloat(q || '0') });
+      const q = validNumber.test(newValue) ? newValue : isQuantity ? keypadValue.quantity : keypadValue.sumWNds;
+      setKeypadValue(getValue(keypadValue, q));
+      onSetLine(getValue(keypadValue, parseFloat(q || '0')));
     },
-    [isKeyboardOpen, isQuantity, item, onSetLine, quantity],
+    [isKeyboardOpen, isQuantity, keypadValue, getValue, onSetLine],
   );
 
   const handleChangeQuantity = useCallback(() => {
     setIsQuantity(!isQuantity);
-    setQuantity(isQuantity ? item.quantity.toString() : (item.sumWNds || 0).toString());
-  }, [isQuantity, item.quantity, item.sumWNds]);
+    setChangeOldValue(true);
+    setKeypadValue(getValue(keypadValue, (isQuantity ? item.quantity : item.sumWNds || 0).toString()));
+  }, [getValue, isQuantity, item.quantity, item.sumWNds, keypadValue]);
 
+  const oldValue = useMemo(() => (isQuantity ? keypadValue.quantity : keypadValue.sumWNds), [isQuantity, keypadValue]);
   const contentStyle = useMemo(
     () =>
       ({
@@ -220,7 +236,9 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
             <View style={localStyles.item}>
               <View style={localStyles.eIdView}>
                 <MediumText>{isQuantity ? 'Сумма с НДС:' : 'Количество:'}</MediumText>
-                <LargeText style={localStyles.value}>{item?.sumWNds?.toString() || '0'}</LargeText>
+                <LargeText style={localStyles.value}>
+                  {isQuantity ? item?.sumWNds?.toString() || '0' : item?.quantity?.toString() || '0'}
+                </LargeText>
               </View>
               <View style={localStyles.button}>
                 <TouchableOpacity>
@@ -269,7 +287,7 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
               onChangeText={handleChangeText}
               returnKeyType="done"
               ref={currRef}
-              value={quantity}
+              value={isQuantity ? keypadValue.quantity : keypadValue.sumWNds}
             />
           </View>
           {isScreenKeyboard && (
@@ -284,14 +302,13 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
         </View>
         {isScreenKeyboard && isKeyboardOpen && (
           <NumberKeypad
-            oldValue={quantity}
+            oldValue={oldValue}
             onApply={(value) => {
-              onSetLine(
-                isQuantity ? { ...item, quantity: parseFloat(value) } : { ...item, sumWNds: parseFloat(value) },
-              );
-              setQuantity(value);
+              onSetLine(getValue(item, parseFloat(value)));
+              setKeypadValue(getValue(keypadValue, value));
             }}
             decDigitsForTotal={3}
+            changeOldValue={changeOldValue}
           />
         )}
       </View>
