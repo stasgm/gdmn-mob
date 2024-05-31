@@ -75,7 +75,7 @@ export const DocEditScreen = () => {
 
   const defaultFromDepartment = useMemo(
     () =>
-      isNamedEntity(fromDepartmentSetting) && (docFromContactType ? docFromContactType?.id === 'department' : true)
+      isNamedEntity(fromDepartmentSetting) && (docFromContactType ? docFromContactType?.id === 'department' : false)
         ? fromDepartmentSetting
         : undefined,
     [fromDepartmentSetting, docFromContactType],
@@ -94,8 +94,11 @@ export const DocEditScreen = () => {
   );
 
   const dtFromContact = useMemo(
-    () => contactTypes.find((item) => (defaultFromDepartment ? item.id === 'department' : item.id === dt?.fromType)),
-    [defaultFromDepartment, dt?.fromType],
+    () =>
+      contactTypes.find((item) =>
+        defaultFromDepartment && docFromContactType ? item.id === 'department' : item.id === dt?.fromType,
+      ),
+    [defaultFromDepartment, docFromContactType, dt?.fromType],
   );
 
   useEffect(() => {
@@ -340,6 +343,18 @@ export const DocEditScreen = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, docDocumentType, defaultFromDepartment, oldDocTypeId]);
+
+  useEffect(() => {
+    //Если меняем тип документа и для поля Откуда есть подразделение по умолчанию
+    if (docFromContactType) {
+      dispatch(
+        appActions.setFormParams({
+          fromContact:
+            defaultFromDepartment && docDocumentType?.fromType === 'department' ? defaultFromDepartment : undefined,
+        }),
+      );
+    }
+  }, [dispatch, docDocumentType, defaultFromDepartment, docFromContactType]);
 
   const handlePresentType = () => {
     if (isBlocked) {

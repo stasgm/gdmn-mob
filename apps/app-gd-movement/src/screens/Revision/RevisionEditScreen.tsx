@@ -19,7 +19,7 @@ import {
 } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
-import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks';
+import { generateId, getDateString, isNamedEntity, useFilteredDocList } from '@lib/mobile-hooks';
 
 import { IDocumentType, IReference, ScreenState } from '@lib/types';
 
@@ -43,6 +43,13 @@ export const RevisionEditScreen = () => {
     ?.data.find((t) => t.name === 'revision');
 
   const doc = useMemo(() => documents?.find((e) => e.id === id), [documents, id]);
+
+  const departmentSetting = useSelector((state) => state.settings?.userData?.toDepartment?.data);
+
+  const defaultDepart = useMemo(
+    () => (isNamedEntity(departmentSetting) ? departmentSetting : undefined),
+    [departmentSetting],
+  );
 
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {
@@ -79,11 +86,12 @@ export const RevisionEditScreen = () => {
           number: newNumber,
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
+          department: defaultDepart,
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, doc]);
+  }, [dispatch, doc, defaultDepart]);
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
