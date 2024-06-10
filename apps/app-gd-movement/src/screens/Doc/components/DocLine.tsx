@@ -219,19 +219,25 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
               <ItemSeparator />
             </View>
           ) : null}
-          <View style={localStyles.item}>
-            <View style={localStyles.halfItem}>
-              <MediumText>Цена:</MediumText>
-              <LargeText style={localStyles.value}>{price.toString()}</LargeText>
-            </View>
-            <View style={[{ backgroundColor: colors.primary }, localStyles.verticalLine]} />
-            <View style={[localStyles.halfItem, localStyles.halfItemRemView]}>
+          {isSumWNds ? (
+            <View style={localStyles.item}>
               <MediumText>Остаток:</MediumText>
               <LargeText style={localStyles.value}>{remains.toString()}</LargeText>
             </View>
-          </View>
+          ) : (
+            <View style={localStyles.item}>
+              <View style={localStyles.halfItem}>
+                <MediumText>Цена:</MediumText>
+                <LargeText style={localStyles.value}>{price.toString()}</LargeText>
+              </View>
+              <View style={[{ backgroundColor: colors.primary }, localStyles.verticalLine]} />
+              <View style={[localStyles.halfItem, localStyles.halfItemRemView]}>
+                <MediumText>Остаток:</MediumText>
+                <LargeText style={localStyles.value}>{remains.toString()}</LargeText>
+              </View>
+            </View>
+          )}
           <ItemSeparator />
-
           {isSumWNds ? (
             <View style={localStyles.item}>
               <View style={localStyles.eIdView}>
@@ -359,6 +365,7 @@ const localStyles = StyleSheet.create({
   eIdView: {
     flexDirection: 'row',
     width: '80%',
+    alignItems: 'center',
   },
   quantitySize: {
     fontSize: 30,

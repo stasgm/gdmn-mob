@@ -63,7 +63,14 @@ export const DocViewScreen = () => {
   const loading = useSelector((state) => state.app.loading);
 
   const docLineQuantity = doc?.lines?.reduce((sum, line) => sum + line.quantity, 0) || 0;
-  const docLineSum = doc?.lines?.reduce((sum, line) => sum + line.quantity * (line?.price || 0), 0) || 0;
+  const docLineSum = useMemo(
+    () =>
+      doc?.lines?.reduce(
+        (sum, line) => sum + (doc?.documentType?.isSumWNds ? line?.sumWNds || 0 : line.quantity * (line?.price || 0)),
+        0,
+      ) || 0,
+    [doc?.documentType?.isSumWNds, doc?.lines],
+  );
 
   const lines = doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0));
   const isBlocked = doc?.status !== 'DRAFT';
@@ -269,11 +276,11 @@ export const DocViewScreen = () => {
           <LargeText style={styles.textBold}>{item.good.name}</LargeText>
           <View style={styles.directionRow}>
             <MediumText>
-              {item.quantity} {good?.valueName} x {(item.price || 0).toString()} р.
+              {item.quantity} {good?.valueName} {!item.sumWNds ? `x ${(item.price || 0).toString()} р.` : null}
             </MediumText>
             {!!item.barcode && <MediumText style={[styles.number, styles.flexDirectionRow]}>{item.barcode}</MediumText>}
           </View>
-          <MediumText>НДС {(item.sumWNds || 0).toString()} р.</MediumText>
+          {item.sumWNds ? <MediumText>Сумма НДС {(item.sumWNds || 0).toString()} р.</MediumText> : null}
         </View>
       </ListItemLine>
     );
@@ -517,7 +524,12 @@ export const DocViewScreen = () => {
         extraData={[goods, delList, isDelList, isBlocked, navigation, id]}
       />
       {doc.lines?.length ? (
-        <DocTotal lineCount={doc.lines?.length || 0} sum={docLineSum} quantity={docLineQuantity} />
+        <DocTotal
+          lineCount={doc.lines?.length || 0}
+          sum={docLineSum}
+          quantity={docLineQuantity}
+          sumWNds={doc?.documentType?.isSumWNds}
+        />
       ) : null}
       <SimpleDialog
         visible={visibleSendDialog}
