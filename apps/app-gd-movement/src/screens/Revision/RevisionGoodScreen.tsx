@@ -12,7 +12,7 @@ import { IScannedObject } from '@lib/client-types';
 
 import { generateId } from '@lib/mobile-hooks';
 
-import { INamedEntity, ISettingsOption } from '@lib/types';
+import { INamedEntity } from '@lib/types';
 
 import { RevisionStackParamList } from '../../navigation/Root/types';
 import { IRevisionDocument, IRevisionLine } from '../../store/types';
@@ -57,9 +57,6 @@ const RevisionGoodScreen = () => {
     contactId ? getRemGoodByContact(goods, remains[contactId], true) : {},
   );
 
-  const settings = useSelector((state) => state.settings?.data);
-  const prefixGtin = (settings.prefixGtin as ISettingsOption<string>)?.data || '';
-
   const handleGetScannedObject = useCallback(
     (brc: string) => {
       // if (doc?.head.isBindGood && doc?.lines?.find((l) => l.barcode === brc)) {
@@ -74,16 +71,14 @@ const RevisionGoodScreen = () => {
         return;
       }
 
-      const newBrc = brc.slice(0, 2) === prefixGtin ? brc.slice(3, 16) : brc;
-
       const scannedGood = {
         id: generateId(),
-        barcode: newBrc,
+        barcode: brc,
       };
 
-      const line = doc.lines.find((i) => i.barcode === newBrc);
+      const line = doc.lines.find((i) => i.barcode === brc);
 
-      const remItem = goodRemains[newBrc];
+      const remItem = goodRemains[brc];
 
       if (remItem) {
         setScaner({ state: line ? 'error' : 'found' });
@@ -100,7 +95,7 @@ const RevisionGoodScreen = () => {
 
         return;
       } else {
-        const good = goods.find((i) => i.barcode === newBrc);
+        const good = goods.find((i) => i.barcode === brc);
 
         if (good) {
           setScaner({ state: line ? 'error' : 'found' });
@@ -124,7 +119,7 @@ const RevisionGoodScreen = () => {
         }
       }
     },
-    [doc, goodRemains, goods, prefixGtin],
+    [doc, goodRemains, goods],
   );
 
   const [currentLineId, setCurrentLineId] = useState('');

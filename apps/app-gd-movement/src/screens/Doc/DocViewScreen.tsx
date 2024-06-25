@@ -43,7 +43,7 @@ import { DocStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS, unknownGood } from '../../utils/constants';
 import { IGood, IMGoodData, IMGoodRemain, IRemains } from '../../store/app/types';
 
-import { getRemGoodByContact } from '../../utils/helpers';
+import { getBrc, getRemGoodByContact } from '../../utils/helpers';
 
 import { appInventoryActions } from '../../store';
 
@@ -327,16 +327,15 @@ export const DocViewScreen = () => {
         return;
       }
 
-      const newBrc = brc.slice(0, 2) === prefixGtin ? brc.slice(3, 16) : brc;
-
       let charFrom = 0;
       let charTo = weightSettingsWeightCode.data.length;
 
       let scannedObject: IMovementLine;
 
-      if (newBrc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
+      if (brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
         const remItem =
-          goodRemains[newBrc] || (documentType?.isRemains ? undefined : { good: { ...unknownGood, barcode: newBrc } });
+          getBrc(brc, prefixGtin, goodRemains) ||
+          (documentType?.isRemains ? undefined : { good: { ...unknownGood, barcode: brc } });
         // Находим товар из модели остатков по баркоду, если баркод не найден, то
         //   если выбор из остатков, то undefined,
         //   иначе подставляем unknownGood cо сканированным шк и добавляем в позицию документа
@@ -367,16 +366,16 @@ export const DocViewScreen = () => {
       } else {
         charFrom = charTo;
         charTo = charFrom + weightSettingsCountCode;
-        const code = Number(newBrc.substring(charFrom, charTo)).toString();
+        const code = Number(brc.substring(charFrom, charTo)).toString();
 
         charFrom = charTo;
         charTo = charFrom + weightSettingsCountWeight;
 
-        const qty = Number(newBrc.substring(charFrom, charTo)) / 1000;
+        const qty = Number(brc.substring(charFrom, charTo)) / 1000;
 
         const remItem =
           Object.values(goodRemains)?.find((item: IMGoodRemain) => item.good.weightCode?.trim() === code) ||
-          (documentType?.isRemains ? undefined : { good: { ...unknownGood, barcode: newBrc } });
+          (documentType?.isRemains ? undefined : { good: { ...unknownGood, barcode: brc } });
 
         if (!remItem) {
           Alert.alert('Внимание!', 'Товар не найден', [

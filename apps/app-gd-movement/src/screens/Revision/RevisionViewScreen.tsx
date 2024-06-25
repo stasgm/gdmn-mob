@@ -44,7 +44,7 @@ import {
   keyExtractor,
 } from '@lib/mobile-hooks';
 
-import { INamedEntity, ISettingsOption, ScreenState } from '@lib/types';
+import { INamedEntity, ScreenState } from '@lib/types';
 
 import { FlashList } from '@shopify/flash-list';
 
@@ -88,9 +88,6 @@ export const RevisionViewScreen = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const settings = useSelector((state) => state.settings?.data);
-  const prefixGtin = (settings.prefixGtin as ISettingsOption<string>)?.data || '';
 
   const ref = useRef<TextInput>(null);
 
@@ -330,11 +327,9 @@ export const RevisionViewScreen = () => {
         return;
       }
 
-      const newBrc = brc.slice(0, 2) === prefixGtin ? brc.slice(3, 16) : brc;
+      const line = lines?.find((i) => i.barcode === brc);
 
-      const line = lines?.find((i) => i.barcode === newBrc);
-
-      const remItem = goodRemains[newBrc];
+      const remItem = goodRemains[brc];
 
       if (remItem) {
         if (line) {
@@ -356,7 +351,7 @@ export const RevisionViewScreen = () => {
             sortOrder: (lines?.[0]?.sortOrder || 0) + 1,
             price: remItem.remains?.length ? remItem.remains[0].price : 0,
             remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
-            barcode: remItem.good.barcode || newBrc || '',
+            barcode: remItem.good.barcode || brc || '',
           };
 
           Alert.alert(
@@ -380,7 +375,7 @@ export const RevisionViewScreen = () => {
         return;
       }
 
-      const refGood = goods.find((i) => i.barcode === newBrc);
+      const refGood = goods.find((i) => i.barcode === brc);
       if (refGood) {
         if (line) {
           if (visibleDialog) {
@@ -398,7 +393,7 @@ export const RevisionViewScreen = () => {
           const newLine: IRevisionLine = {
             good: { id: refGood.id, name: refGood.name },
             id: generateId(),
-            barcode: newBrc,
+            barcode: brc,
             sortOrder: (lines?.[0]?.sortOrder || 0) + 1,
             price: refGood.price || 0,
           };
@@ -422,7 +417,7 @@ export const RevisionViewScreen = () => {
       if (!remItem && !refGood) {
         if (line) {
           Alert.alert(
-            line.withGood ? `Штрихкод ${newBrc} уже привязан` : `Штрихкод ${newBrc} уже добавлен`,
+            line.withGood ? `Штрихкод ${brc} уже привязан` : `Штрихкод ${brc} уже добавлен`,
             line.withGood
               ? `${line.good?.name || ''}\nЦена: ${line.price || 0} р.\n\nЗаменить товар?`
               : 'Добавить товар',
@@ -449,10 +444,10 @@ export const RevisionViewScreen = () => {
         const newLine: IRevisionLine = {
           good: unknownGood,
           id: generateId(),
-          barcode: newBrc,
+          barcode: brc,
           sortOrder: (lines?.[0]?.sortOrder || 0) + 1,
         };
-        Alert.alert('Товар не найден', newBrc, [
+        Alert.alert('Товар не найден', brc, [
           {
             text: 'Добавить',
             onPress: () => {
@@ -490,7 +485,7 @@ export const RevisionViewScreen = () => {
       }
       handleFocus();
     },
-    [dispatch, doc, goodRemains, goods, id, isBlocked, lines, navigation, prefixGtin, visibleDialog],
+    [dispatch, doc, goodRemains, goods, id, isBlocked, lines, navigation, visibleDialog],
   );
 
   const handleSearchBarcode = () => {
