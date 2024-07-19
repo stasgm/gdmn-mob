@@ -22,14 +22,14 @@
     "@lib/client-api": "*",
     "@lib/store": "*",
     "@lib/types": "*",
-    "@react-native-community/netinfo": "9.3.10",
-    "@types/node": "^20.8.4",
-    "@types/react": "~18.2.43",
+    "@react-native-community/netinfo": "11.3.1",
+    "@types/node": "^20.14.9",
+    "@types/react": "~18.2.79",
     "nanoid": "^3.3.4",
     "react": "18.2.0",
-    "react-native": "0.72.10",
-    "react-native-get-random-values": "~1.9.0",
-    "typescript": "^5.2.2"
+    "react-native": "0.74.3",
+    "react-native-get-random-values": "~1.11.0",
+    "typescript": "~5.3.3"
   },
   "devDependencies": {
     "@config/eslint-config": "*",

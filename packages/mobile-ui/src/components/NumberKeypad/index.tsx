@@ -13,11 +13,12 @@ interface IProps {
   onDismiss?: () => void;
   onApply: (newValue: string) => void;
   changeOldValue?: boolean;
+  onSave?: () => void;
 }
 
 const isDiv0 = (expression: string, number?: string) => Number(number) === 0 && expression.indexOf('/') >= 0;
 
-const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal, changeOldValue = false }: IProps) => {
+const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal, changeOldValue = false, onSave }: IProps) => {
   const [expression, setExpression] = useState('');
   const [number, setNumber] = useState(oldValue);
   const [firstOperation, setFirstOperation] = useState(true);
@@ -135,7 +136,7 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal, changeO
     ],
     [
       { title: '-', onPress: () => handleOperationPress({ value: '-' }), operation: true },
-      { title: '+', onPress: () => handleOperationPress({ value: '+' }), grow: 2, operation: true },
+      { title: '+', onPress: () => handleOperationPress({ value: '+' }), grow: 1, operation: true },
       {
         title: '=',
         onPress: () => {
@@ -146,6 +147,7 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal, changeO
         grow: 2,
         operation: true,
       },
+      { title: 'OK', onPress: () => onSave && onSave(), grow: 1, operation: true },
     ],
   ];
 
