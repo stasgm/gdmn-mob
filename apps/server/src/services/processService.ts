@@ -4,7 +4,7 @@ import { unlinkSync, renameSync, existsSync } from 'fs';
 
 import { IAddProcessResponse, IStatusResponse, AddProcess, IProcessedFiles, NewMessage, ICmd } from '@lib/types';
 
-import log from '../utils/logger';
+import { log } from '../utils';
 
 import { DataNotFoundException, ForbiddenException, InnerErrorException } from '../exceptions';
 

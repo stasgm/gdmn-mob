@@ -1,5 +1,5 @@
 import { Box, Container } from '@mui/material';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { IUser } from '@lib/types';
 
 import SortableTable from '../../components/SortableTable';

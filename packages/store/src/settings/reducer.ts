@@ -107,6 +107,16 @@ const baseSettings: Settings<IBaseSettings> = {
     visible: true,
     group: cleanDocSettingGroup,
   },
+  cleanDefaultDocTime: {
+    id: 'cleanDefaultDocTime',
+    description: 'Минимум, дн.',
+    data: 7,
+    type: 'number',
+    sortOrder: 8,
+    visible: true,
+    group: cleanDocSettingGroup,
+    readonly: true,
+  },
 };
 
 export const initialState: Readonly<SettingsState> = {
@@ -176,6 +186,7 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
 
     case getType(actions.deleteOption): {
       const removeProps = action.payload;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [removeProps]: remove, ...rest } = state.data;
       return { ...state, data: rest };
     }

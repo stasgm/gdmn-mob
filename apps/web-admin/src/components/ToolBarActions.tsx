@@ -1,15 +1,16 @@
-import React from 'react';
 import { Button, Box, IconButton, Toolbar, Menu, MenuProps, MenuItemProps, Icon, styled } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemText from '@mui/material/ListItemText';
+
+import { useState } from 'react';
 
 import { IToolBarButton } from '../types';
 interface props {
   buttons: IToolBarButton[];
 }
 
-const StyledMenu = styled(Menu)(({ theme }) => ({
+const StyledMenu = styled(Menu)(() => ({
   paper: {
     border: '1px solid #d3d4d5',
   },
@@ -56,7 +57,7 @@ const ToolBarActions = ({ buttons }: props) => {
     },
   }));
 
-  const MyMenuItem = (props: MenuItemProps) => <StyledMenuItem />;
+  const MyMenuItem = (props: MenuItemProps) => <StyledMenuItem {...props} />;
 
   const buttonsList = (
     <Box>
@@ -81,7 +82,7 @@ const ToolBarActions = ({ buttons }: props) => {
     </>
   );
 
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);

@@ -6,11 +6,11 @@ import FilterIcon from '@mui/icons-material/FilterAltOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import DriveFileMoveOutlinedIcon from '@mui/icons-material/DriveFileMoveOutlined';
 
-import { IFileObject, IFileSystem } from '@lib/types';
+import { IFileParams, ISystemFile } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import { IFileFilter, IHeadCells, IFilePageParam, IToolBarButton } from '../../types';
+import { IFileFilter, IFilePageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
 import actions from '../../store/file';
@@ -54,8 +54,6 @@ const FileList = () => {
     fetchFiles(pageParams?.filesFilters);
   }, [fetchFiles, pageParams?.filesFilters]);
 
-  console.log('pageParams', pageParams?.filesFilters);
-
   const [pageParamLocal, setPageParamLocal] = useState<IFilePageParam | undefined>(pageParams);
 
   const [filterVisible, setFilterVisible] = useState(pageParams?.filesFilters ? true : false);
@@ -70,11 +68,11 @@ const FileList = () => {
     // fetchDevices('');
   };
 
-  useEffect(() => {
-    if (pageParams?.filesFilters) {
-      fetchFiles(pageParams?.filesFilters);
-    }
-  }, [fetchFiles, pageParams?.filesFilters]);
+  // useEffect(() => {
+  //   if (pageParams?.filesFilters) {
+  //     fetchFiles(pageParams?.filesFilters);
+  //   }
+  // }, [fetchFiles, pageParams?.filesFilters]);
 
   const handleSearchClick = () => {
     dispatch(actions.fileSystemActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
@@ -91,11 +89,7 @@ const FileList = () => {
     dispatch(actions.fileSystemActions.clearError());
   };
 
-  const handleClearFilters = () => {
-    dispatch(actions.fileSystemActions.clearFilesFilters());
-  };
-
-  const [selectedFileIds, setSelectedFileIds] = useState<IFileSystem[]>([]);
+  const [selectedFileIds, setSelectedFileIds] = useState<ISystemFile[]>([]);
 
   const handleSelectAll = (event: any) => {
     let newSelectedFileIds;
@@ -109,10 +103,10 @@ const FileList = () => {
     setSelectedFileIds(newSelectedFileIds);
   };
 
-  const handleSelectOne = (_event: any, file: IFileSystem) => {
-    const selectedIndex = selectedFileIds.map((item: IFileSystem) => item.id).indexOf(file.id);
+  const handleSelectOne = (_event: any, file: ISystemFile) => {
+    const selectedIndex = selectedFileIds.map((item: ISystemFile) => item.id).indexOf(file.id);
 
-    let newSelectedFileIds: IFileSystem[] = [];
+    let newSelectedFileIds: ISystemFile[] = [];
 
     if (selectedIndex === -1) {
       newSelectedFileIds = newSelectedFileIds.concat(selectedFileIds, file);
@@ -137,7 +131,7 @@ const FileList = () => {
 
   //   if (selectedFileIds.length === 0) {
   //     if (selectedFiles.length > 0) {
-  //       const newSelectedFileIds = selectedFiles.map((file: IFileSystem) => file);
+  //       const newSelectedFileIds = selectedFiles.map((file: ISystemFile) => file);
 
   //       setSelectedFileIds(newSelectedFileIds);
   //     }
@@ -178,17 +172,16 @@ const FileList = () => {
 
   const handleDelete = useCallback(() => {
     setOpen(false);
-    const ids: IFileObject[] = selectedFileIds.map((i) => {
+    const ids: IFileParams[] = selectedFileIds.map((i) => {
       return {
         id: i.id,
         appSystemId: i.appSystem?.id || '',
         companyId: i.company?.id || '',
-        ext: i.ext || '',
         folder: i.folder || '',
       };
     });
     if (ids) {
-      dispatch(actions.removeFiles(ids));
+      dispatch(actions.deleteFiles(ids));
       setSelectedFileIds([]);
     }
   }, [dispatch, selectedFileIds]);
@@ -250,7 +243,6 @@ const FileList = () => {
           id: i.id,
           appSystemId: i.appSystem?.id || '',
           companyId: i.company?.id || '',
-          ext: i.ext || '',
           folder: i.folder || '',
         };
       });

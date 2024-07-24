@@ -1,8 +1,6 @@
 import { Box, CircularProgress, CardHeader } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { useCallback, useEffect } from 'react';
-
 import FileDetails from '../../components/file/FileDetails';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import fileActions from '../../store/file';
@@ -20,26 +18,26 @@ const FileEdit = () => {
 
   const dispatch: AppDispatch = useDispatch();
 
-  const { loading, errorMessage, file, pageParams, list } = useSelector((state) => state.files);
+  const { loading, errorMessage, file } = useSelector((state) => state.files);
 
   const fileObject = fileSelectors.fileByIdAndFolder(id);
 
-  const fetchFile = useCallback(() => {
-    dispatch(
-      fileActions.fetchFile(
-        id,
-        fileObject?.ext || '',
-        fileObject?.folder || '',
-        fileObject?.appSystem?.id || '',
-        fileObject?.company?.id || '',
-      ),
-    );
-  }, [dispatch, fileObject?.appSystem?.id, fileObject?.company?.id, fileObject?.ext, fileObject?.folder, id]);
+  // const fetchFile = useCallback(() => {
+  //   dispatch(
+  //     fileActions.fetchFile(
+  //       id,
+  //       // fileObject?.ext || '',
+  //       fileObject?.folder || '',
+  //       fileObject?.appSystem?.id || '',
+  //       fileObject?.company?.id || '',
+  //     ),
+  //   );
+  // }, [dispatch, fileObject?.appSystem?.id, fileObject?.company?.id, fileObject?.folder, id]);
 
-  useEffect(() => {
-    // Загружаем данные при загрузке компонента.
-    fetchFile();
-  }, [fetchFile]);
+  // useEffect(() => {
+  //   // Загружаем данные при загрузке компонента.
+  //   fetchFile();
+  // }, [fetchFile]);
 
   const goBack = () => {
     navigate(-1);
@@ -54,7 +52,6 @@ const FileEdit = () => {
       fileActions.updateFile(
         id,
         values as any,
-        fileObject?.ext || '',
         fileObject?.folder || '',
         fileObject?.appSystem?.id || '',
         fileObject?.company?.id || '',

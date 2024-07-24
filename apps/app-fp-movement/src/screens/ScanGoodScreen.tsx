@@ -104,7 +104,7 @@ const ScanGoodScreen = () => {
 
   const departs = refSelectors.selectByName<IAddressStoreEntity>('depart')?.data;
 
-  const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
+  // const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
   const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
   const documentType = useMemo(
@@ -122,9 +122,9 @@ const ScanGoodScreen = () => {
 
   const goodRemains = useMemo<IRemGood[]>(() => {
     return shipment?.head?.fromDepart?.id && isFocused && remains
-      ? getRemGoodListByContact(goods, remains[shipment.head.fromDepart.id], docList, shipment.head.fromDepart.id)
+      ? getRemGoodListByContact(goods, remains[shipment.head.fromDepart.id] /*, docList, shipment.head.fromDepart.id*/)
       : [];
-  }, [docList, goods, isFocused, remains, shipment?.head?.fromDepart?.id]);
+  }, [goods, isFocused, remains, shipment?.head?.fromDepart?.id]);
 
   const handleGetScannedObject = useCallback(
     (brc: string) => {

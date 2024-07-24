@@ -2,7 +2,7 @@ import { IActivationCode, IDBActivationCode } from '@lib/types';
 
 import { DataNotFoundException } from '../exceptions';
 
-import { extraPredicate } from '../utils/helpers';
+import { extraPredicate } from '../utils';
 
 import { getDb } from './dao/db';
 

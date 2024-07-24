@@ -1,5 +1,4 @@
 import { Context, Next } from 'koa';
-import { IUser } from '@lib/types';
 
 import { DataNotFoundException, InvalidParameterException } from '../exceptions';
 

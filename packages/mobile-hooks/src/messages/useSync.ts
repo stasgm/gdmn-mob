@@ -21,7 +21,7 @@ import {
 import api, { isConnectError } from '@lib/client-api';
 import {
   BodyType,
-  IDeviceLog,
+  IDeviceLogEntry,
   IDocument,
   IMessage,
   IReferences,
@@ -38,7 +38,7 @@ import { generateId, getDateString, isIMessage, isIReferences, isNumeric } from 
 import { mobileRequest } from '../mobileRequest';
 
 import { getNextOrder, MULTIPART_ITEM_LIVE_IN_MS, needRequest } from './helpers';
-import { useSaveErrors } from './useSaveErrors';
+import { useSendDeviceLog } from './useSendDeviceLog';
 
 export const useSync = (onSync?: () => Promise<any>) => {
   const docDispatch = useDocThunkDispatch();
@@ -47,8 +47,10 @@ export const useSync = (onSync?: () => Promise<any>) => {
   const settingsDispatch = useSettingsThunkDispatch();
   const dispatch = useDispatch();
 
+  const clean = 0;
+
   const addError = useCallback(
-    (name: string, message: string, errs: IDeviceLog[], addErrorNotice = true) => {
+    (name: string, message: string, errs: IDeviceLogEntry[], addErrorNotice = true) => {
       const err = {
         id: generateId(),
         name,
@@ -82,6 +84,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
   const settings = useSelector((state) => state.settings.data);
 
   const cleanDocTime = (settings.cleanDocTime as ISettingsOption<number>).data || 0;
+  const cleanDefaultDocTime = (settings.cleanDefaultDocTime as ISettingsOption<number>)?.data || 7;
   const cleanDraftDocTime = (settings.cleanDraftDocTime as ISettingsOption<number>)?.data || 0;
   const cleanReadyDocTime = (settings.cleanReadyDocTime as ISettingsOption<number>)?.data || 0;
   const cleanSentDocTime = (settings.cleanSentDocTime as ISettingsOption<number>)?.data || 0;
@@ -97,7 +100,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
   const docVersion = 1;
   const setVersion = 1;
 
-  const { saveErrors } = useSaveErrors();
+  const saveErrors = useSendDeviceLog();
 
   const params = useMemo(
     () => (appSystem && company ? { appSystemId: appSystem?.id, companyId: company?.id } : undefined),
@@ -105,7 +108,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
   );
 
   const processMessage = useCallback(
-    async (msg: IMessage, tempErrs: IDeviceLog[], multipartId?: string) => {
+    async (msg: IMessage, tempErrs: IDeviceLogEntry[], multipartId?: string) => {
       if (!msg || !params) {
         return;
       }
@@ -435,7 +438,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
     dispatch(appActions.setLoading(true));
     dispatch(appActions.clearRequestNotice());
     dispatch(appActions.clearErrorNotice());
-    const tempErrs: IDeviceLog[] = [];
+    const tempErrs: IDeviceLogEntry[] = [];
     let connectError = false;
 
     try {
@@ -737,7 +740,7 @@ export const useSync = (onSync?: () => Promise<any>) => {
                 }
 
                 const removeDocumentsByStatus = async (status: StatusType, cleanTime: number, message: string) => {
-                  if (cleanTime > 0) {
+                  if (cleanTime >= cleanDefaultDocTime) {
                     const maxDocDate = new Date();
                     maxDocDate.setDate(maxDocDate.getDate() - cleanTime);
 

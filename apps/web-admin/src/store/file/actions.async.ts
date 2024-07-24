@@ -3,7 +3,7 @@ import api from '@lib/client-api';
 
 import { authActions } from '@lib/store';
 
-import { IFileObject } from '@lib/types';
+import { IFileParams } from '@lib/types';
 
 import { AppState } from '..';
 
@@ -29,7 +29,6 @@ const fetchFiles = (
 
   return async (dispatch) => {
     dispatch(fileSystemActions.fetchFilesAsync.request(''));
-
     const response = await api.file.getFiles(webRequest(dispatch, authActions), params);
 
     if (response.type === 'GET_FILES') {
@@ -40,18 +39,17 @@ const fetchFiles = (
   };
 };
 
-const fetchFile = (id: string, ext?: string, folder?: string, appSystemId?: string, companyId?: string): AppThunk => {
+const fetchFile = (id: string, folder?: string, appSystemId?: string, companyId?: string): AppThunk => {
   return async (dispatch) => {
     dispatch(fileSystemActions.fetchFileAsync.request(''));
 
-    const params: Record<string, string | number> = { id };
+    const params: Record<string, string | number> = {};
 
-    if (ext) params.ext = ext;
     if (folder) params.folder = folder;
     if (appSystemId) params.appSystemId = appSystemId;
     if (companyId) params.companyId = companyId;
 
-    const response = await api.file.getFile(webRequest(dispatch, authActions), params);
+    const response = await api.file.getFile(webRequest(dispatch, authActions), id, params);
 
     if (response.type === 'GET_FILE') {
       return dispatch(fileSystemActions.fetchFileAsync.success(response.file));
@@ -61,25 +59,17 @@ const fetchFile = (id: string, ext?: string, folder?: string, appSystemId?: stri
   };
 };
 
-const updateFile = (
-  id: string,
-  file: any,
-  ext?: string,
-  folder?: string,
-  appSystemId?: string,
-  companyId?: string,
-): AppThunk => {
+const updateFile = (id: string, file: any, folder?: string, appSystemId?: string, companyId?: string): AppThunk => {
   return async (dispatch) => {
     dispatch(fileSystemActions.updateFileAsync.request('Обновление файла'));
 
-    const params: Record<string, string | number> = { id };
+    const params: Record<string, string | number> = {};
 
-    if (ext) params.ext = ext;
     if (folder) params.folder = folder;
     if (appSystemId) params.appSystemId = appSystemId;
     if (companyId) params.companyId = companyId;
 
-    const response = await api.file.updateFile(webRequest(dispatch, authActions), file, params);
+    const response = await api.file.updateFile(webRequest(dispatch, authActions), id, params, file);
 
     if (response.type === 'UPDATE_FILE') {
       return dispatch(fileSystemActions.updateFileAsync.success(response.file));
@@ -89,18 +79,17 @@ const updateFile = (
   };
 };
 
-const removeFile = (id: string, ext?: string, folder?: string, appSystemId?: string, companyId?: string): AppThunk => {
+const deleteFile = (id: string, folder?: string, appSystemId?: string, companyId?: string): AppThunk => {
   return async (dispatch) => {
     dispatch(fileSystemActions.removeFileAsync.request(''));
 
-    const params: Record<string, string | number> = { id };
+    const params: Record<string, string | number> = {};
 
-    if (ext) params.ext = ext;
     if (folder) params.folder = folder;
     if (appSystemId) params.appSystemId = appSystemId;
     if (companyId) params.companyId = companyId;
 
-    const response = await api.file.removeFile(webRequest(dispatch, authActions), params);
+    const response = await api.file.deleteFile(webRequest(dispatch, authActions), id, params);
 
     if (response.type === 'REMOVE_FILE') {
       return dispatch(fileSystemActions.removeFileAsync.success(id));
@@ -110,11 +99,11 @@ const removeFile = (id: string, ext?: string, folder?: string, appSystemId?: str
   };
 };
 
-const removeFiles = (fileIds: IFileObject[]): AppThunk => {
+const deleteFiles = (fileIds: IFileParams[]): AppThunk => {
   return async (dispatch) => {
     dispatch(fileSystemActions.removeFilesAsync.request(''));
 
-    const response = await api.file.removeFiles(webRequest(dispatch, authActions), fileIds);
+    const response = await api.file.deleteFiles(webRequest(dispatch, authActions), fileIds);
 
     if (response.type === 'REMOVE_FILES') {
       return dispatch(fileSystemActions.removeFilesAsync.success(fileIds));
@@ -124,13 +113,12 @@ const removeFiles = (fileIds: IFileObject[]): AppThunk => {
   };
 };
 
-const moveFiles = (fileIds: IFileObject[], folderName: string): AppThunk => {
+const moveFiles = (fileIds: IFileParams[], folderName: string): AppThunk => {
   return async (dispatch) => {
     dispatch(fileSystemActions.moveFilesAsync.request(''));
 
-    console.log('fileIds', fileIds);
     const response = await api.file.moveFiles(webRequest(dispatch, authActions), fileIds, folderName);
-    console.log('foldername', folderName);
+
     if (response.type === 'MOVE_FILES') {
       return dispatch(fileSystemActions.moveFilesAsync.success(fileIds));
     }
@@ -158,4 +146,4 @@ const fetchFolders = (companyId: string, appSystemId: string): AppThunk => {
   };
 };
 
-export default { fetchFiles, fetchFile, updateFile, removeFile, removeFiles, moveFiles, fetchFolders };
+export default { fetchFiles, fetchFile, updateFile, deleteFile, deleteFiles, moveFiles, fetchFolders };

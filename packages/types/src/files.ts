@@ -6,42 +6,52 @@ export interface IExtraFileInfo {
   consumer?: INamedEntity;
   producer?: INamedEntity;
   device?: INamedEntity;
+  uid?: string;
   folder?: string;
 }
 
-export interface IFileSystem extends IEntity, IExtraFileInfo {
+export interface ISystemFile extends IEntity, IExtraFileInfo {
   [key: string]: unknown;
   date: string;
   size: number;
   path: string;
   mdate: string;
-  ext: string;
 }
 
-export interface IFileSearchOptions {
-  [fieldName: string]: unknown;
-  path: string;
-  fileName: string;
-  uid: string;
-  date: string;
-  company: string;
-  appSystem: string;
-  consumer: string;
-  producer: string;
-  device: string;
+export interface IPathParams {
+  companyId: string;
+  appSystemId: string;
+  folder?: string;
 }
 
-export interface IFileQueryObject {
+export interface IFileQueryParams {
   companyId?: string;
   appSystemId?: string;
   folder?: string;
-  ext?: string;
 }
 
-export interface IFileObject extends IFileQueryObject {
+export interface IFileParams extends IFileQueryParams {
   id: string;
 }
-export interface IFileIds {
-  ids: IFileObject[];
+
+export interface ISystemFileParams {
+  companyId: string;
+  appSystemId?: string;
+  id?: string;
+  folder?: string;
+}
+
+export interface IDeleteFilesRequest {
+  files: IFileParams[];
+}
+
+export interface IMoveFilesRequest {
+  files: IFileParams[];
   toFolder?: string;
+}
+
+export interface IFileActionResult {
+  file: string;
+  success: boolean;
+  error?: string;
 }

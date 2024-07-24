@@ -48,6 +48,7 @@ const reducer: Reducer<MessagesState, MsgActionType> = (state = initialState, ac
       };
 
     case getType(actions.removeMultipartItem): {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [action.payload]: _, ...rest } = state.multipartData;
       return {
         ...state,

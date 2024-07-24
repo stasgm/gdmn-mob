@@ -1,4 +1,4 @@
-import { IDeviceLogFiles } from '@lib/types';
+import { IDeviceLogFile } from '@lib/types';
 import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@mui/material';
 
 import { NavLink } from 'react-router-dom';
@@ -6,7 +6,7 @@ import { NavLink } from 'react-router-dom';
 import { adminPath } from '../../utils/constants';
 
 interface IProps {
-  deviceLogs: IDeviceLogFiles;
+  deviceLogs: IDeviceLogFile;
 }
 
 const DeviceLogDetailsView = ({ deviceLogs }: IProps) => {

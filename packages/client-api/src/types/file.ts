@@ -1,4 +1,4 @@
-import { IDeviceLog, IFileSystem } from '@lib/types';
+import { IFileActionResult, ISystemFile } from '@lib/types';
 
 export interface IFileQueryResponse {
   type:
@@ -14,7 +14,7 @@ export interface IFileQueryResponse {
 
 export interface IGetFilesResponse extends IFileQueryResponse {
   type: 'GET_FILES';
-  files: IFileSystem[];
+  files: ISystemFile[];
 }
 
 export interface IGetFileResponse extends IFileQueryResponse {
@@ -37,12 +37,12 @@ export interface IRemoveFileResponse extends IFileQueryResponse {
 
 export interface IRemoveFilesResponse extends IFileQueryResponse {
   type: 'REMOVE_FILES';
-  fileIds: string[];
+  deletedFiles: IFileActionResult[];
 }
 
 export interface IMoveFilesResponse extends IFileQueryResponse {
   type: 'MOVE_FILES';
-  fileIds: string[];
+  movedFiles: IFileActionResult[];
 }
 
 export interface IGetFoldersResponse extends IFileQueryResponse {

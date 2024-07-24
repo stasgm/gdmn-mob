@@ -15,7 +15,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
-import { IDeviceLog } from '@lib/types';
+import { IDeviceLogEntry } from '@lib/types';
 
 import { useSelector, useDispatch } from '../../store';
 import { IHeadCells, ILinkedEntity, IToolBarButton } from '../../types';
@@ -38,43 +38,54 @@ const DeviceLogView = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading, errorMessage, logList } = useSelector((state) => state.deviceLogs);
+  const { loading, errorMessage, deviceLog } = useSelector((state) => state.deviceLogs);
 
-  const deviceLog = deviceLogSelectors.deviceLogById(id);
+  const deviceLogFile = deviceLogSelectors.deviceLogFileById(id);
 
-  const fetchDeviceLogs = useCallback(() => {
+  const fetchDeviceLog = useCallback(() => {
     dispatch(
       deviceLogActions.fetchDeviceLog(
         id,
-        deviceLog?.ext || '',
-        deviceLog?.folder || '',
-        deviceLog?.appSystem?.id || '',
-        deviceLog?.company?.id || '',
+        deviceLogFile?.folder || '',
+        deviceLogFile?.appSystem?.id || '',
+        deviceLogFile?.company?.id || '',
       ),
     );
-  }, [dispatch, id, deviceLog]);
+  }, [dispatch, id, deviceLogFile]);
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchDeviceLogs();
-  }, [fetchDeviceLogs]);
+    fetchDeviceLog();
+  }, [fetchDeviceLog]);
 
   const deviceLogsDetails: ILinkedEntity[] = useMemo(
     () =>
-      deviceLog
+      deviceLogFile
         ? [
-            { id: 'Компания', value: deviceLog.company, link: `${adminPath}/app/companies/${deviceLog.company.id}/` },
+            {
+              id: 'Компания',
+              value: deviceLogFile.company,
+              link: `${adminPath}/app/companies/${deviceLogFile.company.id}/`,
+            },
             {
               id: 'Подсистема',
-              value: deviceLog?.appSystem,
-              link: `${adminPath}/app/appSystems/${deviceLog.appSystem.id}/`,
+              value: deviceLogFile?.appSystem,
+              link: `${adminPath}/app/appSystems/${deviceLogFile.appSystem.id}/`,
             },
-            { id: 'Устройство', value: deviceLog.device, link: `${adminPath}/app/devices/${deviceLog.device.id}/` },
-            { id: 'Идентификатор устройства', value: deviceLog?.device.id },
-            { id: 'Пользователь', value: deviceLog?.contact, link: `${adminPath}/app/users/${deviceLog.contact.id}/` },
+            {
+              id: 'Устройство',
+              value: deviceLogFile.device,
+              link: `${adminPath}/app/devices/${deviceLogFile.device.id}/`,
+            },
+            { id: 'Идентификатор устройства', value: deviceLogFile?.device.id },
+            {
+              id: 'Пользователь',
+              value: deviceLogFile?.producer,
+              link: `${adminPath}/app/users/${deviceLogFile.producer.id}/`,
+            },
           ]
         : [],
-    [deviceLog],
+    [deviceLogFile],
   );
 
   const [open, setOpen] = useState(false);
@@ -86,30 +97,28 @@ const DeviceLogView = () => {
   const handleDelete = useCallback(async () => {
     setOpen(false);
     const res = await dispatch(
-      deviceLogActions.removeDeviceLog(
+      deviceLogActions.deleteDeviceLog(
         id,
-        deviceLog?.ext || '',
-        deviceLog?.folder || '',
-        deviceLog?.appSystem?.id || '',
-        deviceLog?.company?.id || '',
+        deviceLogFile?.folder || '',
+        deviceLogFile?.appSystem?.id || '',
+        deviceLogFile?.company?.id || '',
       ),
     );
     if (res.type === 'DEVICE_LOG/REMOVE_DEVICE_LOG_SUCCESS') {
       navigate(-1);
     }
-  }, [deviceLog, dispatch, id, navigate]);
+  }, [deviceLogFile, dispatch, id, navigate]);
 
   const refreshData = useCallback(() => {
     dispatch(
       deviceLogActions.fetchDeviceLog(
         id,
-        deviceLog?.ext || '',
-        deviceLog?.folder || '',
-        deviceLog?.appSystem?.id || '',
-        deviceLog?.company?.id || '',
+        deviceLogFile?.folder || '',
+        deviceLogFile?.appSystem?.id || '',
+        deviceLogFile?.company?.id || '',
       ),
     );
-  }, [dispatch, id, deviceLog?.appSystem?.id, deviceLog?.company?.id, deviceLog?.ext, deviceLog?.folder]);
+  }, [dispatch, id, deviceLogFile?.appSystem?.id, deviceLogFile?.company?.id, deviceLogFile?.folder]);
 
   useEffect(() => {
     refreshData();
@@ -127,7 +136,7 @@ const DeviceLogView = () => {
     dispatch(deviceLogActions.deviceLogActions.clearError());
   };
 
-  if (!deviceLog) {
+  if (!deviceLogFile) {
     return (
       <Box
         sx={{
@@ -160,7 +169,7 @@ const DeviceLogView = () => {
     },
   ];
 
-  const headCells: IHeadCells<IDeviceLog>[] = [
+  const headCells: IHeadCells<IDeviceLogEntry>[] = [
     { id: 'name', label: 'Функция', sortEnable: true, filterEnable: true },
     { id: 'message', label: 'Сообщение', sortEnable: true, filterEnable: true },
     { id: 'date', label: 'Дата', sortEnable: true, filterEnable: true },
@@ -219,7 +228,7 @@ const DeviceLogView = () => {
           <DetailsView details={deviceLogsDetails} />
         </Box>
         <Box sx={{ pt: 2 }}>
-          <SortableTable<IDeviceLog> headCells={headCells} data={logList} />
+          <SortableTable<IDeviceLogEntry> headCells={headCells} data={deviceLog} />
         </Box>
       </Box>
 

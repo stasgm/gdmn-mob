@@ -1,5 +1,5 @@
 import { IUser } from '@lib/types';
-import { Avatar, Box, Button, Card, CardActions, CardContent, Divider, Typography, Input } from '@mui/material';
+import { Avatar, Box, Button, Card, CardActions, CardContent, Divider, Typography } from '@mui/material';
 
 const avatar1 = require('../../../assets/images/avatar1.svg');
 

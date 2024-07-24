@@ -8,7 +8,7 @@ import {
   RootState,
 } from '@lib/store';
 
-import { ICmdParams, IDeviceLog, IMessage } from '@lib/types';
+import { ICmdParams, IDeviceLogEntry, IMessage } from '@lib/types';
 import api, { isConnectError } from '@lib/client-api';
 
 import { useMemo } from 'react';
@@ -18,7 +18,7 @@ import { generateId } from '../utils';
 import { mobileRequest } from '../mobileRequest';
 
 import { getNextOrder, needRequest } from './helpers';
-import { useSaveErrors } from './useSaveErrors';
+import { useSendDeviceLog } from './useSendDeviceLog';
 
 export const useSendOneRefRequest = (description: string, params: ICmdParams) => {
   const dispatch = useDispatch();
@@ -29,7 +29,7 @@ export const useSendOneRefRequest = (description: string, params: ICmdParams) =>
   const { user, company, config, appSystem } = useSelector((state) => state.auth);
   const refVersion = 1;
   const deviceId = config.deviceId!;
-  const { saveErrors } = useSaveErrors();
+  const saveErrors = useSendDeviceLog();
 
   const addRequestNotice = (message: string) => {
     dispatch(
@@ -40,7 +40,7 @@ export const useSendOneRefRequest = (description: string, params: ICmdParams) =>
     );
   };
 
-  const addError = (name: string, message: string, tempErrs: IDeviceLog[]) => {
+  const addError = (name: string, message: string, tempErrs: IDeviceLogEntry[]) => {
     const err = {
       id: generateId(),
       name,
@@ -55,7 +55,7 @@ export const useSendOneRefRequest = (description: string, params: ICmdParams) =>
     dispatch(appActions.setLoading(true));
     dispatch(appActions.clearRequestNotice());
     dispatch(appActions.clearErrorNotice());
-    const tempErrs: IDeviceLog[] = [];
+    const tempErrs: IDeviceLogEntry[] = [];
     let connectError = false;
 
     if (!user || !company || !appSystem || !user.erpUser) {

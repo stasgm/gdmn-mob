@@ -1,7 +1,7 @@
-import { Context, Next } from 'koa';
 import { IUser } from '@lib/types';
+import { Context, Next } from 'koa';
 
-export const companyMiddleware = async (ctx: Context, next: Next) => {
+export const setAdminIdMiddleware = async (ctx: Context, next: Next) => {
   const user = ctx.state.user as IUser;
 
   if (user?.role !== 'SuperAdmin') {

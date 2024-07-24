@@ -1,11 +1,11 @@
-import { IFileSystem } from '@lib/types';
+import { ISystemFile } from '@lib/types';
 import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@mui/material';
 import { NavLink } from 'react-router-dom';
 
 import { adminPath } from '../../utils/constants';
 
 interface IProps {
-  list: IFileSystem;
+  list: ISystemFile;
 }
 const FileDetailsView = ({ list }: IProps) => {
   return (
@@ -22,7 +22,7 @@ const FileDetailsView = ({ list }: IProps) => {
             </Grid>
             <Grid item md={10} xs={6}>
               <Typography variant="subtitle1" gutterBottom>
-                {list.fileName}
+                {list.id}
               </Typography>
             </Grid>
             <Grid item md={2} xs={6}>
@@ -35,7 +35,6 @@ const FileDetailsView = ({ list }: IProps) => {
                 {list.path}
               </Typography>
             </Grid>
-
             {list.company ? (
               <>
                 <Grid item md={2} xs={6}>
@@ -52,7 +51,6 @@ const FileDetailsView = ({ list }: IProps) => {
                 </Grid>
               </>
             ) : null}
-
             {list.appSystem ? (
               <>
                 <Grid item md={2} xs={6}>
@@ -67,7 +65,6 @@ const FileDetailsView = ({ list }: IProps) => {
                 </Grid>
               </>
             ) : null}
-
             {list.device ? (
               <>
                 <Grid item md={2} xs={6}>
@@ -80,7 +77,6 @@ const FileDetailsView = ({ list }: IProps) => {
                     {list.device?.name}
                   </Typography>
                 </Grid>
-
                 <Grid item md={2} xs={6}>
                   <Typography variant="subtitle1" gutterBottom>
                     Номер
@@ -107,7 +103,6 @@ const FileDetailsView = ({ list }: IProps) => {
                 </Grid>
               </>
             ) : null}
-
             {list.consumer ? (
               <>
                 <Grid item md={2} xs={6}>
@@ -122,7 +117,6 @@ const FileDetailsView = ({ list }: IProps) => {
                 </Grid>
               </>
             ) : null}
-
             <Grid item md={2} xs={6}>
               <Typography variant="subtitle1" gutterBottom>
                 Дата
@@ -133,7 +127,6 @@ const FileDetailsView = ({ list }: IProps) => {
                 {new Date(list.date || '').toLocaleString('ru', { hour12: false })}
               </Typography>
             </Grid>
-
             <Grid item md={2} xs={6}>
               <Typography variant="subtitle1" gutterBottom>
                 Размер

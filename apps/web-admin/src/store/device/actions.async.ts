@@ -1,4 +1,4 @@
-import api, { CustomRequest } from '@lib/client-api';
+import api from '@lib/client-api';
 import { authActions } from '@lib/store';
 import { IDevice, NewDevice } from '@lib/types';
 

@@ -21,6 +21,7 @@ import {
   ScanButton,
   SaveDocument,
   SimpleDialog,
+  DateInfo,
 } from '@lib/mobile-ui';
 
 import {
@@ -869,26 +870,7 @@ const ShipmentViewScreen = () => {
         <View style={styles.infoBlock}>
           <MediumText>{shipment.head.outlet?.name || ''}</MediumText>
           <MediumText>{`№ ${shipment.number} на ${getDateString(shipment.head?.onDate)}`}</MediumText>
-          {isDateVisible && (
-            <>
-              {shipment.sentDate ? (
-                <View style={styles.rowCenter}>
-                  <MediumText>
-                    Отправлено: {getDateString(shipment.sentDate)}{' '}
-                    {new Date(shipment.sentDate).toLocaleTimeString('ru', { hour12: false })}
-                  </MediumText>
-                </View>
-              ) : null}
-              {shipment.erpCreationDate ? (
-                <View style={styles.rowCenter}>
-                  <MediumText>
-                    Обработано: {getDateString(shipment.erpCreationDate)}{' '}
-                    {new Date(shipment.erpCreationDate).toLocaleTimeString('ru', { hour12: false })}
-                  </MediumText>
-                </View>
-              ) : null}
-            </>
-          )}
+          {isDateVisible && <DateInfo sentDate={shipment.sentDate} erpCreationDate={shipment.erpCreationDate} />}
         </View>
       </InfoBlock>
       <LineTypes />

@@ -100,14 +100,7 @@ const reducer: Reducer<IFileSystemState, FileSystemActionType> = (state = initia
       return {
         ...state,
         loading: false,
-        list: state.list.filter(
-          (
-            i, //{
-          ) =>
-            // console.log('1234', action.payload);
-            action.payload.indexOf(i) === -1,
-          // action.payload.indexOf(i) === -1;
-        ),
+        list: state.list.filter((i) => action.payload.findIndex((fileObj) => fileObj.id === i.id) === -1),
       };
 
     case getType(fileSystemActions.removeFilesAsync.failure):

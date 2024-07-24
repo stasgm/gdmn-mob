@@ -20,10 +20,13 @@ export const getCode = () => {
 };
 
 export const getFilterObject = (filesFilters: IFileFilter) => {
-  const newFilters: IFilterObject = Object.entries(filesFilters).reduce((prev, [name, value]) => {
-    prev[name] = { ...prev[name], value };
-    return prev;
-  }, fileFilterValues);
+  const newFilters: IFilterObject = Object.entries(filesFilters).reduce(
+    (prev, [name, value]) => {
+      prev[name] = { ...prev[name], value };
+      return prev;
+    },
+    { ...fileFilterValues },
+  );
   return newFilters;
 };
 

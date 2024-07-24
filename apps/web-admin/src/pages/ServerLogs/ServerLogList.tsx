@@ -5,7 +5,7 @@ import CachedIcon from '@mui/icons-material/Cached';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import { IFileFilter, IPageParam, IToolBarButton } from '../../types';
+import { IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
 import actions from '../../store/serverLog';
@@ -20,7 +20,7 @@ const ServerLogList = () => {
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
   const fetchServerLogs = useCallback(
-    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+    (filterText?: string, _fromRecord?: number, _toRecord?: number) => {
       dispatch(actions.fetchServerLogs(filterText));
     },
     [dispatch],

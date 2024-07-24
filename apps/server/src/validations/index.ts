@@ -9,6 +9,7 @@ import * as appSystemValidation from './appSystem';
 import * as deviceLogValidation from './deviceLog';
 import * as fileValidation from './file';
 import * as serverLogValidation from './serverLog';
+import * as erpLogValidation from './erpLog';
 
 export {
   authValidation,
@@ -22,4 +23,5 @@ export {
   deviceLogValidation,
   fileValidation,
   serverLogValidation,
+  erpLogValidation,
 };

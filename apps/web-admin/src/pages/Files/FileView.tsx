@@ -21,8 +21,6 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
-import { IFileSystem } from '@lib/types';
-
 import { useSelector, useDispatch } from '../../store';
 import { IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
@@ -47,7 +45,7 @@ const FileView = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading, errorMessage, file, list, folders } = useSelector((state) => state.files);
+  const { loading, errorMessage, file, folders } = useSelector((state) => state.files);
 
   const fileObject = fileSelectors.fileByIdAndFolder(id);
 
@@ -55,7 +53,6 @@ const FileView = () => {
     dispatch(
       fileActions.fetchFile(
         id,
-        fileObject?.ext || '',
         fileObject?.folder || '',
         fileObject?.appSystem?.id || '',
         fileObject?.company?.id || '',
@@ -96,9 +93,8 @@ const FileView = () => {
   const handleDelete = useCallback(async () => {
     setOpen(false);
     const res = await dispatch(
-      fileActions.removeFile(
+      fileActions.deleteFile(
         id,
-        fileObject?.ext || '',
         fileObject?.folder || '',
         fileObject?.appSystem?.id || '',
         fileObject?.company?.id || '',
@@ -109,21 +105,21 @@ const FileView = () => {
     }
   }, [dispatch, fileObject, id, navigate]);
 
-  const refreshData = useCallback(() => {
-    dispatch(
-      fileActions.fetchFile(
-        id,
-        fileObject?.ext || '',
-        fileObject?.folder || '',
-        fileObject?.appSystem?.id || '',
-        fileObject?.company?.id || '',
-      ),
-    );
-  }, [dispatch, fileObject, id]);
+  // const refreshData = useCallback(() => {
+  //   dispatch(
+  //     fileActions.fetchFile(
+  //       id,
+  //       fileObject?.ext || '',
+  //       fileObject?.folder || '',
+  //       fileObject?.appSystem?.id || '',
+  //       fileObject?.company?.id || '',
+  //     ),
+  //   );
+  // }, [dispatch, fileObject, id]);
 
-  useEffect(() => {
-    refreshData();
-  }, [refreshData]);
+  // useEffect(() => {
+  //   refreshData();
+  // }, [refreshData]);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -151,7 +147,6 @@ const FileView = () => {
               id: id,
               appSystemId: fileObject.appSystem?.id || '',
               companyId: fileObject.company?.id || '',
-              ext: fileObject.ext || '',
               folder: fileObject.folder || '',
             },
           ],
@@ -186,7 +181,7 @@ const FileView = () => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${fileObject?.id}.${fileObject?.ext}`;
+    a.download = fileObject?.id || '';
     a.click();
     window.URL.revokeObjectURL(url);
   }, [file, fileObject]);
@@ -211,7 +206,7 @@ const FileView = () => {
       sx: { marginRight: 1 },
       color: 'primary',
       variant: 'contained',
-      onClick: refreshData,
+      onClick: fetchFile,
       icon: <CachedIcon />,
     },
     {

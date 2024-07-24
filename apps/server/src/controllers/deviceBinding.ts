@@ -4,7 +4,7 @@ import { IDeviceBinding, NewDeviceBinding } from '@lib/types';
 
 import { deviceBindingService } from '../services';
 
-import { created, ok } from '../utils/apiHelpers';
+import { created, ok, prepareParams } from '../utils';
 import { DataNotFoundException } from '../exceptions';
 
 const addDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => {
@@ -26,17 +26,15 @@ const updateDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => 
 };
 
 const removeDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id }: { id: string } = ctx.params;
+  const { id: deviceBindingId } = ctx.params;
 
-  deviceBindingService.deleteOne(id);
+  deviceBindingService.deleteOne(deviceBindingId);
 
-  ok(ctx as Context, undefined, `removeDevice: device '${id}' is successfully removed `);
-
-  // TODO передавать только код 204 без body
+  ok(ctx as Context, undefined, `removeDeviceBinding: deviceBinding '${deviceBindingId}' is successfully removed `);
 };
 
 const getDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: deviceBindingId }: { id: string } = ctx.params;
+  const { id: deviceBindingId } = ctx.params;
 
   const deviceBinding = deviceBindingService.findOne(deviceBindingId);
 
@@ -48,37 +46,11 @@ const getDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getDeviceBindings = async (ctx: ParameterizedContext): Promise<void> => {
-  const { deviceId, companyId, userId, state, filterText, fromRecord, toRecord } = ctx.query;
-
-  const params: Record<string, string> = {};
-
-  if (companyId && typeof companyId === 'string') {
-    params.companyId = companyId;
-  }
-
-  if (typeof deviceId === 'string') {
-    params.deviceId = deviceId;
-  }
-
-  if (typeof userId === 'string') {
-    params.userId = userId;
-  }
-
-  if (typeof state === 'string') {
-    params.state = state;
-  }
-
-  if (typeof filterText === 'string') {
-    params.filterText = filterText;
-  }
-
-  if (typeof fromRecord === 'string') {
-    params.fromRecord = fromRecord;
-  }
-
-  if (typeof toRecord === 'string') {
-    params.toRecord = toRecord;
-  }
+  const params = prepareParams(
+    ctx.query,
+    ['companyId', 'deviceId', 'userId', 'state', 'filterText'],
+    ['fromRecord', 'toRecord'],
+  );
 
   const deviceBindingList = deviceBindingService.findMany(params);
 

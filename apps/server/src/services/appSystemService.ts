@@ -2,7 +2,7 @@ import { IAppSystem, NewAppSystem } from '@lib/types';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
 
-import { extraPredicate, getListPart } from '../utils/helpers';
+import { extraPredicate, formatDateToLocale, getListPart } from '../utils';
 
 import { appSystems as mockAppSystems } from './data/appSystems';
 
@@ -114,7 +114,8 @@ const findMany = (params: Record<string, string | number>): IAppSystem[] => {
   }
 
   appSystemList = appSystemList.filter((item) => {
-    const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { fromRecord, toRecord, ...newParams } = params;
 
     /* filtering data */
     let filteredAppSystems = true;
@@ -124,8 +125,8 @@ const findMany = (params: Record<string, string | number>): IAppSystem[] => {
       if (filterText) {
         const name = item.name.toUpperCase();
         const description = item.description?.toUpperCase() || '';
-        const creationDate = new Date(item.creationDate || '').toLocaleString('ru', { hour12: false });
-        const editionDate = new Date(item.editionDate || '').toLocaleString('ru', { hour12: false });
+        const creationDate = formatDateToLocale(item.creationDate);
+        const editionDate = formatDateToLocale(item.editionDate);
 
         filteredAppSystems =
           name.includes(filterText) ||
@@ -139,7 +140,7 @@ const findMany = (params: Record<string, string | number>): IAppSystem[] => {
     return filteredAppSystems && extraPredicate(item, newParams as Record<string, string>);
   });
 
-  return getListPart(appSystemList, params);
+  return getListPart<IAppSystem>(appSystemList, params);
 };
 
 export { addOne, updateOne, deleteOne, findOne, findMany };

@@ -389,12 +389,12 @@ const FileListTable = ({
                               item === 'company'
                                 ? companyList
                                 : item === 'appSystem'
-                                ? appSystemList
-                                : item === 'producer' || item === 'consumer'
-                                ? userList
-                                : item === 'device'
-                                ? deviceList
-                                : []
+                                  ? appSystemList
+                                  : item === 'producer' || item === 'consumer'
+                                    ? userList
+                                    : item === 'device'
+                                      ? deviceList
+                                      : []
                             }
                             setFieldValue={handleUpdateFormik}
                             setTouched={formik.setTouched}
