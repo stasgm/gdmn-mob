@@ -45,6 +45,7 @@ import { adminPath, fileFilterValues, fileFiltersDescription } from '../../utils
 import { IFileFilter, IFilePageParam, IFilterObject, IFilterOption, IPageParam } from '../../types';
 import { useDispatch, useSelector } from '../../store';
 import { getFilesFilters, getFilterObject } from '../../utils/helpers';
+import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
   files: IFileSystem[];
@@ -298,7 +299,7 @@ const FileListTable = ({
               p: 1,
               overflowX: 'auto',
               overflowY: 'auto',
-              maxHeight: window.innerHeight - 268,
+              maxHeight,
               maxWidth: '100%',
               justifyContent: 'space-between',
             }}

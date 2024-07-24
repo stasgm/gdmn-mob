@@ -52,21 +52,22 @@ export interface IFilterObject {
   consumer: IFilterOption;
   device: IFilterOption;
   uid: IFilterOption;
-  date: IFilterOption;
+  // date: IFilterOption;
   dateFrom: IFilterOption;
   dateTo: IFilterOption;
 }
 export interface IFileFilter {
   [fieldName: string]: string;
   path: string;
-  id: string;
+  // id: string;
   company: string;
   appSystem: string;
   producer: string;
   consumer: string;
   device: string;
   uid: string;
-  date: string;
+  dateFrom: string;
+  dateTo: string;
 }
 export interface IFilterOption extends INamedEntity {
   type: 'text' | 'select' | 'date';
