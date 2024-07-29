@@ -36,7 +36,14 @@ import Constants from 'expo-constants';
 
 import { appTradeActions, store, useSelector as useAppTradeSelector } from './src/store';
 
-import { RoutesNavigator, OrdersNavigator, DebetsNavigator, MapNavigator, GoodMatrixNavigator } from './src/navigation';
+import {
+  RoutesNavigator,
+  OrdersNavigator,
+  DebetsNavigator,
+  MapNavigator,
+  GoodMatrixNavigator,
+  ShipmentNavigator,
+} from './src/navigation';
 
 import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
 import { messageAgent } from './src/store/mock';
@@ -62,6 +69,12 @@ const Root = () => {
         title: 'Отчёты',
         icon: 'text-box-search-outline',
         component: ReportsNavigator,
+      },
+      {
+        name: 'ShipmentNav',
+        title: 'Отгрузка',
+        icon: 'truck-outline',
+        component: ShipmentNavigator,
       },
       {
         name: 'DebetsNav',
@@ -120,7 +133,7 @@ const Root = () => {
   }, [isInit]);
 
   const appDataLoading = appSelectors.selectLoading();
-  const authLoading = useSelector((state) => state.auth.loadingData);
+  const { loadingData: authLoading, user } = useSelector((state) => state.auth);
   const tradeLoading = useAppTradeSelector((state) => state.appTrade.loadingData);
   const tradeLoadingError = useAppTradeSelector<string>((state) => state.appTrade.loadingError);
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
@@ -147,6 +160,12 @@ const Root = () => {
       setAddSettings('ADDED');
     }
   }, [addSettings, appDataLoading, dispatch]);
+
+  useEffect(() => {
+    if (user) {
+      setAddSettings('INIT');
+    }
+  }, [user]);
 
   useEffect(() => {
     //Для отрисовки при первом подключении
@@ -237,7 +256,7 @@ const Root = () => {
   ) : infoWindow === 3 ? (
     <AppScreen>
       <Text style={styles.textInfo}>{'Подробную информацию об использовании приложения вы найдете в '}</Text>
-      <TouchableOpacity onPress={() => Linking.openURL(Constants.manifest?.extra?.documentationUrl)}>
+      <TouchableOpacity onPress={() => Linking.openURL(Constants.expoConfig?.extra?.documentationUrl)}>
         <Text style={[styles.textInfo, styles.textDecorationLine]}>{'документации.'}</Text>
       </TouchableOpacity>
       <Text style={styles.textInfo}>

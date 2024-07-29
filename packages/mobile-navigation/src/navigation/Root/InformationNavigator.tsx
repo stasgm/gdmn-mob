@@ -1,10 +1,8 @@
-import { createStackNavigator } from '@react-navigation/stack';
-import React from 'react';
-
+import { InformationStackParamList } from './types';
 import InformationLogScreen from '../../screens/InformationLogScreen';
 import InformationScreen from '../../screens/InformationScreen';
-
-import { InformationStackParamList } from './types';
+import { createStackNavigator } from '@react-navigation/stack';
+import React from 'react';
 
 const Stack = createStackNavigator<InformationStackParamList>();
 

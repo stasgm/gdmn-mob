@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, TouchableHighlight, TextInput, Keyboard } from 'react-native';
+import { View, TouchableHighlight, TextInput, Keyboard, StyleProp, ViewStyle } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Audio } from 'expo-av';
@@ -21,6 +21,7 @@ import {
   ScanButton,
   SaveDocument,
   SimpleDialog,
+  DateInfo,
 } from '@lib/mobile-ui';
 
 import {
@@ -45,7 +46,7 @@ import { barcodeSettings, IShipmentDocument, IShipmentLine, ITempLine } from '..
 
 import { ShipmentStackParamList } from '../../navigation/Root/types';
 
-import { getStatusColor, lineTypes, ONE_SECOND_IN_MS } from '../../utils/constants';
+import { getStatusColor, shipmentLineTypes, ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import { IBarcode, IGood, IRemains, IRemGood } from '../../store/app/types';
 import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../../store/index';
@@ -83,7 +84,7 @@ const ShipmentViewScreen = () => {
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
   const loading = useSelector((state) => state.app.loading);
 
-  const [lineType, setLineType] = useState(lineTypes[1].id);
+  const [lineType, setLineType] = useState(shipmentLineTypes[2].id);
 
   const shipment = docSelectors.selectByDocId<IShipmentDocument>(id);
   const shipmentLines = useMemo(
@@ -136,7 +137,7 @@ const ShipmentViewScreen = () => {
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
   const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
-  const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
+  // const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
   const remainsUse = Boolean(settings.remainsUse?.data);
 
@@ -144,9 +145,9 @@ const ShipmentViewScreen = () => {
 
   const goodRemains = useMemo<IRemGood[]>(() => {
     return shipment?.head?.fromDepart?.id && isFocused && remains
-      ? getRemGoodListByContact(goods, remains[shipment.head.fromDepart.id], docList, shipment.head.fromDepart.id)
+      ? getRemGoodListByContact(goods, remains[shipment.head.fromDepart.id] /*, docList, shipment.head.fromDepart.id*/)
       : [];
-  }, [docList, goods, remains, shipment?.head?.fromDepart?.id, isFocused]);
+  }, [goods, remains, shipment?.head?.fromDepart?.id, isFocused]);
 
   const sound = Audio.Sound.createAsync(require('../../../assets/ok.wav'));
 
@@ -295,6 +296,31 @@ const ShipmentViewScreen = () => {
     [id, isCurr, navigation],
   );
 
+  const handleCopyDoc = useCallback(async () => {
+    if (!shipment) {
+      return;
+    }
+    setScreenState('copying');
+    await sleep(1);
+    const newId = generateId();
+
+    const newDocDate = new Date().toISOString();
+
+    const newDoc: IShipmentDocument = {
+      ...shipment,
+      id: newId,
+      status: 'DRAFT',
+      documentDate: newDocDate,
+      creationDate: newDocDate,
+      editionDate: newDocDate,
+    };
+
+    docDispatch(documentActions.addDocument(newDoc));
+    navigation.navigate('ShipmentView', { id: newId, isCurr });
+
+    setScreenState('copied');
+  }, [shipment, docDispatch, navigation, isCurr]);
+
   const handleDeleteShipment = useCallback(async () => {
     if (!id) {
       return;
@@ -336,31 +362,72 @@ const ShipmentViewScreen = () => {
   }, [dispatch, fpDispatch, id, shipmentLines, tempOrder]);
 
   const actionsMenu = useCallback(() => {
-    showActionSheet([
-      {
-        title: 'Ввести штрих-код',
-        onPress: handleShowDialog,
-      },
-      {
-        title: 'Отменить последнее сканирование',
-        onPress: hanldeCancelLastScan,
-      },
-      {
-        title: 'Редактировать данные',
-        onPress: handleEditShipmentHead,
-      },
-      {
-        title: 'Удалить документ',
-        type: 'destructive',
-        onPress: handleDeleteShipment,
-      },
-      {
-        title: 'Отмена',
-        type: 'cancel',
-        onPress: handleFocus,
-      },
-    ]);
-  }, [showActionSheet, hanldeCancelLastScan, handleEditShipmentHead, handleDeleteShipment]);
+    showActionSheet(
+      isBlocked
+        ? shipment?.status === 'SENT'
+          ? [
+              {
+                title: 'Копировать документ',
+                onPress: handleCopyDoc,
+              },
+              {
+                title: 'Отмена',
+                type: 'cancel',
+              },
+            ]
+          : [
+              {
+                title: 'Копировать документ',
+                onPress: handleCopyDoc,
+              },
+              {
+                title: 'Удалить документ',
+                type: 'destructive',
+                onPress: handleDeleteShipment,
+              },
+              {
+                title: 'Отмена',
+                type: 'cancel',
+              },
+            ]
+        : [
+            {
+              title: 'Ввести штрих-код',
+              onPress: handleShowDialog,
+            },
+            {
+              title: 'Отменить последнее сканирование',
+              onPress: hanldeCancelLastScan,
+            },
+            {
+              title: 'Редактировать данные',
+              onPress: handleEditShipmentHead,
+            },
+            {
+              title: 'Копировать документ',
+              onPress: handleCopyDoc,
+            },
+            {
+              title: 'Удалить документ',
+              type: 'destructive',
+              onPress: handleDeleteShipment,
+            },
+            {
+              title: 'Отмена',
+              type: 'cancel',
+              onPress: handleFocus,
+            },
+          ],
+    );
+  }, [
+    showActionSheet,
+    isBlocked,
+    shipment?.status,
+    handleCopyDoc,
+    handleDeleteShipment,
+    hanldeCancelLastScan,
+    handleEditShipmentHead,
+  ]);
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
@@ -407,14 +474,15 @@ const ShipmentViewScreen = () => {
     () =>
       isBlocked ? (
         shipment?.status === 'READY' ? (
-          <SendButton
-            onPress={() => setVisibleSendDialog(true)}
-            disabled={screenState !== 'idle' || loading || !shipmentLines?.length}
-          />
+          <View style={styles.buttons}>
+            <SendButton
+              onPress={() => setVisibleSendDialog(true)}
+              disabled={screenState !== 'idle' || loading || !shipmentLines?.length}
+            />
+            <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
+          </View>
         ) : (
-          shipment?.status === 'DRAFT' && (
-            <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
-          )
+          <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         )
       ) : (
         <View style={styles.buttons}>
@@ -466,6 +534,8 @@ const ShipmentViewScreen = () => {
     });
   }, [navigation, renderLeft, renderRight]);
 
+  const [isDateVisible, setIsDateVisible] = useState(false);
+
   const [scanned, setScanned] = useState(false);
 
   const ref = useRef<TextInput>(null);
@@ -482,6 +552,10 @@ const ShipmentViewScreen = () => {
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!shipment) {
+        return;
+      }
+
+      if (shipment?.status !== 'DRAFT') {
         return;
       }
 
@@ -511,6 +585,7 @@ const ShipmentViewScreen = () => {
 
       if (!lineGood.good) {
         setVisibleRequestDialog(true);
+        setScanned(false);
         return;
       }
 
@@ -657,16 +732,18 @@ const ShipmentViewScreen = () => {
   }, [scanned, ref, visibleDialog]);
 
   useEffect(() => {
-    if (screenState === 'sent' || screenState === 'deleted') {
+    if (screenState === 'sent' || screenState === 'deleted' || screenState === 'copied') {
       setScreenState('idle');
-      navigation.goBack();
+      if (screenState !== 'copied') {
+        navigation.goBack();
+      }
     }
   }, [navigation, screenState]);
 
   const LineTypes = useCallback(
     () => (
       <View style={styles.containerCenter}>
-        {lineTypes.map((e, i) => {
+        {shipmentLineTypes.map((e, i) => {
           return (
             <TouchableHighlight
               activeOpacity={0.7}
@@ -675,7 +752,7 @@ const ShipmentViewScreen = () => {
               style={[
                 styles.btnTab,
                 i === 0 && styles.firstBtnTab,
-                i === lineTypes.length - 1 && styles.lastBtnTab,
+                i === shipmentLineTypes.length - 1 && styles.lastBtnTab,
                 e.id === lineType && { backgroundColor: colors.primary },
                 { borderColor: colors.primary },
               ]}
@@ -704,9 +781,9 @@ const ShipmentViewScreen = () => {
     ({ item }: { item: IShipmentLine }) => {
       return (
         <ListItemLine
-          key={item.id}
+          // key={item.id}
           readonly={
-            shipment?.status !== 'DRAFT' || item.sortOrder !== shipmentLines?.length || Boolean(item.scannedBarcode)
+            shipment?.status !== 'DRAFT' || item?.sortOrder !== shipmentLines?.length || Boolean(item.scannedBarcode)
           }
           onPress={() => handlePressLine(item.weight)}
         >
@@ -743,15 +820,30 @@ const ShipmentViewScreen = () => {
     );
   }, []);
 
+  const LastLine = useMemo(() => renderShipmentItem, [renderShipmentItem]);
+
+  const isEditable = useMemo(() => (shipment ? ['DRAFT', 'READY'].includes(shipment?.status) : false), [shipment]);
+
+  const viewStyle: StyleProp<ViewStyle> = useMemo(
+    () => ({ ...styles.container, justifyContent: lineType === 'last' ? 'flex-start' : 'center' }),
+    [lineType],
+  );
+
   if (!isFocused) {
     return <AppActivityIndicator />;
   }
 
-  if (screenState === 'deleting' || screenState === 'sending') {
+  if (screenState === 'deleting' || screenState === 'copying' || screenState === 'sending') {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
-          <LargeText>{screenState === 'deleting' ? 'Удаление документа...' : 'Отправка документа...'}</LargeText>
+          <LargeText>
+            {screenState === 'deleting'
+              ? 'Удаление документа...'
+              : screenState === 'copying'
+                ? 'Копирование документа...'
+                : 'Отправка документа...'}
+          </LargeText>
           <AppActivityIndicator style={{}} />
         </View>
       </View>
@@ -767,17 +859,18 @@ const ShipmentViewScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={viewStyle}>
       <InfoBlock
         colorLabel={getStatusColor(shipment?.status || 'DRAFT')}
         title={shipment.documentType.description || ''}
-        onPress={handleEditShipmentHead}
-        disabled={!['DRAFT', 'READY'].includes(shipment.status)}
+        onPress={() => (isEditable ? handleEditShipmentHead() : setIsDateVisible(!isDateVisible))}
+        editable={isEditable}
         isBlocked={isBlocked}
       >
         <View style={styles.infoBlock}>
           <MediumText>{shipment.head.outlet?.name || ''}</MediumText>
           <MediumText>{`№ ${shipment.number} на ${getDateString(shipment.head?.onDate)}`}</MediumText>
+          {isDateVisible && <DateInfo sentDate={shipment.sentDate} erpCreationDate={shipment.erpCreationDate} />}
         </View>
       </InfoBlock>
       <LineTypes />
@@ -804,7 +897,7 @@ const ShipmentViewScreen = () => {
           />
           <ViewTotal quantPack={shipmentLineSum?.quantPack} weight={shipmentLineSum?.weight || 0} />
         </>
-      ) : (
+      ) : lineType === 'order' ? (
         <>
           <FlashList
             key={lineType}
@@ -818,7 +911,12 @@ const ShipmentViewScreen = () => {
           />
           <ViewTotal weight={tempLineSum?.weight || 0} />
         </>
-      )}
+      ) : lineType === 'last' && shipmentLines?.[0] ? (
+        <View style={styles.spaceBetween}>
+          <LastLine item={shipmentLines?.[0]} />
+          <ViewTotal quantPack={shipmentLineSum?.quantPack} weight={shipmentLineSum?.weight || 0} />
+        </View>
+      ) : null}
       <AppDialog
         title="Введите штрих-код"
         visible={visibleDialog}

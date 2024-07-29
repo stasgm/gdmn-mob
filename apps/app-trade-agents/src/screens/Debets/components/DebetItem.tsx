@@ -5,17 +5,18 @@ import { globalStyles as styles, MediumText } from '@lib/mobile-ui';
 
 import { formatValue } from '@lib/mobile-hooks';
 
-import { useTheme } from 'react-native-paper';
+import { MD2Theme, useTheme } from 'react-native-paper';
 
 import { IDebt } from '../../../store/types';
 
 export interface IDebtItem {
   item: IDebt;
+  limitSum?: string;
   onPress: () => void;
 }
 
-const DebetItem = ({ item, onPress }: IDebtItem) => {
-  const { colors } = useTheme();
+const DebetItem = ({ item, limitSum, onPress }: IDebtItem) => {
+  const { colors } = useTheme<MD2Theme>();
   const debtTextStyle = { color: item.saldoDebt && item.saldoDebt > 0 ? colors.error : colors.text };
 
   return (
@@ -39,6 +40,7 @@ const DebetItem = ({ item, onPress }: IDebtItem) => {
               item.saldoDebt,
             )}, ${item.dayLeft} дн.`}</MediumText>
           )}
+          {limitSum ? <MediumText>Лимит: {formatValue({ type: 'currency', decimals: 2 }, limitSum)}</MediumText> : null}
         </View>
       </View>
     </TouchableOpacity>

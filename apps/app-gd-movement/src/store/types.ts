@@ -35,6 +35,14 @@ export interface IScanFormParam extends IFormParam {
   isBindGood?: boolean;
 }
 
+export interface IRevisionFormParam extends IFormParam {
+  number?: string;
+  documentDate?: string;
+  status?: StatusType;
+  department?: Department;
+  comment?: string;
+}
+
 //Подразделения-склады
 export type Department = INamedEntity;
 export type DepartmentType = INamedEntity;
@@ -52,14 +60,14 @@ export interface IMovementHead extends IHead {
   toContact?: Department; //Подразделение
   fromContactType?: IListItem;
   toContactType?: IListItem;
-  comment?: string; // Комvентарий
+  comment?: string;
 }
 
 export interface IMovementLine extends IEntity {
   good: INamedEntity;
   quantity: number;
   price?: number;
-  buyingPrice?: number;
+  buyingPrice?: number; // покупная цена
   remains?: number;
   barcode?: string;
   EID?: string;
@@ -67,6 +75,7 @@ export interface IMovementLine extends IEntity {
   weightCode?: string;
   alias?: string;
   sortOrder?: number; // порядок сортировки
+  sumWNds?: number; // сумма с ндс
 }
 
 export type IMovementDocument = MandateProps<IDocument<IMovementHead, IMovementLine>, 'head' | 'lines'>;
@@ -74,7 +83,7 @@ export type IMovementDocument = MandateProps<IDocument<IMovementHead, IMovementL
 export interface IScanHead extends IHead {
   department?: Department;
   isBindGood?: boolean;
-  comment?: string; // Комvентарий
+  comment?: string;
 }
 
 export interface IScanLine extends IEntity {
@@ -84,6 +93,22 @@ export interface IScanLine extends IEntity {
 }
 
 export type IScanDocument = MandateProps<IDocument<IScanHead, IScanLine>, 'head' | 'lines'>;
+
+export interface IRevisionHead extends IHead {
+  department: Department;
+  comment?: string;
+}
+
+export interface IRevisionLine extends IEntity {
+  barcode: string;
+  good?: INamedEntity;
+  price?: number;
+  remains?: number;
+  sortOrder?: number;
+  withGood?: boolean;
+}
+
+export type IRevisionDocument = MandateProps<IDocument<IRevisionHead, IRevisionLine>, 'head' | 'lines'>;
 
 export type AppThunk<ReturnType = void, S = void, A extends AnyAction = AnyAction> = ThunkAction<
   ReturnType,

@@ -9,6 +9,7 @@ const initialState: Readonly<IServerLogState> = {
   serverLog: undefined,
   loading: false,
   errorMessage: '',
+  pageParams: undefined,
 };
 
 const reducer: Reducer<IServerLogState, ServerLogActionType> = (state = initialState, action): IServerLogState => {
@@ -55,6 +56,18 @@ const reducer: Reducer<IServerLogState, ServerLogActionType> = (state = initialS
         ...state,
         loading: false,
         errorMessage: action.payload || 'error',
+      };
+
+    case getType(serverLogActions.setPageParam):
+      return {
+        ...state,
+        pageParams: { ...state.pageParams, ...action.payload },
+      };
+
+    case getType(serverLogActions.clearPageParams):
+      return {
+        ...state,
+        pageParams: undefined,
       };
 
     default:

@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { ListRenderItem, SectionList, SectionListData, View, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 
 import { documentActions, refSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
@@ -19,6 +19,7 @@ import {
   Menu,
   navBackDrawer,
   SimpleDialog,
+  AppActivityIndicator,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -72,10 +73,10 @@ export const MoveListScreen = () => {
       status === 'all'
         ? list
         : status === 'active'
-        ? list.filter((e) => e.status !== 'PROCESSED')
-        : status !== 'archive' && status !== 'all'
-        ? list.filter((e) => e.status === status)
-        : [];
+          ? list.filter((e) => e.status !== 'PROCESSED')
+          : status !== 'archive' && status !== 'all'
+            ? list.filter((e) => e.status === status)
+            : [];
 
     const newRes = type?.id === 'all' ? res : res?.filter((i) => i?.head.subtype.id === type?.id);
 
@@ -104,7 +105,9 @@ export const MoveListScreen = () => {
               </MediumText>
             </View>
           ),
-        } as IListItemProps),
+          sentDate: i.sentDate,
+          erpCreationDate: i.erpCreationDate,
+        }) as IListItemProps,
     );
   }, [status, list, type?.id, date.id]);
 
@@ -234,6 +237,11 @@ export const MoveListScreen = () => {
   const renderSectionHeader = ({ section }: any) => (
     <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   return (
     <AppScreen>

@@ -30,6 +30,7 @@ export interface IOrderFormParam extends IFormParam {
   onDate?: string;
   status?: StatusType;
   route?: IReferenceData;
+  road?: IReferenceData;
   comment?: string;
 }
 
@@ -53,6 +54,13 @@ export interface IReportListFormParam extends IFormParam {
   filterReportGroup?: IReferenceData[];
   filterReportGood?: IReferenceData[];
   filterReportStatusList: IListItem[];
+}
+
+export interface IShipmentListFormParam extends IFormParam {
+  shipment: IListItem;
+  filterShipmentContact?: IReferenceData;
+  filterShipmentOutlet?: IReferenceData;
+  filterShipmentGood?: IReferenceData[];
 }
 
 export interface IReportItem {
@@ -105,6 +113,7 @@ export interface IContact extends INamedEntity, IReferenceData {
   contractDate: string; // Дата договора
   paycond: string; // Условие оплаты
   phoneNumber: string; // Номер телефона
+  limitSum?: string; // Лимит задолженности
 }
 //Магазины
 export interface IOutlet extends INamedEntity, IReferenceData {
@@ -154,6 +163,7 @@ export interface IOrderHead extends IHead {
   contact: IReferenceData; //организация-плательщик
   outlet: IReferenceData; // магазин –подразделение организации плательщика
   route?: IReferenceData; // 	Маршрут
+  road?: IReferenceData; // 	Маршрут
   depart?: IReferenceData; // Необязательное поле склад (подразделение предприятия-производителя)
   onDate: string; //  Дата отгрузки
   takenOrder?: TakeOrderType; //тип взятия заявки
@@ -242,6 +252,48 @@ interface IVisitHead extends IHead {
 }
 
 export type IVisitDocument = MandateProps<IDocument<IVisitHead>, 'head'>;
+
+export interface IShipmentHead {
+  id: string;
+  orderId: string;
+  number: string;
+  contactId: string;
+  outletId: string;
+  documentDate: string;
+  shipmentNumber?: string;
+}
+
+export interface IShipmentLine {
+  goodId: string;
+  packageId?: string;
+  orderQ: number;
+  sellQ: number;
+  diff: number;
+}
+
+export interface IShipmentLinesRef {
+  [id: string]: IShipmentLine[];
+}
+
+export interface IOrderData {
+  [id: string]: IShipmentLine[];
+}
+
+export interface IContactData {
+  [id: string]: IOutletData;
+}
+
+export interface IOutletData {
+  [id: string]: IOrderData;
+}
+
+export interface IShipmentListItem {
+  [fieldname: string]: any;
+  id: string;
+  lineId?: string;
+  name: string;
+  type: 'contact' | 'outlet' | 'order' | 'good' | 'total';
+}
 
 export const visitDocumentType: IDocumentType = {
   id: 'visit',

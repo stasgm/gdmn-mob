@@ -48,7 +48,6 @@ export const DocLineScreen = () => {
   );
 
   useEffect(() => {
-    // eslint-disable-next-line import/no-named-as-default-member
     KeyEvent.onKeyDownListener((keyEvent: any) => {
       if (keyEvent.keyCode === 66 && !disabledSave) {
         setScreenState('saving');
@@ -56,7 +55,6 @@ export const DocLineScreen = () => {
     });
 
     return () => {
-      // eslint-disable-next-line import/no-named-as-default-member
       KeyEvent.removeKeyDownListener();
     };
   }, [disabledSave]);
@@ -143,7 +141,12 @@ export const DocLineScreen = () => {
 
   return (
     <AppInputScreen>
-      <DocLine item={line} onSetLine={setLine} onSetDisabledSave={setDisabledSave} />
+      <DocLine
+        item={line}
+        onSetLine={setLine}
+        onSetDisabledSave={setDisabledSave}
+        isSumWNds={Boolean(document?.documentType.isSumWNds)}
+      />
     </AppInputScreen>
   );
 };

@@ -16,7 +16,7 @@ import {
   AppActivityIndicator,
   navBackButton,
 } from '@lib/mobile-ui';
-import { IDocumentType, IReference, ScreenState } from '@lib/types';
+import { IDocumentType, INamedEntity, IReference, ScreenState } from '@lib/types';
 
 import { generateId, getDateString, isNamedEntity, useFilteredDocList } from '@lib/mobile-hooks';
 
@@ -46,12 +46,15 @@ const OrderEditScreen = () => {
     onDate: docOnDate,
     status: docStatus,
     comment: docComment,
+    road: docRoad,
   } = useSelector((state) => state.app.formParams as IOrderFormParam);
 
   // Подразделение по умолчанию
   const departSetting = useSelector((state) => state.settings?.userData?.depart?.data);
+
   const defaultDepart = useMemo(() => (isNamedEntity(departSetting) ? departSetting : undefined), [departSetting]);
   const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === docOutlet?.id);
+  const road = refSelectors.selectByName<INamedEntity>('road')?.data;
 
   useEffect(() => {
     if (!docContact && !!docOutlet) {
@@ -88,6 +91,7 @@ const OrderEditScreen = () => {
           status: order.status,
           depart: order.head.depart,
           comment: order.head.comment,
+          road: order.head.road,
         }),
       );
     } else {
@@ -98,21 +102,22 @@ const OrderEditScreen = () => {
       tomorrow.setDate(tomorrow.getDate() + 1);
       const newOnDate = tomorrow.toISOString();
 
-      dispatch(
-        appActions.setFormParams({
-          contact: undefined,
-          outlet: undefined,
-          number: newNumber,
-          onDate: newOnDate,
-          documentDate: newDocDate,
-          status: 'DRAFT',
-          depart: defaultDepart,
-          comment: undefined,
-        }),
-      );
+      const formParams = {
+        contact: undefined,
+        outlet: undefined,
+        number: newNumber,
+        onDate: newOnDate,
+        documentDate: newDocDate,
+        status: 'DRAFT',
+        depart: defaultDepart,
+        comment: undefined,
+        road: undefined,
+      };
+
+      dispatch(appActions.setFormParams(road ? { ...formParams, road: undefined } : formParams));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, order, defaultDepart]);
+  }, [dispatch, order, defaultDepart, road]);
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
@@ -143,6 +148,7 @@ const OrderEditScreen = () => {
             onDate: docOnDate,
             outlet: docOutlet,
             depart: docDepart,
+            road: docRoad,
             comment: docComment && docComment.trim(),
           },
           lines: [],
@@ -201,6 +207,8 @@ const OrderEditScreen = () => {
     docStatus,
     screenState,
     routeId,
+    road,
+    docRoad,
   ]);
 
   const renderRight = useCallback(
@@ -301,6 +309,18 @@ const OrderEditScreen = () => {
     });
   }, [docDepart, isBlocked, navigation]);
 
+  const handlePresentRoad = useCallback(() => {
+    if (isBlocked) {
+      return;
+    }
+
+    navigation.navigate('SelectRefItem', {
+      refName: 'road',
+      fieldName: 'road',
+      value: docRoad && [docRoad],
+    });
+  }, [docRoad, isBlocked, navigation]);
+
   const handleChangeStatus = useCallback(() => {
     dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
   }, [dispatch, docStatus]);
@@ -352,6 +372,10 @@ const OrderEditScreen = () => {
           disabled={isBlocked}
         />
         <SelectableInput label="Магазин" value={docOutlet?.name} onPress={handlePresentOutlet} disabled={isBlocked} />
+        {road ? (
+          <SelectableInput label="Маршрут" value={docRoad?.name} onPress={handlePresentRoad} disabled={isBlocked} />
+        ) : null}
+
         <SelectableInput
           label="Склад-магазин"
           value={docDepart?.name}

@@ -10,4 +10,10 @@ const selectByDocId = <T extends IDocument>(docId?: string) => {
   return useSelector((state: any) => state.documents?.list.find((i: any) => i.id === docId)) as T | undefined;
 };
 
-export default { selectByDocType, selectByDocId };
+const selectByDocSubType = <T extends IDocument>(docSubType: string) => {
+  return useSelector(
+    (state: any) => state.documents?.list.filter((i: any) => i.documentType?.subtype === docSubType),
+  ) as T[];
+};
+
+export default { selectByDocType, selectByDocId, selectByDocSubType };

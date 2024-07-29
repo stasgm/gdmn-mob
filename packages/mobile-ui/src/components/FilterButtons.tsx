@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleProp, Text, TouchableHighlight, View, ViewStyle, StyleSheet } from 'react-native';
-import { useTheme } from 'react-native-paper';
+import { MD2Theme, useTheme } from 'react-native-paper';
 
 import styles from '../styles/global';
 
-interface StatusTypes {
+export interface StatusTypes {
   name: string;
   status: Status;
 }
@@ -26,18 +26,19 @@ const statusTypes: StatusTypes[] = [
 
 interface IProps {
   status: Status;
+  statusList?: StatusTypes[];
   onPress: (status: Status) => void;
   style?: StyleProp<ViewStyle>;
 }
 
-export type Status = 'all' | 'active' | 'archive';
+export type Status = 'all' | 'active' | 'archive' | 'refuse';
 
-const FilterButtons = ({ status, onPress, style }: IProps) => {
-  const { colors } = useTheme();
+const FilterButtons = ({ status, onPress, style, statusList = [] }: IProps) => {
+  const { colors } = useTheme<MD2Theme>();
 
   return (
     <View style={[styles.containerCenter, localStyles.container, style]}>
-      {statusTypes.map((e, i) => {
+      {(statusList?.length ? statusList : statusTypes).map((e, i) => {
         return (
           <TouchableHighlight
             activeOpacity={0.7}
@@ -46,13 +47,13 @@ const FilterButtons = ({ status, onPress, style }: IProps) => {
             style={[
               styles.btnTab,
               i === 0 && styles.firstBtnTab,
-              i === statusTypes.length - 1 && styles.lastBtnTab,
+              i === (statusList?.length ? statusList : statusTypes).length - 1 && styles.lastBtnTab,
               e.status === status && { backgroundColor: colors.primary },
               { borderColor: colors.primary },
             ]}
             onPress={() => onPress(e.status)}
           >
-            <Text style={[{ color: e.status === status ? colors.background : colors.text }, { fontSize: 17 }]}>
+            <Text style={[{ color: e.status === status ? colors.background : colors.text }, localStyles.fontSize]}>
               {e.name}
             </Text>
           </TouchableHighlight>
@@ -68,4 +69,5 @@ const localStyles = StyleSheet.create({
   container: {
     marginBottom: 5,
   },
+  fontSize: { fontSize: 17 },
 });

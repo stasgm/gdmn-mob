@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Divider } from 'react-native-paper';
 
 import { INamedEntity, ISettingsOption } from '@lib/types';
@@ -80,17 +80,9 @@ const SettingsGroup = ({ groupDescription, list, onValueChange, onCheckSettings 
 };
 
 const localStyles = StyleSheet.create({
-  border: {
-    borderWidth: 1,
-    borderRadius: 2,
-    marginHorizontal: 5,
-  },
   title: {
     margin: 3,
     textAlign: 'center',
-  },
-  container: {
-    marginTop: 5,
   },
 });
 

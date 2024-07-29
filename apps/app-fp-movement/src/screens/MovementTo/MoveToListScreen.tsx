@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { ListRenderItem, SectionList, SectionListData, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 
 import { documentActions, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
@@ -20,6 +20,7 @@ import {
   SendButton,
   SimpleDialog,
   FilterButtons,
+  AppActivityIndicator,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -59,10 +60,10 @@ export const MoveToListScreen = () => {
       status === 'all'
         ? list
         : status === 'active'
-        ? list.filter((e) => e.status !== 'PROCESSED')
-        : status === 'archive'
-        ? list.filter((e) => e.status === 'PROCESSED')
-        : [];
+          ? list.filter((e) => e.status !== 'PROCESSED')
+          : status === 'archive'
+            ? list.filter((e) => e.status === 'PROCESSED')
+            : [];
 
     return res.map(
       (i) =>
@@ -83,7 +84,9 @@ export const MoveToListScreen = () => {
               </MediumText>
             </View>
           ),
-        } as IListItemProps),
+          sentDate: i.sentDate,
+          erpCreationDate: i.erpCreationDate,
+        }) as IListItemProps,
     );
   }, [status, list]);
 
@@ -195,6 +198,11 @@ export const MoveToListScreen = () => {
   const renderSectionHeader = ({ section }: any) => (
     <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   return (
     <AppScreen>

@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { View, TextInput, Alert, useWindowDimensions } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { appActions, docSelectors, documentActions, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
@@ -22,6 +21,7 @@ import {
   navBackButton,
   SaveDocument,
   SimpleDialog,
+  DateInfo,
 } from '@lib/mobile-ui';
 
 import {
@@ -67,6 +67,8 @@ export const ScanViewScreen = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const [isDateVisible, setIsDateVisible] = useState(false);
 
   const ref = useRef<TextInput>(null);
 
@@ -232,8 +234,8 @@ export const ScanViewScreen = () => {
           ? `Выделено позиций: ${delList.length}`
           : `Позиций: ${delList.length}`
         : windowWidth > 320
-        ? 'Документ'
-        : '',
+          ? 'Документ'
+          : '',
     });
   }, [delList.length, isDelList, navigation, renderLeft, renderRight, windowWidth]);
 
@@ -267,7 +269,7 @@ export const ScanViewScreen = () => {
   const good = useSelector((state) => state.app.formParams?.good) as INamedEntity | undefined;
 
   useEffect(() => {
-    if (doc?.head.isBindGood && currentLineId) {
+    if (doc?.head.isBindGood && currentLineId && good) {
       const currentLine = doc.lines?.find((l) => l.id === currentLineId);
       if (currentLine && currentLine.good?.id !== good?.id) {
         dispatch(
@@ -285,6 +287,10 @@ export const ScanViewScreen = () => {
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!doc) {
+        return;
+      }
+
+      if (isBlocked) {
         return;
       }
 
@@ -313,7 +319,7 @@ export const ScanViewScreen = () => {
       }
       handleFocus();
     },
-    [dispatch, doc, id, navigation],
+    [dispatch, doc, id, isBlocked, navigation],
   );
 
   const setScan = (brc: string) => {
@@ -338,6 +344,8 @@ export const ScanViewScreen = () => {
       navigation.goBack();
     }
   }, [navigation, screenState]);
+
+  const isEditable = useMemo(() => (doc ? ['DRAFT', 'READY'].includes(doc?.status) : false), [doc]);
 
   const isFocused = useIsFocused();
   if (!isFocused) {
@@ -369,15 +377,17 @@ export const ScanViewScreen = () => {
         <InfoBlock
           colorLabel={getStatusColor(doc?.status || 'DRAFT')}
           title={doc.head.isBindGood ? 'Привязка штрихкодов к ТМЦ' : 'Сканирование'}
-          onPress={handleEditDocHead}
-          disabled={isDelList || !['DRAFT', 'READY'].includes(doc.status)}
+          onPress={() => (isEditable ? handleEditDocHead() : setIsDateVisible(!isDateVisible))}
+          disabled={delList.length > 0}
+          isBlocked={isBlocked}
         >
           <>
             {!!doc.head.department && <MediumText>{doc.head.department.name}</MediumText>}
             <View style={styles.rowCenter}>
               <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
-              {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
             </View>
+
+            {isDateVisible && <DateInfo sentDate={doc.sentDate} erpCreationDate={doc.erpCreationDate} />}
           </>
         </InfoBlock>
         <TextInput

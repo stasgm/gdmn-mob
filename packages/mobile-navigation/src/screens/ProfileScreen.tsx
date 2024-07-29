@@ -1,3 +1,4 @@
+import { ProfileStackParamList } from '../navigation/Root/types';
 import React, { useCallback, useLayoutEffect } from 'react';
 import { Alert, View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Avatar, Divider, IconButton } from 'react-native-paper';
@@ -17,12 +18,10 @@ import {
 import {
   MenuButton,
   PrimeButton,
-  DescriptionItem,
   MediumText,
   AppScreen,
   useActionSheet,
   globalStyles,
-  LargeText,
   Switch,
   navBackDrawer,
 } from '@lib/mobile-ui';
@@ -33,12 +32,11 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useSettingsThunkDispatch } from '@lib/store/src/settings/actions.async';
 
-import { ProfileStackParamList } from '../navigation/Root/types';
-
 const ProfileScreen = () => {
   const { colors } = useTheme();
 
   const { user, company, device, isDemo, loading, isLogout } = useSelector((state) => state.auth);
+  const appLoading = useSelector((state) => state.app.loading);
 
   const userSettings = useSelector((state) => state.settings.userData);
 
@@ -48,7 +46,7 @@ const ProfileScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ProfileStackParamList, 'Profile'>>();
   const showActionSheet = useActionSheet();
 
-  const handleClearData = () => {
+  const handleClearData = useCallback(() => {
     Alert.alert('Вы уверены, что хотите удалить все данные?', '', [
       {
         text: 'Да',
@@ -62,9 +60,9 @@ const ProfileScreen = () => {
         text: 'Отмена',
       },
     ]);
-  };
+  }, [dispatch]);
 
-  const handleClearSettings = () => {
+  const handleClearSettings = useCallback(() => {
     Alert.alert('Вы уверены, что хотите удалить настройки пользователя?', '', [
       {
         text: 'Да',
@@ -76,9 +74,9 @@ const ProfileScreen = () => {
         text: 'Отмена',
       },
     ]);
-  };
+  }, [settingsDispatch]);
 
-  const handleClearAll = () => {
+  const handleClearAll = useCallback(() => {
     Alert.alert(
       'Вы уверены, что хотите выйти и удалить все данные?',
       'После удаления данные не подлежат восстановлению.',
@@ -97,7 +95,7 @@ const ProfileScreen = () => {
         },
       ],
     );
-  };
+  }, [dispatch]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -121,14 +119,16 @@ const ProfileScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [handleClearData, handleClearSettings, showActionSheet]);
+  }, [handleClearAll, handleClearData, handleClearSettings, showActionSheet]);
+
+  const headerRight = useCallback(() => <MenuButton actionsMenu={actionsMenu} />, [actionsMenu]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackDrawer,
-      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+      headerRight,
     });
-  }, [navigation]);
+  }, [actionsMenu, headerRight, navigation]);
 
   const handleLogout = () => {
     authDispatch(authActions.logout(mobileRequest(dispatch, authActions)));
@@ -186,13 +186,13 @@ const ProfileScreen = () => {
               <View style={styles.settingsDetails}>
                 <MediumText>Настройки пользователя</MediumText>
               </View>
-              <IconButton icon="chevron-right" color={colors.text} />
+              <IconButton icon="chevron-right" iconColor={colors.text} />
             </View>
           </TouchableOpacity>
         )}
         <Divider />
         <View>
-          <PrimeButton outlined onPress={handleLogout} disabled={loading} loadIcon={loading}>
+          <PrimeButton outlined onPress={handleLogout} disabled={loading || appLoading} loadIcon={loading}>
             {isDemo ? 'Выйти из демо режима' : 'Сменить пользователя'}
           </PrimeButton>
         </View>

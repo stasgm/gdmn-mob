@@ -8,4 +8,5 @@ module.exports = {
     project: ['./tsconfig.eslint.json'],
     tsconfigRootDir: __dirname,
   },
+  ignorePatterns: ['node_modules/'],
 };

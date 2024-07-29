@@ -1,4 +1,4 @@
-import { isNumeric, log, round } from '@lib/mobile-hooks';
+import { log, round } from '@lib/mobile-hooks';
 
 import { Alert } from 'react-native';
 
@@ -87,11 +87,13 @@ export const getBarcodeString = (barcodeObj: IBarcode) => {
   const shcode = `0000${barcodeObj.shcode}`.slice(-4);
   const quantPack = `0000${barcodeObj.quantPack.toLocaleString()}`.slice(-4);
 
-  const weight = `000000${round(barcodeObj.weight * ONE_KG_IN_G, 3).toLocaleString()}`.slice(-6);
+  const weight =
+    barcodeObj.weight < ONE_T_IN_KG
+      ? `000000${round(barcodeObj.weight * ONE_KG_IN_G, 3).toString()}`.slice(-6)
+      : `000000${round(barcodeObj.weight * ONE_KG_IN_G, 3).toString()}`.slice(6);
 
   const barcode =
     weight + day + month + year + (barcodeObj.time || '0000') + shcode + quantPack + barcodeObj.numReceived;
-
   return barcode;
 };
 
@@ -295,10 +297,9 @@ export const getUpdatedLine = (
   weight?: number,
 ) => {
   const newBarcode = weight
-    ? weight < ONE_T_IN_KG
-      ? getBarcodeString({ ...lineBarcode, quantPack: quantity, weight })
-      : (weight * ONE_KG_IN_G).toString() + getBarcodeString({ ...lineBarcode, quantPack: quantity, weight }).slice(6)
+    ? getBarcodeString({ ...lineBarcode, quantPack: quantity, weight })
     : getBarcodeString({ ...lineBarcode, quantPack: quantity });
+
   return {
     ...line,
     quantPack: quantity,
@@ -336,7 +337,7 @@ export const getDocToSend = (
           usedRemains: i.usedRemains,
           fromCell: (i as IMoveLine).fromCell,
           toCell: (i as IMoveLine).toCell,
-        } as ISendingLine),
+        }) as ISendingLine,
     ),
   };
 };
@@ -344,8 +345,8 @@ export const getDocToSend = (
 export const getRemGoodListByContact = (
   goods: IGood[],
   remains: IRemainsData[] = [],
-  docList: IShipmentDocument[] = [],
-  departId: string,
+  // docList: IShipmentDocument[] = [],
+  // departId: string,
 ) => {
   log('getRemGoodListByContact', 'Начало построения массива товаров по подразделению');
 
@@ -354,9 +355,9 @@ export const getRemGoodListByContact = (
     //Если есть остатки, то формируем модель остатков по ид товара
     if (remains.length) {
       //Формируем объект остатков тмц
-      const linesQuantity = getTotalLines(docList, departId) || undefined;
+      // const linesQuantity = getTotalLines(docList, departId) || undefined;
 
-      const remainsByGoodId = getRemainsByGoodId(remains, linesQuantity);
+      const remainsByGoodId = getRemainsByGoodId(remains /*, linesQuantity*/);
 
       //Формируем массив товаров, добавив свойствоостатка
       //Если по товару нет остатков и если модель не для выбора из справочника тмц, (не из остатков)
@@ -372,17 +373,18 @@ export const getRemGoodListByContact = (
               });
             }
           }
-        } else if (
-          remainsByGoodId &&
-          linesQuantity &&
-          isNumeric(linesQuantity[good.id]) &&
-          linesQuantity[good.id] !== 0
-        ) {
-          remGoods.push({
-            good,
-            remains: linesQuantity[good.id],
-          });
         }
+        // else if (
+        //   remainsByGoodId &&
+        //   linesQuantity &&
+        //   isNumeric(linesQuantity[good.id]) &&
+        //   linesQuantity[good.id] !== 0
+        // ) {
+        //   remGoods.push({
+        //     good,
+        //     remains: linesQuantity[good.id],
+        //   });
+        // }
       }
     }
   }
@@ -392,17 +394,17 @@ export const getRemGoodListByContact = (
 };
 
 //Возвращает объект остатков тмц, пример: {"1": [{ q: 1 }, { q: 2 }]}
-const getRemainsByGoodId = (remains: IRemainsData[], linesQuantity: IGoodQuantity) => {
+const getRemainsByGoodId = (remains: IRemainsData[] /*, linesQuantity: IGoodQuantity*/) => {
   return remains.reduce((p: IMGoodData<IModelRem[]>, { goodId, q = 0 }: IRemainsData) => {
     const x = p[goodId];
-    const goodQ = linesQuantity[goodId] || 0;
+    // const goodQ = linesQuantity[goodId] || 0;
 
-    const newQ = q + goodQ;
-    if (newQ !== 0) {
+    // const newQ = q + goodQ;
+    if (q !== 0) {
       if (!x) {
-        p[goodId] = [{ q: newQ }];
+        p[goodId] = [{ q }];
       } else {
-        x.push({ q: newQ });
+        x.push({ q });
       }
     }
     return p;
