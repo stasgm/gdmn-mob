@@ -50,12 +50,15 @@ export interface IFilterObject {
   producerId: IFilterOption;
   consumerId: IFilterOption;
   uid: IFilterOption;
+  // date: IFilterOption;
   dateFrom: IFilterOption;
   dateTo: IFilterOption;
 }
 
 export interface IFileFilter {
   [fieldName: string]: string;
+  path: string;
+  // id: string;
   folder: string;
   fileName: string;
   companyId: string;

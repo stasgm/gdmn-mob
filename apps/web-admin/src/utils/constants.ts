@@ -34,6 +34,7 @@ const fileFilterValues: IFilterObject = {
   consumerId: { id: 'consumerId', name: 'Получатель', type: 'select', value: '', visible: true, data: [] },
   deviceId: { id: 'deviceId', name: 'Устройство', type: 'select', value: '', visible: true, data: [] },
   uid: { id: 'uid', name: 'Номер устройства', type: 'text', value: '', visible: true },
+  // date: { id: 'date', name: 'Дата', type: 'date', value: '', visible: true },
   dateFrom: { id: 'dateFrom', name: 'Дата начала', type: 'date', value: '', visible: true },
   dateTo: { id: 'dateTo', name: 'Дата окончания', type: 'date', value: '', visible: true },
 };
@@ -49,8 +50,10 @@ const fileFilterInitialValues: IFileFilter = {
   consumerId: '',
   deviceId: '',
   uid: '',
+  // date: '',
   dateFrom: '',
   dateTo: '',
+  path: '',
 };
 
 export { deviceStates, adminPath, validPassword, fileFilterValues, fileFilterInitialValues };
