@@ -21,7 +21,7 @@ import {
   readFileByChunks,
   searchTextInFile,
   writeFileByChunks,
-  collectionNames,
+  messageFolders,
 } from '../utils';
 
 import config from '../../config';
@@ -74,23 +74,36 @@ export const serverLogParams: IParamsInfo = {
   mDateTo: { itemKey: 'mdate', comparator: (a: number, b: number) => a <= b },
 };
 
-export const readDirectory = async (root: string, recursive = false, excludeFolders?: string[]) => {
+/**
+ * Возвращает список файлов из директории, ограниченный параметрами
+ * @param root
+ * @param recursive
+ * @param includedFolders
+ * @returns
+ */
+export const readDirectory = async (root: string, recursive = false, includedFolders?: string[]) => {
   try {
     const files = await readdir(root);
-    const exclude: string[] = (excludeFolders ?? []).map((i) => i.toLocaleLowerCase());
 
     const res = await files.reduce(async (arr: Promise<string[]>, curr: string) => {
       let accum: string[] = await arr;
       const fullCurr = path.join(root, curr);
 
       const isDir = (await stat(fullCurr)).isDirectory();
+
       if (isDir) {
-        if (recursive && !exclude.includes(curr.toLocaleLowerCase())) {
-          const subFiles = await readDirectory(fullCurr, recursive, excludeFolders);
+        if (recursive) {
+          const subFiles = await readDirectory(fullCurr, recursive, includedFolders);
           accum = [...accum, ...subFiles];
         }
       } else {
-        accum = [...accum, fullCurr];
+        const parentFolder = path.basename(path.dirname(fullCurr)).toLocaleLowerCase();
+        const only: string[] = (includedFolders ?? []).map((i) => i.toLocaleLowerCase());
+        const isIncluded = only.length === 0 || only.includes(parentFolder);
+
+        if (isIncluded) {
+          accum = [...accum, fullCurr];
+        }
       }
       return accum;
     }, Promise.resolve([]));
@@ -100,7 +113,6 @@ export const readDirectory = async (root: string, recursive = false, excludeFold
     return [];
   }
 };
-
 export const getFilesByParams = async <T>(
   fileNameList: string[],
   params: IParamsInfo,
@@ -185,70 +197,105 @@ export const writeDataToFile = async (file: IFileParams, data: any): Promise<voi
   }
 };
 
-export const checkDeviceLogsFiles = async (): Promise<void> => {
-  const { devices } = getDb();
-  // Берем все файлы из папки логов устройств
-  const files = (await readDirectory(getDb().dbPath, true)).filter((fileName) => {
-    const parts = fileName.split(path.sep);
-    const lastFolder = parts[parts.length - 2];
-    return lastFolder === deviceLogFolder;
-  });
+// export const checkDeviceLogsFiles = async (): Promise<void> => {
+//   const { devices } = getDb();
+//   // // Берем все файлы из папки логов устройств
+//   // const files = (await readDirectory(getDb().dbPath, true)).filter((fileName) => {
+//   //   const parts = fileName.split(path.sep);
+//   //   const lastFolder = parts[parts.length - 2];
+//   //   return lastFolder === deviceLogFolder;
+//   // });
 
-  for (const file of files) {
-    try {
-      const re = /from_(.+)_dev_(.+)\.json/gi;
-      const match = re.exec(file);
-      if (!match) {
-        log.error(`Invalid deviceLogs file name ${file}`);
-        // eslint-disable-next-line no-await-in-loop
-        await unlink(file);
-      } else {
-        const device = devices.findByField('uid', match[2]);
+//   const files = await readDirectory(getDb().dbPath, true, [deviceLogFolder]);
 
-        if (!device) {
-          // eslint-disable-next-line no-await-in-loop
-          const fileStat = await stat(file);
-          const fileDate = fileStat.birthtimeMs;
-          if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > config.FILES_SAVING_PERIOD_IN_DAYS) {
-            // eslint-disable-next-line no-await-in-loop
-            await unlink(file);
-          }
-        }
-      }
-    } catch (err) {
-      log.warn(`Ошибка при удалении старого файла логов-- ${err}`);
-    }
-  }
-};
+//   for (const file of files) {
+//     try {
+//       const re = /from_(.+)_dev_(.+)\.json/gi;
+//       const match = re.exec(file);
+//       if (!match) {
+//         log.error(`Invalid deviceLogs file name ${file}`);
+//         // eslint-disable-next-line no-await-in-loop
+//         await unlink(file);
+//       } else {
+//         const device = devices.findByField('uid', match[2]);
 
+//         if (!device) {
+//           // eslint-disable-next-line no-await-in-loop
+//           const fileStat = await stat(file);
+//           const fileDate = fileStat.birthtimeMs;
+//           if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > config.FILES_SAVING_PERIOD_IN_DAYS) {
+//             // eslint-disable-next-line no-await-in-loop
+//             await unlink(file);
+//           }
+//         }
+//       }
+//     } catch (err) {
+//       log.warn(`Ошибка при удалении старого файла логов-- ${err}`);
+//     }
+//   }
+// };
+
+/**
+ * Удаление старых файлов
+ * Если файл не логов устройства
+   и старше FILES_SAVING_PERIOD_IN_DAYS для файлов сообщений
+   или DOCS_SAVING_PERIOD_IN_DAYS для файлов документов, то удаляем его
+ * Если файл логов устройства и устройство не найдено и файл старше FILES_SAVING_PERIOD_IN_DAYS, то удаляем его
+ */
 export const checkFiles = async (): Promise<void> => {
-  const defaultExclude = Object.values(collectionNames).map((i) => `${i}.json`);
-
+  // const defaultExclude = Object.values(collectionNames).map((i) => `${i}.json`);
   const root = getDb().dbPath;
-  const files = await readDirectory(root, true, [...defaultExclude, deviceLogFolder]);
+  // Находим все файлы из папок файлов сообщений
+  const files = await readDirectory(root, true, messageFolders);
+  console.log('files', files);
 
   for (const file of files) {
     try {
       const fileStat = await stat(file);
       const fileDate = fileStat.birthtimeMs;
-      const period =
-        file.toUpperCase().indexOf('DOCS') === -1 || file.toUpperCase().indexOf('MESSAGES') > 0
-          ? config.FILES_SAVING_PERIOD_IN_DAYS
-          : config.DOCS_SAVING_PERIOD_IN_DAYS;
 
-      if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > period) {
-        await unlink(file);
+      const parentFolder = path.basename(path.dirname(file)).toLocaleLowerCase();
+
+      // Если файл логов устройства
+      if (parentFolder === deviceLogFolder) {
+        const re = /from_(.+)_dev_(.+)\.json/gi;
+        const match = re.exec(file);
+        // Если имя файла не соответствует формату, то удаляем его
+        if (!match) {
+          log.error(`Invalid deviceLogs file name ${file}`);
+          // eslint-disable-next-line no-await-in-loop
+          await unlink(file);
+        } else {
+          const device = getDb().devices.findByField('uid', match[2]);
+          // Если устройство не найдено и файл старше FILES_SAVING_PERIOD_IN_DAYS, то удаляем его
+          if (!device) {
+            if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > config.FILES_SAVING_PERIOD_IN_DAYS) {
+              // eslint-disable-next-line no-await-in-loop
+              await unlink(file);
+            }
+          }
+        }
+      } else {
+        // Если файл не логов устройства
+        const period =
+          file.toUpperCase().indexOf('DOCS') === -1 //|| file.toUpperCase().indexOf('MESSAGES') > 0
+            ? config.FILES_SAVING_PERIOD_IN_DAYS
+            : config.DOCS_SAVING_PERIOD_IN_DAYS;
+
+        if ((new Date().getTime() - fileDate) / MSEС_IN_DAY > period) {
+          await unlink(file);
+        }
       }
     } catch (err) {
       log.warn(`Ошибка при удалении старого файла-- ${err}`);
     }
   }
 
-  try {
-    await checkDeviceLogsFiles();
-  } catch (err) {
-    log.warn(`Ошибка при удалении старого файла логов-- ${err}`);
-  }
+  // try {
+  //   await checkDeviceLogsFiles();
+  // } catch (err) {
+  //   log.warn(`Ошибка при удалении старого файла логов-- ${err}`);
+  // }
 };
 
 /**
