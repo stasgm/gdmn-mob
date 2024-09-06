@@ -100,11 +100,11 @@
     "styled-components": "^6.1.13",
     "tiny-warning": "^1.0.3",
     "typescript": "^5.2.2",
-    "webpack": "^5.88.2",
+    "webpack": "^5.94.0",
     "webpack-cli": "^5.0.1",
-    "webpack-dev-server": "^4.10.0",
-    "webpack-merge": "^5.8.0",
-    "yup": "^1.2.0"
+    "webpack-dev-server": "^5.1.0",
+    "webpack-merge": "^6.0.1",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@config/eslint-config": "*",
