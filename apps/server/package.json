@@ -40,7 +40,7 @@
     "@types/koa__cors": "^4.0.3",
     "@types/passport-local": "^1.0.38",
     "bcrypt": "^5.1.1",
-    "dotenv": "~16.3.1",
+    "dotenv": "~16.4.5",
     "koa": "^2.14.2",
     "koa-body": "^6.0.1",
     "koa-bodyparser": "^4.3",
@@ -56,7 +56,7 @@
     "nanoid": "^3.3.4",
     "passport-local": "^1.0",
     "ramda": "^0.29.1",
-    "rotating-file-stream": "^3.1.1",
+    "rotating-file-stream": "^3.2.3",
     "typescript": "^5.2.2",
     "winston": "^3.11.0",
     "winston-daily-rotate-file": "^4.7.1"
