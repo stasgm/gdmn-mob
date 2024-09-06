@@ -45,13 +45,13 @@
   },
   "prettier": "@config/prettier-config",
   "dependencies": {
-    "@babel/cli": "^7.23.4",
-    "@babel/core": "^7.23.7",
-    "@babel/preset-env": "^7.23.8",
-    "@babel/preset-react": "^7.23.3",
-    "@babel/preset-typescript": "^7.23.3",
-    "@emotion/react": "^11.10.5",
-    "@emotion/styled": "^11.10.5",
+    "@babel/cli": "^7.25.6",
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.4",
+    "@babel/preset-react": "^7.24.7",
+    "@babel/preset-typescript": "^7.24.7",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
     "@lib/client-api": "*",
     "@lib/mock": "*",
     "@lib/store": "*",
@@ -93,6 +93,7 @@
     "react-router": "^6.16.0",
     "react-router-dom": "^6.16.0",
     "reaptcha": "~1.12.1",
+    "reselect": "^5.1.0",
     "rimraf": "^5.0.5",
     "sass-loader": "^13.2.0",
     "style-loader": "^3.3.1",
@@ -103,8 +104,7 @@
     "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^4.10.0",
     "webpack-merge": "^5.8.0",
-    "yup": "^1.2.0",
-    "reselect": "^5.1.0"
+    "yup": "^1.2.0"
   },
   "devDependencies": {
     "@config/eslint-config": "*",
