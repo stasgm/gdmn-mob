@@ -110,6 +110,6 @@
     "@config/eslint-config": "*",
     "@config/eslint-config-react": "*",
     "@config/prettier-config": "*",
-    "lint-staged": "^14.0.1"
+    "lint-staged": "^15.2.10"
   }
 }

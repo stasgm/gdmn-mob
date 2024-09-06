@@ -7,7 +7,6 @@ import { IUser } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import { companyActions } from '../../store/company';
 import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
 import SortableTable from '../SortableTable';
 import { userActions, userSelectors } from '../../store/user';

@@ -48,12 +48,12 @@
     ]
   },
   "devDependencies": {
-    "@commitlint/cli": "^18.4.3",
-    "@commitlint/config-conventional": "^18.4.3",
+    "@commitlint/cli": "^19.4.1",
+    "@commitlint/config-conventional": "^19.4.1",
     "@config/prettier-config": "*",
     "concurrently": "^8.2.2",
     "husky": "^9.1.5",
-    "lerna": "^8.0.0",
+    "lerna": "^8.1.8",
     "lint-staged": "^15.2.10",
     "log-update": "^6.1.0",
     "patch-package": "^8.0.0",

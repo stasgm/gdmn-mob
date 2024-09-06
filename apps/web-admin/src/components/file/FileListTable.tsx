@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -34,25 +34,12 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDateTimePicker } from '@mui/x-date-pickers/DesktopDateTimePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 
-import actions from '../../store/file';
-
 import { adminPath, fileFilterValues } from '../../utils/constants';
-import {
-  IFileFilter,
-  IFilePageParam,
-  IFilterObject,
-  IFilterOption,
-  IFilterTable,
-  IHeadCells,
-  IListOption,
-  IPageParam,
-} from '../../types';
-import { useDispatch, useSelector } from '../../store';
+import { IFilePageParam, IFilterObject, IFilterOption, IHeadCells, IListOption, IPageParam } from '../../types';
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 import { useWindowResizeWidth } from '../../utils/useWindowResizeMaxWidth';
 import { getFilesFilters, getFilterObject } from '../../utils/helpers';
 import ComboBox from '../ComboBox';
-import { useDrawerResizeMaxHeight } from '../../utils/useDrawerResizeMaxHeight';
 
 type Order = 'asc' | 'desc';
 
@@ -108,7 +95,7 @@ function FileListTable<T extends IEntity>({
   const maxHeight = useWindowResizeMaxHeight();
   const width = useWindowResizeWidth(0.2);
 
-  const drawerHeight = useDrawerResizeMaxHeight();
+  // const drawerHeight = useDrawerResizeMaxHeight();
 
   const formik = useFormik<IFilterObject>({
     enableReinitialize: true,
@@ -307,7 +294,7 @@ function FileListTable<T extends IEntity>({
             {headCells.map((item) => {
               return (
                 <TableCell key={item.label}>
-                  {DeserializeProp<T>(item.id, file[item.id] || item.value, item.fieldName || '')}
+                  {DeserializeProp<T>(item.id, file[item.id as keyof ISystemFile] || item.value, item.fieldName || '')}
                 </TableCell>
               );
             })}
@@ -476,7 +463,10 @@ function FileListTable<T extends IEntity>({
                               inputFormat="DD/MM/YY hh:mm"
                               value={formik.values[item]?.value || null}
                               onChange={(date) =>
-                                handleUpdateFormik(item, { id: item, name: date ? new Date(date).toISOString() : '' })
+                                handleUpdateFormik(item, {
+                                  id: item,
+                                  name: date ? new Date(date as string).toISOString() : '',
+                                })
                               }
                               componentsProps={{
                                 actionBar: {

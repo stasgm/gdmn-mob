@@ -40,6 +40,6 @@
     "@config/eslint-config-react-native": "*",
     "@config/prettier-config": "*",
     "@lib/client-types": "*",
-    "lint-staged": "^14.0.1"
+    "lint-staged": "^15.2.10"
   }
 }
