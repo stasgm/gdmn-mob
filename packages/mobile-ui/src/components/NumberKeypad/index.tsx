@@ -1,6 +1,6 @@
 import { Feather } from '@expo/vector-icons';
 import { evaluate } from 'mathjs';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, useWindowDimensions, StyleProp, ViewStyle } from 'react-native';
 
 import globalColors from '../../styles/colors';
@@ -12,11 +12,13 @@ interface IProps {
   decDigitsForTotal?: number;
   onDismiss?: () => void;
   onApply: (newValue: string) => void;
+  changeOldValue?: boolean;
+  onSave?: () => void;
 }
 
 const isDiv0 = (expression: string, number?: string) => Number(number) === 0 && expression.indexOf('/') >= 0;
 
-const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProps) => {
+const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal, changeOldValue = false, onSave }: IProps) => {
   const [expression, setExpression] = useState('');
   const [number, setNumber] = useState(oldValue);
   const [firstOperation, setFirstOperation] = useState(true);
@@ -134,7 +136,7 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
     ],
     [
       { title: '-', onPress: () => handleOperationPress({ value: '-' }), operation: true },
-      { title: '+', onPress: () => handleOperationPress({ value: '+' }), grow: 2, operation: true },
+      { title: '+', onPress: () => handleOperationPress({ value: '+' }), grow: 1, operation: true },
       {
         title: '=',
         onPress: () => {
@@ -145,8 +147,15 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
         grow: 2,
         operation: true,
       },
+      { title: 'OK', onPress: () => onSave && onSave(), grow: 1, operation: true },
     ],
   ];
+
+  useEffect(() => {
+    if (changeOldValue) {
+      setNumber(oldValue);
+    }
+  }, [changeOldValue, oldValue]);
 
   const windowHeight = useWindowDimensions().height;
   const viewStyle: StyleProp<ViewStyle> = useMemo(

@@ -34,6 +34,7 @@ export interface IDocumentType extends INamedEntity {
   toRequired?: boolean;
   sortOrder?: number;
   subtype?: string;
+  isSumWNds?: boolean;
 }
 
 interface IDocument<T = IHead, K extends IEntity = IEntity> extends IEntity {

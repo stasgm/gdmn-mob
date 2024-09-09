@@ -17,7 +17,7 @@ import { IScannedObject } from '@lib/client-types';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IMovementLine, IMovementDocument } from '../../store/types';
 import { IGood, IMGoodData, IMGoodRemain, IRemains } from '../../store/app/types';
-import { getRemGoodByContact } from '../../utils/helpers';
+import { getBrc, getRemGoodByContact } from '../../utils/helpers';
 import { IBarcodeTypes, unknownGood } from '../../utils/constants';
 import { useSelector as useInvSelector } from '../../store';
 
@@ -29,6 +29,7 @@ const ScanBarcodeScreen = () => {
   const showZeroRemains = settings?.showZeroRemains?.data;
   const isInputQuantity = settings?.quantityInput?.data;
 
+  const prefixGtin = (settings.prefixGtin as ISettingsOption<string>)?.data || '';
   const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
   const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>)?.data || 0;
   const weightSettingsCountWeight = (settings.countWeight as ISettingsOption<number>)?.data || 0;
@@ -104,9 +105,10 @@ const ScanBarcodeScreen = () => {
       let charFrom = 0;
       let charTo = weightSettingsWeightCode.data.length;
 
-      if (brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
+      if (brc.slice(0, 2) === prefixGtin || brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
         const remItem =
-          goodRemains[brc] || (documentType?.isRemains ? undefined : { good: { ...unknownGood, barcode: brc } });
+          getBrc(brc, prefixGtin, goodRemains) ||
+          (documentType?.isRemains ? undefined : { good: { ...unknownGood, barcode: brc } });
 
         // Находим товар из модели остатков по баркоду, если баркод не найден, то
         //   если выбор из остатков, то undefined,
@@ -190,6 +192,7 @@ const ScanBarcodeScreen = () => {
       goodRemains,
       isInputQuantity,
       navigation,
+      prefixGtin,
       weightSettingsCountCode,
       weightSettingsCountWeight,
       weightSettingsWeightCode.data,

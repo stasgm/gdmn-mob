@@ -29,6 +29,6 @@
     "@config/eslint-config": "*",
     "@config/prettier-config": "*",
     "lint-staged": "^15.2.10",
-    "typescript": "^5.2.2"
+    "typescript": "~5.3.3"
   }
 }

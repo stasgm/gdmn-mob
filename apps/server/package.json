@@ -57,7 +57,7 @@
     "passport-local": "^1.0",
     "ramda": "^0.29.1",
     "rotating-file-stream": "^3.2.3",
-    "typescript": "^5.2.2",
+    "typescript": "~5.3.3",
     "winston": "^3.14.2",
     "winston-daily-rotate-file": "^5.0.0"
   },
@@ -65,7 +65,7 @@
     "@config/eslint-config": "*",
     "@config/prettier-config": "*",
     "@types/jest": "^29.5.12",
-    "@types/node": "^20.8.4",
+    "@types/node": "^20.14.9",
     "@types/ramda": "^0.30.2",
     "@types/supertest": "^2.0.16",
     "cross-env": "^7.0.3",

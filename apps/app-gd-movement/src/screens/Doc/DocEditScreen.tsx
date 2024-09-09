@@ -61,14 +61,24 @@ export const DocEditScreen = () => {
     toContactType: docToContactType,
   } = useSelector((state) => state.app.formParams as IDocFormParam);
 
-  const departmentSetting = useSelector((state) => state.settings?.userData?.toDepartment?.data);
+  const toDepartmentSetting = useSelector((state) => state.settings?.userData?.toDepartment?.data);
 
   const defaultToDepartment = useMemo(
     () =>
-      isNamedEntity(departmentSetting) && (docToContactType ? docToContactType?.id === 'department' : true)
-        ? departmentSetting
+      isNamedEntity(toDepartmentSetting) && (docToContactType ? docToContactType?.id === 'department' : true)
+        ? toDepartmentSetting
         : undefined,
-    [departmentSetting, docToContactType],
+    [toDepartmentSetting, docToContactType],
+  );
+
+  const fromDepartmentSetting = useSelector((state) => state.settings?.userData?.fromDepartment?.data);
+
+  const defaultFromDepartment = useMemo(
+    () =>
+      isNamedEntity(fromDepartmentSetting) && (docFromContactType ? docFromContactType?.id === 'department' : false)
+        ? fromDepartmentSetting
+        : undefined,
+    [fromDepartmentSetting, docFromContactType],
   );
 
   const documentType = useMemo(
@@ -81,6 +91,14 @@ export const DocEditScreen = () => {
   const dtToContact = useMemo(
     () => contactTypes.find((item) => (defaultToDepartment ? item.id === 'department' : item.id === dt?.toType)),
     [defaultToDepartment, dt?.toType],
+  );
+
+  const dtFromContact = useMemo(
+    () =>
+      contactTypes.find((item) =>
+        defaultFromDepartment && docFromContactType ? item.id === 'department' : item.id === dt?.fromType,
+      ),
+    [defaultFromDepartment, docFromContactType, dt?.fromType],
   );
 
   useEffect(() => {
@@ -114,7 +132,8 @@ export const DocEditScreen = () => {
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
           documentType: dt,
-          fromContactType: contactTypes.find((item) => item.id === dt?.fromType),
+          fromContactType: dtFromContact,
+          fromContact: defaultFromDepartment,
           toContactType: dtToContact,
           toContact: defaultToDepartment,
         }),
@@ -309,11 +328,13 @@ export const DocEditScreen = () => {
 
   useEffect(() => {
     //Если меняем тип документа и он не такой, какой был, надо обнулить контакты и подставить соответствующие типы контактов
+
     if (oldDocTypeId && docDocumentType && docDocumentType.id !== oldDocTypeId) {
       setOldDocTypeId(docDocumentType.id);
       dispatch(
         appActions.setFormParams({
-          fromContact: undefined,
+          fromContact:
+            defaultFromDepartment && docDocumentType?.fromType === 'department' ? defaultFromDepartment : undefined,
           fromContactType: contactTypes.find((item) => item.id === documentType?.fromType),
           toContact: defaultToDepartment ? defaultToDepartment : undefined,
           toContactType: contactTypes.find((item) => item.id === documentType?.toType),
@@ -321,7 +342,19 @@ export const DocEditScreen = () => {
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, docDocumentType]);
+  }, [dispatch, docDocumentType, defaultFromDepartment, oldDocTypeId]);
+
+  useEffect(() => {
+    //Если меняем тип документа и для поля Откуда есть подразделение по умолчанию
+    if (docFromContactType) {
+      dispatch(
+        appActions.setFormParams({
+          fromContact:
+            defaultFromDepartment && docDocumentType?.fromType === 'department' ? defaultFromDepartment : undefined,
+        }),
+      );
+    }
+  }, [dispatch, docDocumentType, defaultFromDepartment, docFromContactType]);
 
   const handlePresentType = () => {
     if (isBlocked) {

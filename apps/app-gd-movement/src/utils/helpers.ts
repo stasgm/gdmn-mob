@@ -135,3 +135,9 @@ export { getRemGoodByContact, getRemGoodListByContact };
 export const jsonFormat = (str: any) => {
   return JSON.stringify(str, null, '\t');
 };
+
+export const getBrc = (brc: string, prefixGtin: string, goodRemains: IMGoodData<IMGoodRemain>) => {
+  return prefixGtin === brc.slice(0, 2)
+    ? goodRemains[brc.slice(2, 16)] || goodRemains[brc.slice(3, 16)]
+    : goodRemains[brc];
+};

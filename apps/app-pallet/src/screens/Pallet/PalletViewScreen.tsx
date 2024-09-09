@@ -3,6 +3,8 @@ import { View, TextInput, Alert, useWindowDimensions, Keyboard } from 'react-nat
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
+import { Audio } from 'expo-av';
+
 import { appActions, docSelectors, documentActions, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   MenuButton,
@@ -24,6 +26,7 @@ import {
   DeleteButton,
   CloseButton,
   EditDocument,
+  PrintButton,
 } from '@lib/mobile-ui';
 
 import {
@@ -41,11 +44,16 @@ import { ScreenState } from '@lib/types';
 
 import { FlashList } from '@shopify/flash-list';
 
+import * as Print from 'expo-print';
+
 import { IPalletDocument, IPalletLine } from '../../store/types';
 import { PalletStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
+import { alertWithSound } from '../../utils/helpers';
+
 import { BarcodeImage } from './components/Barcode';
+import ViewTotal from './components/ViewTotal';
 
 export const PalletViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -69,6 +77,38 @@ export const PalletViewScreen = () => {
   const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
   const prefixErp = useSelector((state) => state.settings?.data?.prefixErp?.data);
   const prefixS = useSelector((state) => state.settings?.data?.prefixS?.data);
+
+  const sound = Audio.Sound.createAsync(require('../../../assets/ok.wav'));
+
+  const playSound = useCallback(async () => {
+    (await sound).sound.playAsync();
+  }, [sound]);
+
+  const html = `
+  <html>
+    <head>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
+    />
+    </head>
+    <body style="text-align: center; margin-top: 20px">
+      <h1 style="font-size: 22px; font-family: Helvetica Neue; font-weight: normal;">
+      ${`№ ${doc?.number || '-'} от ${getDateString(doc?.documentDate || '')}` || ''}</h1>
+      <h1 style="font-size: 30px; font-family: Helvetica Neue; font-weight: normal;">${doc?.head.palletId || ''}</h1>
+    </body>
+  </html>
+`;
+
+  const [selectedPrinter, setSelectedPrinter] = useState<Print.Printer>();
+
+  const print = useCallback(async () => {
+    // On iOS/android prints the given html. On web prints the HTML from the current page.
+    await Print.printAsync({
+      html,
+      printerUrl: selectedPrinter?.url, // iOS only
+    });
+  }, [html, selectedPrinter?.url]);
 
   useEffect(() => {
     return () => {
@@ -146,8 +186,7 @@ export const PalletViewScreen = () => {
         document: { ...doc, status: 'DRAFT' },
       }),
     );
-    navigation.goBack();
-  }, [dispatch, id, doc, navigation]);
+  }, [dispatch, id, doc]);
 
   const hanldeCancelLastPallet = useCallback(() => {
     const lastId = doc?.lines?.[0]?.id;
@@ -209,11 +248,12 @@ export const PalletViewScreen = () => {
       isBlocked ? (
         doc?.status === 'READY' ? (
           <View style={styles.buttons}>
+            <PrintButton onPress={() => print()} disabled={screenState !== 'idle'} />
             <EditDocument onPress={handleEditDocument} disabled={screenState !== 'idle'} />
             <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
           </View>
         ) : (
-          doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
+          <PrintButton onPress={() => print()} disabled={screenState !== 'idle'} />
         )
       ) : (
         <View style={styles.buttons}>
@@ -221,11 +261,11 @@ export const PalletViewScreen = () => {
             <DeleteButton onPress={handleDeleteLines} />
           ) : (
             <>
+              <PrintButton onPress={() => print()} disabled={screenState !== 'idle'} />
               {doc?.status === 'DRAFT' && (
                 <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
               )}
               <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
-
               <ScanButton
                 onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('PalletGood', { docId: id }))}
                 disabled={screenState !== 'idle'}
@@ -247,9 +287,14 @@ export const PalletViewScreen = () => {
       isScanerReader,
       loading,
       navigation,
+      print,
       screenState,
     ],
   );
+
+  const handleEditPalletHead = useCallback(() => {
+    navigation.navigate('PalletEdit', { id });
+  }, [navigation, id]);
 
   const windowWidth = useWindowDimensions().width;
 
@@ -261,7 +306,7 @@ export const PalletViewScreen = () => {
     navigation.setOptions({
       headerLeft: isDelList ? renderLeft : navBackButton,
       headerRight: renderRight,
-      title: windowWidth > 320 ? 'Документ' : '',
+      title: '',
     });
   }, [isDelList, navigation, renderLeft, renderRight, windowWidth]);
 
@@ -282,12 +327,8 @@ export const PalletViewScreen = () => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      Alert.alert('Внимание!', `${text}.`, [
-        {
-          text: 'ОК',
-          onPress: handleFocus,
-        },
-      ]);
+      alertWithSound('Внимание!', `${text}.`, handleFocus);
+
       setScanned(false);
     }
     handleFocus();
@@ -312,12 +353,15 @@ export const PalletViewScreen = () => {
 
       if (brc.slice(0, 2) !== prefixErp && brc.slice(0, 2) !== prefixS) {
         handleErrorMessage(visibleDialog, 'Баркод неверного формата');
+
         setScanned(false);
         handleFocus();
         return;
       }
 
       if (doc.lines?.find((l) => l.barcode === brc)) {
+        handleErrorMessage(visibleDialog, 'Штрихкод уже добавлен');
+
         setScanned(false);
         handleFocus();
         return;
@@ -325,6 +369,7 @@ export const PalletViewScreen = () => {
 
       const line: IPalletLine = { id: generateId(), barcode: brc, sortOrder: (lines?.[0]?.sortOrder || 0) + 1 };
       dispatch(documentActions.addDocumentLine({ docId: id, line }));
+      playSound();
 
       if (visibleDialog) {
         setVisibleDialog(false);
@@ -336,7 +381,7 @@ export const PalletViewScreen = () => {
 
       handleFocus();
     },
-    [dispatch, doc, handleErrorMessage, id, isBlocked, lines, prefixErp, prefixS, visibleDialog],
+    [dispatch, doc, handleErrorMessage, id, isBlocked, lines, playSound, prefixErp, prefixS, visibleDialog],
   );
 
   const handleSearchBarcode = () => {
@@ -398,7 +443,7 @@ export const PalletViewScreen = () => {
         <InfoBlock
           colorLabel={getStatusColor(doc?.status || 'DRAFT')}
           title={doc.documentType.description || ''}
-          onPress={() => !isEditable && setIsDateVisible(!isDateVisible)}
+          onPress={() => (isEditable ? handleEditPalletHead() : setIsDateVisible(!isDateVisible))}
           isBlocked={isBlocked}
           disabled={delList.length > 0}
         >
@@ -406,7 +451,14 @@ export const PalletViewScreen = () => {
             <View style={styles.rowCenter}>
               <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
             </View>
+            <View style={styles.rowCenter}>
+              <MediumText>Вес коробки: {(doc.head.boxWeight || 0).toString()} кг</MediumText>
+            </View>
+            <View style={styles.rowCenter}>
+              <MediumText>Вес поддона: {(doc.head.palletWeight || 0).toString()} кг</MediumText>
+            </View>
             <BarcodeImage barcode={doc?.head.palletId} />
+
             {isDateVisible && <DateInfo sentDate={doc.sentDate} erpCreationDate={doc.erpCreationDate} />}
           </>
         </InfoBlock>
@@ -428,6 +480,7 @@ export const PalletViewScreen = () => {
           keyExtractor={keyExtractor}
           extraData={[lines, isBlocked, delList, isDelList]}
         />
+        {lines?.length ? <ViewTotal total={lines?.length || 0} /> : null}
         <AppDialog
           title="Введите штрих-код"
           visible={visibleDialog}

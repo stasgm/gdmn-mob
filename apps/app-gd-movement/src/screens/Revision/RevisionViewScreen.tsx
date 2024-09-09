@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, TextInput, Alert, useWindowDimensions } from 'react-native';
+import { View, TextInput, Alert, useWindowDimensions, Keyboard } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -30,6 +30,7 @@ import {
   SaveDocument,
   SimpleDialog,
   DateInfo,
+  AppDialog,
 } from '@lib/mobile-ui';
 
 import {
@@ -92,8 +93,24 @@ export const RevisionViewScreen = () => {
 
   const [isDateVisible, setIsDateVisible] = useState(false);
 
+  const [visibleDialog, setVisibleDialog] = useState(false);
+  const [barcode, setBarcode] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
   const handleFocus = () => {
     ref?.current?.focus();
+  };
+
+  const handleShowDialog = () => {
+    setVisibleDialog(true);
+  };
+
+  const handleDismissBarcode = () => {
+    setVisibleDialog(false);
+    setBarcode('');
+    setErrorMessage('');
+    Keyboard.dismiss();
+    handleFocus();
   };
 
   const handleEditDocHead = useCallback(() => {
@@ -176,6 +193,10 @@ export const RevisionViewScreen = () => {
       {
         title: 'Отменить последнее сканирование',
         onPress: hanldeCancelLastScan,
+      },
+      {
+        title: 'Ввести штрих-код',
+        onPress: handleShowDialog,
       },
       {
         title: 'Редактировать данные',
@@ -312,11 +333,15 @@ export const RevisionViewScreen = () => {
 
       if (remItem) {
         if (line) {
-          Alert.alert(
-            remItem.good.name,
-            `Цена: ${line.price || 0} р., остаток: ${line.remains || 0} \n\nТовар уже добавлен`,
-            [{ text: 'ОК', onPress: handleFocus }],
-          );
+          if (visibleDialog) {
+            setErrorMessage(`Цена: ${line.price || 0} р., остаток: ${line.remains || 0} \n\nТовар уже добавлен`);
+          } else {
+            Alert.alert(
+              remItem.good.name,
+              `Цена: ${line.price || 0} р., остаток: ${line.remains || 0} \n\nТовар уже добавлен`,
+              [{ text: 'ОК', onPress: handleFocus }],
+            );
+          }
           setScanned(false);
           return;
         } else {
@@ -345,18 +370,21 @@ export const RevisionViewScreen = () => {
               { text: 'Отмена', onPress: handleFocus },
             ],
           );
-          setScanned(false);
-
-          return;
         }
+        setScanned(false);
+        return;
       }
 
       const refGood = goods.find((i) => i.barcode === brc);
       if (refGood) {
         if (line) {
-          Alert.alert(refGood.name, `Цена: ${line.price || 0} р. \n\nТовар уже добавлен`, [
-            { text: 'ОК', onPress: handleFocus },
-          ]);
+          if (visibleDialog) {
+            setErrorMessage(`Цена: ${line.price || 0} р. \n\nТовар уже добавлен`);
+          } else {
+            Alert.alert(refGood.name, `Цена: ${line.price || 0} р. \n\nТовар уже добавлен`, [
+              { text: 'ОК', onPress: handleFocus },
+            ]);
+          }
 
           setScanned(false);
 
@@ -448,12 +476,21 @@ export const RevisionViewScreen = () => {
 
         return;
       }
-      setScanned(false);
-
+      if (visibleDialog) {
+        setVisibleDialog(false);
+        setBarcode('');
+        setErrorMessage('');
+      } else {
+        setScanned(false);
+      }
       handleFocus();
     },
-    [dispatch, doc, goodRemains, goods, id, isBlocked, lines, navigation],
+    [dispatch, doc, goodRemains, goods, id, isBlocked, lines, navigation, visibleDialog],
   );
+
+  const handleSearchBarcode = () => {
+    getScannedObject(barcode);
+  };
 
   const setScan = (brc: string) => {
     setKey(key + 1);
@@ -539,6 +576,16 @@ export const RevisionViewScreen = () => {
           keyboardShouldPersistTaps="handled"
           keyExtractor={keyExtractor}
           extraData={[lines, delList, isBlocked]}
+        />
+        <AppDialog
+          title="Введите штрих-код"
+          visible={visibleDialog}
+          text={barcode}
+          onChangeText={setBarcode}
+          onCancel={handleDismissBarcode}
+          onOk={handleSearchBarcode}
+          okLabel={'Найти'}
+          errorMessage={errorMessage}
         />
         <SimpleDialog
           visible={visibleSendDialog}

@@ -10,5 +10,6 @@ export { default as SaveDocument } from './SaveDocument';
 export { default as EditDocument } from './EditDocument';
 export { default as InfoButton } from './InfoButton';
 export { ScanButton } from './ScanButton';
+export { PrintButton } from './PrintButton';
 export { DeleteButton } from './DeleteButton';
 export { CloseButton } from './CloseButton';

@@ -38,8 +38,8 @@
     "docker-compose: build&up": "sudo docker-compose up --remove-orphans --build",
     "docker-compose: build": "sudo docker-compose build",
     "docker-compose: up": "sudo docker-compose up --remove-orphans",
-    "postinstall": "node -e \"process.env.NODE_ENV != 'production' && process.exit(1)\" || husky install",
-    "prepare": "node -e \"process.env.NODE_ENV != 'production' && process.exit(1)\" || husky install"
+    "postinstall": "node -e \"process.env.NODE_ENV != 'production' && process.exit(1)\" || husky init",
+    "prepare": "husky"
   },
   "lint-staged": {
     "package.json": [
@@ -59,7 +59,7 @@
     "patch-package": "^8.0.0",
     "rimraf": "^6.0.1",
     "sort-package-json": "2.10.1",
-    "typescript": "^5.2.2"
+    "typescript": "~5.3.3"
   },
   "prettier": "@config/prettier-config"
 }

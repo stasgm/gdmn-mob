@@ -43,7 +43,7 @@ import { DocStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS, unknownGood } from '../../utils/constants';
 import { IGood, IMGoodData, IMGoodRemain, IRemains } from '../../store/app/types';
 
-import { getRemGoodByContact } from '../../utils/helpers';
+import { getBrc, getRemGoodByContact } from '../../utils/helpers';
 
 import { appInventoryActions } from '../../store';
 
@@ -63,7 +63,14 @@ export const DocViewScreen = () => {
   const loading = useSelector((state) => state.app.loading);
 
   const docLineQuantity = doc?.lines?.reduce((sum, line) => sum + line.quantity, 0) || 0;
-  const docLineSum = doc?.lines?.reduce((sum, line) => sum + line.quantity * (line?.price || 0), 0) || 0;
+  const docLineSum = useMemo(
+    () =>
+      doc?.lines?.reduce(
+        (sum, line) => sum + (doc?.documentType?.isSumWNds ? line?.sumWNds || 0 : line.quantity * (line?.price || 0)),
+        0,
+      ) || 0,
+    [doc?.documentType?.isSumWNds, doc?.lines],
+  );
 
   const lines = doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0));
   const isBlocked = doc?.status !== 'DRAFT';
@@ -140,13 +147,6 @@ export const DocViewScreen = () => {
 
     deleteSelectedLineItems(deleteDocs);
   }, [delList, dispatch, id, setDelList]);
-
-  useEffect(() => {
-    if (screenState === 'sent' || screenState === 'deleted') {
-      setScreenState('idle');
-      navigation.goBack();
-    }
-  }, [navigation, screenState]);
 
   const sendDoc = useSendDocs(doc ? [doc] : []);
 
@@ -269,10 +269,11 @@ export const DocViewScreen = () => {
           <LargeText style={styles.textBold}>{item.good.name}</LargeText>
           <View style={styles.directionRow}>
             <MediumText>
-              {item.quantity} {good?.valueName} x {(item.price || 0).toString()} р.
+              {item.quantity} {good?.valueName} {!item.sumWNds ? `x ${(item.price || 0).toString()} р.` : null}
             </MediumText>
             {!!item.barcode && <MediumText style={[styles.number, styles.flexDirectionRow]}>{item.barcode}</MediumText>}
           </View>
+          {item.sumWNds ? <MediumText>Сумма НДС {(item.sumWNds || 0).toString()} р.</MediumText> : null}
         </View>
       </ListItemLine>
     );
@@ -297,6 +298,7 @@ export const DocViewScreen = () => {
 
   const settings = useSelector((state) => state.settings?.data);
 
+  const prefixGtin = (settings.prefixGtin as ISettingsOption<string>)?.data || '';
   const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
   const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>)?.data || 0;
   const weightSettingsCountWeight = (settings.countWeight as ISettingsOption<number>)?.data || 0;
@@ -325,7 +327,8 @@ export const DocViewScreen = () => {
 
       if (brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
         const remItem =
-          goodRemains[brc] || (documentType?.isRemains ? undefined : { good: { ...unknownGood, barcode: brc } });
+          getBrc(brc, prefixGtin, goodRemains) ||
+          (documentType?.isRemains ? undefined : { good: { ...unknownGood, barcode: brc } });
         // Находим товар из модели остатков по баркоду, если баркод не найден, то
         //   если выбор из остатков, то undefined,
         //   иначе подставляем unknownGood cо сканированным шк и добавляем в позицию документа
@@ -427,6 +430,7 @@ export const DocViewScreen = () => {
       lineConfirm,
       lines,
       navigation,
+      prefixGtin,
       weightSettingsCountCode,
       weightSettingsCountWeight,
       weightSettingsWeightCode.data,
@@ -512,7 +516,12 @@ export const DocViewScreen = () => {
         extraData={[goods, delList, isDelList, isBlocked, navigation, id]}
       />
       {doc.lines?.length ? (
-        <DocTotal lineCount={doc.lines?.length || 0} sum={docLineSum} quantity={docLineQuantity} />
+        <DocTotal
+          lineCount={doc.lines?.length || 0}
+          sum={docLineSum}
+          quantity={docLineQuantity}
+          sumWNds={doc?.documentType?.isSumWNds}
+        />
       ) : null}
       <SimpleDialog
         visible={visibleSendDialog}

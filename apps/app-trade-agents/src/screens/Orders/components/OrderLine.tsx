@@ -15,9 +15,10 @@ interface IProps {
   item: IOrderLine;
   packages: IPackageGood[];
   onSetLine: (value: IOrderLine) => void;
+  onSave?: () => void;
 }
 
-const OrderLine = ({ item, packages, onSetLine }: IProps) => {
+const OrderLine = ({ item, packages, onSetLine, onSave }: IProps) => {
   const { colors } = useTheme();
   const currRef = useRef<TextInput>(null);
 
@@ -64,6 +65,28 @@ const OrderLine = ({ item, packages, onSetLine }: IProps) => {
           </View>
         </View>
         <ItemSeparator />
+        {item.good.scale ? (
+          <>
+            <View style={styles.item}>
+              <View style={styles.details}>
+                <Text style={styles.name}>Коэффициент перевода</Text>
+                <Text style={textStyle}>{item.good.scale.toString()}</Text>
+              </View>
+            </View>
+            <ItemSeparator />
+          </>
+        ) : null}
+        {item.good.barcode ? (
+          <>
+            <View style={styles.item}>
+              <View style={styles.details}>
+                <Text style={styles.name}>Штрихкод</Text>
+                <Text style={textStyle}>{item.good.barcode}</Text>
+              </View>
+            </View>
+            <ItemSeparator />
+          </>
+        ) : null}
         <View style={localStyles.item}>
           <View style={styles.details}>
             <Text style={styles.name}>Упаковка</Text>
@@ -101,6 +124,7 @@ const OrderLine = ({ item, packages, onSetLine }: IProps) => {
         oldValue={item.quantity.toString()}
         onApply={(newValue) => onSetLine({ ...item, quantity: parseFloat(newValue) })}
         decDigitsForTotal={3}
+        onSave={onSave}
       />
     </View>
   );

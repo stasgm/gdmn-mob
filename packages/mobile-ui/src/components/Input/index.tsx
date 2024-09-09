@@ -108,6 +108,7 @@ const Input = ({
           children={undefined}
           autoCapitalize={autoCapitalize}
           onFocus={onFocus}
+          dense={true}
         />
       </View>
     </View>

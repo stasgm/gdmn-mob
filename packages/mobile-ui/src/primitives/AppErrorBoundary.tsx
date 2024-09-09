@@ -1,6 +1,5 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-
 import { Button } from 'react-native-paper';
 
 import ui from './AppText';
@@ -29,17 +28,15 @@ const styles = StyleSheet.create({
 });
 
 export class AppErrorBoundary extends React.Component<Props, State> {
-  static defaultProps = {
-    hasError: false,
-  };
-
   static getDerivedStateFromError(error: Error) {
     console.warn({ error });
-
     return { hasError: true };
   }
 
-  state = { hasError: this.props.hasError };
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: props.hasError ?? false };
+  }
 
   render() {
     if (this.state.hasError) {

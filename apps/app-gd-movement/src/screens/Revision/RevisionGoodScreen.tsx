@@ -56,6 +56,7 @@ const RevisionGoodScreen = () => {
   const [goodRemains] = useState<IMGoodData<IMGoodRemain>>(() =>
     contactId ? getRemGoodByContact(goods, remains[contactId], true) : {},
   );
+
   const handleGetScannedObject = useCallback(
     (brc: string) => {
       // if (doc?.head.isBindGood && doc?.lines?.find((l) => l.barcode === brc)) {

@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Alert, View, StyleSheet, ScrollView, Platform } from 'react-native';
+import { Alert, View, StyleSheet, ScrollView } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Divider } from 'react-native-paper';
 
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { RouteProp, useNavigation, useRoute, StackActions, useTheme, useIsFocused } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -19,45 +18,38 @@ import {
 } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
-import { generateId, getDateString, isNamedEntity, useFilteredDocList } from '@lib/mobile-hooks';
+import { generateId, getDateString, isNumeric, useFilteredDocList } from '@lib/mobile-hooks';
 
 import { IDocumentType, IReference, ScreenState } from '@lib/types';
 
-import { RevisionStackParamList } from '../../navigation/Root/types';
-import { IRevisionFormParam, IRevisionDocument } from '../../store/types';
+import { PalletStackParamList } from '../../navigation/Root/types';
+import { IPalletFormParam, IPalletDocument } from '../../store/types';
 import { STATUS_LIST } from '../../utils/constants';
-import { getNextDocNumber } from '../../utils/helpers';
+import { getEan13Barcode, getNextDocNumber } from '../../utils/helpers';
 
-export const RevisionEditScreen = () => {
-  const id = useRoute<RouteProp<RevisionStackParamList, 'RevisionEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<RevisionStackParamList, 'RevisionEdit'>>();
+export const PalletEditScreen = () => {
+  const id = useRoute<RouteProp<PalletStackParamList, 'PalletEdit'>>().params?.id;
+  const navigation = useNavigation<StackNavigationProp<PalletStackParamList, 'PalletEdit'>>();
   const dispatch = useDispatch();
   const { colors } = useTheme();
 
-  const formParams = useSelector((state) => state.app.formParams as IRevisionFormParam);
+  const formParams = useSelector((state) => state.app.formParams as IPalletFormParam);
 
-  const documents = useFilteredDocList<IRevisionDocument>('revision');
+  const documents = useFilteredDocList<IPalletDocument>('pallet');
 
-  const revisionType = refSelectors
+  const palletType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data.find((t) => t.name === 'revision');
+    ?.data.find((t) => t.name === 'pallet');
 
   const doc = useMemo(() => documents?.find((e) => e.id === id), [documents, id]);
 
-  const departmentSetting = useSelector((state) => state.settings?.userData?.toDepartment?.data);
-
-  const defaultDepart = useMemo(
-    () => (isNamedEntity(departmentSetting) ? departmentSetting : undefined),
-    [departmentSetting],
-  );
-
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {
-    department: docDepartment,
-    documentDate: docDate,
+    boxWeight: docBoxWeight,
+    palletWeight: docPalletWeight,
     number: docNumber,
-    comment: docComment,
     status: docStatus,
+    documentDate: docDate,
   } = useMemo(() => formParams, [formParams]);
 
   useEffect(() => {
@@ -75,8 +67,8 @@ export const RevisionEditScreen = () => {
           number: doc.number,
           documentDate: doc.documentDate,
           status: doc.status,
-          comment: doc.head.comment,
-          department: doc.head.department,
+          boxWeight: doc.head.boxWeight.toString(),
+          palletWeight: doc.head.palletWeight.toString(),
         }),
       );
     } else {
@@ -86,50 +78,61 @@ export const RevisionEditScreen = () => {
           number: newNumber,
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
-          department: defaultDepart,
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, doc, defaultDepart]);
+  }, [dispatch, doc]);
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
   useEffect(() => {
     if (screenState === 'saving') {
-      if (!revisionType) {
+      if (!palletType) {
         setScreenState('idle');
 
-        return Alert.alert('Ошибка!', 'Тип документа для сверки не найден', [{ text: 'OK' }]);
+        return Alert.alert('Ошибка!', 'Тип документа для паллетного листа не найден', [{ text: 'OK' }]);
       }
-      if (!docNumber || !docDate || !docDepartment) {
+      if (!docBoxWeight || !docPalletWeight || !docNumber || !docDate) {
         setScreenState('idle');
 
         return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
       }
 
+      const boxWeight = docBoxWeight.includes(',') ? docBoxWeight.replace(',', '.') : docBoxWeight;
+      if (!isNumeric(boxWeight)) {
+        return Alert.alert('Ошибка!', 'Неправильный формат веса коробки.', [{ text: 'OK' }]);
+      }
+
+      const palletWeight = docPalletWeight.includes(',') ? docPalletWeight.replace(',', '.') : docPalletWeight;
+      if (!isNumeric(palletWeight)) {
+        return Alert.alert('Ошибка!', 'Неправильный формат веса коробки.', [{ text: 'OK' }]);
+      }
+
       const docId = !id ? generateId() : id;
       const createdDate = new Date().toISOString();
 
+      const palletId = getEan13Barcode();
+
       if (!id) {
-        const newDoc: IRevisionDocument = {
+        const newDoc: IPalletDocument = {
           id: docId,
-          documentType: revisionType,
+          documentType: palletType,
           number: docNumber && docNumber.trim(),
-          documentDate: docDate,
+          documentDate: createdDate,
           status: 'DRAFT',
           head: {
-            comment: docComment && docComment.trim(),
-            department: docDepartment,
+            palletId,
+            boxWeight: Number(boxWeight),
+            palletWeight: Number(palletWeight),
           },
           lines: [],
           creationDate: createdDate,
           editionDate: createdDate,
         };
-
         dispatch(documentActions.addDocument(newDoc));
 
-        navigation.dispatch(StackActions.replace('RevisionView', { id: newDoc.id }));
+        navigation.dispatch(StackActions.replace('PalletView', { id: newDoc.id }));
       } else {
         if (!doc) {
           setScreenState('idle');
@@ -139,20 +142,15 @@ export const RevisionEditScreen = () => {
 
         const updatedDate = new Date().toISOString();
 
-        const updatedDoc: IRevisionDocument = {
+        const updatedDoc: IPalletDocument = {
           ...doc,
-          id,
           number: docNumber && docNumber.trim(),
           status: docStatus || 'DRAFT',
-          documentDate: docDate,
-          documentType: revisionType,
-          errorMessage: undefined,
           head: {
             ...doc.head,
-            comment: docComment && docComment.trim(),
-            department: docDepartment,
+            boxWeight: Number(boxWeight),
+            palletWeight: Number(palletWeight),
           },
-          lines: doc.lines,
           creationDate: doc.creationDate || updatedDate,
           editionDate: updatedDate,
         };
@@ -160,21 +158,21 @@ export const RevisionEditScreen = () => {
         dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
         setScreenState('idle');
 
-        navigation.navigate('RevisionView', { id });
+        navigation.navigate('PalletView', { id });
       }
     }
   }, [
-    revisionType,
+    palletType,
     docNumber,
-    docDate,
-    docDepartment,
     id,
-    docComment,
     dispatch,
     navigation,
     doc,
     docStatus,
     screenState,
+    docBoxWeight,
+    docDate,
+    docPalletWeight,
   ]);
 
   const renderRight = useCallback(
@@ -192,41 +190,6 @@ export const RevisionEditScreen = () => {
   const isBlocked = docStatus !== 'DRAFT';
 
   const statusName = id ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
-
-  // Окно календаря для выбора даты
-  const [showDate, setShowDate] = useState(false);
-
-  const handleApplyDate = useCallback(
-    (_event: any, selectedDate: Date | undefined) => {
-      //Закрываем календарь и записываем выбранную дату
-      setShowDate(false);
-
-      if (selectedDate) {
-        dispatch(appActions.setFormParams({ documentDate: selectedDate.toISOString() }));
-      }
-    },
-    [dispatch],
-  );
-
-  const handlePresentDate = useCallback(() => {
-    if (docStatus !== 'DRAFT') {
-      return;
-    }
-
-    setShowDate(true);
-  }, [docStatus]);
-
-  const handlePresentDepartment = useCallback(() => {
-    if (isBlocked) {
-      return;
-    }
-
-    navigation.navigate('SelectRefItem', {
-      refName: 'department',
-      fieldName: 'department',
-      value: docDepartment && [docDepartment],
-    });
-  }, [docDepartment, isBlocked, navigation]);
 
   const handleChangeStatus = useCallback(() => {
     dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
@@ -273,37 +236,30 @@ export const RevisionEditScreen = () => {
             clearInput={true}
             keyboardType="url"
           />
-          <SelectableInput
-            label="Дата"
-            value={getDateString(docDate || '')}
-            onPress={handlePresentDate}
+          <SelectableInput label="Дата" value={getDateString(docDate || '')} disabled={true} />
+          <Input
+            label="Вес коробки"
+            value={docBoxWeight || ''}
+            onChangeText={(text) => {
+              dispatch(appActions.setFormParams({ boxWeight: text || '' }));
+            }}
+            keyboardType={'numeric'}
+            clearInput={true}
+            autoCapitalize="none"
             disabled={docStatus !== 'DRAFT'}
           />
-          <SelectableInput
-            label="Подразделение"
-            value={docDepartment?.name}
-            onPress={handlePresentDepartment}
-            disabled={isBlocked}
-          />
           <Input
-            label="Комментарий"
-            value={docComment}
+            label="Вес поддона"
+            value={docPalletWeight || ''}
             onChangeText={(text) => {
-              dispatch(appActions.setFormParams({ comment: text || '' }));
+              dispatch(appActions.setFormParams({ palletWeight: text || '' }));
             }}
-            disabled={isBlocked}
+            keyboardType={'numeric'}
             clearInput={true}
+            autoCapitalize="none"
+            disabled={docStatus !== 'DRAFT'}
           />
         </ScrollView>
-        {showDate && (
-          <DateTimePicker
-            testID="dateTimePicker"
-            value={new Date(docDate || '')}
-            mode="date"
-            display={Platform.OS === 'ios' ? 'inline' : 'default'}
-            onChange={handleApplyDate}
-          />
-        )}
       </KeyboardAwareScrollView>
     </AppScreen>
   );
