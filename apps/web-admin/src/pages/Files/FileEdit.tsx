@@ -19,6 +19,7 @@ const FileEdit = () => {
   const { loading, file } = useSelector((state) => state.files);
 
   const fileObject = fileSelectors.fileByIdAndFolder(id);
+  // console.log('fileObject', fileObject);
 
   // const fetchFile = useCallback(() => {
   //   dispatch(

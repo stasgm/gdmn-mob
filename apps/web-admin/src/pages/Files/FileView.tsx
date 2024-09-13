@@ -9,7 +9,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { useSelector, useDispatch } from '../../store';
-import { IToolBarButton } from '../../types';
+import { IFileFilter, IFilterTable, IToolBarButton } from '../../types';
 
 import FileDetailsView from '../../components/file/FileDetailsView';
 import FileContentView from '../../components/file/FileContentView';
@@ -29,7 +29,7 @@ const FileView = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading, file, folders } = useSelector((state) => state.files);
+  const { loading, file, folders, list, pageParams } = useSelector((state) => state.files);
 
   const [tabValue, setTabValue] = useState(0);
 
@@ -39,9 +39,22 @@ const FileView = () => {
 
   const fileObject = fileSelectors.fileByIdAndFolder(id);
 
-  const fetchFiles = useCallback(() => {
-    dispatch(fileActions.fetchFiles());
-  }, [dispatch]);
+  const fetchFiles = useCallback(
+    (filesFilters?: IFileFilter, filterText?: string, fromRecord?: number, toRecord?: number) => {
+      if (filesFilters) {
+        const ff: IFilterTable = Object.entries(filesFilters).reduce((prev: IFilterTable, [item, value]) => {
+          if (value) {
+            prev[item] = value;
+          }
+          return prev;
+        }, {});
+        dispatch(fileActions.fetchFiles(ff as IFileFilter, filterText, fromRecord, toRecord));
+      } else {
+        dispatch(fileActions.fetchFiles(filesFilters, filterText, fromRecord, toRecord));
+      }
+    },
+    [dispatch],
+  );
 
   useEffect(() => {
     if (fileObject) {
@@ -51,9 +64,8 @@ const FileView = () => {
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-
-    fetchFiles();
-  }, [fetchFiles]);
+    fetchFiles(pageParams?.filesFilters);
+  }, [fetchFiles, pageParams?.filesFilters]);
 
   const fetchFolders = useCallback(() => {
     if (fileObject && fileObject.company && fileObject.appSystem) {
@@ -245,7 +257,7 @@ const FileView = () => {
   }
 
   const tabs = [
-    { name: 'Общая информация', component: <FileDetailsView list={fileObject!} /> },
+    { name: 'Общая информация', component: fileObject ? <FileDetailsView list={fileObject} /> : null },
     { name: 'Содержимое', component: <FileContentView file={file} /> },
   ];
 

@@ -100,6 +100,23 @@ const updateFile: Config = {
       ...urlValidation.checkURL,
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор файла')),
     }),
+    query: Joi.alternatives()
+      .try(
+        Joi.object({
+          ...urlValidation.checkURL,
+        }),
+        Joi.object({
+          ...urlValidation.checkURL,
+          companyId: Joi.string().required(),
+          appSystemId: Joi.string().required(),
+          folder: Joi.string().optional(),
+        }),
+      )
+      .error(
+        new InvalidParameterException(
+          'Некорректный формат параметров запроса. В параметрах должны быть указаны id компании, id системы и папка',
+        ),
+      ),
     type: 'json',
     body: Joi.alternatives()
       .try(Joi.object(), Joi.array(), Joi.string())

@@ -116,8 +116,6 @@ const FileList = () => {
 
   console.log('formikCompany', formikCompany);
 
-  // console.log('pageParams', pageParams?.filesFilters);
-
   const [pageParamLocal, setPageParamLocal] = useState<IFilePageParam | undefined>(pageParams);
 
   const [filterVisible, setFilterVisible] = useState(pageParams?.filesFilters ? true : false);

@@ -81,6 +81,10 @@ export const robustRequest: RobustRequest = async ({
         res = await api.patch(url, data, config);
         break;
       }
+      case 'PUT': {
+        res = await api.put(url, data, config);
+        break;
+      }
       case 'DELETE': {
         res = await api.delete(url, config);
         break;
@@ -90,6 +94,7 @@ export const robustRequest: RobustRequest = async ({
           type: 'ERROR',
         };
     }
+
     clearTimeout(rTimeout);
 
     let objData = res.data;

@@ -76,7 +76,9 @@ const updateFile = async (ctx: ParameterizedContext): Promise<void> => {
 
   const data = ctx.request.body as string;
 
-  const updatedFile = await fileService.updateOne(params, data);
+  await fileService.updateOne(params, data);
+
+  const updatedFile = await fileService.getOne(params);
 
   ok(ctx as Context, updatedFile, `updateFile: file '${params.id}' is successfully updated`);
 };

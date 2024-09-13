@@ -247,7 +247,6 @@ export const checkFiles = async (): Promise<void> => {
   const root = getDb().dbPath;
   // Находим все файлы из папок файлов сообщений
   const files = await readDirectory(root, true, messageFolders);
-  console.log('files', files);
 
   for (const file of files) {
     try {
@@ -538,7 +537,7 @@ export const getSystemFilePath = ({ companyId, appSystemId, folder, id }: IFileP
   return path.join(
     dbPath,
     `db_${companyId}`,
-    appSystemId ? appSystems.findById(appSystemId)?.name ?? '' : '',
+    appSystemId ? (appSystems.findById(appSystemId)?.name ?? '') : '',
     folder ?? '',
     id || '',
   );
