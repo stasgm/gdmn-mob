@@ -1,4 +1,3 @@
-import { Helmet } from 'react-helmet';
 import { Box, Container, Typography, Grid } from '@mui/material';
 
 import { useEffect } from 'react';
@@ -36,9 +35,6 @@ const Dashboard = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Dashboard</title>
-      </Helmet>
       <Box
         sx={{
           backgroundColor: 'background.default',

@@ -1,4 +1,3 @@
-import { Helmet } from 'react-helmet';
 import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import CachedIcon from '@mui/icons-material/Cached';
@@ -357,9 +356,6 @@ const FileList = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Файловая система</title>
-      </Helmet>
       <Box>
         <Dialog open={open} onClose={handleClose}>
           <DialogContent>

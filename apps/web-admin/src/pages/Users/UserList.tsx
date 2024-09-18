@@ -1,4 +1,3 @@
-import { Helmet } from 'react-helmet';
 import { Box, Container } from '@mui/material';
 import { useNavigate } from 'react-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -89,10 +88,10 @@ const UserList = () => {
 
   const headCells: IHeadCells<IUser>[] = [
     { id: 'name', label: 'Пользователь', sortEnable: true },
-    { id: 'id', label: 'Идентификатор', sortEnable: false },
+    { id: 'id', label: 'Идентификатор', sortEnable: true },
     { id: 'lastName', label: 'Фамилия', sortEnable: true },
     { id: 'firstName', label: 'Имя', sortEnable: true },
-    { id: 'externalId', label: 'Идентификатор из ERP', sortEnable: false },
+    { id: 'externalId', label: 'Идентификатор из ERP', sortEnable: true },
     { id: 'erpUser', label: 'Пользователь ERP', sortEnable: true },
     { id: 'appSystem', label: 'Подсистема', sortEnable: true },
     { id: 'creationDate', label: 'Дата создания', sortEnable: true },
@@ -101,9 +100,6 @@ const UserList = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Пользователи</title>
-      </Helmet>
       <Box
         sx={{
           backgroundColor: 'background.default',

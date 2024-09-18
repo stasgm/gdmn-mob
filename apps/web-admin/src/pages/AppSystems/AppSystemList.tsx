@@ -1,4 +1,3 @@
-import { Helmet } from 'react-helmet';
 import { Box, Container } from '@mui/material';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import CachedIcon from '@mui/icons-material/Cached';
@@ -6,12 +5,22 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 import { useNavigate } from 'react-router';
 
+import { IAppSystem } from '@lib/types';
+
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
 import { appSystemActions } from '../../store/appSystem';
-import { IPageParam, IToolBarButton } from '../../types';
+import { IHeadCells, IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-import AppSystemListTable from '../../components/appSystem/AppSystemListTable';
+import SortableTable from '../../components/SortableTable';
+
+const headCells: IHeadCells<IAppSystem>[] = [
+  { id: 'name', label: 'Наименование', sortEnable: true },
+  { id: 'id', label: 'Идентификатор', sortEnable: true },
+  { id: 'description', label: 'Описание', sortEnable: true },
+  { id: 'creationDate', label: 'Дата создания', sortEnable: true },
+  { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },
+];
 
 const AppSystemList = () => {
   const navigate = useNavigate();
@@ -89,9 +98,6 @@ const AppSystemList = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Подсистемы</title>
-      </Helmet>
       <Box
         sx={{
           backgroundColor: 'background.default',
@@ -113,7 +119,17 @@ const AppSystemList = () => {
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
-            <AppSystemListTable appSystems={list} onSetPageParams={handleSetPageParams} pageParams={pageParams} />
+            // <AppSystemListTable appSystems={list} onSetPageParams={handleSetPageParams} pageParams={pageParams} />
+            <Box sx={{ pt: 2 }}>
+              <SortableTable<IAppSystem>
+                headCells={headCells}
+                data={list}
+                path={'/app/appSystems/'}
+                onSetPageParams={handleSetPageParams}
+                pageParams={pageParams}
+                byMaxHeight={true}
+              />
+            </Box>
           )}
         </Container>
       </Box>

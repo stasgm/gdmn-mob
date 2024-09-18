@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { useCallback, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { DeviceState } from '@lib/types';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -15,7 +15,6 @@ import {
   TablePagination,
   TableRow,
   TableSortLabel,
-  Typography,
 } from '@mui/material';
 
 import { IHeadCells, IPageParam } from '../types';
@@ -35,7 +34,41 @@ interface IProps<T extends { id: string }> {
   pageParams?: IPageParam | undefined;
   byMaxHeight?: boolean;
   minusHeight?: number;
+  withCheckBox?: boolean;
 }
+
+const descendingComparator = <T,>(a: any, b: any, o: keyof T) => {
+  console.log('a[o]', a[o]);
+  const valueA = a[o] ? (typeof a[o] === 'object' && 'name' in a[o] ? a[o].name : a[o]) : '';
+  const valueB = b[o] ? (typeof b[o] === 'object' && 'name' in b[o] ? b[o].name : b[o]) : '';
+
+  if (valueB < valueA) {
+    return -1;
+  }
+  if (valueB > valueA) {
+    return 1;
+  }
+  return 0;
+};
+
+const DeserializeProp = <T,>(propName: keyof T, value: any) => {
+  /** Если в наименовании содержится цифра, то значение преобразоывается в дату */
+  if (propName === 'name') return value;
+
+  if (!isNaN(new Date(value).getDate())) {
+    return new Date(value || '').toLocaleString('ru', { hour12: false });
+  }
+
+  if (propName === 'state') {
+    return deviceStates[value as DeviceState];
+  } // для поля Состояние в устройстве
+
+  if (typeof value === 'object' && 'name' in value) {
+    return value.name;
+  }
+
+  return value;
+};
 
 function SortableTable<T extends { id: string }>({
   data = [],
@@ -46,6 +79,7 @@ function SortableTable<T extends { id: string }>({
   pageParams,
   byMaxHeight = false,
   minusHeight = 0,
+  withCheckBox = false,
   ...rest
 }: IProps<T>) {
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
@@ -55,133 +89,121 @@ function SortableTable<T extends { id: string }>({
   const [orderBy, setOrderBy] = useState<keyof T>();
   const maxHeight = useWindowResizeMaxHeight();
 
-  const handleSelectAll = (event: any) => {
-    let newSelectedItemIds;
+  const navigate = useNavigate();
 
-    if (event.target.checked) {
-      newSelectedItemIds = data.map((item: any) => item.id);
-    } else {
-      newSelectedItemIds = [];
-    }
+  const handleSelectAll = useCallback(
+    (event: any) => {
+      let newSelectedItemIds;
 
-    setSelectedItemIds(newSelectedItemIds);
-  };
+      if (event.target.checked) {
+        newSelectedItemIds = data.map((item: any) => item.id);
+      } else {
+        newSelectedItemIds = [];
+      }
 
-  const handleSelectOne = (_event: any, id: any) => {
-    const isSelected = selectedItemIds.findIndex((selId) => selId === id) !== -1;
-    let newSelectedItemIds: string[] = [];
+      setSelectedItemIds(newSelectedItemIds);
+    },
+    [data],
+  );
 
-    if (!isSelected) {
-      newSelectedItemIds = newSelectedItemIds.concat(selectedItemIds, id);
-    } else {
-      newSelectedItemIds = newSelectedItemIds.filter((selectedId) => selectedId !== id);
-    }
+  const handleSelectOne = useCallback(
+    (e: any, id: any) => {
+      const isSelected = selectedItemIds.findIndex((selId) => selId === id) !== -1;
+      let newSelectedItemIds: string[] = [];
 
-    setSelectedItemIds(newSelectedItemIds);
-  };
+      if (!isSelected) {
+        newSelectedItemIds = newSelectedItemIds.concat(selectedItemIds, id);
+      } else {
+        newSelectedItemIds = newSelectedItemIds.filter((selectedId) => selectedId !== id);
+      }
 
-  const handleLimitChange = (event: any) => {
-    setLimit(event.target.value);
-    onSetPageParams && onSetPageParams({ ...pageParams, limit: event.target.value });
-  };
+      setSelectedItemIds(newSelectedItemIds);
+    },
+    [selectedItemIds],
+  );
 
-  const handlePageChange = (_event: any, newPage: any) => {
-    setPage(newPage);
-    onSetPageParams && onSetPageParams({ ...pageParams, page: newPage });
-  };
+  const handleLimitChange = useCallback(
+    (event: any) => {
+      setLimit(event.target.value);
+      onSetPageParams && onSetPageParams({ ...pageParams, limit: event.target.value });
+    },
+    [onSetPageParams, pageParams],
+  );
 
-  const handleSortRequest = (cellId: keyof T) => {
-    const isAsc = orderBy === cellId && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(cellId);
-  };
+  const handlePageChange = useCallback(
+    (_event: any, newPage: any) => {
+      setPage(newPage);
+      onSetPageParams && onSetPageParams({ ...pageParams, page: newPage });
+    },
+    [onSetPageParams, pageParams],
+  );
 
-  function descendingComparator<T>(a: T, b: T, o: keyof T) {
-    if (b[o] < a[o]) {
-      return -1;
-    }
-    if (b[o] > a[o]) {
-      return 1;
-    }
-    return 0;
-  }
+  const handleSortRequest = useCallback(
+    (cellId: keyof T) => {
+      const isAsc = orderBy === cellId && order === 'asc';
+      setOrder(isAsc ? 'desc' : 'asc');
+      setOrderBy(cellId);
+    },
+    [order, orderBy],
+  );
 
-  function comporator<T>(a: T, b: T, ord: keyof T) {
-    return order === 'desc' ? descendingComparator(a, b, ord) : -descendingComparator(a, b, ord);
-  }
+  const comporator = useCallback(
+    (a: T, b: T, ord: keyof T) => {
+      const compared = descendingComparator(a, b, ord);
+      return order === 'desc' ? compared : -compared;
+    },
+    [order],
+  );
 
-  function SortedTableRows<T>(array: T[]) {
-    const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
+  const sortedTableRows = useMemo(() => {
+    const stabilizedThis = data.map((el, index) => [el, index] as unknown as [T, number]);
+
     stabilizedThis.sort((a, b) => {
-      const order = comporator<T>(a[0], b[0], orderBy as keyof T);
-      if (order !== 0) return order;
+      const isOrder = comporator(a[0], b[0], orderBy as keyof T);
+      console.log('isOrder', a, b, isOrder, orderBy);
+      if (isOrder !== 0) return isOrder;
       return a[1] - b[1];
     });
     return stabilizedThis.map((el) => el[0]);
-  }
-
-  function DeserializeProp<T>(propName: keyof T, value: any) {
-    /** Если в наименовании содержится цифра, то значение преобразоывается в дату */
-    if (propName === 'name') return value;
-
-    if (!isNaN(new Date(value).getDate())) {
-      return new Date(value || '').toLocaleString('ru', { hour12: false });
-    }
-
-    if (propName === 'state') {
-      return deviceStates[value as DeviceState];
-    } // для поля Состояние в устройстве
-
-    if (typeof value === 'object' && 'name' in value) {
-      return value.name;
-    }
-
-    return value;
-  }
+  }, [comporator, data, orderBy]);
 
   const end = endPath ? `/${endPath}/` : '';
 
-  const TableRows = () => {
-    const itemList = SortedTableRows<T>(data)
-      .slice(page * limit, page * limit + limit)
-      .map((item: T) => (
-        <TableRow sx={rowStyle} hover key={item.id} selected={selectedItemIds.indexOf(item.id) !== -1}>
+  const handleRowClick = useCallback(
+    (e: React.MouseEvent<HTMLTableRowElement>, id: string) => {
+      if (window.getSelection()?.toString()) {
+        e.preventDefault();
+      }
+      navigate(`${adminPath}${path}${id}${end}`);
+    },
+    [navigate, path, end],
+  );
+
+  const TableRows = useMemo(() => {
+    const itemList = sortedTableRows.slice(page * limit, page * limit + limit).map((item: T) => (
+      <TableRow
+        sx={rowStyle}
+        hover
+        key={item.id}
+        selected={selectedItemIds.indexOf(item.id) !== -1}
+        onClick={(e) => handleRowClick(e, item.id)}
+        style={{ cursor: 'pointer' }}
+      >
+        {withCheckBox && (
           <TableCell padding="checkbox">
             <Checkbox
               checked={selectedItemIds.indexOf(item.id) !== -1}
               onChange={(event) => handleSelectOne(event, item.id)}
               value="true"
+              onClick={(event) => event.stopPropagation()}
             />
           </TableCell>
-
-          {headCells.map((headCell, index) => {
-            return index ? (
-              <TableCell key={index}>{DeserializeProp<T>(headCell.id, item[headCell.id])}</TableCell>
-            ) : (
-              <TableCell key={index} style={{ padding: '0 16px' }}>
-                <Box
-                  sx={{
-                    alignItems: 'center',
-                    display: 'flex',
-                  }}
-                >
-                  {path ? (
-                    <NavLink to={`${adminPath}${path}${item.id}${end}`}>
-                      <Typography color="textPrimary" variant="body1" key={item.id}>
-                        {DeserializeProp<T>(headCell.id, item[headCell.id])}
-                      </Typography>
-                    </NavLink>
-                  ) : (
-                    <Typography color="textPrimary" variant="body1" key={item.id}>
-                      {DeserializeProp<T>(headCell.id, item[headCell.id])}
-                    </Typography>
-                  )}
-                </Box>
-              </TableCell>
-            );
-          })}
-        </TableRow>
-      ));
+        )}
+        {headCells.map((headCell, index) => {
+          return <TableCell key={index}>{DeserializeProp<T>(headCell.id, item[headCell.id])}</TableCell>;
+        })}
+      </TableRow>
+    ));
 
     const emptyRows = limit - Math.min(limit, data.length - page * limit);
 
@@ -195,29 +217,35 @@ function SortableTable<T extends { id: string }>({
         )}
       </>
     );
-  };
+  }, [sortedTableRows, data, handleRowClick, handleSelectOne, headCells, limit, page, selectedItemIds, withCheckBox]);
 
-  const tableStyle = {
-    p: 1,
-    overflowX: 'auto',
-    ...(byMaxHeight ? { overflowY: 'auto', maxHeight: maxHeight - minusHeight } : {}),
-  };
+  const tableStyle = useMemo(
+    () => ({
+      p: 1,
+      overflowX: 'auto',
+      ...(byMaxHeight ? { overflowY: 'auto', maxHeight: maxHeight - minusHeight } : {}),
+    }),
+    [byMaxHeight, maxHeight, minusHeight],
+  );
 
   return (
     <Card {...rest}>
       <PerfectScrollbar>
         <Box sx={tableStyle}>
-          <Table>
+          <Table sx={{ '& .MuiTableCell-root': { width: 'auto', whiteSpace: 'nowrap', userSelect: 'text' } }}>
             <TableHead>
               <TableRow>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selectedItemIds.length === data.length}
-                    color="primary"
-                    indeterminate={selectedItemIds.length > 0 && selectedItemIds.length < data.length}
-                    onChange={handleSelectAll}
-                  />
-                </TableCell>
+                {withCheckBox && (
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={selectedItemIds.length === data.length}
+                      color="primary"
+                      indeterminate={selectedItemIds.length > 0 && selectedItemIds.length < data.length}
+                      onChange={handleSelectAll}
+                    />
+                  </TableCell>
+                )}
+
                 {headCells.map((headCell) => (
                   <TableCell key={headCell.id as string} sortDirection={orderBy === headCell.id ? order : false}>
                     <TableSortLabel
@@ -231,9 +259,7 @@ function SortableTable<T extends { id: string }>({
                 ))}
               </TableRow>
             </TableHead>
-            <TableBody>
-              <TableRows />
-            </TableBody>
+            <TableBody>{TableRows}</TableBody>
           </Table>
         </Box>
       </PerfectScrollbar>

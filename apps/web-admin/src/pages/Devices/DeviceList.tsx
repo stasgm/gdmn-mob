@@ -1,4 +1,3 @@
-import { Helmet } from 'react-helmet';
 import { Box, Container } from '@mui/material';
 import { useNavigate } from 'react-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -116,9 +115,6 @@ const DeviceList = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Устройства</title>
-      </Helmet>
       <Box
         sx={{
           backgroundColor: 'background.default',

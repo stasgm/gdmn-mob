@@ -1,4 +1,3 @@
-import { Helmet } from 'react-helmet';
 import { Box, Container } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import CachedIcon from '@mui/icons-material/Cached';
@@ -81,9 +80,6 @@ const ServerLogList = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Логи сервера</title>
-      </Helmet>
       <Box
         sx={{
           backgroundColor: 'background.default',

@@ -1,5 +1,4 @@
 import { Link as RouterLink } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
 import { useFormik } from 'formik';
 import {
   Box,
@@ -64,9 +63,6 @@ const Login = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Вход в систему</title>
-      </Helmet>
       <Box
         sx={{
           backgroundColor: 'background.default',

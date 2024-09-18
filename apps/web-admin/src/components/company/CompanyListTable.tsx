@@ -130,7 +130,7 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
     <Card {...rest}>
       <PerfectScrollbar>
         <Box sx={{ p: 1, overflowX: 'auto' }}>
-          <Table>
+          <Table sx={{ '& .MuiTableCell-root': { width: 'auto', whiteSpace: 'nowrap' } }}>
             <TableHead>
               <TableRow>
                 <TableCell padding="checkbox">

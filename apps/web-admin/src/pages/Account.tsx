@@ -1,4 +1,3 @@
-import { Helmet } from 'react-helmet';
 import { Box, Container, Grid } from '@mui/material';
 
 import { IUser } from '@lib/types';
@@ -49,9 +48,6 @@ const Account = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Account</title>
-      </Helmet>
       <Box
         sx={{
           backgroundColor: 'background.default',

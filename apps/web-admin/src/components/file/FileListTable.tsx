@@ -293,7 +293,13 @@ function FileListTable<T extends IEntity>({
             </TableCell>
             {headCells.map((item) => {
               return (
-                <TableCell key={item.label}>
+                <TableCell
+                  key={item.label}
+                  sx={{
+                    width: 'auto',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
                   {DeserializeProp<T>(item.id, file[item.id as keyof ISystemFile] || item.value, item.fieldName || '')}
                 </TableCell>
               );
@@ -343,7 +349,14 @@ function FileListTable<T extends IEntity>({
                   </TableCell>
                   {headCells.map((item) => {
                     return (
-                      <TableCell key={item.label} sortDirection={orderBy === item.id ? order : false}>
+                      <TableCell
+                        key={item.label}
+                        sortDirection={orderBy === item.id ? order : false}
+                        sx={{
+                          width: 'auto',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
                         <TableSortLabel
                           active={orderBy === item.id}
                           direction={orderBy === item.id ? order : 'asc'}

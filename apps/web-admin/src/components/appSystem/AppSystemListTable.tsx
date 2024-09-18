@@ -98,6 +98,11 @@ const AppSystemListTable = ({
     }
   }, [selectedAppSystemIds.length, selectedAppSystems]);
 
+  const sx = {
+    width: 'auto',
+    whiteSpace: 'nowrap',
+  };
+
   const TableRows = () => {
     const appSystemList = appSystems.slice(page * limit, page * limit + limit).map((appSystem: IAppSystem) => {
       return (
@@ -114,6 +119,7 @@ const AppSystemListTable = ({
               sx={{
                 alignItems: 'center',
                 display: 'flex',
+                ...sx,
               }}
             >
               <NavLink to={`${adminPath}/app/appSystems/${appSystem.id}`}>
@@ -123,10 +129,12 @@ const AppSystemListTable = ({
               </NavLink>
             </Box>
           </TableCell>
-          <TableCell>{appSystem.id}</TableCell>
-          <TableCell>{appSystem.description}</TableCell>
-          <TableCell>{new Date(appSystem.creationDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
-          <TableCell>{new Date(appSystem.editionDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
+          <TableCell sx={sx}>{appSystem.id}</TableCell>
+          <TableCell sx={sx}>{appSystem.description}</TableCell>
+          <TableCell sx={sx}>
+            {new Date(appSystem.creationDate || '').toLocaleString('ru', { hour12: false })}
+          </TableCell>
+          <TableCell sx={sx}>{new Date(appSystem.editionDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
         </TableRow>
       );
     });
@@ -160,11 +168,11 @@ const AppSystemListTable = ({
                     onChange={handleSelectAll}
                   />
                 </TableCell>
-                <TableCell>Наименование</TableCell>
-                <TableCell>Идентификатор</TableCell>
-                <TableCell>Описание</TableCell>
-                <TableCell>Дата создания</TableCell>
-                <TableCell>Дата редактирования</TableCell>
+                <TableCell sx={sx}>Наименование</TableCell>
+                <TableCell sx={sx}>Идентификатор</TableCell>
+                <TableCell sx={sx}>Описание</TableCell>
+                <TableCell sx={sx}>Дата создания</TableCell>
+                <TableCell sx={sx}>Дата редактирования</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
