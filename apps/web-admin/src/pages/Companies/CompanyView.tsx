@@ -16,6 +16,7 @@ import DetailsView from '../../components/DetailsView';
 import CompanyAppSystems from '../../components/company/CompanyAppSystems';
 import ViewContainer from '../../components/ViewContainer';
 import ConfirmDialog from '../../components/ConfirmDialog';
+import { appSystemActions } from '../../store/appSystem';
 
 export type Params = {
   id: string;
@@ -76,7 +77,7 @@ const CompanyView = () => {
   const refreshData = useCallback(() => {
     dispatch(companyActions.fetchCompanyById(companyId));
     // dispatch(userActions.fetchUsers(companyId));
-    // dispatch(appSystemActions.fetchAppSystems(companyId));
+    dispatch(appSystemActions.fetchAppSystems(companyId));
   }, [dispatch, companyId]);
 
   useEffect(() => {
@@ -115,6 +116,7 @@ const CompanyView = () => {
 
   const tabs = [
     { name: 'Общая информация', component: <DetailsView details={companyDetails} /> },
+    { name: 'Подсистемы', component: <CompanyAppSystems companyId={companyId} /> },
     { name: 'Пользователи', component: <CompanyUsers companyId={companyId} /> },
     { name: 'ERP-логи', component: <CompanyAppSystems companyId={companyId} /> },
   ];

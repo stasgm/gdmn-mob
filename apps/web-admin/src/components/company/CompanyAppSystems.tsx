@@ -115,8 +115,7 @@ const CompanyAppSystems = ({ companyId }: IProps) => {
           <SortableTable<IAppSystem>
             headCells={headCells}
             data={appSystems}
-            path={`/app/companies/${companyId}/appSystems/`}
-            endPath={'erpLog'}
+            path={'/app/appSystems/'}
             onSetPageParams={handleSetPageParams}
             pageParams={pageParams}
             byMaxHeight={true}
