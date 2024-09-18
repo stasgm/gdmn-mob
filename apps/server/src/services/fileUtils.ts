@@ -461,7 +461,7 @@ export const getFolderList = async (pathSystem: string): Promise<string[]> => {
 
     return folders.filter((i) => i !== undefined) as string[];
   } catch (err) {
-    throw new InnerErrorException(`Ошибка чтения директории ${pathSystem}  - ${err}`);
+    return [];
   }
 };
 

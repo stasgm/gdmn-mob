@@ -29,7 +29,7 @@ const FileView = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading, file, folders, list, pageParams } = useSelector((state) => state.files);
+  const { loading, file, folders, pageParams } = useSelector((state) => state.files);
 
   const [tabValue, setTabValue] = useState(0);
 
@@ -261,6 +261,8 @@ const FileView = () => {
     { name: 'Содержимое', component: <FileContentView file={file} /> },
   ];
 
+  const foldersForMoving = folders.length ? folders[0].folderList : [];
+
   return (
     <Box>
       <ConfirmDialog
@@ -278,7 +280,7 @@ const FileView = () => {
         onChange={(folder) => setSelectedFolder(folder)}
         onClose={handleCloseMovingDialog}
         onOk={handleMoveFiles}
-        values={folders}
+        values={foldersForMoving}
       />
       <ViewContainer
         handleCancel={handleCancel}

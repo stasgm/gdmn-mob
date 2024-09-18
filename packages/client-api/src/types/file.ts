@@ -1,4 +1,4 @@
-import { IFileActionResult, ISystemFile } from '@lib/types';
+import { IFileActionResult, IFolderList, ISystemFile } from '@lib/types';
 
 export interface IFileQueryResponse {
   type:
@@ -47,5 +47,5 @@ export interface IMoveFilesResponse extends IFileQueryResponse {
 
 export interface IGetFoldersResponse extends IFileQueryResponse {
   type: 'GET_FOLDERS';
-  folders: string[];
+  folders: IFolderList[];
 }

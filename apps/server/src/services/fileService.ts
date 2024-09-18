@@ -1,5 +1,5 @@
 /* eslint-disable no-await-in-loop */
-import { ISystemFile, IPathParams, IFileParams, IFileActionResult } from '@lib/types';
+import { ISystemFile, IFileParams, IFileActionResult, IFolderList, IDBCompany, IAppSystem } from '@lib/types';
 
 import { DataNotFoundException } from '../exceptions';
 
@@ -86,22 +86,43 @@ const updateOne = async (file: IFileParams, data: string): Promise<void> => {
  * Возвращает массив папок по компании и подсистеме
  * @returns Массив названий папок
  */
-const getFolders = async (pathParams: IPathParams): Promise<string[]> => {
+const getFolders = async (params: Record<string, string>): Promise<IFolderList[]> => {
   const { companies, appSystems } = getDb();
 
-  if (!companies.findById(pathParams.companyId)) {
-    throw new DataNotFoundException('Компания не найдена');
+  const folderList: { companyId: string; appSystemId: string; folderList: string[] }[] = [];
+
+  const filteredCompanies: IDBCompany[] = params.companyId
+    ? (() => {
+        const company = companies.findById(params.companyId);
+        if (!company) {
+          throw new DataNotFoundException('Компания не найдена');
+        }
+        return [company];
+      })()
+    : [...companies.data];
+
+  const filteredAppSystems: IAppSystem[] = params.appSystemId
+    ? (() => {
+        const appSystem = appSystems.findById(params.appSystemId);
+        if (!appSystem) {
+          throw new DataNotFoundException('Подсистема не найдена');
+        }
+        return [appSystem];
+      })()
+    : [...appSystems.data];
+
+  for (const company of filteredCompanies) {
+    for (const appSystem of filteredAppSystems) {
+      const pathSystem = getSystemFilePath({ companyId: company.id, appSystemId: appSystem.id });
+      const folders = await getFolderList(pathSystem);
+      if (folders.length === 0) {
+        continue;
+      }
+      folderList.push({ companyId: company.id, appSystemId: appSystem.id, folderList: folders });
+    }
   }
 
-  const appSystem = appSystems.findById(pathParams.appSystemId);
-
-  if (!appSystem) {
-    throw new DataNotFoundException('Подсистема не найдена');
-  }
-
-  const pathSystem = getSystemFilePath(pathParams);
-
-  return await getFolderList(pathSystem);
+  return folderList;
 };
 
 export { findMany, getOne, deleteOne, updateOne, deleteMany, getFolders, moveMany };

@@ -1,4 +1,4 @@
-import { IFileParams, ISystemFile } from '@lib/types';
+import { IFileParams, IFolderList, ISystemFile } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
 import { IFilePageParam } from '../../types';
@@ -45,7 +45,7 @@ const moveFilesAsync = createAsyncAction('FILE/MOVE_MANY', 'FILE/MOVE_MANY_SUCCE
 
 const fetchFoldersAsync = createAsyncAction('FILE/GET_FOLDERS', 'FILE/GET_FOLDERS_SUCCESS', 'FILE/GET_FOLDERS_FAILURE')<
   string | undefined,
-  string[],
+  IFolderList[],
   string
 >();
 

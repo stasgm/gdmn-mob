@@ -84,7 +84,7 @@ const updateFile = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getFolders = async (ctx: ParameterizedContext): Promise<void> => {
-  const params = prepareParams<IPathParams>(ctx.query, ['companyId', 'appSystemId']);
+  const params = prepareParams(ctx.query, ['companyId', 'appSystemId']);
 
   const folderList = await fileService.getFolders(params);
 

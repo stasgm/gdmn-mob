@@ -17,8 +17,8 @@ const getFolders: Config = {
     }),
     query: Joi.object({
       ...urlValidation.checkURL,
-      companyId: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор организации')),
-      appSystemId: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор подсистемы')),
+      companyId: Joi.string().optional(),
+      appSystemId: Joi.string().optional(),
     }),
   },
 };

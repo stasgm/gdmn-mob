@@ -1,4 +1,4 @@
-import { IFileActionResult, IFileParams, ISystemFile } from '@lib/types';
+import { IFileActionResult, IFileParams, IFolderList, ISystemFile } from '@lib/types';
 
 import { error, file as types, BaseApi, BaseRequest } from '../types';
 import { response2Log, sleep } from '../utils';
@@ -185,7 +185,7 @@ class File extends BaseRequest {
       } as types.IGetFoldersResponse;
     }
 
-    const res = await customRequest<string[]>({
+    const res = await customRequest<IFolderList[]>({
       api: this.api.axios,
       method: 'GET',
       url: '/files/folders',

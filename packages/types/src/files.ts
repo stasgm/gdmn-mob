@@ -55,3 +55,9 @@ export interface IFileActionResult {
   success: boolean;
   error?: string;
 }
+
+export interface IFolderList {
+  companyId: string;
+  appSystemId: string;
+  folderList: string[];
+}

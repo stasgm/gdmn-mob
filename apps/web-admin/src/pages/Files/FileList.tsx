@@ -93,7 +93,9 @@ const FileList = () => {
         .map((d) => ({ id: d.id, name: d.name }))
     : [];
 
-  const foldersList = folders.map((i) => ({ id: i, name: i })) || [];
+  const foldersForMoving = folders.length ? folders[0].folderList : [];
+
+  const foldersList = foldersForMoving.map((i) => ({ id: i, name: i }));
 
   const listOptions: IListOption = {
     companyId: companyList,
@@ -382,7 +384,7 @@ const FileList = () => {
         onChange={(folder) => setSelectedFolder(folder)}
         onClose={handleCloseMovingDialog}
         onOk={handleMoveFiles}
-        values={folders}
+        values={foldersForMoving}
       />
       <Box
         sx={{
