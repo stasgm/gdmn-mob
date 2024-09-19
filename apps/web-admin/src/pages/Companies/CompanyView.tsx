@@ -116,9 +116,8 @@ const CompanyView = () => {
 
   const tabs = [
     { name: 'Общая информация', component: <DetailsView details={companyDetails} /> },
-    { name: 'Подсистемы', component: <CompanyAppSystems companyId={companyId} /> },
+    { name: 'Подсистемы и ERP-логи', component: <CompanyAppSystems companyId={companyId} /> },
     { name: 'Пользователи', component: <CompanyUsers companyId={companyId} /> },
-    { name: 'ERP-логи', component: <CompanyAppSystems companyId={companyId} /> },
   ];
 
   if (!company) {
