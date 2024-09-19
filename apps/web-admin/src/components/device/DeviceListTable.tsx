@@ -68,10 +68,9 @@ const DeviceListTable = ({
 
   const handleRowClick = useCallback(
     (e: React.MouseEvent<HTMLTableRowElement>, id: string) => {
-      if (window.getSelection()?.toString()) {
-        e.preventDefault();
+      if (!window.getSelection()?.toString()) {
+        navigate(`${adminPath}/app/devices/${id}`);
       }
-      navigate(`${adminPath}/app/devices/${id}`);
     },
     [navigate],
   );

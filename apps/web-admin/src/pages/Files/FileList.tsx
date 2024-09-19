@@ -342,7 +342,7 @@ const FileList = () => {
 
   const headCells: IHeadCells<ISystemFile>[] = [
     { id: 'folder', label: 'Папка', sortEnable: true, value: 'db' },
-    { id: 'id', label: 'Название', sortEnable: true },
+    { id: 'id', label: 'Наименование', sortEnable: true },
     { id: 'company', label: 'Компания', sortEnable: true, fieldName: 'name' },
     { id: 'appSystem', label: 'Подсистема', sortEnable: false, fieldName: 'name' },
     { id: 'producer', label: 'Пользователь', sortEnable: true, fieldName: 'name' },

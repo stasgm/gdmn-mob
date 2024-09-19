@@ -8,7 +8,7 @@ const addCompany: Config = {
   validate: {
     type: 'json',
     body: Joi.object({
-      name: Joi.string().required().error(new InvalidParameterException('Не указано название компании')),
+      name: Joi.string().required().error(new InvalidParameterException('Не указано наименование компании')),
       city: Joi.string().allow('', null),
       appSystems: Joi.array().optional(),
       admin: Joi.object().optional(),

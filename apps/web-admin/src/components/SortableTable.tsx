@@ -171,10 +171,9 @@ function SortableTable<T extends { id: string }>({
 
   const handleRowClick = useCallback(
     (e: React.MouseEvent<HTMLTableRowElement>, id: string) => {
-      if (window.getSelection()?.toString()) {
-        e.preventDefault();
+      if (!window.getSelection()?.toString()) {
+        navigate(`${adminPath}${path}${id}${end}`);
       }
-      navigate(`${adminPath}${path}${id}${end}`);
     },
     [navigate, path, end],
   );
@@ -186,8 +185,8 @@ function SortableTable<T extends { id: string }>({
         hover
         key={item.id}
         selected={selectedItemIds.indexOf(item.id) !== -1}
-        onClick={(e) => handleRowClick(e, item.id)}
-        style={{ cursor: 'pointer' }}
+        onClick={(e) => path && handleRowClick(e, item.id)}
+        style={{ cursor: path ? 'pointer' : '' }}
       >
         {withCheckBox && (
           <TableCell padding="checkbox">

@@ -2,19 +2,27 @@ import { Box, Container } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import CachedIcon from '@mui/icons-material/Cached';
 
+import { ServerLogFile } from '@lib/types';
+
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import { IPageParam, IToolBarButton } from '../../types';
+import { IHeadCells, IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import { serverLogActions } from '../../store/serverLog';
+import SortableTable from '../../components/SortableTable';
 
-import ServerLogListTable from '../../components/serverLog/ServerLogListTable';
+const headCells: IHeadCells<ServerLogFile>[] = [
+  { id: 'id', label: 'Наименование', sortEnable: true },
+  { id: 'path', label: 'Путь', sortEnable: true },
+  { id: 'date', label: 'Дата создания', sortEnable: true },
+  { id: 'mdate', label: 'Дата редактирования', sortEnable: true },
+  { id: 'size', label: 'Размер', sortEnable: true },
+];
 
 const ServerLogList = () => {
   const dispatch = useDispatch();
 
   const { list, loading, pageParams } = useSelector((state) => state.serverLogs);
-
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
   const fetchServerLogs = useCallback(
@@ -102,16 +110,15 @@ const ServerLogList = () => {
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <ServerLogListTable serverLogs={list} onSetPageParams={handleSetPageParams} pageParams={pageParams} />
+              <SortableTable<ServerLogFile>
+                headCells={headCells}
+                data={list}
+                path={'/app/serverLogs/'}
+                onSetPageParams={handleSetPageParams}
+                pageParams={pageParams}
+                byMaxHeight={true}
+              />
             </Box>
-            // <Box sx={{ pt: 2 }}>
-            //   <SortableFilterTable<IDeviceLogFiles>
-            //     headCells={headCells}
-            //     data={filesList}
-            //     path={'/app/deviceLogs/'}
-            //     isFiltered={filterVisible}
-            //   />
-            // </Box>
           )}
         </Container>
       </Box>

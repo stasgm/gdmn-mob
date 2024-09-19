@@ -14,6 +14,14 @@ import CircularProgressWithContent from '../../components/CircularProgressWidthC
 import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
 import SortableTable from '../../components/SortableTable';
 
+const headCells: IHeadCells<ICompany>[] = [
+  { id: 'name', label: 'Наименование', sortEnable: true },
+  { id: 'id', label: 'Идентификатор', sortEnable: true },
+  { id: 'admin', label: 'Администратор', sortEnable: true },
+  { id: 'creationDate', label: 'Дата создания', sortEnable: true },
+  { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },
+];
+
 const CompanyList = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -96,14 +104,6 @@ const CompanyList = () => {
       onClick: handleAddCompany,
       icon: <AddCircleOutlineIcon />,
     },
-  ];
-
-  const headCells: IHeadCells<ICompany>[] = [
-    { id: 'name', label: 'Наименование', sortEnable: true },
-    { id: 'id', label: 'Идентификатор', sortEnable: true },
-    { id: 'admin', label: 'Администратор', sortEnable: true },
-    { id: 'creationDate', label: 'Дата создания', sortEnable: true },
-    { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },
   ];
 
   return (

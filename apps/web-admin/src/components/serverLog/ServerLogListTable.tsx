@@ -161,7 +161,7 @@ const ServerLogListTable = ({
                     onChange={handleSelectAll}
                   />
                 </TableCell>
-                <TableCell>Название</TableCell>
+                <TableCell>Наименование</TableCell>
                 <TableCell>Путь</TableCell>
                 <TableCell>Дата создания</TableCell>
                 <TableCell>Дата редактирования</TableCell>

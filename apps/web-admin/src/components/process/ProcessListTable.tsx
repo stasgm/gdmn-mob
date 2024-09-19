@@ -26,55 +26,13 @@ interface IProps {
   companies: ICompany[];
   selectedProcesses?: IProcess[];
   limitRows?: number;
-  onChangeSelectedDevices?: (newSelectedDeviceIds: any[]) => void;
 }
 
-const ProcessListTable = ({
-  processes = [],
-  onChangeSelectedDevices,
-  selectedProcesses = [],
-  limitRows = 0,
-}: IProps) => {
+const ProcessListTable = ({ processes = [], selectedProcesses = [], limitRows = 0 }: IProps) => {
   const [selectedProcessIds, setSelectedProcessIds] = useState<IProcess[]>(selectedProcesses);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
   const maxHeight = useWindowResizeMaxHeight();
-
-  const handleSelectAll = (event: any) => {
-    let newSelectedProcessIds;
-
-    if (event.target.checked) {
-      newSelectedProcessIds = processes.map((process: any) => process);
-    } else {
-      newSelectedProcessIds = [];
-    }
-
-    setSelectedProcessIds(newSelectedProcessIds);
-    onChangeSelectedDevices && onChangeSelectedDevices(newSelectedProcessIds);
-  };
-
-  const handleSelectOne = (_event: any, process: IProcess) => {
-    const selectedIndex = selectedProcessIds.map((item: IProcess) => item.id).indexOf(process.id);
-
-    let newSelectedProcessIds: IProcess[] = [];
-
-    if (selectedIndex === -1) {
-      newSelectedProcessIds = newSelectedProcessIds.concat(selectedProcessIds, process);
-    } else if (selectedIndex === 0) {
-      newSelectedProcessIds = newSelectedProcessIds.concat(selectedProcessIds.slice(1));
-    } else if (selectedIndex === selectedProcessIds.length - 1) {
-      newSelectedProcessIds = newSelectedProcessIds.concat(selectedProcessIds.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelectedProcessIds = newSelectedProcessIds.concat(
-        selectedProcessIds.slice(0, selectedIndex),
-        selectedProcessIds.slice(selectedIndex + 1),
-      );
-    }
-
-    setSelectedProcessIds(newSelectedProcessIds);
-
-    onChangeSelectedDevices && onChangeSelectedDevices(newSelectedProcessIds);
-  };
 
   const handleLimitChange = (event: any) => {
     setLimit(event.target.value);
@@ -102,19 +60,6 @@ const ProcessListTable = ({
     const processList = processes.slice(page * limit, page * limit + limit).map((process: IProcess) => {
       return (
         <TableRow hover key={process.id} selected={selectedProcessIds.findIndex((d) => d.id === process?.id) !== -1}>
-          <TableCell padding="checkbox">
-            <Checkbox
-              checked={
-                selectedProcessIds
-                  .map((item: IProcess) => {
-                    return item.id;
-                  })
-                  .indexOf(process.id) !== -1
-              }
-              onChange={(event) => handleSelectOne(event, process)}
-              value="true"
-            />
-          </TableCell>
           <TableCell style={{ padding: '0 16px' }}>
             <Box
               sx={{
@@ -163,14 +108,6 @@ const ProcessListTable = ({
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selectedProcessIds.length === processes.length}
-                    color="primary"
-                    indeterminate={selectedProcessIds.length > 0 && selectedProcessIds.length < processes.length}
-                    onChange={handleSelectAll}
-                  />
-                </TableCell>
                 <TableCell>Компания</TableCell>
                 <TableCell>Подсистема</TableCell>
                 <TableCell>Статус</TableCell>

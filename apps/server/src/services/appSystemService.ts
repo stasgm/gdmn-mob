@@ -23,7 +23,7 @@ const addOne = (appSystemData: NewAppSystem): IAppSystem => {
   const { appSystems } = getDb();
 
   if (appSystems.data.find((el) => el.name === appSystemData.name)) {
-    throw new ConflictException(`Подсистема с названием ${appSystemData.name} уже существует`);
+    throw new ConflictException(`Подсистема с наименованием ${appSystemData.name} уже существует`);
   }
 
   return appSystems.insert({
