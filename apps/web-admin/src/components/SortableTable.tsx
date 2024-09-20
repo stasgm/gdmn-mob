@@ -38,7 +38,6 @@ interface IProps<T extends { id: string }> {
 }
 
 const descendingComparator = <T,>(a: any, b: any, o: keyof T) => {
-  console.log('a[o]', a[o]);
   const valueA = a[o] ? (typeof a[o] === 'object' && 'name' in a[o] ? a[o].name : a[o]) : '';
   const valueB = b[o] ? (typeof b[o] === 'object' && 'name' in b[o] ? b[o].name : b[o]) : '';
 
@@ -160,7 +159,6 @@ function SortableTable<T extends { id: string }>({
 
     stabilizedThis.sort((a, b) => {
       const isOrder = comporator(a[0], b[0], orderBy as keyof T);
-      console.log('isOrder', a, b, isOrder, orderBy);
       if (isOrder !== 0) return isOrder;
       return a[1] - b[1];
     });
