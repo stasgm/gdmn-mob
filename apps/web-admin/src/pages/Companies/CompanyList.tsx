@@ -15,8 +15,8 @@ import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
 import SortableTable from '../../components/SortableTable';
 
 const headCells: IHeadCells<ICompany>[] = [
-  { id: 'name', label: 'Наименование', sortEnable: true },
   { id: 'id', label: 'Идентификатор', sortEnable: true },
+  { id: 'name', label: 'Наименование', sortEnable: true },
   { id: 'admin', label: 'Администратор', sortEnable: true },
   { id: 'creationDate', label: 'Дата создания', sortEnable: true },
   { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },

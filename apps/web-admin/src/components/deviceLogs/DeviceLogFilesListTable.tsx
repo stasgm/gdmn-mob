@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, ChangeEventHandler } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -97,7 +97,7 @@ const DeviceLogFilesListTable = ({
   const handleLimitChange = useCallback(
     (event: any) => {
       setLimit(event.target.value);
-      onSetPageParams({ ...pageParams, limit: event.target.value });
+      onSetPageParams && onSetPageParams({ ...pageParams, limit: event.target.value });
     },
     [onSetPageParams, pageParams],
   );
@@ -110,6 +110,16 @@ const DeviceLogFilesListTable = ({
     [onSetPageParams, pageParams],
   );
 
+  const handleRowClick = useCallback(
+    (e: React.MouseEvent<HTMLTableRowElement>, id: string) => {
+      if (!window.getSelection()?.toString()) {
+        e.preventDefault();
+        navigate(`${adminPath}/app/deviceLogs/${id}`);
+      }
+    },
+    [navigate],
+  );
+
   const TableRows = () => {
     const deviceLogFileList = deviceLogFiles
       .slice(page * limit, page * limit + limit)
@@ -119,13 +129,7 @@ const DeviceLogFilesListTable = ({
             hover
             key={deviceLogFile.id}
             selected={selectedDeviceLogFiles?.findIndex((d) => d.id === deviceLogFile?.id) !== -1}
-            onClick={(event) => {
-              event.preventDefault();
-              navigate(
-                // eslint-disable-next-line max-len
-                `${adminPath}/app/deviceLogs/${deviceLogFile.id}`,
-              );
-            }}
+            onClick={(event) => handleRowClick(event, deviceLogFile.id)}
             sx={{ cursor: 'pointer' }}
           >
             <TableCell
@@ -143,7 +147,6 @@ const DeviceLogFilesListTable = ({
                     })
                     .indexOf(deviceLogFile.id) !== -1
                 }
-                // onChange={(event) => onSelectOne(event, deviceLogFile)}
                 value="true"
               />
             </TableCell>
@@ -177,7 +180,7 @@ const DeviceLogFilesListTable = ({
     <Card>
       <PerfectScrollbar>
         <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight }}>
-          <Table>
+          <Table sx={{ '& .MuiTableCell-root': { width: 'auto', whiteSpace: 'nowrap', userSelect: 'text' } }}>
             <TableHead>
               <TableRow>
                 <TableCell padding="checkbox">
@@ -194,7 +197,7 @@ const DeviceLogFilesListTable = ({
                 <TableCell>Подсистема</TableCell>
                 <TableCell>Пользователь</TableCell>
                 <TableCell>Устройство</TableCell>
-                <TableCell>Идентификатор</TableCell>
+                <TableCell>ИД устройства</TableCell>
                 <TableCell>Дата создания</TableCell>
                 <TableCell>Дата редактирования</TableCell>
                 <TableCell>Размер</TableCell>

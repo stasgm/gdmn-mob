@@ -11,8 +11,8 @@ import { userActions, userSelectors } from '../../store/user';
 import CircularProgressWithContent from '../CircularProgressWidthContent';
 
 const headCells: IHeadCells<IUser>[] = [
-  { id: 'name', label: 'Пользователь', sortEnable: true },
   { id: 'id', label: 'Идентификатор', sortEnable: true },
+  { id: 'name', label: 'Пользователь', sortEnable: true },
   { id: 'lastName', label: 'Фамилия', sortEnable: true },
   { id: 'firstName', label: 'Имя', sortEnable: true },
   { id: 'phoneNumber', label: 'Телефон', sortEnable: false },

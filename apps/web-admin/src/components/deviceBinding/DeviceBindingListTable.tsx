@@ -110,19 +110,7 @@ const DeviceBindingListTable = ({
       const device = devices.find((a) => a.id === binding.device.id);
       return (
         <TableRow hover key={binding.id} selected={isBindSelected(binding)}>
-          <TableCell padding="checkbox">
-            <Checkbox
-              checked={
-                selectedDeviceIds
-                  .map((item: IDeviceBinding) => {
-                    return item.id;
-                  })
-                  .indexOf(binding.id) !== -1
-              }
-              onChange={(event) => handleSelectOne(event, binding)}
-              value="true"
-            />
-          </TableCell>
+          <TableCell>{binding.device.id}</TableCell>
           <TableCell style={{ padding: '0 16px' }}>
             <Box
               sx={{
@@ -137,7 +125,6 @@ const DeviceBindingListTable = ({
               </NavLink>
             </Box>
           </TableCell>
-          <TableCell>{binding.device.id}</TableCell>
           <TableCell>
             <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
               <Box>
@@ -194,16 +181,8 @@ const DeviceBindingListTable = ({
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selectedDeviceIds.length === deviceBindings.length}
-                    color="primary"
-                    indeterminate={selectedDeviceIds.length > 0 && selectedDeviceIds.length < deviceBindings.length}
-                    onChange={handleSelectAll}
-                  />
-                </TableCell>
-                <TableCell>Наименование</TableCell>
                 <TableCell>Идентификатор</TableCell>
+                <TableCell>Наименование</TableCell>
                 <TableCell>Номер</TableCell>
                 <TableCell>Состояние</TableCell>
                 <TableCell>Код активации</TableCell>

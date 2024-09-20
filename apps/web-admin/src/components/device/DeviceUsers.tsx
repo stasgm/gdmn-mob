@@ -14,6 +14,7 @@ import { bindingActions } from '../../store/deviceBinding';
 import CircularProgressWithContent from '../CircularProgressWidthContent';
 
 const headCells: IHeadCells<IUser>[] = [
+  { id: 'id', label: 'Идентификатор', sortEnable: true },
   { id: 'name', label: 'Пользователь', sortEnable: true },
   { id: 'lastName', label: 'Фамилия', sortEnable: true },
   { id: 'firstName', label: 'Имя', sortEnable: true },

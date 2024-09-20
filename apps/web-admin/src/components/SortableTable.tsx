@@ -216,7 +216,18 @@ function SortableTable<T extends { id: string }>({
         )}
       </>
     );
-  }, [sortedTableRows, data, handleRowClick, handleSelectOne, headCells, limit, page, selectedItemIds, withCheckBox]);
+  }, [
+    sortedTableRows,
+    page,
+    limit,
+    data.length,
+    selectedItemIds,
+    path,
+    withCheckBox,
+    headCells,
+    handleRowClick,
+    handleSelectOne,
+  ]);
 
   const tableStyle = useMemo(
     () => ({

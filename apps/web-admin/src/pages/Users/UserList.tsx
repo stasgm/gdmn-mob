@@ -87,8 +87,8 @@ const UserList = () => {
   ];
 
   const headCells: IHeadCells<IUser>[] = [
-    { id: 'name', label: 'Пользователь', sortEnable: true },
     { id: 'id', label: 'Идентификатор', sortEnable: true },
+    { id: 'name', label: 'Пользователь', sortEnable: true },
     { id: 'lastName', label: 'Фамилия', sortEnable: true },
     { id: 'firstName', label: 'Имя', sortEnable: true },
     { id: 'externalId', label: 'Идентификатор из ERP', sortEnable: true },

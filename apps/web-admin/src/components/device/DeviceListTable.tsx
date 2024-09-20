@@ -87,8 +87,8 @@ const DeviceListTable = ({
           onClick={(e) => handleRowClick(e, device.id)}
           style={{ cursor: 'pointer' }}
         >
-          <TableCell sx={{ width: 'auto', whiteSpace: 'nowrap', userSelect: 'text' }}>{device.name}</TableCell>
           <TableCell>{device.id} </TableCell>
+          <TableCell sx={{ width: 'auto', whiteSpace: 'nowrap', userSelect: 'text' }}>{device.name}</TableCell>
           <TableCell>
             <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
               <Box style={{ width: '90px' }}>{device.uid}</Box>
@@ -158,8 +158,8 @@ const DeviceListTable = ({
           <Table sx={{ '& .MuiTableCell-root': { width: 'auto', whiteSpace: 'nowrap', userSelect: 'text' } }}>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ width: 'auto', whiteSpace: 'nowrap', userSelect: 'text' }}>Наименование</TableCell>
                 <TableCell>Идентификатор</TableCell>
+                <TableCell sx={{ width: 'auto', whiteSpace: 'nowrap', userSelect: 'text' }}>Наименование</TableCell>
                 <TableCell>Номер</TableCell>
                 <TableCell>Состояние</TableCell>
                 <TableCell>Код активации</TableCell>

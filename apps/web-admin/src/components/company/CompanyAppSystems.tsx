@@ -11,8 +11,8 @@ import CircularProgressWithContent from '../CircularProgressWidthContent';
 import { appSystemActions, appSystemSelectors } from '../../store/appSystem';
 
 const headCells: IHeadCells<IAppSystem>[] = [
-  { id: 'name', label: 'Подсистема', sortEnable: true },
   { id: 'id', label: 'Идентификатор', sortEnable: true },
+  { id: 'name', label: 'Подсистема', sortEnable: true },
   { id: 'description', label: 'Описание', sortEnable: true },
 ];
 

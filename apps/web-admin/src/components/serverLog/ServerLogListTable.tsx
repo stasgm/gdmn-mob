@@ -123,8 +123,8 @@ const ServerLogListTable = ({
               value="true"
             />
           </TableCell>
-          <TableCell style={{ padding: '0 16px' }}>{serverLog.id}</TableCell>
           <TableCell>{serverLog.path}</TableCell>
+          <TableCell style={{ padding: '0 16px' }}>{serverLog.id}</TableCell>
           <TableCell> {new Date(serverLog.date || '').toLocaleString('ru', { hour12: false })}</TableCell>
           <TableCell> {new Date(serverLog.mdate || '').toLocaleString('ru', { hour12: false })}</TableCell>
           <TableCell> {Math.ceil(serverLog.size).toString()} кб</TableCell>
@@ -161,8 +161,8 @@ const ServerLogListTable = ({
                     onChange={handleSelectAll}
                   />
                 </TableCell>
-                <TableCell>Наименование</TableCell>
                 <TableCell>Путь</TableCell>
+                <TableCell>Наименование</TableCell>
                 <TableCell>Дата создания</TableCell>
                 <TableCell>Дата редактирования</TableCell>
                 <TableCell>Размер</TableCell>

@@ -15,8 +15,8 @@ import CircularProgressWithContent from '../../components/CircularProgressWidthC
 import SortableTable from '../../components/SortableTable';
 
 const headCells: IHeadCells<IAppSystem>[] = [
-  { id: 'name', label: 'Наименование', sortEnable: true },
   { id: 'id', label: 'Идентификатор', sortEnable: true },
+  { id: 'name', label: 'Наименование', sortEnable: true },
   { id: 'description', label: 'Описание', sortEnable: true },
   { id: 'creationDate', label: 'Дата создания', sortEnable: true },
   { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },

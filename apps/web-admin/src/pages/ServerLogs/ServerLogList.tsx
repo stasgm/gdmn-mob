@@ -12,8 +12,8 @@ import { serverLogActions } from '../../store/serverLog';
 import SortableTable from '../../components/SortableTable';
 
 const headCells: IHeadCells<ServerLogFile>[] = [
-  { id: 'id', label: 'Наименование', sortEnable: true },
   { id: 'path', label: 'Путь', sortEnable: true },
+  { id: 'id', label: 'Наименование', sortEnable: true },
   { id: 'date', label: 'Дата создания', sortEnable: true },
   { id: 'mdate', label: 'Дата редактирования', sortEnable: true },
   { id: 'size', label: 'Размер', sortEnable: true },
@@ -117,6 +117,7 @@ const ServerLogList = () => {
                 onSetPageParams={handleSetPageParams}
                 pageParams={pageParams}
                 byMaxHeight={true}
+                withCheckBox={true}
               />
             </Box>
           )}
