@@ -47,6 +47,7 @@ const DeviceView = () => {
             { id: 'Номер', value: device.uid },
             { id: 'Состояние', value: deviceStates[device.state] },
             { id: 'Код активации', value: code },
+            { id: 'Компания', value: device.company },
           ]
         : [],
     [device, code],

@@ -15,7 +15,6 @@ import { IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import DeviceListTable from '../../components/device/DeviceListTable';
 import { webRequest } from '../../store/webRequest';
-import { adminPath } from '../../utils/constants';
 
 const DeviceList = () => {
   const navigate = useNavigate();
@@ -23,17 +22,15 @@ const DeviceList = () => {
   const dispatch = useDispatch();
   const authDispatch = useAuthThunkDispatch();
 
+  // const { fileList } = useSelector((state) => state.deviceLogs);
   const { list, loading, pageParams } = useSelector((state) => state.devices);
   const { list: activationCodes, loading: codesLoading } = useSelector((state) => state.activationCodes);
 
   const [filterText, setFilterText] = useState(pageParams?.filterText || '');
   const prevFilterTextRef = useRef<string | undefined | null>(null);
 
-  useEffect(() => {
-    dispatch(deviceActions.setPageParam({ tab: 0 }));
-  }, [dispatch]);
-
   const fetchDevices = useCallback(() => {
+    // dispatch(deviceLogActions.fetchDeviceLogFiles());
     dispatch(deviceActions.fetchDevices(pageParams?.filterText));
     dispatch(codeActions.fetchActivationCodes());
   }, [dispatch, pageParams?.filterText]);
@@ -44,6 +41,11 @@ const DeviceList = () => {
     },
     [dispatch],
   );
+
+  // useEffect(() => {
+  //   fetchDevices();
+  //   dispatch(deviceActions.setPageParam({ tab: 0 }));
+  // }, [dispatch, fetchDevices]);
 
   useEffect(() => {
     // Загружаем данные при первой загрузке компонента или при изменении фильтра

@@ -9,9 +9,9 @@ import { DataNotFoundException } from '../exceptions';
 import { created, ok, prepareParams } from '../utils';
 
 const addAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
-  const { name, description } = ctx.request.body as NewAppSystem;
+  const { name, description, appVersion } = ctx.request.body as NewAppSystem;
 
-  const appSystem: NewAppSystem = { name, description };
+  const appSystem: NewAppSystem = { name, description, appVersion };
 
   const newAppSystem = appSystemService.addOne(appSystem);
 

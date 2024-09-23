@@ -45,6 +45,7 @@ const AppSystemView = () => {
         ? [
             { id: 'Подсистема', value: appSystem },
             { id: 'Идентификатор', value: appSystem?.id },
+            { id: 'Версия', value: appSystem?.appVersion },
             { id: 'Описание', value: appSystem?.description },
           ]
         : [],

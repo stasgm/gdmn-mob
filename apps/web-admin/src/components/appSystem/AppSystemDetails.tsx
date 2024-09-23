@@ -14,12 +14,17 @@ interface IProps {
 const AppSystemDetails = ({ appSystem, loading, onSubmit, onCancel }: IProps) => {
   const formik = useFormik<IAppSystem | NewAppSystem>({
     enableReinitialize: true,
-    initialValues: { ...appSystem, description: appSystem.description || '' },
+    initialValues: { ...appSystem, description: appSystem.description || '', appVersion: appSystem.appVersion || '' },
     validationSchema: yup.object().shape({
       name: yup.string().required('Required'),
     }),
     onSubmit: (values) => {
-      onSubmit({ ...values, name: values.name.trim(), description: values.description?.trim() || '' });
+      onSubmit({
+        ...values,
+        name: values.name.trim(),
+        description: values.description?.trim() || '',
+        appVersion: values.appVersion?.trim() || '',
+      });
     },
   });
 
@@ -49,6 +54,21 @@ const AppSystemDetails = ({ appSystem, loading, onSubmit, onCancel }: IProps) =>
                     type="name"
                     disabled={loading}
                     value={formik.values.name}
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <TextField
+                    error={formik.touched.appVersion && Boolean(formik.errors.appVersion)}
+                    fullWidth
+                    label="Версия"
+                    id="appVersion"
+                    name="appVersion"
+                    variant="outlined"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="appVersion"
+                    disabled={loading}
+                    value={formik.values.appVersion}
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>

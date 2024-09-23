@@ -17,6 +17,7 @@ import SortableTable from '../../components/SortableTable';
 const headCells: IHeadCells<IAppSystem>[] = [
   { id: 'id', label: 'Идентификатор', sortEnable: true },
   { id: 'name', label: 'Наименование', sortEnable: true },
+  { id: 'appVersion', label: 'Версия', sortEnable: true },
   { id: 'description', label: 'Описание', sortEnable: true },
   { id: 'creationDate', label: 'Дата создания', sortEnable: true },
   { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },
@@ -119,7 +120,6 @@ const AppSystemList = () => {
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
-            // <AppSystemListTable appSystems={list} onSetPageParams={handleSetPageParams} pageParams={pageParams} />
             <Box sx={{ pt: 2 }}>
               <SortableTable<IAppSystem>
                 headCells={headCells}

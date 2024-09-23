@@ -49,6 +49,8 @@ export interface IDevice extends INamedEntity {
   uid: string;
   state: DeviceState;
   company: INamedEntity;
+  appSystem?: IAppSystem;
+  appVersion?: string;
 }
 
 export type NewDevice = Pick<IDevice, 'name' | 'company' | 'state'>;
@@ -103,9 +105,10 @@ export interface IDBActivationCode extends Omit<IActivationCode, 'device'> {
 export type SessionId = IEntity;
 
 export interface IAppSystem extends INamedEntity {
+  appVersion?: string;
   description?: string;
 }
 
-export type NewAppSystem = Pick<IAppSystem, 'name' | 'description'>;
+export type NewAppSystem = Pick<IAppSystem, 'name' | 'description' | 'appVersion'>;
 
 export type DBAppSystem = IAppSystem;

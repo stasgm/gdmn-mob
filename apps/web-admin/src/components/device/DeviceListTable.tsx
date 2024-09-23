@@ -17,6 +17,7 @@ import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
   devices: IDevice[];
+  devicesWithVersion?: { deviceId: string; version: string }[];
   selectedDevices?: IDevice[];
   activationCodes: IActivationCode[];
   limitRows?: number;
@@ -87,6 +88,7 @@ const DeviceListTable = ({
   const TableRows = useMemo(() => {
     const deviceList = devices.slice(page * limit, page * limit + limit).map((device: IDevice) => {
       const code = activationCodes.find((a) => a.device.id === device.id)?.code;
+      const version = device.appVersion;
 
       return (
         <TableRow
@@ -94,7 +96,7 @@ const DeviceListTable = ({
           hover
           key={device.id}
           onClick={(e) => handleRowClick(e, device.id)}
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: 'pointer', backgroundColor: version !== device.appSystem?.appVersion ? '#ffcfd1' : 'white' }}
         >
           <TableCell>{device.id} </TableCell>
           <TableCell sx={{ width: 'auto', whiteSpace: 'nowrap', userSelect: 'text' }}>{device.name}</TableCell>
@@ -139,6 +141,10 @@ const DeviceListTable = ({
               </Box>
             </Box>
           </TableCell>
+          <TableCell>
+            {`${device.appSystem?.name || ''}${device.appSystem?.appVersion ? ' ' + device.appSystem.appVersion : ''}`}
+          </TableCell>
+          <TableCell>{version}</TableCell>
           <TableCell>{device.company?.name || ''}</TableCell>
           <TableCell>{new Date(device.creationDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
           <TableCell>{new Date(device.editionDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
@@ -172,6 +178,8 @@ const DeviceListTable = ({
                 <TableCell>Номер</TableCell>
                 <TableCell>Состояние</TableCell>
                 <TableCell>Код активации</TableCell>
+                <TableCell>Подсистема</TableCell>
+                <TableCell>Версия приложения</TableCell>
                 <TableCell>Компания</TableCell>
                 <TableCell>Дата создания</TableCell>
                 <TableCell>Дата редактирования</TableCell>

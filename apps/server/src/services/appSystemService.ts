@@ -30,6 +30,7 @@ const addOne = (appSystemData: NewAppSystem): IAppSystem => {
     id: '',
     name: appSystemData.name,
     description: appSystemData.description || '',
+    appVersion: appSystemData.appVersion || '',
     creationDate: new Date().toISOString(),
     editionDate: new Date().toISOString(),
   });
@@ -58,6 +59,7 @@ const updateOne = (id: string, appSystemData: Partial<IAppSystem>): IAppSystem =
     id,
     name: appSystemData.name || appSystemObj.name,
     description: appSystemData.description === undefined ? appSystemObj.description : appSystemData.description,
+    appVersion: appSystemData.appVersion === undefined ? appSystemObj.appVersion : appSystemData.appVersion,
     creationDate: appSystemObj.creationDate,
     editionDate: new Date().toISOString(),
   });
@@ -134,12 +136,14 @@ const findMany = (params: Record<string, string | number>): IAppSystem[] => {
       if (filterText) {
         const name = item.name.toUpperCase();
         const description = item.description?.toUpperCase() || '';
+        const version = item.appVersion?.toUpperCase() || '';
         const creationDate = formatDateToLocale(item.creationDate);
         const editionDate = formatDateToLocale(item.editionDate);
 
         filteredAppSystems =
           name.includes(filterText) ||
           description.includes(filterText) ||
+          version.includes(filterText) ||
           creationDate.includes(filterText) ||
           editionDate.includes(filterText);
       }
