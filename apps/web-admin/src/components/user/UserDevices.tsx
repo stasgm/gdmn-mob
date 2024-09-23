@@ -143,6 +143,7 @@ const UserDevices = ({ userId }: IProps) => {
       ) : (
         <Box sx={{ pt: 2 }}>
           <DeviceListTable
+            bindings={userBindingDevices}
             devices={devices}
             activationCodes={activationCodes}
             onCreateCode={handleCreateCode}

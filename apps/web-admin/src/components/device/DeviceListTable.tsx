@@ -9,7 +9,7 @@ import Tooltip from '@mui/material/Tooltip';
 
 import { Box, Button, Card, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@mui/material';
 
-import { IDevice, IActivationCode } from '@lib/types';
+import { IDevice, IActivationCode, IDeviceBinding } from '@lib/types';
 
 import { deviceStates, adminPath } from '../../utils/constants';
 import { IPageParam } from '../../types';
@@ -20,10 +20,11 @@ interface IProps {
   selectedDevices?: IDevice[];
   activationCodes: IActivationCode[];
   limitRows?: number;
-  onCreateCode?: (deviceId: string) => void;
+  onCreateCode: (deviceId: string) => void;
   onCreateUid: (code: string, deviceId: string) => void;
   onSetPageParams: (pageParams: IPageParam) => void;
   pageParams?: IPageParam | undefined;
+  bindings?: IDeviceBinding[];
 }
 const rowStyle = { height: 53, cursor: 'pointer' };
 
@@ -35,6 +36,7 @@ const DeviceListTable = ({
   onCreateUid,
   onSetPageParams,
   pageParams,
+  bindings,
 }: IProps) => {
   const navigate = useNavigate();
   const maxHeight = useWindowResizeMaxHeight();
@@ -69,10 +71,17 @@ const DeviceListTable = ({
   const handleRowClick = useCallback(
     (e: React.MouseEvent<HTMLTableRowElement>, id: string) => {
       if (!window.getSelection()?.toString()) {
+        if (bindings) {
+          const binding = bindings.find((b) => b.device.id === id);
+          if (binding) {
+            navigate(`${adminPath}/app/users/${binding.user.id}/binding/${binding.id}`);
+            return;
+          }
+        }
         navigate(`${adminPath}/app/devices/${id}`);
       }
     },
-    [navigate],
+    [bindings, navigate],
   );
 
   const TableRows = useMemo(() => {

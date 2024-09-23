@@ -15,6 +15,7 @@ import { IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import DeviceListTable from '../../components/device/DeviceListTable';
 import { webRequest } from '../../store/webRequest';
+import { adminPath } from '../../utils/constants';
 
 const DeviceList = () => {
   const navigate = useNavigate();
