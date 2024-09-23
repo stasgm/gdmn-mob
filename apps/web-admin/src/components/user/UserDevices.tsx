@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { authActions, useAuthThunkDispatch } from '@lib/store';
 import CachedIcon from '@mui/icons-material/Cached';
@@ -14,10 +14,10 @@ import { useDispatch, useSelector } from '../../store';
 import { bindingActions, bindingSelectors } from '../../store/deviceBinding';
 import { deviceActions } from '../../store/device';
 import { codeActions } from '../../store/activationCode';
-import DeviceBindingListTable from '../deviceBinding/DeviceBindingListTable';
 import { webRequest } from '../../store/webRequest';
 import { adminPath } from '../../utils/constants';
 import CircularProgressWithContent from '../CircularProgressWidthContent';
+import DeviceListTable from '../device/DeviceListTable';
 
 interface IProps {
   userId: string;
@@ -28,10 +28,15 @@ const UserDevices = ({ userId }: IProps) => {
   const authDispatch = useAuthThunkDispatch();
   const navigate = useNavigate();
 
-  const { list: codes, loading: codeLoading } = useSelector((state) => state.activationCodes);
-  const { list: devices, loading: deviceLoading } = useSelector((state) => state.devices);
+  const { list: activationCodes, loading: codeLoading } = useSelector((state) => state.activationCodes);
+  const { list, loading: deviceLoading } = useSelector((state) => state.devices);
   const { loading: bindingLoading } = useSelector((state) => state.deviceBindings);
   const userBindingDevices = bindingSelectors.bindingsByUserId(userId);
+
+  const devices = useMemo(
+    () => list.filter((device) => userBindingDevices.some((binding) => binding.device.id === device.id)),
+    [list, userBindingDevices],
+  );
 
   const { pageParams } = useSelector((state) => state.deviceBindings);
   const [filterText, setFilterText] = useState(pageParams?.filterText || '');
@@ -62,7 +67,7 @@ const UserDevices = ({ userId }: IProps) => {
   const handleCreateUid = async (code: string, deviceId: string) => {
     await authDispatch(authActions.activateDevice(webRequest(authDispatch, authActions), code));
     dispatch(deviceActions.fetchDeviceById(deviceId));
-    dispatch(codeActions.fetchActivationCodes(deviceId));
+    dispatch(codeActions.fetchActivationCodes());
   };
 
   const handleUpdateInput = (value: string) => {
@@ -90,7 +95,7 @@ const UserDevices = ({ userId }: IProps) => {
 
   const handleCreateCode = (deviceId: string) => {
     dispatch(codeActions.createActivationCode(deviceId));
-    dispatch(codeActions.fetchActivationCodes(deviceId));
+    dispatch(codeActions.fetchActivationCodes());
   };
 
   const handleSetPageParams = useCallback(
@@ -137,10 +142,9 @@ const UserDevices = ({ userId }: IProps) => {
         <CircularProgressWithContent content={'Идет загрузка данных...'} />
       ) : (
         <Box sx={{ pt: 2 }}>
-          <DeviceBindingListTable
+          <DeviceListTable
             devices={devices}
-            deviceBindings={userBindingDevices}
-            activationCodes={codes}
+            activationCodes={activationCodes}
             onCreateCode={handleCreateCode}
             onCreateUid={handleCreateUid}
             onSetPageParams={handleSetPageParams}

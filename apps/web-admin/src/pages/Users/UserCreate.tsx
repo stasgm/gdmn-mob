@@ -12,6 +12,7 @@ import { useSelector, useDispatch, AppDispatch } from '../../store';
 import { appSystemActions } from '../../store/appSystem';
 import { userActions } from '../../store/user';
 import { webRequest } from '../../store/webRequest';
+import { companyActions } from '../../store/company';
 
 const UserCreate = () => {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ const UserCreate = () => {
   useEffect(() => {
     dispatch(appSystemActions.fetchAppSystems());
     dispatch(userActions.fetchUsers());
+    dispatch(companyActions.fetchCompanies());
   }, [dispatch]);
 
   const goBack = () => {

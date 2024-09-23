@@ -23,7 +23,7 @@ const DeviceList = () => {
   const authDispatch = useAuthThunkDispatch();
 
   const { list, loading, pageParams } = useSelector((state) => state.devices);
-  const { list: activationCodes } = useSelector((state) => state.activationCodes);
+  const { list: activationCodes, loading: codesLoading } = useSelector((state) => state.activationCodes);
 
   const [filterText, setFilterText] = useState(pageParams?.filterText || '');
   const prevFilterTextRef = useRef<string | undefined | null>(null);
@@ -133,7 +133,7 @@ const DeviceList = () => {
             clearOnClick={handleClearSearch}
             disabled={loading}
           />
-          {loading ? (
+          {loading || codesLoading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <DeviceListTable

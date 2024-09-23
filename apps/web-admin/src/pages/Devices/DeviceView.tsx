@@ -119,7 +119,7 @@ const DeviceView = () => {
     { name: 'Общая информация', component: <DetailsView details={deviceDetails} /> },
     {
       name: 'Пользователи',
-      component: <DeviceUsers companyId={device?.company.id} deviceId={deviceId} />,
+      component: <DeviceUsers deviceId={deviceId} />, //companyId={device?.company.id}
     },
   ];
 

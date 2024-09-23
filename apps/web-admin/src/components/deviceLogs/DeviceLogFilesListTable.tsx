@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, ChangeEventHandler } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';

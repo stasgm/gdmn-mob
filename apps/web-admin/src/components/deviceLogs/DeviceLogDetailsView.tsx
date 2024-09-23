@@ -67,7 +67,7 @@ const DeviceLogDetailsView = ({ deviceLogs }: IProps) => {
               </Grid>
               <Grid item md={10} xs={6}>
                 <Typography variant="h4" gutterBottom>
-                  {deviceLogs.contact.name}
+                  {deviceLogs.consumer?.name}
                 </Typography>
               </Grid>
             </Grid>
