@@ -20,6 +20,7 @@ import {
 import { IHeadCells, IPageParam } from '../types';
 import { deviceStates, adminPath } from '../utils/constants';
 import { useWindowResizeMaxHeight } from '../utils/useWindowResizeMaxHeight';
+import { isDate } from '../utils/helpers';
 
 type Order = 'asc' | 'desc';
 
@@ -50,11 +51,11 @@ const descendingComparator = <T,>(a: any, b: any, o: keyof T) => {
   return 0;
 };
 
-const DeserializeProp = <T,>(propName: keyof T, value: any) => {
-  /** Если в наименовании содержится цифра, то значение преобразоывается в дату */
-  if (propName === 'name') return value;
+const DeserializeProp = <T,>(propName: keyof T, value: any, type?: any) => {
+  // if (propName === 'name') return value;
 
-  if (!isNaN(new Date(value).getDate())) {
+  if (type === 'date' && isDate(value)) {
+    console.log('propName', propName, 'value', value, 'type', type);
     return new Date(value || '').toLocaleString('ru', { hour12: false });
   }
 
@@ -197,7 +198,7 @@ function SortableTable<T extends { id: string }>({
           </TableCell>
         )}
         {headCells.map((headCell, index) => {
-          return <TableCell key={index}>{DeserializeProp<T>(headCell.id, item[headCell.id])}</TableCell>;
+          return <TableCell key={index}>{DeserializeProp<T>(headCell.id, item[headCell.id], headCell.type)}</TableCell>;
         })}
       </TableRow>
     ));
@@ -240,7 +241,7 @@ function SortableTable<T extends { id: string }>({
     <Card {...rest}>
       <PerfectScrollbar>
         <Box sx={tableStyle}>
-          <Table sx={{ '& .MuiTableCell-root': { width: 'auto', whiteSpace: 'nowrap', userSelect: 'text' } }}>
+          <Table>
             <TableHead>
               <TableRow>
                 {withCheckBox && (
@@ -267,20 +268,24 @@ function SortableTable<T extends { id: string }>({
                 ))}
               </TableRow>
             </TableHead>
-            <TableBody>{TableRows}</TableBody>
+            <TableBody sx={{ '& .MuiTableCell-root': { width: 'auto', whiteSpace: 'nowrap', userSelect: 'text' } }}>
+              {TableRows}
+            </TableBody>
           </Table>
         </Box>
       </PerfectScrollbar>
-      <TablePagination
-        component="div"
-        count={data.length}
-        labelRowsPerPage="Строк на странице"
-        onPageChange={handlePageChange}
-        onRowsPerPageChange={handleLimitChange}
-        page={page}
-        rowsPerPage={limit}
-        rowsPerPageOptions={[5, 10, 25]}
-      />
+      {onSetPageParams && (
+        <TablePagination
+          component="div"
+          count={data.length}
+          labelRowsPerPage="Строк на странице"
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleLimitChange}
+          page={page}
+          rowsPerPage={limit}
+          rowsPerPageOptions={[5, 10, 25]}
+        />
+      )}
     </Card>
   );
 }

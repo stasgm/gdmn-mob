@@ -19,8 +19,8 @@ const headCells: IHeadCells<IAppSystem>[] = [
   { id: 'name', label: 'Наименование', sortEnable: true },
   { id: 'appVersion', label: 'Версия', sortEnable: true },
   { id: 'description', label: 'Описание', sortEnable: true },
-  { id: 'creationDate', label: 'Дата создания', sortEnable: true },
-  { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },
+  { id: 'creationDate', label: 'Дата создания', sortEnable: true, type: 'date' },
+  { id: 'editionDate', label: 'Дата редактирования', sortEnable: true, type: 'date' },
 ];
 
 const AppSystemList = () => {

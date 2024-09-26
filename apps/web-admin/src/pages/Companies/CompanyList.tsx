@@ -18,8 +18,8 @@ const headCells: IHeadCells<ICompany>[] = [
   { id: 'id', label: 'Идентификатор', sortEnable: true },
   { id: 'name', label: 'Наименование', sortEnable: true },
   { id: 'admin', label: 'Администратор', sortEnable: true },
-  { id: 'creationDate', label: 'Дата создания', sortEnable: true },
-  { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },
+  { id: 'creationDate', label: 'Дата создания', sortEnable: true, type: 'date' },
+  { id: 'editionDate', label: 'Дата редактирования', sortEnable: true, type: 'date' },
 ];
 
 const CompanyList = () => {

@@ -94,8 +94,8 @@ const UserList = () => {
     { id: 'externalId', label: 'Идентификатор из ERP', sortEnable: true },
     { id: 'erpUser', label: 'Пользователь ERP', sortEnable: true },
     { id: 'appSystem', label: 'Подсистема', sortEnable: true },
-    { id: 'creationDate', label: 'Дата создания', sortEnable: true },
-    { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },
+    { id: 'creationDate', label: 'Дата создания', sortEnable: true, type: 'date' },
+    { id: 'editionDate', label: 'Дата редактирования', sortEnable: true, type: 'date' },
   ];
 
   return (

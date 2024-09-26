@@ -349,7 +349,7 @@ const FileList = () => {
     { id: 'consumer', label: 'Получатель', sortEnable: true, fieldName: 'name' },
     { id: 'device', label: 'Устройство', sortEnable: true, fieldName: 'name' },
     { id: 'device', label: 'Номер устройства', sortEnable: true, fieldName: 'id' },
-    { id: 'date', label: 'Дата', sortEnable: true },
+    { id: 'date', label: 'Дата', sortEnable: true, type: 'date' },
     { id: 'size', label: 'Размер', sortEnable: true },
     { id: 'path', label: 'Путь', sortEnable: true },
   ];

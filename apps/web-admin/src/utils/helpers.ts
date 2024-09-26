@@ -8,8 +8,9 @@ export const isNamedEntity = (obj: any): obj is INamedEntity => {
   return typeof obj === 'object' && 'name' in obj;
 };
 
-export const isDate = (date: any) => {
-  return !isNaN(new Date(date).getDate());
+export const isDate = (value: any) => {
+  const date = new Date(value);
+  return !isNaN(new Date(date).getTime());
 };
 
 export const getNumber = (value: any, defaultValue: number) =>

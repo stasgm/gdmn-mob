@@ -14,8 +14,8 @@ import SortableTable from '../../components/SortableTable';
 const headCells: IHeadCells<ServerLogFile>[] = [
   { id: 'path', label: 'Путь', sortEnable: true },
   { id: 'id', label: 'Наименование', sortEnable: true },
-  { id: 'date', label: 'Дата создания', sortEnable: true },
-  { id: 'mdate', label: 'Дата редактирования', sortEnable: true },
+  { id: 'date', label: 'Дата создания', sortEnable: true, type: 'date' },
+  { id: 'mdate', label: 'Дата редактирования', sortEnable: true, type: 'date' },
   { id: 'size', label: 'Размер', sortEnable: true },
 ];
 

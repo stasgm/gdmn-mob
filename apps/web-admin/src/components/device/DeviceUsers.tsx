@@ -19,8 +19,8 @@ const headCells: IHeadCells<IUser>[] = [
   { id: 'lastName', label: 'Фамилия', sortEnable: true },
   { id: 'firstName', label: 'Имя', sortEnable: true },
   { id: 'phoneNumber', label: 'Телефон', sortEnable: false },
-  { id: 'creationDate', label: 'Дата создания', sortEnable: false },
-  { id: 'editionDate', label: 'Дата редактирования', sortEnable: false },
+  { id: 'creationDate', label: 'Дата создания', sortEnable: false, type: 'date' },
+  { id: 'editionDate', label: 'Дата редактирования', sortEnable: false, type: 'date' },
 ];
 
 interface IProps {

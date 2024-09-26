@@ -22,12 +22,12 @@ export interface IPageParam {
 
 export interface IHeadCells<T> {
   id: keyof T;
-  label: string;
+  label: any;
   sortEnable?: boolean;
   filterEnable?: boolean;
   fieldName?: string;
   value?: string;
-  type?: 'number' | 'date';
+  type?: 'number' | 'date' | 'string' | 'object' | 'boolean';
 }
 
 export interface IMessageHead {
