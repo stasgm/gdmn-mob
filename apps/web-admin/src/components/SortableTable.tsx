@@ -52,10 +52,7 @@ const descendingComparator = <T,>(a: any, b: any, o: keyof T) => {
 };
 
 const DeserializeProp = <T,>(propName: keyof T, value: any, type?: any) => {
-  // if (propName === 'name') return value;
-
   if (type === 'date' && isDate(value)) {
-    console.log('propName', propName, 'value', value, 'type', type);
     return new Date(value || '').toLocaleString('ru', { hour12: false });
   }
 

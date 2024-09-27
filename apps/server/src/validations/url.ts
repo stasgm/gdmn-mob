@@ -1,4 +1,4 @@
-import { Joi } from 'koa-joi-router';
+import Joi from 'joi';
 
 import { InvalidParameterException } from '../exceptions';
 

@@ -132,7 +132,7 @@ const Dashboard = () => {
                       >
                         <CardContent style={appSystem.id === selectedAppSystemId ? selectedStyle : undefined}>
                           <Box display="flex" alignItems="center" mb={1}>
-                            <WidgetsIcon style={{ color: palette.primary.main, marginRight: 8 }} />
+                            <WidgetsIcon sx={{ color: palette.primary.main, marginRight: 1 }} />
                             <Typography variant="h5">{appSystem.name}</Typography>
                           </Box>
                           <Typography color="textSecondary" variant="h6">

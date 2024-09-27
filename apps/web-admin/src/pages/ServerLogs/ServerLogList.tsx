@@ -10,6 +10,7 @@ import { IHeadCells, IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import { serverLogActions } from '../../store/serverLog';
 import SortableTable from '../../components/SortableTable';
+import ServerInfoCard from '../../components/serverLog/ServerInfoCard';
 
 const headCells: IHeadCells<ServerLogFile>[] = [
   { id: 'path', label: 'Путь', sortEnable: true },
@@ -22,12 +23,13 @@ const headCells: IHeadCells<ServerLogFile>[] = [
 const ServerLogList = () => {
   const dispatch = useDispatch();
 
-  const { list, loading, pageParams } = useSelector((state) => state.serverLogs);
+  const { list, loading, pageParams, serverInfo } = useSelector((state) => state.serverLogs);
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
   const fetchServerLogs = useCallback(
     (filterText?: string, _fromRecord?: number, _toRecord?: number) => {
       dispatch(serverLogActions.fetchServerLogs(filterText));
+      dispatch(serverLogActions.fetchServerInfo());
     },
     [dispatch],
   );
@@ -96,6 +98,7 @@ const ServerLogList = () => {
         }}
       >
         <Container maxWidth={false}>
+          {serverInfo && <ServerInfoCard serverInfo={serverInfo} />}
           <ToolbarActionsWithSearch
             buttons={buttons}
             searchTitle={'Найти файл'}

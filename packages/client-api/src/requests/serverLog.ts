@@ -38,6 +38,35 @@ class ServerLog extends BaseRequest {
     } as error.IServerError;
   };
 
+  getServerInfo = async (customRequest: CustomRequest) => {
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
+
+      return {
+        type: 'ERROR',
+        message: 'Информация по серверу не найдена',
+      } as error.IServerError;
+    }
+
+    const res = await customRequest<any>({
+      api: this.api.axios,
+      method: 'GET',
+      url: '/serverLogs/info',
+    });
+
+    if (res.type === 'SUCCESS') {
+      return {
+        type: 'GET_SERVERINFO',
+        serverInfo: res?.data,
+      } as types.IGetServerInfoResponse;
+    }
+
+    return {
+      type: res.type,
+      message: response2Log(res) || 'Информация по серверу не получена',
+    } as error.IServerError;
+  };
+
   getServerLogs = async (customRequest: CustomRequest, params?: Record<string, string | number>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);

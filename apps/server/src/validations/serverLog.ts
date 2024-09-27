@@ -57,4 +57,12 @@ const deleteServerLogs: Config = {
   },
 };
 
-export { getServerLog, getServerLogs, deleteServerLog, deleteServerLogs };
+const getServerInfo: Config = {
+  validate: {
+    params: Joi.object({
+      ...urlValidation.checkURL,
+    }),
+  },
+};
+
+export { getServerLog, getServerLogs, deleteServerLog, deleteServerLogs, getServerInfo };

@@ -49,4 +49,32 @@ const deleteServerLogs = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
-export { getServerLogs, getServerLog as getServerLog, deleteServerLog, deleteServerLogs };
+const getServerInfo = async (ctx: ParameterizedContext): Promise<void> => {
+  // Использование памяти процессом
+  const memoryUsage = process.memoryUsage();
+  // Использование CPU процессом
+  const usage = process.cpuUsage();
+  const cpuUsage = {
+    user: `${usage.user / 1000} ms`,
+    system: `${usage.system / 1000} ms`,
+  };
+
+  // Время работы приложения (uptime процесса)
+  const processUptime = process.uptime();
+
+  const days = Math.floor(processUptime / (60 * 60 * 24));
+  const hours = Math.floor((processUptime % (60 * 60 * 24)) / (60 * 60));
+  const minutes = Math.floor((processUptime % (60 * 60)) / 60);
+  const seconds = Math.floor(processUptime % 60);
+
+  // Возвращаем информацию о приложении
+  const serverInfo = {
+    memoryUsage: memoryUsage,
+    cpuUsage,
+    processUptime: `${days} days ${hours} hours ${minutes} minutes ${seconds} seconds`,
+  };
+
+  ok(ctx as Context, serverInfo, 'getServerInfo: server memory are successfully received');
+};
+
+export { getServerLogs, getServerLog as getServerLog, deleteServerLog, deleteServerLogs, getServerInfo };
