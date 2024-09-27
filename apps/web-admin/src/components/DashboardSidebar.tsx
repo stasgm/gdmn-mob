@@ -3,13 +3,13 @@ import { Box, Divider, Drawer, List } from '@mui/material';
 import {
   BarChart as BarChartIcon,
   Settings as SettingsIcon,
-  ShoppingBag as ShoppingBagIcon,
-  User as UserIcon,
   Users as UsersIcon,
-  List as ProcessIcon,
-  Server as AppSystemsIcon,
+  Smartphone as TabletIcon,
+  Briefcase as BriefcaseIcon,
+  Activity as ProcessIcon,
+  Box as BoxIcon,
   File as FileIcon,
-  FileText as FileTextIcon,
+  Server as ServerIcon,
   AlertCircle as AlertIcon,
 } from 'react-feather';
 
@@ -19,14 +19,6 @@ import { adminPath } from '../utils/constants';
 
 import NavItem from './NavItem';
 import NavToggle from './NavToggle';
-
-// const avatar1 = require('../../assets/images/avatar1.svg');
-
-// const userInfo = {
-//   avatar: avatar1,
-//   jobTitle: 'User',
-//   name: 'Katarina Smith',
-// };
 
 interface IProps {
   onMobileClose: () => void;
@@ -48,22 +40,22 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
           },
           {
             href: `${adminPath}/app/appSystems`,
-            icon: AppSystemsIcon,
+            icon: BoxIcon,
             title: 'Подсистемы',
           },
           {
             href: `${adminPath}/app/companies`,
-            icon: UsersIcon,
+            icon: BriefcaseIcon,
             title: 'Компании',
           },
           {
             href: `${adminPath}/app/users`,
-            icon: ShoppingBagIcon,
+            icon: UsersIcon,
             title: 'Пользователи',
           },
           {
             href: `${adminPath}/app/devices`,
-            icon: UserIcon,
+            icon: TabletIcon,
             title: 'Устройства',
           },
           {
@@ -83,8 +75,8 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
           },
           {
             href: `${adminPath}/app/serverLogs`,
-            icon: FileTextIcon,
-            title: 'Cервер',
+            icon: ServerIcon,
+            title: 'Сервер',
           },
           {
             href: `${adminPath}/app/account`,
@@ -100,22 +92,22 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
           },
           {
             href: `${adminPath}/app/appSystems`,
-            icon: AppSystemsIcon,
+            icon: BoxIcon,
             title: 'Подсистемы',
           },
           {
             href: `${adminPath}/app/companies`,
-            icon: UsersIcon,
+            icon: BriefcaseIcon,
             title: 'Компании',
           },
           {
             href: `${adminPath}/app/users`,
-            icon: ShoppingBagIcon,
+            icon: UsersIcon,
             title: 'Пользователи',
           },
           {
             href: `${adminPath}/app/devices`,
-            icon: UserIcon,
+            icon: TabletIcon,
             title: 'Устройства',
           },
           {
