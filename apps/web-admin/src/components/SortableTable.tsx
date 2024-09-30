@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { Fragment, useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DeviceState } from '@lib/types';
 
@@ -29,6 +29,8 @@ const rowStyle = { height: 53 };
 interface IProps<T extends { id: string }> {
   headCells: IHeadCells<T>[];
   data: T[];
+  // headCellsDetails?: IHeadCells<any>[];
+  // dataDetails?: any[];
   path?: string;
   endPath?: string;
   onSetPageParams?: (pageParams: IPageParam) => void;
@@ -36,6 +38,8 @@ interface IProps<T extends { id: string }> {
   byMaxHeight?: boolean;
   minusHeight?: number;
   withCheckBox?: boolean;
+  onClickRow?: (id: string) => void;
+  // withNestedTable?: boolean;
 }
 
 const descendingComparator = <T,>(a: any, b: any, o: keyof T) => {
@@ -70,6 +74,8 @@ const DeserializeProp = <T,>(propName: keyof T, value: any, type?: any) => {
 function SortableTable<T extends { id: string }>({
   data = [],
   headCells = [],
+  // dataDetails = [],
+  // headCellsDetails = [],
   path,
   endPath,
   onSetPageParams,
@@ -77,6 +83,8 @@ function SortableTable<T extends { id: string }>({
   byMaxHeight = false,
   minusHeight = 0,
   withCheckBox = false,
+  onClickRow,
+  // withNestedTable = false,
   ...rest
 }: IProps<T>) {
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
@@ -165,39 +173,56 @@ function SortableTable<T extends { id: string }>({
 
   const end = endPath ? `/${endPath}/` : '';
 
+  // const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+
   const handleRowClick = useCallback(
     (e: React.MouseEvent<HTMLTableRowElement>, id: string) => {
+      // setSelectedItemId(id);
       if (!window.getSelection()?.toString()) {
-        navigate(`${adminPath}${path}${id}${end}`);
+        onClickRow && onClickRow(id);
+        path && navigate(`${adminPath}${path}${id}${end}`);
       }
     },
-    [navigate, path, end],
+    [onClickRow, navigate, path, end],
   );
 
   const TableRows = useMemo(() => {
     const itemList = sortedTableRows.slice(page * limit, page * limit + limit).map((item: T) => (
-      <TableRow
-        sx={rowStyle}
-        hover
-        key={item.id}
-        selected={selectedItemIds.indexOf(item.id) !== -1}
-        onClick={(e) => path && handleRowClick(e, item.id)}
-        style={{ cursor: path ? 'pointer' : '' }}
-      >
-        {withCheckBox && (
-          <TableCell padding="checkbox">
-            <Checkbox
-              checked={selectedItemIds.indexOf(item.id) !== -1}
-              onChange={(event) => handleSelectOne(event, item.id)}
-              value="true"
-              onClick={(event) => event.stopPropagation()}
-            />
-          </TableCell>
-        )}
-        {headCells.map((headCell, index) => {
-          return <TableCell key={index}>{DeserializeProp<T>(headCell.id, item[headCell.id], headCell.type)}</TableCell>;
-        })}
-      </TableRow>
+      <Fragment key={item.id}>
+        <TableRow
+          sx={rowStyle}
+          hover
+          key={item.id}
+          selected={selectedItemIds.indexOf(item.id) !== -1}
+          onClick={(e) => handleRowClick(e, item.id)}
+          style={{ cursor: path || onClickRow ? 'pointer' : '' }}
+        >
+          {withCheckBox && (
+            <TableCell padding="checkbox">
+              <Checkbox
+                checked={selectedItemIds.indexOf(item.id) !== -1}
+                onChange={(event) => handleSelectOne(event, item.id)}
+                value="true"
+                onClick={(event) => event.stopPropagation()}
+              />
+            </TableCell>
+          )}
+          {headCells.map((headCell, index) => {
+            return (
+              <TableCell key={index} style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                {DeserializeProp<T>(headCell.id, item[headCell.id], headCell.type)}
+              </TableCell>
+            );
+          })}
+        </TableRow>
+        {/* {withNestedTable && item.id === selectedItemId ? (
+          <TableRow>
+            <TableCell colSpan={4}>
+              <SortableTable<any> headCells={headCellsDetails} data={dataDetails} byMaxHeight={true} />
+            </TableCell>
+          </TableRow>
+        ) : null} */}
+      </Fragment>
     ));
 
     const emptyRows = limit - Math.min(limit, data.length - page * limit);
@@ -219,6 +244,7 @@ function SortableTable<T extends { id: string }>({
     data.length,
     selectedItemIds,
     path,
+    onClickRow,
     withCheckBox,
     headCells,
     handleRowClick,

@@ -1,10 +1,10 @@
 import { Box, Container, Typography, Grid, CardContent, Card, useTheme } from '@mui/material';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import WidgetsIcon from '@mui/icons-material/Widgets';
 
-import { INamedEntity } from '@lib/types';
+import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 
 import { useDispatch, useSelector } from '../store';
 
@@ -17,27 +17,24 @@ import { userActions } from '../store/user';
 import { deviceActions } from '../store/device';
 import CircularProgressWithContent from '../components/CircularProgressWidthContent';
 import { appSystemActions } from '../store/appSystem';
-import { IHeadCells } from '../types';
-import SortableTable from '../components/SortableTable';
+import { IFileFilter, IHeadCells } from '../types';
 import TotalAppSystems from '../components/dashboard/Totalappsystems';
+import { fileActions } from '../store/file';
+import UserDeviceTable from '../components/dashboard/UserDeviceTable';
 
-interface ICompanyInfo extends INamedEntity {
+interface ICompanyInfo {
+  id: string;
+  name: string;
   deviceQuantity: string;
   userQuantity: string;
   lastActivity: string;
 }
 
-const companiesCells: IHeadCells<ICompanyInfo>[] = [
-  { id: 'name', label: 'Наименование', sortEnable: true },
-  { id: 'deviceQuantity', label: 'Устройств/из них активных', sortEnable: true },
-  { id: 'userQuantity', label: 'Пользователей/из них активных', sortEnable: true },
-  { id: 'lastActivity', label: 'Последняя активность', sortEnable: true, type: 'date' },
-];
-
 const Dashboard = () => {
   const dispatch = useDispatch();
   const { palette } = useTheme();
   const { list: devices, loading: deviceLoading } = useSelector((state) => state.devices);
+  const { list: files, loading: filesLoading } = useSelector((state) => state.files);
   const { list: users, loading: userLoading } = useSelector((state) => state.users);
   const { list: companies, loading: companyLoading } = useSelector((state) => state.companies);
   const { list: appSystems, loading: appSystemLoading } = useSelector((state) => state.appSystems);
@@ -54,34 +51,36 @@ const Dashboard = () => {
   }, [dispatch]);
 
   const [selectedAppSystemId, setSelectedAppSystemId] = useState<string | undefined>();
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | undefined>();
 
-  const companyInfo = useMemo(
-    () =>
-      (selectedAppSystemId
-        ? companies.filter((c) => c.appSystems?.some((s) => s.id === selectedAppSystemId))
-        : companies
-      ).map((company) => {
-        const deviceQuantity = devices.filter((d) => d.company?.id === company.id).length;
-        const activeDeviceQuantity = devices.filter((d) => d.company?.id === company.id).length;
-        const userQuantity = users.filter((u) => u.company?.id === company.id).length;
-        const activeUserQuantity = users.filter((u) => u.company?.id === company.id).length;
-        return {
-          id: company.id,
-          name: company.name,
-          deviceQuantity: `${deviceQuantity}/${activeDeviceQuantity}`,
-          userQuantity: `${userQuantity}/${activeUserQuantity}`,
-          lastActivity: '2024/09/25',
-        };
-      }),
-    [companies, devices, selectedAppSystemId, users],
-  );
+  useEffect(() => {
+    (async () => {
+      const params = {} as IFileFilter;
+      if (selectedCompanyId) {
+        params.companyId = selectedCompanyId;
+      }
+      if (selectedAppSystemId) {
+        params.appSystemId = selectedAppSystemId;
+      }
+
+      await dispatch(fileActions.fetchFiles(params));
+    })();
+  }, [selectedCompanyId, selectedAppSystemId, dispatch]);
 
   const selectedStyle = {
     border: `1px solid ${palette.primary.main}`,
     borderRadius: 4,
+    padding: 14,
+  };
+
+  const selectedCompanyStyle = {
+    border: `1px solid ${palette.warning.light}`,
+    borderRadius: 4,
+    padding: 14,
   };
 
   const handleClickedAppSystem = (id: string) => {
+    setSelectedCompanyId(undefined);
     if (selectedAppSystemId === id) {
       setSelectedAppSystemId(undefined);
       return;
@@ -90,17 +89,92 @@ const Dashboard = () => {
     setSelectedAppSystemId(id);
   };
 
+  const handleClickedCompany = (id: string) => {
+    if (selectedCompanyId === id) {
+      setSelectedCompanyId(undefined);
+      return;
+    }
+
+    setSelectedCompanyId(id);
+  };
+
+  const getUsers = useCallback(
+    (appSystemId?: string, companyId?: string) => {
+      if (!appSystemId && !companyId) {
+        return users;
+      }
+
+      return users.filter((u) => {
+        const matchesAppSystem = appSystemId
+          ? u.appSystem?.id === appSystemId ||
+            users.some((erp) => erp.id === u.erpUser?.id && erp.appSystem?.id === appSystemId)
+          : true;
+
+        const matchesCompany = companyId ? u.company?.id === companyId : true;
+
+        return matchesAppSystem && matchesCompany && u.role === 'User';
+      });
+    },
+    [users],
+  );
+
+  const getDevices = useCallback(
+    (appSystemId?: string, companyId?: string) => {
+      if (!appSystemId && !companyId) {
+        return devices;
+      }
+
+      return devices.filter((d) => {
+        const matchesAppSystem = appSystemId ? d.appSystem?.id === appSystemId : true;
+        const matchesCompany = companyId ? d.company?.id === companyId : true;
+        return matchesAppSystem && matchesCompany;
+      });
+    },
+    [devices],
+  );
+
+  const filteredUsers = useMemo(() => {
+    return getUsers(selectedAppSystemId, selectedCompanyId);
+  }, [getUsers, selectedAppSystemId, selectedCompanyId]);
+
+  const filteredDevices = useMemo(() => {
+    return getDevices(selectedAppSystemId, selectedCompanyId);
+  }, [getDevices, selectedAppSystemId, selectedCompanyId]);
+
+  const companyInfo = useMemo(
+    () =>
+      (selectedAppSystemId
+        ? companies.filter((c) => c.appSystems?.some((s) => s.id === selectedAppSystemId))
+        : companies
+      ).map((company) => {
+        const deviceQuantity = getDevices(selectedAppSystemId, company.id).length;
+        const activeDeviceQuantity = getDevices(selectedAppSystemId, company.id).length;
+        const userQuantity = getUsers(selectedAppSystemId, company.id).length;
+        const activeUserQuantity = getUsers(selectedAppSystemId, company.id).length;
+        return {
+          id: company.id,
+          name: company.name,
+          admin: company.admin.name,
+          deviceQuantity: `${deviceQuantity}/${activeDeviceQuantity}`,
+          userQuantity: `${userQuantity}/${activeUserQuantity}`,
+          lastActivity: '2024/09/25',
+        };
+      }),
+    [selectedAppSystemId, companies, getDevices, getUsers],
+  );
+
   return (
     <>
       <Box
         sx={{
           backgroundColor: 'background.default',
-          minHeight: '100%',
           py: 3,
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
-        <Container maxWidth={false}>
-          {deviceLoading || userLoading || companyLoading || appSystemLoading ? (
+        <Container maxWidth={false} sx={{ flexGrow: 1 }}>
+          {deviceLoading || userLoading || companyLoading || appSystemLoading || filesLoading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box>
@@ -121,7 +195,7 @@ const Dashboard = () => {
               <Grid container>
                 <Grid container mt={1} spacing={2}>
                   {appSystems.map((appSystem) => (
-                    <Grid item lg={4} sm={6} xl={3} xs={12} key={appSystem.id}>
+                    <Grid item lg={4} sm={6} xl={2} xs={12} key={appSystem.id}>
                       <Card
                         sx={{
                           cursor: 'pointer',
@@ -130,36 +204,70 @@ const Dashboard = () => {
                         }}
                         onClick={() => handleClickedAppSystem(appSystem.id)}
                       >
-                        <CardContent style={appSystem.id === selectedAppSystemId ? selectedStyle : undefined}>
-                          <Box display="flex" alignItems="center" mb={1}>
+                        <CardContent style={appSystem.id === selectedAppSystemId ? selectedStyle : { padding: 14 }}>
+                          <Box display="flex" alignItems="center" mb={1} minHeight={28}>
                             <WidgetsIcon sx={{ color: palette.primary.main, marginRight: 1 }} />
-                            <Typography variant="h5">{appSystem.name}</Typography>
+                            <Typography variant="h6" lineHeight={1}>
+                              {appSystem.name}
+                            </Typography>
                           </Box>
                           <Typography color="textSecondary" variant="h6">
                             Компаний: {companies.filter((c) => c.appSystems?.some((s) => s.id === appSystem.id)).length}
                           </Typography>
                           <Typography color="textSecondary" variant="h6">
-                            Устройств: {devices.filter((d) => d.appSystem?.id === appSystem.id).length}
+                            Устройств: {getDevices(appSystem.id).length}
                           </Typography>
                           <Typography color="textSecondary" variant="h6">
-                            Пользователей: {users.filter((u) => u.appSystem?.id === appSystem.id).length}
+                            Пользователей: {getUsers(appSystem.id).length}
                           </Typography>
                         </CardContent>
                       </Card>
                     </Grid>
                   ))}
                 </Grid>
-                <Grid item lg={12} sm={12} xl={12} xs={12} pt={2}>
-                  <Box>
-                    <SortableTable<ICompanyInfo>
-                      headCells={companiesCells}
-                      data={companyInfo}
-                      path={'/app/companies/'}
-                      byMaxHeight={true}
-                    />
-                  </Box>
+
+                <Grid container mt={1} spacing={2}>
+                  {companyInfo.map((company) => (
+                    <Grid item lg={4} sm={6} xl={2} xs={12} key={company.id}>
+                      <Card
+                        sx={{
+                          cursor: 'pointer',
+                          transition: '0.3s',
+                          '&:hover': { boxShadow: 6 },
+                          height: '100%',
+                        }}
+                        onClick={() => handleClickedCompany(company.id)}
+                      >
+                        <CardContent
+                          style={company.id === selectedCompanyId ? selectedCompanyStyle : { padding: 14 }}
+                          sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+                        >
+                          <Box display="flex" alignItems="center" mb={1} minHeight={28}>
+                            <BusinessCenterIcon sx={{ color: palette.primary.main, marginRight: 1 }} />
+                            <Typography lineHeight={1} variant="h6">
+                              {company.name}
+                            </Typography>
+                          </Box>
+                          <Typography color="textSecondary" variant="h6">
+                            Администратор: {company.admin}
+                          </Typography>
+                          <Typography color="textSecondary" variant="h6">
+                            Пользователей: {company.userQuantity}
+                          </Typography>
+                          <Typography color="textSecondary" variant="h6">
+                            Устройств: {company.deviceQuantity}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  ))}
                 </Grid>
               </Grid>
+            </Box>
+          )}
+          {selectedCompanyId && !!filteredUsers.length && (
+            <Box>
+              <UserDeviceTable users={filteredUsers} devices={filteredDevices} files={files} />
             </Box>
           )}
         </Container>
