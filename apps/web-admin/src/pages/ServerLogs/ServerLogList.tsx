@@ -98,7 +98,7 @@ const ServerLogList = () => {
         }}
       >
         <Container maxWidth={false}>
-          {serverInfo && <ServerInfoCard serverInfo={serverInfo} />}
+          {serverInfo && !loading && <ServerInfoCard serverInfo={serverInfo} />}
           <ToolbarActionsWithSearch
             buttons={buttons}
             searchTitle={'Найти файл'}
