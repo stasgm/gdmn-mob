@@ -38,7 +38,7 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal, changeO
     //Если уже было число 0, без выражения, и не введена точка, то берем введеное число
     //иначе склеиваем к предыдущему числу введенное число
     let newValue = `${number === '0' && ((!expression && value !== '.') || value === '0') ? '' : number}${value}`;
-    newValue = Number.isNaN(parseFloat(newValue)) ? '0.' : newValue ?? '0';
+    newValue = Number.isNaN(parseFloat(newValue)) ? '0.' : (newValue ?? '0');
     const validNumber = new RegExp(/^([-+]?\d{1,6}(.))?\d{0,4}$/);
     const n = validNumber.test(newValue) ? newValue : number;
     setNumber(n);
