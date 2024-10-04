@@ -1,8 +1,6 @@
 import React from 'react';
 import { StyleProp, TextStyle, View } from 'react-native';
-import { IconButton, MD2Theme, TextInput, useTheme } from 'react-native-paper';
-
-import buttonStyles from '../../styles/buttonRippleStyle';
+import { MD2Theme, TextInput, useTheme } from 'react-native-paper';
 
 import styles from './styles';
 
@@ -42,13 +40,19 @@ const SelectableInput = ({ value, onPress, label, placeholder, editable = false,
           style={style ? [styles.input, style] : styles.input}
           placeholderTextColor={colors.text}
           placeholder={placeholder}
+          right={
+            <TextInput.Icon
+              icon="chevron-right"
+              size={24}
+              style={styles.marginTop}
+              onPress={onPress}
+              disabled={disabled}
+            />
+          }
           editable={editable}
           disabled={disabled}
           children={undefined}
         />
-      </View>
-      <View style={buttonStyles.viewRight_24}>
-        <IconButton icon="chevron-right" size={24} style={buttonStyles.icon_24} onPress={onPress} disabled={disabled} />
       </View>
     </View>
   );

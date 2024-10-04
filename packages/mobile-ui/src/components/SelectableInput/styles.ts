@@ -7,17 +7,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   input: {
-    lineHeight: 40,
     height: 40,
+    lineHeight: 40,
     flex: 1,
     marginHorizontal: 10,
     fontSize: 17,
-    paddingRight: 18,
   },
   containerInput: {
     flexDirection: 'row',
     paddingBottom: 12,
   },
+  marginTop: { marginTop: 14 },
 });
 
 export default styles;
