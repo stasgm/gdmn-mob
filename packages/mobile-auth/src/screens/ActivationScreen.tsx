@@ -34,7 +34,11 @@ const ActivationScreen = (props: Props) => {
           returnKeyType="done"
           onChangeText={setActivationCode}
         />
-        <PrimeButton icon="login" onPress={handleActivate} disabled={loading || !activationCode}>
+        <PrimeButton
+          icon="login"
+          onPress={handleActivate}
+          disabled={loading || !activationCode || activationCode.length !== 4}
+        >
           Отправить
         </PrimeButton>
       </AppInputScreen>
