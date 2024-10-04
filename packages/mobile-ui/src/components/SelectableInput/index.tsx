@@ -20,7 +20,7 @@ interface Props {
 const truncate = (str: string, l: number | undefined = 40) => (str.length > l ? `${str.substring(0, l)}...` : str);
 
 const SelectableInput = ({ value, onPress, label, placeholder, editable = false, disabled, style }: Props) => {
-  const { colors } = useTheme<MD2Theme>();
+  const { dark: isThemeDark, colors } = useTheme<MD2Theme>();
 
   return (
     <View style={styles.container}>
@@ -29,6 +29,8 @@ const SelectableInput = ({ value, onPress, label, placeholder, editable = false,
           label={label}
           value={truncate(value || '', 35)}
           theme={{
+            dark: isThemeDark,
+            mode: 'adaptive',
             colors: {
               primary: colors.primary,
               text: colors.text,

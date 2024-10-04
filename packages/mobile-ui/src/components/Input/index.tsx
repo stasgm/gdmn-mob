@@ -60,7 +60,7 @@ const Input = ({
   isIcon,
   iconName,
 }: Props) => {
-  const { colors } = useTheme<MD2Theme>();
+  const { dark: isThemeDark, colors } = useTheme<MD2Theme>();
 
   return (
     <View style={styles.container}>
@@ -71,6 +71,8 @@ const Input = ({
           onChangeText={onChangeText}
           onEndEditing={onEndEditing}
           theme={{
+            dark: isThemeDark,
+            mode: 'adaptive',
             colors: {
               primary: colors.primary,
               text: colors.text,
