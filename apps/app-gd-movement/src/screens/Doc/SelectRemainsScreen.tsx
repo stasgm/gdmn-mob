@@ -115,18 +115,34 @@ export const SelectRemainsScreen = () => {
         });
       } else {
         const lower = searchQuery.toLowerCase();
+        let gr, fn;
+        const charSeparator = '+';
 
-        const fn = isNaN(Number(lower))
-          ? ({ good }: IRemGood) =>
-              good.name?.toLowerCase().includes(lower) || good.alias?.toLowerCase().includes(lower)
-          : ({ good }: IRemGood) =>
-              good.barcode?.includes(searchQuery) ||
-              good.name?.toLowerCase().includes(lower) ||
-              good.weightCode?.toLowerCase().includes(lower) ||
-              good.alias?.toLowerCase().includes(lower);
+        if (lower.includes(charSeparator)) {
+          const queries = lower.split(charSeparator);
 
-        let gr;
+          if (lower.endsWith(charSeparator)) {
+            queries.pop();
+          }
 
+          fn = ({ good }: IRemGood) => {
+            let prevIndex = 0;
+            return queries.every((value) => {
+              const answer = good.name?.toLowerCase().indexOf(value, prevIndex);
+              prevIndex = answer + value.length;
+              return answer !== -1;
+            });
+          };
+        } else {
+          fn = isNaN(Number(lower))
+            ? ({ good }: IRemGood) =>
+                good.name?.toLowerCase().includes(lower) || good.alias?.toLowerCase().includes(lower)
+            : ({ good }: IRemGood) =>
+                good.barcode?.includes(searchQuery) ||
+                good.name?.toLowerCase().includes(lower) ||
+                good.weightCode?.toLowerCase().includes(lower) ||
+                good.alias?.toLowerCase().includes(lower);
+        }
         if (
           filteredList.searchQuery &&
           searchQuery.length > filteredList.searchQuery.length &&
