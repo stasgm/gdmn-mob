@@ -1,5 +1,5 @@
 import React, { useState, useLayoutEffect, useMemo, useCallback } from 'react';
-import { ListRenderItem, SectionList, SectionListData, View } from 'react-native';
+import { ListRenderItem, SectionList, SectionListData } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 
 import { docSelectors } from '@lib/store';
@@ -131,16 +131,14 @@ const ApplListScreen = () => {
       <FilterButtons status={status} onPress={setStatus} />
       {filterVisible && (
         <>
-          <View style={styles.flexDirectionRow}>
-            <Searchbar
-              placeholder="Поиск"
-              onChangeText={setSearchQuery}
-              value={searchQuery}
-              style={[styles.flexGrow, styles.searchBar]}
-              autoFocus
-              selectionColor={colors.primary}
-            />
-          </View>
+          <Searchbar
+            placeholder="Поиск"
+            onChangeText={setSearchQuery}
+            value={searchQuery}
+            style={styles.searchBar}
+            autoFocus
+            selectionColor={colors.primary}
+          />
           <ItemSeparator />
         </>
       )}

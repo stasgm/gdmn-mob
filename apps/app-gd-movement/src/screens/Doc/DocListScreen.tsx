@@ -410,16 +410,14 @@ export const DocListScreen = () => {
       </View>
       {filterVisible && (
         <>
-          <View style={styles.flexDirectionRow}>
-            <Searchbar
-              placeholder="Поиск"
-              onChangeText={setSearchQuery}
-              value={searchQuery}
-              style={[styles.flexGrow, styles.searchBar]}
-              autoFocus
-              selectionColor={colors.primary}
-            />
-          </View>
+          <Searchbar
+            placeholder="Поиск"
+            onChangeText={setSearchQuery}
+            value={searchQuery}
+            style={styles.searchBar}
+            autoFocus
+            selectionColor={colors.primary}
+          />
           <ItemSeparator />
         </>
       )}

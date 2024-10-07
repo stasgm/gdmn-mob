@@ -309,16 +309,14 @@ export const CellsViewScreen = () => {
     <AppScreen>
       {filterVisible ? (
         <>
-          <View style={styles.flexDirectionRow}>
-            <Searchbar
-              placeholder="Поиск"
-              onChangeText={setSearchQuery}
-              value={searchQuery}
-              style={[styles.flexGrow, styles.searchBar]}
-              autoFocus
-              selectionColor={colors.primary}
-            />
-          </View>
+          <Searchbar
+            placeholder="Поиск"
+            onChangeText={setSearchQuery}
+            value={searchQuery}
+            style={styles.searchBar}
+            autoFocus
+            selectionColor={colors.primary}
+          />
           <View style={localStyles.status}>
             {searchTypes.map((elem) => (
               <View key={elem.id}>

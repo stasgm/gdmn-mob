@@ -2,7 +2,6 @@ import { styles } from './styles';
 import ReferenceItem from './components/ReferenceItem';
 import { ReferenceStackParamList } from '../../navigation/Root/types';
 import React, { useState, useMemo, useLayoutEffect, useEffect, useCallback } from 'react';
-import { View } from 'react-native';
 import { Divider, Searchbar } from 'react-native-paper';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
 import { SubTitle, ItemSeparator, SearchButton, AppScreen, navBackButton } from '@lib/mobile-ui';
@@ -65,16 +64,14 @@ const ReferenceViewScreen = () => {
       <SubTitle style={[styles.title]}>{list?.description || list.name}</SubTitle>
       {filterVisible && (
         <>
-          <View style={styles.flexDirectionRow}>
-            <Searchbar
-              placeholder="Поиск"
-              onChangeText={setSearchQuery}
-              value={searchQuery}
-              style={[styles.flexGrow, styles.searchBar]}
-              autoFocus
-              selectionColor="green"
-            />
-          </View>
+          <Searchbar
+            placeholder="Поиск"
+            onChangeText={setSearchQuery}
+            value={searchQuery}
+            style={styles.searchBar}
+            autoFocus
+            selectionColor="green"
+          />
           <ItemSeparator />
         </>
       )}

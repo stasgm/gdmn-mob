@@ -14,7 +14,7 @@ import { IReference } from '@lib/types';
 import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { SectionList, SectionListData, View, Alert } from 'react-native';
+import { SectionList, SectionListData, Alert } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
@@ -114,16 +114,14 @@ const ContactListScreen = () => {
     <AppScreen>
       {filterVisible && (
         <>
-          <View style={styles.flexDirectionRow}>
-            <Searchbar
-              placeholder="Поиск"
-              onChangeText={setSearchQuery}
-              value={searchQuery}
-              style={[styles.flexGrow, styles.searchBar]}
-              autoFocus
-              selectionColor={colors.primary}
-            />
-          </View>
+          <Searchbar
+            placeholder="Поиск"
+            onChangeText={setSearchQuery}
+            value={searchQuery}
+            style={styles.searchBar}
+            autoFocus
+            selectionColor={colors.primary}
+          />
           <ItemSeparator />
         </>
       )}

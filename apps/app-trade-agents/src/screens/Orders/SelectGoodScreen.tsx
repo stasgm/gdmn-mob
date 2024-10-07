@@ -482,18 +482,16 @@ const SelectGoodScreen = () => {
       {!!orderLine && <OrderLineEdit orderLine={orderLine} onDismiss={hadndleDismiss} />}
       {filterVisible && (
         <View>
-          <View style={styles.flexDirectionRow}>
-            <Searchbar
-              placeholder="Поиск"
-              onChangeText={(text) => {
-                setSearchQuery(text);
-              }}
-              value={searchQuery}
-              style={[styles.flexGrow, styles.searchBar]}
-              autoFocus
-              selectionColor={colors.primary}
-            />
-          </View>
+          <Searchbar
+            placeholder="Поиск"
+            onChangeText={(text) => {
+              setSearchQuery(text);
+            }}
+            value={searchQuery}
+            style={styles.searchBar}
+            autoFocus
+            selectionColor={colors.primary}
+          />
           <ItemSeparator />
         </View>
       )}

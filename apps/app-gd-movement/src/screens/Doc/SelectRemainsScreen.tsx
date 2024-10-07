@@ -346,16 +346,14 @@ export const SelectRemainsScreen = () => {
       <Divider />
       {filterVisible && (
         <>
-          <View style={styles.flexDirectionRow}>
-            <Searchbar
-              placeholder="Поиск (штрихкод, наименование, артикул)"
-              onChangeText={setSearchQuery}
-              value={searchQuery}
-              style={[styles.flexGrow, styles.searchBar]}
-              autoFocus
-              selectionColor={searchStyle}
-            />
-          </View>
+          <Searchbar
+            placeholder="Поиск (штрихкод, наименование, артикул)"
+            onChangeText={setSearchQuery}
+            value={searchQuery}
+            style={styles.searchBar}
+            autoFocus
+            selectionColor={searchStyle}
+          />
           <ItemSeparator />
         </>
       )}
