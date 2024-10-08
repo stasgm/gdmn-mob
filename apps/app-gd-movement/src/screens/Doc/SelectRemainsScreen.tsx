@@ -116,7 +116,7 @@ export const SelectRemainsScreen = () => {
       } else {
         const lower = searchQuery.toLowerCase();
         let gr, fn;
-        const charSeparator = '+';
+        const charSeparator = '%';
 
         if (lower.includes(charSeparator)) {
           const queries = lower.split(charSeparator);

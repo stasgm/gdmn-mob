@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleProp, TextStyle, View } from 'react-native';
 import { MD2Theme, TextInput, useTheme } from 'react-native-paper';
 
@@ -15,17 +15,20 @@ interface Props {
   style?: StyleProp<TextStyle>;
 }
 
-const truncate = (str: string, l: number | undefined = 40) => (str.length > l ? `${str.substring(0, l)}...` : str);
-
 const SelectableInput = ({ value, onPress, label, placeholder, editable = false, disabled, style }: Props) => {
   const { dark: isThemeDark, colors } = useTheme<MD2Theme>();
+  const [shortValue, setShortValue] = useState(value);
+
+  useEffect(() => {
+    setShortValue(value && value.length > 30 ? `${value.substring(0, 30)}...` : value);
+  }, [value]);
 
   return (
     <View style={styles.container}>
       <View style={styles.containerInput}>
         <TextInput
           label={label}
-          value={truncate(value || '', 35)}
+          value={shortValue}
           theme={{
             dark: isThemeDark,
             mode: 'adaptive',
