@@ -1,5 +1,5 @@
 import React from 'react';
-import { ReturnKeyTypeOptions, View } from 'react-native';
+import { ReturnKeyTypeOptions, StyleProp, TextStyle, View } from 'react-native';
 import { MD2Theme, TextInput, useTheme } from 'react-native-paper';
 
 import styles from './styles';
@@ -38,6 +38,7 @@ interface Props {
   isIcon?: boolean;
   iconName?: any;
   onIconPress?: () => void;
+  style?: StyleProp<TextStyle>;
 }
 
 const Input = ({
@@ -59,6 +60,7 @@ const Input = ({
   onIconPress,
   isIcon,
   iconName,
+  style,
 }: Props) => {
   const { dark: isThemeDark, colors } = useTheme<MD2Theme>();
 
@@ -84,7 +86,7 @@ const Input = ({
           returnKeyType={returnKeyType}
           keyboardType={keyboardType}
           autoCorrect={autoCorrect}
-          style={styles.input}
+          style={style ? [styles.input, style] : styles.input}
           maxLength={maxLength}
           placeholderTextColor={colors.text}
           right={
@@ -92,13 +94,13 @@ const Input = ({
               <TextInput.Icon icon={iconName} size={20} style={styles.marginTop} onPress={onIconPress} />
             ) : (
               !!value &&
-              !!clearInput &&
-              !disabled && (
+              !!clearInput && (
                 <TextInput.Icon
                   icon="close"
                   size={20}
                   style={styles.marginTop}
                   onPress={() => onChangeText && onChangeText('')}
+                  disabled={disabled}
                 />
               )
             )
