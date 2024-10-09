@@ -170,9 +170,8 @@ export const DocListScreen = () => {
         const lower = searchQuery.toLowerCase();
 
         const fn = ({ head, documentDate, number, documentType }: IMovementDocument) =>
-          (documentType.remainsField === 'fromContact'
-            ? head.fromContact?.name?.toLowerCase().includes(lower)
-            : head.toContact?.name?.toLowerCase().includes(lower)) ||
+          head.fromContact?.name?.toLowerCase().includes(lower) ||
+          head.toContact?.name?.toLowerCase().includes(lower) ||
           documentType?.description?.toLowerCase().includes(lower) ||
           number.toLowerCase().includes(lower) ||
           getDateString(documentDate).toLowerCase().includes(lower);
