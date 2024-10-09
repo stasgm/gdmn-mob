@@ -20,7 +20,7 @@ const SelectableInput = ({ value, onPress, label, placeholder, editable = false,
   const [shortValue, setShortValue] = useState(value);
 
   useEffect(() => {
-    setShortValue(value && value.length > 30 ? `${value.substring(0, 30)}...` : value);
+    setShortValue(value && value.length > 30 ? `${value.substring(0, 30)}...` : value || '');
   }, [value]);
 
   return (
