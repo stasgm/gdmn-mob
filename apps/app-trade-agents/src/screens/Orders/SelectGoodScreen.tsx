@@ -288,6 +288,10 @@ const SelectGoodScreen = () => {
     if (selectedDateBegin && _event.type !== 'dismissed') {
       setFilterDateBegin(selectedDateBegin.toISOString().slice(0, 10));
     }
+
+    if (_event.type === 'neutralButtonPressed') {
+      dispatch(appActions.setFormParams({ filterDateBegin: undefined }));
+    }
   };
   const handlePresentDateBegin = () => {
     Keyboard.dismiss();
@@ -301,6 +305,10 @@ const SelectGoodScreen = () => {
 
     if (selectedDateEnd && _event.type !== 'dismissed') {
       setFilterDateEnd(selectedDateEnd.toISOString().slice(0, 10));
+    }
+
+    if (_event.type === 'neutralButtonPressed') {
+      dispatch(appActions.setFormParams({ filterDateBegin: undefined }));
     }
   };
 
@@ -569,6 +577,8 @@ const SelectGoodScreen = () => {
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateBegin}
+          maximumDate={filterDateEnd ? new Date(filterDateEnd) : undefined}
+          neutralButtonLabel="Очистить"
         />
       )}
       {showDateEnd && (
@@ -578,6 +588,8 @@ const SelectGoodScreen = () => {
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateEnd}
+          minimumDate={filterDateBegin ? new Date(filterDateBegin) : undefined}
+          neutralButtonLabel="Очистить"
         />
       )}
     </AppScreen>

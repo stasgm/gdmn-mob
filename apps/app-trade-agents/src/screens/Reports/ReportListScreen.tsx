@@ -134,6 +134,10 @@ const ReportListScreen = () => {
     if (selectedDateBegin && _event.type !== 'dismissed') {
       dispatch(appActions.setFormParams({ filterReportDB: selectedDateBegin.toISOString().slice(0, 10) }));
     }
+
+    if (_event.type === 'neutralButtonPressed') {
+      dispatch(appActions.setFormParams({ filterReportDB: undefined }));
+    }
   };
 
   const handlePresentDateBegin = () => {
@@ -148,6 +152,10 @@ const ReportListScreen = () => {
 
     if (selectedDateEnd && _event.type !== 'dismissed') {
       dispatch(appActions.setFormParams({ filterReportDE: selectedDateEnd.toISOString().slice(0, 10) }));
+    }
+
+    if (_event.type === 'neutralButtonPressed') {
+      dispatch(appActions.setFormParams({ filterReportDE: undefined }));
     }
   };
 
@@ -164,6 +172,10 @@ const ReportListScreen = () => {
     if (selectedDateBegin && _event.type !== 'dismissed') {
       dispatch(appActions.setFormParams({ filterReportOnDB: selectedDateBegin.toISOString().slice(0, 10) }));
     }
+
+    if (_event.type === 'neutralButtonPressed') {
+      dispatch(appActions.setFormParams({ filterReportOnDB: undefined }));
+    }
   };
 
   const handlePresentOnDateBegin = () => {
@@ -178,6 +190,10 @@ const ReportListScreen = () => {
 
     if (selectedDateEnd && _event.type !== 'dismissed') {
       dispatch(appActions.setFormParams({ filterReportOnDE: selectedDateEnd.toISOString().slice(0, 10) }));
+    }
+
+    if (_event.type === 'neutralButtonPressed') {
+      dispatch(appActions.setFormParams({ filterReportOnDE: undefined }));
     }
   };
 
@@ -372,6 +388,8 @@ const ReportListScreen = () => {
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateBegin}
+          maximumDate={filterReportDE ? new Date(filterReportDE) : undefined}
+          neutralButtonLabel="Очистить"
         />
       )}
       {showDateEnd && (
@@ -381,6 +399,8 @@ const ReportListScreen = () => {
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateEnd}
+          minimumDate={filterReportDB ? new Date(filterReportDB) : undefined}
+          neutralButtonLabel="Очистить"
         />
       )}
       {showOnDateBegin && (
@@ -390,6 +410,8 @@ const ReportListScreen = () => {
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyOnDateBegin}
+          maximumDate={filterReportOnDE ? new Date(filterReportOnDE) : undefined}
+          neutralButtonLabel="Очистить"
         />
       )}
       {showOnDateEnd && (
@@ -399,6 +421,8 @@ const ReportListScreen = () => {
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyOnDateEnd}
+          minimumDate={filterReportOnDB ? new Date(filterReportOnDB) : undefined}
+          neutralButtonLabel="Очистить"
         />
       )}
     </AppScreen>

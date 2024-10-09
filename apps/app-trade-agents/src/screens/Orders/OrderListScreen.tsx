@@ -282,6 +282,10 @@ const OrderListScreen = () => {
     if (selectedDateBegin && _event.type !== 'dismissed') {
       dispatch(appActions.setFormParams({ filterDateBegin: selectedDateBegin.toISOString().slice(0, 10) }));
     }
+
+    if (_event.type === 'neutralButtonPressed') {
+      dispatch(appActions.setFormParams({ filterDateBegin: undefined }));
+    }
   };
   const handlePresentDateBegin = () => {
     Keyboard.dismiss();
@@ -295,6 +299,10 @@ const OrderListScreen = () => {
 
     if (selectedDateEnd && _event.type !== 'dismissed') {
       dispatch(appActions.setFormParams({ filterDateEnd: selectedDateEnd.toISOString().slice(0, 10) }));
+    }
+
+    if (_event.type === 'neutralButtonPressed') {
+      dispatch(appActions.setFormParams({ filterDateEnd: undefined }));
     }
   };
 
@@ -482,6 +490,8 @@ const OrderListScreen = () => {
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateBegin}
+          maximumDate={filterDateEnd ? new Date(filterDateEnd) : undefined}
+          neutralButtonLabel="Очистить"
         />
       )}
       {showDateEnd && (
@@ -491,6 +501,8 @@ const OrderListScreen = () => {
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateEnd}
+          minimumDate={filterDateBegin ? new Date(filterDateBegin) : undefined}
+          neutralButtonLabel="Очистить"
         />
       )}
     </AppScreen>
