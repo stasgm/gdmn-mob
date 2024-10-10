@@ -36,9 +36,10 @@ interface IProps {
   onSetLine: (value: IMovementLine) => void;
   onSetDisabledSave: (value: boolean) => void;
   isSumWNds?: boolean;
+  onSave?: () => void;
 }
 
-export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProps) => {
+export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave, onSave }: IProps) => {
   const { colors } = useTheme();
 
   const [goodEID, setGoodEID] = useState<string | undefined>(item?.EID?.toString());
@@ -58,7 +59,7 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(isScreenKeyboard);
 
   const [isQuantity, setIsQuantity] = useState(true);
-  const [changeOldValue, setChangeOldValue] = useState(true);
+  const [changeOldValue, setChangeOldValue] = useState(false);
 
   useEffect(() => {
     !visibleDialog &&
@@ -122,7 +123,10 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
   const buyingPrice = item?.buyingPrice || 0;
   const barcode = item?.barcode || '';
 
-  const [keypadValue, setKeypadValue] = useState<IQuantity>({ quantity: item.quantity.toString() });
+  const [keypadValue, setKeypadValue] = useState<IQuantity>({
+    quantity: item.quantity.toString(),
+    sumWNds: item.sumWNds?.toString(),
+  });
 
   const getValue = useCallback(
     (obj: any, value?: string | number) => {
@@ -136,7 +140,6 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
       if (isKeyboardOpen) {
         setIsKeyboardOpen(false);
       }
-      setChangeOldValue(false);
       let newValue = text.replace(',', '.');
       newValue = !newValue.includes('.') ? parseFloat(newValue).toString() : newValue;
       newValue = Number.isNaN(parseFloat(newValue)) ? '0' : newValue;
@@ -150,8 +153,8 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
 
   const handleChangeQuantity = useCallback(() => {
     setIsQuantity(!isQuantity);
-    setChangeOldValue(true);
     setKeypadValue(getValue(keypadValue, (isQuantity ? item.quantity : item.sumWNds || 0).toString()));
+    setChangeOldValue(true);
   }, [getValue, isQuantity, item.quantity, item.sumWNds, keypadValue]);
 
   const oldValue = useMemo(() => (isQuantity ? keypadValue.quantity : keypadValue.sumWNds), [isQuantity, keypadValue]);
@@ -315,6 +318,10 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
             }}
             decDigitsForTotal={3}
             changeOldValue={changeOldValue}
+            applyValue={() => {
+              setChangeOldValue(false);
+            }}
+            onSave={onSave}
           />
         )}
       </View>
