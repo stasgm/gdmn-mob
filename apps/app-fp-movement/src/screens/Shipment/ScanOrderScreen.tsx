@@ -31,7 +31,7 @@ import { ICodeEntity } from '../../store/app/types';
 import { actions as fpActions } from '../../store/app/actions';
 import { useSelector as useFpSelector } from '../../store/index';
 
-import { barCodeTypes } from '../../utils/constants';
+import { barcodeTypes } from '../../utils/constants';
 
 const ScanOrderScreen = () => {
   const { isCurr } = useRoute<RouteProp<ShipmentStackParamList, 'ScanOrder'>>().params;
@@ -206,7 +206,7 @@ const ScanOrderScreen = () => {
           onGetScannedObject={handleGetScannedObject}
           onClearScannedObject={handleClearScaner}
           scaner={scaner}
-          barCodeTypes={barCodeTypes}
+          barcodeTypes={barcodeTypes}
         >
           <ScanItem />
         </ScanBarcode>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, ReactNode } from 'react';
 import { View, TouchableOpacity, Vibration, Text } from 'react-native';
 import { IconButton } from 'react-native-paper';
-import { Camera, FlashMode, AutoFocus, WhiteBalance } from 'expo-camera';
+import { CameraView, BarcodeType } from 'expo-camera';
 
 import { useTheme } from '@react-navigation/native';
 
@@ -26,7 +26,7 @@ interface IProps {
   onSave?: () => void;
   onGetScannedObject: (brc: string, typeOk?: boolean) => void;
   onClearScannedObject: () => void;
-  barCodeTypes?: string[];
+  barcodeTypes?: BarcodeType[];
   children?: ReactNode;
   onSearch?: () => void;
   isLeftButton?: boolean;
@@ -42,7 +42,7 @@ const ScanBarcode = ({
   onSave,
   onGetScannedObject,
   onClearScannedObject,
-  barCodeTypes = [],
+  barcodeTypes = [],
   children,
   onSearch,
   isLeftButton,
@@ -138,14 +138,14 @@ const ScanBarcode = ({
 
   return (
     <View style={styles.content}>
-      <Camera
+      <CameraView
         key={`${scaner.state}`}
-        flashMode={flashMode ? FlashMode.torch : FlashMode.off}
-        barCodeScannerSettings={barCodeTypes.length ? { barCodeTypes } : undefined}
-        autoFocus={AutoFocus.on}
-        whiteBalance={WhiteBalance.auto}
-        onBarCodeScanned={({ data, type }: { data: string; type: string }) =>
-          !scanned && handleBarCodeScanned(data, barCodeTypes.length ? barCodeTypes.indexOf(type) >= 0 : true)
+        flash={flashMode ? 'on' : 'off'}
+        barcodeScannerSettings={barcodeTypes.length ? { barcodeTypes: barcodeTypes } : undefined}
+        focusable={true}
+        onBarcodeScanned={({ data, type }: { data: string; type: string }) =>
+          !scanned &&
+          handleBarCodeScanned(data, barcodeTypes.length ? barcodeTypes.indexOf(type as BarcodeType) >= 0 : true)
         }
         style={cameraStyle}
       >
@@ -233,7 +233,7 @@ const ScanBarcode = ({
             <Text style={styles.text}>Наведите рамку на штрихкод</Text>
           </View>
         )}
-      </Camera>
+      </CameraView>
       <AppDialog
         title="Введите штрих-код"
         visible={visibleDialog}
