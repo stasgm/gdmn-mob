@@ -122,7 +122,7 @@ const ScanGoodScreen = () => {
       onGetScannedObject={handleGetScannedObject}
       onClearScannedObject={handleClearScaner}
       scaner={scaner}
-      barCodeTypes={[]}
+      barcodeTypes={[]}
     >
       {scannedObject ? (
         <View style={localStyles.itemInfo}>

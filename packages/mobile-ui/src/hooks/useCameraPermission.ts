@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
-import { Camera, PermissionResponse } from 'expo-camera';
+import { PermissionResponse, useCameraPermissions } from 'expo-camera';
 
 function useCameraPermission(): PermissionResponse | null {
-  const [permission, requestPermission] = Camera.useCameraPermissions();
+  const [permission, requestPermission] = useCameraPermissions();
 
   useEffect(() => {
     (async () => {

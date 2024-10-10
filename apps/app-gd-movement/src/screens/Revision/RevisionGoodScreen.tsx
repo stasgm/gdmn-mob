@@ -204,7 +204,7 @@ const RevisionGoodScreen = () => {
       onGetScannedObject={handleGetScannedObject}
       onClearScannedObject={handleClearScaner}
       scaner={scaner}
-      barCodeTypes={[]}
+      barcodeTypes={[]}
       showExtraButton={scannedObject?.good?.id === 'unknown'}
       extraButtonIcon="clipboard-text-search-outline"
       extraButtonName="Привязать ТМЦ"
