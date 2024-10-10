@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, Vibration, Text } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import { AutoFocus, Camera, FlashMode } from 'expo-camera';
+import { CameraView } from 'expo-camera';
 
 import { useIsFocused, useTheme } from '@react-navigation/native';
 
@@ -75,13 +75,13 @@ const ScanBarcode = ({ onSave, getScannedObject }: IProps) => {
 
   return isFocused ? (
     <View style={[styles.content]}>
-      <Camera
-        flashMode={flashMode ? FlashMode.torch : FlashMode.off}
-        barCodeScannerSettings={{
-          barCodeTypes: [BarCodeScanner.Constants.BarCodeType.ean13, BarCodeScanner.Constants.BarCodeType.ean8],
+      <CameraView
+        flash={flashMode ? 'on' : 'off'}
+        barcodeScannerSettings={{
+          barcodeTypes: ['ean13', 'ean8'],
         }}
-        autoFocus={AutoFocus.on}
-        onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
+        focusable={true}
+        onBarcodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
         style={[styles.camera, { backgroundColor: colors.card }]}
       >
         <View style={styles.header}>
@@ -162,7 +162,7 @@ const ScanBarcode = ({ onSave, getScannedObject }: IProps) => {
             </>
           </View>
         )}
-      </Camera>
+      </CameraView>
     </View>
   ) : (
     <></>

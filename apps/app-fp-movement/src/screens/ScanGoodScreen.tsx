@@ -41,7 +41,7 @@ import {
 } from '../utils/helpers';
 import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../store/index';
 
-import { barCodeTypes } from '../utils/constants';
+import { barcodeTypes } from '../utils/constants';
 
 const ScanGoodScreen = () => {
   const docId = useRoute<RouteProp<ShipmentStackParamList, 'ScanGood'>>().params?.docId;
@@ -304,7 +304,7 @@ const ScanGoodScreen = () => {
       onGetScannedObject={handleGetScannedObject}
       onClearScannedObject={handleClearScaner}
       scaner={scaner}
-      barCodeTypes={barCodeTypes}
+      barcodeTypes={barcodeTypes}
     >
       {scannedObject ? (
         <View style={localStyles.itemInfo}>

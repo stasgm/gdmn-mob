@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@babel/preset-env": "^7.24.7",
-    "@expo/vector-icons": "^14.0.2",
+    "@expo/vector-icons": "^14.0.3",
     "@lib/mobile-ui": "*",
     "@react-navigation/drawer": "^6.7.2",
     "@react-navigation/native": "^6.1.18",
