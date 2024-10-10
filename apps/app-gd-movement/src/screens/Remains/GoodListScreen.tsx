@@ -81,52 +81,54 @@ const GoodListScreen = () => {
     goodRemains,
   });
 
+  const searchGoodRemains = useCallback(
+    (remain: string) => {
+      const lower = searchQuery.toLowerCase();
+
+      const fn = isNaN(Number(lower))
+        ? ({ good }: IRemGood) => good.name?.toLowerCase().includes(lower)
+        : ({ good }: IRemGood) => good.barcode?.includes(searchQuery) || good.name?.toLowerCase().includes(lower);
+
+      let gr;
+
+      if (
+        filteredList.searchQuery &&
+        searchQuery.length > filteredList.searchQuery.length &&
+        searchQuery.startsWith(filteredList.searchQuery)
+      ) {
+        gr = filteredList.goodRemains.filter(fn);
+      } else {
+        gr = (remain === 'all' ? goodRemains : goodRemains.filter((item) => item.remains > 0)).filter(fn);
+      }
+      return gr;
+    },
+    [filteredList.goodRemains, filteredList.searchQuery, goodRemains, searchQuery],
+  );
+
   const handleApply = useCallback(
     (option: IListItem) => {
       setVisibleMenu(false);
+      setRem(option);
       setFilteredList({
         searchQuery,
-        goodRemains: option.id === 'all' ? goodRemains : goodRemains.filter((item) => item.remains > 0),
+        goodRemains: searchGoodRemains(option.id),
       });
-
-      setRem(option);
     },
-    [goodRemains, searchQuery],
+    [searchGoodRemains, searchQuery],
   );
 
   useEffect(() => {
     if (searchQuery !== filteredList.searchQuery) {
-      if (!searchQuery) {
-        setFilteredList({
-          searchQuery,
-          goodRemains,
-        });
-      } else {
-        const lower = searchQuery.toLowerCase();
-
-        const fn = isNaN(Number(lower))
-          ? ({ good }: IRemGood) => good.name?.toLowerCase().includes(lower)
-          : ({ good }: IRemGood) => good.barcode?.includes(searchQuery) || good.name?.toLowerCase().includes(lower);
-
-        let gr;
-
-        if (
-          filteredList.searchQuery &&
-          searchQuery.length > filteredList.searchQuery.length &&
-          searchQuery.startsWith(filteredList.searchQuery)
-        ) {
-          gr = filteredList.goodRemains.filter(fn);
-        } else {
-          gr = goodRemains.filter(fn);
-        }
-
-        setFilteredList({
-          searchQuery,
-          goodRemains: gr,
-        });
-      }
+      setFilteredList({
+        searchQuery,
+        goodRemains: !searchQuery
+          ? rem.id === 'all'
+            ? goodRemains
+            : goodRemains.filter((item) => item.remains > 0)
+          : searchGoodRemains(rem.id),
+      });
     }
-  }, [goodRemains, filteredList, searchQuery]);
+  }, [goodRemains, filteredList, searchQuery, searchGoodRemains, rem.id]);
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
