@@ -18,8 +18,6 @@ import { IconButton } from 'react-native-paper';
 
 import { useTheme } from '@react-navigation/native';
 
-import { BarCodeScanner } from 'expo-barcode-scanner';
-
 import { IScannedObject } from '@lib/client-types';
 
 import { IMovementLine } from '../../../store/types';
@@ -184,7 +182,7 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave, onSave 
             onGetScannedObject={handleGetScannedObject}
             onClearScannedObject={handleClearScaner}
             scaner={scaner}
-            barCodeTypes={[BarCodeScanner.Constants.BarCodeType.datamatrix]}
+            barcodeTypes={['datamatrix']}
             isLeftButton={true}
             onCancel={handleCancel}
           />
