@@ -12,19 +12,26 @@ import { IScannedObject } from '@lib/client-types';
 
 import { generateId } from '@lib/mobile-hooks';
 
-import { INamedEntity } from '@lib/types';
+import { INamedEntity, ISettingsOption } from '@lib/types';
 
 import { ScanStackParamList } from '../../navigation/Root/types';
 import { IScanLine, IScanDocument } from '../../store/types';
+import { IBarcodeTypes } from '../../utils/constants';
 
 const ScanGoodScreen = () => {
   const docId = useRoute<RouteProp<ScanStackParamList, 'ScanGood'>>().params?.docId;
   const navigation = useNavigation<StackNavigationProp<ScanStackParamList, 'ScanGood'>>();
+  const settings = useSelector((state) => state.settings?.data);
 
   const dispatch = useDispatch();
 
   const [scaner, setScaner] = useState<IScannedObject>({ state: 'init' });
   const [scannedObject, setScannedObject] = useState<IScanLine>();
+
+  const barcodeTypes =
+    (settings.barcodeTypes as ISettingsOption<Array<IBarcodeTypes>>)?.data
+      ?.filter((t) => t.selected)
+      .map((t) => t.type) || [];
 
   useEffect(() => {
     return () => {
@@ -122,7 +129,7 @@ const ScanGoodScreen = () => {
       onGetScannedObject={handleGetScannedObject}
       onClearScannedObject={handleClearScaner}
       scaner={scaner}
-      barcodeTypes={[]}
+      barcodeTypes={barcodeTypes}
     >
       {scannedObject ? (
         <View style={localStyles.itemInfo}>
