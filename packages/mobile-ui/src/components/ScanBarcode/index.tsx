@@ -138,102 +138,115 @@ const ScanBarcode = ({
 
   return (
     <View style={styles.content}>
-      <CameraView
-        key={`${scaner.state}`}
-        flash={flashMode ? 'on' : 'off'}
-        barcodeScannerSettings={barcodeTypes.length ? { barcodeTypes: barcodeTypes } : undefined}
-        focusable={true}
-        onBarcodeScanned={({ data, type }: { data: string; type: string }) =>
-          !scanned &&
-          handleBarCodeScanned(data, barcodeTypes.length ? barcodeTypes.indexOf(type as BarcodeType) >= 0 : true)
-        }
-        style={cameraStyle}
-      >
-        <View style={styles.header}>
-          {isLeftButton ? (
-            <IconButton icon="arrow-left" iconColor={'#FFF'} size={30} style={styles.transparent} onPress={onCancel} />
-          ) : null}
-          <IconButton
-            icon={flashMode ? 'flash' : 'flash-off'}
-            size={30}
-            iconColor={'#FFF'}
-            style={styles.transparent}
-            onPress={() => setFlashMode(!flashMode)}
-          />
-          <IconButton
-            icon={vibroMode ? 'vibrate' : 'vibrate-off'}
-            size={30}
-            iconColor={'#FFF'}
-            style={styles.transparent}
-            onPress={() => setVibroMode(!vibroMode)}
-          />
-          <IconButton
-            icon={'feature-search-outline'}
-            size={30}
-            iconColor={'#FFF'}
-            style={styles.transparent}
-            onPress={onSearch ? onSearch : handleShowDialog}
-          />
-        </View>
-        {!scanned ? (
-          <View style={[styles.scannerContainer, styles.notScannedContainer]}>
-            <View style={styles.notScannedHeader}>
-              <View style={styles.notScannedFrame}>
-                <View style={[styles.border, styles.borderTop, styles.borderLeft]} />
-                <View style={[styles.border, styles.borderTop, styles.borderRight]} />
-              </View>
-              <View style={styles.notScannedFrame}>
-                <View style={[styles.border, styles.borderBottom, styles.borderLeft]} />
-                <View style={[styles.border, styles.borderBottom, styles.borderRight]} />
-              </View>
-            </View>
+      {!scanned ? (
+        <CameraView
+          active={!scanned}
+          enableTorch={flashMode}
+          barcodeScannerSettings={{
+            barcodeTypes,
+          }}
+          // autofocus={isActiveCamera ? 'on' : 'off'}
+          onBarcodeScanned={({ data, type }: { data: string; type: string }) => {
+            !scanned &&
+              // Временно. Тип штрих-кода на андроиде передается числом
+              // handleBarCodeScanned(data, barcodeTypes.length ? barcodeTypes.indexOf(type as BarcodeType) >= 0 : true);
+              handleBarCodeScanned(data, true);
+          }}
+          style={cameraStyle}
+        >
+          <View style={styles.header}>
+            {isLeftButton ? (
+              <IconButton
+                icon="arrow-left"
+                iconColor={'#FFF'}
+                size={30}
+                style={styles.transparent}
+                onPress={onCancel}
+              />
+            ) : null}
+            <IconButton
+              icon={flashMode ? 'flash' : 'flash-off'}
+              size={30}
+              iconColor={'#FFF'}
+              style={styles.transparent}
+              onPress={() => setFlashMode(!flashMode)}
+            />
+            <IconButton
+              icon={vibroMode ? 'vibrate' : 'vibrate-off'}
+              size={30}
+              iconColor={'#FFF'}
+              style={styles.transparent}
+              onPress={() => setVibroMode(!vibroMode)}
+            />
+            <IconButton
+              icon={'feature-search-outline'}
+              size={30}
+              iconColor={'#FFF'}
+              style={styles.transparent}
+              onPress={onSearch ? onSearch : handleShowDialog}
+            />
           </View>
-        ) : (
-          <View style={styles.scannerContainer}>
-            <View style={styles.buttonsContainer}>
-              <TouchableOpacity style={[styles.buttons, styles.btnReScan]} onPress={onClearScannedObject}>
-                <IconButton icon="barcode-scan" iconColor={'#FFF'} size={30} />
-                <Text style={styles.text}>Пересканировать</Text>
-              </TouchableOpacity>
-            </View>
-            {scaner.message ? (
-              <View style={styles.infoContainer}>
-                <View style={[styles.buttons, styles.btnNotFind]}>
-                  <IconButton icon={'information-outline'} iconColor={'#FFF'} size={30} />
-                  <View>
-                    <Text style={styles.text}>{barcode}</Text>
-                    <Text style={styles.text}>{scaner.message}</Text>
-                  </View>
+          <>
+            <View style={[styles.scannerContainer, styles.notScannedContainer]}>
+              <View style={styles.notScannedHeader}>
+                <View style={styles.notScannedFrame}>
+                  <View style={[styles.border, styles.borderTop, styles.borderLeft]} />
+                  <View style={[styles.border, styles.borderTop, styles.borderRight]} />
+                </View>
+                <View style={styles.notScannedFrame}>
+                  <View style={[styles.border, styles.borderBottom, styles.borderLeft]} />
+                  <View style={[styles.border, styles.borderBottom, styles.borderRight]} />
                 </View>
               </View>
-            ) : children ? (
-              <View style={styles.buttonsContainer}>
-                <TouchableOpacity
-                  style={[styles.buttons, scaner.state === 'error' ? styles.btnNotFind : styles.btnFind]}
-                  onPress={handleSave}
-                >
-                  <IconButton icon={'checkbox-marked-circle-outline'} iconColor={'#FFF'} size={30} />
-                  {children}
-                </TouchableOpacity>
-              </View>
-            ) : null}
-            {showExtraButton && (
-              <View style={styles.buttonsContainer}>
-                <TouchableOpacity style={[styles.buttons, styles.btnFind]} onPress={handlePressExtraButton}>
-                  <IconButton icon={extraButtonIcon || 'checkbox-marked-circle-outline'} iconColor={'#FFF'} size={30} />
-                  <Text style={styles.text}>{extraButtonName || ''}</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
-        )}
-        {!scanned && (
+            </View>
+          </>
           <View style={styles.footer}>
             <IconButton icon={'barcode-scan'} iconColor={'#FFF'} size={40} />
             <Text style={styles.text}>Наведите рамку на штрихкод</Text>
+            <Text style={[styles.text, { fontSize: 14 }]}>{`Типы штрих-кодов: ${
+              barcodeTypes.length ? barcodeTypes.toString() : 'не указано.'
+            }`}</Text>
           </View>
-        )}
-      </CameraView>
+        </CameraView>
+      ) : (
+        <View style={[styles.scannerContainer, { backgroundColor: colors.background }]}>
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity style={[styles.buttons, styles.btnReScan]} onPress={onClearScannedObject}>
+              <IconButton icon="barcode-scan" iconColor={'#FFF'} size={30} />
+              <Text style={styles.text}>Пересканировать</Text>
+            </TouchableOpacity>
+          </View>
+          {scaner.message ? (
+            <View style={styles.infoContainer}>
+              <View style={[styles.buttons, styles.btnNotFind]}>
+                <IconButton icon={'information-outline'} iconColor={'#FFF'} size={30} />
+                <View>
+                  <Text style={styles.text}>{barcode}</Text>
+                  <Text style={styles.text}>{scaner.message}</Text>
+                </View>
+              </View>
+            </View>
+          ) : children ? (
+            <View style={styles.buttonsContainer}>
+              <TouchableOpacity
+                style={[styles.buttons, scaner.state === 'error' ? styles.btnNotFind : styles.btnFind]}
+                onPress={handleSave}
+              >
+                <IconButton icon={'checkbox-marked-circle-outline'} iconColor={'#FFF'} size={30} />
+                {children}
+              </TouchableOpacity>
+            </View>
+          ) : null}
+          {showExtraButton && (
+            <View style={styles.buttonsContainer}>
+              <TouchableOpacity style={[styles.buttons, styles.btnFind]} onPress={handlePressExtraButton}>
+                <IconButton icon={extraButtonIcon || 'checkbox-marked-circle-outline'} iconColor={'#FFF'} size={30} />
+                <Text style={styles.text}>{extraButtonName || ''}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      )}
       <AppDialog
         title="Введите штрих-код"
         visible={visibleDialog}
