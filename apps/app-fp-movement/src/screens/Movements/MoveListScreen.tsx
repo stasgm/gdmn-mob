@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
+import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { ListRenderItem, SectionList, SectionListData, View, StyleSheet } from 'react-native';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 
@@ -68,10 +68,6 @@ export const MoveListScreen = () => {
   const docTypes = useMemo(() => docDepartTypes.concat(documentSubtypes), [documentSubtypes]);
 
   const [type, setType] = useState(docTypes[0]);
-
-  useEffect(() => {
-    console.log(filterStatus.id);
-  }, [filterStatus.id]);
 
   const filteredList: IListItemProps[] = useMemo(() => {
     const res = list.filter((e) => ((filterStatus.statuses as []) || []).find((i) => i === e.status));

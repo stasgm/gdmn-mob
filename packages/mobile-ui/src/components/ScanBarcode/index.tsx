@@ -115,6 +115,10 @@ const ScanBarcode = ({
     }
   };
 
+  useEffect(() => {
+    scanned && setFlashMode(false);
+  }, [scanned, flashMode]);
+
   if (!permission) {
     return (
       <View style={globalStyles.container}>
