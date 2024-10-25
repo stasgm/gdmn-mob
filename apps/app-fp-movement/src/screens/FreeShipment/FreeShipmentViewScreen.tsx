@@ -252,6 +252,8 @@ export const FreeShipmentViewScreen = () => {
       documentDate: newDocDate,
       creationDate: newDocDate,
       editionDate: newDocDate,
+      sentDate: undefined,
+      erpCreationDate: undefined,
     };
 
     docDispatch(documentActions.addDocument(newDoc));
