@@ -72,13 +72,15 @@ export const MoveListScreen = () => {
   const filteredList: IListItemProps[] = useMemo(() => {
     const res = list.filter((e) => ((filterStatus.statuses as []) || []).find((i) => i === e.status));
 
-    res.sort((a, b) =>
+    const newRes = type?.id === 'all' ? res : res?.filter((i) => i?.head.subtype.id === type?.id);
+
+    newRes.sort((a, b) =>
       date.id === 'new'
         ? new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()
         : new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
     );
 
-    return res.map(
+    return newRes.map(
       (i) =>
         ({
           id: i.id,
@@ -101,7 +103,7 @@ export const MoveListScreen = () => {
           erpCreationDate: i.erpCreationDate,
         }) as IListItemProps,
     );
-  }, [list, filterStatus.statuses, date.id]);
+  }, [list, type?.id, filterStatus.statuses, date.id]);
 
   const sections = useMemo(
     () =>
