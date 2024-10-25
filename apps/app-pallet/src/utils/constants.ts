@@ -1,6 +1,7 @@
 import { IListItem } from '@lib/mobile-types';
 import { Settings, StatusType } from '@lib/types';
 // import { BarCodeScanner } from 'expo-barcode-scanner';
+import { BarcodeType } from 'expo-camera';
 
 const statusColors = ['#E91E63', '#06567D', '#80B12C', '#FFA700'] as const;
 
@@ -14,7 +15,7 @@ export const contactTypes: IListItem[] = [
 
 export interface IBarcodeTypes extends IListItem {
   selected?: boolean;
-  type: string;
+  type: BarcodeType;
 }
 
 export const barcodeList: IBarcodeTypes[] = [

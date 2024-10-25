@@ -12,8 +12,12 @@ import { IScannedObject } from '@lib/client-types';
 
 import { generateId } from '@lib/mobile-hooks';
 
+import { ISettingsOption } from '@lib/types';
+
 import { PalletStackParamList } from '../../navigation/Root/types';
 import { IPalletLine, IPalletDocument } from '../../store/types';
+
+import { IBarcodeTypes } from '../../utils/constants';
 
 const PalletGoodScreen = () => {
   const docId = useRoute<RouteProp<PalletStackParamList, 'PalletGood'>>().params?.docId;
@@ -26,6 +30,12 @@ const PalletGoodScreen = () => {
 
   const prefixErp = useSelector((state) => state.settings?.data?.prefixErp?.data);
   const prefixS = useSelector((state) => state.settings?.data?.prefixS?.data);
+  const settings = useSelector((state) => state.settings?.data);
+
+  const barcodeTypes =
+    (settings.barcodeTypes as ISettingsOption<Array<IBarcodeTypes>>)?.data
+      ?.filter((t) => t.selected)
+      .map((t) => t.type) || [];
 
   useEffect(() => {
     return () => {
@@ -103,7 +113,7 @@ const PalletGoodScreen = () => {
       onGetScannedObject={handleGetScannedObject}
       onClearScannedObject={handleClearScaner}
       scaner={scaner}
-      barcodeTypes={[]}
+      barcodeTypes={barcodeTypes}
     >
       {scannedObject ? (
         <View style={localStyles.itemInfo}>
