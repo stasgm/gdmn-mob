@@ -358,4 +358,5 @@ export const cellColors = {
   barcode: '#226182',
   free: '#d5dce3',
   textWhite: 'white',
+  tertiary: '#eb8826',
 };

@@ -216,15 +216,17 @@ export const SelectCellScreen = () => {
       };
       const backColorStyle = {
         backgroundColor:
-          (fromCell && fromCell.barcode === i.barcode) || (toCell && toCell.barcode === i.barcode)
-            ? colors.error
-            : i.disabled
-              ? colors.backdrop
-              : defaultCell.length && defaultCell.find((e) => e === i.name)
-                ? cellColors.default
-                : i.barcode
-                  ? cellColors.barcode
-                  : cellColors.free,
+          fromCell?.fromCell && fromCell.barcode === i.barcode
+            ? cellColors.tertiary
+            : (fromCell && fromCell.barcode === i.barcode) || (toCell && toCell.barcode === i.barcode)
+              ? colors.error
+              : i.disabled
+                ? colors.backdrop
+                : defaultCell.length && defaultCell.find((e) => e === i.name)
+                  ? cellColors.default
+                  : i.barcode
+                    ? cellColors.barcode
+                    : cellColors.free,
       };
 
       return (
@@ -277,11 +279,6 @@ export const SelectCellScreen = () => {
   return (
     <AppScreen>
       <View style={localStyles.groupItem}>
-        {fromCell ? (
-          <View style={styles.alignItemsCenter}>
-            <Text style={localStyles.buttonLabel}>Из {fromCell?.fromCell}</Text>
-          </View>
-        ) : null}
         <ScrollView>
           <Group
             values={Object.keys(cellList)}
