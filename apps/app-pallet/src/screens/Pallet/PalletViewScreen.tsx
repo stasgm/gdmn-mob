@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { View, TextInput, Alert, useWindowDimensions, Keyboard } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { barcodeToSvg } from '@adrianso/react-native-barcode-builder';
 
 import { Audio } from 'expo-av';
 
@@ -84,17 +85,28 @@ export const PalletViewScreen = () => {
     (await sound).sound.playAsync();
   }, [sound]);
 
+  const SVGBarcode = barcodeToSvg({
+    value: doc?.head.palletId || '',
+    // format: 'EAN13',
+    // flat,
+    width: 500,
+    height: 200,
+  });
+
   const html = `
   <html>
     <head>
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
-    />
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
+      />
+      <script src="//code.jquery.com/jquery-latest.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.8.0/dist/JsBarcode.all.min.js"></script>
     </head>
     <body style="text-align: center; margin-top: 20px">
       <h1 style="font-size: 22px; font-family: Helvetica Neue; font-weight: normal;">
       ${`№ ${doc?.number || '-'} от ${getDateString(doc?.documentDate || '')}` || ''}</h1>
+      <div>${SVGBarcode}</div>
       <h1 style="font-size: 30px; font-family: Helvetica Neue; font-weight: normal;">${doc?.head.palletId || ''}</h1>
     </body>
   </html>

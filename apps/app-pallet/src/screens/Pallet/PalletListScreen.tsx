@@ -206,7 +206,6 @@ export const PalletListScreen = () => {
             isPrint={true}
             printText={` <h1 style="font-size: 22px; font-family: Helvetica Neue; font-weight: normal;">
         ${`№ ${i?.number || '-'} от ${getDateString(i?.documentDate || '')}` || ''}</h1>
-        <h1 style="font-size: 30px; font-family: Helvetica Neue; font-weight: normal;">${i?.head.palletId || ''}</h1>
       `}
           />
         ),
