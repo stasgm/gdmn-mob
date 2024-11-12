@@ -97,13 +97,13 @@ const ShipmentEditScreen = () => {
   useEffect(() => {
     if (screenState === 'saving') {
       if (!shipmentType) {
-        alertWithSound('Ошибка!', 'Тип документа для заявок не найден.');
+        alertWithSound('Ошибка!', 'Тип документа для заявок не найден.', undefined, 'ERROR');
         setScreenState('idle');
         return;
       }
 
       if (!docDocumentDate || !docFromDepart) {
-        alertWithSound('Ошибка!', 'Не все поля заполнены.');
+        alertWithSound('Ошибка!', 'Не все поля заполнены.', undefined, 'ERROR');
         setScreenState('idle');
         return;
       }

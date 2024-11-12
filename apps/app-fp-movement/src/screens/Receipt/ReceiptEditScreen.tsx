@@ -102,13 +102,13 @@ export const ReceiptEditScreen = () => {
   useEffect(() => {
     if (screenState === 'saving') {
       if (!movementType) {
-        alertWithSound('Внимание!', 'Тип документа для приходов не найден.');
+        alertWithSound('Внимание!', 'Тип документа для приходов не найден.', undefined, 'ERROR');
         setScreenState('idle');
         return;
       }
 
       if (!(docNumber && docDate && docFromDepart && docToDepart)) {
-        alertWithSound('Ошибка!', 'Не все поля заполнены.');
+        alertWithSound('Ошибка!', 'Не все поля заполнены.', undefined, 'ERROR');
         setScreenState('idle');
         return;
       }

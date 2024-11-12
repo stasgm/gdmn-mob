@@ -159,7 +159,12 @@ export const SelectCellScreen = () => {
                 setFromCell({ ...item, fromCell: newCell });
               }
             } else {
-              alertWithSound('Ошибка выбора ячейки!', 'Данная ячейка занята другим товаром, выберите другую ячейку.');
+              alertWithSound(
+                'Ошибка выбора ячейки!',
+                'Данная ячейка занята другим товаром, выберите другую ячейку.',
+                undefined,
+                'ERROR',
+              );
             }
           } else {
             const newLine: IMoveLine = { ...fromCell, toCell: newCell };

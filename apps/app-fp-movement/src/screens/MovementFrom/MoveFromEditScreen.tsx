@@ -111,19 +111,19 @@ export const MoveFromEditScreen = () => {
   useEffect(() => {
     if (screenState === 'saving') {
       if (!movementType) {
-        alertWithSound('Внимание!', 'Тип документа для перемещений не найден.');
+        alertWithSound('Внимание!', 'Тип документа для перемещений не найден.', undefined, 'ERROR');
         setScreenState('idle');
         return;
       }
 
       if (!docDocumentSubtype) {
-        alertWithSound('Ошибка!', 'Не указан тип документа.');
+        alertWithSound('Ошибка!', 'Не указан тип документа.', undefined, 'ERROR');
         setScreenState('idle');
         return;
       }
 
       if (!(docNumber && docDate && docFromDepart && docToDepart)) {
-        alertWithSound('Ошибка!', 'Не все поля заполнены.');
+        alertWithSound('Ошибка!', 'Не все поля заполнены.', undefined, 'ERROR');
         setScreenState('idle');
         return;
       }

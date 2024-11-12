@@ -28,7 +28,7 @@ const NamedRow = ({ item }: { item: string }) => (
 );
 
 const handleAlert = (label: string, text: string) => {
-  alertWithSound(label, `Рекомендуется: ${text}.`);
+  alertWithSound(label, `Рекомендуется: ${text}.`, undefined, 'ERROR');
 };
 
 const Cells = ({

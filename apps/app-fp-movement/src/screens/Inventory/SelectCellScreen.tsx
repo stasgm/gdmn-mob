@@ -94,7 +94,7 @@ export const SelectCellScreen = () => {
       setSelectedRow(getCellItem(cell.name).row);
       setToCell(item);
     } else {
-      alertWithSound('Ошибка!', 'Данный товар не находится в ячейке.');
+      alertWithSound('Ошибка!', 'Данный товар не находится в ячейке.', undefined, 'ERROR');
     }
   }, [cell, item, mode]);
 
