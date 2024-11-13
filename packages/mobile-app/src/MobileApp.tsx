@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View, Text, AppState, Alert, Linking } from 'react-native';
 import { Store } from 'redux';
 
@@ -15,7 +15,7 @@ import {
 } from '@lib/store';
 import { AuthNavigator } from '@lib/mobile-auth';
 import { DrawerNavigator, INavItem } from '@lib/mobile-navigation';
-import { globalStyles, Theme as defaultTheme } from '@lib/mobile-ui';
+import { globalStyles, theme as defaultTheme, themeDark } from '@lib/mobile-ui';
 import VersionCheck from 'react-native-version-check';
 import { getInstallReferrerAsync } from 'expo-application';
 import Constants from 'expo-constants';
@@ -225,45 +225,57 @@ const MobileApp = ({ loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
     dispatch(authActions.setErrorMessage(''));
   };
 
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
+  const themeData = { isDarkTheme, setIsDarkTheme };
+
   return (
-    <NavigationContainer theme={defaultTheme}>
-      <Snackbar
-        visible={!!errorMessage}
-        onDismiss={closeErrBar}
-        style={localStyles.snack}
-        action={{
-          icon: 'close',
-          label: '',
-          onPress: closeErrBar,
-          color: 'white',
-        }}
-      >
-        <Text style={localStyles.snackText}>{errorMessage}</Text>
-      </Snackbar>
-      {isLoggedWithCompany ? <AppRoot {...props} /> : <AuthNavigator />}
-      <Snackbar
-        visible={barVisible}
-        onDismiss={closeSnackbar}
-        style={{ backgroundColor: colors.error }}
-        action={{
-          icon: 'close',
-          label: '',
-          onPress: closeSnackbar,
-          color: 'white',
-        }}
-      >
-        <View style={globalStyles.container}>
-          {!!errList?.length &&
-            errList.map((err, id) => (
-              <Text style={localStyles.snackText} key={id}>
-                {truncate(err)}
-              </Text>
-            ))}
-        </View>
-      </Snackbar>
-    </NavigationContainer>
+    <ThemeContext.Provider value={themeData}>
+      <NavigationContainer theme={isDarkTheme ? themeDark : defaultTheme}>
+        <Snackbar
+          visible={!!errorMessage}
+          onDismiss={closeErrBar}
+          style={localStyles.snack}
+          action={{
+            icon: 'close',
+            label: '',
+            onPress: closeErrBar,
+            color: 'white',
+          }}
+        >
+          <Text style={localStyles.snackText}>{errorMessage}</Text>
+        </Snackbar>
+        {isLoggedWithCompany ? <AppRoot {...props} /> : <AuthNavigator />}
+        <Snackbar
+          visible={barVisible}
+          onDismiss={closeSnackbar}
+          style={{ backgroundColor: colors.error }}
+          action={{
+            icon: 'close',
+            label: '',
+            onPress: closeSnackbar,
+            color: 'white',
+          }}
+        >
+          <View style={globalStyles.container}>
+            {!!errList?.length &&
+              errList.map((err, id) => (
+                <Text style={localStyles.snackText} key={id}>
+                  {truncate(err)}
+                </Text>
+              ))}
+          </View>
+        </Snackbar>
+      </NavigationContainer>
+    </ThemeContext.Provider>
   );
 };
+
+export const ThemeContext = createContext<{
+  isDarkTheme: boolean;
+  setIsDarkTheme?: (value: boolean) => void;
+}>({
+  isDarkTheme: false,
+});
 
 export default MobileApp;
 

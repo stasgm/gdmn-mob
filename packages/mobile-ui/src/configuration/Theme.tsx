@@ -1,5 +1,5 @@
-import { DefaultTheme as PaperDefaultTheme, MD2LightTheme } from 'react-native-paper';
-import { DefaultTheme as NavigationDefaultTheme } from '@react-navigation/native';
+import { DefaultTheme as PaperDefaultTheme, MD2LightTheme, MD2DarkTheme } from 'react-native-paper';
+import { DefaultTheme as NavigationDefaultTheme, DarkTheme as NavigationDarkTheme } from '@react-navigation/native';
 
 import colors from '../styles/colors';
 
@@ -20,4 +20,21 @@ const theme = {
   dark: false,
 };
 
-export default theme;
+const themeDark = {
+  ...PaperDefaultTheme,
+  ...NavigationDarkTheme,
+  ...MD2DarkTheme,
+  colors: {
+    ...PaperDefaultTheme.colors,
+    ...NavigationDarkTheme.colors,
+    ...MD2DarkTheme.colors,
+    primary: colors.primary,
+    accent: colors.accent,
+    text: colors.text,
+    placeholder: colors.placeholder,
+  },
+  roundness: 2,
+  dark: true,
+};
+
+export { theme, themeDark };

@@ -22,13 +22,14 @@ import {
 import {
   AppScreen,
   globalStyles as styles,
-  Theme as defaultTheme,
+  theme as defaultTheme,
+  themeDark as darkTheme,
   Provider as UIProvider,
   AppFallback,
   PrimeButton,
 } from '@lib/mobile-ui';
 
-import { ActivityIndicator, Caption, Text } from 'react-native-paper';
+import { ActivityIndicator, Caption, Text, useTheme } from 'react-native-paper';
 
 import { IDocument, IReferences, IUserSettings } from '@lib/types';
 
@@ -73,6 +74,8 @@ import {
 
 const Root = () => {
   const { isInit, data: settings } = useSelector((state) => state.settings);
+
+  const { dark } = useTheme();
 
   const isAddressStore = useMemo(() => settings.addressStore?.data || false, [settings.addressStore?.data]);
 
@@ -466,7 +469,7 @@ const Root = () => {
         </AppScreen>
       ) : authLoading || loading || fpLoading || appDataLoading ? (
         <AppScreen>
-          <ActivityIndicator size="large" color={defaultTheme.colors.primary} />
+          <ActivityIndicator size="large" color={dark ? darkTheme.colors.primary : defaultTheme.colors.primary} />
           <Caption style={styles.title}>
             {appDataLoading || fpLoading ? 'Загрузка данных...' : 'Пожалуйста, подождите..'}
           </Caption>
@@ -483,13 +486,17 @@ const Root = () => {
   );
 };
 
-const App = () => (
-  <Provider store={store}>
-    <UIProvider theme={defaultTheme}>
-      <Root />
-      <StatusBar style="auto" />
-    </UIProvider>
-  </Provider>
-);
+const App = () => {
+  const { dark } = useTheme();
+
+  return (
+    <Provider store={store}>
+      <UIProvider theme={dark ? darkTheme : defaultTheme}>
+        <Root />
+        <StatusBar style="auto" />
+      </UIProvider>
+    </Provider>
+  );
+};
 
 export default App;
