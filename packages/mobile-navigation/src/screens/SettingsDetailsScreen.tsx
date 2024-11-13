@@ -1,5 +1,5 @@
 import { SettingsStackParamList } from '../navigation/Root/types';
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useLayoutEffect, useState, useContext } from 'react';
 import { Alert, StyleSheet } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
@@ -8,6 +8,7 @@ import { AppDialog, AppScreen, SettingsGroup, navBackButton } from '@lib/mobile-
 import { ISettingsOption } from '@lib/types';
 
 import { mobileRequest } from '@lib/mobile-hooks';
+import { ThemeContext } from '@lib/mobile-app';
 
 const SettingsDetailsScreen = () => {
   const navigation = useNavigation();
@@ -33,6 +34,7 @@ const SettingsDetailsScreen = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const [updateOption, setUpdateOption] = useState<any>(undefined);
+  const { setIsDarkTheme } = useContext(ThemeContext);
 
   const handleDismissDialog = () => {
     setVisibleDialog(false);
@@ -51,6 +53,10 @@ const SettingsDetailsScreen = () => {
 
   const handleUpdate = (optionName: string, value: ISettingsOption) => {
     setUpdateOption({ optionName, value });
+    if (value.id === 'isDarkTheme') {
+      setIsDarkTheme && setIsDarkTheme(value.data as boolean);
+    }
+
     if (value.group?.checkSettingsCode || value.checkSettingsCode) {
       setVisibleDialog(true);
     } else {

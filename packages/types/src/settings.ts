@@ -21,6 +21,7 @@ type Settings<T = Record<string, SettingValue>> = {
 interface IBaseSettings {
   autoSync: boolean;
   refLoadType: boolean;
+  isDarkTheme: boolean;
   cleanDocTime: number;
   cleanDraftDocTime: number;
   cleanReadyDocTime: number;

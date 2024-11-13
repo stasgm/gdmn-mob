@@ -225,7 +225,9 @@ const MobileApp = ({ loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
     dispatch(authActions.setErrorMessage(''));
   };
 
-  const [isDarkTheme, setIsDarkTheme] = useState(false);
+  const themeSetting = useSelector((state) => state.settings?.data).isDarkTheme?.data as boolean;
+
+  const [isDarkTheme, setIsDarkTheme] = useState(themeSetting);
   const themeData = { isDarkTheme, setIsDarkTheme };
 
   return (

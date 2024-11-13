@@ -71,6 +71,15 @@ const baseSettings: Settings<IBaseSettings> = {
     visible: false,
     group: mainSettingGroup,
   },
+  isDarkTheme: {
+    id: 'isDarkTheme',
+    description: 'Темная тема',
+    data: false,
+    type: 'boolean',
+    sortOrder: 0,
+    visible: true,
+    group: mainSettingGroup,
+  },
   cleanDraftDocTime: {
     id: 'cleanDraftDocTime',
     description: 'Черновики, дн.',

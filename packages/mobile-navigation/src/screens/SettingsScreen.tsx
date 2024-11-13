@@ -1,14 +1,13 @@
 import { SettingsStackParamList } from '../navigation/Root/types';
-import React, { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Divider, IconButton, Switch } from 'react-native-paper';
+import { Divider, IconButton } from 'react-native-paper';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { baseSettingGroup, settingsActions, useDispatch, useSelector } from '@lib/store';
 import { MenuButton, useActionSheet, SettingsGroup, AppScreen, MediumText, navBackDrawer } from '@lib/mobile-ui';
 import { INamedEntity, ISettingsOption, Settings, SettingValue } from '@lib/types';
-import { ThemeContext } from '@lib/mobile-app';
 
 const SettingsScreen = () => {
   const navigation = useNavigation<StackNavigationProp<SettingsStackParamList, 'Settings'>>();
@@ -17,14 +16,7 @@ const SettingsScreen = () => {
   const data = useSelector((state) => state.settings.data);
   const config = useSelector((state) => state.auth.config);
 
-  const { dark, colors } = useTheme();
-  const { setIsDarkTheme } = useContext(ThemeContext);
-  const [isSwitchOn, setIsSwitchOn] = useState(dark);
-  const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);
-
-  useEffect(() => {
-    setIsDarkTheme && setIsDarkTheme(isSwitchOn);
-  }, [isSwitchOn, setIsDarkTheme]);
+  const { colors } = useTheme();
 
   useEffect(() => {
     dispatch(
@@ -133,15 +125,6 @@ const SettingsScreen = () => {
               </View>
             );
           })}
-        </View>
-        <View>
-          <Divider />
-          <View style={localStyles.container}>
-            <View style={localStyles.details}>
-              <MediumText>Темная тема</MediumText>
-            </View>
-            <Switch value={isSwitchOn} onValueChange={onToggleSwitch} />
-          </View>
         </View>
       </KeyboardAwareScrollView>
     </AppScreen>
