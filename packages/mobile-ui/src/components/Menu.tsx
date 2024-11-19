@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, View, Text, StyleProp, ViewStyle, TouchableHighlight } from 'react-native';
 import { IconButton, MD2Theme, Menu as PaperMenu, useTheme } from 'react-native-paper';
 
 import { IListItem } from '@lib/mobile-types';
+
+import { globalColors as customColors } from '../..';
 
 interface Props {
   options: IListItem[];
@@ -19,6 +21,7 @@ interface Props {
   isActive?: boolean;
   iconName?: any;
   iconSize?: number;
+  iconColor?: string;
   menuIconSize?: number;
 }
 
@@ -38,35 +41,41 @@ const Menu = ({
   iconSize,
   menuIconSize,
   iconName,
+  iconColor,
 }: Props) => {
   const { colors } = useTheme<MD2Theme>();
 
+  const colorText = useMemo(
+    () => (isActive ? customColors.card : disabled ? colors.disabled : colors.primary),
+    [isActive, disabled, colors.disabled, colors.primary],
+  );
+
+  const colorIcon = useMemo(
+    () => (isActive ? customColors.card : disabled ? colors.disabled : iconColor || colors.primary),
+    [isActive, disabled, colors.disabled, colors.primary, iconColor],
+  );
+
   return (
-    <View style={[style, isActive && { backgroundColor: colors.primary }]}>
+    <View
+      style={[
+        style,
+        { borderColor: isActive ? customColors.primary : colors.primary },
+        isActive && { backgroundColor: customColors.primary },
+      ]}
+    >
       <PaperMenu
         visible={visible}
         onDismiss={onDismiss}
         anchor={
           <View style={[localStyles.menu, menuStyle]}>
-            {title && (
-              <Text
-                style={[
-                  {
-                    color: isActive ? colors.background : disabled ? colors.disabled : colors.primary,
-                  },
-                  localStyles.fontSize,
-                ]}
-              >
-                {title}
-              </Text>
-            )}
+            {title && <Text style={[{ color: colorText }, localStyles.fontSize]}>{title}</Text>}
             {iconName && (
               <IconButton
                 icon={iconName}
                 size={iconSize || 20}
                 onPress={onPress}
                 disabled={disabled}
-                iconColor={isActive ? colors.background : disabled ? colors.disabled : colors.primary}
+                iconColor={colorIcon}
                 style={localStyles.icon}
               />
             )}
@@ -76,7 +85,7 @@ const Menu = ({
         {options?.map((option) => (
           <TouchableHighlight
             activeOpacity={0.7}
-            underlayColor="#DDDDDD"
+            underlayColor={customColors.primary}
             key={`${title}${option?.id}`}
             onPress={() => onChange(option)}
             disabled={disabled}

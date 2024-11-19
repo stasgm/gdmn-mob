@@ -19,13 +19,16 @@ export interface IContactItem {
   item: IDepartment | IEmployee;
 }
 
-const NamedRow = ({ item }: { item: string }) => (
-  <View key={item} style={[localStyles.flexColumn, localStyles.height]}>
-    <TouchableOpacity style={localStyles.row}>
-      <Text style={localStyles.buttonLabel}>{item}</Text>
-    </TouchableOpacity>
-  </View>
-);
+const NamedRow = ({ item }: { item: string }) => {
+  const { colors } = useTheme<MD2Theme>();
+  return (
+    <View key={item} style={[localStyles.flexColumn, localStyles.height]}>
+      <TouchableOpacity style={localStyles.row}>
+        <Text style={[{ color: colors.text }, localStyles.buttonLabel]}>{item}</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 const handleAlert = (label: string, text: string) => {
   alertWithSound(label, `Рекомендуется: ${text}.`);
@@ -45,7 +48,7 @@ const Cells = ({
   selectedRow: string;
 }) => {
   const navigation = useNavigation<StackNavigationProp<CellsStackParamList, 'ContactList'>>();
-  const { colors } = useTheme<MD2Theme>();
+  const { dark, colors } = useTheme<MD2Theme>();
 
   const Cell = useCallback(
     ({ item }: { item: ICellData }) => {
@@ -59,7 +62,9 @@ const Cells = ({
         backgroundColor: item.barcode
           ? cellColors.barcode
           : item.disabled
-            ? colors.backdrop
+            ? dark
+              ? colors.disabled
+              : colors.backdrop
             : item.defaultGroup && item.defaultGroup.id
               ? cellColors.default
               : cellColors.free,
@@ -84,7 +89,7 @@ const Cells = ({
         </TouchableOpacity>
       );
     },
-    [colors.backdrop, getScannedObject, lines, navigation],
+    [colors.backdrop, colors.disabled, dark, getScannedObject, lines, navigation],
   );
 
   const CellsColumn = useCallback(
@@ -103,7 +108,7 @@ const Cells = ({
 
   return (
     <View>
-      <Text style={localStyles.cellItem}>Ячейки</Text>
+      <Text style={[{ color: colors.text }, localStyles.cellItem]}>Ячейки</Text>
       <View style={styles.flexDirectionRow}>
         <View style={styles.directionColumn}>
           {cellsByRow.map(([key, _]) => (

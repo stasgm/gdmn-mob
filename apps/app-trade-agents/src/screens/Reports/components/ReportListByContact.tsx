@@ -14,7 +14,7 @@ import { formatValue, getDateString, keyExtractorByIndex, round } from '@lib/mob
 
 import { docSelectors, refSelectors, useSelector } from '@lib/store';
 
-import { Chip } from 'react-native-paper';
+import { Chip, useTheme } from 'react-native-paper';
 
 import { IOrderDocument, IOutlet, IReportItem, IReportListFormParam } from '../../../store/types';
 import { noPackage } from '../../../utils/constants';
@@ -47,10 +47,6 @@ const renderItem: ListRenderItem<IReportItem> = ({ item }) => (
   </View>
 );
 
-const renderSectionHeader = ({ section }: any) => (
-  <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
-);
-
 export const ReportListByContact = () => {
   const {
     filterReportContact,
@@ -65,6 +61,8 @@ export const ReportListByContact = () => {
 
   const outlets = refSelectors.selectByName<IOutlet>('outlet')?.data;
   const orders = docSelectors.selectByDocType<IOrderDocument>('order');
+
+  const { colors } = useTheme();
 
   const filteredOrderList = useMemo(
     () =>
@@ -192,6 +190,12 @@ export const ReportListByContact = () => {
     ({ section }: any) =>
       filterReportGood && sections.length > 0 ? <ReportTotalByDate data={section.data} title={section.title} /> : null,
     [filterReportGood, sections],
+  );
+
+  const renderSectionHeader = ({ section }: any) => (
+    <SubTitle style={[styles.header, styles.sectionTitle, { backgroundColor: colors.surfaceVariant }]}>
+      {section.title}
+    </SubTitle>
   );
 
   return (

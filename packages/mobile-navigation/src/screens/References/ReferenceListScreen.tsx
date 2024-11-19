@@ -3,7 +3,7 @@ import { styles } from './styles';
 import { ReferenceStackParamList } from '../../navigation/Root/types';
 import React, { useCallback, useLayoutEffect, useMemo } from 'react';
 import { FlatList, RefreshControl, Text } from 'react-native';
-import { Divider } from 'react-native-paper';
+import { Divider, MD2Theme, useTheme } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -17,6 +17,7 @@ type ViewScreenProp = StackNavigationProp<ReferenceStackParamList, 'ReferenceVie
 const ReferenceListScreen = () => {
   const { list, loading } = useSelector((state) => state.references);
   const appLoading = useSelector((state) => state.app.loading);
+  const { dark, colors } = useTheme<MD2Theme>();
 
   const refData = useMemo(() => {
     return Object.entries(list)
@@ -61,6 +62,7 @@ const ReferenceListScreen = () => {
   }, [navigation, appLoading, renderRight]);
 
   const renderItem = ({ item }: { item: RefListItem }) => <ReferenceItem item={item} />;
+  const separator = () => <Divider theme={{ dark }} />;
 
   return (
     <AppScreen>
@@ -68,12 +70,14 @@ const ReferenceListScreen = () => {
         data={refData}
         keyExtractor={keyExtractorByIndex}
         renderItem={renderItem}
-        ItemSeparatorComponent={Divider}
+        ItemSeparatorComponent={separator}
         scrollEventThrottle={400}
         refreshControl={<RefreshControl refreshing={loading} />}
         ListEmptyComponent={
           !loading ? (
-            <Text style={styles.emptyList}>{'Список пуст. \nПожалуйста, выполните синхронизацию.'}</Text>
+            <Text style={[{ color: colors.text }, styles.emptyList]}>
+              {'Список пуст. \nПожалуйста, выполните синхронизацию.'}
+            </Text>
           ) : null
         }
       />

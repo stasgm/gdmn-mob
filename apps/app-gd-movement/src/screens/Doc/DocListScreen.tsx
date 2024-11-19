@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
 import { StyleSheet, SectionList, ListRenderItem, SectionListData, View, Text } from 'react-native';
-import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
-import { Searchbar } from 'react-native-paper';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { MD2Theme, Searchbar, useTheme } from 'react-native-paper';
 
 import {
   globalStyles as styles,
@@ -56,7 +56,8 @@ export const DocListScreen = () => {
   const docDispatch = useDocThunkDispatch();
   const dispatch = useDispatch();
 
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
+  const colorsMD3 = useTheme().colors;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -358,8 +359,12 @@ export const DocListScreen = () => {
   };
 
   const renderSectionHeader = useCallback(
-    ({ section }: any) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
-    [],
+    ({ section }: any) => (
+      <SubTitle style={[styles.header, styles.sectionTitle, { backgroundColor: colorsMD3.surfaceVariant }]}>
+        {section.title}
+      </SubTitle>
+    ),
+    [colorsMD3.surfaceVariant],
   );
 
   return (

@@ -7,6 +7,7 @@ import { RouteProp, useNavigation, useRoute, StackActions, useTheme, useIsFocuse
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import {
+  globalColors as customColors,
   SelectableInput,
   Input,
   SaveButton,
@@ -31,7 +32,7 @@ export const PalletEditScreen = () => {
   const id = useRoute<RouteProp<PalletStackParamList, 'PalletEdit'>>().params?.id;
   const navigation = useNavigation<StackNavigationProp<PalletStackParamList, 'PalletEdit'>>();
   const dispatch = useDispatch();
-  const { colors } = useTheme();
+  const { dark, colors } = useTheme();
 
   const formParams = useSelector((state) => state.app.formParams as IPalletFormParam);
 
@@ -204,9 +205,9 @@ export const PalletEditScreen = () => {
     () => [
       localStyles.switchContainer,
       localStyles.border,
-      { borderColor: colors.primary, backgroundColor: colors.card },
+      { borderColor: customColors.primary, backgroundColor: colors.card },
     ],
-    [colors.card, colors.primary],
+    [colors.card],
   );
 
   const isFocused = useIsFocused();
@@ -218,7 +219,7 @@ export const PalletEditScreen = () => {
     <AppScreen>
       <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} keyboardShouldPersistTaps={'handled'}>
         <SubTitle>{statusName}</SubTitle>
-        <Divider />
+        <Divider theme={{ dark }} />
         <ScrollView>
           <View style={viewStyle}>
             <RadioGroup

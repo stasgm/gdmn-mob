@@ -28,6 +28,8 @@ import { deleteSelectedItems, getDateString, getDelList, keyExtractor, useSendDo
 
 import { IDelList } from '@lib/mobile-types';
 
+import { useTheme } from 'react-native-paper';
+
 import { ILaboratoryDocument } from '../../store/types';
 import { LaboratoryStackParamList } from '../../navigation/Root/types';
 
@@ -40,6 +42,7 @@ export type SectionDataProps = SectionListData<IListItemProps, LaboratoryListSec
 export const LaboratoryListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<LaboratoryStackParamList, 'LaboratoryList'>>();
   const docDispatch = useDocThunkDispatch();
+  const { colors } = useTheme();
 
   const list = (
     useSelector((state) => state.documents.list)?.filter(
@@ -179,7 +182,9 @@ export const LaboratoryListScreen = () => {
   );
 
   const renderSectionHeader = ({ section }: any) => (
-    <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
+    <SubTitle style={[styles.header, styles.sectionTitle, { backgroundColor: colors.surfaceVariant }]}>
+      {section.title}
+    </SubTitle>
   );
 
   const isFocused = useIsFocused();

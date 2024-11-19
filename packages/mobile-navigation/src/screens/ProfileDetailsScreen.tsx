@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect } from 'react';
 import { Alert, View, StyleSheet } from 'react-native';
-import { Divider } from 'react-native-paper';
+import { Divider, useTheme } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 
 import { useSelector, settingsActions } from '@lib/store';
@@ -13,6 +13,7 @@ const ProfileDetailsScreen = () => {
   const settingsDispatch = useSettingsThunkDispatch();
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
+  const { dark } = useTheme();
 
   const handleClearSettings = useCallback(() => {
     Alert.alert('Вы уверены, что хотите удалить настройки пользователя?', '', [
@@ -60,7 +61,7 @@ const ProfileDetailsScreen = () => {
           <View style={styles.descriptionContainer}>
             {visibleList.map(([key, item]) => (
               <View key={key}>
-                <Divider />
+                <Divider theme={{ dark }} />
                 <DescriptionItem description={item.description} data={item.data} />
               </View>
             ))}

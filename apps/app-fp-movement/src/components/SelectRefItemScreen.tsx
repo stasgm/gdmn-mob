@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useLayoutEffect, useMemo } from 'react';
 import { View, FlatList, Alert, TouchableOpacity, Text } from 'react-native';
-import { Searchbar, Divider, Checkbox } from 'react-native-paper';
-import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
+import { Searchbar, Divider, Checkbox, useTheme, MD2Theme } from 'react-native-paper';
+import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
 
 import { appActions, refSelectors } from '@lib/store';
 import {
@@ -26,7 +26,7 @@ import { IAddressStoreEntity } from '../store/app/types';
 const SelectRefItemScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { colors } = useTheme();
+  const { dark, colors } = useTheme();
 
   const {
     screenName,
@@ -188,8 +188,8 @@ const SelectRefItemScreen = () => {
 
   return (
     <AppScreen>
-      <SubTitle style={styles.title}>{title}</SubTitle>
-      <Divider />
+      <SubTitle style={[styles.title, { backgroundColor: colors.surfaceVariant }]}>{title}</SubTitle>
+      <Divider theme={{ dark }} />
       {filterVisible && (
         <>
           <View style={styles.flexDirectionRow}>
@@ -230,7 +230,7 @@ const LineItem = React.memo(
     descrFieldName?: string;
     disabled?: boolean;
   }) => {
-    const { colors } = useTheme();
+    const { colors } = useTheme<MD2Theme>();
     const viewStyle = useMemo(() => [styles.item, { backgroundColor: colors.background }], [colors.background]);
     const textStyle = useMemo(() => [styles.name, { color: colors.text }], [colors.text]);
 

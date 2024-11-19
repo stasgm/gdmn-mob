@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { Alert, Switch, View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
-import { Divider } from 'react-native-paper';
+import { Divider, MD2Theme, useTheme } from 'react-native-paper';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
@@ -27,6 +27,8 @@ export const MovementEditScreen = () => {
   const id = useRoute<RouteProp<MovementStackParamList, 'MovementEdit'>>().params?.id;
   const navigation = useNavigation<StackNavigationProp<MovementStackParamList, 'MovementEdit'>>();
   const dispatch = useDispatch();
+
+  const { dark, colors } = useTheme<MD2Theme>();
 
   const {
     fromPlace: docFromPlace,
@@ -217,12 +219,12 @@ export const MovementEditScreen = () => {
   return (
     <AppInputScreen>
       <SubTitle>{statusName}</SubTitle>
-      <Divider />
+      <Divider theme={{ dark }} />
       <ScrollView>
         {['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && (
           <>
             <View style={[styles.directionRow, localStyles.switchContainer]}>
-              <Text>Черновик:</Text>
+              <Text style={{ color: colors.text }}>Черновик:</Text>
               <Switch
                 value={docStatus === 'DRAFT' || !docStatus}
                 onValueChange={() => {
@@ -263,6 +265,9 @@ export const MovementEditScreen = () => {
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyOnDate}
+          themeVariant={dark ? 'dark' : 'light'}
+          accentColor={colors.accent}
+          textColor={colors.text}
         />
       )}
     </AppInputScreen>

@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, View, StyleSheet, ScrollView, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Divider } from 'react-native-paper';
+import { Divider, MD2Theme, useTheme } from 'react-native-paper';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { RouteProp, useNavigation, useRoute, StackActions, useTheme, useIsFocused } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, StackActions, useIsFocused } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import {
+  globalColors as customColors,
   SelectableInput,
   Input,
   SaveButton,
@@ -32,7 +33,7 @@ export const RevisionEditScreen = () => {
   const id = useRoute<RouteProp<RevisionStackParamList, 'RevisionEdit'>>().params?.id;
   const navigation = useNavigation<StackNavigationProp<RevisionStackParamList, 'RevisionEdit'>>();
   const dispatch = useDispatch();
-  const { colors } = useTheme();
+  const { dark, colors } = useTheme<MD2Theme>();
 
   const formParams = useSelector((state) => state.app.formParams as IRevisionFormParam);
 
@@ -241,9 +242,9 @@ export const RevisionEditScreen = () => {
     () => [
       localStyles.switchContainer,
       localStyles.border,
-      { borderColor: colors.primary, backgroundColor: colors.card },
+      { borderColor: customColors.primary, backgroundColor: colors.surface },
     ],
-    [colors.card, colors.primary],
+    [colors.surface],
   );
 
   const isFocused = useIsFocused();
@@ -255,7 +256,7 @@ export const RevisionEditScreen = () => {
     <AppScreen>
       <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} keyboardShouldPersistTaps={'handled'}>
         <SubTitle>{statusName}</SubTitle>
-        <Divider />
+        <Divider theme={{ dark }} />
         <ScrollView>
           <View style={viewStyle}>
             <RadioGroup
@@ -302,6 +303,9 @@ export const RevisionEditScreen = () => {
             mode="date"
             display={Platform.OS === 'ios' ? 'inline' : 'default'}
             onChange={handleApplyDate}
+            themeVariant={dark ? 'dark' : 'light'}
+            accentColor={colors.accent}
+            textColor={colors.text}
           />
         )}
       </KeyboardAwareScrollView>

@@ -6,11 +6,14 @@ import { globalStyles as styles, MediumText } from '@lib/mobile-ui';
 
 import { getDateString } from '@lib/mobile-hooks';
 
+import { MD2Theme, useTheme } from 'react-native-paper';
+
 import { IRouteDocument } from '../../../store/types';
 import { getStatusColor } from '../../../utils/constants';
 
 const RouteListItem = ({ item, onPress }: { item: IRouteDocument; onPress: () => void }) => {
   const todayStr = getDateString(item.documentDate) === getDateString(new Date()) ? ' (сегодня)' : '';
+  const { colors } = useTheme<MD2Theme>();
 
   return (
     <TouchableOpacity onPress={onPress}>
@@ -20,10 +23,12 @@ const RouteListItem = ({ item, onPress }: { item: IRouteDocument; onPress: () =>
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <Text style={styles.name}>{`${getDateString(item.documentDate)}${todayStr}`}</Text>
+            <Text
+              style={[{ color: colors.text }, styles.name]}
+            >{`${getDateString(item.documentDate)}${todayStr}`}</Text>
             <View style={styles.directionRow}>
               <Text style={styles.field}>{item.lines.length}</Text>
-              <MaterialCommunityIcons name="shopping-outline" size={18} />
+              <MaterialCommunityIcons name="shopping-outline" size={18} color={colors.onSurface} />
             </View>
           </View>
           <View style={styles.directionRow}>

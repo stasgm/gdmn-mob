@@ -56,19 +56,21 @@ const ApplListItem = ({
     >
       <View style={[localStyles.label, { backgroundColor: getStatusColor(status || 'DRAFT') }]} />
       <View style={localStyles.info}>
-        <Text style={[styles.textBold, styles.textDescription]}>{dept}</Text>
-        {/* <Divider /> */}
-        <Text style={[styles.name]}>{title}</Text>
-        <Text style={[styles.textBold, styles.field]}>{applStatus}</Text>
+        <Text style={[{ color: colors.text }, styles.textBold, styles.textDescription]}>{dept}</Text>
+        {/* <Divider theme={{ dark }} /> */}
+        <Text style={[{ color: colors.text }, styles.name]}>{title}</Text>
+        <Text style={[{ color: colors.text }, styles.textBold, styles.field]}>{applStatus}</Text>
         <View style={styles.rowBottom}>
-          <Text style={[styles.number, styles.field]}>{subtitle}</Text>
+          <Text style={[{ color: colors.text }, styles.number, styles.field]}>{subtitle}</Text>
           <View style={[styles.rowCenter]}>
-            <Text style={[styles.number, styles.field]}>{lineCount}</Text>
+            <Text style={[{ color: colors.text }, styles.number, styles.field]}>{lineCount}</Text>
             <MaterialCommunityIcons name="information-outline" size={15} color={colors.text} style={styles.field} />
           </View>
         </View>
-        <Text style={[styles.number, styles.field]}>{description}</Text>
-        {errorMessage && <Text style={[styles.number, localStyles.error]}>{errorMessage || ''}</Text>}
+        <Text style={[{ color: colors.text }, styles.number, styles.field]}>{description}</Text>
+        {errorMessage && (
+          <Text style={[{ color: colors.text }, styles.number, localStyles.error]}>{errorMessage || ''}</Text>
+        )}
       </View>
     </TouchableOpacity>
   );

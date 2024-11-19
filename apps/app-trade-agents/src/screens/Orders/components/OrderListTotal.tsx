@@ -22,7 +22,7 @@ export interface IItem {
 }
 
 const OrderListTotal = ({ sectionOrders }: IItem) => {
-  const { colors } = useTheme();
+  const { dark } = useTheme();
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;
   const firstLevelGroups = groups?.filter((item) => !item.parent?.id);
@@ -64,20 +64,20 @@ const OrderListTotal = ({ sectionOrders }: IItem) => {
 
   return (
     <View>
-      <Divider style={{ backgroundColor: colors.primary }} />
+      <Divider theme={{ dark }} />
       {totalListByOrders?.length ? (
         <>
           <View style={[localStyles.margins, styles.rowCenter]}>
             <LargeText style={styles.textTotal}>Итого вес, кг:</LargeText>
           </View>
-          <Divider style={{ backgroundColor: colors.primary }} />
+          <Divider theme={{ dark }} />
           <FlatList
             data={totalListByOrders}
             keyExtractor={keyExtractorByIndex}
             renderItem={renderTotalItem}
             style={localStyles.groupMargin}
           />
-          <Divider style={{ backgroundColor: colors.primary }} />
+          <Divider theme={{ dark }} />
         </>
       ) : null}
       <View style={[styles.directionRow, localStyles.margins]}>
@@ -86,7 +86,7 @@ const OrderListTotal = ({ sectionOrders }: IItem) => {
           {formatValue({ type: 'number' }, round(total?.quantity || 0, 3))}
         </MediumText>
       </View>
-      <Divider style={{ backgroundColor: colors.primary }} />
+      <Divider theme={{ dark }} />
       <View style={[styles.directionColumn, localStyles.margins]}>
         <View style={styles.itemNoMargin}>
           <LargeText style={styles.textTotal}>Принятых заявок: </LargeText>

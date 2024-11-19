@@ -2,6 +2,8 @@ import React, { ReactNode } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
+import { useTheme } from 'react-native-paper';
+
 import styles from '../styles/global';
 
 interface IProps {
@@ -13,6 +15,7 @@ interface IProps {
 }
 
 export const ListItemLine = ({ checked = false, readonly = false, onPress, onLongPress, children }: IProps) => {
+  const { colors } = useTheme();
   return (
     <TouchableOpacity onPress={onPress} onLongPress={onLongPress} disabled={readonly}>
       <View style={styles.item}>
@@ -22,7 +25,7 @@ export const ListItemLine = ({ checked = false, readonly = false, onPress, onLon
           </View>
           {checked ? (
             <View style={styles.checkedIcon}>
-              <MaterialCommunityIcons name="check" size={11} color={'#FFF'} />
+              <MaterialCommunityIcons name="check" size={11} color={colors.onBackground} />
             </View>
           ) : null}
         </View>

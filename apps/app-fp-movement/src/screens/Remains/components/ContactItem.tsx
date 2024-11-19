@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, View, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles, LargeText } from '@lib/mobile-ui';
 
@@ -17,6 +17,7 @@ export interface IContactItem {
 
 const ContactItem = ({ item }: IContactItem) => {
   const navigation = useNavigation<StackNavigationProp<RemainsStackParamList, 'ContactList'>>();
+  const { colors } = useTheme();
 
   return (
     <TouchableOpacity
@@ -30,7 +31,7 @@ const ContactItem = ({ item }: IContactItem) => {
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <LargeText style={styles.textBold}>{item?.name}</LargeText>
+            <LargeText style={[styles.textBold, { color: colors.text }]}>{item?.name}</LargeText>
           </View>
         </View>
       </View>

@@ -12,7 +12,7 @@ interface IProps {
 }
 
 export const InfoDialog = ({ visible, onOk, title }: IProps) => {
-  const { colors } = useTheme<MD2Theme>();
+  const { dark, colors } = useTheme<MD2Theme>();
 
   return (
     <Dialog visible={visible} onDismiss={onOk}>
@@ -31,7 +31,7 @@ export const InfoDialog = ({ visible, onOk, title }: IProps) => {
           <MediumText style={localStyles.text}>рекомендуемая</MediumText>
         </View>
         <View style={localStyles.cell}>
-          <View style={[localStyles.buttons, { backgroundColor: colors.backdrop }]} />
+          <View style={[localStyles.buttons, { backgroundColor: dark ? colors.disabled : colors.backdrop }]} />
           <MediumText style={localStyles.text}>недоступна</MediumText>
         </View>
         <View style={localStyles.cell}>

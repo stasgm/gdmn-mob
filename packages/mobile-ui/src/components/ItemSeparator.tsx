@@ -1,10 +1,9 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { MD2Theme, useTheme } from 'react-native-paper';
+
+import { globalColors as colors } from '../..';
 
 const ItemSeparator = () => {
-  const { colors } = useTheme<MD2Theme>();
-
   return <View style={[styles.separator, { backgroundColor: colors.primary }]} />;
 };
 

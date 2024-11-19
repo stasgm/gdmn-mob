@@ -23,7 +23,7 @@ const RoundButton = ({ onPress, style, icon, disabled }: IProps) => {
       style={[styles.rectangularButton, style]}
       disabled={disabled}
     >
-      <View style={[styles.roundButton, disabled && { backgroundColor: colors.disabled }]}>
+      <View style={[styles.roundButton, disabled && { backgroundColor: colors.accent }]}>
         <Icon name={icon} size={30} color={colors.background} />
       </View>
     </TouchableOpacity>

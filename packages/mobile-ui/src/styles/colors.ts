@@ -1,5 +1,6 @@
 export default {
   primary: '#18435A',
+  surface: '#486987',
   accent: '#759bba',
   text: '#13293d',
   placeholder: '#2a628f',
@@ -9,7 +10,7 @@ export default {
   card: 'rgb(255, 255, 255)',
   border: 'rgb(216, 216, 216)',
   background: 'rgb(242, 242, 242)',
-  blueLight: '#d5dce3',
+  blueLight: '#c2e7ff',
   lavenderLight: '#dbd5da',
   lavenderDark: '#854875',
   backgroundDark: 'rgb( 204, 204, 204)',

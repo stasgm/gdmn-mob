@@ -28,7 +28,7 @@ const ReferenceListItem = ({ item }: { item: RefListItem }) => {
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <Text style={styles.name}>{item.description || item.name || item.refName}</Text>
+            <Text style={[{ color: colors.text }, styles.name]}>{item.description || item.name || item.refName}</Text>
           </View>
           <Text style={[styles.number, styles.field, { color: colors.text }]}>Размер: {item.data.length}</Text>
         </View>

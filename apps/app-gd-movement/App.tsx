@@ -22,13 +22,14 @@ import {
 import {
   AppScreen,
   globalStyles as styles,
-  Theme as defaultTheme,
+  theme as defaultTheme,
+  themeDark as darkTheme,
   Provider as UIProvider,
   AppFallback,
   PrimeButton,
 } from '@lib/mobile-ui';
 
-import { ActivityIndicator, Caption, Text } from 'react-native-paper';
+import { ActivityIndicator, Caption, Text, useTheme } from 'react-native-paper';
 
 import { IDocument, IReferences } from '@lib/types';
 
@@ -264,13 +265,16 @@ const Root = () => {
   );
 };
 
-const App = () => (
-  <Provider store={store}>
-    <UIProvider theme={defaultTheme}>
-      <Root />
-      <StatusBar style="auto" />
-    </UIProvider>
-  </Provider>
-);
+const App = () => {
+  const { dark } = useTheme();
+  return (
+    <Provider store={store}>
+      <UIProvider theme={dark ? darkTheme : defaultTheme}>
+        <Root />
+        <StatusBar style="auto" />
+      </UIProvider>
+    </Provider>
+  );
+};
 
 export default App;

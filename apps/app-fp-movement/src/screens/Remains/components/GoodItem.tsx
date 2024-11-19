@@ -5,6 +5,8 @@ import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles, LargeText, MediumText } from '@lib/mobile-ui';
 
+import { useTheme } from 'react-native-paper';
+
 import { RemainsParamList } from '../../../navigation/Root/types';
 import { IRemGood } from '../../../store/app/types';
 
@@ -14,6 +16,7 @@ interface IProps {
 
 const GoodItem = ({ item }: IProps) => {
   const navigation = useNavigation<StackNavigationProp<RemainsParamList, 'GoodList'>>();
+  const { colors } = useTheme();
 
   return (
     <TouchableOpacity
@@ -26,10 +29,10 @@ const GoodItem = ({ item }: IProps) => {
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          <LargeText style={styles.textBold}>{item?.good.name}</LargeText>
+          <LargeText style={[styles.textBold, { color: colors.inversePrimary }]}>{item?.good.name}</LargeText>
           <View style={styles.directionRow}>
             <View style={styles.flexDirectionRow}>
-              <MaterialCommunityIcons name="shopping-outline" size={18} />
+              <MaterialCommunityIcons name="shopping-outline" size={18} color={colors.onSurface} />
 
               <MediumText>{item.remains} кг</MediumText>
             </View>

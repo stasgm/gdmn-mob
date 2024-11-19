@@ -12,11 +12,11 @@ import {
 } from '@lib/mobile-ui';
 import { refSelectors, useSelector } from '@lib/store';
 import { IDepartment, IReference } from '@lib/types';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { SectionList, SectionListData, View } from 'react-native';
-import { Searchbar } from 'react-native-paper';
+import { Searchbar, useTheme } from 'react-native-paper';
 
 import { RemainsStackParamList } from '../../navigation/Root/types';
 import { IEmployee, IRemains } from '../../store/app/types';
@@ -121,8 +121,12 @@ const ContactListScreen = () => {
   const renderItem = ({ item }: { item: IDepartment | IEmployee }) => <ContactItem item={item} />;
 
   const renderSectionHeader = useCallback(
-    ({ section }: any) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
-    [],
+    ({ section }: any) => (
+      <SubTitle style={[styles.header, styles.sectionTitle, { backgroundColor: colors.surfaceVariant }]}>
+        {section.title}
+      </SubTitle>
+    ),
+    [colors.surfaceVariant],
   );
 
   return (

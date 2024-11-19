@@ -7,6 +7,7 @@ import { Divider } from 'react-native-paper';
 
 import { docSelectors, documentActions, refSelectors, useSelector, appActions, useDispatch } from '@lib/store';
 import {
+  globalColors as customColors,
   AppInputScreen,
   Input,
   SaveButton,
@@ -38,7 +39,7 @@ const ShipmentEditScreen = () => {
 
   const dispatch = useDispatch();
 
-  const { colors } = useTheme();
+  const { dark, colors } = useTheme();
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
@@ -200,15 +201,15 @@ const ShipmentEditScreen = () => {
     () => [
       localStyles.switchContainer,
       localStyles.border,
-      { borderColor: colors.primary, backgroundColor: colors.card },
+      { borderColor: customColors.primary, backgroundColor: colors.card },
     ],
-    [colors.card, colors.primary],
+    [colors.card],
   );
 
   return (
     <AppInputScreen>
       <SubTitle>{statusName}</SubTitle>
-      <Divider />
+      <Divider theme={{ dark }} />
       <ScrollView>
         <View style={viewStyle}>
           <RadioGroup

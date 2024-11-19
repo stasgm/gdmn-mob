@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, TouchableHighlight, StyleProp, ViewStyle } from
 import { MD2Theme, useTheme } from 'react-native-paper';
 import { IListItem } from '@lib/mobile-types';
 
+import customColors from '../styles/colors';
+
 type Props = {
   options: IListItem[];
   activeButtonId?: string;
@@ -11,6 +13,8 @@ type Props = {
 };
 
 const RadioGroup = ({ options, onChange, activeButtonId, directionRow }: Props) => {
+  const { colors } = useTheme<MD2Theme>();
+
   const onPress = useCallback(
     (option: IListItem) => {
       if (option.id === activeButtonId) {
@@ -39,12 +43,12 @@ const RadioGroup = ({ options, onChange, activeButtonId, directionRow }: Props) 
             activeOpacity={0.4}
             key={option.id}
             style={localStyles.item}
-            underlayColor="#DDDDDD"
+            underlayColor={colors.backdrop}
             onPress={() => onPress(option)}
           >
             <>
               <Circle active={activeButtonId === option.id} />
-              <Text style={[localStyles.radioText, textStyle]}>{option.value}</Text>
+              <Text style={[{ color: colors.primary }, localStyles.radioText, textStyle]}>{option.value}</Text>
             </>
           </TouchableHighlight>
         );
@@ -57,15 +61,11 @@ interface ICircleProps {
   active?: boolean;
 }
 
-const Circle = ({ active }: ICircleProps) => {
-  const { colors } = useTheme<MD2Theme>();
-
-  return (
-    <View style={[localStyles.radioCircle, { borderColor: colors.primary }]}>
-      {active && <View style={[localStyles.selectedRb, { backgroundColor: colors.primary }]} />}
-    </View>
-  );
-};
+const Circle = ({ active }: ICircleProps) => (
+  <View style={[localStyles.radioCircle, { borderColor: customColors.primary }]}>
+    {active && <View style={[localStyles.selectedRb, { backgroundColor: customColors.primary }]} />}
+  </View>
+);
 
 const localStyles = StyleSheet.create({
   item: {
@@ -89,7 +89,6 @@ const localStyles = StyleSheet.create({
     width: 20,
   },
   radioText: {
-    color: '#000',
     flex: 1,
     fontSize: 16,
     marginRight: 20,

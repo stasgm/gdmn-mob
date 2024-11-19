@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { View, TextInput, Keyboard, TouchableHighlight, StyleProp, ViewStyle } from 'react-native';
-import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Audio } from 'expo-av';
 
@@ -8,6 +8,7 @@ import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDi
 import {
   MenuButton,
   useActionSheet,
+  globalColors as customColors,
   globalStyles as styles,
   InfoBlock,
   ItemSeparator,
@@ -37,6 +38,8 @@ import {
 import { ScreenState } from '@lib/types';
 
 import { FlashList } from '@shopify/flash-list';
+
+import { MD2Theme, useTheme } from 'react-native-paper';
 
 import { barcodeSettings, IFreeShipmentDocument, IFreeShipmentLine, IShipmentDocument } from '../../store/types';
 import { FreeShipmentStackParamList } from '../../navigation/Root/types';
@@ -75,7 +78,7 @@ export const FreeShipmentViewScreen = () => {
   const doc = docSelectors.selectByDocId<IFreeShipmentDocument>(id);
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
 
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)) || [], [doc?.lines]);
 
@@ -471,24 +474,24 @@ export const FreeShipmentViewScreen = () => {
           return (
             <TouchableHighlight
               activeOpacity={0.7}
-              underlayColor="#DDDDDD"
+              underlayColor={colors.backdrop}
               key={e.id}
               style={[
                 styles.btnTab,
                 i === 0 && styles.firstBtnTab,
                 i === lineTypes.length - 1 && styles.lastBtnTab,
-                e.id === lineType && { backgroundColor: colors.primary },
-                { borderColor: colors.primary },
+                e.id === lineType && { backgroundColor: customColors.primary },
+                { borderColor: customColors.primary },
               ]}
               onPress={() => setLineType(e.id)}
             >
-              <LargeText style={{ color: e.id === lineType ? colors.background : colors.text }}>{e.value}</LargeText>
+              <LargeText style={{ color: e.id === lineType ? customColors.card : colors.text }}>{e.value}</LargeText>
             </TouchableHighlight>
           );
         })}
       </View>
     ),
-    [colors.background, colors.primary, colors.text, lineType],
+    [colors.backdrop, colors.text, lineType],
   );
 
   const renderItem = useCallback(

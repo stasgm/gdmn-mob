@@ -18,7 +18,7 @@ export interface IItem {
 }
 
 const DocTotal = ({ lineCount, sum, quantity, scan = false, sumWNds = false }: IItem) => {
-  const { colors } = useTheme();
+  const { dark, colors } = useTheme();
 
   return (
     <View>
@@ -33,7 +33,7 @@ const DocTotal = ({ lineCount, sum, quantity, scan = false, sumWNds = false }: I
           </View>
         </View>
       ) : null}
-      <Divider style={{ backgroundColor: colors.primary }} />
+      <Divider theme={{ dark }} />
       <View style={styles.itemNoMargin}>
         <View style={styles.details}>
           <View style={styles.directionRow}>

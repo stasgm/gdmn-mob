@@ -5,6 +5,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView, TouchableOpacity } from '@gorhom/bottom-sheet';
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 
+import { useTheme } from 'react-native-paper';
+
 import { ItemSeparator } from './ItemSeparator';
 
 interface IProps {
@@ -17,16 +19,18 @@ interface IProps {
 }
 
 const BottomSheet = ({ sheetRef, children, title, snapPoints = ['40%', '90%'], onDismiss, onApply }: IProps) => {
+  const { colors } = useTheme();
+
   return (
     <BottomSheetModal ref={sheetRef} snapPoints={snapPoints} backdropComponent={BottomSheetBackdrop}>
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <TouchableOpacity onPress={onDismiss}>
-            <MaterialCommunityIcons name={'close'} color={'#000'} size={24} />
+            <MaterialCommunityIcons name={'close'} color={colors.onSurface} size={24} />
           </TouchableOpacity>
           <Text style={styles.text}>{title}</Text>
           <TouchableOpacity onPress={onApply}>
-            <MaterialCommunityIcons name={'check'} color={'#000'} size={24} />
+            <MaterialCommunityIcons name={'check'} color={colors.onSurface} size={24} />
           </TouchableOpacity>
         </View>
         <ItemSeparator />

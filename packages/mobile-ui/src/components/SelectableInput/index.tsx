@@ -2,6 +2,8 @@ import React from 'react';
 import { StyleProp, TextStyle, View } from 'react-native';
 import { IconButton, MD2Theme, TextInput, useTheme } from 'react-native-paper';
 
+import customColors from '../../styles/colors';
+
 import buttonStyles from '../../styles/buttonRippleStyle';
 
 import styles from './styles';
@@ -40,6 +42,10 @@ const SelectableInput = ({ value, onPress, label, placeholder, editable = false,
           style={style ? [styles.input, style] : styles.input}
           placeholderTextColor={colors.text}
           placeholder={placeholder}
+          underlineColor={customColors.primary}
+          activeUnderlineColor={colors.primary}
+          outlineColor={customColors.primary}
+          activeOutlineColor={colors.primary}
           editable={editable}
           disabled={disabled}
           children={undefined}

@@ -31,7 +31,7 @@ const GroupItem = ({
   selected?: string;
 }) => {
   const { colors } = useTheme<MD2Theme>();
-  const colorStyle = { color: selected === item ? 'white' : colors.text };
+  const colorStyle = { color: selected === item ? 'white' : colors.background };
   const backColorStyle = { backgroundColor: selected === item ? colorSelected : colorBack };
   return (
     <TouchableOpacity
@@ -54,10 +54,11 @@ export const Group = ({
   heightBtn = 50,
   widthBtn = 50,
 }: IGroup) => {
+  const { colors } = useTheme<MD2Theme>();
   return (
     <View style={styles.flexDirectionRow}>
       <View style={localStyles.titleView}>
-        <Text style={localStyles.title}>{title}</Text>
+        <Text style={[{ color: colors.text }, localStyles.title]}>{title}</Text>
       </View>
       <View style={[localStyles.flexRowWrap, localStyles.flex]}>
         {values.map((item) => (

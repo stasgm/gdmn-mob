@@ -11,11 +11,11 @@ export interface IItem {
 }
 
 const ViewTotal = ({ total }: IItem) => {
-  const { colors } = useTheme();
+  const { dark } = useTheme();
 
   return (
     <View>
-      <Divider style={{ backgroundColor: colors.primary }} />
+      <Divider theme={{ dark }} />
       <View style={[localStyles.total, styles.directionRow]}>
         <View style={localStyles.groupWidth}>
           <MediumText style={styles.textTotal}>Итого: </MediumText>

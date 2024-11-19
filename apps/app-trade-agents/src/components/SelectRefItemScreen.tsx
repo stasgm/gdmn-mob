@@ -37,7 +37,7 @@ const SelectRefItemScreen = () => {
     refFieldName = 'name',
     descrFieldName,
   } = useRoute<RouteProp<RefParamList, 'SelectRefItem'>>().params;
-  const { colors } = useTheme();
+  const { dark, colors } = useTheme();
 
   const refObj = refSelectors.selectByName<IReferenceData>(refName);
 
@@ -182,7 +182,7 @@ const SelectRefItemScreen = () => {
   return (
     <AppScreen>
       <SubTitle style={styles.title}>{title}</SubTitle>
-      <Divider />
+      <Divider theme={{ dark }} />
       {filterVisible && (
         <>
           <View style={styles.flexDirectionRow}>

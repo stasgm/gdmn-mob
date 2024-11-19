@@ -27,7 +27,7 @@ const keyExtractor = (item: IReferenceData) => item.id;
 export const SelectRefItemScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { colors } = useTheme();
+  const { dark, colors } = useTheme();
 
   const {
     refName,
@@ -166,7 +166,7 @@ export const SelectRefItemScreen = () => {
   return (
     <AppScreen>
       <SubTitle style={styles.title}>{title}</SubTitle>
-      <Divider />
+      <Divider theme={{ dark }} />
       {filterVisible && (
         <>
           <View style={styles.flexDirectionRow}>

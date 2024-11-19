@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Divider } from 'react-native-paper';
+import { useTheme } from '@react-navigation/native';
 
 import { INamedEntity, ISettingsOption } from '@lib/types';
 
@@ -15,6 +16,7 @@ type Props = {
 };
 
 const SettingsGroup = ({ groupDescription, list, onValueChange, onCheckSettings }: Props) => {
+  const { dark } = useTheme();
   //Массив уникальных подгрупп группы настройки
   const parents = useMemo(
     () =>
@@ -40,7 +42,7 @@ const SettingsGroup = ({ groupDescription, list, onValueChange, onCheckSettings 
           .map((item) => {
             return (
               <View key={item.id}>
-                <Divider />
+                <Divider theme={{ dark }} />
                 <SettingsItem
                   label={item.description || item.id}
                   value={item.data}
@@ -51,7 +53,7 @@ const SettingsGroup = ({ groupDescription, list, onValueChange, onCheckSettings 
               </View>
             );
           })}
-        {parents.length > 0 && <Divider />}
+        {parents.length > 0 && <Divider theme={{ dark }} />}
         {parents.map((group) => {
           return (
             <View key={group.id}>
@@ -61,7 +63,7 @@ const SettingsGroup = ({ groupDescription, list, onValueChange, onCheckSettings 
                 .sort((itema, itemb) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0))
                 .map((s, xid) => (
                   <View key={s.id}>
-                    {xid > 0 && <Divider />}
+                    {xid > 0 && <Divider theme={{ dark }} />}
                     <SettingsItem
                       label={s.description || s.id}
                       value={s.data}

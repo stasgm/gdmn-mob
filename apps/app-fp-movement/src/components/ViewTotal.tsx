@@ -14,7 +14,7 @@ export interface IItem {
 }
 
 const ViewTotal = ({ weight, quantPack, scan = false }: IItem) => {
-  const { colors } = useTheme();
+  const { dark } = useTheme();
 
   return (
     <View>
@@ -23,7 +23,7 @@ const ViewTotal = ({ weight, quantPack, scan = false }: IItem) => {
           <MediumText style={styles.textTotal}>Итого:</MediumText>
         </View>
       ) : null}
-      <Divider style={{ backgroundColor: colors.primary }} />
+      <Divider theme={{ dark }} />
       <View style={styles.itemNoMargin}>
         <View style={styles.details}>
           <View style={styles.directionRow}>

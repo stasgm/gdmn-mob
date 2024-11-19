@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { ScrollView, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Divider } from 'react-native-paper';
+import { Divider, MD2Theme, useTheme } from 'react-native-paper';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
@@ -29,6 +29,8 @@ export const MoveEditScreen = () => {
   const screenName = navState.routes.some((route) => route.name === 'Dashboard')
     ? 'MoveEditScreenDashboard'
     : 'MoveEditScreen';
+
+  const { dark, colors } = useTheme<MD2Theme>();
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
@@ -390,7 +392,7 @@ export const MoveEditScreen = () => {
     <AppScreen>
       <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }}>
         <SubTitle>{statusName}</SubTitle>
-        <Divider />
+        <Divider theme={{ dark }} />
         <ScrollView>
           <Input
             label="Номер"
@@ -447,6 +449,9 @@ export const MoveEditScreen = () => {
             mode="date"
             display={Platform.OS === 'ios' ? 'inline' : 'default'}
             onChange={handleApplyDate}
+            themeVariant={dark ? 'dark' : 'light'}
+            accentColor={colors.accent}
+            textColor={colors.text}
           />
         )}
       </KeyboardAwareScrollView>

@@ -1,11 +1,10 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { DrawerContentComponentProps, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
-import { useTheme } from '@react-navigation/native';
-import { Avatar, Caption, Divider, Drawer, Title } from 'react-native-paper';
+import { Avatar, Caption, Divider, Drawer, MD2Theme, Title, useTheme } from 'react-native-paper';
 import Animated from 'react-native-reanimated';
 import { useSelector } from '@lib/store';
-import { PrimeButton } from '@lib/mobile-ui';
+import { PrimeButton, globalColors as customColors } from '@lib/mobile-ui';
 import { getDateString } from '@lib/mobile-hooks';
 
 interface ICutsomProps {
@@ -16,7 +15,7 @@ interface ICutsomProps {
 type Props = DrawerContentComponentProps & ICutsomProps;
 
 const SyncBtn = ({ onSync }: { onSync?: () => void }) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
   const { syncDate } = useSelector((state) => state.app);
   const captionStyle = { color: colors.text, fontSize: 16 };
 
@@ -35,7 +34,7 @@ const SyncBtn = ({ onSync }: { onSync?: () => void }) => {
 };
 
 export const DrawerContent = ({ onSync, ...props }: Props) => {
-  const { colors } = useTheme();
+  const { dark, colors } = useTheme<MD2Theme>();
   const { user, company, isDemo } = useSelector((state) => state.auth);
 
   return (
@@ -46,7 +45,7 @@ export const DrawerContent = ({ onSync, ...props }: Props) => {
             <Avatar.Icon
               size={50}
               icon="badge-account-horizontal-outline"
-              style={{ backgroundColor: colors.primary }}
+              style={{ backgroundColor: customColors.primary }}
             />
           </TouchableOpacity>
           <View style={styles.profileInfo}>
@@ -58,13 +57,13 @@ export const DrawerContent = ({ onSync, ...props }: Props) => {
         </View>
         <Caption style={[styles.caption, { color: colors.text }]}>{company?.name || ''}</Caption>
       </View>
-      <Divider />
+      <Divider theme={{ dark }} />
       <DrawerContentScrollView {...props} contentContainerStyle={styles.contentStyle}>
         <Animated.View
           style={[
             styles.drawerContent,
             {
-              backgroundColor: colors.card,
+              backgroundColor: colors.background,
             },
           ]}
         >

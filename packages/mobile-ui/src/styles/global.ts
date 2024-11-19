@@ -85,7 +85,7 @@ const globalStyles = StyleSheet.create({
   },
   text: {
     textAlign: 'center',
-    color: '#333333',
+    //color: '#333333',
     marginBottom: 5,
   },
   text18: {
@@ -107,7 +107,7 @@ const globalStyles = StyleSheet.create({
     margin: 3,
     fontSize: 18,
     textAlign: 'center',
-    color: colors.text,
+    // color: colors.text,
   },
   content: {
     height: '100%',
@@ -144,10 +144,11 @@ const globalStyles = StyleSheet.create({
   flexGrow: {
     flexGrow: 10,
   },
-  sectionTitle: { backgroundColor: '#ddd', paddingVertical: 5 },
+  // sectionTitle: { backgroundColor: '#ddd', paddingVertical: 5 },
+  sectionTitle: { paddingVertical: 5 },
   header: {
     flexDirection: 'row',
-    backgroundColor: '#e1e1e1',
+    // backgroundColor: '#e1e1e1',
     justifyContent: 'space-around',
     paddingVertical: 6,
   },
@@ -222,7 +223,7 @@ const globalStyles = StyleSheet.create({
     fontSize: 15,
   },
   lightText: {
-    color: '#fff',
+    // color: '#fff',
   },
   textTotal: {
     fontSize: 16,

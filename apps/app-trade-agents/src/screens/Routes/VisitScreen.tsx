@@ -12,6 +12,7 @@ import { RouteProp, useFocusEffect, useIsFocused, useNavigation, useRoute } from
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   SubTitle,
+  globalColors as customColors,
   globalStyles as styles,
   InfoBlock,
   AppScreen,
@@ -76,7 +77,8 @@ const VisitScreen = () => {
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'Visit'>>();
   const { routeId, id } = useRoute<RouteProp<RoutesStackParamList, 'Visit'>>().params;
-  const { colors } = useTheme<MD2Theme>();
+  const { dark, colors } = useTheme<MD2Theme>();
+  const colorsMD3 = useTheme().colors;
 
   const visit = docSelectors.selectByDocType<IVisitDocument>('visit')?.find((e) => e.head.routeLineId === id);
   const dateBegin = visit ? new Date(visit?.head.dateBegin) : undefined;
@@ -368,12 +370,12 @@ const VisitScreen = () => {
                 styles.btnTab,
                 i === 0 && styles.firstBtnTab,
                 i === lineTypes.length - 1 && styles.lastBtnTab,
-                e.id === lineType && { backgroundColor: colors.primary },
-                { borderColor: colors.primary },
+                e.id === lineType && { backgroundColor: customColors.primary },
+                { borderColor: customColors.primary },
               ]}
               onPress={() => setLineType(e.id)}
             >
-              <LargeText style={[{ color: e.id === lineType ? colors.background : colors.text }, localStyles.size]}>
+              <LargeText style={[{ color: e.id === lineType ? customColors.card : colors.text }, localStyles.size]}>
                 {e.value}
               </LargeText>
             </TouchableHighlight>
@@ -381,7 +383,7 @@ const VisitScreen = () => {
         })}
       </View>
     ),
-    [colors.background, colors.primary, colors.text, lineType],
+    [colors.text, lineType],
   );
 
   const renderItem = useCallback(
@@ -411,7 +413,9 @@ const VisitScreen = () => {
   };
 
   const renderSectionHeader = ({ section }: any) => (
-    <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
+    <SubTitle style={[styles.header, styles.sectionTitle, { backgroundColor: colorsMD3.surfaceVariant }]}>
+      {section.title}
+    </SubTitle>
   );
 
   const isFocused = useIsFocused();
@@ -465,13 +469,13 @@ const VisitScreen = () => {
               {outlet.phoneNumber ? <MediumText>{outlet.phoneNumber}</MediumText> : null}
             </>
           )}
-          <Divider />
+          <Divider theme={{ dark }} />
           <LargeText style={localStyles.contract}>{`Договор №${contact.contractNumber || '-'} от ${getDateString(
             contact.contractDate,
           )}`}</LargeText>
           {contact && (
             <>
-              <Divider />
+              <Divider theme={{ dark }} />
               <MediumText>{`Условия оплаты: ${contact.paycond}`}</MediumText>
               <MediumText>
                 {saldo < 0
@@ -488,7 +492,7 @@ const VisitScreen = () => {
                   <MediumText>Лимит: {formatValue({ type: 'currency', decimals: 2 }, contact.limitSum)}</MediumText>
                 </View>
               ) : null}
-              <Divider />
+              <Divider theme={{ dark }} />
               {visit && dateBegin && (
                 <View>
                   <LargeText style={localStyles.contract}>

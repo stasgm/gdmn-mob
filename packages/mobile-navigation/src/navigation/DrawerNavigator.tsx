@@ -14,7 +14,13 @@ import { appActions, authActions, useDispatch, useSelector } from '@lib/store';
 
 import { Button, Dialog, Snackbar, useTheme, Text, MD2Theme } from 'react-native-paper';
 
-import { globalStyles as styles, AppActivityIndicator, LargeText, MediumText } from '@lib/mobile-ui';
+import {
+  globalColors as customColors,
+  globalStyles as styles,
+  AppActivityIndicator,
+  LargeText,
+  MediumText,
+} from '@lib/mobile-ui';
 
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 
@@ -54,7 +60,7 @@ export interface IProps {
 }
 
 const DrawerNavigator = ({ onSyncClick, items, dashboardScreens }: IProps) => {
-  const { colors } = useTheme<MD2Theme>();
+  const { dark, colors } = useTheme<MD2Theme>();
   const dispatch = useDispatch();
 
   const DashboardComponent = useCallback(
@@ -128,7 +134,7 @@ const DrawerNavigator = ({ onSyncClick, items, dashboardScreens }: IProps) => {
   return (
     <>
       <Modal animationType="fade" visible={showSyncInfo} statusBarTranslucent={true}>
-        <Dialog visible={showSyncInfo} onDismiss={onDismissDialog} style={localStyles.dialog}>
+        <Dialog visible={showSyncInfo} onDismiss={onDismissDialog} style={localStyles.dialog} theme={{ dark }}>
           <Dialog.Title>
             <View style={styles.containerCenter}>
               <LargeText
@@ -186,6 +192,7 @@ const DrawerNavigator = ({ onSyncClick, items, dashboardScreens }: IProps) => {
           visible={!!errorMessage}
           onDismiss={closeErrBar}
           style={{ backgroundColor: colors.error }}
+          theme={{ dark }}
           action={{
             icon: 'close',
             label: '',
@@ -193,13 +200,14 @@ const DrawerNavigator = ({ onSyncClick, items, dashboardScreens }: IProps) => {
             color: 'white',
           }}
         >
-          <Text style={localStyles.snackText}>{errorMessage}</Text>
+          <Text style={[{ color: colors.text }, localStyles.snackText]}>{errorMessage}</Text>
         </Snackbar>
       </Modal>
       <Drawer.Navigator
         screenOptions={{
-          drawerActiveBackgroundColor: colors.primary,
-          drawerActiveTintColor: '#ffffff',
+          drawerActiveBackgroundColor: customColors.primary,
+          drawerActiveTintColor: customColors.card,
+          drawerInactiveTintColor: colors.primary,
           drawerStyle: { width: 270 },
         }}
         drawerContent={drawerContent}

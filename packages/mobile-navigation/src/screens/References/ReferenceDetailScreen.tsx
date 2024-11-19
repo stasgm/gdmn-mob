@@ -26,7 +26,7 @@ const LineItem = React.memo(({ item }: { item: IProperty }) => {
   return (
     <View style={styles.item}>
       <View style={styles.details}>
-        <Text style={styles.name}>{item.title}</Text>
+        <Text style={[{ color: colors.text }, styles.name]}>{item.title}</Text>
         <Text style={[styles.number, styles.field, { color: colors.text }]}>{item.value}</Text>
       </View>
     </View>
@@ -35,6 +35,7 @@ const LineItem = React.memo(({ item }: { item: IProperty }) => {
 
 const ReferenceDetailScreen = () => {
   const navigation = useNavigation();
+  const { dark } = useTheme();
 
   const { name, id } = useRoute<RouteProp<ReferenceStackParamList, 'ReferenceDetals'>>().params;
 
@@ -78,6 +79,7 @@ const ReferenceDetailScreen = () => {
   }
 
   const renderItem = ({ item }: { item: IProperty }) => <LineItem item={item} />;
+  const separator = () => <Divider theme={{ dark }} />;
 
   return (
     <AppScreen>
@@ -86,7 +88,7 @@ const ReferenceDetailScreen = () => {
         data={refData}
         keyExtractor={keyExtractorByIndex}
         renderItem={renderItem}
-        ItemSeparatorComponent={Divider}
+        ItemSeparatorComponent={separator}
       />
     </AppScreen>
   );

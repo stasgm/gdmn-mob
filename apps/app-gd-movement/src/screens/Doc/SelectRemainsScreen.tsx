@@ -47,7 +47,7 @@ export const SelectRemainsScreen = () => {
 
   const dispatch = useDispatch();
 
-  const { colors } = useTheme();
+  const { dark, colors } = useTheme();
   const searchStyle = useMemo(() => colors.primary, [colors.primary]);
 
   const [filterVisible, setFilterVisible] = useState(false);
@@ -343,7 +343,7 @@ export const SelectRemainsScreen = () => {
 
   return (
     <AppScreen>
-      <Divider />
+      <Divider theme={{ dark }} />
       {filterVisible && (
         <>
           <View style={styles.flexDirectionRow}>

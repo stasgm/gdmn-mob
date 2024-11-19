@@ -2,6 +2,8 @@ import React from 'react';
 import { ReturnKeyTypeOptions, View } from 'react-native';
 import { MD2Theme, TextInput, useTheme } from 'react-native-paper';
 
+import customColors from '../../styles/colors';
+
 import styles from './styles';
 
 interface Props {
@@ -85,6 +87,10 @@ const Input = ({
           style={styles.input}
           maxLength={maxLength}
           placeholderTextColor={colors.text}
+          underlineColor={customColors.primary}
+          activeUnderlineColor={colors.primary}
+          outlineColor={customColors.primary}
+          activeOutlineColor={colors.primary}
           right={
             isIcon && iconName ? (
               <TextInput.Icon icon={iconName} size={20} style={styles.marginTop} onPress={onIconPress} />

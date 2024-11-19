@@ -3,7 +3,7 @@ import ReferenceItem from './components/ReferenceItem';
 import { ReferenceStackParamList } from '../../navigation/Root/types';
 import React, { useState, useMemo, useLayoutEffect, useEffect, useCallback } from 'react';
 import { View } from 'react-native';
-import { Divider, Searchbar } from 'react-native-paper';
+import { Divider, Searchbar, useTheme } from 'react-native-paper';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
 import { SubTitle, ItemSeparator, SearchButton, AppScreen, navBackButton } from '@lib/mobile-ui';
 
@@ -16,6 +16,7 @@ import { FlashList } from '@shopify/flash-list';
 
 const ReferenceViewScreen = () => {
   const navigation = useNavigation();
+  const { dark } = useTheme();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -59,6 +60,7 @@ const ReferenceViewScreen = () => {
   }
 
   const renderItem = ({ item }: { item: INamedEntity }) => <ReferenceItem item={item} refName={refName} />;
+  const separator = () => <Divider theme={{ dark }} />;
 
   return (
     <AppScreen>
@@ -82,7 +84,7 @@ const ReferenceViewScreen = () => {
         data={filteredList}
         renderItem={renderItem}
         estimatedItemSize={60}
-        ItemSeparatorComponent={Divider}
+        ItemSeparatorComponent={separator}
         keyExtractor={keyExtractorByIndex}
         keyboardShouldPersistTaps={'handled'}
       />

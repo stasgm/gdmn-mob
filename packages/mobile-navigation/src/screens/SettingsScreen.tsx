@@ -16,7 +16,7 @@ const SettingsScreen = () => {
   const data = useSelector((state) => state.settings.data);
   const config = useSelector((state) => state.auth.config);
 
-  const { colors } = useTheme();
+  const { dark, colors } = useTheme();
 
   useEffect(() => {
     dispatch(
@@ -107,7 +107,7 @@ const SettingsScreen = () => {
                   <SettingsGroup key={groupKey} list={list} onValueChange={handleUpdate} />
                 ) : (
                   <View key={groupKey}>
-                    <Divider />
+                    <Divider theme={{ dark }} />
                     <TouchableOpacity
                       onPress={() => {
                         navigation.navigate('SettingsDetails', { id: group.id });

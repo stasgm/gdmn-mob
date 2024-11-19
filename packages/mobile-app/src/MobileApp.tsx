@@ -22,7 +22,7 @@ import Constants from 'expo-constants';
 
 import api from '@lib/client-api';
 
-import { MD2Theme, Snackbar, useTheme } from 'react-native-paper';
+import { PaperProvider, Snackbar, useTheme } from 'react-native-paper';
 
 import { NavigationContainer } from '@react-navigation/native';
 
@@ -98,7 +98,7 @@ const AppRoot = ({ items, dashboardScreens, onSync }: Omit<IApp, 'store'>) => {
 
 const MobileApp = ({ loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
   const dispatch = useDispatch();
-  const { colors } = useTheme<MD2Theme>();
+  const { colors } = useTheme();
   const { loadingError: authLoadingError, errorMessage } = useSelector((state) => state.auth);
   const isLoggedWithCompany = authSelectors.isLoggedWithCompany();
   const docsLoadingError = useSelector<string>((state) => state.documents.loadingError);
@@ -232,42 +232,44 @@ const MobileApp = ({ loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
 
   return (
     <ThemeContext.Provider value={themeData}>
-      <NavigationContainer theme={isDarkTheme ? themeDark : defaultTheme}>
-        <Snackbar
-          visible={!!errorMessage}
-          onDismiss={closeErrBar}
-          style={localStyles.snack}
-          action={{
-            icon: 'close',
-            label: '',
-            onPress: closeErrBar,
-            color: 'white',
-          }}
-        >
-          <Text style={localStyles.snackText}>{errorMessage}</Text>
-        </Snackbar>
-        {isLoggedWithCompany ? <AppRoot {...props} /> : <AuthNavigator />}
-        <Snackbar
-          visible={barVisible}
-          onDismiss={closeSnackbar}
-          style={{ backgroundColor: colors.error }}
-          action={{
-            icon: 'close',
-            label: '',
-            onPress: closeSnackbar,
-            color: 'white',
-          }}
-        >
-          <View style={globalStyles.container}>
-            {!!errList?.length &&
-              errList.map((err, id) => (
-                <Text style={localStyles.snackText} key={id}>
-                  {truncate(err)}
-                </Text>
-              ))}
-          </View>
-        </Snackbar>
-      </NavigationContainer>
+      <PaperProvider theme={isDarkTheme ? themeDark : defaultTheme}>
+        <NavigationContainer theme={isDarkTheme ? themeDark : defaultTheme}>
+          <Snackbar
+            visible={!!errorMessage}
+            onDismiss={closeErrBar}
+            style={localStyles.snack}
+            action={{
+              icon: 'close',
+              label: '',
+              onPress: closeErrBar,
+              color: 'white',
+            }}
+          >
+            <Text style={localStyles.snackText}>{errorMessage}</Text>
+          </Snackbar>
+          {isLoggedWithCompany ? <AppRoot {...props} /> : <AuthNavigator />}
+          <Snackbar
+            visible={barVisible}
+            onDismiss={closeSnackbar}
+            style={{ backgroundColor: colors.error }}
+            action={{
+              icon: 'close',
+              label: '',
+              onPress: closeSnackbar,
+              color: 'white',
+            }}
+          >
+            <View style={globalStyles.container}>
+              {!!errList?.length &&
+                errList.map((err, id) => (
+                  <Text style={localStyles.snackText} key={id}>
+                    {truncate(err)}
+                  </Text>
+                ))}
+            </View>
+          </Snackbar>
+        </NavigationContainer>
+      </PaperProvider>
     </ThemeContext.Provider>
   );
 };

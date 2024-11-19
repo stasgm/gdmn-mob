@@ -6,6 +6,8 @@ import { getDateString } from '@lib/mobile-hooks';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
+import { useTheme } from 'react-native-paper';
+
 import { IMoveLine } from '../store/types';
 
 interface IItem {
@@ -27,12 +29,14 @@ const LineItem = ({
   isFromAddressed = false,
   isToAddressed = false,
 }: IItem) => {
+  const { colors } = useTheme();
+
   return (
     <ListItemLine readonly={disabled} onPress={onPress}>
       <View style={styles.details}>
         <LargeText style={styles.textBold}>{item.good.name}</LargeText>
         <View style={styles.flexDirectionRow}>
-          <MaterialCommunityIcons name="shopping-outline" size={18} />
+          <MaterialCommunityIcons name="shopping-outline" size={18} color={colors.onSurface} />
           <MediumText>
             {(item.weight || 0).toString()} кг{isLab ? '' : `, ${(item.quantPack || 0).toString()} кор.`}
           </MediumText>

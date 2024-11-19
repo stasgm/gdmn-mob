@@ -9,18 +9,21 @@ interface IProps {
   onPress?: () => void;
 }
 
+// Жирный черный цвет
 export const LargeText = ({ children, style, selectable = false }: IProps) => {
+  const { colors } = useTheme();
   return (
-    <Text style={[localStyles.largeText, style]} selectable={selectable}>
+    <Text style={[{ color: colors.primary }, localStyles.largeText, style]} selectable={selectable}>
       {children}
     </Text>
   );
 };
 
+//обычный легкий светлый или темный цвет в зависимости от темы
 export const MediumText = ({ children, style, selectable = false, onPress }: IProps) => {
   const { colors } = useTheme();
   return (
-    <Text style={[localStyles.mediumText, { color: colors.text }, style]} selectable={selectable} onPress={onPress}>
+    <Text style={[{ color: colors.text }, localStyles.mediumText, style]} selectable={selectable} onPress={onPress}>
       {children}
     </Text>
   );

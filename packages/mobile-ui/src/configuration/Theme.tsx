@@ -1,14 +1,14 @@
-import { DefaultTheme as PaperDefaultTheme, MD2LightTheme, MD2DarkTheme } from 'react-native-paper';
+import { MD2LightTheme, MD2DarkTheme, MD3LightTheme, MD3DarkTheme } from 'react-native-paper';
 import { DefaultTheme as NavigationDefaultTheme, DarkTheme as NavigationDarkTheme } from '@react-navigation/native';
 
 import colors from '../styles/colors';
 
 const theme = {
-  ...PaperDefaultTheme,
+  ...MD3LightTheme,
   ...NavigationDefaultTheme,
   ...MD2LightTheme,
   colors: {
-    ...PaperDefaultTheme.colors,
+    ...MD3LightTheme.colors,
     ...NavigationDefaultTheme.colors,
     ...MD2LightTheme.colors,
     primary: colors.primary,
@@ -21,17 +21,18 @@ const theme = {
 };
 
 const themeDark = {
-  ...PaperDefaultTheme,
+  ...MD3DarkTheme,
   ...NavigationDarkTheme,
   ...MD2DarkTheme,
   colors: {
-    ...PaperDefaultTheme.colors,
+    ...MD3DarkTheme.colors,
     ...NavigationDarkTheme.colors,
     ...MD2DarkTheme.colors,
-    primary: colors.primary,
+    primary: colors.blueLight,
     accent: colors.accent,
-    text: colors.text,
+    text: colors.backgroundLight,
     placeholder: colors.placeholder,
+    inversePrimary: colors.blueLight,
   },
   roundness: 2,
   dark: true,

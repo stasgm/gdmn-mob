@@ -18,7 +18,7 @@ import {
   Checkbox,
 } from '@lib/mobile-ui';
 
-import { MD2Theme, Searchbar, useTheme } from 'react-native-paper';
+import { Searchbar, useTheme } from 'react-native-paper';
 
 import { ScrollView } from 'react-native-gesture-handler';
 
@@ -64,7 +64,7 @@ export type SectionDataProps = SectionListData<IListItemProps, OrderListSectionP
 
 export const CellsViewScreen = () => {
   const navigation = useNavigation<StackNavigationProp<CellsStackParamList, 'CellsView'>>();
-  const { colors } = useTheme<MD2Theme>();
+  const { colors } = useTheme();
 
   const contactId = useRoute<RouteProp<CellsStackParamList, 'CellsView'>>().params.contactId;
 
@@ -282,7 +282,9 @@ export const CellsViewScreen = () => {
   }, []);
 
   const renderSectionHeader = ({ section }: any) => (
-    <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
+    <SubTitle style={[styles.header, styles.sectionTitle, { backgroundColor: colors.surfaceVariant }]}>
+      {section.title}
+    </SubTitle>
   );
 
   const searchTypes: IListItem[] = [
@@ -361,7 +363,7 @@ export const CellsViewScreen = () => {
               onPress={(item) => handleSelectChamber(item)}
               selected={selectedChamber}
               colorBack="#d5dce3"
-              colorSelected={colors.placeholder}
+              colorSelected={colors.primary}
               title="Камера"
               heightBtn={54}
               widthBtn={106}

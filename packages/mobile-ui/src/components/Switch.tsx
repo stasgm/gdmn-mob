@@ -10,10 +10,11 @@ type Props = {
 
 const Switch = ({ value, onValueChange, disabled }: Props) => {
   const { colors } = useTheme<MD2Theme>();
+  const colorsMD3 = useTheme().colors;
   return (
     <View>
       <SwitchComponent
-        thumbColor={value ? (disabled ? colors.background : colors.placeholder) : colors.background}
+        thumbColor={value ? (disabled ? colorsMD3.surfaceVariant : colors.placeholder) : colorsMD3.surfaceVariant}
         trackColor={{ false: colors.disabled, true: disabled ? colors.disabled : colors.accent }}
         value={value}
         onValueChange={() => onValueChange(!value)}

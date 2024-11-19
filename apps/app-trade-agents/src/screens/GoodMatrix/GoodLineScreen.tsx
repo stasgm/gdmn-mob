@@ -30,7 +30,7 @@ const LineItem = React.memo(({ item }: { item: IProperty }) => {
   return (
     <View style={styles.item}>
       <View style={styles.details}>
-        <Text style={styles.name}>{item.title}</Text>
+        <Text style={[{ color: colors.text }, styles.name]}>{item.title}</Text>
         <Text style={textStyle}>{item.value}</Text>
       </View>
     </View>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Text, TouchableHighlight } from 'react-native';
-import { Divider } from 'react-native-paper';
+import { Divider, MD2Theme, useTheme as usePaperTheme } from 'react-native-paper';
+import { useTheme } from '@react-navigation/native';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -30,25 +31,41 @@ const InfoBlock = ({
   isFromRoute = false,
   editable = false,
 }: IProps) => {
+  const { dark, colors } = usePaperTheme<MD2Theme>();
+  const colorsTheme = useTheme().colors;
   return (
-    <View style={[styles.flexDirectionRow, localStyles.box]}>
+    <View style={[styles.flexDirectionRow, localStyles.box, { borderColor: colors.disabled }]}>
       <View style={[localStyles.label, { backgroundColor: colorLabel }]} />
       <TouchableHighlight
         activeOpacity={0.7}
-        underlayColor="#DDDDDD"
+        underlayColor={colors.backdrop}
         onPress={onPress}
         disabled={disabled}
         style={localStyles.info}
       >
         <>
-          <Text style={localStyles.titleText}>{title}</Text>
-          <Divider />
+          <Text style={[localStyles.titleText, { color: colorsTheme.text }]}>{title}</Text>
+          <Divider theme={{ dark }} />
           <View style={localStyles.infoContainer}>
             <View style={localStyles.childrenView}>{children}</View>
-            {isFromRoute && <MaterialCommunityIcons name="routes" size={20} style={localStyles.iconEdit} />}
-            {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} style={localStyles.iconEdit} /> : null}
+            {isFromRoute && (
+              <MaterialCommunityIcons name="routes" color={colors.onSurface} size={20} style={localStyles.iconEdit} />
+            )}
+            {isBlocked ? (
+              <MaterialCommunityIcons
+                name="lock-outline"
+                color={colors.onSurface}
+                size={20}
+                style={localStyles.iconEdit}
+              />
+            ) : null}
             {!disabled && editable && onPress ? (
-              <MaterialCommunityIcons name="file-document-edit-outline" size={20} style={localStyles.iconEdit} />
+              <MaterialCommunityIcons
+                name="file-document-edit-outline"
+                color={colors.onSurface}
+                size={20}
+                style={localStyles.iconEdit}
+              />
             ) : null}
           </View>
         </>
@@ -61,7 +78,6 @@ export default InfoBlock;
 
 const localStyles = StyleSheet.create({
   box: {
-    borderColor: '#8888',
     borderRadius: 10,
     borderWidth: 0.5,
     marginBottom: 10,
@@ -73,12 +89,10 @@ const localStyles = StyleSheet.create({
   },
   label: {
     width: 10,
-    backgroundColor: '#3914AF',
     borderTopLeftRadius: 10,
     borderBottomLeftRadius: 10,
   },
   titleText: {
-    color: '#333536',
     fontSize: 18,
     fontWeight: 'bold',
   },

@@ -1,11 +1,13 @@
 import React, { ReactNode } from 'react';
 import { TouchableOpacity, View, StyleSheet } from 'react-native';
-import { MD2Theme, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusType } from '@lib/types';
 import { getDateString } from '@lib/mobile-hooks';
 
+import { useTheme, MD2Theme } from 'react-native-paper';
+
 import styles from '../../styles/global';
+import customColors from '../../styles/colors';
 
 import { LargeText, MediumText } from '../AppText';
 
@@ -55,7 +57,7 @@ const ScreenListItem = ({
           </View>
           {checked ? (
             <View style={styles.checkedIcon}>
-              <MaterialCommunityIcons name="check" size={11} color={'#FFF'} />
+              <MaterialCommunityIcons name="check" size={11} color={customColors.card} />
             </View>
           ) : null}
         </View>

@@ -19,7 +19,8 @@ import {
 import {
   AppScreen,
   globalStyles as styles,
-  Theme as defaultTheme,
+  theme as defaultTheme,
+  themeDark as darkTheme,
   Provider as UIProvider,
   AppFallback,
 } from '@lib/mobile-ui';
@@ -126,12 +127,15 @@ const Root = () => {
   );
 };
 
-const App = () => (
-  <Provider store={store}>
-    <UIProvider theme={defaultTheme}>
-      <Root />
-    </UIProvider>
-  </Provider>
-);
+const App = () => {
+  const { dark } = useTheme();
+  return (
+    <Provider store={store}>
+      <UIProvider theme={dark ? darkTheme : defaultTheme}>
+        <Root />
+      </UIProvider>
+    </Provider>
+  );
+};
 
 export default App;

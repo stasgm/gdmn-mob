@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, View, StyleSheet, ScrollView, Platform, Keyboard } from 'react-native';
-import { RouteProp, useNavigation, useRoute, StackActions, useTheme, useIsFocused } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, StackActions, useIsFocused } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Divider } from 'react-native-paper';
+import { Divider, MD2Theme, useTheme } from 'react-native-paper';
 
 import { documentActions, refSelectors, useSelector, appActions, useDispatch } from '@lib/store';
 import {
+  globalColors as customColors,
   AppInputScreen,
   Input,
   SelectableInput,
@@ -29,7 +30,7 @@ const OrderEditScreen = () => {
   const { id, routeId } = useRoute<RouteProp<OrdersStackParamList, 'OrderEdit'>>().params || {};
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderEdit'>>();
   const dispatch = useDispatch();
-  const { colors } = useTheme();
+  const { dark, colors } = useTheme<MD2Theme>();
 
   const orders = useFilteredDocList<IOrderDocument>('order');
   const order = orders?.find((e) => e.id === id);
@@ -333,9 +334,9 @@ const OrderEditScreen = () => {
     () => [
       localStyles.switchContainer,
       localStyles.border,
-      { borderColor: colors.primary, backgroundColor: colors.card },
+      { borderColor: customColors.primary, backgroundColor: colors.surface },
     ],
-    [colors.card, colors.primary],
+    [colors.surface],
   );
 
   const isFocused = useIsFocused();
@@ -346,7 +347,7 @@ const OrderEditScreen = () => {
   return (
     <AppInputScreen>
       <SubTitle>{statusName}</SubTitle>
-      <Divider />
+      <Divider theme={{ dark }} />
       <ScrollView keyboardShouldPersistTaps={'handled'}>
         <View style={viewStyle}>
           <RadioGroup
@@ -397,6 +398,9 @@ const OrderEditScreen = () => {
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyOnDate}
+          themeVariant={dark ? 'dark' : 'light'}
+          accentColor={colors.accent}
+          textColor={colors.text}
         />
       )}
     </AppInputScreen>

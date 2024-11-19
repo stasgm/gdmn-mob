@@ -30,6 +30,8 @@ import { INamedEntity } from '@lib/types';
 
 import { IDelList, IListItem } from '@lib/mobile-types';
 
+import { useTheme } from 'react-native-paper';
+
 import { IMoveDocument } from '../../store/types';
 import { MoveStackParamList } from '../../navigation/Root/types';
 import { dateTypes, docDepartTypes, statusTypes } from '../../utils/constants';
@@ -43,6 +45,7 @@ export type SectionDataProps = SectionListData<IListItemProps, MoveListSectionPr
 export const MoveListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'MoveList'>>();
   const docDispatch = useDocThunkDispatch();
+  const { colors } = useTheme();
 
   const list = (
     useSelector((state) => state.documents.list)?.filter((i) => i.documentType?.name === 'movement') as IMoveDocument[]
@@ -235,7 +238,9 @@ export const MoveListScreen = () => {
   );
 
   const renderSectionHeader = ({ section }: any) => (
-    <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
+    <SubTitle style={[styles.header, styles.sectionTitle, { backgroundColor: colors.surfaceVariant }]}>
+      {section.title}
+    </SubTitle>
   );
 
   const isFocused = useIsFocused();

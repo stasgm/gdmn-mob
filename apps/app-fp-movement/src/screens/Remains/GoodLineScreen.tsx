@@ -20,7 +20,7 @@ const LineItem = React.memo(({ item }: { item: IRemGood }) => {
         <View>
           <View style={styles.item}>
             <View style={styles.details}>
-              <Text style={styles.name}>Код</Text>
+              <Text style={[{ color: colors.text }, styles.name]}>Код</Text>
               <Text style={textStyle}>{item?.good?.shcode}</Text>
             </View>
           </View>
@@ -28,7 +28,7 @@ const LineItem = React.memo(({ item }: { item: IRemGood }) => {
 
           <View style={styles.item}>
             <View style={styles.details}>
-              <Text style={styles.name}>Остаток</Text>
+              <Text style={[{ color: colors.text }, styles.name]}>Остаток</Text>
               <Text style={textStyle}>{`${item?.remains} кг`}</Text>
             </View>
           </View>

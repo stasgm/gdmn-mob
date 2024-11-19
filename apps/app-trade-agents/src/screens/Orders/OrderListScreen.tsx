@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
 import { ListRenderItem, Platform, SectionList, SectionListData, View, StyleSheet, Keyboard } from 'react-native';
-import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 
 import {
   globalStyles as styles,
@@ -33,7 +33,7 @@ import { appActions, documentActions, refSelectors, useDispatch, useDocThunkDisp
 
 import { IDelList, IListItem } from '@lib/mobile-types';
 
-import { Searchbar } from 'react-native-paper';
+import { MD2Theme, Searchbar, useTheme } from 'react-native-paper';
 
 import { StatusTypes } from '@lib/mobile-ui/src/components/FilterButtons';
 
@@ -54,7 +54,8 @@ const OrderListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
-  const { colors } = useTheme();
+  const { dark, colors } = useTheme();
+  const colorsMD2 = useTheme<MD2Theme>().colors;
 
   const orders = useSelector((state) => state.documents.list) as IOrderDocument[];
   const outlets = refSelectors.selectByName<IOutlet>('outlet')?.data;
@@ -363,7 +364,9 @@ const OrderListScreen = () => {
   };
 
   const renderSectionHeader = ({ section }: any) => (
-    <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
+    <SubTitle style={[styles.header, styles.sectionTitle, { backgroundColor: colors.surfaceVariant }]}>
+      {section.title}
+    </SubTitle>
   );
 
   const renderSectionFooter = useCallback(
@@ -482,6 +485,9 @@ const OrderListScreen = () => {
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateBegin}
+          themeVariant={dark ? 'dark' : 'light'}
+          accentColor={colorsMD2.accent}
+          textColor={colorsMD2.text}
         />
       )}
       {showDateEnd && (
@@ -491,6 +497,9 @@ const OrderListScreen = () => {
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateEnd}
+          themeVariant={dark ? 'dark' : 'light'}
+          accentColor={colorsMD2.accent}
+          textColor={colorsMD2.text}
         />
       )}
     </AppScreen>

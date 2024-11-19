@@ -13,12 +13,19 @@ import {
   ScrollView,
   ViewStyle,
 } from 'react-native';
-import { Avatar, Divider } from 'react-native-paper';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { Avatar, Divider, useTheme } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
 
 import Constants from 'expo-constants';
 
-import { AppScreen, globalStyles as styles, LargeText, MediumText, navBackDrawer } from '@lib/mobile-ui';
+import {
+  AppScreen,
+  globalColors as customColors,
+  globalStyles as styles,
+  LargeText,
+  MediumText,
+  navBackDrawer,
+} from '@lib/mobile-ui';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 const dialCall = (number: string) => {
@@ -40,29 +47,31 @@ interface IProfileItem {
   style?: StyleProp<TextStyle>;
 }
 
-const ProfileItem = ({ item, iconStyle }: { item: IProfileItem; iconStyle: StyleProp<ViewStyle> }) => (
-  <>
-    <Divider />
-    <View style={localStyles.profileContainer}>
-      <View style={localStyles.profileIcon}>
-        <Avatar.Icon size={40} icon={item.icon} style={iconStyle} />
+const ProfileItem = ({ item, iconStyle }: { item: IProfileItem; iconStyle: StyleProp<ViewStyle> }) => {
+  const { dark } = useTheme();
+  return (
+    <>
+      <Divider theme={{ dark }} />
+      <View style={localStyles.profileContainer}>
+        <View style={localStyles.profileIcon}>
+          <Avatar.Icon size={40} icon={item.icon} style={iconStyle} />
+        </View>
+        <View style={localStyles.profileInfo}>
+          <LargeText style={styles.textBold}>{item.title}</LargeText>
+          <TouchableOpacity onPress={item.onPress}>
+            <MediumText selectable={true} style={item.style}>
+              {item.text}
+            </MediumText>
+          </TouchableOpacity>
+        </View>
       </View>
-      <View style={localStyles.profileInfo}>
-        <LargeText style={styles.textBold}>{item.title}</LargeText>
-        <TouchableOpacity onPress={item.onPress}>
-          <MediumText selectable={true} style={item.style}>
-            {item.text}
-          </MediumText>
-        </TouchableOpacity>
-      </View>
-    </View>
-  </>
-);
+    </>
+  );
+};
 
 const InformationScreen = () => {
-  const { colors } = useTheme();
-
   const navigation = useNavigation<StackNavigationProp<InformationStackParamList, 'Information'>>();
+  const { colors } = useTheme();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -121,17 +130,17 @@ const InformationScreen = () => {
     },
   ];
 
-  const iconStyle = { backgroundColor: colors.primary };
+  const iconStyle = { backgroundColor: customColors.primary };
 
   return (
     <AppScreen>
       <ScrollView>
         <View style={localStyles.container}>
-          <Text style={styles.title}>Приложение {Constants.expoConfig?.extra?.name}</Text>
+          <Text style={[{ color: colors.primary }, styles.title]}>Приложение {Constants.expoConfig?.extra?.name}</Text>
           {appList.map((item) => (
             <ProfileItem key={item.id} item={item} iconStyle={iconStyle} />
           ))}
-          <Text style={styles.title}>О разработчике</Text>
+          <Text style={[{ color: colors.primary }, styles.title]}>О разработчике</Text>
           {developList.map((item) => (
             <ProfileItem key={item.id} item={item} iconStyle={iconStyle} />
           ))}

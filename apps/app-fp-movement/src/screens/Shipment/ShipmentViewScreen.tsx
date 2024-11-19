@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { View, TouchableHighlight, TextInput, Keyboard, StyleProp, ViewStyle } from 'react-native';
-import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Audio } from 'expo-av';
 
@@ -8,6 +8,7 @@ import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDi
 import {
   MenuButton,
   useActionSheet,
+  globalColors as customColors,
   globalStyles as styles,
   InfoBlock,
   ItemSeparator,
@@ -42,6 +43,8 @@ import { FlashList } from '@shopify/flash-list';
 
 import { DashboardStackParamList } from '@lib/mobile-navigation';
 
+import { MD2Theme, useTheme } from 'react-native-paper';
+
 import { barcodeSettings, IShipmentDocument, IShipmentLine, ITempLine } from '../../store/types';
 
 import { ShipmentStackParamList } from '../../navigation/Root/types';
@@ -65,7 +68,7 @@ import QuantDialog from '../../components/QuantDialog';
 
 const keyExtractor = (item: IShipmentLine | ITempLine) => item.id;
 const ShipmentViewScreen = () => {
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
   const isFocused = useIsFocused();
@@ -753,18 +756,18 @@ const ShipmentViewScreen = () => {
                 styles.btnTab,
                 i === 0 && styles.firstBtnTab,
                 i === shipmentLineTypes.length - 1 && styles.lastBtnTab,
-                e.id === lineType && { backgroundColor: colors.primary },
-                { borderColor: colors.primary },
+                e.id === lineType && { backgroundColor: customColors.primary },
+                { borderColor: customColors.primary },
               ]}
               onPress={() => setLineType(e.id)}
             >
-              <LargeText style={{ color: e.id === lineType ? colors.background : colors.text }}>{e.value}</LargeText>
+              <LargeText style={{ color: e.id === lineType ? customColors.card : colors.text }}>{e.value}</LargeText>
             </TouchableHighlight>
           );
         })}
       </View>
     ),
-    [colors.background, colors.primary, colors.text, lineType],
+    [colors.text, lineType],
   );
 
   const handlePressLine = useCallback(
@@ -790,7 +793,7 @@ const ShipmentViewScreen = () => {
           <View style={styles.details}>
             <LargeText style={styles.textBold}>{item.good.name}</LargeText>
             <View style={styles.flexDirectionRow}>
-              <MaterialCommunityIcons name="shopping-outline" size={18} />
+              <MaterialCommunityIcons name="shopping-outline" size={18} color={colors.onSurface} />
               <MediumText>
                 {(item.weight || 0).toString()} кг, {(item.quantPack || 0).toString()} кор.
               </MediumText>
@@ -804,7 +807,7 @@ const ShipmentViewScreen = () => {
         </ListItemLine>
       );
     },
-    [handlePressLine, shipment?.status, shipmentLines?.length],
+    [colors.onSurface, handlePressLine, shipment?.status, shipmentLines?.length],
   );
 
   const renderTempItem = useCallback(({ item }: { item: ITempLine }) => {

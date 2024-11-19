@@ -31,13 +31,16 @@ export interface ICellList extends ICell, ICellRef {
   department?: string;
 }
 
-const NamedRow = ({ item }: { item: string }) => (
-  <View key={item} style={[localStyles.flexColumn, localStyles.height]}>
-    <TouchableOpacity style={localStyles.row}>
-      <Text style={localStyles.buttonLabel}>{item}</Text>
-    </TouchableOpacity>
-  </View>
-);
+const NamedRow = ({ item }: { item: string }) => {
+  const { colors } = useTheme<MD2Theme>();
+  return (
+    <View key={item} style={[localStyles.flexColumn, localStyles.height]}>
+      <TouchableOpacity style={localStyles.row}>
+        <Text style={[{ color: colors.text }, localStyles.buttonLabel]}>{item}</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 export const SelectCellScreen = () => {
   const dispatch = useDispatch();
@@ -279,7 +282,7 @@ export const SelectCellScreen = () => {
       <View style={localStyles.groupItem}>
         {fromCell ? (
           <View style={styles.alignItemsCenter}>
-            <Text style={localStyles.buttonLabel}>Из {fromCell?.fromCell}</Text>
+            <Text style={[{ color: colors.text }, localStyles.buttonLabel]}>Из {fromCell?.fromCell}</Text>
           </View>
         ) : null}
         <ScrollView>
@@ -305,7 +308,7 @@ export const SelectCellScreen = () => {
           ) : null}
           {selectedRow && selectedChamber && (
             <View>
-              <Text style={localStyles.cellItem}>Ячейки</Text>
+              <Text style={[{ color: colors.text }, localStyles.cellItem]}>Ячейки</Text>
 
               <View style={styles.flexDirectionRow}>
                 <View style={styles.directionColumn}>

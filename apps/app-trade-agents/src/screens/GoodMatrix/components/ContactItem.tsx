@@ -8,6 +8,8 @@ import { globalStyles as styles } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
+import { MD2Theme, useTheme } from 'react-native-paper';
+
 import { IContact } from '../../../store/types';
 import { GoodMatrixStackParamList } from '../../../navigation/Root/types';
 
@@ -17,6 +19,7 @@ export interface IContactItem {
 
 const ContactItem = ({ item }: IContactItem) => {
   const navigation = useNavigation<StackNavigationProp<GoodMatrixStackParamList, 'ContactList'>>();
+  const { colors } = useTheme<MD2Theme>();
 
   return (
     <TouchableOpacity
@@ -30,7 +33,7 @@ const ContactItem = ({ item }: IContactItem) => {
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <Text style={styles.name}>{item?.name}</Text>
+            <Text style={[{ color: colors.text }, styles.name]}>{item?.name}</Text>
           </View>
         </View>
       </View>

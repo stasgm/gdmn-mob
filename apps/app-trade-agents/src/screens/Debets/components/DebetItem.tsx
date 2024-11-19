@@ -27,7 +27,7 @@ const DebetItem = ({ item, limitSum, onPress }: IDebtItem) => {
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <Text style={styles.name}>{item.name}</Text>
+            <Text style={[{ color: colors.text }, styles.name]}>{item.name}</Text>
           </View>
           <MediumText>
             {item.saldo < 0

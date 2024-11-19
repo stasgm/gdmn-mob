@@ -28,6 +28,8 @@ import { getDelList, getDateString, keyExtractor, deleteSelectedItems, useSendDo
 
 import { IDelList, IListItem } from '@lib/mobile-types';
 
+import { useTheme } from 'react-native-paper';
+
 import { IShipmentDocument } from '../../store/types';
 import { ShipmentStackParamList } from '../../navigation/Root/types';
 import { dateTypes, statusTypes } from '../../utils/constants';
@@ -44,6 +46,7 @@ export const ShipmentListScreen = () => {
   const isCurr = route.name.toLowerCase().includes('curr');
   const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ShipmentList'>>();
   const docDispatch = useDocThunkDispatch();
+  const { colors } = useTheme();
 
   const isFocused = useIsFocused();
 
@@ -249,7 +252,9 @@ export const ShipmentListScreen = () => {
   );
 
   const renderSectionHeader = ({ section }: any) => (
-    <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
+    <SubTitle style={[styles.header, styles.sectionTitle, { backgroundColor: colors.surfaceVariant }]}>
+      {section.title}
+    </SubTitle>
   );
 
   if (!isFocused) {

@@ -46,7 +46,7 @@ const DebetListScreen = () => {
 
   const [visibleDialog, setVisibleDialog] = useState(false);
 
-  const { colors } = useTheme();
+  const { dark, colors } = useTheme();
 
   const debets = refSelectors.selectByName<IDebt>('debt')?.data;
   const contacts = refSelectors.selectByName<IContact>('contact')?.data;
@@ -131,7 +131,7 @@ const DebetListScreen = () => {
           iconName={'chevron-down'}
         />
       </View>
-      <Divider />
+      <Divider theme={{ dark }} />
       {filterVisible && (
         <>
           <View style={styles.flexDirectionRow}>

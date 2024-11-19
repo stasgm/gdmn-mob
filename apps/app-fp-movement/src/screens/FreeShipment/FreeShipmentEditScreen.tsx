@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { View, StyleSheet, ScrollView, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Divider } from 'react-native-paper';
+import { Divider, MD2Theme, useTheme } from 'react-native-paper';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { RouteProp, useNavigation, useRoute, StackActions, useTheme } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { SelectableInput, Input, SaveButton, SubTitle, AppScreen, RadioGroup, navBackButton } from '@lib/mobile-ui';
@@ -15,6 +15,8 @@ import { generateId, getDateString } from '@lib/mobile-hooks';
 import { IDocumentType, IReference, ScreenState } from '@lib/types';
 
 import { DashboardStackParamList } from '@lib/mobile-navigation';
+
+import customColors from '@lib/mobile-ui/src/styles/colors';
 
 import { FreeShipmentStackParamList } from '../../navigation/Root/types';
 import { IFreeShipmentFormParam, IFreeShipmentDocument } from '../../store/types';
@@ -31,15 +33,14 @@ export const FreeShipmentEditScreen = () => {
     ? 'FreeShipmentEditScreenDashboard'
     : 'FreeShipmentEditScreen';
 
-  const { colors } = useTheme();
+  const { dark, colors } = useTheme<MD2Theme>();
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
-  const shipments = useSelector(
-    (state) =>
-      state.documents?.list.filter((i) =>
-        isCurr ? i.documentType.name === 'currFreeShipment' : i.documentType.name === 'freeShipment',
-      ),
+  const shipments = useSelector((state) =>
+    state.documents?.list.filter((i) =>
+      isCurr ? i.documentType.name === 'currFreeShipment' : i.documentType.name === 'freeShipment',
+    ),
   ) as IFreeShipmentDocument[];
 
   const doc = shipments?.find((e) => e.id === id);
@@ -266,16 +267,16 @@ export const FreeShipmentEditScreen = () => {
     () => [
       localStyles.switchContainer,
       localStyles.border,
-      { borderColor: colors.primary, backgroundColor: colors.card },
+      { borderColor: customColors.primary, backgroundColor: colors.surface },
     ],
-    [colors.card, colors.primary],
+    [colors.surface],
   );
 
   return (
     <AppScreen>
       <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }}>
         <SubTitle>{statusName}</SubTitle>
-        <Divider />
+        <Divider theme={{ dark }} />
         <ScrollView>
           <View style={viewStyle}>
             <RadioGroup
@@ -327,6 +328,9 @@ export const FreeShipmentEditScreen = () => {
             mode="date"
             display={Platform.OS === 'ios' ? 'inline' : 'default'}
             onChange={handleApplyDate}
+            themeVariant={dark ? 'dark' : 'light'}
+            accentColor={colors.accent}
+            textColor={colors.text}
           />
         )}
       </KeyboardAwareScrollView>

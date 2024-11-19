@@ -21,6 +21,8 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { getDateString } from '@lib/mobile-hooks';
 
+import { MD2Theme, useTheme } from 'react-native-paper';
+
 import { IMovementDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';
 import { MovementStackParamList } from '../../navigation/Root/types';
@@ -36,6 +38,8 @@ export type SectionDataProps = SectionListData<IListItemProps, MovementListSecti
 
 export const MovementListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<MovementStackParamList, 'MovementList'>>();
+  const { colors } = useTheme();
+  const colorsMD2 = useTheme<MD2Theme>().colors;
 
   const { loading } = useSelector((state) => state.documents);
 
@@ -126,10 +130,14 @@ export const MovementListScreen = () => {
         keyExtractor={({ id }) => id}
         ItemSeparatorComponent={ItemSeparator}
         renderSectionHeader={({ section }) => (
-          <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
+          <SubTitle style={[styles.header, styles.sectionTitle, { backgroundColor: colors.surfaceVariant }]}>
+            {section.title}
+          </SubTitle>
         )}
         refreshControl={<RefreshControl refreshing={loading} title="идет загрузка данных..." />}
-        ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
+        ListEmptyComponent={
+          !loading ? <Text style={[styles.emptyList, { color: colorsMD2.text }]}>Список пуст</Text> : null
+        }
       />
     </AppScreen>
   );

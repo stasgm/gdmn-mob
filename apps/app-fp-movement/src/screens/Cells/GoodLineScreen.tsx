@@ -22,7 +22,7 @@ const LineItem = React.memo(({ item }: { item: IMoveLine }) => {
         <View>
           <View style={styles.item}>
             <View style={styles.details}>
-              <Text style={styles.name}>Штрих-код</Text>
+              <Text style={[styles.name, { color: colors.text }]}>Штрих-код</Text>
               <Text style={textStyle}>{item?.barcode}</Text>
             </View>
           </View>
@@ -30,7 +30,7 @@ const LineItem = React.memo(({ item }: { item: IMoveLine }) => {
 
           <View style={styles.item}>
             <View style={styles.details}>
-              <Text style={styles.name}>Вес</Text>
+              <Text style={[styles.name, { color: colors.text }]}>Вес</Text>
               <Text style={textStyle}>{(item.weight || 0).toString()} кг</Text>
             </View>
           </View>
@@ -38,7 +38,7 @@ const LineItem = React.memo(({ item }: { item: IMoveLine }) => {
 
           <View style={styles.item}>
             <View style={styles.details}>
-              <Text style={styles.name}>Партия</Text>
+              <Text style={[styles.name, { color: colors.text }]}>Партия</Text>
               <Text style={textStyle}>{item.numReceived} </Text>
             </View>
           </View>
@@ -46,7 +46,7 @@ const LineItem = React.memo(({ item }: { item: IMoveLine }) => {
 
           <View style={styles.item}>
             <View style={styles.details}>
-              <Text style={styles.name}>Дата</Text>
+              <Text style={[styles.name, { color: colors.text }]}>Дата</Text>
               <Text style={textStyle}>{getDateString(item.workDate)}</Text>
             </View>
           </View>
@@ -54,7 +54,7 @@ const LineItem = React.memo(({ item }: { item: IMoveLine }) => {
 
           <View style={styles.item}>
             <View style={styles.details}>
-              <Text style={styles.name}>Ячейка</Text>
+              <Text style={[styles.name, { color: colors.text }]}>Ячейка</Text>
               <Text style={textStyle}>{item?.toCell} </Text>
             </View>
           </View>

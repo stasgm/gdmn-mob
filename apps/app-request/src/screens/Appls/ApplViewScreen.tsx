@@ -28,7 +28,7 @@ import { ApplsStackParamList } from '../../navigation/Root/types';
 import ApplItem from './components/ApplItem';
 
 const ApplViewScreen = () => {
-  const { colors } = useTheme();
+  const { dark, colors } = useTheme();
   const dispatch = useDispatch();
   const navigation = useNavigation<StackNavigationProp<ApplsStackParamList, 'ApplView'>>();
   const { id } = useRoute<RouteProp<ApplsStackParamList, 'ApplView'>>().params;
@@ -132,27 +132,27 @@ const ApplViewScreen = () => {
           <MediumText>{`${appl.head.purpose.name}`} </MediumText>
           <MediumText style={[styles.field, styles.number]}>{`${appl.head.justification}`} </MediumText>
           {appl.head.applStatus.name ? (
-            <Text style={[styles.textBold, styles.field]}>{appl.head.applStatus.name}</Text>
+            <Text style={[{ color: colors.text }, styles.textBold, styles.field]}>{appl.head.applStatus.name}</Text>
           ) : null}
           {appl.head.cancelReason ? (
-            <Text style={[styles.field, styles.number]}>{`${appl.head.cancelReason}`} </Text>
+            <Text style={[{ color: colors.text }, styles.field, styles.number]}>{`${appl.head.cancelReason}`} </Text>
           ) : null}
           <ItemSeparator />
 
           <LargeText style={styles.textBold}>{appl.head.sysApplicant?.name || ' - '} </LargeText>
           <MediumText>Системный заявитель</MediumText>
 
-          <Divider />
+          <Divider theme={{ dark }} />
 
           <LargeText style={styles.textBold}>{appl.head.applicant?.name || ' - '} </LargeText>
           <MediumText>Заявитель</MediumText>
 
-          <Divider />
+          <Divider theme={{ dark }} />
 
           <LargeText style={styles.textBold}>{appl.head.specPreAgree?.name || ' - '} </LargeText>
           <MediumText>Специалист, предварительно согласовавший заявку</MediumText>
 
-          <Divider />
+          <Divider theme={{ dark }} />
 
           <LargeText style={styles.textBold}>{appl.head.specAgreeEngin?.name || ' - '} </LargeText>
           <MediumText>Специалист, согласовавший со стороны инженерной службы заявку</MediumText>

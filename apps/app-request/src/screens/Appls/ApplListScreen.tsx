@@ -1,6 +1,6 @@
 import React, { useState, useLayoutEffect, useMemo, useCallback } from 'react';
 import { ListRenderItem, SectionList, SectionListData, View } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 import { docSelectors } from '@lib/store';
 import {
@@ -15,7 +15,7 @@ import {
   navBackDrawer,
 } from '@lib/mobile-ui';
 
-import { Searchbar } from 'react-native-paper';
+import { Searchbar, useTheme } from 'react-native-paper';
 
 import { getDateString, keyExtractor, shortenString } from '@lib/mobile-hooks';
 
@@ -119,11 +119,13 @@ const ApplListScreen = () => {
       headerLeft: navBackDrawer,
       headerRight: renderRight,
     });
-  }, [colors.card, filterVisible, navigation, renderRight]);
+  }, [colors.background, filterVisible, navigation, renderRight]);
 
   const renderSectionHeader = useCallback(
-    ({ section }: any) => <SubTitle style={[styles.header]}>{section.title}</SubTitle>,
-    [],
+    ({ section }: any) => (
+      <SubTitle style={[styles.header, { backgroundColor: colors.surfaceVariant }]}>{section.title}</SubTitle>
+    ),
+    [colors.surfaceVariant],
   );
 
   return (

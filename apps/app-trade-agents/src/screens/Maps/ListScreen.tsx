@@ -15,6 +15,8 @@ import {
 
 import { keyExtractor } from '@lib/mobile-hooks';
 
+import { useTheme } from 'react-native-paper';
+
 import { useDispatch, useSelector } from '../../store';
 import { ILocation } from '../../store/geo/types';
 import { geoActions } from '../../store/geo/actions';
@@ -22,6 +24,8 @@ import { geoActions } from '../../store/geo/actions';
 import localStyles from './styles';
 
 const Item = ({ item, onPress, selected }: { item: ILocation; onPress: () => void; selected: boolean }) => {
+  const { colors } = useTheme();
+
   const viewStyle = useMemo(
     () => [
       styles.icon,
@@ -43,7 +47,7 @@ const Item = ({ item, onPress, selected }: { item: ILocation; onPress: () => voi
             <LargeText style={styles.textBold}>{item.name}</LargeText>
           </View>
           <View style={styles.flexDirectionRow}>
-            <MaterialCommunityIcons name="map-marker-check-outline" size={15} />
+            <MaterialCommunityIcons name="map-marker-check-outline" size={15} color={colors.onSurface} />
             <MediumText>{`${item.coords.latitude}, ${item.coords.longitude}`}</MediumText>
           </View>
         </View>

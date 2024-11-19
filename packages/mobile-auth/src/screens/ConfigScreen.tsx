@@ -23,7 +23,7 @@ export type Props = {
 
 const ConfigScreen = ({ config, onSetConfig, onSetDemoMode, device }: Props) => {
   const navigation = useNavigation<StackNavigationProp<AuthStackParamList, 'Config'>>();
-  const { colors } = useTheme();
+  const { dark, colors } = useTheme();
 
   const [serverName, setServerName] = useState(`${config?.protocol}${config?.server}` || '');
   const [serverPort, setServerPort] = useState(config?.port?.toString() || '');
@@ -158,7 +158,7 @@ const ConfigScreen = ({ config, onSetConfig, onSetDemoMode, device }: Props) => 
           </View>
         </KeyboardAwareScrollView>
       </AppScreen>
-      <Dialog visible={visibleDialog} onDismiss={handleVisibleFalse}>
+      <Dialog visible={visibleDialog} onDismiss={handleVisibleFalse} theme={{ dark }}>
         <Dialog.Title>{device ? `Устройство ${device.name}` : 'Устройство не активировано'}</Dialog.Title>
         <Dialog.Content>
           <TouchableOpacity onPress={() => setInitConfig(!initConfig)}>

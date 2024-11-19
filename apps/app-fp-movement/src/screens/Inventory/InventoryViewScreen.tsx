@@ -8,6 +8,7 @@ import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDi
 import {
   MenuButton,
   useActionSheet,
+  globalColors as customColors,
   globalStyles as styles,
   InfoBlock,
   ItemSeparator,
@@ -409,18 +410,18 @@ export const InventoryViewScreen = () => {
                 styles.btnTab,
                 i === 0 && styles.firstBtnTab,
                 i === lineTypes.length - 1 && styles.lastBtnTab,
-                e.id === lineType && { backgroundColor: colors.primary },
-                { borderColor: colors.primary },
+                e.id === lineType && { backgroundColor: customColors.primary },
+                { borderColor: customColors.primary },
               ]}
               onPress={() => setLineType(e.id)}
             >
-              <LargeText style={{ color: e.id === lineType ? colors.background : colors.text }}>{e.value}</LargeText>
+              <LargeText style={{ color: e.id === lineType ? customColors.card : colors.text }}>{e.value}</LargeText>
             </TouchableHighlight>
           );
         })}
       </View>
     ),
-    [colors.background, colors.primary, colors.text, lineType],
+    [colors.text, lineType],
   );
 
   const renderItem = useCallback(

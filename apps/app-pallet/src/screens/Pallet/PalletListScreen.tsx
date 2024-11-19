@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
 import { SectionList, ListRenderItem, SectionListData, View } from 'react-native';
-import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
-import { Searchbar } from 'react-native-paper';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { Searchbar, useTheme } from 'react-native-paper';
 
 import {
   globalStyles as styles,
@@ -263,8 +263,12 @@ export const PalletListScreen = () => {
   };
 
   const renderSectionHeader = useCallback(
-    ({ section }: any) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
-    [],
+    ({ section }: any) => (
+      <SubTitle style={[styles.header, styles.sectionTitle, { backgroundColor: colors.surfaceVariant }]}>
+        {section.title}
+      </SubTitle>
+    ),
+    [colors.surfaceVariant],
   );
 
   // const A = useCallback(() => {

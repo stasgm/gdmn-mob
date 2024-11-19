@@ -53,14 +53,14 @@ const OrderLine = ({ item, packages, onSetLine, onSave }: IProps) => {
       <ScrollView keyboardShouldPersistTaps={'handled'} contentContainerStyle={localStyles.containerScroll}>
         <View style={styles.item}>
           <View style={styles.details}>
-            <Text style={styles.name}>Наименование</Text>
+            <Text style={[{ color: colors.text }, styles.name]}>Наименование</Text>
             <Text style={textStyle}>{item ? item.good.name || 'товар не найден' : ''}</Text>
           </View>
         </View>
         <ItemSeparator />
         <View style={styles.item}>
           <View style={styles.details}>
-            <Text style={styles.name}>Цена</Text>
+            <Text style={[{ color: colors.text }, styles.name]}>Цена</Text>
             <Text style={textStyle}>{item.good.priceFsn}</Text>
           </View>
         </View>
@@ -69,7 +69,7 @@ const OrderLine = ({ item, packages, onSetLine, onSave }: IProps) => {
           <>
             <View style={styles.item}>
               <View style={styles.details}>
-                <Text style={styles.name}>Коэффициент перевода</Text>
+                <Text style={[{ color: colors.text }, styles.name]}>Коэффициент перевода</Text>
                 <Text style={textStyle}>{item.good.scale.toString()}</Text>
               </View>
             </View>
@@ -80,7 +80,7 @@ const OrderLine = ({ item, packages, onSetLine, onSave }: IProps) => {
           <>
             <View style={styles.item}>
               <View style={styles.details}>
-                <Text style={styles.name}>Штрихкод</Text>
+                <Text style={[{ color: colors.text }, styles.name]}>Штрихкод</Text>
                 <Text style={textStyle}>{item.good.barcode}</Text>
               </View>
             </View>
@@ -89,7 +89,7 @@ const OrderLine = ({ item, packages, onSetLine, onSave }: IProps) => {
         ) : null}
         <View style={localStyles.item}>
           <View style={styles.details}>
-            <Text style={styles.name}>Упаковка</Text>
+            <Text style={[{ color: colors.text }, styles.name]}>Упаковка</Text>
             {packages?.length > 0 ? (
               <View style={localStyles.packages}>
                 {packages?.map((elem) => (
@@ -109,7 +109,7 @@ const OrderLine = ({ item, packages, onSetLine, onSave }: IProps) => {
         <ItemSeparator />
         <View style={styles.item}>
           <View style={styles.details}>
-            <Text style={styles.name}>Количество, кг</Text>
+            <Text style={[{ color: colors.text }, styles.name]}>Количество, кг</Text>
             <TextInput
               style={[textStyle, localStyles.quantityItem]}
               showSoftInputOnFocus={false}

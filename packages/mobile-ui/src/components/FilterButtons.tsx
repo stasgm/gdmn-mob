@@ -3,6 +3,7 @@ import { StyleProp, Text, TouchableHighlight, View, ViewStyle, StyleSheet } from
 import { MD2Theme, useTheme } from 'react-native-paper';
 
 import styles from '../styles/global';
+import { globalColors as customColors } from '../..';
 
 export interface StatusTypes {
   name: string;
@@ -42,18 +43,18 @@ const FilterButtons = ({ status, onPress, style, statusList = [] }: IProps) => {
         return (
           <TouchableHighlight
             activeOpacity={0.7}
-            underlayColor="#DDDDDD"
+            underlayColor={colors.backdrop}
             key={e.name}
             style={[
               styles.btnTab,
               i === 0 && styles.firstBtnTab,
               i === (statusList?.length ? statusList : statusTypes).length - 1 && styles.lastBtnTab,
-              e.status === status && { backgroundColor: colors.primary },
-              { borderColor: colors.primary },
+              e.status === status && { backgroundColor: customColors.primary },
+              { borderColor: customColors.primary },
             ]}
             onPress={() => onPress(e.status)}
           >
-            <Text style={[{ color: e.status === status ? colors.background : colors.text }, localStyles.fontSize]}>
+            <Text style={[{ color: e.status === status ? customColors.card : colors.text }, localStyles.fontSize]}>
               {e.name}
             </Text>
           </TouchableHighlight>

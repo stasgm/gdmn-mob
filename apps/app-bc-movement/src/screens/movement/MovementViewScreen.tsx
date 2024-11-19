@@ -9,6 +9,8 @@ import { globalStyles as styles, InfoBlock, ItemSeparator, SubTitle, ScanButton,
 
 import { getDateString, keyExtractorByIndex } from '@lib/mobile-hooks';
 
+import { MD2Theme, useTheme } from 'react-native-paper';
+
 import { IMovementDocument, IMovementLine } from '../../store/types';
 import { MovementStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
@@ -19,6 +21,9 @@ export const MovementViewScreen = () => {
   const navigation = useNavigation<StackNavigationProp<MovementStackParamList, 'MovementView'>>();
 
   const id = useRoute<RouteProp<MovementStackParamList, 'MovementView'>>().params?.id;
+
+  const { colors } = useTheme<MD2Theme>();
+  const colorsMD3 = useTheme().colors;
 
   const bcMovement = docSelectors.selectByDocId<IMovementDocument>(id);
 
@@ -48,7 +53,7 @@ export const MovementViewScreen = () => {
   if (!bcMovement) {
     return (
       <View style={styles.container}>
-        <SubTitle style={styles.title}>Документ не найден</SubTitle>
+        <SubTitle style={[styles.title, { backgroundColor: colorsMD3.surfaceVariant }]}>Документ не найден</SubTitle>
       </View>
     );
   }
@@ -68,8 +73,10 @@ export const MovementViewScreen = () => {
         disabled={!['DRAFT', 'READY'].includes(bcMovement.status)}
       >
         <View style={styles.rowCenter}>
-          <Text>{`№ ${bcMovement.number} от ${getDateString(bcMovement.documentDate)}`}</Text>
-          {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
+          <Text
+            style={{ color: colors.text }}
+          >{`№ ${bcMovement.number} от ${getDateString(bcMovement.documentDate)}`}</Text>
+          {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} color={colors.onSurface} /> : null}
         </View>
       </InfoBlock>
       <FlatList

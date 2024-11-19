@@ -3,7 +3,7 @@ import { ReferenceStackParamList } from '../../../navigation/Root/types';
 import React from 'react';
 import { TouchableOpacity, View, Text } from 'react-native';
 
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -19,6 +19,7 @@ type ViewScreenProp = StackNavigationProp<ReferenceStackParamList, 'ReferenceDet
 
 const ReferenceItem = ({ item, refName }: IRefItem) => {
   const navigation = useNavigation<ViewScreenProp>();
+  const { colors } = useTheme();
 
   return (
     <TouchableOpacity
@@ -32,7 +33,7 @@ const ReferenceItem = ({ item, refName }: IRefItem) => {
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <Text style={styles.name}>{item.name || item.id}</Text>
+            <Text style={[{ color: colors.text }, styles.name]}>{item.name || item.id}</Text>
           </View>
         </View>
       </View>

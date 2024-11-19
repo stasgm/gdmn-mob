@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, LatLng, Polyline } from 'react-native-maps';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Snackbar } from 'react-native-paper';
+import { Snackbar, useTheme } from 'react-native-paper';
 
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
-import { globalStyles as styles, Theme, BottomSheet, RadioGroup, AppActivityIndicator } from '@lib/mobile-ui';
+import { globalStyles as styles, BottomSheet, RadioGroup, AppActivityIndicator } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 
 import { IListItem } from '@lib/mobile-types';
@@ -36,6 +36,7 @@ const DEFAULT_LATITUDE = 53.9;
 const DEFAULT_LONGITUDE = 27.56667;
 
 const MapScreen = () => {
+  const { colors } = useTheme();
   const [barVisible, setBarVisible] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -287,7 +288,12 @@ const MapScreen = () => {
           </View>
           <View>
             <TouchableOpacity onPress={handlePresentRoute} disabled={loading}>
-              <MaterialCommunityIcons style={localStyles.routeIcon} name="autorenew" size={25} color="#000" />
+              <MaterialCommunityIcons
+                style={localStyles.routeIcon}
+                name="autorenew"
+                size={25}
+                color={colors.onSurface}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -305,20 +311,20 @@ const MapScreen = () => {
       ) : null}
       <View style={[localStyles.buttonContainer]}>
         <TouchableOpacity onPress={movePrevPoint} style={[localStyles.bubble, localStyles.button]} disabled={loading}>
-          <MaterialCommunityIcons name="chevron-left" size={35} color="#000" />
+          <MaterialCommunityIcons name="chevron-left" size={35} color={colors.onSurface} />
         </TouchableOpacity>
         <TouchableOpacity onPress={moveNextPoint} style={[localStyles.bubble, localStyles.button]}>
-          <MaterialCommunityIcons name="chevron-right" size={35} color="#000" />
+          <MaterialCommunityIcons name="chevron-right" size={35} color={colors.onSurface} />
         </TouchableOpacity>
         <TouchableOpacity onPress={handleFitToCoordinates} style={[localStyles.bubble, localStyles.button]}>
-          <MaterialCommunityIcons name="routes" size={35} color="#000" />
+          <MaterialCommunityIcons name="routes" size={35} color={colors.onSurface} />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={handleGetLocation}
           disabled={loading}
           style={[localStyles.bubble, localStyles.button]}
         >
-          <MaterialCommunityIcons name="crosshairs-gps" size={35} color="#000" />
+          <MaterialCommunityIcons name="crosshairs-gps" size={35} color={colors.onSurface} />
         </TouchableOpacity>
       </View>
       <BottomSheet
@@ -333,7 +339,7 @@ const MapScreen = () => {
       <Snackbar
         visible={barVisible}
         onDismiss={() => setBarVisible(false)}
-        style={{ backgroundColor: Theme.colors.error }}
+        style={{ backgroundColor: colors.error }}
         action={{
           icon: 'close',
           label: '',

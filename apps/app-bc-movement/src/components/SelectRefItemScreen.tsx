@@ -22,6 +22,7 @@ import { RefParamList } from '../navigation/Root/types';
 export const SelectRefItemScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const { dark, colors } = useTheme();
   const { refName, isMulti, fieldName, value, clause } = useRoute<RouteProp<RefParamList, 'SelectRefItem'>>().params;
 
   const refObj = refSelectors.selectByName<any>(refName);
@@ -128,8 +129,8 @@ export const SelectRefItemScreen = () => {
 
   return (
     <AppScreen>
-      <SubTitle style={styles.title}>{title}</SubTitle>
-      <Divider />
+      <SubTitle style={[styles.title, { backgroundColor: colors.surfaceVariant }]}>{title}</SubTitle>
+      <Divider theme={{ dark }} />
       {filterVisible && (
         <>
           <View style={styles.flexDirectionRow}>

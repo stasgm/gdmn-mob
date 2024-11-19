@@ -11,11 +11,11 @@ import {
 } from '@lib/mobile-ui';
 import { refSelectors, useSelector } from '@lib/store';
 import { IReference } from '@lib/types';
-import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { SectionList, SectionListData, View, Alert } from 'react-native';
-import { Searchbar } from 'react-native-paper';
+import { Searchbar, useTheme } from 'react-native-paper';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
 import { IContact, IGoodMatrix } from '../../store/types';
@@ -102,7 +102,9 @@ const ContactListScreen = () => {
   const renderItem = ({ item }: { item: IContact }) => <ContactItem item={item} />;
 
   const renderSectionHeader = ({ section }: any) => (
-    <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
+    <SubTitle style={[styles.header, styles.sectionTitle, { backgroundColor: colors.surfaceVariant }]}>
+      {section.title}
+    </SubTitle>
   );
 
   const isFocused = useIsFocused();

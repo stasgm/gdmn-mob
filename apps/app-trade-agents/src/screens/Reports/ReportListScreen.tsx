@@ -12,7 +12,7 @@ import {
 } from '@lib/mobile-ui';
 import { appActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 import { IReference } from '@lib/types';
-import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -20,6 +20,8 @@ import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import { SectionListData, View, StyleSheet, Platform, Keyboard } from 'react-native';
 
 import { IListItem } from '@lib/mobile-types';
+
+import { MD2Theme, useTheme } from 'react-native-paper';
 
 import { ReportStackParamList } from '../../navigation/Root/types';
 import { IReportListFormParam, IOutlet, IReportItem } from '../../store/types';
@@ -42,7 +44,7 @@ const ReportListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ReportStackParamList, 'ReportList'>>();
   const [visibleReport, setVisibleReport] = useState(false);
 
-  const { colors } = useTheme();
+  const { dark, colors } = useTheme<MD2Theme>();
   const dispatch = useDispatch();
 
   const {
@@ -372,6 +374,9 @@ const ReportListScreen = () => {
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateBegin}
+          themeVariant={dark ? 'dark' : 'light'}
+          accentColor={colors.accent}
+          textColor={colors.text}
         />
       )}
       {showDateEnd && (
@@ -381,6 +386,9 @@ const ReportListScreen = () => {
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateEnd}
+          themeVariant={dark ? 'dark' : 'light'}
+          accentColor={colors.accent}
+          textColor={colors.text}
         />
       )}
       {showOnDateBegin && (
@@ -390,6 +398,9 @@ const ReportListScreen = () => {
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyOnDateBegin}
+          themeVariant={dark ? 'dark' : 'light'}
+          accentColor={colors.accent}
+          textColor={colors.text}
         />
       )}
       {showOnDateEnd && (
@@ -399,6 +410,9 @@ const ReportListScreen = () => {
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyOnDateEnd}
+          themeVariant={dark ? 'dark' : 'light'}
+          accentColor={colors.accent}
+          textColor={colors.text}
         />
       )}
     </AppScreen>

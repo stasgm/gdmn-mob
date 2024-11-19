@@ -59,7 +59,7 @@ const SelectGoodScreen = () => {
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGood'>>().params;
   const dispatch = useDispatch();
 
-  const { colors } = useTheme<MD2Theme>();
+  const { dark, colors } = useTheme<MD2Theme>();
 
   const settings = useSelector((state) => state.settings.data);
   const isUseNetPrice = settings?.isUseNetPrice?.data as boolean;
@@ -504,9 +504,7 @@ const SelectGoodScreen = () => {
             <Switch value={isUseMatrix} onValueChange={() => setIsUseMatrix(!isUseMatrix)} />
           </View>
         )}
-        {contactId && goodMatrix[contactId] && !isShowPrev && filterVisible && (
-          <Divider style={{ backgroundColor: colors.primary }} />
-        )}
+        {contactId && goodMatrix[contactId] && !isShowPrev && filterVisible && <Divider theme={{ dark }} />}
       </View>
 
       {isShowPrev && (
@@ -571,6 +569,9 @@ const SelectGoodScreen = () => {
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateBegin}
+          themeVariant={dark ? 'dark' : 'light'}
+          accentColor={colors.accent}
+          textColor={colors.text}
         />
       )}
       {showDateEnd && (
@@ -580,6 +581,9 @@ const SelectGoodScreen = () => {
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateEnd}
+          themeVariant={dark ? 'dark' : 'light'}
+          accentColor={colors.accent}
+          textColor={colors.text}
         />
       )}
     </AppScreen>

@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, View, StyleSheet, ScrollView, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Divider } from 'react-native-paper';
+import { Divider, MD2Theme, useTheme } from 'react-native-paper';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { RouteProp, useNavigation, useRoute, StackActions, useTheme } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import {
+  globalColors as customColors,
   Menu,
   SelectableInput,
   Input,
@@ -34,7 +35,7 @@ export const DocEditScreen = () => {
   const id = useRoute<RouteProp<DocStackParamList, 'DocEdit'>>().params?.id;
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'DocEdit'>>();
   const dispatch = useDispatch();
-  const { colors } = useTheme();
+  const { dark, colors } = useTheme<MD2Theme>();
 
   // const documents = useSelector((state) =>
   //   state.documents.list.filter((i) => i.documentType.subtype === 'inventory'),
@@ -443,16 +444,16 @@ export const DocEditScreen = () => {
     () => [
       localStyles.switchContainer,
       localStyles.border,
-      { borderColor: colors.primary, backgroundColor: colors.card },
+      { borderColor: customColors.primary, backgroundColor: colors.surface },
     ],
-    [colors.card, colors.primary],
+    [colors.surface],
   );
 
   return (
     <AppScreen>
       <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} keyboardShouldPersistTaps={'handled'}>
         <SubTitle>{statusName}</SubTitle>
-        <Divider />
+        <Divider theme={{ dark }} />
         <ScrollView>
           <View style={viewStyle}>
             <RadioGroup
@@ -483,7 +484,7 @@ export const DocEditScreen = () => {
             disabled={isBlocked}
           />
           {!!documentType?.fromType && docFromContactType && (
-            <View style={[localStyles.border, { borderColor: isBlocked ? colors.card : colors.primary }]}>
+            <View style={[localStyles.border, { borderColor: isBlocked ? colors.surface : colors.primary }]}>
               <View style={localStyles.contactType}>
                 <Menu
                   key={'fromType'}
@@ -508,7 +509,7 @@ export const DocEditScreen = () => {
             </View>
           )}
           {!!documentType?.toType && docToContactType && (
-            <View style={[localStyles.border, { borderColor: isBlocked ? colors.card : colors.primary }]}>
+            <View style={[localStyles.border, { borderColor: isBlocked ? colors.surface : colors.primary }]}>
               <View style={[localStyles.contactType]}>
                 <Menu
                   key={'toType'}
@@ -549,6 +550,9 @@ export const DocEditScreen = () => {
             mode="date"
             display={Platform.OS === 'ios' ? 'inline' : 'default'}
             onChange={handleApplyDate}
+            themeVariant={dark ? 'dark' : 'light'}
+            accentColor={colors.accent}
+            textColor={colors.text}
           />
         )}
       </KeyboardAwareScrollView>

@@ -1,13 +1,22 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { View, StyleSheet, ScrollView, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Divider } from 'react-native-paper';
+import { Divider, MD2Theme, useTheme } from 'react-native-paper';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { RouteProp, useNavigation, useRoute, StackActions, useTheme } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { SelectableInput, Input, SaveButton, SubTitle, AppScreen, RadioGroup, navBackButton } from '@lib/mobile-ui';
+import {
+  globalColors as customColors,
+  SelectableInput,
+  Input,
+  SaveButton,
+  SubTitle,
+  AppScreen,
+  RadioGroup,
+  navBackButton,
+} from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
 import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks';
@@ -31,7 +40,7 @@ export const LaboratoryEditScreen = () => {
     ? 'LaboratoryEditScreenDashboard'
     : 'LaboratoryEditScreen';
 
-  const { colors } = useTheme();
+  const { dark, colors } = useTheme<MD2Theme>();
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
@@ -259,16 +268,16 @@ export const LaboratoryEditScreen = () => {
     () => [
       localStyles.switchContainer,
       localStyles.border,
-      { borderColor: colors.primary, backgroundColor: colors.card },
+      { borderColor: customColors.primary, backgroundColor: colors.surface },
     ],
-    [colors.card, colors.primary],
+    [colors.surface],
   );
 
   return (
     <AppScreen>
       <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }}>
         <SubTitle>{statusName}</SubTitle>
-        <Divider />
+        <Divider theme={{ dark }} />
         <ScrollView>
           <View style={viewStyle}>
             <RadioGroup
@@ -320,6 +329,9 @@ export const LaboratoryEditScreen = () => {
             mode="date"
             display={Platform.OS === 'ios' ? 'inline' : 'default'}
             onChange={handleApplyDate}
+            themeVariant={dark ? 'dark' : 'light'}
+            accentColor={colors.accent}
+            textColor={colors.text}
           />
         )}
       </KeyboardAwareScrollView>

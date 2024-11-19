@@ -39,7 +39,7 @@ export const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    backgroundColor: '#e1e1e1',
+    // backgroundColor: '#e1e1e1',
     justifyContent: 'space-around',
     paddingVertical: 6,
   },

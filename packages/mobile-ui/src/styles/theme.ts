@@ -19,11 +19,11 @@ const themeDark = {
   roundness: 2,
   colors: {
     ...MD3DarkTheme.colors,
-    primary: colors.primary,
+    primary: colors.blueLight,
     accent: colors.accent,
-    text: colors.text,
+    text: colors.backgroundLight,
     placeholder: colors.placeholder,
-    background: colors.backgroundDark,
+    inversePrimary: colors.blueLight,
   },
 };
 

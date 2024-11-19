@@ -29,6 +29,8 @@ import { deleteSelectedItems, getDateString, getDelList, keyExtractor, useSendDo
 
 import { IDelList } from '@lib/mobile-types';
 
+import { useTheme } from 'react-native-paper';
+
 import { IMoveDocument } from '../../store/types';
 import { MoveFromStackParamList } from '../../navigation/Root/types';
 
@@ -41,6 +43,7 @@ export type SectionDataProps = SectionListData<IListItemProps, MoveFromListSecti
 export const MoveFromListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<MoveFromStackParamList, 'MoveFromList'>>();
   const docDispatch = useDocThunkDispatch();
+  const { colors } = useTheme();
 
   const list = (
     useSelector((state) => state.documents.list)?.filter(
@@ -196,7 +199,9 @@ export const MoveFromListScreen = () => {
   );
 
   const renderSectionHeader = ({ section }: any) => (
-    <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
+    <SubTitle style={[styles.header, styles.sectionTitle, { backgroundColor: colors.surfaceVariant }]}>
+      {section.title}
+    </SubTitle>
   );
 
   const isFocused = useIsFocused();

@@ -22,6 +22,7 @@ import {
   AppScreen,
   useActionSheet,
   globalStyles,
+  globalColors as customColors,
   Switch,
   navBackDrawer,
 } from '@lib/mobile-ui';
@@ -33,8 +34,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useSettingsThunkDispatch } from '@lib/store/src/settings/actions.async';
 
 const ProfileScreen = () => {
-  const { colors } = useTheme();
-
   const { user, company, device, isDemo, loading, isLogout } = useSelector((state) => state.auth);
   const appLoading = useSelector((state) => state.app.loading);
 
@@ -45,6 +44,7 @@ const ProfileScreen = () => {
   const settingsDispatch = useSettingsThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<ProfileStackParamList, 'Profile'>>();
   const showActionSheet = useActionSheet();
+  const { dark, colors } = useTheme();
 
   const handleClearData = useCallback(() => {
     Alert.alert('Вы уверены, что хотите удалить все данные?', '', [
@@ -149,7 +149,7 @@ const ProfileScreen = () => {
             <Avatar.Icon
               size={50}
               icon="badge-account-horizontal-outline"
-              style={{ backgroundColor: colors.primary }}
+              style={{ backgroundColor: customColors.primary }}
             />
           </View>
           <View style={styles.profileInfo}>
@@ -160,22 +160,22 @@ const ProfileScreen = () => {
             <MediumText>{company?.name || ''}</MediumText>
           </View>
         </View>
-        <Divider />
+        <Divider theme={{ dark }} />
         <View style={styles.profileContainer}>
           <View style={styles.profileIcon}>
-            <Avatar.Icon size={50} icon="devices" style={{ backgroundColor: colors.primary }} />
+            <Avatar.Icon size={50} icon="devices" style={{ backgroundColor: customColors.primary }} />
           </View>
           <View style={styles.profileInfo}>
             <MediumText style={globalStyles.textBold}>{device?.name || ''}</MediumText>
             <MediumText>{device?.state || ''}</MediumText>
           </View>
         </View>
-        <Divider />
+        <Divider theme={{ dark }} />
         <View style={[styles.containerSet, { borderColor: colors.primary }]}>
           <MediumText style={styles.subHeading}>{'Не выходить из профиля'}</MediumText>
           <Switch value={!isLogout} onValueChange={handleUpdate} />
         </View>
-        <Divider />
+        <Divider theme={{ dark }} />
         {!!visibleList?.length && (
           <TouchableOpacity
             onPress={() => {
@@ -190,7 +190,7 @@ const ProfileScreen = () => {
             </View>
           </TouchableOpacity>
         )}
-        <Divider />
+        <Divider theme={{ dark }} />
         <View>
           <PrimeButton outlined onPress={handleLogout} disabled={loading || appLoading} loadIcon={loading}>
             {isDemo ? 'Выйти из демо режима' : 'Сменить пользователя'}

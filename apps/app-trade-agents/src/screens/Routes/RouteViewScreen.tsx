@@ -43,7 +43,7 @@ const RouteViewScreen = () => {
   const docDispatch = useDocThunkDispatch();
   const dispatch = useDispatch();
 
-  const { colors } = useTheme();
+  const { dark, colors } = useTheme();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -209,7 +209,7 @@ const RouteViewScreen = () => {
     return (
       <AppScreen>
         <SubTitle style={styles.title}>{getDateString(route.documentDate)}</SubTitle>
-        <Divider />
+        <Divider theme={{ dark }} />
         {filterVisible && (
           <>
             <View style={styles.flexDirectionRow}>
@@ -243,7 +243,7 @@ const RouteViewScreen = () => {
         )}
       </AppScreen>
     );
-  }, [colors.primary, filterVisible, isGroupVisible, renderItem, route, routeLineList, routeList, searchQuery]);
+  }, [dark, colors.primary, filterVisible, isGroupVisible, renderItem, route, routeLineList, routeList, searchQuery]);
   return <>{RouteView}</>;
 };
 

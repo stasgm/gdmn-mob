@@ -17,7 +17,7 @@ import { getDateString, keyExtractor } from '@lib/mobile-hooks';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 
 import { IDeviceLogEntry } from '@lib/types';
 
@@ -25,6 +25,7 @@ const InformationLogScreen = () => {
   const navigation = useNavigation<StackNavigationProp<InformationStackParamList, 'Log'>>();
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
+  const { colors } = useTheme();
 
   const handleClearLog = useCallback(() => {
     Alert.alert('Вы уверены, что хотите удалить всю историю ошибок?', '', [
@@ -76,7 +77,9 @@ const InformationLogScreen = () => {
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <Text style={styles.name}>{`${getDateString(errDate)} ${new Date(errDate).toLocaleTimeString()}`}</Text>
+            <Text
+              style={[{ color: colors.text }, styles.name]}
+            >{`${getDateString(errDate)} ${new Date(errDate).toLocaleTimeString()}`}</Text>
           </View>
           <MediumText>{item.name}</MediumText>
           <MediumText>{item.message}</MediumText>

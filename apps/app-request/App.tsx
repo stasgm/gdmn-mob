@@ -15,7 +15,13 @@ import {
   referenceActions,
   documentActions,
 } from '@lib/store';
-import { globalStyles as styles, Theme as defaultTheme, Provider as UIProvider, AppScreen } from '@lib/mobile-ui';
+import {
+  globalStyles as styles,
+  theme as defaultTheme,
+  themeDark as darkTheme,
+  Provider as UIProvider,
+  AppScreen,
+} from '@lib/mobile-ui';
 import { ActivityIndicator, Caption, MD2Theme, useTheme } from 'react-native-paper';
 
 import { StatusBar } from 'expo-status-bar';
@@ -103,13 +109,16 @@ const Root = () => {
   );
 };
 
-const App = () => (
-  <Provider store={store}>
-    <UIProvider theme={defaultTheme}>
-      <Root />
-      <StatusBar style="auto" />
-    </UIProvider>
-  </Provider>
-);
+const App = () => {
+  const { dark } = useTheme();
+  return (
+    <Provider store={store}>
+      <UIProvider theme={dark ? darkTheme : defaultTheme}>
+        <Root />
+        <StatusBar style="auto" />
+      </UIProvider>
+    </Provider>
+  );
+};
 
 export default App;
