@@ -46,8 +46,9 @@ export const BarcodeImage = ({ barcode, isPrint = false, printText }: IProps) =>
           value={barcode}
           text={barcode}
           style={localStyles.marginTop5}
+          textStyle={{ color: colors.text }}
           background={colors.background}
-          lineColor="black"
+          lineColor={colors.text}
           height={40}
           width={2}
         />

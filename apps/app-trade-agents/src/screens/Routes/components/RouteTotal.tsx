@@ -1,13 +1,13 @@
 import React, { useMemo } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { refSelectors } from '@lib/store';
-import { DataTable, IconButton } from 'react-native-paper';
+import { DataTable, IconButton, useTheme as useThemePaper } from 'react-native-paper';
 
 import { useIsFocused, useTheme } from '@react-navigation/native';
 
 import { formatValue, round, useFilteredDocList } from '@lib/mobile-hooks';
 
-import { globalColors, globalStyles } from '@lib/mobile-ui';
+import { globalStyles } from '@lib/mobile-ui';
 
 import { IGoodGroup, IOrderDocument, IOrderLine } from '../../../store/types';
 import { totalList, totalListByGroup } from '../../../utils/helpers';
@@ -20,6 +20,7 @@ export interface IItem {
 
 const RouteTotal = ({ routeId, onPress, isGroupVisible = false }: IItem) => {
   const { colors } = useTheme();
+  const colorsPaper = useThemePaper().colors;
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;
   const firstLevelGroups = groups?.filter((item) => !item.parent?.id);
@@ -50,17 +51,28 @@ const RouteTotal = ({ routeId, onPress, isGroupVisible = false }: IItem) => {
     borderTopColor: colors.border,
   };
 
+  const headerStyle = [
+    localStyles.borderColor,
+    localStyles.borderBottomColor,
+    localStyles.borderTopColor,
+    {
+      backgroundColor: colorsPaper.surfaceVariant,
+      borderTopColor: colorsPaper.surfaceVariant,
+      borderTopWidth: 0,
+    },
+  ];
+
   const textColor = { color: colors.text };
   const rowStyle = [
     { minHeight: 22, borderBottomWidth: 0, borderTopWidth: isGroupVisible ? StyleSheet.hairlineWidth * 2 : 0 },
     localStyles.borderTopColor,
   ];
   const textStyle = [localStyles.cellText, textColor];
-  const textBoldStyle = [textStyle, textColor, globalStyles.textBold];
-  const labelStyle = { backgroundColor: colors.border, borderBottomColor: globalColors.backgroundLight };
+  const textBoldStyle = [textStyle, globalStyles.textBold];
+  const labelStyle = { backgroundColor: colors.border };
   const totalStyle = {
     backgroundColor:
-      isGroupVisible && totalListByRoute?.length % 2 === 1 ? globalColors.backgroundLight : 'transparent',
+      isGroupVisible && totalListByRoute?.length % 2 === 1 ? colorsPaper.surfaceVariant : colorsPaper.inverseOnSurface,
   };
 
   const isFocused = useIsFocused();
@@ -87,7 +99,7 @@ const RouteTotal = ({ routeId, onPress, isGroupVisible = false }: IItem) => {
         </DataTable.Header>
         {isGroupVisible
           ? totalListByRoute?.map((item, index) => {
-              const groupStyle = { backgroundColor: index % 2 === 1 ? globalColors.backgroundLight : 'transparent' };
+              const groupStyle = { backgroundColor: index % 2 === 1 ? colorsPaper.background : 'transparent' };
               return (
                 <View key={item.group.id} style={groupStyle}>
                   <DataTable.Row style={[localStyles.row, localStyles.borderBottomColor]}>
@@ -179,13 +191,3 @@ const localStyles = StyleSheet.create({
   borderTopColor: { borderTopColor: 'transparent' },
   borderBottomColor: { borderBottomColor: 'transparent' },
 });
-const headerStyle = [
-  localStyles.borderColor,
-  localStyles.borderBottomColor,
-  localStyles.borderTopColor,
-  {
-    backgroundColor: globalColors.backgroundLight,
-    borderTopColor: globalColors.backgroundLight,
-    borderTopWidth: 0,
-  },
-];

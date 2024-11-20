@@ -16,7 +16,7 @@ import { FlashList } from '@shopify/flash-list';
 
 const ReferenceViewScreen = () => {
   const navigation = useNavigation();
-  const { dark } = useTheme();
+  const { dark, colors } = useTheme();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -74,7 +74,7 @@ const ReferenceViewScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
-              selectionColor="green"
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />

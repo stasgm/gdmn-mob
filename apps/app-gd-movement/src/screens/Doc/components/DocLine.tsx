@@ -285,7 +285,7 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
           <View style={localStyles.item}>
             <MediumText>{isQuantity ? 'Количество:' : 'Сумма с НДС:'}</MediumText>
             <TextInput
-              style={localStyles.quantitySize}
+              style={[localStyles.quantitySize, { color: colors.text }]}
               showSoftInputOnFocus={false}
               caretHidden={true}
               keyboardType="numeric"

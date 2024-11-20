@@ -29,6 +29,7 @@ import {
   DeleteButton,
   CloseButton,
   SimpleDialog,
+  globalColors,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -461,7 +462,7 @@ const VisitScreen = () => {
 
   return (
     <AppScreen style={styles.contentTop}>
-      <InfoBlock colorLabel={colors.primary} title={point.outlet.name}>
+      <InfoBlock colorLabel={globalColors.primary} title={point.outlet.name}>
         <>
           {outlet && (
             <>

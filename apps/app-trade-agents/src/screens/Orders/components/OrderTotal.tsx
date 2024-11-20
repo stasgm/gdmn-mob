@@ -1,13 +1,13 @@
 import React, { useMemo } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { refSelectors } from '@lib/store';
-import { DataTable, IconButton } from 'react-native-paper';
+import { DataTable, IconButton, useTheme as useThemePaper } from 'react-native-paper';
 
 import { useTheme } from '@react-navigation/native';
 
 import { formatValue, round } from '@lib/mobile-hooks';
 
-import { globalColors, globalStyles } from '@lib/mobile-ui';
+import { globalStyles } from '@lib/mobile-ui';
 
 import { IGoodGroup, IOrderDocument } from '../../../store/types';
 import { totalList, totalListByGroup } from '../../../utils/helpers';
@@ -20,6 +20,7 @@ export interface IItem {
 
 const OrderTotal = ({ order, isGroupVisible = false, onPress }: IItem) => {
   const { colors } = useTheme();
+  const colorsPaper = useThemePaper().colors;
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;
   const firstLevelGroups = groups?.filter((item) => !item.parent?.id);
@@ -39,8 +40,8 @@ const OrderTotal = ({ order, isGroupVisible = false, onPress }: IItem) => {
     localStyles.borderBottomColor,
     localStyles.borderTopColor,
     {
-      backgroundColor: globalColors.backgroundLight,
-      borderTopColor: globalColors.backgroundLight,
+      backgroundColor: colorsPaper.surfaceVariant,
+      borderTopColor: colorsPaper.surfaceVariant,
       borderTopWidth: 0,
     },
   ];
@@ -50,10 +51,11 @@ const OrderTotal = ({ order, isGroupVisible = false, onPress }: IItem) => {
     localStyles.borderTopColor,
   ];
   const textStyle = [localStyles.cellText, textColor];
-  const textBoldStyle = [textStyle, textColor, globalStyles.textBold];
-  const labelStyle = { backgroundColor: colors.border, borderBottomColor: globalColors.backgroundLight };
+  const textBoldStyle = [textStyle, globalStyles.textBold];
+  const labelStyle = { backgroundColor: colors.border, borderBottomColor: colorsPaper.surfaceVariant };
   const totalStyle = {
-    backgroundColor: isGroupVisible && totalListByOrder.length % 2 === 1 ? globalColors.backgroundLight : 'transparent',
+    backgroundColor:
+      isGroupVisible && totalListByOrder.length % 2 === 1 ? colorsPaper.surfaceVariant : colorsPaper.inverseOnSurface,
   };
 
   const total = useMemo(() => totalList(totalListByOrder), [totalListByOrder]);
@@ -75,7 +77,7 @@ const OrderTotal = ({ order, isGroupVisible = false, onPress }: IItem) => {
         </DataTable.Header>
         {isGroupVisible
           ? totalListByOrder.map((item, index) => {
-              const groupStyle = { backgroundColor: index % 2 === 1 ? globalColors.backgroundLight : 'transparent' };
+              const groupStyle = { backgroundColor: index % 2 === 1 ? colorsPaper.background : 'transparent' };
               return (
                 <View key={item.group.id} style={groupStyle}>
                   <DataTable.Row style={[localStyles.row, localStyles.borderBottomColor]}>

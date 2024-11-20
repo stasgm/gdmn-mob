@@ -148,10 +148,11 @@ const GoodListScreen = () => {
           activeOptionId={rem.id}
           iconName="filter-outline"
           iconSize={25}
+          iconColor={colors.text}
         />
       </View>
     ),
-    [filterVisible, handleApply, rem.id, remainsList, visibleMenu],
+    [colors.text, filterVisible, handleApply, rem.id, remainsList, visibleMenu],
   );
 
   useLayoutEffect(() => {

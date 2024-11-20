@@ -3,7 +3,7 @@ import { evaluate } from 'mathjs';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, useWindowDimensions, StyleProp, ViewStyle } from 'react-native';
 
-import globalColors from '../../styles/colors';
+import { useTheme } from 'react-native-paper';
 
 import { IKeyProps, Key } from './Key';
 
@@ -19,6 +19,7 @@ interface IProps {
 const isDiv0 = (expression: string, number?: string) => Number(number) === 0 && expression.indexOf('/') >= 0;
 
 const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal, changeOldValue = false, onSave }: IProps) => {
+  const { colors } = useTheme();
   const [expression, setExpression] = useState('');
   const [number, setNumber] = useState(oldValue);
   const [firstOperation, setFirstOperation] = useState(true);
@@ -165,15 +166,15 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal, changeO
 
   return (
     <View style={viewStyle}>
-      <View style={[styles.input, { borderColor: globalColors.border, backgroundColor: globalColors.card }]}>
+      <View style={[styles.input, { borderColor: colors.surfaceVariant, backgroundColor: colors.background }]}>
         <View>
-          <Text style={styles.currentNumber}>
+          <Text style={[styles.currentNumber, { color: colors.onSurface }]}>
             {expression}
             {number}
           </Text>
         </View>
         <TouchableOpacity onPress={handleDelete}>
-          <Feather name="delete" size={24} color={globalColors.primary} />
+          <Feather name="delete" size={24} color={colors.primary} />
         </TouchableOpacity>
       </View>
       <View style={styles.keypad}>

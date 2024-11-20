@@ -223,7 +223,7 @@ const globalStyles = StyleSheet.create({
     fontSize: 15,
   },
   lightText: {
-    // color: '#fff',
+    color: '#fff',
   },
   textTotal: {
     fontSize: 16,

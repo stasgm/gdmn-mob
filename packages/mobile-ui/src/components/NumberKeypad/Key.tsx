@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, TouchableOpacity, Text, StyleProp, ViewStyle } from 'react-native';
 
-import globalColors from '../../styles/colors';
+import { useTheme } from 'react-native-paper';
 
 interface IKeyProps {
   title: string;
@@ -11,6 +11,7 @@ interface IKeyProps {
 }
 
 const Key = ({ title, grow = 1, operation, onPress }: IKeyProps) => {
+  const { dark, colors } = useTheme();
   const viewStyle: StyleProp<ViewStyle> = useMemo(
     () => ({
       flexGrow: grow,
@@ -25,14 +26,20 @@ const Key = ({ title, grow = 1, operation, onPress }: IKeyProps) => {
       style={[
         styles.container,
         {
-          borderColor: globalColors.border,
+          borderColor: colors.surfaceDisabled,
           backgroundColor:
-            title === '=' ? globalColors.backgroundLight : operation ? globalColors.background : globalColors.card,
+            title === '='
+              ? dark
+                ? colors.onSurfaceDisabled
+                : colors.surfaceDisabled
+              : operation
+                ? colors.surfaceVariant
+                : colors.inverseOnSurface,
         },
         viewStyle,
       ]}
     >
-      <Text style={styles.text}>{title}</Text>
+      <Text style={[styles.text, { color: colors.onSurface }]}>{title}</Text>
     </TouchableOpacity>
   );
 };

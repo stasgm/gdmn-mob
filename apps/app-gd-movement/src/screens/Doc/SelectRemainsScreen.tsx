@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback } from 'react';
 import { View, StyleSheet, Alert, RefreshControl, TouchableOpacity } from 'react-native';
-import { Searchbar, Divider, Chip } from 'react-native-paper';
+import { Searchbar, Divider, Chip, useTheme as useThemePaper } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 
@@ -13,7 +13,6 @@ import {
   MediumText,
   LargeText,
   navBackButton,
-  globalColors,
   EmptyList,
 } from '@lib/mobile-ui';
 import { docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
@@ -48,6 +47,7 @@ export const SelectRemainsScreen = () => {
   const dispatch = useDispatch();
 
   const { dark, colors } = useTheme();
+  const colorsPaper = useThemePaper().colors;
   const searchStyle = useMemo(() => colors.primary, [colors.primary]);
 
   const [filterVisible, setFilterVisible] = useState(false);
@@ -291,7 +291,7 @@ export const SelectRemainsScreen = () => {
 
     const iconStyle = [styles.icon, { backgroundColor: isAdded ? '#06567D' : '#E91E63' }];
     const goodStyle = {
-      backgroundColor: isAdded ? globalColors.backgroundLight : 'transparent',
+      backgroundColor: isAdded ? colorsPaper.surfaceVariant : colors.background,
     };
 
     return (
@@ -325,6 +325,7 @@ export const SelectRemainsScreen = () => {
                 {lines.map((line) => (
                   <Chip
                     key={line.id}
+                    theme={{ dark }}
                     style={[localStyles.lineChip, { borderColor: colors.primary }]}
                     onPress={() => setSelectedLine(line)}
                   >

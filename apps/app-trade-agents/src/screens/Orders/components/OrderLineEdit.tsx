@@ -78,7 +78,7 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
 
   return (
     <Modal animationType="fade" visible={true}>
-      <SafeAreaView style={localStyles.container}>
+      <SafeAreaView style={[localStyles.container, { backgroundColor: colors.background }]}>
         <View style={localStyles.container1}>
           <View style={localStyles.navigation}>
             <IconButton icon="chevron-left" onPress={onDismiss} size={30} />

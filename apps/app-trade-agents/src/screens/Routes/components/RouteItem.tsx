@@ -4,6 +4,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { globalStyles as styles, LargeText, MediumText } from '@lib/mobile-ui';
 
+import colors from '@lib/mobile-ui/src/styles/colors';
+
 import { IRouteLineItem } from '../../../store/types';
 
 export interface IItem {
@@ -18,7 +20,7 @@ const RouteItem = ({ item, onPressItem }: IItem) => (
   <TouchableOpacity onPress={onPressItem}>
     <View style={[styles.item, localStyles.item]}>
       <View style={styles.icon}>
-        <MediumText style={styles.lightText}>{item.ordNumber}</MediumText>
+        <MediumText style={[styles.lightText, { color: colors.card }]}>{item.ordNumber}</MediumText>
       </View>
       <View style={styles.details}>
         <View style={styles.directionRow}>

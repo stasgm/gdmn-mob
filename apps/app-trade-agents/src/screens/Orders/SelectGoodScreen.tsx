@@ -332,7 +332,7 @@ const SelectGoodScreen = () => {
         <View style={localStyles.groupItem}>
           <View style={localStyles.flexRowWrap}>
             {values.map((item) => {
-              const colorStyle = { color: item.id === selectedGroupId ? 'white' : colors.text };
+              const colorStyle = { color: item.id === selectedGroupId ? 'white' : colors.backdrop };
               const backColorStyle = { backgroundColor: item.id === selectedGroupId ? colorSelected : colorBack };
               const badgeColor = {
                 backgroundColor: item.decoration?.color ? item.decoration.color : 'transparent',
@@ -356,7 +356,7 @@ const SelectGoodScreen = () => {
         </View>
       );
     },
-    [colors.text, groupButtonStyle],
+    [colors.backdrop, groupButtonStyle],
   );
 
   const handlePressGood = useCallback(

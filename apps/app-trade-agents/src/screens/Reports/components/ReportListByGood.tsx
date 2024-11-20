@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { EmptyList, globalColors, globalStyles as styles, ItemSeparator, LargeText, MediumText } from '@lib/mobile-ui';
 
@@ -7,6 +7,8 @@ import { formatValue, keyExtractorByIndex, round } from '@lib/mobile-hooks';
 import { docSelectors, refSelectors, useSelector } from '@lib/store';
 
 import { FlashList } from '@shopify/flash-list';
+
+import { useTheme } from 'react-native-paper';
 
 import {
   IGoodGroup,
@@ -21,29 +23,35 @@ export interface ReportListSectionProps {
   title: string;
 }
 
-const renderItem = ({ item }: { item: IReportItemByGoods }) => (
-  <View style={styles.flex}>
-    {item.type === 'good' ? (
-      <View style={[styles.directionRow, localStyles.good]}>
-        <View style={localStyles.name}>
-          <MediumText style={localStyles.n}>{item.n}</MediumText>
-          <MediumText style={localStyles.goodName}>{item.name}</MediumText>
+const ReportItemByGoods = ({ item }: { item: IReportItemByGoods }) => {
+  const { colors } = useTheme();
+  return (
+    <View style={styles.flex}>
+      {item.type === 'good' ? (
+        <View style={[styles.directionRow, localStyles.good]}>
+          <View style={localStyles.name}>
+            <MediumText style={localStyles.n}>{item.n}</MediumText>
+            <MediumText style={localStyles.goodName}>{item.name}</MediumText>
+          </View>
+          <View style={localStyles.quantity}>
+            <MediumText>{formatValue({ type: 'number' }, round(item.quantity || 0, 3))}</MediumText>
+          </View>
         </View>
-        <View style={localStyles.quantity}>
-          <MediumText>{formatValue({ type: 'number' }, round(item.quantity || 0, 3))}</MediumText>
+      ) : (
+        <View style={localStyles.group}>
+          <MediumText
+            style={[
+              item.type === 'parent' && { ...localStyles.itemParent, backgroundColor: colors.surfaceVariant },
+              item.type === 'group' && localStyles.itemGroup,
+            ]}
+          >
+            {item.name}
+          </MediumText>
         </View>
-      </View>
-    ) : (
-      <View style={localStyles.group}>
-        <MediumText
-          style={[item.type === 'parent' && localStyles.itemParent, item.type === 'group' && localStyles.itemGroup]}
-        >
-          {item.name}
-        </MediumText>
-      </View>
-    )}
-  </View>
-);
+      )}
+    </View>
+  );
+};
 
 export const ReportListByGood = () => {
   const {
@@ -55,6 +63,8 @@ export const ReportListByGood = () => {
     filterReportOnDE,
     filterReportStatusList = [],
   } = useSelector((state) => state.app.formParams as IReportListFormParam);
+
+  const { colors } = useTheme();
 
   const orders = docSelectors.selectByDocType<IOrderDocument>('order');
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup').data;
@@ -136,6 +146,8 @@ export const ReportListByGood = () => {
     [filteredGroupList],
   );
 
+  const renderItem = useCallback(({ item }: { item: IReportItemByGoods }) => <ReportItemByGoods item={item} />, []);
+
   return (
     <View style={styles.flex}>
       <FlashList
@@ -148,8 +160,8 @@ export const ReportListByGood = () => {
         estimatedItemSize={40}
         extraData={[firstLevelGroups, groups, lines]}
       />
-      <View style={{ backgroundColor: globalColors.backgroundLight }}>
-        <View style={[styles.directionRow, localStyles.margins, { backgroundColor: globalColors.backgroundLight }]}>
+      <View style={{ backgroundColor: colors.surfaceVariant }}>
+        <View style={[styles.directionRow, localStyles.margins]}>
           <LargeText style={styles.textTotal}>Общий вес, кг: </LargeText>
           <MediumText style={styles.textTotal}>{sAll}</MediumText>
         </View>

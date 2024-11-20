@@ -6,7 +6,7 @@ import { Snackbar, useTheme } from 'react-native-paper';
 
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
-import { globalStyles as styles, BottomSheet, RadioGroup, AppActivityIndicator } from '@lib/mobile-ui';
+import { globalStyles as styles, BottomSheet, RadioGroup, AppActivityIndicator, globalColors } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 
 import { IListItem } from '@lib/mobile-types';
@@ -36,7 +36,7 @@ const DEFAULT_LATITUDE = 53.9;
 const DEFAULT_LONGITUDE = 27.56667;
 
 const MapScreen = () => {
-  const { colors } = useTheme();
+  const { dark, colors } = useTheme();
   const [barVisible, setBarVisible] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -252,6 +252,7 @@ const MapScreen = () => {
         initialRegion={region}
         style={localStyles.mapView}
         provider={useGoogleMaps ? PROVIDER_GOOGLE : PROVIDER_DEFAULT}
+        userInterfaceStyle={dark ? 'dark' : 'light'}
       >
         {list.map((point) => (
           <Marker
@@ -292,7 +293,7 @@ const MapScreen = () => {
                 style={localStyles.routeIcon}
                 name="autorenew"
                 size={25}
-                color={colors.onSurface}
+                color={globalColors.black}
               />
             </TouchableOpacity>
           </View>
@@ -311,20 +312,20 @@ const MapScreen = () => {
       ) : null}
       <View style={[localStyles.buttonContainer]}>
         <TouchableOpacity onPress={movePrevPoint} style={[localStyles.bubble, localStyles.button]} disabled={loading}>
-          <MaterialCommunityIcons name="chevron-left" size={35} color={colors.onSurface} />
+          <MaterialCommunityIcons name="chevron-left" size={35} color={globalColors.black} />
         </TouchableOpacity>
         <TouchableOpacity onPress={moveNextPoint} style={[localStyles.bubble, localStyles.button]}>
-          <MaterialCommunityIcons name="chevron-right" size={35} color={colors.onSurface} />
+          <MaterialCommunityIcons name="chevron-right" size={35} color={globalColors.black} />
         </TouchableOpacity>
         <TouchableOpacity onPress={handleFitToCoordinates} style={[localStyles.bubble, localStyles.button]}>
-          <MaterialCommunityIcons name="routes" size={35} color={colors.onSurface} />
+          <MaterialCommunityIcons name="routes" size={35} color={globalColors.black} />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={handleGetLocation}
           disabled={loading}
           style={[localStyles.bubble, localStyles.button]}
         >
-          <MaterialCommunityIcons name="crosshairs-gps" size={35} color={colors.onSurface} />
+          <MaterialCommunityIcons name="crosshairs-gps" size={35} color={globalColors.black} />
         </TouchableOpacity>
       </View>
       <BottomSheet

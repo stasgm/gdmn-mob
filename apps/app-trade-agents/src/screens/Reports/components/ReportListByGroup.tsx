@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { EmptyList, globalColors, globalStyles as styles, ItemSeparator, LargeText, MediumText } from '@lib/mobile-ui';
+import { EmptyList, globalStyles as styles, ItemSeparator, LargeText, MediumText } from '@lib/mobile-ui';
 
 import { formatValue, keyExtractorByIndex, round } from '@lib/mobile-hooks';
 
@@ -9,6 +9,8 @@ import { docSelectors, useSelector } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 
 import { FlashList } from '@shopify/flash-list';
+
+import { useTheme } from 'react-native-paper';
 
 import { IOrderDocument, IReportItemByGroup, IReportListFormParam } from '../../../store/types';
 
@@ -44,6 +46,8 @@ export const ReportListByGroup = () => {
   } = useSelector((state) => state.app.formParams as IReportListFormParam);
 
   const orders = docSelectors.selectByDocType<IOrderDocument>('order');
+
+  const { colors } = useTheme();
 
   const filteredOrderList = useMemo(
     () =>
@@ -142,8 +146,8 @@ export const ReportListByGroup = () => {
         extraData={[filterReportGroup, filteredOrderList]}
       />
       {sAll > 0 && (
-        <View style={{ backgroundColor: globalColors.backgroundLight }}>
-          <View style={[styles.directionRow, localStyles.margins, { backgroundColor: globalColors.backgroundLight }]}>
+        <View style={{ backgroundColor: colors.surfaceVariant }}>
+          <View style={[styles.directionRow, localStyles.margins]}>
             <LargeText style={styles.textTotal}>Общий вес, кг: </LargeText>
             <MediumText style={styles.textTotal}>{formatValue({ type: 'number' }, sAll)}</MediumText>
           </View>

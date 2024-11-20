@@ -50,7 +50,7 @@ const FilterButtons = ({ status, onPress, style, statusList = [] }: IProps) => {
               i === 0 && styles.firstBtnTab,
               i === (statusList?.length ? statusList : statusTypes).length - 1 && styles.lastBtnTab,
               e.status === status && { backgroundColor: customColors.primary },
-              { borderColor: customColors.primary },
+              { borderColor: e.status === status ? customColors.primary : colors.primary },
             ]}
             onPress={() => onPress(e.status)}
           >

@@ -31,7 +31,7 @@ const GoodItem = ({ item }: IProps) => {
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          <LargeText style={[styles.textBold, { color: colors.inversePrimary }]}>{item?.good.name}</LargeText>
+          <LargeText style={[styles.textBold, { color: colors.onSurface }]}>{item?.good.name}</LargeText>
           <View style={styles.directionRow}>
             <MediumText>
               {item.remains} {item.good.valueName} - {(item?.price || 0).toString()} р.
