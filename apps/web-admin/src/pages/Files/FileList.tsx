@@ -8,6 +8,8 @@ import DriveFileMoveOutlinedIcon from '@mui/icons-material/DriveFileMoveOutlined
 
 import { IFileSystem } from '@lib/types';
 
+import { useFormik } from 'formik';
+
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
 import { IFileFilter, IHeadCells, IFilePageParam, IToolBarButton } from '../../types';
@@ -16,11 +18,35 @@ import SnackBar from '../../components/SnackBar';
 import actions from '../../store/file';
 import FileListTable from '../../components/file/FileListTable';
 import RadioGroup from '../../components/RadioGoup';
+import SearchTextField from '../../components/SearchTextField';
 
 const FileList = () => {
   const dispatch = useDispatch();
 
   const { list, loading, errorMessage, pageParams, folders } = useSelector((state) => state.files);
+
+  const initialValues = useMemo(() => {
+    return {
+      path: '',
+      fileName: '',
+      company: '',
+      appSystem: '',
+      producer: '',
+      consumer: '',
+      device: '',
+      uid: '',
+      date: '',
+      searchQuery: '',
+    };
+  }, []);
+
+  const formik = useFormik<IFileFilter>({
+    enableReinitialize: true,
+    initialValues: pageParams?.filesFilters || initialValues,
+    onSubmit: (values) => {
+      fetchFiles(values);
+    },
+  });
 
   const sortedList = useMemo(() => list.sort((a, b) => (a.path < b.path ? -1 : 1)), [list]);
   const fetchFiles = useCallback(
@@ -177,6 +203,12 @@ const FileList = () => {
   };
 
   const [openFolder, setOpenFolder] = useState(false);
+  const [openTextField, setOpenTextField] = useState(false);
+  const [textSearch, setTextSearch] = useState('');
+
+  const handleOpenSearchField = () => {
+    setOpenTextField(true);
+  };
 
   const handleGetFolders = () => {
     if (!selectedFileIds.length) {
@@ -218,6 +250,10 @@ const FileList = () => {
     setOpenFolder(false);
   };
 
+  const handleCloseTextField = () => {
+    setOpenTextField(false);
+  };
+
   const handleMoveFiles = () => {
     setOpenFolder(false);
     if (selectedFolder && selectedFileIds.length) {
@@ -230,9 +266,32 @@ const FileList = () => {
     }
   };
 
+  const updateTable = (value: string) => {
+    handleSetPageParams({
+      ...pageParams,
+      filesFilters: { ...(pageParams?.filesFilters || initialValues), searchQuery: value },
+      page: 0,
+    });
+  };
+
+  const handleSearch = useCallback(
+    (value: string) => {
+      setTextSearch(value);
+      formik.setFieldValue('searchQuery', value);
+      setOpenTextField(false);
+    },
+    [formik],
+  );
+
   const [selectedFolder, setSelectedFolder] = useState<string | undefined>(undefined);
 
   const buttons: IToolBarButton[] = [
+    {
+      name: 'Поиск в файлах',
+      sx: { mx: 1 },
+      onClick: handleOpenSearchField,
+      icon: <FilterIcon />,
+    },
     {
       name: 'Обновить',
       sx: { mx: 1 },
@@ -291,6 +350,17 @@ const FileList = () => {
         onOk={handleMoveFiles}
         values={folders}
       />
+      <SearchTextField
+        isOpen={openTextField}
+        okLabel="Поиск в файле"
+        value={textSearch}
+        onClose={handleCloseTextField}
+        onOk={(value) => {
+          handleSearch(value);
+          updateTable(value);
+        }}
+      />
+      <></>
       <Box
         sx={{
           backgroundColor: 'background.default',

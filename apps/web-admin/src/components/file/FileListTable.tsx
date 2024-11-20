@@ -73,6 +73,7 @@ const FileListTable = ({
       device: '',
       uid: '',
       date: '',
+      searchQuery: '',
     };
   }, []);
 

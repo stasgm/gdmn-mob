@@ -52,6 +52,7 @@ export interface IFileFilter {
   device: string;
   uid: string;
   date: string;
+  searchQuery: string;
 }
 
 export interface IFilePageParam extends IPageParam {
