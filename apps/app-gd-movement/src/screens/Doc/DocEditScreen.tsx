@@ -346,7 +346,7 @@ export const DocEditScreen = () => {
 
   useEffect(() => {
     //Если меняем тип документа и для поля Откуда есть подразделение по умолчанию
-    if (docFromContactType) {
+    if ((docFromContactType && !doc) || (docFromContactType && oldDocTypeId)) {
       dispatch(
         appActions.setFormParams({
           fromContact:
@@ -354,7 +354,7 @@ export const DocEditScreen = () => {
         }),
       );
     }
-  }, [dispatch, docDocumentType, defaultFromDepartment, docFromContactType]);
+  }, [dispatch, docDocumentType, defaultFromDepartment, docFromContactType, doc, oldDocTypeId]);
 
   const handlePresentType = () => {
     if (isBlocked) {

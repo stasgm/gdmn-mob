@@ -143,9 +143,9 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
       const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
       const q = validNumber.test(newValue) ? newValue : isQuantity ? keypadValue.quantity : keypadValue.sumWNds;
       setKeypadValue(getValue(keypadValue, q));
-      onSetLine(getValue(keypadValue, parseFloat(q || '0')));
+      onSetLine(getValue({ ...item, keypadValue }, parseFloat(q || '0')));
     },
-    [isKeyboardOpen, isQuantity, keypadValue, getValue, onSetLine],
+    [isKeyboardOpen, isQuantity, keypadValue, getValue, onSetLine, item],
   );
 
   const handleChangeQuantity = useCallback(() => {
