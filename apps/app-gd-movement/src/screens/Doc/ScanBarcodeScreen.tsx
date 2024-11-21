@@ -89,8 +89,8 @@ const ScanBarcodeScreen = () => {
   );
 
   const getScannedObject = useCallback(
-    (brc: string, typeOk = true) => {
-      if (!brc) {
+    (brcScan: string, typeOk = true) => {
+      if (!brcScan) {
         return;
       }
 
@@ -101,6 +101,10 @@ const ScanBarcodeScreen = () => {
         });
         return;
       }
+
+      ///^01\d{13,14}21[a-z\d]{13}91[a-z\d]{1,4}92[a-z\d]{1,44}$/i - если нужно будет проверять больше
+      const isTypeDM = RegExp(/^01\d{13,14}21[a-z\d]{13}[a-z\d]{44,}$/i).test(brcScan);
+      const brc = isTypeDM ? brcScan.substring(2, brcScan.indexOf('21', 15)) : brcScan;
 
       let charFrom = 0;
       let charTo = weightSettingsWeightCode.data.length;
@@ -129,6 +133,7 @@ const ScanBarcodeScreen = () => {
           sortOrder: (document?.lines?.[0]?.sortOrder || 0) + 1,
           alias: remItem.good.alias || '',
           weightCode: remItem.good.weightCode?.trim() || '',
+          EID: isTypeDM && remItem.good.isMark ? brcScan : undefined,
         };
 
         if (scannedObject) {
@@ -171,6 +176,7 @@ const ScanBarcodeScreen = () => {
           sortOrder: (document?.lines?.[0]?.sortOrder || 0) + 1,
           alias: remItem.good.alias || '',
           weightCode: remItem.good.weightCode?.trim() || '',
+          EID: isTypeDM && remItem.good.isMark ? brcScan : undefined,
         };
 
         if (scannedObject) {

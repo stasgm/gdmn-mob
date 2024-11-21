@@ -80,16 +80,25 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
     };
   }, [visibleDialog]);
 
-  const handleGetScannedObject = useCallback((brc: string) => {
-    setScaner({ state: 'found' });
-    if (!brc) {
-      return;
-    }
-    setGoodEID(brc);
+  const handleGetScannedObject = useCallback(
+    (brc: string) => {
+      setScaner({ state: 'found' });
+      if (!brc || !RegExp(/^01\d{13,14}21[a-z\d]{13}[a-z\d]{44,}$/i).test(brc)) {
+        return;
+      }
 
-    setScaner({ state: 'init' });
-    setDoScanned(false);
-  }, []);
+      const gtin = brc.substring(2, brc.indexOf('21', 15));
+      if (gtin !== item?.barcode) {
+        setScaner({ state: 'error', message: 'Коды товаров не совпадают.' });
+        return;
+      }
+      setGoodEID(brc);
+
+      setScaner({ state: 'init' });
+      setDoScanned(false);
+    },
+    [item?.barcode],
+  );
 
   const handleClearScaner = () => setScaner({ state: 'init' });
 

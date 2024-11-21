@@ -59,6 +59,7 @@ export interface IGood extends INamedEntity {
   price?: number; //Цена
   buyingPrice?: number;
   scale?: number; //количество единиц в месте
+  isMark?: boolean; //маркируется
 }
 
 export interface IRemGood {
