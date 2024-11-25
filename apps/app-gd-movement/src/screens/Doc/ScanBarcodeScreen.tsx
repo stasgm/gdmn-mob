@@ -30,6 +30,7 @@ const ScanBarcodeScreen = () => {
   const isInputQuantity = settings?.quantityInput?.data;
 
   const prefixGtin = (settings.prefixGtin as ISettingsOption<string>)?.data || '';
+  const prefixISN = (settings.prefixISN as ISettingsOption<string>)?.data || '';
   const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
   const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>)?.data || 0;
   const weightSettingsCountWeight = (settings.countWeight as ISettingsOption<number>)?.data || 0;
@@ -89,8 +90,8 @@ const ScanBarcodeScreen = () => {
   );
 
   const getScannedObject = useCallback(
-    (brcScan: string, typeOk = true) => {
-      if (!brcScan) {
+    (brc: string, typeOk = true) => {
+      if (!brc) {
         return;
       }
 
@@ -102,16 +103,13 @@ const ScanBarcodeScreen = () => {
         return;
       }
 
-      ///^01\d{13,14}21[a-z\d]{13}91[a-z\d]{1,4}92[a-z\d]{1,44}$/i - если нужно будет проверять больше
-      const isTypeDM = RegExp(/^01\d{13,14}21[a-z\d]{13}[a-z\d]{44,}$/i).test(brcScan);
-      const brc = isTypeDM ? brcScan.substring(2, brcScan.indexOf('21', 15)) : brcScan;
-
       let charFrom = 0;
       let charTo = weightSettingsWeightCode.data.length;
+      const regIsTypeDM = RegExp(`^.{0,1}${prefixGtin}\\d{13,14}${prefixISN}[a-zа-яё\\d]{13}.{44,}`, 'i');
 
       if (brc.slice(0, 2) === prefixGtin || brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
         const remItem =
-          getBrc(brc, prefixGtin, goodRemains) ||
+          getBrc(brc, prefixGtin, goodRemains, prefixISN) ||
           (documentType?.isRemains ? undefined : { good: { ...unknownGood, barcode: brc } });
 
         // Находим товар из модели остатков по баркоду, если баркод не найден, то
@@ -133,7 +131,7 @@ const ScanBarcodeScreen = () => {
           sortOrder: (document?.lines?.[0]?.sortOrder || 0) + 1,
           alias: remItem.good.alias || '',
           weightCode: remItem.good.weightCode?.trim() || '',
-          EID: isTypeDM && remItem.good.isMark ? brcScan : undefined,
+          EID: regIsTypeDM.test(brc) && remItem.good.isMark ? brc : undefined,
         };
 
         if (scannedObject) {
@@ -176,7 +174,7 @@ const ScanBarcodeScreen = () => {
           sortOrder: (document?.lines?.[0]?.sortOrder || 0) + 1,
           alias: remItem.good.alias || '',
           weightCode: remItem.good.weightCode?.trim() || '',
-          EID: isTypeDM && remItem.good.isMark ? brcScan : undefined,
+          EID: regIsTypeDM.test(brc) && remItem.good.isMark ? brc : undefined,
         };
 
         if (scannedObject) {
@@ -199,6 +197,7 @@ const ScanBarcodeScreen = () => {
       isInputQuantity,
       navigation,
       prefixGtin,
+      prefixISN,
       weightSettingsCountCode,
       weightSettingsCountWeight,
       weightSettingsWeightCode.data,

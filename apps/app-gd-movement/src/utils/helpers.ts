@@ -136,8 +136,15 @@ export const jsonFormat = (str: any) => {
   return JSON.stringify(str, null, '\t');
 };
 
-export const getBrc = (brc: string, prefixGtin: string, goodRemains: IMGoodData<IMGoodRemain>) => {
-  return prefixGtin === brc.slice(0, 2)
-    ? goodRemains[brc.slice(2, 16)] || goodRemains[brc.slice(3, 16)]
-    : goodRemains[brc];
+export const getBrc = (brc: string, prefixGtin: string, goodRemains: IMGoodData<IMGoodRemain>, prefixISN?: string) => {
+  const regSymbol = '[a-zа-яё\\d]';
+
+  ///^01\d{13,14}21[a-z\d]{13}91[a-z\d]{1,4}92.{1,44}$/i - если нужно будет проверять полностью
+  const isTypeDM = RegExp(`^.{0,1}${prefixGtin}\\d{13,14}${prefixISN}${regSymbol}{13}.{44,}`, 'i').test(brc);
+
+  const startPosition = brc.match(RegExp(`${prefixGtin}\\d{13,14}${isTypeDM ? prefixISN : ''}`));
+
+  return startPosition
+    ? goodRemains[startPosition[0].slice(2, -2)] || goodRemains[startPosition[0].slice(3, -2)]
+    : goodRemains[brc.slice(1, 14)] || goodRemains[brc];
 };
