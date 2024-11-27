@@ -1,4 +1,4 @@
-import { ICompany, IDBCompany, NewCompany as NewCompanyData, IAppSystem } from '@lib/types';
+import { ICompany, IDBCompany, NewCompany as NewCompanyData, ICompanyWithAppSystems } from '@lib/types';
 
 import { extraPredicate, formatDateToLocale, getListPart } from '../utils';
 
@@ -29,13 +29,13 @@ const addOne = (companyData: NewCompanyData): ICompany => {
   }
 
   // Проверяем есть ли в базе подсистемы
-  const appSystemIds = companyData.appSystems ? getAppSystemIds(companyData.appSystems) : undefined;
+  const appSystems = companyData.appSystems ? getAppSystemIds(companyData.appSystems) : undefined;
 
   const company = companies.insert({
     id: '',
     name: companyData.name,
     city: companyData.city,
-    appSystemIds,
+    appSystems,
     adminId: companyData.admin.id,
     externalId: companyData.externalId,
     creationDate: new Date().toISOString(),
@@ -78,7 +78,7 @@ const updateOne = (id: string, companyData: Partial<ICompany>): ICompany => {
   }
 
   // Проверяем есть ли в базе подсистемы
-  const appSystemIds = companyData.appSystems ? getAppSystemIds(companyData.appSystems) : undefined;
+  const appSystems = companyData.appSystems ? getAppSystemIds(companyData.appSystems) : undefined;
 
   companies.update({
     id,
@@ -86,7 +86,7 @@ const updateOne = (id: string, companyData: Partial<ICompany>): ICompany => {
     adminId,
     externalId: companyData.externalId || company.externalId,
     city: companyData.city,
-    appSystemIds: appSystemIds || company.appSystemIds,
+    appSystems,
     creationDate: company.creationDate,
     editionDate: new Date().toISOString(),
   });
@@ -205,12 +205,18 @@ const findMany = (params: Record<string, string | number>): ICompany[] => {
 export const makeCompany = (company: IDBCompany): ICompany => {
   const { users, appSystems } = getDb();
 
+  company.appSystems?.map((s) => {
+    return { ...appSystems.getNamedItem(s.id), deviceCount: s.deviceCount };
+  });
+
   /* TODO В звависимости от прав возвращать разный набор полей */
   return {
     id: company.id,
     name: company.name,
     city: company.city,
-    appSystems: company.appSystemIds?.map((s) => appSystems.getNamedItem(s)),
+    appSystems: company.appSystems?.map((s) => {
+      return { ...appSystems.getNamedItem(s.id), deviceCount: s.deviceCount };
+    }),
     admin: users.getNamedItem(company.adminId),
     externalId: company.externalId,
     creationDate: company.creationDate,
@@ -218,13 +224,13 @@ export const makeCompany = (company: IDBCompany): ICompany => {
   };
 };
 
-const getAppSystemIds = (namedAppSystems: IAppSystem[]) => {
+const getAppSystemIds = (namedAppSystems: ICompanyWithAppSystems[]) => {
   // Проверяем есть ли в базе подсистемы
-  return namedAppSystems.map(({ id }) => {
-    if (!getDb().appSystems.findById(id)) {
+  return namedAppSystems.map((item) => {
+    if (!getDb().appSystems.findById(item.id)) {
       throw new DataNotFoundException('Подсистема не найдена');
     }
-    return id;
+    return { id: item.id, deviceCount: item.deviceCount };
   });
 };
 

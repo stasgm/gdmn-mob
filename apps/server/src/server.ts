@@ -29,7 +29,7 @@ import { errorHandler } from './middleware';
 import { userService, processList } from './services';
 import router from './routes';
 import { createDb } from './services/dao/db';
-import { checkFiles } from './services/fileUtils';
+import { checkFiles, formatingFileCompanies } from './services/fileUtils';
 import { log, MSEС_IN_MIN, MSEС_IN_DAY } from './utils';
 
 interface IServer {
@@ -47,6 +47,10 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   app.keys = ['super-secret-key-web1215'];
 
   app.context.db = await createDb(server.dbPath, server.dbName);
+
+  // временно
+  // перед началом работы вызов метода, который исправит файл
+  await formatingFileCompanies(app.context.db.dbPath);
 
   processList.loadProcessListFromDisk();
   processList.checkProcessList(true);
