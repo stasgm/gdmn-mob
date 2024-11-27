@@ -85,10 +85,9 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
   const handleGetScannedObject = useCallback(
     (brc: string) => {
       setScaner({ state: 'found' });
-      const regSymbol = '[a-zа-яё\\d]';
       const prefixGtin = (settings.prefixGtin as ISettingsOption<string>)?.data || '';
       const prefixISN = (settings.prefixISN as ISettingsOption<string>)?.data || '';
-      const isTypeDM = RegExp(`^.{0,1}${prefixGtin}\\d{13,14}${prefixISN}${regSymbol}{13}.{44,}`, 'i').test(brc);
+      const isTypeDM = RegExp(`^.{0,1}${prefixGtin}\\d{13,14}${prefixISN}.{13}91.{1,4}92.{1,44}`, 'i').test(brc);
       if (!brc || !isTypeDM) {
         return;
       }

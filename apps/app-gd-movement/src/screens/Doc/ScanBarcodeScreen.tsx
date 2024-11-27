@@ -105,7 +105,7 @@ const ScanBarcodeScreen = () => {
 
       let charFrom = 0;
       let charTo = weightSettingsWeightCode.data.length;
-      const regIsTypeDM = RegExp(`^.{0,1}${prefixGtin}\\d{13,14}${prefixISN}[a-zа-яё\\d]{13}.{44,}`, 'i');
+      const regIsTypeDM = RegExp(`^.{0,1}${prefixGtin}\\d{13,14}${prefixISN}.{13}91.{1,4}92.{1,44}`, 'i');
 
       if (brc.slice(0, 2) === prefixGtin || brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
         const remItem =

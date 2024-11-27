@@ -44,14 +44,14 @@ import {
   keyExtractor,
 } from '@lib/mobile-hooks';
 
-import { INamedEntity, ScreenState } from '@lib/types';
+import { INamedEntity, ISettingsOption, ScreenState } from '@lib/types';
 
 import { FlashList } from '@shopify/flash-list';
 
 import { IRevisionDocument, IRevisionLine } from '../../store/types';
 import { RevisionStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS, unknownGood } from '../../utils/constants';
-import { getRemGoodByContact } from '../../utils/helpers';
+import { getBrc, getRemGoodByContact } from '../../utils/helpers';
 import { IGood, IMGoodData, IMGoodRemain, IRemains } from '../../store/app/types';
 
 export const RevisionViewScreen = () => {
@@ -67,6 +67,8 @@ export const RevisionViewScreen = () => {
   const doc = docSelectors.selectByDocId<IRevisionDocument>(id);
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
   const loading = useSelector((state) => state.app.loading);
+  const settings = useSelector((state) => state.settings?.data);
+  const prefixGtin = (settings.prefixGtin as ISettingsOption<string>)?.data || '';
 
   const isBlocked = doc?.status !== 'DRAFT';
 
@@ -329,7 +331,7 @@ export const RevisionViewScreen = () => {
 
       const line = lines?.find((i) => i.barcode === brc);
 
-      const remItem = goodRemains[brc];
+      const remItem = getBrc(brc, prefixGtin, goodRemains);
 
       if (remItem) {
         if (line) {
@@ -485,7 +487,7 @@ export const RevisionViewScreen = () => {
       }
       handleFocus();
     },
-    [dispatch, doc, goodRemains, goods, id, isBlocked, lines, navigation, visibleDialog],
+    [dispatch, doc, goodRemains, goods, id, isBlocked, lines, navigation, prefixGtin, visibleDialog],
   );
 
   const handleSearchBarcode = () => {
