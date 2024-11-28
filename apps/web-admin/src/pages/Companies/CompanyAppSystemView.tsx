@@ -58,8 +58,9 @@ const CompanyAppSystemView = () => {
   };
 
   const refreshData = useCallback(() => {
-    dispatch(appSystemActions.fetchAppSystems(companyId));
-  }, [dispatch, companyId]);
+    dispatch(companyActions.fetchCompanyById(companyId));
+    dispatch(appSystemActions.fetchAppSystemById(appSystemId));
+  }, [dispatch, companyId, appSystemId]);
 
   useEffect(() => {
     refreshData();
@@ -128,6 +129,7 @@ const CompanyAppSystemView = () => {
       </Box>
     );
   }
+
   const handleDelete = async () => {
     setOpen(false);
     const res = await dispatch(
