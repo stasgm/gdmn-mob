@@ -50,8 +50,6 @@ const CompanyView = () => {
     [company],
   );
 
-  console.log('company: ', company);
-
   const handleEdit = useCallback(() => {
     navigate(`${adminPath}/app/companies/${companyId}/edit`);
   }, [navigate, companyId]);
@@ -121,8 +119,6 @@ const CompanyView = () => {
     { name: 'Подсистемы и ERP-логи', component: <CompanyAppSystems companyId={companyId} /> },
     { name: 'Пользователи', component: <CompanyUsers companyId={companyId} /> },
   ];
-
-  console.log('appSystems: ', company?.appSystems?.toString());
 
   if (!company) {
     return (

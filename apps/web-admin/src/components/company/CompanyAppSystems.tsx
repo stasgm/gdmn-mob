@@ -2,8 +2,6 @@ import { Box } from '@mui/material';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { IAppSystemCompany, ICompanyWithAppSystems } from '@lib/types';
 import CachedIcon from '@mui/icons-material/Cached';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 import { useNavigate } from 'react-router';
@@ -13,7 +11,7 @@ import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
 import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
 import { useDispatch, useSelector } from '../../store';
 import CircularProgressWithContent from '../CircularProgressWidthContent';
-import { appSystemActions, appSystemSelectors } from '../../store/appSystem';
+import { appSystemActions } from '../../store/appSystem';
 import { companySelectors } from '../../store/company';
 
 const headCells: IHeadCells<IAppSystemCompany>[] = [
@@ -31,7 +29,6 @@ const CompanyAppSystems = ({ companyId }: IProps) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const company = companySelectors.companyById(companyId);
-  const appSystems = appSystemSelectors.appSystemsByCompanyId(companyId);
   const { loading, pageParams } = useSelector((state) => state.appSystems);
   const [filterText, setFilterText] = useState(pageParams?.filterText || '');
   const prevFilterTextRef = useRef<string | undefined | null>(null);
@@ -75,31 +72,13 @@ const CompanyAppSystems = ({ companyId }: IProps) => {
     setFilterText('');
   };
 
-  const handleAddAppSystem = () => {
+  const handleAddAppSystem = useCallback(() => {
     // if (list.length && !(authUser?.role === 'SuperAdmin')) {
     //   dispatch(companyActions.setError('Компания уже существует'));
     // } else {
-    return navigate(`${location.pathname}/new`);
+    return navigate(`${location.pathname}/appSystems/new`);
     // }
-  };
-
-  const handleUpdateAppSystem = () => {
-    // if (list.length && !(authUser?.role === 'SuperAdmin')) {
-    //   dispatch(companyActions.setError('Компания уже существует'));
-    // } else {
-    //   return navigate(`${location.pathname}/new`);
-    // }
-    return navigate(`${location.pathname}/new`);
-  };
-
-  const handleDeleteAppSystem = () => {
-    // if (list.length && !(authUser?.role === 'SuperAdmin')) {
-    //   dispatch(companyActions.setError('Компания уже существует'));
-    // } else {
-    //   return navigate(`${location.pathname}/new`);
-    // }
-    return navigate(`${location.pathname}/new`);
-  };
+  }, [navigate]);
 
   const handleSetPageParams = useCallback(
     (newParams: IPageParam) => {
@@ -129,20 +108,6 @@ const CompanyAppSystems = ({ companyId }: IProps) => {
         onClick: handleAddAppSystem,
         icon: <AddCircleOutlineIcon />,
       },
-      // {
-      //   name: 'Редактировать',
-      //   color: 'primary',
-      //   variant: 'contained',
-      //   onClick: handleUpdateAppSystem,
-      //   icon: <EditIcon />,
-      // },
-      // {
-      //   name: 'Удалить',
-      //   color: 'primary',
-      //   variant: 'contained',
-      //   onClick: handleDeleteAppSystem,
-      //   icon: <DeleteIcon />,
-      // },
     ],
     [fetchAppSystems, handleAddAppSystem, loading],
   );
@@ -159,8 +124,6 @@ const CompanyAppSystems = ({ companyId }: IProps) => {
       </Box>
     );
   }
-
-  console.log('company: ', company.toString());
 
   return (
     <Box
@@ -187,22 +150,11 @@ const CompanyAppSystems = ({ companyId }: IProps) => {
             headCells={headCells}
             data={company.appSystems || []}
             path={`/app/companies/${companyId}/appSystems/`}
-            // endPath={'erpLog'}
             onSetPageParams={handleSetPageParams}
             pageParams={pageParams}
             byMaxHeight={true}
             minusHeight={112}
           />
-          {/* <SortableTable<IAppSystem>
-            headCells={headCells}
-            data={appSystems}
-            path={`/app/companies/${companyId}/appSystems/`}
-            endPath={'erpLog'}
-            onSetPageParams={handleSetPageParams}
-            pageParams={pageParams}
-            byMaxHeight={true}
-            minusHeight={112}
-          /> */}
         </Box>
       )}
     </Box>

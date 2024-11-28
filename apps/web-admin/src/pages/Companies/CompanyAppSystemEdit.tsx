@@ -1,6 +1,6 @@
 import { Box, CardHeader, CircularProgress } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ICompany, NewCompany } from '@lib/types';
+import { ICompany } from '@lib/types';
 
 import { useEffect } from 'react';
 
@@ -33,12 +33,26 @@ const CompanyAppSystemEdit = () => {
     navigate(-1);
   };
 
-  const handleSubmit = async (values: ICompany | NewCompany) => {
-    const res = await dispatch(companyActions.addCompany(values as NewCompany));
-    if (res.type === 'COMPANY/ADD_SUCCESS') {
+  const handleSubmit = async (values: ICompany) => {
+    const res = await dispatch(companyActions.updateCompany(values as ICompany));
+    if (res.type === 'COMPANY/UPDATE_SUCCESS') {
       handleGoBack();
     }
   };
+
+  if (!company) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          p: 3,
+        }}
+      >
+        Компания не найдена
+      </Box>
+    );
+  }
 
   return (
     <>
@@ -60,17 +74,12 @@ const CompanyAppSystemEdit = () => {
           </Box>
         </Box>
         <CompanyAppSystemDetails
-          company={{ name: '' } as ICompany}
+          company={company}
+          appSystemId={appSystemId}
           loading={loading}
           onSubmit={handleSubmit}
           onCancel={handleGoBack}
         />
-        {/* <CompanyDetails
-          company={{ name: '' } as ICompany}
-          loading={loading}
-          onSubmit={handleSubmit}
-          onCancel={handleGoBack}
-        /> */}
       </Box>
     </>
   );

@@ -1,32 +1,28 @@
 import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@mui/material';
 
-import { ICompany, NewCompany } from '@lib/types';
+import { ICompany, INamedEntity } from '@lib/types';
 import { useFormik, Field, FormikProvider } from 'formik';
 import * as yup from 'yup';
 
 import { useEffect } from 'react';
 
-import MultipleAutocomplete from '../MultipleAutocomplete';
 import { useDispatch, useSelector } from '../../store';
 import { appSystemActions } from '../../store/appSystem';
 import ComboBox from '../ComboBox';
 
 interface IProps {
   loading: boolean;
-  company: ICompany | NewCompany;
-  onSubmit: (values: ICompany | NewCompany) => void;
+  company: ICompany;
+  appSystemId?: string;
+  onSubmit: (values: ICompany) => void;
   onCancel: () => void;
 }
 
-const CompanyAppSystemDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
+const CompanyAppSystemDetails = ({ company, loading, appSystemId, onSubmit, onCancel }: IProps) => {
   const { list, loading: loadingAppSystems } = useSelector((state) => state.appSystems);
-  const { list: users, loading: loadingUsers } = useSelector((state) => state.users);
-
-  const { user: authUser } = useSelector((state) => state.auth);
-
-  const adminList = users.filter((i) => i.role === 'Admin' && !i.company).map((d) => ({ id: d.id, name: d.name }));
-
-  const isAdminRequired = authUser?.role === 'SuperAdmin' && !company.admin;
+  const appSystem = company.appSystems?.find((i) => i.id === appSystemId);
+  const appSystems =
+    list?.map((l) => ({ id: l.id, name: l.name })).filter((l) => !company.appSystems?.find((a) => a.id === l.id)) || [];
 
   const dispatch = useDispatch();
 
@@ -34,14 +30,30 @@ const CompanyAppSystemDetails = ({ company, loading, onSubmit, onCancel }: IProp
     dispatch(appSystemActions.fetchAppSystems());
   }, [dispatch]);
 
-  const formik = useFormik<ICompany | NewCompany>({
+  const formik = useFormik<{ appSystem: INamedEntity; deviceCount: number }>({
     enableReinitialize: true,
-    initialValues: { ...company, city: company.city || '' },
+    initialValues: {
+      appSystem: {
+        id: appSystemId || '',
+        name: appSystem?.name || '',
+      },
+      deviceCount: appSystem?.deviceCount || 0,
+    },
     validationSchema: yup.object().shape({
-      name: yup.string().required('Required'),
+      appSystem: yup.object().required('Required'),
+      deviceCount: yup.number().required('Required'),
     }),
     onSubmit: (values) => {
-      onSubmit({ ...values, name: values.name.trim() });
+      onSubmit({
+        ...company,
+        appSystems: appSystemId
+          ? [
+              ...(company.appSystems || []).map((as) => {
+                return as.id === appSystemId ? { ...values.appSystem, deviceCount: values.deviceCount } : as;
+              }),
+            ]
+          : [...(company.appSystems || []), { ...values.appSystem, deviceCount: values.deviceCount }],
+      });
     },
   });
 
@@ -65,34 +77,38 @@ const CompanyAppSystemDetails = ({ company, loading, onSubmit, onCancel }: IProp
                     variant="outlined"
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
-                    type="city"
+                    type="company"
                     required={true}
-                    disabled={loading}
-                    value={formik.values.city}
+                    disabled={true}
+                    value={company.name}
                   />
-                  <TextField
-                    error={formik.touched.city && Boolean(formik.errors.city)}
-                    fullWidth
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <Field
+                    component={ComboBox}
+                    name="appSystem"
                     label="Подсистема"
-                    name="city"
-                    variant="outlined"
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    type="city"
-                    disabled={loading}
-                    value={formik.values.city}
+                    type="appSystem"
+                    options={appSystems}
+                    setFieldValue={formik.setFieldValue}
+                    setTouched={formik.setTouched}
+                    error={Boolean(formik.touched.appSystem && formik.errors.appSystem)}
+                    disabled={loadingAppSystems || appSystemId}
+                    // required={isAdminRequired}
                   />
+                </Grid>
+                <Grid item md={6} xs={12}>
                   <TextField
-                    error={formik.touched.city && Boolean(formik.errors.city)}
                     fullWidth
                     label="Количество устройств"
-                    name="city"
+                    name="deviceCount"
                     variant="outlined"
+                    value={formik.values.deviceCount}
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
-                    type="city"
+                    type="deviceCount"
                     disabled={loading}
-                    value={formik.values.city}
+                    error={Boolean(formik.touched.deviceCount && formik.errors.deviceCount)}
                   />
                 </Grid>
               </Grid>
