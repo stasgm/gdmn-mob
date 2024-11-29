@@ -46,8 +46,8 @@ const UserView = () => {
             { id: 'Email', value: user.email },
             { id: 'Идентификатор из ERP', value: user.externalId },
             user.appSystem
-              ? { id: 'Подсистема', value: user.appSystem.name }
-              : { id: 'Пользователь ERP', value: user.erpUser?.name },
+              ? { id: 'Подсистема', value: user.appSystem }
+              : { id: 'Пользователь ERP', value: user.erpUser },
             { id: 'Компания', value: user.company, link: `${adminPath}/app/companies/${user.company?.id}/` },
           ]
         : [],
