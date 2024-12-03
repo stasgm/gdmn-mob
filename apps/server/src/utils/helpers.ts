@@ -2,6 +2,7 @@ import { IDBHeadMessage, IDBMessage } from '@lib/types';
 import { customAlphabet } from 'nanoid';
 
 import { IParamsInfo } from '../types';
+import { getDb } from '../services/dao/db';
 
 const extraPredicate = (item: any, params: Record<string, string>) => {
   let matched = 0;
@@ -184,6 +185,31 @@ const isAllParamMatched = (item: any, paramsInfo: IParamsInfo) => {
   return true;
 };
 
+const getCountDevicesCompany = (companyId: string) => {
+  //для подсчета количества устройств в компании для каждой подсистемы
+  const { devices, users, deviceBindings, companies } = getDb();
+  const appSystems = companies.data.find((system) => system.id === companyId)?.appSystems;
+  const companyDevices = devices.data.filter((device) => device.companyId === companyId);
+  const deviceBindingsList = companyDevices
+    .map((device) => deviceBindings.data.find((binding) => device.id === binding.deviceId))
+    .filter((i) => !!i);
+  const filterUsers = deviceBindingsList
+    .map((binding) =>
+      users.data.find(
+        (user) =>
+          binding?.userId === user.id &&
+          user.company === companyId &&
+          appSystems?.find((system) => system.id === users.data.find((i) => i.id === user.erpUserId)?.appSystemId),
+      ),
+    )
+    .filter((i) => !!i);
+  const usedAppSystems = filterUsers.map((user) => users.data.find((i) => i.id === user?.erpUserId)?.appSystemId);
+  const mapSystems = new Map<string, number>();
+  usedAppSystems.forEach((i) => i && mapSystems.set(i, (mapSystems.get(i) || 0) + 1));
+
+  return mapSystems;
+};
+
 export {
   extraPredicate,
   getListPart,
@@ -194,4 +220,5 @@ export {
   checkDateFormat,
   isAllParamMatched,
   getListPartByParams,
+  getCountDevicesCompany,
 };

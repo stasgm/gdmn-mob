@@ -69,7 +69,7 @@ const addOne = (userData: NewUser): IUser => {
  * @return обновленный объект пользователя
  * */
 const updateOne = (id: string, userData: Partial<IUser & { password: string }>): IUser => {
-  const { users, companies, appSystems } = getDb();
+  const { users, companies, deviceBindings, appSystems } = getDb();
 
   const oldUser = users.findById(id);
 
@@ -112,6 +112,15 @@ const updateOne = (id: string, userData: Partial<IUser & { password: string }>):
       throw new DataNotFoundException('Пользователь для данной подсистемы уже существует');
     }
   }
+
+  // Проверяем есть ли привязанные устройства, если меняем подсистему
+  const subUsers = users.data.filter((user) => user.erpUserId === oldUser.id);
+  if (deviceBindings.data.find((biding) => subUsers.find((user) => user.id === biding.userId))) {
+    throw new ConflictException(
+      'Нельзя изменить подсистему, т.к. есть привязанные устройства к пользователям подсистемы',
+    );
+  }
+
   // Проверяем есть ли в базе пользователь ERP
   let newErpUserId;
   if (userData.erpUser) {

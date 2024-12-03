@@ -2,7 +2,7 @@ import { IDBDevice, IDevice, NewDevice } from '@lib/types';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
 
-import { extraPredicate, formatDateToLocale, getListPart, deviceStates } from '../utils';
+import { extraPredicate, formatDateToLocale, getListPart, deviceStates, getCountDevicesCompany } from '../utils';
 
 import { getDb } from './dao/db';
 
@@ -15,10 +15,19 @@ import { devices as mockDevices } from './data/devices';
  * */
 
 const addOne = (deviceData: NewDevice): IDevice => {
-  const { devices } = getDb();
+  const { devices, companies } = getDb();
 
   if (devices.data.find((i) => i.name === deviceData.name && i.companyId === deviceData.company?.id)) {
-    throw new ConflictException(`Устройство с наименование ${deviceData.name} уже сущеcтвует`);
+    throw new ConflictException(`Устройство с наименованием ${deviceData.name} уже сущеcтвует`);
+  }
+
+  const appSystems = companies.data.find((system) => system.id === deviceData.company?.id)?.appSystems;
+
+  const systems = getCountDevicesCompany(deviceData.company?.id);
+  const devicesCount = appSystems?.filter((a) => a.deviceCount > (systems.get(a.id) || 0)).map((i) => i.id);
+
+  if (!devicesCount || devicesCount.length === 0) {
+    throw new ConflictException('Во всех подсистемах компании нет свободных мест для нового устройства');
   }
 
   const device = devices.insert({
@@ -40,7 +49,19 @@ const addOne = (deviceData: NewDevice): IDevice => {
  * @return обновленное устройство
  * */
 const updateOne = (id: string, deviceData: Partial<IDevice>, params?: Record<string, string>): IDevice => {
-  const { companies, devices, users } = getDb();
+  const { companies, devices, users, deviceBindings } = getDb();
+
+  if (params) {
+    if ('adminId' in params) {
+      const admin = users.findById(params.adminId);
+      if (admin?.role !== 'SuperAdmin') {
+        const company = companies.data.find((c) => c.id === companyId && c.adminId === params.adminId);
+        if (!company) {
+          throw new DataNotFoundException('Устройство не может быть отредактировано');
+        }
+      }
+    }
+  }
 
   const oldDevice = devices.findById(id);
 
@@ -58,16 +79,11 @@ const updateOne = (id: string, deviceData: Partial<IDevice>, params?: Record<str
     companyId = company.id;
   }
 
-  if (params) {
-    if ('adminId' in params) {
-      const admin = users.findById(params.adminId);
-      if (admin?.role !== 'SuperAdmin') {
-        const company = companies.data.find((c) => c.id === companyId && c.adminId === params.adminId);
-        if (!company) {
-          throw new DataNotFoundException('Устройство не может быть отредактировано');
-        }
-      }
-    }
+  if (
+    oldDevice.companyId !== deviceData.company?.id &&
+    deviceBindings.data.find((binding) => binding.deviceId === id)
+  ) {
+    throw new ConflictException('Нельзя изменить комапнию, т.к. устройство уже привязано к пользовтелю');
   }
 
   devices.update({

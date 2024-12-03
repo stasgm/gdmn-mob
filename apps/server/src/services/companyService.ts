@@ -1,6 +1,6 @@
 import { ICompany, IDBCompany, NewCompany as NewCompanyData, ICompanyWithAppSystems } from '@lib/types';
 
-import { extraPredicate, formatDateToLocale, getListPart } from '../utils';
+import { extraPredicate, formatDateToLocale, getCountDevicesCompany, getListPart } from '../utils';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
 
@@ -79,6 +79,21 @@ const updateOne = (id: string, companyData: Partial<ICompany>): ICompany => {
 
   // Проверяем есть ли в базе подсистемы
   const appSystems = companyData.appSystems ? getAppSystemIds(companyData.appSystems) : undefined;
+  if (appSystems) {
+    const appSystemsEdit = appSystems.filter((i) => {
+      const app = company.appSystems?.find((p) => p.id === i.id);
+      return app && app.deviceCount > i.deviceCount;
+    });
+    if (appSystemsEdit.length > 0) {
+      const systems = getCountDevicesCompany(company.id);
+      const v = appSystems?.filter((a) => a.deviceCount >= (systems.get(a.id) || 0)).map((i) => i.id);
+      console.log('you can add a device: ', v);
+
+      if (!v || v.length === 0) {
+        throw new ConflictException(`Невозможно уменьшить количество устройств в подсистеме ${v}`);
+      }
+    }
+  }
 
   companies.update({
     id,
@@ -134,7 +149,12 @@ const deleteOne = (id: string) => {
   //Удаляем всех пользователей данной компании кроме Админа и Суперадмина
   users.data
     .filter((user) => user.company === id && user.role !== 'Admin' && user.role !== 'SuperAdmin')
-    ?.forEach((user) => users.deleteById(user.id));
+    ?.forEach((user) => {
+      deviceBindings.data
+        .filter((binding) => binding.userId === user.id)
+        ?.forEach((binding) => deviceBindings.deleteById(binding.id));
+      users.deleteById(user.id);
+    });
 
   //Очищаем компанию у админа
   updateUserCompany(company.adminId, { id: company.adminId, company: undefined });
