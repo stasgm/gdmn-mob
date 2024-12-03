@@ -13,6 +13,7 @@ import { adminPath, deviceStates } from '../../utils/constants';
 import { useDispatch, useSelector } from '../../store';
 import { deviceActions } from '../../store/device';
 import FieldWithIcon from '../FiledWithIcon';
+import { userSelectors } from '../../store/user';
 
 interface IProps {
   loading: boolean;
@@ -27,6 +28,8 @@ export interface IDeviceBindingFormik extends Omit<IDeviceBinding, 'state'> {
 
 const DeviceBindingDetails = ({ deviceBinding, loading, onSubmit, onCancel }: IProps) => {
   const { list: devices, loading: loadingDevices } = useSelector((state) => state.devices);
+  const user = userSelectors.userById(deviceBinding.user.id);
+  const userERP = user?.erpUser && userSelectors.userById(user.erpUser.id);
 
   const navigate = useNavigate();
 
@@ -113,7 +116,14 @@ const DeviceBindingDetails = ({ deviceBinding, loading, onSubmit, onCancel }: IP
                     label="Устройство"
                     name="device"
                     type="device"
-                    options={devices?.map((d) => ({ id: d.id, name: d.name })) || []}
+                    options={
+                      (!userERP ? devices : (devices || []).filter((d) => d.company.id === user?.company?.id)).map(
+                        (d) => ({
+                          id: d.id,
+                          name: d.name,
+                        }),
+                      ) || []
+                    }
                     setFieldValue={handleAddDevice}
                     setTouched={formik.setTouched}
                     error={Boolean(formik.touched.device && formik.errors.device)}
