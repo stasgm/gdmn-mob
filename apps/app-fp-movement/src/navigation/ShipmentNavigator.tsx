@@ -8,10 +8,7 @@ const Stack = createStackNavigator<ShipmentStackParamList>();
 
 export const ShipmentNavigator = () => {
   return (
-    <Stack.Navigator
-      initialRouteName="ShipmentList"
-      screenOptions={{ headerShown: true, headerBackTitleVisible: false }}
-    >
+    <Stack.Navigator initialRouteName="ShipmentList" screenOptions={{ headerShown: true, headerBackTitle: '' }}>
       {Object.entries({ ...shipmentListScreens, ...shipmentScreens }).map(([name, { title, component }]) => (
         <Stack.Screen
           name={name as keyof ShipmentStackParamList}

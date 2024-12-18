@@ -11,9 +11,10 @@
       "android": {
         "distribution": "internal",
         "buildType": "apk"
-      }
+      },
+      "node": "20.9.0"
     },
-    "production": {"node": "18.14.0"}
+    "production": {"node": "20.9.0"}
   },
   "submit": {
     "production": {}

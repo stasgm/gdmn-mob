@@ -200,12 +200,12 @@ export const PalletListScreen = () => {
         errorMessage: i.errorMessage,
         sentDate: i.sentDate,
         erpCreationDate: i.erpCreationDate,
-        children: (
+        children: i.head.palletId && (
           <BarcodeImage
-            barcode={i?.head.palletId}
+            barcode={i.head.palletId}
             isPrint={true}
             printText={` <h1 style="font-size: 22px; font-family: Helvetica Neue; font-weight: normal;">
-        ${`№ ${i?.number || '-'} от ${getDateString(i?.documentDate || '')}` || ''}</h1>
+        ${`№ ${i.number || '-'} от ${getDateString(i.documentDate || '')}` || ''}</h1>
       `}
           />
         ),

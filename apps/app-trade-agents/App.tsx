@@ -1,6 +1,7 @@
 import { Linking, ScrollView, TouchableOpacity, View } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
+import * as SplashScreen from 'expo-splash-screen';
 import { MobileApp } from '@lib/mobile-app';
 import { dialCall, sleep } from '@lib/mobile-hooks';
 import { INavItem, GDMN_PHONE, GDMN_EMAIL, GDMN_SITE_ADDRESS } from '@lib/mobile-navigation';
@@ -48,6 +49,10 @@ import {
 import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
 import { messageAgent } from './src/store/mock';
 import ReportsNavigator from './src/navigation/Root/ReportsNavigator';
+
+SplashScreen.preventAutoHideAsync()
+  .then((result) => console.log(`SplashScreen.preventAutoHideAsync() succeeded: ${result}`))
+  .catch(console.warn);
 
 const navItems: INavItem[] = [
   { name: 'RoutesNav', title: 'Маршруты', icon: 'routes', component: RoutesNavigator },
@@ -121,8 +126,8 @@ const Root = () => {
 
   useEffect(() => {
     //Для отрисовки при первом подключении
-    const timer = setTimeout(() => {
-      setLoading(false);
+    const timer = setTimeout(async () => {
+      await setLoading(false);
     }, 1000);
     return () => clearTimeout(timer);
   }, []);
@@ -152,8 +157,14 @@ const Root = () => {
     setInfoWindow(value);
   }, []);
 
+  const onLayoutRoot = useCallback(() => {
+    if (!authLoading || !loading || !tradeLoading || !appDataLoading) {
+      SplashScreen.hide();
+    }
+  }, [appDataLoading, authLoading, loading, tradeLoading]);
+
   return authLoading || loading || tradeLoading || appDataLoading ? (
-    <AppScreen>
+    <AppScreen onLayout={onLayoutRoot}>
       <ActivityIndicator size="large" color={defaultTheme.colors.primary} />
       <Caption style={styles.title}>
         {appDataLoading || tradeLoading ? 'Загрузка данных...' : 'Пожалуйста, подождите..'}

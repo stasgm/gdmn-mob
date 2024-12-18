@@ -453,7 +453,7 @@ export const PalletViewScreen = () => {
     <>
       <View style={styles.container}>
         <InfoBlock
-          colorLabel={getStatusColor(doc?.status || 'DRAFT')}
+          colorLabel={getStatusColor(doc.status || 'DRAFT')}
           title={doc.documentType.description || ''}
           onPress={() => (isEditable ? handleEditPalletHead() : setIsDateVisible(!isDateVisible))}
           isBlocked={isBlocked}
@@ -469,7 +469,7 @@ export const PalletViewScreen = () => {
             <View style={styles.rowCenter}>
               <MediumText>Вес поддона: {(doc.head.palletWeight || 0).toString()} кг</MediumText>
             </View>
-            <BarcodeImage barcode={doc?.head.palletId} />
+            <BarcodeImage barcode={doc.head.palletId} />
 
             {isDateVisible && <DateInfo sentDate={doc.sentDate} erpCreationDate={doc.erpCreationDate} />}
           </>

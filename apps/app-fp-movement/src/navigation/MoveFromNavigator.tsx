@@ -8,10 +8,7 @@ const Stack = createStackNavigator<MoveFromStackParamList>();
 
 export const MoveFromNavigator = () => {
   return (
-    <Stack.Navigator
-      initialRouteName="MoveFromList"
-      screenOptions={{ headerShown: true, headerBackTitleVisible: false }}
-    >
+    <Stack.Navigator initialRouteName="MoveFromList" screenOptions={{ headerShown: true, headerBackTitle: '' }}>
       {Object.entries({ ...moveFromListScreens, ...moveFromScreens }).map(([name, { title, component }]) => (
         <Stack.Screen
           name={name as keyof MoveFromStackParamList}

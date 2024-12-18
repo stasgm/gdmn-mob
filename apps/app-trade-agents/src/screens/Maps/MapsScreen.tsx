@@ -254,7 +254,7 @@ const MapScreen = () => {
       >
         {list.map((point) => (
           <Marker
-            key={point.id}
+            key={`${point.coords.latitude},${point.coords.longitude}`}
             coordinate={point.coords}
             title={currentPoint?.name}
             description={`${point.coords.latitude}, ${point.coords.longitude}`}
