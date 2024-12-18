@@ -39,6 +39,7 @@ import {
   alertWithSound,
   alertWithSoundMulti,
   getBarcode,
+  getCodeForCheck,
   getDocToSend,
   getNextDocNumber,
   getUpdatedLine,
@@ -155,6 +156,7 @@ export const InventoryViewScreen = () => {
             : round(line?.weight * quantity, 3);
 
         const newLine: IInventoryLine = getUpdatedLine(
+          goodBarcodeSettings,
           false,
           lineBarcode,
           line,
@@ -165,7 +167,7 @@ export const InventoryViewScreen = () => {
         dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
       }
     },
-    [dispatch, goodBarcodeSettings?.boxWeight, id, isAddressedDoc, lines],
+    [dispatch, goodBarcodeSettings, id, isAddressedDoc, lines],
   );
 
   const handleEditQuantPack = useCallback(() => {
@@ -485,7 +487,9 @@ export const InventoryViewScreen = () => {
 
       const barc = getBarcode(brc, goodBarcodeSettings);
 
-      const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
+      const good = goods.find(
+        (item) => getCodeForCheck(item.shcode, goodBarcodeSettings?.countCode || 4) === barc.shcode,
+      );
 
       if (!good) {
         handleErrorMessage(visibleDialog, 'Товар не найден!');

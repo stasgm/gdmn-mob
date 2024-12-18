@@ -33,7 +33,7 @@ import { FlashList } from '@shopify/flash-list';
 import { barcodeSettings, ICell, ICellRef, IMoveDocument, IMoveLine } from '../../store/types';
 import { CellsStackParamList } from '../../navigation/Root/types';
 
-import { getBarcode, getCellList, getCellListRef } from '../../utils/helpers';
+import { getBarcode, getCellList, getCellListRef, getCodeForCheck } from '../../utils/helpers';
 import { ICellRefList, ICodeEntity, IGood } from '../../store/app/types';
 
 import { Group } from '../../components/Group';
@@ -150,7 +150,7 @@ export const CellsViewScreen = () => {
             id: i.name,
             barcode: i.barcode,
             name: i.name,
-            good: goods.find((g) => `0000${g.shcode}`.slice(-4) === shcode),
+            good: goods.find((g) => getCodeForCheck(g.shcode, goodBarcodeSettings?.countCode || 4) === shcode),
             workDate,
             weight,
             numReceived,
@@ -235,7 +235,9 @@ export const CellsViewScreen = () => {
     (brc: string, cell: string) => {
       const barc = getBarcode(brc, goodBarcodeSettings);
 
-      const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
+      const good = goods.find(
+        (item) => getCodeForCheck(item.shcode, goodBarcodeSettings?.countCode || 4) === barc.shcode,
+      );
 
       const newLine: IMoveLine = {
         good: { id: good?.id || '', name: good?.name || '', shcode: good?.shcode || '' },

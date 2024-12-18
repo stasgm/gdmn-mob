@@ -37,6 +37,7 @@ import {
   alertWithSound,
   alertWithSoundMulti,
   getBarcode,
+  getCodeForCheck,
   getDocToSend,
   getLineGood,
   getNextDocNumber,
@@ -149,7 +150,9 @@ export const LaboratoryViewScreen = () => {
 
       if (remainsUse && goodRemains.length) {
         const good = goodRemains.find(
-          (item) => `0000${item.good.shcode}`.slice(-4) === `0000${line.good.shcode}`.slice(-4),
+          (item) =>
+            getCodeForCheck(item.good.shcode, goodBarcodeSettings?.countCode || 4) ===
+            getCodeForCheck(line.good.shcode, goodBarcodeSettings?.countCode || 4),
         );
 
         if (good) {
@@ -186,7 +189,7 @@ export const LaboratoryViewScreen = () => {
         }
       }
     },
-    [dispatch, goodRemains, id, lines, remainsUse],
+    [dispatch, goodBarcodeSettings?.countCode, goodRemains, id, lines, remainsUse],
   );
 
   const handleEditWeight = () => {
@@ -507,7 +510,14 @@ export const LaboratoryViewScreen = () => {
 
       const barc = getBarcode(brc, goodBarcodeSettings);
 
-      const lineGood = getLineGood(barc.shcode, barc.weight, goods, goodRemains, remainsUse);
+      const lineGood = getLineGood(
+        barc.shcode,
+        barc.weight,
+        goods,
+        goodRemains,
+        remainsUse,
+        goodBarcodeSettings?.countCode || 4,
+      );
 
       if (!lineGood.good) {
         handleErrorMessage(visibleDialog, 'Товар не найден!');
