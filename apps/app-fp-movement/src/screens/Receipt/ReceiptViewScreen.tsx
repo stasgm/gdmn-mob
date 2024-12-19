@@ -45,6 +45,7 @@ import {
   alertWithSound,
   alertWithSoundMulti,
   getBarcode,
+  getCodeForCheck,
   getDocToSend,
   getLineGood,
   getNextDocNumber,
@@ -180,7 +181,11 @@ export const ReceiptViewScreen = () => {
 
       const good =
         remainsUse && goodRemains.length
-          ? goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === `0000${line.good.shcode}`.slice(-4))
+          ? goodRemains.find(
+              (item) =>
+                getCodeForCheck(item.good.shcode, goodBarcodeSettings?.countCode || 4) ===
+                getCodeForCheck(line.good.shcode, goodBarcodeSettings?.countCode || 4),
+            )
           : undefined;
 
       if (remainsUse && goodRemains.length) {
@@ -195,6 +200,7 @@ export const ReceiptViewScreen = () => {
         }
       }
       const newLine: IReceiptLine = getUpdatedLine(
+        goodBarcodeSettings,
         remainsUse,
         lineBarcode,
         line,
@@ -204,7 +210,7 @@ export const ReceiptViewScreen = () => {
 
       dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
     },
-    [dispatch, goodBarcodeSettings?.boxWeight, goodRemains, id, lines, remainsUse],
+    [dispatch, goodBarcodeSettings, goodRemains, id, lines, remainsUse],
   );
 
   const handleEditQuantPack = useCallback(() => {
@@ -524,7 +530,14 @@ export const ReceiptViewScreen = () => {
 
       const barc = getBarcode(brc, goodBarcodeSettings);
 
-      const lineGood = getLineGood(barc.shcode, barc.weight, goods, goodRemains, remainsUse);
+      const lineGood = getLineGood(
+        barc.shcode,
+        barc.weight,
+        goods,
+        goodRemains,
+        remainsUse,
+        goodBarcodeSettings?.countCode || 4,
+      );
 
       if (!lineGood.good) {
         handleErrorMessage(visibleDialog, 'Товар не найден!');

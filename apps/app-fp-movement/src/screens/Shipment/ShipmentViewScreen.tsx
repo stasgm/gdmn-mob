@@ -55,6 +55,7 @@ import {
   alertWithSound,
   alertWithSoundMulti,
   getBarcode,
+  getCodeForCheck,
   getDocToSend,
   getLineGood,
   getRemGoodListByContact,
@@ -197,7 +198,11 @@ const ShipmentViewScreen = () => {
 
       const good =
         remainsUse && goodRemains.length
-          ? goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === `0000${line.good.shcode}`.slice(-4))
+          ? goodRemains.find(
+              (item) =>
+                getCodeForCheck(item.good.shcode, goodBarcodeSettings?.countCode || 4) ===
+                getCodeForCheck(line.good.shcode, goodBarcodeSettings?.countCode || 4),
+            )
           : undefined;
 
       if (remainsUse && goodRemains.length) {
@@ -222,6 +227,7 @@ const ShipmentViewScreen = () => {
             }),
           );
           const newLine: IShipmentLine = getUpdatedLine(
+            goodBarcodeSettings,
             remainsUse,
             lineBarcode,
             line,
@@ -242,6 +248,7 @@ const ShipmentViewScreen = () => {
                 }),
               );
               const newLine: IShipmentLine = getUpdatedLine(
+                goodBarcodeSettings,
                 remainsUse,
                 lineBarcode,
                 line,
@@ -256,6 +263,7 @@ const ShipmentViewScreen = () => {
         }
       } else {
         const newLine: IShipmentLine = getUpdatedLine(
+          goodBarcodeSettings,
           remainsUse,
           lineBarcode,
           line,
@@ -266,7 +274,7 @@ const ShipmentViewScreen = () => {
         dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
       }
     },
-    [dispatch, fpDispatch, goodBarcodeSettings?.boxWeight, goodRemains, id, remainsUse, shipmentLines, tempOrder],
+    [dispatch, fpDispatch, goodBarcodeSettings, goodRemains, id, remainsUse, shipmentLines, tempOrder],
   );
 
   const handleEditQuantPack = useCallback(() => {
@@ -581,7 +589,14 @@ const ShipmentViewScreen = () => {
       }
 
       const barc = getBarcode(brc, goodBarcodeSettings);
-      const lineGood = getLineGood(barc.shcode, barc.weight, goods, goodRemains, remainsUse);
+      const lineGood = getLineGood(
+        barc.shcode,
+        barc.weight,
+        goods,
+        goodRemains,
+        remainsUse,
+        goodBarcodeSettings?.countCode || 4,
+      );
 
       if (!lineGood.good) {
         setVisibleRequestDialog(true);

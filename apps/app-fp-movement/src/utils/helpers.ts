@@ -79,18 +79,18 @@ export const getBarcode = (barcode: string, settings: barcodeSettings) => {
   return barcodeObj;
 };
 
-export const getBarcodeString = (barcodeObj: IBarcode) => {
+export const getBarcodeString = (barcodeObj: IBarcode, settings: barcodeSettings) => {
   const day = `00${new Date(barcodeObj.workDate).getDate().toLocaleString()}`.slice(-2);
   const month = `00${(new Date(barcodeObj.workDate).getMonth() + 1).toLocaleString()}`.slice(-2);
   const year = `00${new Date(barcodeObj.workDate).getFullYear().toLocaleString().slice(2)}`.slice(-2);
 
-  const shcode = `0000${barcodeObj.shcode}`.slice(-4);
-  const quantPack = `0000${barcodeObj.quantPack.toLocaleString()}`.slice(-4);
+  const shcode = getCodeForCheck(barcodeObj.shcode, settings?.countCode || 4);
+  const quantPack = getCodeForCheck(barcodeObj.quantPack.toLocaleString(), settings?.countQuantPack || 4);
 
   const weight =
     barcodeObj.weight < ONE_T_IN_KG
-      ? `000000${round(barcodeObj.weight * ONE_KG_IN_G, 3).toString()}`.slice(-6)
-      : `000000${round(barcodeObj.weight * ONE_KG_IN_G, 3).toString()}`.slice(6);
+      ? getCodeForCheck(round(barcodeObj.weight * ONE_KG_IN_G, 3).toString(), settings?.countWeight || 6)
+      : getCodeForCheck(round(barcodeObj.weight * ONE_KG_IN_G, 3).toString(), -(settings?.countWeight || 6));
 
   const barcode =
     weight + day + month + year + (barcodeObj.time || '0000') + shcode + quantPack + barcodeObj.numReceived;
@@ -227,10 +227,13 @@ export const getLineGood = (
   goods: IGood[],
   goodRemains: IRemGood[],
   remainsUse: boolean,
+  countCode: number,
 ) => {
   if (remainsUse) {
     if (goodRemains.length) {
-      const good = goodRemains.find((item) => item.good && `0000${item.good.shcode}`.slice(-4) === shcode);
+      const good = goodRemains.find(
+        (item) => item.good && getCodeForCheck(item.good.shcode, countCode || 4) === shcode,
+      );
 
       if (good) {
         const isRightWeight = good.remains >= weight;
@@ -252,7 +255,7 @@ export const getLineGood = (
       return { good: undefined, isRightWeight: false };
     }
   } else {
-    const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === shcode);
+    const good = goods.find((item) => getCodeForCheck(item.shcode, countCode || 4) === shcode);
     return {
       good: good
         ? { id: good.id, name: good.name, shcode: good.shcode, isCattle: good.isCattle, goodGroupId: good.goodGroupId }
@@ -290,6 +293,7 @@ export const getTotalLines = (docList: IShipmentDocument[], departId: string) =>
   }, {});
 
 export const getUpdatedLine = (
+  settings: barcodeSettings,
   usedRemains: boolean,
   lineBarcode: IBarcode,
   line: IBasedLine,
@@ -297,8 +301,8 @@ export const getUpdatedLine = (
   weight?: number,
 ) => {
   const newBarcode = weight
-    ? getBarcodeString({ ...lineBarcode, quantPack: quantity, weight })
-    : getBarcodeString({ ...lineBarcode, quantPack: quantity });
+    ? getBarcodeString({ ...lineBarcode, quantPack: quantity, weight }, settings)
+    : getBarcodeString({ ...lineBarcode, quantPack: quantity }, settings);
 
   return {
     ...line,
@@ -440,3 +444,6 @@ export const alertWithSoundMulti = (label: string, text: string, onOk: () => voi
     },
   ]);
 };
+
+export const getCodeForCheck = (value: string, count: number) =>
+  `${'0'.repeat(count || 4)}${value}`.slice(-(count || 4));

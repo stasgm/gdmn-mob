@@ -351,6 +351,7 @@ export const lineTypes: IListItem[] = [
 ];
 
 export const barCodeTypes = [
+  BarCodeScanner.Constants.BarCodeType.qr,
   BarCodeScanner.Constants.BarCodeType.code128,
   BarCodeScanner.Constants.BarCodeType.ean13,
   BarCodeScanner.Constants.BarCodeType.ean8,
