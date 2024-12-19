@@ -480,12 +480,15 @@ export const MoveViewScreen = () => {
 
   const handlePressLine = useCallback(
     (weight: number) => {
+      if (doc?.head.subtype.id !== 'departMovement') {
+        return;
+      }
       setQuantPack('');
       setQuantPallet('1');
       setVisibleQuantPackDialog(true);
       weight >= goodBarcodeSettings?.boxWeight ? setIsPack(false) : setIsPack(true);
     },
-    [goodBarcodeSettings?.boxWeight],
+    [doc?.head.subtype.id, goodBarcodeSettings?.boxWeight],
   );
 
   const [lineType, setLineType] = useState(lineTypes[1].id);

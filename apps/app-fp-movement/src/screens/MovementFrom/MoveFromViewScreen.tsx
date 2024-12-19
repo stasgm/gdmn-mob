@@ -496,7 +496,14 @@ export const MoveFromViewScreen = () => {
 
       const barc = getBarcode(brc, goodBarcodeSettings);
 
-      const lineGood = getLineGood(barc.shcode, barc.weight, goods, goodRemains, remainsUse);
+      const lineGood = getLineGood(
+        barc.shcode,
+        barc.weight,
+        goods,
+        goodRemains,
+        remainsUse,
+        goodBarcodeSettings?.countCode || 4,
+      );
 
       if (!lineGood.good) {
         handleErrorMessage(visibleDialog, 'Товар не найден!');

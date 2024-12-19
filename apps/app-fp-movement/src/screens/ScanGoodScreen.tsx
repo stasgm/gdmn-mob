@@ -149,15 +149,14 @@ const ScanGoodScreen = () => {
         return;
       }
       const barc = getBarcode(brc, goodBarcodeSettings);
-
       const lineGood = getLineGood(
         barc.shcode,
         barc.weight,
         goods,
         goodRemains,
         remainsUse && shipment?.documentType?.name !== 'return' && shipment?.documentType?.name !== 'inventory',
+        goodBarcodeSettings?.countCode || 4,
       );
-
       if (!lineGood.good) {
         setScaner({ state: 'error', message: 'Товар не найден' });
         return;
