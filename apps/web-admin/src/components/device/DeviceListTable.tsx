@@ -75,7 +75,7 @@ const DeviceListTable = ({
         if (bindings) {
           const binding = bindings.find((b) => b.device.id === id);
           if (binding) {
-            navigate(`${adminPath}/app/users/${binding.user.id}/binding/${binding.id}`);
+            navigate(`${adminPath}/app/users/${binding?.user?.id}/binding/${binding.id}`);
             return;
           }
         }

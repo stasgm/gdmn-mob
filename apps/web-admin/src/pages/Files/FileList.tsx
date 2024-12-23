@@ -19,6 +19,7 @@ import { userActions } from '../../store/user';
 import { appSystemActions } from '../../store/appSystem';
 import { deviceActions } from '../../store/device';
 import { useWindowResizeWidth } from '../../utils/useWindowResizeMaxWidth';
+import { bindingActions } from '../../store/deviceBinding';
 
 const FileList = () => {
   const dispatch = useDispatch();
@@ -27,7 +28,7 @@ const FileList = () => {
 
   const sortedList = useMemo(() => list.sort((a, b) => (a.path < b.path ? -1 : 1)), [list]);
 
-  const maxWidth = useWindowResizeWidth(0.8);
+  const maxWidth = useWindowResizeWidth(0.7);
 
   const fetchFiles = useCallback(
     (filesFilters?: IFileFilter, filterText?: string, fromRecord?: number, toRecord?: number) => {
@@ -58,6 +59,7 @@ const FileList = () => {
     dispatch(userActions.fetchUsers());
     dispatch(appSystemActions.fetchAppSystems());
     dispatch(deviceActions.fetchDevices());
+    dispatch(bindingActions.fetchDeviceBindings());
   }, [dispatch]);
 
   useEffect(() => {
@@ -71,24 +73,42 @@ const FileList = () => {
     //   : undefined,
     undefined,
   );
+  const [formikAppSystem, setFormikAppSystem] = useState<INamedEntity | undefined>(undefined);
+  const [formikProducer, setFormikProducer] = useState<INamedEntity | undefined>(undefined);
 
   const { list: companies } = useSelector((state) => state.companies);
   const { list: appSystems } = useSelector((state) => state.appSystems);
   const { list: users } = useSelector((state) => state.users);
   const { list: devices } = useSelector((state) => state.devices);
+  const { list: deviceBindings } = useSelector((state) => state.deviceBindings);
 
   const companyList = companies.map((d) => ({ id: d.id, name: d.name })) || [];
-  const appSystemList = appSystems.map((d) => ({ id: d.id, name: d.name })) || [];
 
   const userList = companyList.length
-    ? users
-        .filter((i) => companyList.find((c) => c.id === formikCompany?.id && c.id === i.company?.id))
-        .map((d) => ({ id: d.id, name: d.name }))
+    ? users.filter((i) => companyList.find((c) => c.id === formikCompany?.id && c.id === i.company?.id))
     : [];
 
+  const userOASList = userList
+    .filter(
+      (u) =>
+        !formikAppSystem ||
+        u.appSystem?.id === formikAppSystem.id ||
+        users.find((e) => e.appSystem?.id === formikAppSystem.id)?.id === u.erpUser?.id,
+    )
+    .map((d) => ({ id: d.id, name: d.name }));
+
+  const appSystemList =
+    appSystems.filter((i) => userList.find((u) => u.appSystem?.id === i.id)).map((d) => ({ id: d.id, name: d.name })) ||
+    [];
+
+  const db = deviceBindings.filter((b) => !formikProducer || b.user.id === formikProducer.id);
   const deviceList = companyList.length
     ? devices
-        .filter((i) => companyList.find((c) => c.id === formikCompany?.id && c.id === i.company?.id))
+        .filter(
+          (i) =>
+            companyList.find((c) => c.id === formikCompany?.id && c.id === i.company?.id) &&
+            db.find((b) => b.device.id === i.id),
+        )
         .map((d) => ({ id: d.id, name: d.name }))
     : [];
 
@@ -99,11 +119,12 @@ const FileList = () => {
   const listOptions: IListOption = {
     companyId: companyList,
     appSystemId: appSystemList,
-    producerId: userList,
-    consumerId: userList,
+    producerId: userOASList,
+    consumerId: userOASList,
     deviceId: deviceList,
     folder: foldersList,
   };
+
   useEffect(() => {
     if (pageParams?.filesFilters?.companyId && pageParams?.filesFilters?.appSystemId) {
       // const companyId = companies.find((i) => i.id === pageParams?.filesFilters?.companyId)?.id;
@@ -114,8 +135,6 @@ const FileList = () => {
       // }
     }
   }, [appSystems, companies, dispatch, pageParams?.filesFilters?.appSystemId, pageParams?.filesFilters?.companyId]);
-
-  console.log('formikCompany', formikCompany);
 
   const [pageParamLocal, setPageParamLocal] = useState<IFilePageParam | undefined>(pageParams);
 
@@ -418,6 +437,8 @@ const FileList = () => {
                 pageParams={pageParams}
                 onCloseFilters={() => setFilterVisible(false)}
                 setCompany={(value: INamedEntity) => setFormikCompany(value)}
+                setAppSystem={(value: INamedEntity) => setFormikAppSystem(value)}
+                setProducer={(value: INamedEntity) => setFormikProducer(value)}
                 listOptions={listOptions}
               />
             </Box>

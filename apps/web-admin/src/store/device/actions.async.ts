@@ -76,7 +76,7 @@ const fetchDevices = (filterText?: string, fromRecord?: number, toRecord?: numbe
         devices.forEach((device) => {
           const binding = responseBindings.deviceBindings.find((b) => b.device.id === device.id);
           if (binding) {
-            const erpUserId = responseUsers.users.find((u) => u.id === binding.user.id)?.erpUser?.id;
+            const erpUserId = responseUsers.users.find((u) => u.id === binding?.user?.id)?.erpUser?.id;
             const appSystemId = responseUsers.users.find((u) => u.id === erpUserId)?.appSystem?.id;
             if (appSystemId) {
               device.appSystem = responseAppSystems.appSystems.find((a) => a.id === appSystemId);

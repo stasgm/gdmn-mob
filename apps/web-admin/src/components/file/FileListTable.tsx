@@ -60,6 +60,8 @@ interface IProps<T extends IEntity> {
   onCloseFilters?: () => void;
   onClearFilters?: () => void;
   setCompany: (value: INamedEntity) => void;
+  setAppSystem: (value: INamedEntity) => void;
+  setProducer: (value: INamedEntity) => void;
   listOptions: IListOption;
 }
 
@@ -81,6 +83,8 @@ function FileListTable<T extends IEntity>({
   onCloseFilters,
   onClearFilters,
   setCompany,
+  setAppSystem,
+  setProducer,
   listOptions,
 }: IProps<T>) {
   // }: IProps<T>) => {
@@ -93,7 +97,7 @@ function FileListTable<T extends IEntity>({
 
   const navigate = useNavigate();
   const maxHeight = useWindowResizeMaxHeight();
-  const width = useWindowResizeWidth(0.2);
+  const width = useWindowResizeWidth(0.3);
 
   // const drawerHeight = useDrawerResizeMaxHeight();
 
@@ -173,11 +177,17 @@ function FileListTable<T extends IEntity>({
           value: value ? (formik.values[field].type === 'select' ? value.id : value.name) : '',
         },
       });
-      if (field === 'companyId' && value) {
+      if (field === 'companyId') {
         setCompany(value);
       }
+      if (field === 'appSystemId') {
+        setAppSystem(value);
+      }
+      if (field === 'producerId') {
+        setProducer(value);
+      }
     },
-    [formik, setCompany],
+    [formik, setAppSystem, setCompany, setProducer],
   );
 
   const handleSortRequest = (cellId: keyof T) => {
@@ -375,16 +385,7 @@ function FileListTable<T extends IEntity>({
             </Table>
           </Box>
           {isFilterVisible && (
-            <Box
-            // sx={{
-            // top: 64,
-            // width,
-            // paddingBottom: 5,
-            // overflow: 'visible',
-            // height: drawerHeight,
-            // maxHeight: drawerHeight,
-            // }}
-            >
+            <>
               <Divider orientation="vertical" flexItem />
               <Drawer
                 // ModalProps={{ disableScrollLock: true }}
@@ -399,7 +400,7 @@ function FileListTable<T extends IEntity>({
                     // overflow: 'visible',
                     // height: drawerHeight,
                     // maxHeight: drawerHeight,
-                    height: 'calc(100% - 64px)',
+                    height: 'calc(100% - 64px - 48px)',
                     transitionProperty: 'width, transform !important',
                     transitionDuration: '0.3s !important',
                     transitionTimingFunction: 'cubic-bezier(0.4, 0, 1, 1) !important',
@@ -524,47 +525,53 @@ function FileListTable<T extends IEntity>({
                       </Grid>
                     ))}
                   </Box>
-                  <Box
-                    sx={{
-                      p: 3,
-                      flexDirection: 'row',
-                      maxHeight: '10%',
-                      justifyContent: 'space-between',
-                      // minWidth: '100%',
-                      display: 'flex',
-                    }}
-                  >
-                    {/* <Grid item> */}
-                    {/* sx={{maxWidth: '50%'}} */}
-                    <Box>
-                      <Button
-                        color="primary"
-                        type="submit"
-                        variant="contained"
-                        // sx={{ m: 1 }}
-                        // fullWidth
-                        onClick={handleSearchClick}
-                      >
-                        Применить
-                      </Button>
-                    </Box>
-                    {/* </Grid> */}
-                    {/* <Grid item> */}
-                    <Box /*sx={{ paddingRight: 2 }}*/>
-                      <Button
-                        color="secondary"
-                        variant="contained"
-                        onClick={handleClearFilters}
-                        // fullWidth
-                      >
-                        Очистить
-                      </Button>
-                    </Box>
-                    {/* </Grid> */}
-                  </Box>
                 </form>
               </Drawer>
-            </Box>
+              <Box
+                sx={{
+                  p: 3,
+                  flexDirection: 'row',
+                  maxHeight: '10%',
+                  justifyContent: 'space-between',
+                  width,
+                  display: 'flex',
+                  position: 'fixed',
+                  bottom: 0,
+                  right: 0,
+                  background: '#FFFFFF',
+                  borderLeft: 1,
+                  borderLeftColor: '#DDDDDD',
+                }}
+              >
+                {/* <Grid item> */}
+                {/* sx={{maxWidth: '50%'}} */}
+                <Box>
+                  <Button
+                    color="primary"
+                    type="submit"
+                    variant="contained"
+                    // sx={{ m: 1 }}
+                    // fullWidth
+                    onClick={handleSearchClick}
+                  >
+                    Применить
+                  </Button>
+                </Box>
+                {/* </Grid> */}
+                {/* <Grid item> */}
+                <Box sx={{ paddingRight: 2 }}>
+                  <Button
+                    color="secondary"
+                    variant="contained"
+                    onClick={handleClearFilters}
+                    // fullWidth
+                  >
+                    Очистить
+                  </Button>
+                </Box>
+                {/* </Grid> */}
+              </Box>
+            </>
           )}
         </PerfectScrollbar>
         <TablePagination

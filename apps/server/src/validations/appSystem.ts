@@ -10,6 +10,7 @@ const addAppSystem: Config = {
     body: Joi.object({
       name: Joi.string().required().error(new InvalidParameterException('Не указано наименование подсистемы')),
       description: Joi.string().allow('', null),
+      appVersion: Joi.string().allow('', null),
     }),
   },
 };
