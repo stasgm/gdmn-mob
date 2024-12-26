@@ -1,6 +1,6 @@
 import { INamedEntity } from '@lib/types';
 
-import { IFileFilter, IFilterObject } from '../types';
+import { IFileFilter, IFileFilterObject, IFilterObject, ILogFileFilter, ILogFilterObject } from '../types';
 
 import { fileFilterInitialValues, fileFilterValues } from './constants';
 
@@ -20,8 +20,8 @@ export const getCode = () => {
   return `${Math.floor(1000 + Math.random() * 9000)}`;
 };
 
-export const getFilterObject = (filesFilters: IFileFilter) => {
-  const newFilters: IFilterObject = Object.entries(filesFilters).reduce(
+export const getFilterObject = (filesFilters: IFileFilter | ILogFileFilter) => {
+  const newFilters: IFileFilterObject | ILogFilterObject = Object.entries(filesFilters).reduce(
     (prev, [name, value]) => {
       prev[name] = { ...prev[name], value };
       // prev[name] = name.indexOf('Id') === -1 ? { ...prev[name], value } : value;

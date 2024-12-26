@@ -23,7 +23,7 @@ import {
   TextField,
 } from '@mui/material';
 
-import { IEntity, INamedEntity, ISystemFile } from '@lib/types';
+import { IDeviceLogFile, IEntity, INamedEntity, ISystemFile } from '@lib/types';
 
 import { Field, FormikProvider, useFormik } from 'formik';
 
@@ -34,8 +34,16 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDateTimePicker } from '@mui/x-date-pickers/DesktopDateTimePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 
-import { adminPath, fileFilterValues } from '../../utils/constants';
-import { IFilePageParam, IFilterObject, IFilterOption, IHeadCells, IListOption, IPageParam } from '../../types';
+import { adminPath, fileFilterValues, logFilterValues } from '../../utils/constants';
+import {
+  IFileFilterObject,
+  IFilePageParam,
+  IFilterOption,
+  IHeadCells,
+  IListOption,
+  ILogFilterObject,
+  IPageParam,
+} from '../../types';
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 import { useWindowResizeWidth } from '../../utils/useWindowResizeMaxWidth';
 import { getFilesFilters, getFilterObject } from '../../utils/helpers';
@@ -44,6 +52,7 @@ import ComboBox from '../ComboBox';
 type Order = 'asc' | 'desc';
 
 interface IProps<T extends IEntity> {
+  type: 'DeviceLog' | 'Files';
   headCells: IHeadCells<T>[];
   files: ISystemFile[];
   selectedFiles?: ISystemFile[];
@@ -52,7 +61,7 @@ interface IProps<T extends IEntity> {
   isFilterVisible?: boolean;
   onSubmit: (values: any) => void;
   onDelete?: (ids?: string[]) => void;
-  onSelectOne: (_event: any, file: ISystemFile) => void;
+  onSelectOne: (_event: any, file: ISystemFile | IDeviceLogFile) => void;
   onSelectMany: (event: any) => void;
   selectedFileIds: ISystemFile[];
   onSetPageParams: (filesFilters: IPageParam) => void;
@@ -67,6 +76,7 @@ interface IProps<T extends IEntity> {
 
 // const FileListTable: T = ({
 function FileListTable<T extends IEntity>({
+  type,
   files = [],
   headCells = [],
 
@@ -100,27 +110,29 @@ function FileListTable<T extends IEntity>({
   const width = useWindowResizeWidth(0.3);
 
   // const drawerHeight = useDrawerResizeMaxHeight();
+  const field = type === 'DeviceLog' ? 'logFilters' : 'filesFilters';
+  const filterValues = type === 'DeviceLog' ? logFilterValues : fileFilterValues;
 
-  const formik = useFormik<IFilterObject>({
+  const formik = useFormik<IFileFilterObject | ILogFilterObject>({
     enableReinitialize: true,
-    initialValues: pageParams?.filesFilters ? getFilterObject(pageParams?.filesFilters) : fileFilterValues,
+    initialValues: pageParams?.[`${field}`] ? getFilterObject(pageParams?.[`${field}`]) : filterValues,
     onSubmit: (values) => {
       onSubmit(getFilesFilters(values));
     },
   });
 
   const handleSearchClick = () => {
-    onSetPageParams({ ...pageParams, filesFilters: getFilesFilters(formik.values), page: 0 });
+    onSetPageParams({ ...pageParams, [`${field}`]: getFilesFilters(formik.values), page: 0 });
     setPage(0);
     // onCloseFilters
   };
 
   const handleClearFilters = useCallback(() => {
-    formik.setValues(fileFilterValues);
-    onSetPageParams({ ...pageParams, filesFilters: undefined, page: 0 });
+    formik.setValues(filterValues);
+    onSetPageParams({ ...pageParams, [`${field}`]: undefined, page: 0 });
     setPage(0);
     onClearFilters && onClearFilters();
-  }, [formik, onClearFilters, onSetPageParams, pageParams]);
+  }, [field, filterValues, formik, onClearFilters, onSetPageParams, pageParams]);
 
   const handleLimitChange = useCallback(
     (event: any) => {
@@ -430,9 +442,9 @@ function FileListTable<T extends IEntity>({
                       overflowY: 'auto',
                     }}
                   >
-                    {Object.keys(fileFilterValues).map((item) => (
+                    {Object.keys(filterValues).map((item) => (
                       <Grid item key={item} marginBottom={3}>
-                        {fileFilterValues[item].type === 'select' ? (
+                        {filterValues[item].type === 'select' ? (
                           <Field
                             InputProps={{
                               sx: {
@@ -449,7 +461,7 @@ function FileListTable<T extends IEntity>({
                             component={ComboBox}
                             id={item}
                             name={item}
-                            label={fileFilterValues[item].name || ''}
+                            label={filterValues[item].name || ''}
                             value={
                               formik.values[item]?.value ? getValue(formik.values[item]?.value, listOptions[item]) : ''
                             }
@@ -470,10 +482,10 @@ function FileListTable<T extends IEntity>({
                             }
                             disabled={item === 'companyId' ? false : !formik.values['companyId'].value}
                           />
-                        ) : fileFilterValues[item].type === 'date' ? (
+                        ) : filterValues[item].type === 'date' ? (
                           <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale="ru">
                             <DesktopDateTimePicker
-                              label={fileFilterValues[item].name || ''}
+                              label={filterValues[item].name || ''}
                               inputFormat="DD/MM/YY hh:mm"
                               value={formik.values[item]?.value || null}
                               onChange={(date) =>
@@ -513,7 +525,7 @@ function FileListTable<T extends IEntity>({
                             }}
                             fullWidth
                             name={item}
-                            label={fileFilterValues[item].name}
+                            label={filterValues[item].name}
                             variant="outlined"
                             type="text"
                             value={formik.values[item]?.value}

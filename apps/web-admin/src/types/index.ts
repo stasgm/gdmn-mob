@@ -45,14 +45,26 @@ export interface IFilterObject {
   [fieldName: string]: IFilterOption;
   companyId: IFilterOption;
   appSystemId: IFilterOption;
+  producerId: IFilterOption;
+  uid: IFilterOption;
+}
+
+export interface IFileFilterObject extends IFilterObject {
   folder: IFilterOption;
   fileName: IFilterOption;
-  producerId: IFilterOption;
   consumerId: IFilterOption;
-  uid: IFilterOption;
   // date: IFilterOption;
   dateFrom: IFilterOption;
   dateTo: IFilterOption;
+}
+
+export interface ILogFilterObject extends IFilterObject {
+  producerId: IFilterOption;
+  deviceId: IFilterOption;
+  dateFrom: IFilterOption;
+  dateTo: IFilterOption;
+  mDateFrom: IFilterOption;
+  mDateTo: IFilterOption;
 }
 
 export interface IFileFilter {
@@ -69,6 +81,18 @@ export interface IFileFilter {
   uid: string;
   dateFrom: string;
   dateTo: string;
+}
+
+export interface ILogFileFilter {
+  [fieldName: string]: string;
+  companyId: string;
+  appSystemId: string;
+  producerId: string;
+  deviceId: string;
+  dateFrom: string;
+  dateTo: string;
+  mDateFrom: string;
+  mDateTo: string;
 }
 
 export interface IFilterOption extends INamedEntity {

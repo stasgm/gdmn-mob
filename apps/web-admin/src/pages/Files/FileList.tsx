@@ -9,7 +9,7 @@ import { IFileParams, INamedEntity, ISystemFile } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import { IFileFilter, IFilePageParam, IFilterTable, IHeadCells, IListOption, IToolBarButton } from '../../types';
+import { IFilePageParam, IFilterTable, IHeadCells, IListOption, IToolBarButton, IFileFilter } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import { fileActions } from '../../store/file';
 import FileListTable from '../../components/file/FileListTable';
@@ -367,7 +367,7 @@ const FileList = () => {
     { id: 'producer', label: 'Пользователь', sortEnable: true, fieldName: 'name' },
     { id: 'consumer', label: 'Получатель', sortEnable: true, fieldName: 'name' },
     { id: 'device', label: 'Устройство', sortEnable: true, fieldName: 'name' },
-    { id: 'device', label: 'Номер устройства', sortEnable: true, fieldName: 'id' },
+    { id: 'uid', label: 'Номер устройства', sortEnable: true },
     { id: 'date', label: 'Дата', sortEnable: true, type: 'date' },
     { id: 'size', label: 'Размер', sortEnable: true },
     { id: 'path', label: 'Путь', sortEnable: true },
@@ -425,6 +425,7 @@ const FileList = () => {
           ) : (
             <Box sx={{ pt: 2 }}>
               <FileListTable
+                type="Files"
                 headCells={headCells}
                 files={sortedList}
                 isFilterVisible={filterVisible}

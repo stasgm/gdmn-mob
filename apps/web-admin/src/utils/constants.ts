@@ -1,4 +1,4 @@
-import { IFileFilter, IFilterObject } from '../types';
+import { IFileFilter, IFileFilterObject, ILogFileFilter, ILogFilterObject } from '../types';
 
 const deviceStates = {
   'NON-REGISTERED': 'Не зарегистрировано',
@@ -24,7 +24,7 @@ const validPassword = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?([^
 //   date: 'Дата',
 // };
 
-const fileFilterValues: IFilterObject = {
+const fileFilterValues: IFileFilterObject = {
   companyId: { id: 'companyId', name: 'Компания', type: 'select', value: '', visible: true, data: [] },
   appSystemId: { id: 'appSystemId', name: 'Подсистема', type: 'select', value: '', visible: true, data: [] },
   folder: { id: 'folder', name: 'Папка', type: 'select', value: '', visible: true, data: [] },
@@ -37,6 +37,20 @@ const fileFilterValues: IFilterObject = {
   // date: { id: 'date', name: 'Дата', type: 'date', value: '', visible: true },
   dateFrom: { id: 'dateFrom', name: 'Дата начала', type: 'date', value: '', visible: true },
   dateTo: { id: 'dateTo', name: 'Дата окончания', type: 'date', value: '', visible: true },
+};
+
+const logFilterValues: ILogFilterObject = {
+  companyId: { id: 'companyId', name: 'Компания', type: 'select', value: '', visible: true, data: [] },
+  appSystemId: { id: 'appSystemId', name: 'Подсистема', type: 'select', value: '', visible: true, data: [] },
+  // path: '',
+  producerId: { id: 'producerId', name: 'Пользователь', type: 'select', value: '', visible: true, data: [] },
+  deviceId: { id: 'deviceId', name: 'Устройство', type: 'select', value: '', visible: true, data: [] },
+  uid: { id: 'uid', name: 'Номер устройства', type: 'text', value: '', visible: true },
+  // date: { id: 'date', name: 'Дата', type: 'date', value: '', visible: true },
+  dateFrom: { id: 'dateFrom', name: 'Дата начала создания', type: 'date', value: '', visible: true },
+  dateTo: { id: 'dateTo', name: 'Дата окончания создания', type: 'date', value: '', visible: true },
+  mDateFrom: { id: 'mDateFrom', name: 'Дата начала редактирования', type: 'date', value: '', visible: true },
+  mDateTo: { id: 'mDateTo', name: 'Дата окончания редактирования', type: 'date', value: '', visible: true },
 };
 
 const fileFilterInitialValues: IFileFilter = {
@@ -56,4 +70,25 @@ const fileFilterInitialValues: IFileFilter = {
   path: '',
 };
 
-export { deviceStates, adminPath, validPassword, fileFilterValues, fileFilterInitialValues };
+const logFilterInitialValues: ILogFileFilter = {
+  companyId: '',
+  appSystemId: '',
+  producerId: '',
+  deviceId: '',
+  uid: '',
+  // date: '',
+  dateFrom: '',
+  dateTo: '',
+  mDateFrom: '',
+  mDateTo: '',
+};
+
+export {
+  deviceStates,
+  adminPath,
+  validPassword,
+  fileFilterValues,
+  logFilterValues,
+  fileFilterInitialValues,
+  logFilterInitialValues,
+};
