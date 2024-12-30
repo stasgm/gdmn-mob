@@ -488,12 +488,19 @@ function FileListTable<T extends IEntity>({
                               label={filterValues[item].name || ''}
                               inputFormat="DD/MM/YY hh:mm"
                               value={formik.values[item]?.value || null}
-                              onChange={(date) =>
+                              onChange={(date, kbDate) => {
+                                if (date === null) handleUpdateFormik(item, { id: item, name: '' });
+                                const newDate = (kbDate || '').replace(
+                                  new RegExp('^(\\d{2})\\/(\\d{2})\\/(\\d{2}).$'),
+                                  '$2/$1/$3 12:00',
+                                );
+                                if (!Date.parse(date as string) && (!Date.parse(newDate) || kbDate?.length !== 9))
+                                  return;
                                 handleUpdateFormik(item, {
                                   id: item,
-                                  name: date ? new Date(date as string).toISOString() : '',
-                                })
-                              }
+                                  name: new Date(Date.parse(date as string) ? (date as string) : newDate).toISOString(),
+                                });
+                              }}
                               componentsProps={{
                                 actionBar: {
                                   actions: ['clear'],
