@@ -130,7 +130,7 @@ class File extends BaseRequest {
     const res = await customRequest<IFileActionResult[]>({
       api: this.api.axios,
       method: 'POST',
-      url: '/actions/deleteList',
+      url: '/files/actions/deleteList',
       data: { files },
     });
 
