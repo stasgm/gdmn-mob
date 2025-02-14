@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleProp, TextStyle, View } from 'react-native';
-import { IconButton, MD2Theme, TextInput, useTheme } from 'react-native-paper';
+import { IconButton, MD2Theme, TextInput, TextInputProps, useTheme } from 'react-native-paper';
 
 import buttonStyles from '../../styles/buttonRippleStyle';
 
@@ -15,11 +15,24 @@ interface Props {
   disabled?: boolean;
   required?: boolean;
   style?: StyleProp<TextStyle>;
+  iconViewStyle?: StyleProp<TextStyle>;
+  mode?: 'flat' | 'outlined';
+  props?: TextInputProps;
 }
 
 const truncate = (str: string, l: number | undefined = 40) => (str.length > l ? `${str.substring(0, l)}...` : str);
 
-const SelectableInput = ({ value, onPress, label, placeholder, editable = false, disabled, style }: Props) => {
+const SelectableInput = ({
+  value,
+  onPress,
+  label,
+  placeholder,
+  editable = false,
+  disabled,
+  style,
+  iconViewStyle,
+  mode = 'outlined',
+}: Props) => {
   const { colors } = useTheme<MD2Theme>();
 
   return (
@@ -36,7 +49,7 @@ const SelectableInput = ({ value, onPress, label, placeholder, editable = false,
               background: colors.surface,
             },
           }}
-          mode="outlined"
+          mode={mode ? mode : 'outlined'}
           style={style ? [styles.input, style] : styles.input}
           placeholderTextColor={colors.text}
           placeholder={placeholder}
@@ -45,7 +58,7 @@ const SelectableInput = ({ value, onPress, label, placeholder, editable = false,
           children={undefined}
         />
       </View>
-      <View style={buttonStyles.viewRight_24}>
+      <View style={iconViewStyle ? iconViewStyle : buttonStyles.viewRight_24}>
         <IconButton icon="chevron-right" size={24} style={buttonStyles.icon_24} onPress={onPress} disabled={disabled} />
       </View>
     </View>

@@ -174,15 +174,24 @@ export interface IShipmentHead extends IHead {
   orderId: string;
 }
 
-export type IShipmentLine = IBasedLine;
-
+export interface IShipmentLine extends IBasedLine {
+  box?: IBox;
+}
 export type IShipmentDocument = MandateProps<IDocument<IShipmentHead, IShipmentLine>, 'head' | 'lines'>;
 
 export interface IFreeShipmentHead extends IHead {
   fromDepart: ICodeEntity;
   comment?: string; // Коментарий
 }
-export type IFreeShipmentLine = IBasedLine;
+
+export interface IBox extends IEntity {
+  packageWeight: number; //вес тары
+  packageId: string; // из справочника тары
+  additionalWeight?: number; //дополнительный вес тары
+}
+export interface IFreeShipmentLine extends IBasedLine {
+  box?: IBox;
+}
 
 export type IFreeShipmentDocument = MandateProps<IDocument<IFreeShipmentHead, IFreeShipmentLine>, 'head' | 'lines'>;
 

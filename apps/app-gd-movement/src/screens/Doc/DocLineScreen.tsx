@@ -25,6 +25,8 @@ import { appInventoryActions } from '../../store';
 
 import { unknownGood } from '../../utils/constants';
 
+import { IGood } from '../../store/app/types';
+
 import { DocLine } from './components/DocLine';
 
 export const DocLineScreen = () => {
@@ -46,6 +48,8 @@ export const DocLineScreen = () => {
     () => documentTypes?.find((d) => d.id === document?.documentType.id),
     [document?.documentType.id, documentTypes],
   );
+
+  const goods = refSelectors.selectByName<IGood>('good')?.data;
 
   useEffect(() => {
     KeyEvent.onKeyDownListener((keyEvent: any) => {
@@ -118,13 +122,28 @@ export const DocLineScreen = () => {
                 return;
               }
             }
+            const goodIsMark = goods?.find((e) => e.id === item?.good.id)?.isMark;
+
+            if (!!goodIsMark && !line.EID) {
+              Alert.alert('Ошибка!', 'Поле EID должно быть заполнено! Отсканируйте штрих-код.', [{ text: 'Ок' }]);
+              return;
+            }
             setScreenState('saving');
           }}
           disabled={screenState === 'saving' || disabledSave}
         />
       </View>
     ),
-    [disabledSave, documentType?.isControlRemains, line.quantity, line.remains, screenState],
+    [
+      disabledSave,
+      documentType?.isControlRemains,
+      goods,
+      item?.good.id,
+      line.EID,
+      line.quantity,
+      line.remains,
+      screenState,
+    ],
   );
 
   useLayoutEffect(() => {

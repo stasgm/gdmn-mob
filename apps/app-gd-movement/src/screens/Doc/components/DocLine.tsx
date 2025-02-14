@@ -22,6 +22,8 @@ import { BarCodeScanner } from 'expo-barcode-scanner';
 
 import { IScannedObject } from '@lib/client-types';
 
+import { ISettingsOption } from '@lib/types';
+
 import { IMovementLine } from '../../../store/types';
 
 import { ONE_SECOND_IN_MS } from '../../../utils/constants';
@@ -80,16 +82,28 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
     };
   }, [visibleDialog]);
 
-  const handleGetScannedObject = useCallback((brc: string) => {
-    setScaner({ state: 'found' });
-    if (!brc) {
-      return;
-    }
-    setGoodEID(brc);
+  const handleGetScannedObject = useCallback(
+    (brc: string) => {
+      setScaner({ state: 'found' });
+      const prefixGtin = (settings.prefixGtin as ISettingsOption<string>)?.data || '';
+      const prefixISN = (settings.prefixISN as ISettingsOption<string>)?.data || '';
+      const isTypeDM = RegExp(`^.{0,1}${prefixGtin}\\d{13,14}${prefixISN}.{13}91.{1,4}92.{1,44}`, 'i').test(brc);
+      if (!brc || !isTypeDM) {
+        return;
+      }
+      const gtin = brc.match(RegExp(`${prefixGtin}0?\\d{13}${prefixISN}`));
 
-    setScaner({ state: 'init' });
-    setDoScanned(false);
-  }, []);
+      if (!gtin || (gtin[0].slice(2, -2) !== item?.barcode && gtin[0].slice(3, -2) !== item?.barcode)) {
+        setScaner({ state: 'error', message: 'Коды товаров не совпадают.' });
+        return;
+      }
+      setGoodEID(brc);
+
+      setScaner({ state: 'init' });
+      setDoScanned(false);
+    },
+    [item?.barcode, settings.prefixGtin, settings.prefixISN],
+  );
 
   const handleClearScaner = () => setScaner({ state: 'init' });
 

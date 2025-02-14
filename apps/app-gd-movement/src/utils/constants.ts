@@ -171,6 +171,15 @@ export const appSettings: Settings = {
     visible: true,
     group: scanSettings,
   },
+  prefixISN: {
+    id: 'prefixISN',
+    sortOrder: 36,
+    description: 'Префикс ИСН',
+    data: '21',
+    type: 'string',
+    visible: true,
+    group: scanSettings,
+  },
   screenKeyboard: {
     id: 'screenKeyboard',
     sortOrder: 8,

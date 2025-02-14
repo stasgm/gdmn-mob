@@ -19,6 +19,7 @@ import {
   IReceiptDocument,
   IReturnDocument,
   ISendingLine,
+  IFreeShipmentLine,
 } from '../store/types';
 import {
   IBarcode,
@@ -341,6 +342,7 @@ export const getDocToSend = (
           usedRemains: i.usedRemains,
           fromCell: (i as IMoveLine).fromCell,
           toCell: (i as IMoveLine).toCell,
+          box: (i as IFreeShipmentLine).box,
         }) as ISendingLine,
     ),
   };

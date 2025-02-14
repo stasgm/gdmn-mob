@@ -306,6 +306,7 @@ export const DocViewScreen = () => {
   const settings = useSelector((state) => state.settings?.data);
 
   const prefixGtin = (settings.prefixGtin as ISettingsOption<string>)?.data || '';
+  const prefixISN = (settings.prefixISN as ISettingsOption<string>)?.data || '';
   const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
   const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>)?.data || 0;
   const weightSettingsCountWeight = (settings.countWeight as ISettingsOption<number>)?.data || 0;
@@ -331,10 +332,11 @@ export const DocViewScreen = () => {
       let charTo = weightSettingsWeightCode.data.length;
 
       let scannedObject: IMovementLine;
+      const regIsTypeDM = RegExp(`^.{0,1}${prefixGtin}\\d{13,14}${prefixISN}.{13}91.{1,4}92.{1,44}`, 'i');
 
       if (brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
         const remItem =
-          getBrc(brc, prefixGtin, goodRemains) ||
+          getBrc(brc, prefixGtin, goodRemains, prefixISN) ||
           (documentType?.isRemains ? undefined : { good: { ...unknownGood, barcode: brc } });
         // Находим товар из модели остатков по баркоду, если баркод не найден, то
         //   если выбор из остатков, то undefined,
@@ -362,6 +364,7 @@ export const DocViewScreen = () => {
           sortOrder: (lines?.[0]?.sortOrder || 0) + 1,
           alias: remItem.good.alias || '',
           weightCode: remItem.good.weightCode?.trim() || '',
+          EID: regIsTypeDM.test(brc) ? brc : undefined,
         };
       } else {
         charFrom = charTo;
@@ -399,6 +402,7 @@ export const DocViewScreen = () => {
           sortOrder: (lines?.[0]?.sortOrder || 0) + 1,
           alias: remItem.good.alias || '',
           weightCode: remItem.good.weightCode?.trim() || '',
+          EID: regIsTypeDM.test(brc) ? brc : undefined,
         };
       }
 
@@ -438,6 +442,7 @@ export const DocViewScreen = () => {
       lines,
       navigation,
       prefixGtin,
+      prefixISN,
       weightSettingsCountCode,
       weightSettingsCountWeight,
       weightSettingsWeightCode.data,
