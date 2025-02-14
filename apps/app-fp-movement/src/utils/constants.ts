@@ -310,6 +310,24 @@ export const appSettings: Settings = {
     visible: true,
     group: orderGroup,
   },
+  limitDelta: {
+    id: 'limitDelta',
+    sortOrder: 21,
+    description: 'Превышение количества, %',
+    data: 0,
+    type: 'number',
+    visible: true,
+    group: orderGroup,
+  },
+  usePackage: {
+    id: 'usePackage',
+    sortOrder: 22,
+    description: 'Использовать тару',
+    data: false,
+    type: 'boolean',
+    visible: true,
+    group: goodGroup,
+  },
 };
 
 export const unknownGood: IGood = {

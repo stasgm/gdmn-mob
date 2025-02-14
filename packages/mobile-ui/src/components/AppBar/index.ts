@@ -13,3 +13,4 @@ export { ScanButton } from './ScanButton';
 export { PrintButton } from './PrintButton';
 export { DeleteButton } from './DeleteButton';
 export { CloseButton } from './CloseButton';
+export { PackageButton } from './PackageButton';

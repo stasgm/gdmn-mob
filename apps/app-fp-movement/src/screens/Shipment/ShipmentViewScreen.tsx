@@ -4,7 +4,15 @@ import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@rea
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Audio } from 'expo-av';
 
-import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
+import {
+  appActions,
+  docSelectors,
+  documentActions,
+  refSelectors,
+  useDispatch,
+  useDocThunkDispatch,
+  useSelector,
+} from '@lib/store';
 import {
   MenuButton,
   useActionSheet,
@@ -22,6 +30,7 @@ import {
   SaveDocument,
   SimpleDialog,
   DateInfo,
+  PackageButton,
 } from '@lib/mobile-ui';
 
 import {
@@ -42,7 +51,7 @@ import { FlashList } from '@shopify/flash-list';
 
 import { DashboardStackParamList } from '@lib/mobile-navigation';
 
-import { barcodeSettings, IShipmentDocument, IShipmentLine, ITempLine } from '../../store/types';
+import { barcodeSettings, IBox, IShipmentDocument, IShipmentLine, ITempLine } from '../../store/types';
 
 import { ShipmentStackParamList } from '../../navigation/Root/types';
 
@@ -63,6 +72,7 @@ import {
 } from '../../utils/helpers';
 import ViewTotal from '../../components/ViewTotal';
 import QuantDialog from '../../components/QuantDialog';
+import BoxDialog from '../../components/BoxDialog';
 
 const keyExtractor = (item: IShipmentLine | ITempLine) => item.id;
 const ShipmentViewScreen = () => {
@@ -126,6 +136,16 @@ const ShipmentViewScreen = () => {
   const [quantPallet, setQuantPallet] = useState('');
   const [isPack, setIsPack] = useState(true);
 
+  const [visibleBoxDialog, setVisibleBoxDialog] = useState<boolean>(false);
+  const [box, setBox] = useState<IBox | undefined>(undefined);
+
+  useEffect(() => {
+    return () => {
+      dispatch(appActions.clearScreenFormParams('ShipmentView'));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const goods = refSelectors.selectByName<IGood>('good').data;
 
   const goodBarcodeSettings = Object.entries(settings).reduce((prev: barcodeSettings, [idx, item]) => {
@@ -137,6 +157,9 @@ const ShipmentViewScreen = () => {
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
   const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
+
+  const usePackage = Boolean(settings.usePackage?.data);
+  const limitDelta = (settings.limitDelta?.data as number) || 0;
 
   // const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
@@ -506,6 +529,13 @@ const ShipmentViewScreen = () => {
             onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('ScanGood', { docId: id, isCurr }))}
             disabled={screenState !== 'idle'}
           />
+          {usePackage && (
+            <PackageButton
+              onPress={() => (box ? setBox(undefined) : setVisibleBoxDialog(true))}
+              iconColor={box ? 'red' : undefined}
+              disabled={screenState !== 'idle'}
+            />
+          )}
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
@@ -515,8 +545,10 @@ const ShipmentViewScreen = () => {
       screenState,
       loading,
       shipmentLines?.length,
-      handleSaveDocument,
       actionsMenu,
+      handleSaveDocument,
+      usePackage,
+      box,
       isScanerReader,
       navigation,
       id,
@@ -630,7 +662,7 @@ const ShipmentViewScreen = () => {
 
       const tempLine = tempOrder?.lines?.find((i) => lineGood.good?.id === i.good.id);
 
-      const newLine: IShipmentLine = {
+      const shipmentLine: IShipmentLine = {
         good: lineGood.good,
         id: generateId(),
         weight: barc.weight,
@@ -642,6 +674,22 @@ const ShipmentViewScreen = () => {
         sortOrder: (shipmentLines?.length || 0) + 1,
         usedRemains: remainsUse,
       };
+
+      const boxLine = box
+        ? shipmentLines?.find(
+            (i) => i.box?.id === box?.id && (i.good.id !== newLine.good.id || i.numReceived !== newLine.numReceived),
+          )
+        : null;
+
+      if (boxLine) {
+        handleErrorMessage(
+          visibleDialog,
+          'Нельзя поместить разные товары или товары с разными партиями в одну коробку!',
+        );
+        return;
+      }
+
+      const newLine = box ? { ...shipmentLine, box } : shipmentLine;
 
       if (tempLine && tempOrder) {
         const newTempLine = { ...tempLine, weight: round(tempLine.weight - newLine.weight, 3) };
@@ -664,21 +712,33 @@ const ShipmentViewScreen = () => {
           dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
           playSound();
         } else {
-          alertWithSoundMulti(
-            'Данное количество превышает количество в заявке.',
-            'Добавить позицию?',
-            () => {
-              dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
-              fpDispatch(
-                fpMovementActions.updateTempOrderLine({
-                  docId: tempOrder?.id,
-                  line: newTempLine,
-                }),
-              );
-              playSound();
-            },
-            handleFocus,
-          );
+          const currTempLine = tempOrderLines.find((i) => i.id === newTempLine.id);
+          if (currTempLine?.weight && Math.abs(newTempLine.weight) <= currTempLine?.weight * limitDelta) {
+            dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+            fpDispatch(
+              fpMovementActions.updateTempOrderLine({
+                docId: tempOrder?.id,
+                line: newTempLine,
+              }),
+            );
+            playSound();
+          } else {
+            alertWithSoundMulti(
+              'Данное количество превышает количество в заявке.',
+              'Добавить позицию?',
+              () => {
+                dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+                fpDispatch(
+                  fpMovementActions.updateTempOrderLine({
+                    docId: tempOrder?.id,
+                    line: newTempLine,
+                  }),
+                );
+                playSound();
+              },
+              handleFocus,
+            );
+          }
         }
       } else {
         alertWithSoundMulti(
@@ -714,12 +774,15 @@ const ShipmentViewScreen = () => {
       isCattle,
       shipmentLines,
       tempOrder,
+      box,
       visibleDialog,
       handleErrorMessage,
       fpDispatch,
       dispatch,
       id,
       playSound,
+      tempOrderLines,
+      limitDelta,
     ],
   );
 
@@ -955,6 +1018,21 @@ const ShipmentViewScreen = () => {
         keyboardType="numbers-and-punctuation"
         okDisabled={!quantPack || !quantPallet}
       />
+      {usePackage && (
+        <BoxDialog
+          visible={visibleBoxDialog}
+          onCancel={() => setVisibleBoxDialog(false)}
+          onOk={(newBox) => {
+            setBox(newBox);
+            setVisibleBoxDialog(false);
+          }}
+          okLabel={'Ок'}
+          keyboardType="numbers-and-punctuation"
+          okDisabled={!quantPack || !quantPallet}
+          screenName="ShipmentView"
+          lastBox={shipmentLines?.[0]?.box || undefined}
+        />
+      )}
       <SimpleDialog
         visible={visibleSendDialog}
         title={'Внимание!'}
