@@ -157,6 +157,16 @@ export const appSettings: Settings = {
     group: mainSettingGroup,
     checkSettingsCode: true,
   },
+  scanUnit: {
+    id: 'scanUnit',
+    sortOrder: 36,
+    description: 'Сканирование в шт.',
+    data: false,
+    type: 'boolean',
+    visible: true,
+    group: mainSettingGroup,
+    checkSettingsCode: true,
+  },
   minBarcodeLength: {
     id: 'minBarcodeLength',
     sortOrder: 6,

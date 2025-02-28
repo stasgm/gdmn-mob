@@ -73,6 +73,7 @@ import {
 import ViewTotal from '../../components/ViewTotal';
 import QuantDialog from '../../components/QuantDialog';
 import BoxDialog from '../../components/BoxDialog';
+import BarcodeDialog from '../../components/BarcodeDialog';
 
 const keyExtractor = (item: IShipmentLine | ITempLine) => item.id;
 const ShipmentViewScreen = () => {
@@ -115,16 +116,21 @@ const ShipmentViewScreen = () => {
 
   const shipmentLineSum = shipmentLines?.reduce(
     (sum, line) => {
-      return { ...sum, quantPack: sum.quantPack + (line.quantPack || 0), weight: sum.weight + (line.weight || 0) };
+      return {
+        ...sum,
+        quantPack: sum.quantPack + (line.quantPack || 0),
+        weight: sum.weight + (line.weight || 0),
+        quantity: sum.quantity + (line.quantity || 0),
+      };
     },
-    { quantPack: 0, weight: 0 },
+    { quantPack: 0, weight: 0, quantity: 0 },
   );
 
   const tempLineSum = tempOrderLines?.reduce(
     (sum, line) => {
       return { ...sum, weight: sum.weight + (line.weight || 0) };
     },
-    { quantPack: 0, weight: 0 },
+    { quantPack: 0, weight: 0, quantity: 0 },
   );
 
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -138,6 +144,9 @@ const ShipmentViewScreen = () => {
 
   const [visibleBoxDialog, setVisibleBoxDialog] = useState<boolean>(false);
   const [box, setBox] = useState<IBox | undefined>(undefined);
+
+  const [visibleBarcodeDialog, setVisibleBarcodeDialog] = useState<boolean>(false);
+  const [brcLine, setBrcLine] = useState<IShipmentLine | undefined>(undefined);
 
   useEffect(() => {
     return () => {
@@ -162,6 +171,7 @@ const ShipmentViewScreen = () => {
   const limitDelta = (settings.limitDelta?.data as number) || 0;
 
   // const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
+  const scanUnit = Boolean(settings.scanUnit?.data);
 
   const remainsUse = Boolean(settings.remainsUse?.data);
 
@@ -364,6 +374,11 @@ const ShipmentViewScreen = () => {
         setScreenState('deleting');
         await sleep(1);
         const res = await docDispatch(documentActions.removeDocument(id));
+
+        if (tempOrder) {
+          dispatch(fpMovementActions.removeTempOrders([tempOrder?.id]));
+        }
+
         if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
           setScreenState('deleted');
         } else {
@@ -372,7 +387,7 @@ const ShipmentViewScreen = () => {
       },
       handleFocus,
     );
-  }, [docDispatch, id]);
+  }, [dispatch, docDispatch, id, tempOrder]);
 
   const hanldeCancelLastScan = useCallback(() => {
     if (shipmentLines?.length) {
@@ -380,17 +395,116 @@ const ShipmentViewScreen = () => {
       dispatch(documentActions.removeDocumentLine({ docId: id, lineId: shipmentLine.id }));
 
       const tempLine = tempOrder?.lines?.find((i) => shipmentLine.good.id === i.good.id);
+      const good = scanUnit ? goods?.find((i) => shipmentLine.good.id === i.id) : undefined;
       if (tempLine && tempOrder) {
         fpDispatch(
           fpMovementActions.updateTempOrderLine({
             docId: tempOrder.id,
-            line: { ...tempLine, weight: round(tempLine.weight + shipmentLine.weight, 3) },
+            line:
+              scanUnit && good && shipmentLine.quantity
+                ? { ...tempLine, weight: round(tempLine.weight + shipmentLine.quantity, 3) }
+                : { ...tempLine, weight: round(tempLine.weight + shipmentLine.weight, 3) },
           }),
         );
       }
     }
     handleFocus();
-  }, [dispatch, fpDispatch, id, shipmentLines, tempOrder]);
+  }, [dispatch, fpDispatch, goods, id, scanUnit, shipmentLines, tempOrder]);
+
+  const handleSetNewBox = (newBox: IBox) => {
+    setBox(newBox);
+    setVisibleBoxDialog(false);
+    handleFocus();
+  };
+
+  const handleCancelBoxDialog = () => {
+    setVisibleBoxDialog(false);
+    handleFocus();
+  };
+
+  const handleAddUnitLine = useCallback(
+    async (line: IShipmentLine) => {
+      const newLine = box ? { ...line, box } : line;
+
+      const tempLine = tempOrder?.lines?.find((i) => line.good?.id === i.good.id);
+
+      if (tempLine && tempOrder && line.quantity) {
+        const newTempLine = { ...tempLine, weight: round(tempLine.weight - line.quantity, 3) };
+        if (newTempLine.weight > 0) {
+          fpDispatch(
+            fpMovementActions.updateTempOrderLine({
+              docId: tempOrder?.id,
+              line: newTempLine,
+            }),
+          );
+          dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+          playSound();
+        } else if (newTempLine.weight === 0) {
+          fpDispatch(
+            fpMovementActions.updateTempOrderLine({
+              docId: tempOrder?.id,
+              line: newTempLine,
+            }),
+          );
+          dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+          playSound();
+        } else {
+          const currTempLine = tempOrderLines.find((i) => i.id === newTempLine.id);
+          if (currTempLine?.weight && Math.abs(newTempLine.weight) <= currTempLine?.weight * limitDelta) {
+            dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+            fpDispatch(
+              fpMovementActions.updateTempOrderLine({
+                docId: tempOrder?.id,
+                line: newTempLine,
+              }),
+            );
+            playSound();
+          } else {
+            alertWithSoundMulti(
+              'Данное количество превышает количество в заявке.',
+              'Добавить позицию?',
+              () => {
+                dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+                fpDispatch(
+                  fpMovementActions.updateTempOrderLine({
+                    docId: tempOrder?.id,
+                    line: newTempLine,
+                  }),
+                );
+                playSound();
+              },
+              handleFocus,
+            );
+          }
+        }
+      } else {
+        alertWithSoundMulti(
+          'Данный товар отсутствует в позициях заявки.',
+          'Добавить позицию?',
+          () => {
+            dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+            playSound();
+          },
+          handleFocus,
+        );
+      }
+      // dispatch(documentActions.addDocumentLine({ docId: id, line: box ? { ...line, box } : line }));
+
+      if (box && !(box.numReceived && box.workDate)) {
+        setBox({ ...box, numReceived: line.numReceived, workDate: line.workDate });
+      }
+
+      setVisibleBarcodeDialog(false);
+
+      handleFocus();
+    },
+    [box, dispatch, fpDispatch, id, limitDelta, playSound, tempOrder, tempOrderLines],
+  );
+
+  const handleCancelUnitDialog = () => {
+    setVisibleBarcodeDialog(false);
+    handleFocus();
+  };
 
   const actionsMenu = useCallback(() => {
     showActionSheet(
@@ -604,7 +718,62 @@ const ShipmentViewScreen = () => {
         return;
       }
 
-      if (brc.length < minBarcodeLength) {
+      if (scanUnit && brc.length === 13) {
+        const goodRem = goodRemains.find((item) => item.good.shcode === brc);
+        if (!goodRem) {
+          setVisibleRequestDialog(true);
+          setScanned(false);
+          return;
+        }
+
+        /////////////////////////////////////////////////////////////
+        // if (good.remains >= weight) {
+        //   handleErrorMessage(visibleDialog, 'Вес товара превышает вес в остатках!');
+        //   return;
+        // }
+
+        const good = goods.find((item) => item.shcode === brc && item.isUnit);
+        if (!good) {
+          handleErrorMessage(visibleDialog, 'Товар не является штучным. Проверьте товар в справочнике!');
+          return;
+        }
+
+        const newLine: IShipmentLine = {
+          good: {
+            id: good.id,
+            name: good.name,
+            shcode: good.shcode,
+            isCattle: good?.isCattle,
+            goodGroupId: good?.goodGroupId,
+            isUnit: Boolean(good?.isUnit),
+          },
+          id: generateId(),
+          quantity: 0,
+          barcode: brc,
+          workDate: '',
+          numReceived: '',
+          sortOrder: shipment?.lines?.length + 1,
+          usedRemains: remainsUse,
+          quantPack: 0,
+          weight: goodRem.remains,
+          unitWeight: good.unitWeight,
+        };
+
+        setBrcLine(newLine);
+        if (visibleDialog) {
+          setVisibleDialog(false);
+          setErrorMessage('');
+          setBarcode('');
+        } else {
+          setScanned(false);
+        }
+
+        setVisibleBarcodeDialog(true);
+        handleFocus();
+        return;
+      }
+
+      if (!scanUnit && brc.length < minBarcodeLength) {
         handleErrorMessage(
           visibleDialog,
           'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
@@ -752,6 +921,10 @@ const ShipmentViewScreen = () => {
         );
       }
 
+      if (box && !(box.numReceived && box.workDate)) {
+        setBox({ ...box, numReceived: newLine.numReceived, workDate: box.workDate });
+      }
+
       if (visibleDialog) {
         setVisibleDialog(false);
         setErrorMessage('');
@@ -765,6 +938,7 @@ const ShipmentViewScreen = () => {
 
     [
       shipment,
+      scanUnit,
       minBarcodeLength,
       maxBarcodeLength,
       goodBarcodeSettings,
@@ -861,7 +1035,10 @@ const ShipmentViewScreen = () => {
         <ListItemLine
           // key={item.id}
           readonly={
-            shipment?.status !== 'DRAFT' || item?.sortOrder !== shipmentLines?.length || Boolean(item.scannedBarcode)
+            shipment?.status !== 'DRAFT' ||
+            scanUnit ||
+            item?.sortOrder !== shipmentLines?.length ||
+            Boolean(item.scannedBarcode)
           }
           onPress={() => handlePressLine(item.weight)}
         >
@@ -870,7 +1047,11 @@ const ShipmentViewScreen = () => {
             <View style={styles.flexDirectionRow}>
               <MaterialCommunityIcons name="shopping-outline" size={18} />
               <MediumText>
-                {(item.weight || 0).toString()} кг, {(item.quantPack || 0).toString()} кор.
+                {item.good.isUnit ? `${(item.quantity || 0).toString()} шт.` : `${(item.weight || 0).toString()} кг`}
+                {item.good.isUnit
+                  ? `, ${round((item.unitWeight || 0) * (item.quantity || 0), 3)} кг`
+                  : `, ${(item.quantPack || 0).toString()} кор.`}
+                {/* {(item.weight || 0).toString()} кг, {(item.quantPack || 0).toString()} кор. */}
               </MediumText>
             </View>
             <View style={styles.flexDirectionRow}>
@@ -882,21 +1063,29 @@ const ShipmentViewScreen = () => {
         </ListItemLine>
       );
     },
-    [handlePressLine, shipment?.status, shipmentLines?.length],
+    [handlePressLine, scanUnit, shipment?.status, shipmentLines?.length],
   );
 
-  const renderTempItem = useCallback(({ item }: { item: ITempLine }) => {
-    return (
-      <ListItemLine key={item.id} readonly={true}>
-        <View style={styles.details}>
-          <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-          <View style={styles.directionRow}>
-            <MediumText>Вес: {(item.weight || 0).toString()} кг</MediumText>
+  const renderTempItem = useCallback(
+    ({ item }: { item: ITempLine }) => {
+      const good = scanUnit ? goods.find((i) => i.id === item.good.id && i.isUnit) : undefined;
+      return (
+        <ListItemLine key={item.id} readonly={true}>
+          <View style={styles.details}>
+            <LargeText style={styles.textBold}>{item.good.name}</LargeText>
+            <View style={styles.directionRow}>
+              {scanUnit && good ? (
+                <MediumText>Количество: {(item.weight || 0).toString()} шт.</MediumText>
+              ) : (
+                <MediumText>Вес: {(item.weight || 0).toString()} кг</MediumText>
+              )}
+            </View>
           </View>
-        </View>
-      </ListItemLine>
-    );
-  }, []);
+        </ListItemLine>
+      );
+    },
+    [goods, scanUnit],
+  );
 
   const LastLine = useMemo(() => renderShipmentItem, [renderShipmentItem]);
 
@@ -973,7 +1162,11 @@ const ShipmentViewScreen = () => {
             extraData={[shipmentLines, isBlocked]}
             keyboardShouldPersistTaps={'always'}
           />
-          <ViewTotal quantPack={shipmentLineSum?.quantPack} weight={shipmentLineSum?.weight || 0} />
+          <ViewTotal
+            quantPack={shipmentLineSum?.quantPack}
+            weight={shipmentLineSum?.weight || 0}
+            quantity={shipmentLineSum?.quantity || 0}
+          />
         </>
       ) : lineType === 'order' ? (
         <>
@@ -992,7 +1185,11 @@ const ShipmentViewScreen = () => {
       ) : lineType === 'last' && shipmentLines?.[0] ? (
         <View style={styles.spaceBetween}>
           <LastLine item={shipmentLines?.[0]} />
-          <ViewTotal quantPack={shipmentLineSum?.quantPack} weight={shipmentLineSum?.weight || 0} />
+          <ViewTotal
+            quantPack={shipmentLineSum?.quantPack}
+            weight={shipmentLineSum?.weight || 0}
+            quantity={shipmentLineSum?.quantity || 0}
+          />
         </View>
       ) : null}
       <AppDialog
@@ -1021,16 +1218,27 @@ const ShipmentViewScreen = () => {
       {usePackage && (
         <BoxDialog
           visible={visibleBoxDialog}
-          onCancel={() => setVisibleBoxDialog(false)}
-          onOk={(newBox) => {
-            setBox(newBox);
-            setVisibleBoxDialog(false);
-          }}
+          onCancel={handleCancelBoxDialog}
+          onOk={handleSetNewBox}
           okLabel={'Ок'}
           keyboardType="numbers-and-punctuation"
           okDisabled={!quantPack || !quantPallet}
           screenName="ShipmentView"
           lastBox={shipmentLines?.[0]?.box || undefined}
+        />
+      )}
+      {scanUnit && (
+        <BarcodeDialog
+          visible={visibleBarcodeDialog}
+          onCancel={handleCancelUnitDialog}
+          onOk={handleAddUnitLine}
+          okLabel={'Ок'}
+          keyboardType="numbers-and-punctuation"
+          okDisabled={!quantPack || !quantPallet}
+          screenName="ShipmentView"
+          line={brcLine}
+          box={box}
+          remainsUse={remainsUse}
         />
       )}
       <SimpleDialog

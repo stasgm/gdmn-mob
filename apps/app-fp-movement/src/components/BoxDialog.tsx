@@ -5,7 +5,7 @@ import { Dialog, Button, TextInput } from 'react-native-paper';
 import { LargeText, SelectableInput } from '@lib/mobile-ui';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { INamedEntity, IReference } from '@lib/types';
+import { IReference } from '@lib/types';
 
 import { appActions, IFormParam, refSelectors, useDispatch, useSelector } from '@lib/store';
 
@@ -13,6 +13,7 @@ import { generateId } from '@lib/mobile-hooks';
 
 import { FreeShipmentStackParamList, ShipmentStackParamList } from '../navigation/Root/types';
 import { IBox } from '../store/types';
+import { IPackage } from '../store/app/types';
 
 interface IProps {
   visible: boolean;
@@ -26,7 +27,7 @@ interface IProps {
   screenName: string;
 }
 export interface IBoxFormParam extends IFormParam {
-  box?: INamedEntity;
+  box?: IPackage;
   weight?: string;
   additionalWeight?: string;
 }
@@ -44,7 +45,7 @@ const BoxDialog = ({
 }: IProps) => {
   const { colors } = useTheme();
   // const navigation = useNavigation();
-  const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList | FreeShipmentStackParamList>>();
+  const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList & FreeShipmentStackParamList>>();
 
   const forms = useSelector((state) => state.app.screenFormParams);
 
@@ -68,9 +69,9 @@ const BoxDialog = ({
     [dispatch, screenName],
   );
 
-  const lastLineBox = refSelectors
-    .selectByName<IReference<INamedEntity>>('packages')
-    ?.data.find((t) => lastBox?.packageId === t.id);
+  const packages: IPackage[] = refSelectors.selectByName<IReference<IPackage>>('packages')?.data;
+
+  const lastLineBox = packages?.find((t) => lastBox?.packageId === t.id);
 
   useEffect(() => {
     const formParams = {
@@ -104,6 +105,7 @@ const BoxDialog = ({
       refName: 'packages',
       fieldName: 'box',
       value: docBox && [docBox],
+      additionalField: 'unitWeight',
     });
   };
 
@@ -149,6 +151,13 @@ const BoxDialog = ({
     clearFormParams();
     onCancel && onCancel();
   }, [clearFormParams, onCancel]);
+
+  useEffect(() => {
+    //Если меняем тару и в ней указан вес
+    if (docBox) {
+      handleChangeWeight((docBox?.unitWeight || '').toString());
+    }
+  }, [dispatch, docBox, handleChangeWeight, packages]);
 
   return (
     <Dialog visible={visible} onDismiss={onCancel}>

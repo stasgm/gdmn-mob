@@ -176,6 +176,8 @@ export interface IShipmentHead extends IHead {
 
 export interface IShipmentLine extends IBasedLine {
   box?: IBox;
+  quantity?: number;
+  unitWeight?: number;
 }
 export type IShipmentDocument = MandateProps<IDocument<IShipmentHead, IShipmentLine>, 'head' | 'lines'>;
 
@@ -188,9 +190,14 @@ export interface IBox extends IEntity {
   packageWeight: number; //вес тары
   packageId: string; // из справочника тары
   additionalWeight?: number; //дополнительный вес тары
+  workDate?: string;
+  numReceived?: string;
 }
+
 export interface IFreeShipmentLine extends IBasedLine {
   box?: IBox;
+  quantity?: number;
+  unitWeight?: number;
 }
 
 export type IFreeShipmentDocument = MandateProps<IDocument<IFreeShipmentHead, IFreeShipmentLine>, 'head' | 'lines'>;

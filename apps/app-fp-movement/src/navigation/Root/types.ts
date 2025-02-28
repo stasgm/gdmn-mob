@@ -13,6 +13,7 @@ export type IRefSelectParams = {
   docType?: string;
   refFieldName?: string;
   descrFieldName?: string;
+  additionalField?: string;
 };
 
 export type RefParamList = {
