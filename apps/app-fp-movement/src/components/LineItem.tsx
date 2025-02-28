@@ -2,14 +2,14 @@ import React, { ReactNode } from 'react';
 import { View } from 'react-native';
 import { globalStyles as styles, MediumText, ListItemLine, LargeText } from '@lib/mobile-ui';
 
-import { getDateString } from '@lib/mobile-hooks';
+import { getDateString, round } from '@lib/mobile-hooks';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { IMoveLine } from '../store/types';
+import { IFreeShipmentLine, IMoveLine } from '../store/types';
 
 interface IItem {
-  item: IMoveLine; // | IBasedLine;
+  item: IMoveLine | IFreeShipmentLine; // | IBasedLine;
   disabled?: boolean;
   onPress?: () => void;
   children?: ReactNode;
@@ -34,7 +34,17 @@ const LineItem = ({
         <View style={styles.flexDirectionRow}>
           <MaterialCommunityIcons name="shopping-outline" size={18} />
           <MediumText>
-            {(item.weight || 0).toString()} кг{isLab ? '' : `, ${(item.quantPack || 0).toString()} кор.`}
+            {item.good.isUnit
+              ? `${((item as IFreeShipmentLine).quantity || 0).toString()} шт.`
+              : `${(item.weight || 0).toString()} кг`}
+            {item.good.isUnit
+              ? `, ${round(
+                  ((item as IFreeShipmentLine).unitWeight || 0) * ((item as IFreeShipmentLine).quantity || 0),
+                  3,
+                )} кг`
+              : isLab
+                ? ''
+                : `, ${(item.quantPack || 0).toString()} кор.`}
           </MediumText>
         </View>
         <View style={styles.flexDirectionRow}>
@@ -44,13 +54,13 @@ const LineItem = ({
         </View>
         {isFromAddressed ? (
           <View style={styles.flexDirectionRow}>
-            <MediumText>Откуда: {item.fromCell || ''}</MediumText>
+            <MediumText>Откуда: {(item as IMoveLine).fromCell || ''}</MediumText>
           </View>
         ) : null}
         {isToAddressed ? (
           <View style={styles.flexDirectionRow}>
             <MediumText>
-              {isFromAddressed ? 'Куда:' : 'Ячейка №'} {item.toCell || ''}
+              {isFromAddressed ? 'Куда:' : 'Ячейка №'} {(item as IMoveLine).toCell || ''}
             </MediumText>
           </View>
         ) : null}

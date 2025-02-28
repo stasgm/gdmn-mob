@@ -82,6 +82,7 @@ export const shipmentScreens = {
   ScanOrder: { title: 'Сканер заявки', component: ScanOrderScreen },
   ScanGood: { title: 'Сканер', component: ScanGoodScreen },
   SelectCell: { title: 'Выбор ячейки', component: SelectCellScreen },
+  SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
 };
 
 export const shipmentListScreens = {

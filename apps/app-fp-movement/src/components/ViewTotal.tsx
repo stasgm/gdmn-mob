@@ -11,9 +11,10 @@ export interface IItem {
   quantPack?: number;
   weight: number;
   scan?: boolean;
+  quantity?: number;
 }
 
-const ViewTotal = ({ weight, quantPack, scan = false }: IItem) => {
+const ViewTotal = ({ weight, quantPack, scan = false, quantity }: IItem) => {
   const { colors } = useTheme();
 
   return (
@@ -42,6 +43,16 @@ const ViewTotal = ({ weight, quantPack, scan = false }: IItem) => {
               </View>
               <View style={localStyles.quantity}>
                 <MediumText>{`${round(quantPack, 3)}` || 0}</MediumText>
+              </View>
+            </View>
+          ) : null}
+          {quantity ? (
+            <View style={styles.directionRow}>
+              <View style={localStyles.groupWidth}>
+                <MediumText>Количество, шт.</MediumText>
+              </View>
+              <View style={localStyles.quantity}>
+                <MediumText>{`${round(quantity, 3)}` || 0}</MediumText>
               </View>
             </View>
           ) : null}

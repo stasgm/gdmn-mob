@@ -334,6 +334,7 @@ export const getDocToSend = (
           id: i.id,
           goodId: i.good.id,
           weight: i.weight,
+          quantity: (i as IFreeShipmentLine).quantity,
           workDate: i.workDate,
           numReceived: i.numReceived,
           barcode: i.barcode,

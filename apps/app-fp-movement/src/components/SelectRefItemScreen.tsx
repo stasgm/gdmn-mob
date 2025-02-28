@@ -38,6 +38,7 @@ const SelectRefItemScreen = () => {
     clauseType,
     refFieldName = 'name' || 'shcode',
     descrFieldName,
+    additionalField,
   } = useRoute<RouteProp<RefParamList, 'SelectRefItem'>>().params;
 
   const refObj = refSelectors.selectByName<IReferenceData>(refName);
@@ -128,18 +129,22 @@ const SelectRefItemScreen = () => {
         );
       } else {
         setScreenState('saving');
+        const field = { id: item.id, name: item.name, shcode: item.shcode, isAddressStore: item.isAddressStore };
         dispatch(
           appActions.setScreenFormParams({
             screenName,
             params: {
-              [fieldName]: { id: item.id, name: item.name, shcode: item.shcode, isAddressStore: item.isAddressStore },
+              [fieldName]:
+                additionalField && item[additionalField]
+                  ? { ...field, [additionalField]: item[additionalField] }
+                  : field,
             },
           }),
         );
         navigation.goBack();
       }
     },
-    [isMulti, checkedItem, dispatch, fieldName, screenName, navigation],
+    [isMulti, checkedItem, dispatch, screenName, fieldName, additionalField, navigation],
   );
 
   const renderItem = useCallback(
