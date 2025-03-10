@@ -1,8 +1,7 @@
 import { IDBUser, IUser, NewUser, IUserWithDevice } from '@lib/types';
 
 import { DataNotFoundException, ConflictException, InvalidParameterException, ForbiddenException } from '../exceptions';
-import { hashPassword } from '../utils/crypt';
-import { extraPredicate, getListPart } from '../utils/helpers';
+import { hashPassword, extraPredicate, formatDateToLocale, getListPart } from '../utils';
 
 import { getDb } from './dao/db';
 
@@ -70,7 +69,7 @@ const addOne = (userData: NewUser): IUser => {
  * @return обновленный объект пользователя
  * */
 const updateOne = (id: string, userData: Partial<IUser & { password: string }>): IUser => {
-  const { users, companies, appSystems } = getDb();
+  const { users, companies, deviceBindings, appSystems } = getDb();
 
   const oldUser = users.findById(id);
 
@@ -113,6 +112,15 @@ const updateOne = (id: string, userData: Partial<IUser & { password: string }>):
       throw new DataNotFoundException('Пользователь для данной подсистемы уже существует');
     }
   }
+
+  // Проверяем есть ли привязанные устройства, если меняем подсистему
+  const subUsers = users.data.filter((user) => user.erpUserId === oldUser.id);
+  if (deviceBindings.data.find((biding) => subUsers.find((user) => user.id === biding.userId))) {
+    throw new ConflictException(
+      'Нельзя изменить подсистему, т.к. есть привязанные устройства к пользователям подсистемы',
+    );
+  }
+
   // Проверяем есть ли в базе пользователь ERP
   let newErpUserId;
   if (userData.erpUser) {
@@ -250,7 +258,8 @@ const findMany = (params: Record<string, string | number>): IUser[] => {
   }
 
   userList = userList.filter((item) => {
-    const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { fromRecord, toRecord, ...newParams } = params;
 
     let companyFound = true;
 
@@ -283,8 +292,8 @@ const findMany = (params: Record<string, string | number>): IUser[] => {
         const firstname = typeof item.firstName === 'string' ? item.firstName.toUpperCase() : '';
         const lastName = typeof item.lastName === 'string' ? item.lastName.toUpperCase() : '';
         const middleName = typeof item.middleName === 'string' ? item.middleName.toUpperCase() : '';
-        const creationDate = new Date(item.creationDate || '').toLocaleString('ru', { hour12: false });
-        const editionDate = new Date(item.editionDate || '').toLocaleString('ru', { hour12: false });
+        const creationDate = formatDateToLocale(item.creationDate);
+        const editionDate = formatDateToLocale(item.editionDate);
 
         filteredUsers =
           name.includes(filterText) ||
@@ -306,7 +315,7 @@ const findMany = (params: Record<string, string | number>): IUser[] => {
     );
   });
 
-  return getListPart(userList, params).map((i) => makeUser(i));
+  return getListPart<IDBUser>(userList, params).map((i) => makeUser(i));
 };
 
 /**

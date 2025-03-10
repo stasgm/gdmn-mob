@@ -2,10 +2,8 @@ import { IAppSystem, NewAppSystem } from '@lib/types';
 
 import { appSystems as mockAppSystems } from '@lib/mock';
 
-import { error, appSystem as types } from '../types';
+import { error, appSystem as types, BaseApi, BaseRequest } from '../types';
 import { generateId, response2Log, sleep } from '../utils';
-import { BaseApi } from '../types/BaseApi';
-import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
 
 class AppSystem extends BaseRequest {

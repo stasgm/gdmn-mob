@@ -3,15 +3,17 @@ import api from '@lib/client-api';
 
 import { authActions } from '@lib/store';
 
+import { IFileParams } from '@lib/types';
+
 import { AppState } from '..';
 
 import { webRequest } from '../webRequest';
 
 import { IFileFilter } from '../../types';
 
-import { fileSystemActions, FileSystemActionType } from './actions';
+import { systemFileActions, SystemFileActionType } from './actions';
 
-export type AppThunk = ThunkAction<Promise<FileSystemActionType>, AppState, null, FileSystemActionType>;
+export type AppThunk = ThunkAction<Promise<SystemFileActionType>, AppState, null, SystemFileActionType>;
 
 const fetchFiles = (
   filesFilters?: IFileFilter,
@@ -26,85 +28,102 @@ const fetchFiles = (
   if (toRecord) params.toRecord = toRecord;
 
   return async (dispatch) => {
-    dispatch(fileSystemActions.fetchFilesAsync.request(''));
-
+    dispatch(systemFileActions.fetchFilesAsync.request(''));
     const response = await api.file.getFiles(webRequest(dispatch, authActions), params);
 
     if (response.type === 'GET_FILES') {
-      return dispatch(fileSystemActions.fetchFilesAsync.success(response.files));
+      return dispatch(systemFileActions.fetchFilesAsync.success(response.files));
     }
 
-    return dispatch(fileSystemActions.fetchFilesAsync.failure(response.message));
+    return dispatch(systemFileActions.fetchFilesAsync.failure(response.message));
   };
 };
 
-const fetchFile = (id: string): AppThunk => {
+const fetchFile = (id: string, folder?: string, appSystemId?: string, companyId?: string): AppThunk => {
   return async (dispatch) => {
-    dispatch(fileSystemActions.fetchFileAsync.request(''));
+    dispatch(systemFileActions.fetchFileAsync.request(''));
 
-    const response = await api.file.getFile(webRequest(dispatch, authActions), id);
+    const params: Record<string, string | number> = {};
+
+    if (folder) params.folder = folder;
+    if (appSystemId) params.appSystemId = appSystemId;
+    if (companyId) params.companyId = companyId;
+
+    const response = await api.file.getFile(webRequest(dispatch, authActions), id, params);
 
     if (response.type === 'GET_FILE') {
-      return dispatch(fileSystemActions.fetchFileAsync.success(response.file));
+      return dispatch(systemFileActions.fetchFileAsync.success(response.file));
     }
 
-    return dispatch(fileSystemActions.fetchFileAsync.failure(response.message));
+    return dispatch(systemFileActions.fetchFileAsync.failure(response.message));
   };
 };
 
-const updateFile = (id: string, file: any): AppThunk => {
+const updateFile = (id: string, file: any, folder?: string, appSystemId?: string, companyId?: string): AppThunk => {
   return async (dispatch) => {
-    dispatch(fileSystemActions.updateFileAsync.request('Обновление файла'));
+    dispatch(systemFileActions.updateFileAsync.request('Обновление файла'));
 
-    const response = await api.file.updateFile(webRequest(dispatch, authActions), id, file);
+    const params: Record<string, string | number> = {};
+
+    if (folder) params.folder = folder;
+    if (appSystemId) params.appSystemId = appSystemId;
+    if (companyId) params.companyId = companyId;
+
+    const response = await api.file.updateFile(webRequest(dispatch, authActions), id, params, file);
 
     if (response.type === 'UPDATE_FILE') {
-      return dispatch(fileSystemActions.updateFileAsync.success(response.file));
+      return dispatch(systemFileActions.updateFileAsync.success(response.file));
     }
 
-    return dispatch(fileSystemActions.updateFileAsync.failure(response.message));
+    return dispatch(systemFileActions.updateFileAsync.failure(response.message));
   };
 };
 
-const removeFile = (id: string): AppThunk => {
+const deleteFile = (id: string, folder?: string, appSystemId?: string, companyId?: string): AppThunk => {
   return async (dispatch) => {
-    dispatch(fileSystemActions.removeFileAsync.request(''));
+    dispatch(systemFileActions.removeFileAsync.request(''));
 
-    const response = await api.file.removeFile(webRequest(dispatch, authActions), id);
+    const params: Record<string, string | number> = {};
+
+    if (folder) params.folder = folder;
+    if (appSystemId) params.appSystemId = appSystemId;
+    if (companyId) params.companyId = companyId;
+
+    const response = await api.file.deleteFile(webRequest(dispatch, authActions), id, params);
 
     if (response.type === 'REMOVE_FILE') {
-      return dispatch(fileSystemActions.removeFileAsync.success(id));
+      return dispatch(systemFileActions.removeFileAsync.success(id));
     }
 
-    return dispatch(fileSystemActions.removeFileAsync.failure(response.message));
+    return dispatch(systemFileActions.removeFileAsync.failure(response.message));
   };
 };
 
-const removeFiles = (fileIds: string[]): AppThunk => {
+const deleteFiles = (fileIds: IFileParams[]): AppThunk => {
   return async (dispatch) => {
-    dispatch(fileSystemActions.removeFilesAsync.request(''));
+    dispatch(systemFileActions.removeFilesAsync.request(''));
 
-    const response = await api.file.removeFiles(webRequest(dispatch, authActions), fileIds);
+    const response = await api.file.deleteFiles(webRequest(dispatch, authActions), fileIds);
 
     if (response.type === 'REMOVE_FILES') {
-      return dispatch(fileSystemActions.removeFilesAsync.success(fileIds));
+      return dispatch(systemFileActions.removeFilesAsync.success(fileIds));
     }
 
-    return dispatch(fileSystemActions.removeFilesAsync.failure(response.message));
+    return dispatch(systemFileActions.removeFilesAsync.failure(response.message));
   };
 };
 
-const moveFiles = (fileIds: string[], folderName: string): AppThunk => {
+const moveFiles = (fileIds: IFileParams[], folderName: string): AppThunk => {
   return async (dispatch) => {
-    dispatch(fileSystemActions.moveFilesAsync.request(''));
+    dispatch(systemFileActions.moveFilesAsync.request(''));
 
     const response = await api.file.moveFiles(webRequest(dispatch, authActions), fileIds, folderName);
 
     if (response.type === 'MOVE_FILES') {
-      return dispatch(fileSystemActions.moveFilesAsync.success(fileIds));
+      return dispatch(systemFileActions.moveFilesAsync.success(fileIds));
     }
 
-    return dispatch(fileSystemActions.moveFilesAsync.failure(response.message));
+    return dispatch(systemFileActions.moveFilesAsync.failure(response.message));
   };
 };
 
@@ -115,16 +134,16 @@ const fetchFolders = (companyId: string, appSystemId: string): AppThunk => {
   params.appSystemId = appSystemId;
 
   return async (dispatch) => {
-    dispatch(fileSystemActions.fetchFoldersAsync.request(''));
+    dispatch(systemFileActions.fetchFoldersAsync.request(''));
 
     const response = await api.file.getFolders(webRequest(dispatch, authActions), params);
 
     if (response.type === 'GET_FOLDERS') {
-      return dispatch(fileSystemActions.fetchFoldersAsync.success(response.folders));
+      return dispatch(systemFileActions.fetchFoldersAsync.success(response.folders));
     }
 
-    return dispatch(fileSystemActions.fetchFoldersAsync.failure(response.message));
+    return dispatch(systemFileActions.fetchFoldersAsync.failure(response.message));
   };
 };
 
-export default { fetchFiles, fetchFile, updateFile, removeFile, removeFiles, moveFiles, fetchFolders };
+export default { fetchFiles, fetchFile, updateFile, deleteFile, deleteFiles, moveFiles, fetchFolders };

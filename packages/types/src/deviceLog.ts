@@ -1,44 +1,34 @@
-import { IEntity, INamedEntity } from './common';
+import { INamedEntity } from './common';
+import { IDeleteFilesRequest, IPathParams, ISystemFile } from './files';
+import { Settings } from './settings';
 
-export interface IDeviceLog {
-  id: string;
-  name: string;
-  date: string;
-  message: string;
-  isSent?: boolean;
+export interface IDeviceData {
+  appVersion: string;
+  appSettings: Settings;
+  deviceLog: IDeviceLogEntry[];
 }
 
-export interface IFileDeviceLogInfo {
+export interface IDeviceLogEntry {
+  id: string;
+  name: string;
+  message: string;
+  date: string;
+  isSent?: boolean;
+  processId?: string;
+}
+
+export interface IDeviceLogParams extends IPathParams {
   producerId: string;
   deviceId: string;
 }
 
-export interface IPathParams {
-  companyId: string;
-  appSystemId: string;
-}
+export type IAddDeviceLogParams = IDeviceData & IDeviceLogParams;
 
-export interface IDeviceLogParams extends IPathParams {
-  deviceLog: IDeviceLog[];
-}
-
-export interface IDeviceLogFiles extends IEntity {
-  [key: string]: unknown;
+export interface IDeviceLogFile extends ISystemFile {
   company: INamedEntity;
   appSystem: INamedEntity;
-  contact: INamedEntity;
+  producer: INamedEntity;
   device: INamedEntity;
-  date: string;
-  size: number;
-  mdate: string;
 }
 
-export interface IDeviceLogOptions {
-  [fieldName: string]: unknown;
-  company: string;
-  appSystem: string;
-  contact: string;
-  device: string;
-  uid: string;
-  date: string;
-}
+export type DeleteDeviceLogsRequest = IDeleteFilesRequest;

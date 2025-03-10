@@ -15,15 +15,22 @@ import {
 
 import { IFiles, IDBProcess, AddProcess, IMessage, IDBMessage, NewMessage, IMessageParams, IProcess } from '@lib/types';
 
-import { extraPredicate, generateId, getListPart, isIDBMessage } from '../utils/helpers';
-
-import log from '../utils/logger';
+import {
+  log,
+  extraPredicate,
+  formatDateToLocale,
+  generateId,
+  getListPart,
+  isIDBMessage,
+  BYTES_PER_MB,
+  defMaxDataVolume,
+  defMaxFiles,
+  MSEС_IN_MIN,
+} from '../utils';
 
 import config from '../../config';
 
-import { InnerErrorException, InvalidParameterException } from '../exceptions';
-
-import { BYTES_PER_MB, defMaxDataVolume, defMaxFiles, MSEС_IN_MIN } from '../utils/constants';
+import { InnerErrorException } from '../exceptions';
 
 import { messageFileName2params } from '../utils/json-db/MessageCollection';
 
@@ -94,32 +101,12 @@ export const getProcessById = (processId: string) => processList.find((p) => p.i
 export const getProcesses = (params: Record<string, string | number>): IProcess[] => {
   const { appSystems, companies } = getDb();
 
-  // let filteredList;
-  // if (process.env.MOCK) {
-  //   filteredList = mockProcesses;
-  // } else {
-  // filteredList = processList;
-  // }
-
   const filteredList = processList.filter((item) => {
-    const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { fromRecord, toRecord, ...newParams } = params;
 
     const appSystem = appSystems.findById(item.appSystemId);
     const company = companies.findById(item.companyId);
-
-    // let companyFound = true;
-
-    // if ('companyId' in newParams) {
-    //   companyFound = item.companyId === newParams.companyId;
-    //   delete newParams['companyId'];
-    // }
-
-    // let appSystemFound = true;
-
-    // if ('appSystemId' in newParams) {
-    //   appSystemFound = item.appSystemId === newParams.appSystemId;
-    //   delete newParams['appSystemId'];
-    // }
 
     /** filtering data */
     let filteredProcesses = true;
@@ -130,15 +117,14 @@ export const getProcesses = (params: Record<string, string | number>): IProcess[
         const companyName = company?.name.toUpperCase() || '';
         const appSystemName = appSystem?.name.toUpperCase() || '';
         const status = item.status.toUpperCase();
-        const dateBegin = new Date(item.dateBegin || '').toLocaleString('ru', { hour12: false });
-        const dateReadyToCommit = new Date(item.dateReadyToCommit || '').toLocaleString('ru', { hour12: false });
+        const dateBegin = formatDateToLocale(item.dateBegin);
+        const dateReadyToCommit = formatDateToLocale(item.dateReadyToCommit);
         filteredProcesses =
           companyName.includes(filterText) ||
           appSystemName.includes(filterText) ||
           status.includes(filterText) ||
           dateBegin.includes(filterText) ||
           dateReadyToCommit.includes(filterText);
-        // const company = item.companyId;
       }
       delete newParams['filterText'];
     }
@@ -146,7 +132,7 @@ export const getProcesses = (params: Record<string, string | number>): IProcess[
     return filteredProcesses && extraPredicate(item, newParams as Record<string, string>);
   });
 
-  return getListPart(filteredList, params).map((i) => makeProcess(i));
+  return getListPart<IDBProcess>(filteredList, params).map((i) => makeProcess(i));
 };
 
 const getPath = (folders: string[], fn = '') => {

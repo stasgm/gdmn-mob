@@ -148,13 +148,6 @@ export const DocViewScreen = () => {
     deleteSelectedLineItems(deleteDocs);
   }, [delList, dispatch, id, setDelList]);
 
-  useEffect(() => {
-    if (screenState === 'sent' || screenState === 'deleted') {
-      setScreenState('idle');
-      navigation.goBack();
-    }
-  }, [navigation, screenState]);
-
   const sendDoc = useSendDocs(doc ? [doc] : []);
 
   const [visibleSendDialog, setVisibleSendDialog] = useState(false);

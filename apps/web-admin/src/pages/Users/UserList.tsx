@@ -1,7 +1,6 @@
-import { Helmet } from 'react-helmet';
 import { Box, Container } from '@mui/material';
 import { useNavigate } from 'react-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import CachedIcon from '@mui/icons-material/Cached';
@@ -12,52 +11,45 @@ import SortableTable from '../../components/SortableTable';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import actions from '../../store/user';
+import { userActions } from '../../store/user';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import { IToolBarButton, IHeadCells, IPageParam } from '../../types';
-import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 const UserList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-  const maxHeight = useWindowResizeMaxHeight();
 
   const { list, loading, pageParams } = useSelector((state) => state.users);
+  const [filterText, setFilterText] = useState(pageParams?.filterText || '');
+  const prevFilterTextRef = useRef<string | undefined | null>(null);
 
-  const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
-
-  const fetchUsers = useCallback(
-    (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(actions.fetchUsers('', filterText, fromRecord, toRecord));
-    },
-    [dispatch],
-  );
+  const fetchUsers = useCallback(() => {
+    dispatch(userActions.fetchUsers('', pageParams?.filterText));
+  }, [dispatch, pageParams?.filterText]);
 
   useEffect(() => {
-    /* Загружаем данные при загрузке компонента */
-    fetchUsers(pageParams?.filterText);
+    // Загружаем данные при первой загрузке компонента или при изменении фильтра
+    if (prevFilterTextRef.current !== pageParams?.filterText) {
+      prevFilterTextRef.current = pageParams?.filterText;
+      fetchUsers();
+    }
   }, [fetchUsers, pageParams?.filterText]);
 
   const handleUpdateInput = (value: string) => {
-    const inputValue: string = value;
+    setFilterText(value);
 
-    setPageParamLocal({ filterText: value });
-
-    if (inputValue) return;
-
-    fetchUsers('');
+    if (value) return;
+    dispatch(userActions.setPageParam({ filterText: '', page: 0 }));
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.userActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
-    fetchUsers(pageParamLocal?.filterText);
+    dispatch(userActions.setPageParam({ filterText, page: 0 }));
   };
 
   const handleClearSearch = () => {
-    dispatch(actions.userActions.setPageParam({ filterText: undefined, page: 0 }));
-    setPageParamLocal({ filterText: undefined });
-    fetchUsers();
+    dispatch(userActions.setPageParam({ filterText: '', page: 0 }));
+    setFilterText('');
   };
 
   const handleKeyPress = (key: string) => {
@@ -67,11 +59,11 @@ const UserList = () => {
   };
 
   const handleSetPageParams = useCallback(
-    (pageParams: IPageParam) => {
+    (newParams: IPageParam) => {
       dispatch(
-        actions.userActions.setPageParam({
-          page: pageParams.page,
-          limit: pageParams.limit,
+        userActions.setPageParam({
+          page: newParams.page,
+          limit: newParams.limit,
         }),
       );
     },
@@ -82,7 +74,7 @@ const UserList = () => {
     {
       name: 'Обновить',
       sx: { mx: 1 },
-      onClick: () => fetchUsers(),
+      onClick: fetchUsers,
       icon: <CachedIcon />,
     },
     {
@@ -95,22 +87,19 @@ const UserList = () => {
   ];
 
   const headCells: IHeadCells<IUser>[] = [
+    { id: 'id', label: 'Идентификатор', sortEnable: true },
     { id: 'name', label: 'Пользователь', sortEnable: true },
     { id: 'lastName', label: 'Фамилия', sortEnable: true },
     { id: 'firstName', label: 'Имя', sortEnable: true },
-    { id: 'id', label: 'ID', sortEnable: false },
-    { id: 'externalId', label: 'ID из ERP системы', sortEnable: false },
+    { id: 'externalId', label: 'Идентификатор из ERP', sortEnable: true },
     { id: 'erpUser', label: 'Пользователь ERP', sortEnable: true },
     { id: 'appSystem', label: 'Подсистема', sortEnable: true },
-    { id: 'creationDate', label: 'Дата создания', sortEnable: true },
-    { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },
+    { id: 'creationDate', label: 'Дата создания', sortEnable: true, type: 'date' },
+    { id: 'editionDate', label: 'Дата редактирования', sortEnable: true, type: 'date' },
   ];
 
   return (
     <>
-      <Helmet>
-        <title>Пользователи</title>
-      </Helmet>
       <Box
         sx={{
           backgroundColor: 'background.default',
@@ -125,8 +114,9 @@ const UserList = () => {
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
-            value={(pageParamLocal?.filterText as undefined) || ''}
+            value={filterText}
             clearOnClick={handleClearSearch}
+            disabled={loading}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
@@ -138,7 +128,7 @@ const UserList = () => {
                 path={'/app/users/'}
                 onSetPageParams={handleSetPageParams}
                 pageParams={pageParams}
-                style={{ overflowY: 'auto', maxHeight }}
+                byMaxHeight={true}
               />
             </Box>
           )}

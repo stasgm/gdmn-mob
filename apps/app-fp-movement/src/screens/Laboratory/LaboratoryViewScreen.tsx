@@ -4,6 +4,8 @@ import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@rea
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Audio } from 'expo-av';
 
+import { FlashList } from '@shopify/flash-list';
+
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   MenuButton,
@@ -27,8 +29,6 @@ import { generateId, getDateString, keyExtractor, useSendDocs, sleep, useSendOne
 
 import { IDocumentType, INamedEntity, ScreenState } from '@lib/types';
 
-import { FlashList } from '@shopify/flash-list';
-
 import { barcodeSettings, ILaboratoryDocument, ILaboratoryLine, IShipmentDocument } from '../../store/types';
 import { LaboratoryStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, lineTypes, ONE_SECOND_IN_MS, ONE_T_IN_KG } from '../../utils/constants';
@@ -42,6 +42,7 @@ import {
   getLineGood,
   getNextDocNumber,
   getRemGoodListByContact,
+  TypeSound,
 } from '../../utils/helpers';
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
 
@@ -158,7 +159,7 @@ export const LaboratoryViewScreen = () => {
         if (good) {
           const newLocal = newWeight < ONE_T_IN_KG || newWeight <= line.weight;
           if (good.remains < newWeight - line.weight) {
-            alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.', handleFocus);
+            alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.', handleFocus, 'NOT_REMAINS_GOOD');
 
             return;
           } else if (newLocal) {
@@ -171,7 +172,7 @@ export const LaboratoryViewScreen = () => {
             dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
           }
         } else {
-          alertWithSound('Ошибка!', 'Товар не найден.', handleFocus);
+          alertWithSound('Ошибка!', 'Товар не найден.', handleFocus, 'NOT_FIND_GOOD');
           return;
         }
       } else {
@@ -184,7 +185,7 @@ export const LaboratoryViewScreen = () => {
 
           dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
         } else {
-          alertWithSound('Ошибка!', 'Неверный вес.', handleFocus);
+          alertWithSound('Ошибка!', 'Неверный вес.', handleFocus, 'INCORRECT_WEIGHT');
           return;
         }
       }
@@ -232,6 +233,8 @@ export const LaboratoryViewScreen = () => {
       documentDate: newDocDate,
       creationDate: newDocDate,
       editionDate: newDocDate,
+      sentDate: undefined,
+      erpCreationDate: undefined,
     };
 
     docDispatch(documentActions.addDocument(newDoc));
@@ -468,11 +471,11 @@ export const LaboratoryViewScreen = () => {
 
   const ref = useRef<TextInput>(null);
 
-  const handleErrorMessage = useCallback((visible: boolean, text: string) => {
+  const handleErrorMessage = useCallback((visible: boolean, text: string, typeSound?: TypeSound) => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      alertWithSound('Внимание!', `${text}.`, handleFocus);
+      alertWithSound('Внимание!', `${text}.`, handleFocus, typeSound || 'ERROR');
       setScanned(false);
     }
   }, []);
@@ -488,7 +491,7 @@ export const LaboratoryViewScreen = () => {
       }
 
       if (!brc.match(/^-{0,1}\d+$/)) {
-        handleErrorMessage(visibleDialog, 'Штрих-код не определён. Повторите сканирование!');
+        handleErrorMessage(visibleDialog, 'Штрих-код не определён. Повторите сканирование!', 'NOT_DEFINED_BARCODE');
         return;
       }
 
@@ -496,6 +499,7 @@ export const LaboratoryViewScreen = () => {
         handleErrorMessage(
           visibleDialog,
           'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
+          'LENGTH_LESS_MIN',
         );
         return;
       }
@@ -504,6 +508,7 @@ export const LaboratoryViewScreen = () => {
         handleErrorMessage(
           visibleDialog,
           'Длина штрих-кода больше максимальной длины, указанной в настройках. Повторите сканирование!',
+          'LENGTH_MORE_MAX',
         );
         return;
       }
@@ -520,19 +525,19 @@ export const LaboratoryViewScreen = () => {
       );
 
       if (!lineGood.good) {
-        handleErrorMessage(visibleDialog, 'Товар не найден!');
+        handleErrorMessage(visibleDialog, 'Товар не найден!', 'NOT_FIND_GOOD');
         return;
       }
 
       if (!lineGood.isRightWeight) {
-        handleErrorMessage(visibleDialog, 'Вес товара превышает вес в остатках!');
+        handleErrorMessage(visibleDialog, 'Вес товара превышает вес в остатках!', 'NOT_REMAINS_GOOD');
         return;
       }
 
       const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
 
       if (line) {
-        handleErrorMessage(visibleDialog, 'Товар уже добавлен!');
+        handleErrorMessage(visibleDialog, 'Товар уже добавлен!', 'DUBLICATE_GOOD');
         return;
       }
 

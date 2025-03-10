@@ -4,8 +4,7 @@ import { IAppSystem, NewAppSystem } from '@lib/types';
 
 import AppSystemDetails from '../../components/appSystem/AppSystemDetails';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import actions from '../../store/appSystem';
-import selectors from '../../store/appSystem/selectors';
+import { appSystemActions, appSystemSelectors } from '../../store/appSystem';
 
 export type Params = {
   id: string;
@@ -16,14 +15,14 @@ const AppSystemEdit = () => {
   const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch();
   const { loading } = useSelector((state) => state.companies);
-  const appSystem = selectors.appSystemById(id);
+  const appSystem = appSystemSelectors.appSystemById(id);
 
   const goBack = () => {
     navigate(-1);
   };
 
   const handleSubmit = async (values: IAppSystem | NewAppSystem) => {
-    const res = await dispatch(actions.updateAppSystem(values as IAppSystem));
+    const res = await dispatch(appSystemActions.updateAppSystem(values as IAppSystem));
     if (res.type === 'APP_SYSTEM/UPDATE_SUCCESS') {
       goBack();
     }

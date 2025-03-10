@@ -1,12 +1,12 @@
 import { ThunkAction } from 'redux-thunk';
-import api, { CustomRequest } from '@lib/client-api';
+import api from '@lib/client-api';
 import { IUser, NewUser } from '@lib/types';
 
 import { authActions } from '@lib/store';
 
-import { AppState } from '../';
-
 import { webRequest } from '../webRequest';
+
+import { AppState } from '..';
 
 import { userActions, UserActionType } from './actions';
 

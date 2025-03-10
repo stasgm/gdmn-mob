@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { View, TextInput, Keyboard, TouchableHighlight, StyleProp, ViewStyle } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Audio } from 'expo-av';
+
+import { FlashList } from '@shopify/flash-list';
 
 import {
   // appActions,
@@ -45,8 +46,6 @@ import {
 
 import { ScreenState } from '@lib/types';
 
-import { FlashList } from '@shopify/flash-list';
-
 import { barcodeSettings, IBox, IFreeShipmentDocument, IFreeShipmentLine, IShipmentDocument } from '../../store/types';
 import { FreeShipmentStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, lineTypes, ONE_SECOND_IN_MS } from '../../utils/constants';
@@ -61,6 +60,8 @@ import {
   getNextDocNumber,
   getRemGoodListByContact,
   getUpdatedLine,
+  playSound,
+  TypeSound,
 } from '../../utils/helpers';
 import { IBarcode, IGood, IRemains, IRemGood } from '../../store/app/types';
 
@@ -151,11 +152,11 @@ export const FreeShipmentViewScreen = () => {
   const [visibleBarcodeDialog, setVisibleBarcodeDialog] = useState<boolean>(false);
   const [brcLine, setBrcLine] = useState<IFreeShipmentLine | undefined>(undefined);
 
-  const sound = Audio.Sound.createAsync(require('../../../assets/ok.wav'));
+  // const sound = Audio.Sound.createAsync(require('../../../assets/ok.wav'));
 
-  const playSound = useCallback(async () => {
-    (await sound).sound.playAsync();
-  }, [sound]);
+  // const playSound = useCallback(async () => {
+  //   (await sound).sound.playAsync();
+  // }, [sound]);
 
   const handleFocus = () => {
     ref?.current?.focus();
@@ -206,11 +207,11 @@ export const FreeShipmentViewScreen = () => {
 
       if (remainsUse && goodRemains.length) {
         if (!good) {
-          alertWithSound('Ошибка!', 'Товар не найден.', handleFocus);
+          alertWithSound('Ошибка!', 'Товар не найден.', handleFocus, 'NOT_FIND_GOOD');
 
           return;
         } else if (good.remains < weight - line.weight) {
-          alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.', handleFocus);
+          alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.', handleFocus, 'NOT_REMAINS_GOOD');
 
           return;
         }
@@ -232,7 +233,7 @@ export const FreeShipmentViewScreen = () => {
 
   const handleEditQuantPack = useCallback(() => {
     if (!isNumeric(quantPack) || !isNumeric(quantPallet)) {
-      alertWithSound('Ошибка!', 'Неправильное количество.', handleFocus);
+      alertWithSound('Ошибка!', 'Неправильное количество.', handleFocus, 'INCORRECT_QUANTITY');
       return;
     }
 
@@ -279,6 +280,8 @@ export const FreeShipmentViewScreen = () => {
       documentDate: newDocDate,
       creationDate: newDocDate,
       editionDate: newDocDate,
+      sentDate: undefined,
+      erpCreationDate: undefined,
     };
 
     docDispatch(documentActions.addDocument(newDoc));
@@ -576,11 +579,12 @@ export const FreeShipmentViewScreen = () => {
 
   const [scanned, setScanned] = useState(false);
 
-  const handleErrorMessage = useCallback((visible: boolean, text: string) => {
+  const handleErrorMessage = useCallback((visible: boolean, text: string, typeSound?: TypeSound) => {
     if (visible) {
+      typeSound && playSound(typeSound);
       setErrorMessage(text);
     } else {
-      alertWithSound('Внимание!', `${text}.`, handleFocus);
+      alertWithSound('Внимание!', `${text}.`, handleFocus, typeSound || 'ERROR');
       setScanned(false);
     }
     handleFocus();
@@ -599,7 +603,7 @@ export const FreeShipmentViewScreen = () => {
       }
 
       if (!brc.match(/^-{0,1}\d+$/)) {
-        handleErrorMessage(visibleDialog, 'Штрих-код не определён. Повторите сканирование!');
+        handleErrorMessage(visibleDialog, 'Штрих-код не определён. Повторите сканирование!', 'NOT_DEFINED_BARCODE');
         return;
       }
 
@@ -662,6 +666,7 @@ export const FreeShipmentViewScreen = () => {
         handleErrorMessage(
           visibleDialog,
           'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
+          'LENGTH_LESS_MIN',
         );
         return;
       }
@@ -670,6 +675,7 @@ export const FreeShipmentViewScreen = () => {
         handleErrorMessage(
           visibleDialog,
           'Длина штрих-кода больше максимальной длины, указанной в настройках. Повторите сканирование!',
+          'LENGTH_MORE_MAX',
         );
         return;
       }
@@ -687,6 +693,7 @@ export const FreeShipmentViewScreen = () => {
 
       if (!lineGood.good) {
         setVisibleRequestDialog(true);
+        playSound('NOT_FIND_GOOD');
         setScanned(false);
         return;
       }
@@ -704,14 +711,14 @@ export const FreeShipmentViewScreen = () => {
       }
 
       if (!lineGood.isRightWeight) {
-        handleErrorMessage(visibleDialog, 'Вес товара превышает вес в остатках!');
+        handleErrorMessage(visibleDialog, 'Вес товара превышает вес в остатках!', 'NOT_REMAINS_GOOD');
         return;
       }
 
       const line = doc?.lines?.find((i) => i.barcode === barc.barcode || i.scannedBarcode === barc.barcode);
 
       if (line) {
-        handleErrorMessage(visibleDialog, 'Данный штрих-код уже добавлен!');
+        handleErrorMessage(visibleDialog, 'Данный штрих-код уже добавлен!', 'DUBLICATE_BARCODE');
         return;
       }
 
@@ -748,7 +755,7 @@ export const FreeShipmentViewScreen = () => {
         setBox({ ...box, numReceived: newLine.numReceived, workDate: box.workDate });
       }
 
-      playSound();
+      playSound('OK');
 
       if (visibleDialog) {
         setVisibleDialog(false);
@@ -774,7 +781,6 @@ export const FreeShipmentViewScreen = () => {
       box,
       dispatch,
       id,
-      playSound,
       visibleDialog,
       handleErrorMessage,
     ],

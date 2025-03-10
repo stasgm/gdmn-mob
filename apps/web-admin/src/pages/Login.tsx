@@ -1,5 +1,4 @@
 import { Link as RouterLink } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
 import { useFormik } from 'formik';
 import {
   Box,
@@ -16,7 +15,7 @@ import * as yup from 'yup';
 
 import { IUserCredentials } from '@lib/types';
 
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { authActions, useSelector, useDispatch, useAuthThunkDispatch } from '@lib/store';
 
@@ -64,9 +63,6 @@ const Login = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Вход в систему</title>
-      </Helmet>
       <Box
         sx={{
           backgroundColor: 'background.default',

@@ -1,23 +1,15 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Box, CardHeader, IconButton, CircularProgress, Grid, Typography } from '@mui/material';
+import { useCallback, useEffect } from 'react';
+import { Box } from '@mui/material';
 import CachedIcon from '@mui/icons-material/Cached';
 
 import { useNavigate, useParams } from 'react-router-dom';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { useSelector, useDispatch } from '../../store';
 import { IToolBarButton } from '../../types';
-import ToolBarAction from '../../components/ToolBarActions';
 
-import fileSelectors from '../../store/file/selectors';
-import SnackBar from '../../components/SnackBar';
-
-import FileContentView from '../../components/file/FileContentView';
-import serverLogActions from '../../store/serverLog';
-import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-import { adminPath } from '../../utils/constants';
+import { serverLogActions, serverLogSelectors } from '../../store/serverLog';
 import ServerLogDetailsView from '../../components/serverLog/ServerLogDetailsView';
-import serverLogSelectors from '../../store/serverLog/selectors';
+import ViewContainer from '../../components/ViewContainer';
 
 export type Params = {
   id: string;
@@ -29,7 +21,7 @@ const ServerLogView = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading, errorMessage, serverLog, list } = useSelector((state) => state.serverLogs);
+  const { loading, serverLog } = useSelector((state) => state.serverLogs);
 
   const fetchServerLog = useCallback(() => {
     dispatch(serverLogActions.fetchServerLog(id));
@@ -41,8 +33,6 @@ const ServerLogView = () => {
   }, [fetchServerLog]);
 
   const log = serverLogSelectors.serverLogById(id);
-
-  const [open, setOpen] = useState(false);
 
   const handleCancel = () => {
     navigate(-1);
@@ -56,11 +46,7 @@ const ServerLogView = () => {
     refreshData();
   }, [refreshData]);
 
-  const handleClearError = () => {
-    dispatch(serverLogActions.serverLogActions.clearError());
-  };
-
-  if (!serverLog) {
+  if (!serverLog && !loading) {
     return (
       <Box
         sx={{
@@ -69,7 +55,7 @@ const ServerLogView = () => {
           p: 3,
         }}
       >
-        {loading ? <CircularProgressWithContent content={'Идет загрузка данных...'} /> : 'Сообщение не найдено'}
+        Сообщение не найдено
       </Box>
     );
   }
@@ -85,61 +71,9 @@ const ServerLogView = () => {
     },
   ];
 
-  return (
-    <>
-      <Box
-        sx={{
-          p: 3,
-        }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Box sx={{ display: 'inline-flex', marginBottom: 1 }}>
-            <IconButton color="primary" onClick={handleCancel}>
-              <ArrowBackIcon />
-            </IconButton>
-            <CardHeader title={'Назад'} />
-            {loading && <CircularProgress size={40} />}
-          </Box>
-          <Box
-            sx={{
-              justifyContent: 'right',
-            }}
-          >
-            <ToolBarAction buttons={buttons} />
-          </Box>
-        </Box>
-        {serverLog ? (
-          <>
-            <Box
-              sx={{
-                backgroundColor: 'background.default',
-                minHeight: '100%',
-              }}
-            >
-              <ServerLogDetailsView serverLog={serverLog} title={log?.fileName} />
-            </Box>
-          </>
-        ) : (
-          <Box>
-            <CardHeader sx={{ mx: 2 }} />
-            <Grid item>
-              <Typography variant="subtitle1" gutterBottom>
-                Данный файл не является файлом формата JSON
-              </Typography>
-            </Grid>
-          </Box>
-        )}
-      </Box>
+  const tabs = [{ name: log?.id || 'Содержание', component: <ServerLogDetailsView serverLog={serverLog!} /> }];
 
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
-    </>
-  );
+  return <ViewContainer handleCancel={handleCancel} buttons={buttons} loading={loading} tabValue={0} tabs={tabs} />;
 };
 
 export default ServerLogView;

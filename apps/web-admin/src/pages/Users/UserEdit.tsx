@@ -5,9 +5,8 @@ import { useEffect } from 'react';
 
 import UserDetails from '../../components/user/UserDetails';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import appSystemActions from '../../store/appSystem';
-import userActions from '../../store/user';
-import selectors from '../../store/user/selectors';
+import { appSystemActions } from '../../store/appSystem';
+import { userActions, userSelectors } from '../../store/user';
 
 export type Params = {
   id: string;
@@ -21,7 +20,7 @@ const UserEdit = () => {
   const dispatch: AppDispatch = useDispatch();
 
   const { loading } = useSelector((state) => state.users);
-  const user = selectors.userById(userId);
+  const user = userSelectors.userById(userId);
 
   useEffect(() => {
     dispatch(appSystemActions.fetchAppSystems());

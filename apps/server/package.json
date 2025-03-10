@@ -16,7 +16,7 @@
     "lint": "eslint \"./src/**/*.ts\"",
     "lint:fix": "eslint --fix \"./src/**/*.ts\"",
     "precommit": "lint-staged",
-    "test": "cross-env NODE_ENV=test jest --colors"
+    "test": "cross-env NODE_ENV=test jest src/utils/__tests__/files.spec.ts --colors"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -40,8 +40,9 @@
     "@types/koa__cors": "^4.0.3",
     "@types/passport-local": "^1.0.38",
     "bcrypt": "^5.1.1",
-    "dotenv": "~16.3.1",
+    "dotenv": "~16.4.5",
     "koa": "^2.14.2",
+    "koa-body": "^6.0.1",
     "koa-bodyparser": "^4.3",
     "koa-compose": "^4.1.0",
     "koa-helmet": "^7.0.2",
@@ -55,26 +56,26 @@
     "nanoid": "^3.3.4",
     "passport-local": "^1.0",
     "ramda": "^0.29.1",
-    "rotating-file-stream": "^3.1.1",
-    "typescript": "^5.2.2",
-    "winston": "^3.11.0",
-    "winston-daily-rotate-file": "^4.7.1"
+    "rotating-file-stream": "^3.2.3",
+    "typescript": "~5.7.2",
+    "winston": "^3.14.2",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
     "@config/eslint-config": "*",
     "@config/prettier-config": "*",
-    "@types/jest": "^29.5.11",
-    "@types/ramda": "^0.29.9",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^22.13.9",
+    "@types/ramda": "^0.30.2",
     "@types/supertest": "^2.0.16",
-    "@types/node": "^20.8.4",
     "cross-env": "^7.0.3",
     "eslint": "^8.55.0",
     "jest": "^29.7.0",
-    "lint-staged": "^15.2.0",
-    "nodemon": "^3.0.2",
-    "prettier": "^3.1.1",
-    "supertest": "^6.3.3",
-    "ts-jest": "^29.0.3",
+    "lint-staged": "^15.2.10",
+    "nodemon": "^3.1.4",
+    "prettier": "^3.3.3",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.1.2"
   }

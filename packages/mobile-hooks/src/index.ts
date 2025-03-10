@@ -6,3 +6,6 @@ export { getNextOrder } from './messages/helpers';
 export { useSync } from './messages/useSync';
 export * from './utils';
 export { mobileRequest } from './mobileRequest';
+export { useSendDeviceLog } from './useSendDeviceLog';
+export { useDeleteOldDocs } from './useDeleteOldDocs';
+export { useCheckDeviceStatus } from './useCheckDeviceStatus';

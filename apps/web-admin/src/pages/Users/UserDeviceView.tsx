@@ -1,34 +1,27 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Box,
-  Button,
-  CardHeader,
-  IconButton,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-} from '@mui/material';
+import { Box } from '@mui/material';
 import CachedIcon from '@mui/icons-material/Cached';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate, useParams } from 'react-router-dom';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
-import { useSelector, useDispatch } from '../../store';
-import bindingActions from '../../store/deviceBinding';
-import deviceActions from '../../store/device';
+import { useDispatch, useSelector } from '../../store';
+import { bindingActions, bindingSelectors } from '../../store/deviceBinding';
+import { deviceActions, deviceSelectors } from '../../store/device';
+
 import { ILinkedEntity, IToolBarButton } from '../../types';
-import ToolBarAction from '../../components/ToolBarActions';
-
-import deviceBindingSelectors from '../../store/deviceBinding/selectors';
-import deviceSelectors from '../../store/device/selectors';
 
 import { adminPath, deviceStates } from '../../utils/constants';
 
 import DetailsView from '../../components/DetailsView';
 
+import ConfirmDialog from '../../components/ConfirmDialog';
+
+import ViewContainer from '../../components/ViewContainer';
+
+import { deviceLogActions } from '../../store/deviceLog';
+
+import UserDeviceSettings from './UserDeviceSettings';
 import UserDeviceLog from './UserDeviceLog';
 
 export type Params = {
@@ -39,19 +32,33 @@ const UserDeviceView = () => {
   const { bindingid } = useParams<keyof Params>() as Params;
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { loading } = useSelector((state) => state.devices);
-  const deviceBinding = deviceBindingSelectors.bindingById(bindingid);
+  const { pageParams, loading: bindingLoading } = useSelector((state) => state.deviceBindings);
+  const { loading: deviceLoading } = useSelector((state) => state.devices);
+  const {
+    appSettings,
+    loading: deviceLogLoading,
+    fileList,
+    deviceLog,
+    appVersion,
+  } = useSelector((state) => state.deviceLogs);
+  const deviceBinding = bindingSelectors.bindingById(bindingid);
   const device = deviceSelectors.deviceById(deviceBinding?.device.id);
-  const [open, setOpen] = useState(false);
-
   const { user } = useSelector((state) => state.auth);
+
+  const [open, setOpen] = useState(false);
+  const [tabValue, setTabValue] = useState(pageParams?.tab || 0);
+
+  const handleChangeTab = (event: any, newValue: number) => {
+    setTabValue(newValue);
+    dispatch(bindingActions.setPageParam({ tab: newValue }));
+  };
 
   const deviceBindingDetails: ILinkedEntity[] = useMemo(
     () =>
       deviceBinding
         ? [
             {
-              id: 'Наименование',
+              id: 'Устройство',
               value: deviceBinding.device,
               link: `${adminPath}/app/devices/${deviceBinding.device.id}`,
             },
@@ -62,33 +69,24 @@ const UserDeviceView = () => {
             },
             { id: 'Состояние', value: deviceStates[deviceBinding.state] },
             { id: 'Номер', value: device?.uid },
+            { id: 'Версия приложения', value: appVersion },
           ]
         : [],
-    [device?.uid, deviceBinding],
+    [appVersion, device?.uid, deviceBinding],
   );
 
   const handleCancel = () => {
     navigate(-1);
   };
 
-  const handleEdit = () => {
-    navigate(`${adminPath}/app/users/${deviceBinding?.user.id}/binding/${bindingid}/edit`);
-  };
-
-  const handleDelete = async () => {
-    setOpen(false);
-    const res = await dispatch(bindingActions.removeDeviceBinding(bindingid));
-    if (res.type === 'DEVICEBINDING/REMOVE_SUCCES') {
-      navigate(-1);
-    }
-  };
-
   const refreshData = useCallback(() => {
-    dispatch(bindingActions.fetchDeviceBindings());
     dispatch(deviceActions.fetchDevices());
+    dispatch(bindingActions.fetchDeviceBindings());
+    dispatch(deviceLogActions.fetchDeviceLogFiles());
   }, [dispatch]);
 
   useEffect(() => {
+    // Загружаем данные при первой загрузке компонента
     refreshData();
   }, [refreshData]);
 
@@ -100,35 +98,76 @@ const UserDeviceView = () => {
     setOpen(false);
   };
 
-  const buttons: IToolBarButton[] = [
-    {
-      name: 'Обновить',
-      sx: { marginRight: 1 },
-      color: 'primary',
-      variant: 'contained',
-      onClick: refreshData,
-      icon: <CachedIcon />,
-    },
-    {
-      name: 'Редактировать',
-      sx: { marginRight: 1 },
-      disabled: true,
-      color: 'secondary',
-      variant: 'contained',
-      onClick: handleEdit,
-      icon: <EditIcon />,
-    },
-    {
-      name: 'Удалить',
-      disabled: true,
-      color: 'secondary',
-      variant: 'contained',
-      onClick: handleClickOpen,
-      icon: <DeleteIcon />,
-    },
-  ];
+  const handleEdit = () => {
+    navigate(`${adminPath}/app/users/${deviceBinding?.user.id}/binding/${bindingid}/edit`);
+  };
 
-  if (!deviceBinding) {
+  const handleDelete = async () => {
+    setOpen(false);
+    const res = await dispatch(bindingActions.removeDeviceBinding(bindingid));
+    if (res.type === 'DEVICEBINDING/REMOVE_SUCCES') {
+      handleCancel();
+    }
+  };
+
+  const userLogFile = useMemo(() => {
+    if (!device || !deviceBinding) {
+      return;
+    }
+
+    return fileList.find((i) => i.producer.id === deviceBinding.user.id && i.device.id === device.id);
+  }, [device, deviceBinding, fileList]);
+
+  useEffect(() => {
+    if (!userLogFile) {
+      return;
+    }
+    // Загружаем данные при загрузке компонента.
+    dispatch(deviceLogActions.fetchDeviceLog(userLogFile.id, userLogFile.appSystem.id, userLogFile.company.id));
+  }, [dispatch, userLogFile]);
+
+  const buttons: IToolBarButton[] =
+    tabValue === 0
+      ? [
+          {
+            name: 'Обновить',
+            sx: { mr: 1 },
+            color: 'secondary',
+            variant: 'contained',
+            onClick: refreshData,
+            icon: <CachedIcon />,
+          },
+          {
+            name: 'Редактировать',
+            sx: { mr: 1 },
+            color: 'primary',
+            variant: 'contained',
+            onClick: handleEdit,
+            icon: <EditIcon />,
+          },
+          {
+            name: 'Удалить',
+            color: 'secondary',
+            variant: 'contained',
+            onClick: handleClickOpen,
+            icon: <DeleteIcon />,
+          },
+        ]
+      : [];
+
+  const tabs =
+    user?.role === 'SuperAdmin'
+      ? [
+          { name: 'Общая информация', component: <DetailsView details={deviceBindingDetails} /> },
+          { name: 'Журнал ошибок', component: <UserDeviceLog deviceLog={deviceLog} /> },
+          { name: 'Настройки', component: <UserDeviceSettings appSettings={appSettings} /> },
+        ]
+      : [
+          { name: 'Общая информация', component: <DetailsView details={deviceBindingDetails} /> },
+          { name: 'Настройки', component: <UserDeviceSettings appSettings={appSettings} /> },
+        ];
+
+  if (!deviceBinding && !bindingLoading && !deviceLoading && !deviceLogLoading) {
     return (
       <Box
         sx={{
@@ -145,62 +184,21 @@ const UserDeviceView = () => {
   return (
     <>
       <Box>
-        <Dialog open={open} onClose={handleClose}>
-          <DialogContent>
-            <DialogContentText color="black">Вы действительно хотите удалить привязанное устройство?</DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDelete} color="primary" variant="contained">
-              Удалить
-            </Button>
-            <Button onClick={handleClose} color="secondary" variant="contained">
-              Отмена
-            </Button>
-          </DialogActions>
-        </Dialog>
+        <ConfirmDialog
+          open={open}
+          handleClose={handleClose}
+          handleDelete={handleDelete}
+          questionText={'Вы действительно хотите удалить привязанное устройство?'}
+        />
+        <ViewContainer
+          handleCancel={handleCancel}
+          buttons={buttons}
+          loading={bindingLoading || deviceLoading || deviceLogLoading}
+          tabValue={tabValue}
+          handleChangeTab={handleChangeTab}
+          tabs={tabs}
+        />
       </Box>
-      <Box
-        sx={{
-          p: 3,
-        }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Box sx={{ display: 'inline-flex', marginBottom: 1 }}>
-            <IconButton color="primary" onClick={handleCancel}>
-              <ArrowBackIcon />
-            </IconButton>
-            <CardHeader title={'Назад'} />
-            {loading && <CircularProgress size={40} />}
-          </Box>
-          <Box
-            sx={{
-              justifyContent: 'right',
-            }}
-          >
-            <ToolBarAction buttons={buttons} />
-          </Box>
-        </Box>
-        <Box
-          sx={{
-            backgroundColor: 'background.default',
-            minHeight: '100%',
-          }}
-        >
-          <DetailsView details={deviceBindingDetails} />
-        </Box>
-      </Box>
-      {user?.role === 'SuperAdmin' ? (
-        <Box>
-          <CardHeader title={'Журнал ошибок устройства пользователя'} sx={{ mx: 2 }} />
-          <UserDeviceLog deviceId={device?.uid} userId={deviceBinding.user.id} />
-        </Box>
-      ) : null}
     </>
   );
 };

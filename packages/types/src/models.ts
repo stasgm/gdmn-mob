@@ -37,10 +37,12 @@ export type IUserCredentials = Pick<IUser, 'name' | 'email'> & { password: strin
 
 export type IUserWithDevice = IUser & { deviceUids?: string[] };
 
+export type ICompanyWithAppSystems = INamedEntity & { deviceCount: number };
+
 export interface ICompany extends INamedEntity, IExternalSystemProps {
   city?: string;
   admin: INamedEntity;
-  appSystems?: INamedEntity[];
+  appSystems?: ICompanyWithAppSystems[];
 }
 
 export type NewCompany = Pick<ICompany, 'admin' | 'externalId' | 'name' | 'city' | 'appSystems'>;
@@ -49,6 +51,8 @@ export interface IDevice extends INamedEntity {
   uid: string;
   state: DeviceState;
   company: INamedEntity;
+  appSystem?: IAppSystem;
+  appVersion?: string;
 }
 
 export type NewDevice = Pick<IDevice, 'name' | 'company' | 'state'>;
@@ -84,6 +88,8 @@ export interface IDBUser extends Omit<IUser, 'creator' | 'company' | 'erpUser' |
 
 export interface IDBCompany extends Omit<ICompany, 'admin' | 'appSystems'> {
   adminId: string;
+  appSystems?: { id: string; deviceCount: number }[];
+  // временно остается, пока не будет хоть раз заново запущен сервер
   appSystemIds?: string[];
 }
 
@@ -103,9 +109,14 @@ export interface IDBActivationCode extends Omit<IActivationCode, 'device'> {
 export type SessionId = IEntity;
 
 export interface IAppSystem extends INamedEntity {
+  appVersion?: string;
   description?: string;
 }
 
-export type NewAppSystem = Pick<IAppSystem, 'name' | 'description'>;
+export interface IAppSystemCompany extends IAppSystem {
+  deviceCount?: number;
+}
+
+export type NewAppSystem = Pick<IAppSystem, 'name' | 'description' | 'appVersion'>;
 
 export type DBAppSystem = IAppSystem;

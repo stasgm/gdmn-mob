@@ -19,7 +19,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useNavigation } from '@react-navigation/native';
 
-import { IDeviceLog } from '@lib/types';
+import { IDeviceLogEntry } from '@lib/types';
 
 const InformationLogScreen = () => {
   const navigation = useNavigation<StackNavigationProp<InformationStackParamList, 'Log'>>();
@@ -67,7 +67,7 @@ const InformationLogScreen = () => {
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   );
 
-  const renderItem = ({ item }: { item: IDeviceLog }) => {
+  const renderItem = ({ item }: { item: IDeviceLogEntry }) => {
     const errDate = new Date(item.date);
     return (
       <View style={styles.item}>
@@ -87,7 +87,7 @@ const InformationLogScreen = () => {
 
   return (
     <AppScreen style={styles.contentTop}>
-      <FlatList
+      <FlatList<IDeviceLogEntry>
         data={errorLog}
         keyExtractor={keyExtractor}
         renderItem={renderItem}

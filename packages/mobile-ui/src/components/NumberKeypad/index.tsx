@@ -13,13 +13,23 @@ interface IProps {
   onDismiss?: () => void;
   onApply: (newValue: string) => void;
   changeOldValue?: boolean;
+  applyValue?: () => void;
+  onSave?: () => void;
 }
 
 const isDiv0 = (expression: string, number?: string) => Number(number) === 0 && expression.indexOf('/') >= 0;
 
-const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal, changeOldValue = false }: IProps) => {
+const NumberKeypad = ({
+  oldValue,
+  onDismiss,
+  onApply,
+  decDigitsForTotal,
+  changeOldValue = false,
+  applyValue,
+  onSave,
+}: IProps) => {
   const [expression, setExpression] = useState('');
-  const [number, setNumber] = useState(oldValue);
+  const [number, setNumber] = useState(oldValue || '');
   const [firstOperation, setFirstOperation] = useState(true);
 
   const calc = useCallback(
@@ -37,7 +47,7 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal, changeO
     //Если уже было число 0, без выражения, и не введена точка, то берем введеное число
     //иначе склеиваем к предыдущему числу введенное число
     let newValue = `${number === '0' && ((!expression && value !== '.') || value === '0') ? '' : number}${value}`;
-    newValue = Number.isNaN(parseFloat(newValue)) ? '0.' : newValue ?? '0';
+    newValue = Number.isNaN(parseFloat(newValue)) ? '0.' : (newValue ?? '0');
     const validNumber = new RegExp(/^([-+]?\d{1,6}(.))?\d{0,4}$/);
     const n = validNumber.test(newValue) ? newValue : number;
     setNumber(n);
@@ -135,25 +145,29 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal, changeO
     ],
     [
       { title: '-', onPress: () => handleOperationPress({ value: '-' }), operation: true },
-      { title: '+', onPress: () => handleOperationPress({ value: '+' }), grow: 2, operation: true },
+      { title: '+', onPress: () => handleOperationPress({ value: '+' }), grow: 1, operation: true },
       {
         title: '=',
         onPress: () => {
-          setNumber(oldValue);
+          setNumber(oldValue || '');
           setExpression('');
           onDismiss && onDismiss();
         },
         grow: 2,
         operation: true,
       },
+      { title: 'OK', onPress: () => onSave && onSave(), grow: 1, operation: true },
     ],
   ];
 
   useEffect(() => {
     if (changeOldValue) {
-      setNumber(oldValue);
+      setNumber(oldValue || '0');
+      setExpression('');
+      onApply(oldValue || '0');
+      applyValue && applyValue();
     }
-  }, [changeOldValue, oldValue]);
+  }, [applyValue, changeOldValue, oldValue, onApply]);
 
   const windowHeight = useWindowDimensions().height;
   const viewStyle: StyleProp<ViewStyle> = useMemo(

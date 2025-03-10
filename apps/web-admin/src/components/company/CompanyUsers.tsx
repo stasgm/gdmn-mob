@@ -1,88 +1,90 @@
-import { Box, Container } from '@mui/material';
+import { Box } from '@mui/material';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { IUser } from '@lib/types';
+import CachedIcon from '@mui/icons-material/Cached';
 
 import SortableTable from '../../components/SortableTable';
 import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
 import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
 import { useDispatch, useSelector } from '../../store';
-import actions from '../../store/user';
+import { userActions, userSelectors } from '../../store/user';
+import CircularProgressWithContent from '../CircularProgressWidthContent';
+
+const headCells: IHeadCells<IUser>[] = [
+  { id: 'id', label: 'Идентификатор', sortEnable: true },
+  { id: 'name', label: 'Пользователь', sortEnable: true },
+  { id: 'lastName', label: 'Фамилия', sortEnable: true },
+  { id: 'firstName', label: 'Имя', sortEnable: true },
+  { id: 'phoneNumber', label: 'Телефон', sortEnable: false },
+  { id: 'creationDate', label: 'Дата создания', sortEnable: true, type: 'date' },
+  { id: 'editionDate', label: 'Дата редактирования', sortEnable: true, type: 'date' },
+];
 
 interface IProps {
-  users: IUser[];
+  companyId: string;
 }
 
-const CompanyUsers = ({ users }: IProps) => {
+const CompanyUsers = ({ companyId }: IProps) => {
   const dispatch = useDispatch();
+  const { loading, pageParams } = useSelector((state) => state.users);
+  const users = userSelectors.usersByCompanyId(companyId);
+  const [filterText, setFilterText] = useState(pageParams?.filterText || '');
 
-  const { pageParams } = useSelector((state) => state.users);
+  const prevFilterTextRef = useRef<string | undefined | null>(null);
 
-  const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
-
-  const fetchUsers = useCallback(
-    (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(actions.fetchUsers('', filterText, fromRecord, toRecord));
-    },
-    [dispatch],
-  );
+  const fetchUsers = useCallback(() => {
+    dispatch(userActions.fetchUsers(companyId, pageParams?.filterText));
+  }, [companyId, dispatch, pageParams?.filterText]);
 
   useEffect(() => {
-    /* Загружаем данные при загрузке компонента */
-    fetchUsers(pageParams?.filterText);
+    // Загружаем данные при первой загрузке компонента или при изменении фильтра
+    if (prevFilterTextRef.current !== pageParams?.filterText) {
+      prevFilterTextRef.current = pageParams?.filterText;
+      fetchUsers();
+    }
   }, [fetchUsers, pageParams?.filterText]);
 
   const handleUpdateInput = (value: string) => {
-    const inputValue: string = value;
+    setFilterText(value);
+    if (value) return;
 
-    setPageParamLocal({ filterText: value });
-
-    if (inputValue) return;
-
-    fetchUsers('');
+    dispatch(userActions.setPageParam({ filterText: '', page: 0 }));
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.userActions.setPageParam({ filterText: pageParamLocal?.filterText }));
-    fetchUsers(pageParamLocal?.filterText as string);
+    dispatch(userActions.setPageParam({ filterText, page: 0 }));
   };
 
   const handleKeyPress = (key: string) => {
     if (key !== 'Enter') return;
+
     handleSearchClick();
   };
 
   const handleClearSearch = () => {
-    dispatch(actions.userActions.setPageParam({ filterText: undefined }));
-    setPageParamLocal({ filterText: undefined });
-    fetchUsers();
+    dispatch(userActions.setPageParam({ filterText: '', page: 0 }));
+    setFilterText('');
   };
 
   const handleSetPageParams = useCallback(
-    (pageParams: IPageParam) => {
+    (newParams: IPageParam) => {
       dispatch(
-        actions.userActions.setPageParam({
-          companyPage: pageParams.page,
-          companyLimit: pageParams.limit,
+        userActions.setPageParam({
+          page: newParams.page,
+          limit: newParams.limit,
         }),
       );
     },
     [dispatch],
   );
 
-  const newPageParams: IPageParam = {
-    limit: pageParams?.companyLimit && !isNaN(Number(pageParams?.limit)) ? Number(pageParams?.limit) : 10,
-    page: pageParams?.companyPage && !isNaN(Number(pageParams?.page)) ? Number(pageParams.companyPage) : 0,
-  };
-
-  const userButtons: IToolBarButton[] = [];
-
-  const headCells: IHeadCells<IUser>[] = [
-    { id: 'name', label: 'Пользователь', sortEnable: true },
-    { id: 'lastName', label: 'Фамилия', sortEnable: true },
-    { id: 'firstName', label: 'Имя', sortEnable: true },
-    { id: 'phoneNumber', label: 'Телефон', sortEnable: false },
-    { id: 'creationDate', label: 'Дата создания', sortEnable: true },
-    { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },
+  const userButtons: IToolBarButton[] = [
+    {
+      name: 'Обновить',
+      sx: { mx: 1 },
+      onClick: fetchUsers,
+      icon: <CachedIcon />,
+    },
   ];
 
   return (
@@ -92,26 +94,31 @@ const CompanyUsers = ({ users }: IProps) => {
         minHeight: '100%',
       }}
     >
-      <Container maxWidth={false}>
-        <ToolbarActionsWithSearch
-          buttons={userButtons}
-          searchTitle={'Найти пользователя'}
-          updateInput={handleUpdateInput}
-          searchOnClick={handleSearchClick}
-          keyPress={handleKeyPress}
-          value={(pageParamLocal?.filterText as undefined) || ''}
-          clearOnClick={handleClearSearch}
-        />
-        <Box>
+      <ToolbarActionsWithSearch
+        buttons={userButtons}
+        searchTitle={'Найти пользователя'}
+        updateInput={handleUpdateInput}
+        searchOnClick={handleSearchClick}
+        keyPress={handleKeyPress}
+        value={filterText}
+        clearOnClick={handleClearSearch}
+        disabled={loading}
+      />
+      {loading ? (
+        <CircularProgressWithContent content={'Идет загрузка данных...'} />
+      ) : (
+        <Box sx={{ pt: 2 }}>
           <SortableTable<IUser>
             headCells={headCells}
             data={users}
             path={'/app/users/'}
             onSetPageParams={handleSetPageParams}
-            pageParams={newPageParams}
+            pageParams={pageParams}
+            byMaxHeight={true}
+            minusHeight={112}
           />
         </Box>
-      </Container>
+      )}
     </Box>
   );
 };

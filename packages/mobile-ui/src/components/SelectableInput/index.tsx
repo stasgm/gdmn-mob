@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleProp, TextStyle, View } from 'react-native';
 import { IconButton, MD2Theme, TextInput, TextInputProps, useTheme } from 'react-native-paper';
 
@@ -20,7 +20,7 @@ interface Props {
   props?: TextInputProps;
 }
 
-const truncate = (str: string, l: number | undefined = 40) => (str.length > l ? `${str.substring(0, l)}...` : str);
+// const truncate = (str: string, l: number | undefined = 40) => (str.length > l ? `${str.substring(0, l)}...` : str);
 
 const SelectableInput = ({
   value,
@@ -33,15 +33,22 @@ const SelectableInput = ({
   iconViewStyle,
   mode = 'outlined',
 }: Props) => {
-  const { colors } = useTheme<MD2Theme>();
+  const { dark: isThemeDark, colors } = useTheme<MD2Theme>();
+  const [shortValue, setShortValue] = useState(value);
+
+  useEffect(() => {
+    setShortValue(value && value.length > 30 ? `${value.substring(0, 30)}...` : value || '');
+  }, [value]);
 
   return (
     <View style={styles.container}>
       <View style={styles.containerInput}>
         <TextInput
           label={label}
-          value={truncate(value || '', 35)}
+          value={shortValue}
           theme={{
+            dark: isThemeDark,
+            mode: 'adaptive',
             colors: {
               primary: colors.primary,
               text: colors.text,
@@ -53,6 +60,7 @@ const SelectableInput = ({
           style={style ? [styles.input, style] : styles.input}
           placeholderTextColor={colors.text}
           placeholder={placeholder}
+          right={<TextInput.Icon icon="chevron-right" size={24} onPress={onPress} disabled={disabled} />}
           editable={editable}
           disabled={disabled}
           children={undefined}

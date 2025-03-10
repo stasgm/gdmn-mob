@@ -7,6 +7,8 @@ import { userActions } from '../../store/user/actions';
 
 import SnackBar from '../../components/SnackBar';
 
+import { deviceBindingActions } from '../../store/deviceBinding/actions';
+
 import UserDeviceView from './UserDeviceView';
 
 import UserDeviceEdit from './UserDeviceEdit';
@@ -32,15 +34,21 @@ export default function Users() {
   const routeComponent = useRoutes(routes);
   const dispatch = useDispatch();
   const usersErrorMessage = useSelector((state) => state.users.errorMessage);
+  const bindingsErrorMessage = useSelector((state) => state.deviceBindings.errorMessage);
 
   const handleClearError = () => {
     dispatch(userActions.clearError());
+    dispatch(deviceBindingActions.clearError());
   };
 
   return (
     <>
       {routeComponent}
-      <SnackBar visible={!!usersErrorMessage} errorMessage={usersErrorMessage} onClearError={handleClearError} />
+      <SnackBar
+        visible={!!usersErrorMessage || !!bindingsErrorMessage}
+        errorMessage={usersErrorMessage || bindingsErrorMessage}
+        onClearError={handleClearError}
+      />
     </>
   );
 }

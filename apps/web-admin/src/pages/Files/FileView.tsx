@@ -1,38 +1,23 @@
-import { useCallback, useEffect, useState } from 'react';
-import {
-  Box,
-  Button,
-  CardHeader,
-  IconButton,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  Grid,
-  Typography,
-} from '@mui/material';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Box } from '@mui/material';
 import CachedIcon from '@mui/icons-material/Cached';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import DriveFileMoveOutlinedIcon from '@mui/icons-material/DriveFileMoveOutlined';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
 import { useNavigate, useParams } from 'react-router-dom';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { useSelector, useDispatch } from '../../store';
-import { IToolBarButton } from '../../types';
-import ToolBarAction from '../../components/ToolBarActions';
-
-import fileSelectors from '../../store/file/selectors';
-import SnackBar from '../../components/SnackBar';
+import { IFileFilter, IFilterTable, IToolBarButton } from '../../types';
 
 import FileDetailsView from '../../components/file/FileDetailsView';
 import FileContentView from '../../components/file/FileContentView';
-import fileActions from '../../store/file';
-import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
+import { fileActions, fileSelectors } from '../../store/file';
 import { adminPath } from '../../utils/constants';
 import RadioGroup from '../../components/RadioGoup';
+import ConfirmDialog from '../../components/ConfirmDialog';
+import ViewContainer from '../../components/ViewContainer';
 
 export type Params = {
   id: string;
@@ -44,61 +29,98 @@ const FileView = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading, errorMessage, file, list, pageParams, folders } = useSelector((state) => state.files);
+  const { loading, file, folders, pageParams } = useSelector((state) => state.files);
 
-  const fetchFile = useCallback(
-    (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(fileActions.fetchFile(id));
+  const [tabValue, setTabValue] = useState(0);
+
+  const handleChangeTab = (event: any, newValue: number) => {
+    setTabValue(newValue);
+  };
+
+  const fileObject = fileSelectors.fileByIdAndFolder(id);
+
+  const fetchFiles = useCallback(
+    (filesFilters?: IFileFilter, filterText?: string, fromRecord?: number, toRecord?: number) => {
+      if (filesFilters) {
+        const ff: IFilterTable = Object.entries(filesFilters).reduce((prev: IFilterTable, [item, value]) => {
+          if (value) {
+            prev[item] = value;
+          }
+          return prev;
+        }, {});
+        dispatch(fileActions.fetchFiles(ff as IFileFilter, filterText, fromRecord, toRecord));
+      } else {
+        dispatch(fileActions.fetchFiles(filesFilters, filterText, fromRecord, toRecord));
+      }
     },
-    [dispatch, id],
+    [dispatch],
   );
 
   useEffect(() => {
-    // Загружаем данные при загрузке компонента.
-    fetchFile(pageParams?.filterText as string);
-  }, [fetchFile, pageParams?.filterText]);
+    if (fileObject) {
+      dispatch(fileActions.fetchFile(id, fileObject.folder, fileObject.appSystem?.id, fileObject.company?.id));
+    }
+  }, [dispatch, id, fileObject]);
 
-  const process = fileSelectors.fileById(id);
+  useEffect(() => {
+    // Загружаем данные при загрузке компонента.
+    fetchFiles(pageParams?.filesFilters);
+  }, [fetchFiles, pageParams?.filesFilters]);
 
   const fetchFolders = useCallback(() => {
-    if (process && process.company && process.appSystem) {
-      dispatch(fileActions.fetchFolders(process.company.id, process.appSystem.id));
+    if (fileObject && fileObject.company && fileObject.appSystem) {
+      dispatch(fileActions.fetchFolders(fileObject.company.id, fileObject.appSystem.id));
     }
-  }, [dispatch, process]);
+  }, [dispatch, fileObject]);
 
   const [open, setOpen] = useState(false);
   const [openFolder, setOpenFolder] = useState(false);
 
-  const handleGetFolders = () => {
-    if (process?.appSystem?.id && process?.company?.id) {
+  const handleGetFolders = useCallback(() => {
+    if (fileObject?.appSystem?.id && fileObject?.company?.id) {
       setOpenFolder(true);
       fetchFolders();
     }
-  };
+  }, [fileObject, fetchFolders]);
 
   const handleCancel = () => {
     navigate(-1);
   };
 
-  const handleEdit = () => {
+  const handleEdit = useCallback(() => {
     navigate(`${adminPath}/app/files/${id}/edit`);
-  };
+  }, [navigate, id]);
 
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     setOpen(false);
-    const res = await dispatch(fileActions.removeFile(id));
+    const res = await dispatch(
+      fileActions.deleteFile(
+        id,
+        fileObject?.folder || '',
+        fileObject?.appSystem?.id || '',
+        fileObject?.company?.id || '',
+      ),
+    );
     if (res.type === 'FILE/REMOVE_FILE_SUCCESS') {
       navigate(-1);
     }
-  };
+  }, [dispatch, fileObject, id, navigate]);
 
-  const refreshData = useCallback(() => {
-    dispatch(fileActions.fetchFile(id));
-  }, [dispatch, id]);
+  // const refreshData = useCallback(() => {
+  //   dispatch(
+  //     fileActions.fetchFile(
+  //       id,
+  //       fileObject?.ext || '',
+  //       fileObject?.folder || '',
+  //       fileObject?.appSystem?.id || '',
+  //       fileObject?.company?.id || '',
+  //     ),
+  //   );
+  // }, [dispatch, fileObject, id]);
 
-  useEffect(() => {
-    refreshData();
-  }, [refreshData]);
+  // useEffect(() => {
+  //   refreshData();
+  // }, [refreshData]);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -112,21 +134,115 @@ const FileView = () => {
     setOpenFolder(false);
   };
 
-  const handleMoveFiles = () => {
-    setOpenFolder(false);
-    if (selectedFolder && process?.id) {
-      dispatch(fileActions.moveFiles([process?.id], selectedFolder));
-    }
-    handleCancel();
-  };
-
   const [selectedFolder, setSelectedFolder] = useState<string | undefined>(undefined);
 
-  const handleClearError = () => {
-    dispatch(fileActions.fileSystemActions.clearError());
+  const handleMoveFiles = useCallback(() => {
+    setOpenFolder(false);
+
+    if (selectedFolder && fileObject?.id) {
+      dispatch(
+        fileActions.moveFiles(
+          [
+            {
+              id: id,
+              appSystemId: fileObject.appSystem?.id || '',
+              companyId: fileObject.company?.id || '',
+              folder: fileObject.folder || '',
+            },
+          ],
+          selectedFolder,
+        ),
+      );
+    }
+    handleCancel();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, fileObject, id, selectedFolder]);
+
+  // const handleClearError = () => {
+  //   dispatch(fileActions.clearError());
+  // };
+
+  const encode = (s: string) => {
+    const out = [];
+    for (let i = 0; i < s.length; i++) {
+      out[i] = s.charCodeAt(i);
+    }
+    return new Uint16Array(out);
   };
 
-  if (!process) {
+  const handleDownload = useCallback(async () => {
+    setOpen(false);
+    const fileStr = JSON.stringify(file);
+    const bufferArray = encode(fileStr);
+    const blob = new Blob([bufferArray], {
+      type: 'application/octet-stream',
+    });
+
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileObject?.id || '';
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }, [file, fileObject]);
+
+  const buttons: IToolBarButton[] = useMemo(() => {
+    return tabValue === 0
+      ? [
+          {
+            name: 'Обновить',
+            sx: { mr: 1 },
+            color: 'secondary',
+            variant: 'contained',
+            onClick: fetchFiles,
+            icon: <CachedIcon />,
+          },
+
+          {
+            name: 'Переместить',
+            sx: { mr: 1 },
+            color: 'secondary',
+            variant: 'contained',
+            onClick: handleGetFolders,
+            icon: <DriveFileMoveOutlinedIcon />,
+          },
+          {
+            name: 'Скачать',
+            sx: { mr: 1 },
+            color: 'secondary',
+            variant: 'contained',
+            onClick: handleDownload,
+            icon: <ArrowDownwardIcon />,
+          },
+          {
+            name: 'Удалить',
+            color: 'secondary',
+            variant: 'contained',
+            onClick: handleClickOpen,
+            icon: <DeleteIcon />,
+          },
+        ]
+      : [
+          {
+            name: 'Обновить',
+            sx: { mr: 1 },
+            color: 'secondary',
+            variant: 'contained',
+            onClick: fetchFiles,
+            icon: <CachedIcon />,
+          },
+          {
+            name: 'Редактировать',
+            sx: { marginRight: 1 },
+            color: 'primary',
+            variant: 'contained',
+            onClick: handleEdit,
+            icon: <EditIcon />,
+          },
+        ];
+  }, [fetchFiles, handleDownload, handleEdit, handleGetFolders, tabValue]);
+
+  if (!fileObject && !loading) {
     return (
       <Box
         sx={{
@@ -135,64 +251,26 @@ const FileView = () => {
           p: 3,
         }}
       >
-        {loading ? <CircularProgressWithContent content={'Идет загрузка данных...'} /> : 'Сообщение не найдено'}
+        Сообщение не найдено
       </Box>
     );
   }
 
-  const buttons: IToolBarButton[] = [
-    {
-      name: 'Обновить',
-      sx: { marginRight: 1 },
-      color: 'primary',
-      variant: 'contained',
-      onClick: refreshData,
-      icon: <CachedIcon />,
-    },
-    {
-      name: 'Редактировать',
-      sx: { marginRight: 1 },
-      disabled: true,
-      color: 'secondary',
-      variant: 'contained',
-      onClick: handleEdit,
-      icon: <EditIcon />,
-    },
-    {
-      name: 'Переместить',
-      sx: { marginRight: 1 },
-      color: 'secondary',
-      variant: 'contained',
-      onClick: handleGetFolders,
-      icon: <DriveFileMoveOutlinedIcon />,
-    },
-    {
-      name: 'Удалить',
-      disabled: true,
-      color: 'secondary',
-      variant: 'contained',
-      onClick: handleClickOpen,
-      icon: <DeleteIcon />,
-    },
+  const tabs = [
+    { name: 'Общая информация', component: fileObject ? <FileDetailsView list={fileObject} /> : null },
+    { name: 'Содержимое', component: <FileContentView file={file} /> },
   ];
 
+  const foldersForMoving = folders.length ? folders[0].folderList : [];
+
   return (
-    <>
-      <Box>
-        <Dialog open={open} onClose={handleClose}>
-          <DialogContent>
-            <DialogContentText color="black">Вы действительно хотите удалить файл?</DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDelete} color="primary" variant="contained">
-              Удалить
-            </Button>
-            <Button onClick={handleClose} color="secondary" variant="contained">
-              Отмена
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
+    <Box>
+      <ConfirmDialog
+        open={open}
+        handleClose={handleClose}
+        handleDelete={handleDelete}
+        questionText={'Вы действительно хотите удалить файл?'}
+      />
       <RadioGroup
         contentText="Выберите нужную папку:"
         checked={selectedFolder || undefined}
@@ -202,65 +280,17 @@ const FileView = () => {
         onChange={(folder) => setSelectedFolder(folder)}
         onClose={handleCloseMovingDialog}
         onOk={handleMoveFiles}
-        values={folders}
+        values={foldersForMoving}
       />
-      <Box
-        sx={{
-          p: 3,
-        }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Box sx={{ display: 'inline-flex', marginBottom: 1 }}>
-            <IconButton color="primary" onClick={handleCancel}>
-              <ArrowBackIcon />
-            </IconButton>
-            <CardHeader title={'Назад'} />
-            {loading && <CircularProgress size={40} />}
-          </Box>
-          <Box
-            sx={{
-              justifyContent: 'right',
-            }}
-          >
-            <ToolBarAction buttons={buttons} />
-          </Box>
-        </Box>
-        {file ? (
-          <>
-            <Box
-              sx={{
-                backgroundColor: 'background.default',
-                minHeight: '100%',
-              }}
-            >
-              <FileDetailsView list={process} />
-            </Box>
-
-            <Box>
-              <CardHeader sx={{ mx: 2 }} />
-              <FileContentView file={file} />
-            </Box>
-          </>
-        ) : (
-          <Box>
-            <CardHeader sx={{ mx: 2 }} />
-            <Grid item>
-              <Typography variant="subtitle1" gutterBottom>
-                Данный файл не является файлом формата JSON
-              </Typography>
-            </Grid>
-          </Box>
-        )}
-      </Box>
-
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
-    </>
+      <ViewContainer
+        handleCancel={handleCancel}
+        buttons={buttons}
+        loading={loading}
+        tabValue={tabValue}
+        handleChangeTab={handleChangeTab}
+        tabs={tabs}
+      />
+    </Box>
   );
 };
 

@@ -8,10 +8,7 @@ const Stack = createStackNavigator<CellsStackParamList>();
 
 export const CellsNavigator = () => {
   return (
-    <Stack.Navigator
-      initialRouteName="ContactList"
-      screenOptions={{ headerShown: true, headerBackTitleVisible: false }}
-    >
+    <Stack.Navigator initialRouteName="ContactList" screenOptions={{ headerShown: true, headerBackTitle: '' }}>
       {Object.entries({ ...cellsListScreens, ...cellsScreens }).map(([name, { title, component }]) => (
         <Stack.Screen name={name as keyof CellsStackParamList} component={component} key={name} options={{ title }} />
       ))}

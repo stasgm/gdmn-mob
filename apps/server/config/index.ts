@@ -44,4 +44,6 @@ export default {
   FILES_SAVING_PERIOD_IN_DAYS: getNumber(process.env.FILES_SAVING_PERIOD_IN_DAYS, config.FILES_SAVING_PERIOD_IN_DAYS),
   /** Период хранения файлов, в днях */
   DOCS_SAVING_PERIOD_IN_DAYS: getNumber(process.env.DOCS_SAVING_PERIOD_IN_DAYS, config.DOCS_SAVING_PERIOD_IN_DAYS),
+  /** Путь к папке, содержащий временные файлы для ERP логов, относительно пути сервера*/
+  ERP_LOG_PATH: process.env.ERP_LOG_PATH || config.ERP_LOG_PATH,
 };

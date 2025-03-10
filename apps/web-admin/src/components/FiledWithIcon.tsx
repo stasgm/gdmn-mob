@@ -34,7 +34,6 @@ const FieldWithIcon = ({
   error,
   toolipTitle,
   onButtonClick,
-  required = false,
   disabled = false,
 }: IProps) => {
   return (

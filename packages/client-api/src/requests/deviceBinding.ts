@@ -1,10 +1,8 @@
 import { IDeviceBinding, NewDeviceBinding } from '@lib/types';
 import { deviceBinding as mockDeviceBinding, deviceBindings as mockDeviceBindings } from '@lib/mock';
 
-import { error, deviceBinding as types } from '../types';
+import { error, deviceBinding as types, BaseApi, BaseRequest } from '../types';
 import { generateId, response2Log, sleep } from '../utils';
-import { BaseApi } from '../types/BaseApi';
-import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
 
 class DeviceBinding extends BaseRequest {

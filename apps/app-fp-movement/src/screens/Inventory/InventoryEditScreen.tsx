@@ -105,18 +105,18 @@ export const InventoryEditScreen = () => {
   useEffect(() => {
     if (screenState === 'saving') {
       if (!shipmentType) {
-        alertWithSound('Внимание!', 'Тип документа для инвентаризации не найден.');
+        alertWithSound('Внимание!', 'Тип документа для инвентаризации не найден.', undefined, 'ERROR');
         setScreenState('idle');
         return;
       }
       if (!docFromDepart) {
-        alertWithSound('Ошибка!', 'Нет подразделения пользователя. Обратитесь к администратору.');
+        alertWithSound('Ошибка!', 'Нет подразделения пользователя. Обратитесь к администратору.', undefined, 'ERROR');
         setScreenState('idle');
         return;
       }
 
       if (!(docNumber && docFromDepart && docDate)) {
-        alertWithSound('Ошибка!', 'Не все поля заполнены.');
+        alertWithSound('Ошибка!', 'Не все поля заполнены.', undefined, 'ERROR');
         setScreenState('idle');
         return;
       }

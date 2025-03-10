@@ -5,7 +5,7 @@ import { DataNotFoundException, InvalidParameterException } from '../exceptions'
 
 import { getDb } from '../services/dao/db';
 
-export const deviceMiddleware = async (ctx: Context, next: Next) => {
+export const deviceBindMiddleware = async (ctx: Context, next: Next) => {
   const user = ctx.state.user as IUser;
 
   if (user?.role === 'User') {

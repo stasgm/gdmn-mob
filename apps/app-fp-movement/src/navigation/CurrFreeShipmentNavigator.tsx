@@ -8,10 +8,7 @@ const Stack = createStackNavigator<CurrFreeShipmentStackParamList>();
 
 export const CurrFreeShipmentNavigator = () => {
   return (
-    <Stack.Navigator
-      initialRouteName="CurrFreeShipmentList"
-      screenOptions={{ headerShown: true, headerBackTitleVisible: false }}
-    >
+    <Stack.Navigator initialRouteName="CurrFreeShipmentList" screenOptions={{ headerShown: true, headerBackTitle: '' }}>
       {Object.entries({ ...currFreeShipmentListScreens, ...currFreeShipmentScreens }).map(
         ([name, { title, component }]) => (
           <Stack.Screen

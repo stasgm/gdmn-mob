@@ -3,7 +3,7 @@ import { RouteObject } from 'react-router';
 
 import { useDispatch, useSelector } from '../../store';
 
-import { fileSystemActions } from '../../store/file/actions';
+import { systemFileActions } from '../../store/file/actions';
 
 import SnackBar from '../../components/SnackBar';
 
@@ -24,7 +24,7 @@ export default function Files() {
   const filesErrorMessage = useSelector((state) => state.files.errorMessage);
 
   const handleClearError = () => {
-    dispatch(fileSystemActions.clearError());
+    dispatch(systemFileActions.clearError());
   };
 
   return (

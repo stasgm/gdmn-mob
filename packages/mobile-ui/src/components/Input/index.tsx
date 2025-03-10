@@ -1,5 +1,5 @@
 import React from 'react';
-import { ReturnKeyTypeOptions, View } from 'react-native';
+import { ReturnKeyTypeOptions, StyleProp, TextStyle, View } from 'react-native';
 import { MD2Theme, TextInput, useTheme } from 'react-native-paper';
 
 import styles from './styles';
@@ -38,6 +38,7 @@ interface Props {
   isIcon?: boolean;
   iconName?: any;
   onIconPress?: () => void;
+  style?: StyleProp<TextStyle>;
 }
 
 const Input = ({
@@ -59,8 +60,9 @@ const Input = ({
   onIconPress,
   isIcon,
   iconName,
+  style,
 }: Props) => {
-  const { colors } = useTheme<MD2Theme>();
+  const { dark: isThemeDark, colors } = useTheme<MD2Theme>();
 
   return (
     <View style={styles.container}>
@@ -71,6 +73,8 @@ const Input = ({
           onChangeText={onChangeText}
           onEndEditing={onEndEditing}
           theme={{
+            dark: isThemeDark,
+            mode: 'adaptive',
             colors: {
               primary: colors.primary,
               text: colors.text,
@@ -82,21 +86,20 @@ const Input = ({
           returnKeyType={returnKeyType}
           keyboardType={keyboardType}
           autoCorrect={autoCorrect}
-          style={styles.input}
+          style={style ? [styles.input, style] : styles.input}
           maxLength={maxLength}
           placeholderTextColor={colors.text}
           right={
             isIcon && iconName ? (
-              <TextInput.Icon icon={iconName} size={20} style={styles.marginTop} onPress={onIconPress} />
+              <TextInput.Icon icon={iconName} size={20} onPress={onIconPress} />
             ) : (
               !!value &&
-              !!clearInput &&
-              !disabled && (
+              !!clearInput && (
                 <TextInput.Icon
                   icon="close"
                   size={20}
-                  style={styles.marginTop}
                   onPress={() => onChangeText && onChangeText('')}
+                  disabled={disabled}
                 />
               )
             )
@@ -108,6 +111,7 @@ const Input = ({
           children={undefined}
           autoCapitalize={autoCapitalize}
           onFocus={onFocus}
+          dense={true}
         />
       </View>
     </View>

@@ -1,16 +1,15 @@
 import { useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import { Avatar, Box, Divider, Drawer, List, Typography } from '@mui/material';
+import { Box, Divider, Drawer, List } from '@mui/material';
 import {
   BarChart as BarChartIcon,
   Settings as SettingsIcon,
-  ShoppingBag as ShoppingBagIcon,
-  User as UserIcon,
   Users as UsersIcon,
-  List as ProcessIcon,
-  Server as AppSystemsIcon,
+  Smartphone as TabletIcon,
+  Briefcase as BriefcaseIcon,
+  Activity as ProcessIcon,
+  Box as BoxIcon,
   File as FileIcon,
-  FileText as FileTextIcon,
+  Server as ServerIcon,
   AlertCircle as AlertIcon,
 } from 'react-feather';
 
@@ -18,18 +17,8 @@ import { useSelector } from '@lib/store';
 
 import { adminPath } from '../utils/constants';
 
-import { useDispatch } from '../store';
-
 import NavItem from './NavItem';
 import NavToggle from './NavToggle';
-
-const avatar1 = require('../../assets/images/avatar1.svg');
-
-const userInfo = {
-  avatar: avatar1,
-  jobTitle: 'User',
-  name: 'Katarina Smith',
-};
 
 interface IProps {
   onMobileClose: () => void;
@@ -51,22 +40,22 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
           },
           {
             href: `${adminPath}/app/appSystems`,
-            icon: AppSystemsIcon,
+            icon: BoxIcon,
             title: 'Подсистемы',
           },
           {
             href: `${adminPath}/app/companies`,
-            icon: UsersIcon,
+            icon: BriefcaseIcon,
             title: 'Компании',
           },
           {
             href: `${adminPath}/app/users`,
-            icon: ShoppingBagIcon,
+            icon: UsersIcon,
             title: 'Пользователи',
           },
           {
             href: `${adminPath}/app/devices`,
-            icon: UserIcon,
+            icon: TabletIcon,
             title: 'Устройства',
           },
           {
@@ -77,7 +66,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
           {
             href: `${adminPath}/app/deviceLogs`,
             icon: AlertIcon,
-            title: 'Журнал ошибок',
+            title: 'Журналы ошибок',
           },
           {
             href: `${adminPath}/app/files`,
@@ -86,8 +75,8 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
           },
           {
             href: `${adminPath}/app/serverLogs`,
-            icon: FileTextIcon,
-            title: 'Логи сервера',
+            icon: ServerIcon,
+            title: 'Сервер',
           },
           {
             href: `${adminPath}/app/account`,
@@ -103,22 +92,22 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
           },
           {
             href: `${adminPath}/app/appSystems`,
-            icon: AppSystemsIcon,
+            icon: BoxIcon,
             title: 'Подсистемы',
           },
           {
             href: `${adminPath}/app/companies`,
-            icon: UsersIcon,
+            icon: BriefcaseIcon,
             title: 'Компании',
           },
           {
             href: `${adminPath}/app/users`,
-            icon: ShoppingBagIcon,
+            icon: UsersIcon,
             title: 'Пользователи',
           },
           {
             href: `${adminPath}/app/devices`,
-            icon: UserIcon,
+            icon: TabletIcon,
             title: 'Устройства',
           },
           {

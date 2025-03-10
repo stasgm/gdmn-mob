@@ -12,7 +12,7 @@ import {
   IconButton,
 } from '@mui/material';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { INamedEntity, IUser, IUserCredentials, NewUser } from '@lib/types';
 import { FormikTouched, useFormik, Field, FormikProvider } from 'formik';
@@ -358,7 +358,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                         }
                         fullWidth
                         required={userERP || (user.role && user.role !== 'User') || isAdmin ? false : true}
-                        label="ID из ERP системы"
+                        label="Идентификатор из ERP"
                         name="externalId"
                         variant="outlined"
                         onBlur={formik.handleBlur}

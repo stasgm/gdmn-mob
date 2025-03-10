@@ -4,6 +4,8 @@ import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@rea
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Audio } from 'expo-av';
 
+import { FlashList } from '@shopify/flash-list';
+
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   MenuButton,
@@ -27,8 +29,6 @@ import { generateId, getDateString, keyExtractor, useSendDocs, sleep, round, isN
 
 import { ScreenState } from '@lib/types';
 
-import { FlashList } from '@shopify/flash-list';
-
 import { DashboardStackParamList } from '@lib/mobile-navigation';
 
 import { barcodeSettings, IInventoryDocument, IInventoryLine } from '../../store/types';
@@ -43,6 +43,7 @@ import {
   getDocToSend,
   getNextDocNumber,
   getUpdatedLine,
+  TypeSound,
 } from '../../utils/helpers';
 import { IAddressStoreEntity, IBarcode, IGood } from '../../store/app/types';
 
@@ -172,7 +173,7 @@ export const InventoryViewScreen = () => {
 
   const handleEditQuantPack = useCallback(() => {
     if (!isNumeric(quantPack) || !isNumeric(quantPallet)) {
-      alertWithSound('Ошибка!', 'Неправильное количество.', handleFocus);
+      alertWithSound('Ошибка!', 'Неправильное количество.', handleFocus, 'INCORRECT_QUANTITY');
       return;
     }
 
@@ -215,6 +216,8 @@ export const InventoryViewScreen = () => {
       documentDate: newDocDate,
       creationDate: newDocDate,
       editionDate: newDocDate,
+      sentDate: undefined,
+      erpCreationDate: undefined,
     };
 
     docDispatch(documentActions.addDocument(newDoc));
@@ -445,11 +448,11 @@ export const InventoryViewScreen = () => {
 
   const ref = useRef<TextInput>(null);
 
-  const handleErrorMessage = useCallback((visible: boolean, text: string) => {
+  const handleErrorMessage = useCallback((visible: boolean, text: string, typeSound?: TypeSound) => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      alertWithSound('Внимание!', `${text}.`, handleFocus);
+      alertWithSound('Внимание!', `${text}.`, handleFocus, typeSound || 'ERROR');
       setScanned(false);
     }
   }, []);
@@ -465,7 +468,7 @@ export const InventoryViewScreen = () => {
       }
 
       if (!brc.match(/^-{0,1}\d+$/)) {
-        handleErrorMessage(visibleDialog, 'Штрих-код не определён. Повторите сканирование!');
+        handleErrorMessage(visibleDialog, 'Штрих-код не определён. Повторите сканирование!', 'NOT_DEFINED_BARCODE');
         return;
       }
 
@@ -473,6 +476,7 @@ export const InventoryViewScreen = () => {
         handleErrorMessage(
           visibleDialog,
           'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
+          'LENGTH_LESS_MIN',
         );
         return;
       }
@@ -481,6 +485,7 @@ export const InventoryViewScreen = () => {
         handleErrorMessage(
           visibleDialog,
           'Длина штрих-кода больше максимальной длины, указанной в настройках. Повторите сканирование!',
+          'LENGTH_MORE_MAX',
         );
         return;
       }
@@ -492,14 +497,14 @@ export const InventoryViewScreen = () => {
       );
 
       if (!good) {
-        handleErrorMessage(visibleDialog, 'Товар не найден!');
+        handleErrorMessage(visibleDialog, 'Товар не найден!', 'NOT_FIND_GOOD');
         return;
       }
 
       const line = doc?.lines?.find((i) => i.barcode === barc.barcode || i.scannedBarcode === barc.barcode);
 
       if (line) {
-        handleErrorMessage(visibleDialog, 'Данный штрих-код уже добавлен!');
+        handleErrorMessage(visibleDialog, 'Данный штрих-код уже добавлен!', 'DUBLICATE_BARCODE');
         return;
       }
 

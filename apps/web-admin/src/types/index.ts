@@ -10,24 +10,24 @@ export interface IToolBarButton {
   disabled?: boolean;
 }
 
-// export interface IPageParams<T = IPageParam> {
-//   [name: string]: T;
-// }
-
 export interface IPageParam {
-  [name: string]: unknown;
+  [name: string]: any;
   filterText?: string;
   fromRecord?: number;
   toRecord?: number;
   page?: number;
   limit?: number;
+  tab?: number;
 }
 
 export interface IHeadCells<T> {
   id: keyof T;
-  label: string;
+  label: any;
   sortEnable?: boolean;
   filterEnable?: boolean;
+  fieldName?: string;
+  value?: string;
+  type?: 'number' | 'date' | 'string' | 'object' | 'boolean';
 }
 
 export interface IMessageHead {
@@ -41,17 +41,74 @@ export interface IMessageHead {
   message: string;
 }
 
+export interface IFilterObject {
+  [fieldName: string]: IFilterOption;
+  companyId: IFilterOption;
+  appSystemId: IFilterOption;
+  producerId: IFilterOption;
+  uid: IFilterOption;
+}
+
+export interface IFileFilterObject extends IFilterObject {
+  folder: IFilterOption;
+  fileName: IFilterOption;
+  consumerId: IFilterOption;
+  // date: IFilterOption;
+  dateFrom: IFilterOption;
+  dateTo: IFilterOption;
+}
+
+export interface ILogFilterObject extends IFilterObject {
+  producerId: IFilterOption;
+  deviceId: IFilterOption;
+  dateFrom: IFilterOption;
+  dateTo: IFilterOption;
+  mDateFrom: IFilterOption;
+  mDateTo: IFilterOption;
+}
+
 export interface IFileFilter {
   [fieldName: string]: string;
   path: string;
+  // id: string;
+  folder: string;
   fileName: string;
-  company: string;
-  appSystem: string;
-  producer: string;
-  consumer: string;
-  device: string;
+  companyId: string;
+  appSystemId: string;
+  producerId: string;
+  consumerId: string;
+  deviceId: string;
   uid: string;
-  date: string;
+  dateFrom: string;
+  dateTo: string;
+}
+
+export interface ILogFileFilter {
+  [fieldName: string]: string;
+  companyId: string;
+  appSystemId: string;
+  producerId: string;
+  deviceId: string;
+  dateFrom: string;
+  dateTo: string;
+  mDateFrom: string;
+  mDateTo: string;
+}
+
+export interface IFilterOption extends INamedEntity {
+  type: 'text' | 'select' | 'date';
+  value: INamedEntity | string;
+  visible: boolean;
+  data?: [];
+  valueId?: string;
+}
+
+export interface IFilterTable {
+  [fieldName: string]: string;
+}
+
+export interface IListOption {
+  [fieldName: string]: INamedEntity[];
 }
 
 export interface IFilePageParam extends IPageParam {
@@ -62,7 +119,7 @@ export interface IDeviceLogFileFilter {
   [fieldName: string]: string;
   company: string;
   appSystem: string;
-  contact: string;
+  producer: string;
   device: string;
   uid: string;
   date: string;
@@ -75,4 +132,9 @@ export interface IDeviceLogPageParam extends IPageParam {
 export interface ILinkedEntity extends IEntity {
   value: string | number | INamedEntity | INamedEntity[] | undefined;
   link?: string;
+}
+
+export interface ITabPanel {
+  name: string;
+  component: React.ReactNode;
 }

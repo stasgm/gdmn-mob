@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Provider } from 'react-redux';
+import * as SplashScreen from 'expo-splash-screen';
 
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
@@ -28,6 +29,10 @@ import ApplNavigator from './src/navigation/Root/ApplNavigator';
 import { store } from './src/store';
 
 import { messageRequest, ONE_SECOND_IN_MS } from './src/utils/constants';
+
+SplashScreen.preventAutoHideAsync()
+  .then((result) => console.log(`SplashScreen.preventAutoHideAsync() succeeded: ${result}`))
+  .catch(console.warn);
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -85,14 +90,20 @@ const Root = () => {
 
   useEffect(() => {
     //Для отрисовки при первом подключении
-    const timer = setTimeout(() => {
-      setLoading(false);
+    const timer = setTimeout(async () => {
+      await setLoading(false);
     }, 1000);
     return () => clearTimeout(timer);
   }, []);
 
+  const onLayoutRoot = useCallback(() => {
+    if (!authLoading || !loading || !appDataLoading) {
+      SplashScreen.hide();
+    }
+  }, [appDataLoading, authLoading, loading]);
+
   return authLoading || loading || appDataLoading ? (
-    <AppScreen>
+    <AppScreen onLayout={onLayoutRoot}>
       <ActivityIndicator size="large" color={colors.primary}>
         <></>
       </ActivityIndicator>

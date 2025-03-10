@@ -308,7 +308,6 @@ const OrderEditScreen = () => {
       value: docDepart && [docDepart],
     });
   }, [docDepart, isBlocked, navigation]);
-
   const handlePresentRoad = useCallback(() => {
     if (isBlocked) {
       return;
@@ -357,7 +356,13 @@ const OrderEditScreen = () => {
             directionRow={true}
           />
         </View>
-        <Input label="Номер" value={docNumber} onChangeText={handleChangeNumber} disabled={isBlocked} />
+        <Input
+          label="Номер"
+          value={docNumber}
+          onChangeText={handleChangeNumber}
+          disabled={isBlocked}
+          clearInput={true}
+        />
         <SelectableInput
           label="Дата отгрузки"
           value={getDateString(docOnDate || '')}
@@ -375,7 +380,6 @@ const OrderEditScreen = () => {
         {road ? (
           <SelectableInput label="Маршрут" value={docRoad?.name} onPress={handlePresentRoad} disabled={isBlocked} />
         ) : null}
-
         <SelectableInput
           label="Склад-магазин"
           value={docDepart?.name}

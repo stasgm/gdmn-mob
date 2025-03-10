@@ -14,6 +14,7 @@ import processReducer from './process/reducer';
 import deviceLogReducer from './deviceLog/reducer';
 import fileReducer from './file/reducer';
 import serverLogReducer from './serverLog/reducer';
+import erpLogReducer from './erpLog/reducer';
 import { DeviceActionType } from './device/actions';
 import { ActivationCodeActionType } from './activationCode/actions';
 import { UserActionType } from './user/actions';
@@ -21,8 +22,9 @@ import { DeviceBindingActionType } from './deviceBinding/actions';
 import { AppSystemActionType } from './appSystem/actions';
 import { ProcessActionType } from './process/actions';
 import { DeviceLogActionType } from './deviceLog/actions';
-import { FileSystemActionType } from './file/actions';
+import { SystemFileActionType } from './file/actions';
 import { ServerLogActionType } from './serverLog/actions';
+import { ErpLogActionType } from './erpLog/actions';
 import { loadDataFromDisk, saveDataToDisk } from './appStorageWeb';
 
 export const reducers = {
@@ -36,6 +38,7 @@ export const reducers = {
   deviceLogs: deviceLogReducer,
   files: fileReducer,
   serverLogs: serverLogReducer,
+  erpLogs: erpLogReducer,
 };
 
 type TActions =
@@ -47,8 +50,9 @@ type TActions =
   | AppSystemActionType
   | ProcessActionType
   | DeviceLogActionType
-  | FileSystemActionType
-  | ServerLogActionType;
+  | SystemFileActionType
+  | ServerLogActionType
+  | ErpLogActionType;
 
 const appReducer = combineReducers(reducers);
 

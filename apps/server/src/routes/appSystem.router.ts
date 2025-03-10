@@ -1,19 +1,16 @@
 import route from 'koa-joi-router';
 
-import { getAppSystem, addAppSystem, getAppSystems, removeAppSystem, updateAppSystem } from '../controllers/appSystem';
-import { authMiddleware } from '../middleware/authRequired';
-import { companyMiddleware } from '../middleware/companyRequired';
-import { appSystemMiddleware } from '../middleware/appSystemRequired';
-import { roleBasedParamsMiddlware } from '../middleware/roleBasedParams';
+import { addAppSystem, getAppSystem, getAppSystems, removeAppSystem, updateAppSystem } from '../controllers/appSystem';
+import { authMiddleware, setAdminIdMiddleware, setCompanyIdMiddleware, superAdminMiddleware } from '../middleware';
 import { appSystemValidation } from '../validations';
 
 const appSystems = route();
 
 appSystems.prefix('/appSystems');
-appSystems.post('/', appSystemValidation.addAppSystem, authMiddleware, appSystemMiddleware, addAppSystem);
+appSystems.post('/', appSystemValidation.addAppSystem, authMiddleware, superAdminMiddleware, addAppSystem);
 appSystems.get('/:id', appSystemValidation.getAppSystem, authMiddleware, getAppSystem);
-appSystems.get('/', authMiddleware, companyMiddleware, roleBasedParamsMiddlware, getAppSystems);
-appSystems.patch('/:id', appSystemValidation.updateAppSystem, authMiddleware, appSystemMiddleware, updateAppSystem);
-appSystems.delete('/:id', appSystemValidation.removeAppSystem, authMiddleware, appSystemMiddleware, removeAppSystem);
+appSystems.get('/', authMiddleware, setAdminIdMiddleware, setCompanyIdMiddleware, getAppSystems);
+appSystems.patch('/:id', appSystemValidation.updateAppSystem, authMiddleware, superAdminMiddleware, updateAppSystem);
+appSystems.delete('/:id', appSystemValidation.removeAppSystem, authMiddleware, superAdminMiddleware, removeAppSystem);
 
 export default appSystems;

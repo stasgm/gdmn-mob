@@ -1,5 +1,5 @@
 import asyncActions from './actions.async';
-import { appSystemActions } from './actions';
-import * as userSelectors from './selectors';
+import { appSystemActions as actions } from './actions';
 
-export default { ...asyncActions, ...appSystemActions, userSelectors };
+export { default as appSystemSelectors } from './selectors';
+export const appSystemActions = { ...asyncActions, ...actions };

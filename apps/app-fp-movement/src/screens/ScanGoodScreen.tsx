@@ -41,7 +41,7 @@ import {
 } from '../utils/helpers';
 import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../store/index';
 
-import { barCodeTypes } from '../utils/constants';
+import { barcodeTypes } from '../utils/constants';
 
 const ScanGoodScreen = () => {
   const docId = useRoute<RouteProp<ShipmentStackParamList, 'ScanGood'>>().params?.docId;
@@ -255,8 +255,11 @@ const ScanGoodScreen = () => {
         isToAddressed
       ) {
         if (scannedObject.weight < goodBarcodeSettings?.boxWeight) {
-          alertWithSound('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings?.boxWeight}.`, () =>
-            setScaner({ state: 'init' }),
+          alertWithSound(
+            'Внимание!',
+            `Вес поддона не может быть меньше ${goodBarcodeSettings?.boxWeight}.`,
+            () => setScaner({ state: 'init' }),
+            'WEIGHT_PALLET_LESS_MIN',
           );
 
           return;
@@ -303,7 +306,7 @@ const ScanGoodScreen = () => {
       onGetScannedObject={handleGetScannedObject}
       onClearScannedObject={handleClearScaner}
       scaner={scaner}
-      barCodeTypes={barCodeTypes}
+      barcodeTypes={barcodeTypes}
     >
       {scannedObject ? (
         <View style={localStyles.itemInfo}>

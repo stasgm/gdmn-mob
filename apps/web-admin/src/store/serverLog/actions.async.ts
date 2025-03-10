@@ -45,4 +45,18 @@ const fetchServerLog = (name: string): AppThunk => {
   };
 };
 
-export default { fetchServerLogs, fetchServerLog };
+const fetchServerInfo = (): AppThunk => {
+  return async (dispatch) => {
+    dispatch(serverLogActions.fetchServerInfoAsync.request());
+
+    const response = await api.serverLog.getServerInfo(webRequest(dispatch, authActions));
+
+    if (response.type === 'GET_SERVERINFO') {
+      return dispatch(serverLogActions.fetchServerInfoAsync.success(response.serverInfo));
+    }
+
+    return dispatch(serverLogActions.fetchServerInfoAsync.failure(response.message));
+  };
+};
+
+export default { fetchServerLogs, fetchServerLog, fetchServerInfo };

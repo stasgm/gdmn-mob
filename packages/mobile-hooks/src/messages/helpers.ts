@@ -8,6 +8,14 @@ export const MULTIPART_ITEM_LIVE_IN_MS = 3600000;
 
 export const REPEAT_REQUEST_TIME_IN_MS = 3600000;
 
+/**
+ * Проверка необходимости запроса
+ * Возвращает true, если запроса не было или прошло больше REPEAT_REQUEST_TIME_IN_MS с момента последнего запроса
+ * @param syncRequests
+ * @param cmdName
+ * @param currentDate
+ * @returns
+ */
 export const needRequest = (syncRequests: ISyncRequest[], cmdName: CmdNameSyncRequest, currentDate: Date) => {
   const syncReq = syncRequests.find((req) => req.cmdName === cmdName);
   return (

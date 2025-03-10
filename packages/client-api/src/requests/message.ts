@@ -1,9 +1,7 @@
 import { IMessage, IMessageInfo, INamedEntity, NewMessage } from '@lib/types';
 
-import { error, message as types } from '../types';
+import { error, message as types, BaseApi, BaseRequest } from '../types';
 import { generateId, response2Log, sleep } from '../utils';
-import { BaseApi } from '../types/BaseApi';
-import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
 
 class Message extends BaseRequest {

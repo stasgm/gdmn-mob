@@ -2,6 +2,12 @@ import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { View, StyleSheet, SectionListData, SectionList, ListRenderItem } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+
+import { MD2Theme, Searchbar, useTheme } from 'react-native-paper';
+import { FlashList } from '@shopify/flash-list';
+
+import { ScrollView } from 'react-native-gesture-handler';
+
 import { refSelectors, useSelector } from '@lib/store';
 import {
   EmptyList,
@@ -18,17 +24,11 @@ import {
   Checkbox,
 } from '@lib/mobile-ui';
 
-import { MD2Theme, Searchbar, useTheme } from 'react-native-paper';
-
-import { ScrollView } from 'react-native-gesture-handler';
-
 import { generateId, getDateString, keyExtractor } from '@lib/mobile-hooks';
 
 import { IListItem } from '@lib/mobile-types';
 
 import { INamedEntity } from '@lib/types';
-
-import { FlashList } from '@shopify/flash-list';
 
 import { barcodeSettings, ICell, ICellRef, IMoveDocument, IMoveLine } from '../../store/types';
 import { CellsStackParamList } from '../../navigation/Root/types';
@@ -311,16 +311,14 @@ export const CellsViewScreen = () => {
     <AppScreen>
       {filterVisible ? (
         <>
-          <View style={styles.flexDirectionRow}>
-            <Searchbar
-              placeholder="Поиск"
-              onChangeText={setSearchQuery}
-              value={searchQuery}
-              style={[styles.flexGrow, styles.searchBar]}
-              autoFocus
-              selectionColor={colors.primary}
-            />
-          </View>
+          <Searchbar
+            placeholder="Поиск"
+            onChangeText={setSearchQuery}
+            value={searchQuery}
+            style={styles.searchBar}
+            autoFocus
+            selectionColor={colors.primary}
+          />
           <View style={localStyles.status}>
             {searchTypes.map((elem) => (
               <View key={elem.id}>

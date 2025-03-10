@@ -1,11 +1,7 @@
-import { Helmet } from 'react-helmet';
 import { Box, Container, Typography } from '@mui/material';
 
 const NotFound = () => (
   <>
-    <Helmet>
-      <title>404 | Material Kit</title>
-    </Helmet>
     <Box
       sx={{
         backgroundColor: 'background.default',

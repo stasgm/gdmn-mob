@@ -1,4 +1,4 @@
-import { IDeviceLogFiles } from '@lib/types';
+import { IDeviceLogFile } from '@lib/types';
 import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@mui/material';
 
 import { NavLink } from 'react-router-dom';
@@ -6,7 +6,7 @@ import { NavLink } from 'react-router-dom';
 import { adminPath } from '../../utils/constants';
 
 interface IProps {
-  deviceLogs: IDeviceLogFiles;
+  deviceLogs: IDeviceLogFile;
 }
 
 const DeviceLogDetailsView = ({ deviceLogs }: IProps) => {
@@ -67,7 +67,7 @@ const DeviceLogDetailsView = ({ deviceLogs }: IProps) => {
               </Grid>
               <Grid item md={10} xs={6}>
                 <Typography variant="h4" gutterBottom>
-                  {deviceLogs.contact.name}
+                  {deviceLogs.consumer?.name}
                 </Typography>
               </Grid>
             </Grid>

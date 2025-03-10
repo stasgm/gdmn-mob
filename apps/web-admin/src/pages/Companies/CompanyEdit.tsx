@@ -4,8 +4,7 @@ import { ICompany, NewCompany } from '@lib/types';
 
 import CompanyDetails from '../../components/company/CompanyDetails';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import actions from '../../store/company';
-import selectors from '../../store/company/selectors';
+import { companyActions, companySelectors } from '../../store/company';
 
 export type Params = {
   id: string;
@@ -16,14 +15,14 @@ const CompanyEdit = () => {
   const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch();
   const { loading } = useSelector((state) => state.companies);
-  const company = selectors.companyById(companyId);
+  const company = companySelectors.companyById(companyId);
 
   const goBack = () => {
     navigate(-1);
   };
 
   const handleSubmit = async (values: ICompany | NewCompany) => {
-    const res = await dispatch(actions.updateCompany(values as ICompany));
+    const res = await dispatch(companyActions.updateCompany(values as ICompany));
     if (res.type === 'COMPANY/UPDATE_SUCCESS') {
       goBack();
     }

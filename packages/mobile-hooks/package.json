@@ -22,20 +22,20 @@
     "@lib/client-api": "*",
     "@lib/store": "*",
     "@lib/types": "*",
-    "@react-native-community/netinfo": "9.3.10",
-    "@types/node": "^20.8.4",
-    "@types/react": "~18.2.43",
+    "@react-native-community/netinfo": "11.4.1",
+    "@types/node": "^22.13.9",
+    "@types/react": "18.3.18",
     "nanoid": "^3.3.4",
-    "react": "18.2.0",
-    "react-native": "0.72.10",
-    "react-native-get-random-values": "~1.9.0",
-    "typescript": "^5.2.2"
+    "react": "18.3.1",
+    "react-native": "0.76.7",
+    "react-native-get-random-values": "~1.11.0",
+    "typescript": "~5.7.2"
   },
   "devDependencies": {
     "@config/eslint-config": "*",
     "@config/eslint-config-react": "*",
     "@config/eslint-config-react-native": "*",
     "@config/prettier-config": "*",
-    "lint-staged": "^14.0.1"
+    "lint-staged": "^15.2.10"
   }
 }

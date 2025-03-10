@@ -11,7 +11,7 @@ const DashboardNavigator = ({ dashboardScreens, items = [] }: { dashboardScreens
   return (
     <Stack.Navigator
       initialRouteName="Dashboard"
-      screenOptions={{ headerShown: true, title: 'GDMN Отгрузка', headerBackTitleVisible: false }}
+      screenOptions={{ headerShown: true, title: 'GDMN Отгрузка', headerBackTitle: '' }}
     >
       <Stack.Screen name="Dashboard" component={DashboardScreenComponent} />
       {Object.entries(dashboardScreens).map(([name, { title, component }]: any) => (

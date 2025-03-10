@@ -21,7 +21,9 @@ module.exports = merge(commonConfig, {
     port: server.port,
     open: true,
     static: './',
-    historyApiFallback: true,
+    historyApiFallback: {
+      disableDotRule: true
+    },
   },
   devtool: 'inline-source-map',
   plugins: [

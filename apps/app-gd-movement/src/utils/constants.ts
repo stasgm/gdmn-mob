@@ -1,7 +1,8 @@
 import { IListItem } from '@lib/mobile-types';
 import { mainSettingGroup } from '@lib/store';
 import { Settings, StatusType } from '@lib/types';
-import { BarCodeScanner } from 'expo-barcode-scanner';
+// import { BarCodeScanner } from 'expo-barcode-scanner';
+import { BarcodeType } from 'expo-camera';
 
 import { IGood } from '../store/app/types';
 
@@ -17,15 +18,15 @@ export const contactTypes: IListItem[] = [
 
 export interface IBarcodeTypes extends IListItem {
   selected?: boolean;
-  type: string;
+  type: BarcodeType;
 }
 
 export const barcodeList: IBarcodeTypes[] = [
-  { id: 'ean8', value: 'EAN-8', type: BarCodeScanner.Constants.BarCodeType.ean8, selected: true },
-  { id: 'ean13', value: 'EAN-13', type: BarCodeScanner.Constants.BarCodeType.ean13, selected: true },
-  { id: 'code128', value: 'Code 128', type: BarCodeScanner.Constants.BarCodeType.code128, selected: true },
-  { id: 'datamatrix', value: 'Data Matrix', type: BarCodeScanner.Constants.BarCodeType.datamatrix },
-  { id: 'qr', value: 'QR code', type: BarCodeScanner.Constants.BarCodeType.qr },
+  { id: 'ean8', value: 'EAN-8', type: 'ean8', selected: true },
+  { id: 'ean13', value: 'EAN-13', type: 'ean13', selected: true },
+  { id: 'code128', value: 'Code 128', type: 'code128', selected: true },
+  { id: 'datamatrix', value: 'Data Matrix', type: 'datamatrix' },
+  { id: 'qr', value: 'QR code', type: 'qr' },
 ];
 
 export const docContactTypes: IListItem[] = [{ id: 'all', value: 'Все' }];

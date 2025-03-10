@@ -1,32 +1,22 @@
-import {
-  Box,
-  Button,
-  CardHeader,
-  IconButton,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-} from '@mui/material';
+import { Box } from '@mui/material';
 import CachedIcon from '@mui/icons-material/Cached';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate, useParams } from 'react-router-dom';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import actions from '../../store/company';
-import userActions from '../../store/user';
+import { companyActions, companySelectors } from '../../store/company';
 import CompanyUsers from '../../components/company/CompanyUsers';
 import { ILinkedEntity, IToolBarButton } from '../../types';
-import ToolBarAction from '../../components/ToolBarActions';
-import companySelectors from '../../store/company/selectors';
-import userSelectors from '../../store/user/selectors';
 
 import { adminPath } from '../../utils/constants';
 import DetailsView from '../../components/DetailsView';
+
+import CompanyAppSystems from '../../components/company/CompanyAppSystems';
+import ViewContainer from '../../components/ViewContainer';
+import ConfirmDialog from '../../components/ConfirmDialog';
+import { appSystemActions } from '../../store/appSystem';
 
 export type Params = {
   id: string;
@@ -36,36 +26,37 @@ const CompanyView = () => {
   const { id: companyId } = useParams<keyof Params>() as Params;
   const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch();
-  const { loading } = useSelector((state) => state.companies);
+  const { loading, pageParams } = useSelector((state) => state.companies);
   const company = companySelectors.companyById(companyId);
-  const users = userSelectors.usersByCompanyId(companyId);
+
   const [open, setOpen] = useState(false);
+  const [tabValue, setTabValue] = useState(pageParams?.tab || 0);
+
+  const handleChangeTab = (event: any, newValue: number) => {
+    setTabValue(newValue);
+    dispatch(companyActions.setPageParam({ tab: newValue }));
+  };
 
   const companyDetails: ILinkedEntity[] = useMemo(
     () =>
       company
         ? [
-            { id: 'Наименование', value: company },
-            { id: 'ID', value: company?.id },
+            { id: 'Компания', value: company },
+            { id: 'Идентификатор', value: company?.id },
             { id: 'Город', value: company?.city },
             { id: 'Администратор', value: company?.admin, link: `${adminPath}/app/users/${company.admin.id}/` },
-            { id: 'Подсистемы', value: company?.appSystems },
           ]
         : [],
     [company],
   );
 
-  const handleCancel = () => {
-    navigate(-1);
-  };
-
-  const handleEdit = () => {
+  const handleEdit = useCallback(() => {
     navigate(`${adminPath}/app/companies/${companyId}/edit`);
-  };
+  }, [navigate, companyId]);
 
   const handleDelete = async () => {
     setOpen(false);
-    const res = await dispatch(actions.removeCompany(companyId));
+    const res = await dispatch(companyActions.removeCompany(companyId));
     if (res.type === 'COMPANY/REMOVE_SUCCESS') {
       navigate(-1);
     }
@@ -79,14 +70,55 @@ const CompanyView = () => {
     setOpen(false);
   };
 
+  const handleCancel = () => {
+    navigate(-1);
+  };
+
   const refreshData = useCallback(() => {
-    dispatch(actions.fetchCompanyById(companyId));
-    dispatch(userActions.fetchUsers(companyId));
+    dispatch(companyActions.fetchCompanyById(companyId));
+    // dispatch(userActions.fetchUsers(companyId));
+    dispatch(appSystemActions.fetchAppSystems(companyId));
   }, [dispatch, companyId]);
 
   useEffect(() => {
     refreshData();
   }, [refreshData]);
+
+  const buttons: IToolBarButton[] = useMemo(() => {
+    return tabValue === 0
+      ? [
+          {
+            name: 'Обновить',
+            sx: { marginRight: 1 },
+            color: 'secondary',
+            variant: 'contained',
+            onClick: refreshData,
+            icon: <CachedIcon />,
+          },
+          {
+            name: 'Редактировать',
+            sx: { marginRight: 1 },
+            color: 'primary',
+            variant: 'contained',
+            onClick: handleEdit,
+            icon: <EditIcon />,
+          },
+          {
+            name: 'Удалить',
+            color: 'secondary',
+            variant: 'contained',
+            onClick: handleClickOpen,
+            icon: <DeleteIcon />,
+          },
+        ]
+      : [];
+  }, [handleEdit, refreshData, tabValue]);
+
+  const tabs = [
+    { name: 'Общая информация', component: <DetailsView details={companyDetails} /> },
+    { name: 'Подсистемы и ERP-логи', component: <CompanyAppSystems companyId={companyId} /> },
+    { name: 'Пользователи', component: <CompanyUsers companyId={companyId} /> },
+  ];
 
   if (!company) {
     return (
@@ -102,91 +134,22 @@ const CompanyView = () => {
     );
   }
 
-  const buttons: IToolBarButton[] = [
-    {
-      name: 'Обновить',
-      sx: { marginRight: 1 },
-      color: 'primary',
-      variant: 'contained',
-      onClick: refreshData,
-      icon: <CachedIcon />,
-    },
-    {
-      name: 'Редактировать',
-      sx: { marginRight: 1 },
-      disabled: true,
-      color: 'secondary',
-      variant: 'contained',
-      onClick: handleEdit,
-      icon: <EditIcon />,
-    },
-    {
-      name: 'Удалить',
-      disabled: true,
-      color: 'secondary',
-      variant: 'contained',
-      onClick: handleClickOpen,
-      icon: <DeleteIcon />,
-    },
-  ];
-
   return (
     <>
-      <Box>
-        <Dialog open={open} onClose={handleClose}>
-          <DialogContent>
-            <DialogContentText color="black">Вы действительно хотите удалить компанию?</DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDelete} color="primary" variant="contained">
-              Удалить
-            </Button>
-            <Button onClick={handleClose} color="secondary" variant="contained">
-              Отмена
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
-      <Box
-        sx={{
-          p: 3,
-        }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Box sx={{ display: 'inline-flex', marginBottom: 1 }}>
-            <IconButton color="primary" onClick={handleCancel}>
-              <ArrowBackIcon />
-            </IconButton>
-            <CardHeader title={'Назад'} />
-            {loading && <CircularProgress size={40} />}
-          </Box>
-          <Box
-            sx={{
-              justifyContent: 'right',
-            }}
-          >
-            <ToolBarAction buttons={buttons} />
-          </Box>
-        </Box>
-        <Box
-          sx={{
-            backgroundColor: 'background.default',
-            minHeight: '100%',
-          }}
-        >
-          <DetailsView details={companyDetails} />
-        </Box>
-      </Box>
-      <Box>
-        <CardHeader title={'Пользователи компании'} sx={{ mx: 2 }} />
-        <CompanyUsers users={users} />
-      </Box>
+      <ConfirmDialog
+        open={open}
+        handleClose={handleClose}
+        handleDelete={handleDelete}
+        questionText={'Вы действительно хотите удалить компанию?'}
+      />
+      <ViewContainer
+        handleCancel={handleCancel}
+        buttons={buttons}
+        loading={loading}
+        tabValue={tabValue}
+        handleChangeTab={handleChangeTab}
+        tabs={tabs}
+      />
     </>
   );
 };

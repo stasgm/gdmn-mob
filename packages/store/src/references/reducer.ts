@@ -67,6 +67,7 @@ const reducer: Reducer<ReferenceState, ReferenceActionType> = (state = initialSt
       };
 
     case getType(actions.deleteReference): {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [action.payload]: _, ...rest } = state.list;
       return { ...state, list: rest };
     }
@@ -87,6 +88,7 @@ const reducer: Reducer<ReferenceState, ReferenceActionType> = (state = initialSt
       return { ...state, loading: true, errorMessage: '' };
 
     case getType(actions.removeReferenceAsync.success): {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [action.payload]: _, ...rest } = state.list;
       return { ...state, loading: false, list: rest };
     }

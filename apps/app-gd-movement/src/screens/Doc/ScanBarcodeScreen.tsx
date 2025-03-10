@@ -222,7 +222,7 @@ const ScanBarcodeScreen = () => {
       onGetScannedObject={getScannedObject}
       onClearScannedObject={handleClearScaner}
       scaner={scaner}
-      barCodeTypes={barcodeTypes}
+      barcodeTypes={barcodeTypes}
       onSearch={handleShowRemains}
     />
   );

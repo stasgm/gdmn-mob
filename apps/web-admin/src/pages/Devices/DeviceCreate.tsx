@@ -6,8 +6,8 @@ import { useEffect } from 'react';
 
 import DeviceDetails from '../../components/device/DeviceDetails';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import actions from '../../store/device';
-import companyActions from '../../store/company';
+import { deviceActions } from '../../store/device';
+import { companyActions } from '../../store/company';
 
 const DeviceCreate = () => {
   const navigate = useNavigate();
@@ -21,12 +21,12 @@ const DeviceCreate = () => {
   }, [dispatch]);
 
   const goBack = () => {
-    dispatch(actions.clearError());
+    dispatch(deviceActions.clearError());
     navigate(-1);
   };
 
   const handleSubmit = async (values: IDevice | NewDevice) => {
-    const res = await dispatch(actions.addDevice({ ...values } as NewDevice));
+    const res = await dispatch(deviceActions.addDevice({ ...values } as NewDevice));
     if (res.type === 'DEVICE/ADD_SUCCESS') {
       goBack();
     }

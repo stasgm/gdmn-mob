@@ -165,6 +165,7 @@ export const DocLineScreen = () => {
         onSetLine={setLine}
         onSetDisabledSave={setDisabledSave}
         isSumWNds={Boolean(document?.documentType.isSumWNds)}
+        onSave={() => setScreenState('saving')}
       />
     </AppInputScreen>
   );

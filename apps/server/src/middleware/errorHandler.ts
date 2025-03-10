@@ -2,7 +2,7 @@ import { Context, Next } from 'koa';
 
 import { FailureResponse } from '@lib/types';
 
-import log from '../utils/logger';
+import { log } from '../utils';
 import { ApplicationException } from '../exceptions';
 import { getDb } from '../services/dao/db';
 

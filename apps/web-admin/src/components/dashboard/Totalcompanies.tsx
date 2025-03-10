@@ -1,6 +1,5 @@
-import { Avatar, Box, Card, CardContent, Grid, Typography } from '@mui/material';
+import { Avatar, Card, CardContent, Grid, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 
 interface IProps {

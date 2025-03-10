@@ -2,7 +2,7 @@
   "expo": {
     "name": "GDMN Агент",
     "slug": "gdmn-sales-representative",
-    "version": "0.14.0",
+    "version": "0.14.1",
     "githubUrl": "https://github.com/stasgm/gdmn-mob",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -29,18 +29,26 @@
     "android": {
       "package": "com.gsbelarus.salesrepresentative2",
       "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "FOREGROUND_SERVICE"],
-      "versionCode": 65
+      "versionCode": 66
     },
+    "newArchEnabled": true,
     "plugins": [
       [
         "expo-build-properties",
         {
           "android": {
-            "compileSdkVersion": 33,
-            "targetSdkVersion": 33,
-            "buildToolsVersion": "33.0.0",
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "buildToolsVersion": "35.0.0",
             "usesCleartextTraffic": true
           }
+        }
+      ],
+      "expo-router",
+      [ "expo-splash-screen",
+        {
+          "image": "./assets/splash-new.png",
+          "backgroundColor": "#ffffff"
         }
       ]
     ]

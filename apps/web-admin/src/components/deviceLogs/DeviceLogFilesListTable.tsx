@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
@@ -16,7 +16,7 @@ import {
   TextField,
 } from '@mui/material';
 
-import { IDeviceLogFiles } from '@lib/types';
+import { IDeviceLogFile } from '@lib/types';
 
 import { useFormik } from 'formik';
 
@@ -25,14 +25,13 @@ import { IDeviceLogFileFilter, IDeviceLogPageParam, IPageParam } from '../../typ
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
-  deviceLogFiles: IDeviceLogFiles[];
-  selectedDeviceLogFiles: IDeviceLogFiles[];
+  deviceLogFiles: IDeviceLogFile[];
+  selectedDeviceLogFiles: IDeviceLogFile[];
   limitRows?: number;
-  // onChangeSelectedDeviceLogFiles: (newSelectedDeviceIds: any[]) => void;
   isFilterVisible?: boolean;
   onSubmit: (values: any) => void;
   onDelete?: (ids?: string[]) => void;
-  onSelectOne: (_event: any, file: IDeviceLogFiles) => void;
+  onSelectOne: (_event: any, file: IDeviceLogFile) => void;
   onSelectMany: (event: any) => void;
   onSetPageParams: (logFilters: IPageParam) => void;
   pageParams?: IDeviceLogPageParam | undefined;
@@ -40,9 +39,6 @@ interface IProps {
 
 const DeviceLogFilesListTable = ({
   deviceLogFiles = [],
-  // onChangeSelectedDeviceLogFiles,
-  // selectedDeviceLogFiles = [],
-  // limitRows = 0,
   isFilterVisible = false,
   onSubmit,
   onSelectOne,
@@ -62,7 +58,7 @@ const DeviceLogFilesListTable = ({
     return {
       company: '',
       appSystem: '',
-      contact: '',
+      producer: '',
       device: '',
       uid: '',
       date: '',
@@ -101,7 +97,7 @@ const DeviceLogFilesListTable = ({
   const handleLimitChange = useCallback(
     (event: any) => {
       setLimit(event.target.value);
-      onSetPageParams({ ...pageParams, limit: event.target.value });
+      onSetPageParams && onSetPageParams({ ...pageParams, limit: event.target.value });
     },
     [onSetPageParams, pageParams],
   );
@@ -114,35 +110,26 @@ const DeviceLogFilesListTable = ({
     [onSetPageParams, pageParams],
   );
 
-  // useEffect(() => {
-  //   if (limitRows > 0) {
-  //     setLimit(limitRows);
-  //   }
-
-  //   if (selectedDeviceLogFileIds.length === 0) {
-  //     if (selectedDeviceLogFiles.length > 0) {
-  //       const newSelectedDeviceLogFileIds = selectedDeviceLogFiles.map(
-  //         (deviceLogFile: IDeviceLogFiles) => deviceLogFile,
-  //       );
-
-  //       setSelectedDeviceLogFileIds(newSelectedDeviceLogFileIds);
-  //     }
-  //   }
-  // }, [limitRows, selectedDeviceLogFileIds.length, selectedDeviceLogFiles]);
+  const handleRowClick = useCallback(
+    (e: React.MouseEvent<HTMLTableRowElement>, id: string) => {
+      if (!window.getSelection()?.toString()) {
+        e.preventDefault();
+        navigate(`${adminPath}/app/deviceLogs/${id}`);
+      }
+    },
+    [navigate],
+  );
 
   const TableRows = () => {
     const deviceLogFileList = deviceLogFiles
       .slice(page * limit, page * limit + limit)
-      .map((deviceLogFile: IDeviceLogFiles) => {
+      .map((deviceLogFile: IDeviceLogFile) => {
         return (
           <TableRow
             hover
             key={deviceLogFile.id}
             selected={selectedDeviceLogFiles?.findIndex((d) => d.id === deviceLogFile?.id) !== -1}
-            onClick={(event) => {
-              event.preventDefault();
-              navigate(`${adminPath}/app/deviceLogs/${deviceLogFile.id}`);
-            }}
+            onClick={(event) => handleRowClick(event, deviceLogFile.id)}
             sx={{ cursor: 'pointer' }}
           >
             <TableCell
@@ -155,18 +142,17 @@ const DeviceLogFilesListTable = ({
               <Checkbox
                 checked={
                   selectedDeviceLogFiles
-                    ?.map((item: IDeviceLogFiles) => {
+                    ?.map((item: IDeviceLogFile) => {
                       return item.id;
                     })
                     .indexOf(deviceLogFile.id) !== -1
                 }
-                // onChange={(event) => onSelectOne(event, deviceLogFile)}
                 value="true"
               />
             </TableCell>
             <TableCell>{deviceLogFile.company.name}</TableCell>
             <TableCell>{deviceLogFile.appSystem.name}</TableCell>
-            <TableCell>{deviceLogFile.contact.name}</TableCell>
+            <TableCell>{deviceLogFile.producer.name}</TableCell>
             <TableCell>{deviceLogFile.device.name}</TableCell>
             <TableCell>{deviceLogFile.device.id}</TableCell>
             <TableCell>{new Date(deviceLogFile.date || '').toLocaleString('ru', { hour12: false })}</TableCell>
@@ -194,7 +180,7 @@ const DeviceLogFilesListTable = ({
     <Card>
       <PerfectScrollbar>
         <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight }}>
-          <Table>
+          <Table sx={{ '& .MuiTableCell-root': { width: 'auto', whiteSpace: 'nowrap', userSelect: 'text' } }}>
             <TableHead>
               <TableRow>
                 <TableCell padding="checkbox">
@@ -211,7 +197,7 @@ const DeviceLogFilesListTable = ({
                 <TableCell>Подсистема</TableCell>
                 <TableCell>Пользователь</TableCell>
                 <TableCell>Устройство</TableCell>
-                <TableCell>Идентификатор</TableCell>
+                <TableCell>ИД устройства</TableCell>
                 <TableCell>Дата создания</TableCell>
                 <TableCell>Дата редактирования</TableCell>
                 <TableCell>Размер</TableCell>

@@ -1,27 +1,35 @@
-import { Helmet } from 'react-helmet';
 import { Box, Container } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import CachedIcon from '@mui/icons-material/Cached';
 
+import { ServerLogFile } from '@lib/types';
+
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import { IFileFilter, IPageParam, IToolBarButton } from '../../types';
+import { IHeadCells, IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-import SnackBar from '../../components/SnackBar';
-import actions from '../../store/serverLog';
+import { serverLogActions } from '../../store/serverLog';
+import SortableTable from '../../components/SortableTable';
+import ServerInfoCard from '../../components/serverLog/ServerInfoCard';
 
-import ServerLogListTable from '../../components/serverLog/ServerLogListTable';
+const headCells: IHeadCells<ServerLogFile>[] = [
+  { id: 'path', label: 'Путь', sortEnable: true },
+  { id: 'id', label: 'Наименование', sortEnable: true },
+  { id: 'date', label: 'Дата создания', sortEnable: true, type: 'date' },
+  { id: 'mdate', label: 'Дата редактирования', sortEnable: true, type: 'date' },
+  { id: 'size', label: 'Размер', sortEnable: true },
+];
 
 const ServerLogList = () => {
   const dispatch = useDispatch();
 
-  const { list, loading, errorMessage, pageParams } = useSelector((state) => state.serverLogs);
-
+  const { list, loading, pageParams, serverInfo } = useSelector((state) => state.serverLogs);
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
   const fetchServerLogs = useCallback(
-    (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(actions.fetchServerLogs(filterText));
+    (filterText?: string, _fromRecord?: number, _toRecord?: number) => {
+      dispatch(serverLogActions.fetchServerLogs(filterText));
+      dispatch(serverLogActions.fetchServerInfo());
     },
     [dispatch],
   );
@@ -42,7 +50,7 @@ const ServerLogList = () => {
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.serverLogActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
+    dispatch(serverLogActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
 
     fetchServerLogs(pageParamLocal?.filterText);
   };
@@ -53,12 +61,8 @@ const ServerLogList = () => {
     handleSearchClick();
   };
 
-  const handleClearError = () => {
-    dispatch(actions.serverLogActions.clearError());
-  };
-
   const handleClearSearch = () => {
-    dispatch(actions.serverLogActions.setPageParam({ filterText: undefined, page: 0 }));
+    dispatch(serverLogActions.setPageParam({ filterText: '', page: 0 }));
     setPageParamLocal({ filterText: undefined });
     fetchServerLogs();
   };
@@ -66,7 +70,7 @@ const ServerLogList = () => {
   const handleSetPageParams = useCallback(
     (pageParams: IPageParam) => {
       dispatch(
-        actions.serverLogActions.setPageParam({
+        serverLogActions.setPageParam({
           page: pageParams.page,
           limit: pageParams.limit,
         }),
@@ -86,9 +90,6 @@ const ServerLogList = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Логи сервера</title>
-      </Helmet>
       <Box
         sx={{
           backgroundColor: 'background.default',
@@ -97,34 +98,34 @@ const ServerLogList = () => {
         }}
       >
         <Container maxWidth={false}>
+          {serverInfo && !loading && <ServerInfoCard serverInfo={serverInfo} />}
           <ToolbarActionsWithSearch
             buttons={buttons}
             searchTitle={'Найти файл'}
-            //valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
             value={(pageParamLocal?.filterText as undefined) || ''}
             clearOnClick={handleClearSearch}
+            disabled={loading}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <ServerLogListTable serverLogs={list} onSetPageParams={handleSetPageParams} pageParams={pageParams} />
+              <SortableTable<ServerLogFile>
+                headCells={headCells}
+                data={list}
+                path={'/app/serverLogs/'}
+                onSetPageParams={handleSetPageParams}
+                pageParams={pageParams}
+                byMaxHeight={true}
+                withCheckBox={true}
+              />
             </Box>
-            // <Box sx={{ pt: 2 }}>
-            //   <SortableFilterTable<IDeviceLogFiles>
-            //     headCells={headCells}
-            //     data={filesList}
-            //     path={'/app/deviceLogs/'}
-            //     isFiltered={filterVisible}
-            //   />
-            // </Box>
           )}
         </Container>
       </Box>
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

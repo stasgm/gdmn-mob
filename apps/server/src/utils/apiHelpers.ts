@@ -1,7 +1,7 @@
-import { SuccessResponse } from '@lib/types';
+import { FailureResponse, SuccessResponse } from '@lib/types';
 import { Context } from 'koa';
 
-import log from '../utils/logger';
+import { log } from '../utils';
 
 export const ok = <T>(ctx: Context, data?: T, logMessage?: string, logData?: boolean) => {
   ctx.statusMessage = 'success result';
@@ -38,11 +38,15 @@ export const created = (ctx: Context, data?: any, logMessage?: string, logData?:
   }
 };
 
-export const notOk = (ctx: Context) => {
-  ctx.status = 400;
+export const notOk = (ctx: Context, status?: number, error?: string, data?: any) => {
+  ctx.status = status || 500;
+  const logMessage = error || 'Internal Server Error';
   ctx.body = {
     result: false,
     type: 'FAILURE',
-    status: 400,
-  };
+    status: status || 500,
+    error: logMessage,
+    data,
+  } as FailureResponse;
+  log.info(error);
 };

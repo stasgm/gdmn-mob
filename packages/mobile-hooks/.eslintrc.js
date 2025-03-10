@@ -7,12 +7,5 @@ module.exports = {
   parserOptions: {
     project: ['./tsconfig.eslint.json'],
     tsconfigRootDir: __dirname,
-  },
-  settings: {
-    'import/resolver': {
-      node: {
-        extensions: ['.ts', '.tsx', '.json'],
-      },
-    },
-  },
+  }
 };

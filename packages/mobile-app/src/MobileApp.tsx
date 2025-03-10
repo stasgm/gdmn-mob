@@ -38,21 +38,14 @@ export interface IApp {
 }
 
 const AppRoot = ({ items, dashboardScreens, onSync }: Omit<IApp, 'store'>) => {
-  const { syncData } = useSync(onSync);
+  const { user, isDemo } = useSelector((state) => state.auth);
   const settings = useSelector((state) => state.settings?.data);
-  const autoSynchPeriod = (settings.autoSynchPeriod?.data as number) || 10;
   const autoSync = (settings.autoSync?.data as boolean) || false;
-  const { config, user, isDemo } = useSelector((state) => state.auth);
-  const loading = useSelector((state) => state.app.loading);
+  const autoSynchPeriod = (settings.autoSynchPeriod?.data as number) || 10;
 
   const appState = useRef(AppState.currentState);
   const authDispatch = useAuthThunkDispatch();
-
-  useEffect(() => {
-    //При запуске приложения записываем настройки в апи
-    api.config = { ...api.config, ...config };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const syncData = useSync(onSync);
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', async (nextAppState) => {
@@ -68,32 +61,37 @@ const AppRoot = ({ items, dashboardScreens, onSync }: Omit<IApp, 'store'>) => {
     };
   }, [authDispatch, user]);
 
-  //Если в параметрах указана Автосинхронизация, выполняем синхронизацию при запуске
+  const timerRef = useRef<NodeJS.Timeout>();
+
   useEffect(() => {
-    if (autoSync && !loading && !isDemo) {
-      syncData();
+    if (!autoSync || isDemo) {
+      return;
     }
+
+    syncData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  //Если в параметрах указана Автосинхронизация,
-  //устанавливаем запуск следующей синхронизации через synchPeriod минут
+  // Если включена автосинхронизация, то вызываем функцию, которая при каждом выполнении устанавливает новый таймер для следующей синхронизации
   useEffect(() => {
-    if (!autoSync || loading || isDemo) {
+    if (!autoSync || isDemo) {
       return;
     }
-    const timeOutId = setTimeout(
-      () => {
-        syncData();
-      },
-      autoSynchPeriod * 60 * 1000,
-    );
+
+    const syncDataPeriodically = async () => {
+      clearTimeout(timerRef.current);
+      timerRef.current = undefined;
+
+      await syncData();
+      timerRef.current = setTimeout(syncDataPeriodically, autoSynchPeriod * 60 * 1000);
+    };
+    timerRef.current = setTimeout(syncDataPeriodically, autoSynchPeriod * 60 * 1000);
 
     return () => {
-      clearTimeout(timeOutId);
+      clearTimeout(timerRef.current);
+      timerRef.current = undefined;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoSynchPeriod, autoSync, loading, isDemo]);
+  }, [autoSync, autoSynchPeriod, isDemo, syncData]);
 
   return <DrawerNavigator items={items} dashboardScreens={dashboardScreens} onSyncClick={syncData} />;
 };

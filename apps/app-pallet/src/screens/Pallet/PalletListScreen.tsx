@@ -200,13 +200,12 @@ export const PalletListScreen = () => {
         errorMessage: i.errorMessage,
         sentDate: i.sentDate,
         erpCreationDate: i.erpCreationDate,
-        children: (
+        children: i.head.palletId && (
           <BarcodeImage
-            barcode={i?.head.palletId}
+            barcode={i.head.palletId}
             isPrint={true}
             printText={` <h1 style="font-size: 22px; font-family: Helvetica Neue; font-weight: normal;">
-        ${`№ ${i?.number || '-'} от ${getDateString(i?.documentDate || '')}` || ''}</h1>
-        <h1 style="font-size: 30px; font-family: Helvetica Neue; font-weight: normal;">${i?.head.palletId || ''}</h1>
+        ${`№ ${i.number || '-'} от ${getDateString(i.documentDate || '')}` || ''}</h1>
       `}
           />
         ),
@@ -276,16 +275,14 @@ export const PalletListScreen = () => {
       <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} />
       {filterVisible && (
         <>
-          <View style={styles.flexDirectionRow}>
-            <Searchbar
-              placeholder="Поиск"
-              onChangeText={setSearchQuery}
-              value={searchQuery}
-              style={[styles.flexGrow, styles.searchBar]}
-              autoFocus
-              selectionColor={colors.primary}
-            />
-          </View>
+          <Searchbar
+            placeholder="Поиск"
+            onChangeText={setSearchQuery}
+            value={searchQuery}
+            style={styles.searchBar}
+            autoFocus
+            selectionColor={colors.primary}
+          />
           <ItemSeparator />
         </>
       )}

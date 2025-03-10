@@ -1,4 +1,3 @@
-import { Helmet } from 'react-helmet';
 import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import CachedIcon from '@mui/icons-material/Cached';
@@ -6,41 +5,136 @@ import FilterIcon from '@mui/icons-material/FilterAltOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import DriveFileMoveOutlinedIcon from '@mui/icons-material/DriveFileMoveOutlined';
 
-import { IFileSystem } from '@lib/types';
+import { IFileParams, INamedEntity, ISystemFile } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import { IFileFilter, IHeadCells, IFilePageParam, IToolBarButton } from '../../types';
+import { IFilePageParam, IFilterTable, IHeadCells, IListOption, IToolBarButton, IFileFilter } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-import SnackBar from '../../components/SnackBar';
-import actions from '../../store/file';
+import { fileActions } from '../../store/file';
 import FileListTable from '../../components/file/FileListTable';
 import RadioGroup from '../../components/RadioGoup';
+import { companyActions } from '../../store/company';
+import { userActions } from '../../store/user';
+import { appSystemActions } from '../../store/appSystem';
+import { deviceActions } from '../../store/device';
+import { useWindowResizeWidth } from '../../utils/useWindowResizeMaxWidth';
+import { bindingActions } from '../../store/deviceBinding';
 
 const FileList = () => {
   const dispatch = useDispatch();
 
-  const { list, loading, errorMessage, pageParams, folders } = useSelector((state) => state.files);
+  const { list, loading, pageParams, folders } = useSelector((state) => state.files);
 
   const sortedList = useMemo(() => list.sort((a, b) => (a.path < b.path ? -1 : 1)), [list]);
+
+  const maxWidth = useWindowResizeWidth(0.7);
+
   const fetchFiles = useCallback(
     (filesFilters?: IFileFilter, filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(actions.fetchFiles(filesFilters, filterText, fromRecord, toRecord));
+      if (filesFilters) {
+        const ff: IFilterTable = Object.entries(filesFilters).reduce((prev: IFilterTable, [item, value]) => {
+          if (value) {
+            prev[item] = value;
+          }
+          return prev;
+        }, {});
+        dispatch(fileActions.fetchFiles(ff as IFileFilter, filterText, fromRecord, toRecord));
+      } else {
+        dispatch(fileActions.fetchFiles(filesFilters, filterText, fromRecord, toRecord));
+      }
     },
     [dispatch],
   );
 
   const fetchFolders = useCallback(
     (companyId: string, appSystemId: string) => {
-      dispatch(actions.fetchFolders(companyId, appSystemId));
+      dispatch(fileActions.fetchFolders(companyId, appSystemId));
     },
     [dispatch],
   );
 
   useEffect(() => {
+    dispatch(companyActions.fetchCompanies());
+    dispatch(userActions.fetchUsers());
+    dispatch(appSystemActions.fetchAppSystems());
+    dispatch(deviceActions.fetchDevices());
+    dispatch(bindingActions.fetchDeviceBindings());
+  }, [dispatch]);
+
+  useEffect(() => {
     // Загружаем данные при загрузке компонента.
     fetchFiles(pageParams?.filesFilters);
   }, [fetchFiles, pageParams?.filesFilters]);
+
+  const [formikCompany, setFormikCompany] = useState<INamedEntity | undefined>(
+    // pageParams?.filesFilters?.company
+    //   ? companyList.find((c) => c.name === pageParams?.filesFilters?.company)
+    //   : undefined,
+    undefined,
+  );
+  const [formikAppSystem, setFormikAppSystem] = useState<INamedEntity | undefined>(undefined);
+  const [formikProducer, setFormikProducer] = useState<INamedEntity | undefined>(undefined);
+
+  const { list: companies } = useSelector((state) => state.companies);
+  const { list: appSystems } = useSelector((state) => state.appSystems);
+  const { list: users } = useSelector((state) => state.users);
+  const { list: devices } = useSelector((state) => state.devices);
+  const { list: deviceBindings } = useSelector((state) => state.deviceBindings);
+
+  const companyList = companies.map((d) => ({ id: d.id, name: d.name })) || [];
+
+  const userList = companyList.length
+    ? users.filter((i) => companyList.find((c) => c.id === formikCompany?.id && c.id === i.company?.id))
+    : [];
+
+  const userOASList = userList
+    .filter(
+      (u) =>
+        !formikAppSystem ||
+        u.appSystem?.id === formikAppSystem.id ||
+        users.find((e) => e.appSystem?.id === formikAppSystem.id)?.id === u.erpUser?.id,
+    )
+    .map((d) => ({ id: d.id, name: d.name }));
+
+  const appSystemList =
+    appSystems.filter((i) => userList.find((u) => u.appSystem?.id === i.id)).map((d) => ({ id: d.id, name: d.name })) ||
+    [];
+
+  const db = deviceBindings.filter((b) => !formikProducer || b.user.id === formikProducer.id);
+  const deviceList = companyList.length
+    ? devices
+        .filter(
+          (i) =>
+            companyList.find((c) => c.id === formikCompany?.id && c.id === i.company?.id) &&
+            db.find((b) => b.device.id === i.id),
+        )
+        .map((d) => ({ id: d.id, name: d.name }))
+    : [];
+
+  const foldersForMoving = folders.length ? folders[0].folderList : [];
+
+  const foldersList = foldersForMoving.map((i) => ({ id: i, name: i }));
+
+  const listOptions: IListOption = {
+    companyId: companyList,
+    appSystemId: appSystemList,
+    producerId: userOASList,
+    consumerId: userOASList,
+    deviceId: deviceList,
+    folder: foldersList,
+  };
+
+  useEffect(() => {
+    if (pageParams?.filesFilters?.companyId && pageParams?.filesFilters?.appSystemId) {
+      // const companyId = companies.find((i) => i.id === pageParams?.filesFilters?.companyId)?.id;
+      // const appSystemId = appSystems.find((i) => i.id === pageParams?.filesFilters?.appSystemId)?.id;
+
+      // if (companyId && appSystemId) {
+      dispatch(fileActions.fetchFolders(pageParams?.filesFilters?.companyId, pageParams?.filesFilters?.appSystemId));
+      // }
+    }
+  }, [appSystems, companies, dispatch, pageParams?.filesFilters?.appSystemId, pageParams?.filesFilters?.companyId]);
 
   const [pageParamLocal, setPageParamLocal] = useState<IFilePageParam | undefined>(pageParams);
 
@@ -56,14 +150,14 @@ const FileList = () => {
     // fetchDevices('');
   };
 
-  useEffect(() => {
-    if (pageParams?.filesFilters) {
-      fetchFiles(pageParams?.filesFilters);
-    }
-  }, [fetchFiles, pageParams?.filesFilters]);
+  // useEffect(() => {
+  //   if (pageParams?.filesFilters) {
+  //     fetchFiles(pageParams?.filesFilters);
+  //   }
+  // }, [fetchFiles, pageParams?.filesFilters]);
 
   const handleSearchClick = () => {
-    dispatch(actions.fileSystemActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
+    dispatch(fileActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
     fetchFiles(pageParamLocal?.filesFilters ? pageParamLocal?.filesFilters : undefined, pageParamLocal?.filterText);
   };
 
@@ -73,11 +167,7 @@ const FileList = () => {
     handleSearchClick();
   };
 
-  const handleClearError = () => {
-    dispatch(actions.fileSystemActions.clearError());
-  };
-
-  const [selectedFileIds, setSelectedFileIds] = useState<IFileSystem[]>([]);
+  const [selectedFileIds, setSelectedFileIds] = useState<ISystemFile[]>([]);
 
   const handleSelectAll = (event: any) => {
     let newSelectedFileIds;
@@ -91,10 +181,10 @@ const FileList = () => {
     setSelectedFileIds(newSelectedFileIds);
   };
 
-  const handleSelectOne = (_event: any, file: IFileSystem) => {
-    const selectedIndex = selectedFileIds.map((item: IFileSystem) => item.id).indexOf(file.id);
+  const handleSelectOne = (_event: any, file: ISystemFile) => {
+    const selectedIndex = selectedFileIds.map((item: ISystemFile) => item.id).indexOf(file.id);
 
-    let newSelectedFileIds: IFileSystem[] = [];
+    let newSelectedFileIds: ISystemFile[] = [];
 
     if (selectedIndex === -1) {
       newSelectedFileIds = newSelectedFileIds.concat(selectedFileIds, file);
@@ -119,7 +209,7 @@ const FileList = () => {
 
   //   if (selectedFileIds.length === 0) {
   //     if (selectedFiles.length > 0) {
-  //       const newSelectedFileIds = selectedFiles.map((file: IFileSystem) => file);
+  //       const newSelectedFileIds = selectedFiles.map((file: ISystemFile) => file);
 
   //       setSelectedFileIds(newSelectedFileIds);
   //     }
@@ -129,7 +219,7 @@ const FileList = () => {
   const handleSetPageParams = useCallback(
     (pageParams: IFilePageParam) => {
       dispatch(
-        actions.fileSystemActions.setPageParam({
+        fileActions.setPageParam({
           filesFilters: pageParams.filesFilters,
           page: pageParams.page,
           limit: pageParams.limit,
@@ -152,35 +242,40 @@ const FileList = () => {
   const handleFilter = useCallback(() => {
     if (filterVisible) {
       setFilterVisible(false);
-      dispatch(actions.fileSystemActions.setPageParam({ filesFilters: undefined, page: 0 }));
+      // dispatch(actions.fileSystemActions.setPageParam({ filesFilters: undefined, page: 0 }));
     } else {
       setFilterVisible(true);
     }
-  }, [dispatch, filterVisible]);
+  }, [filterVisible]);
 
   const handleDelete = useCallback(() => {
     setOpen(false);
-    const ids = selectedFileIds.map((i) => {
-      return i.id;
+    const ids: IFileParams[] = selectedFileIds.map((i) => {
+      return {
+        id: i.id,
+        appSystemId: i.appSystem?.id || '',
+        companyId: i.company?.id || '',
+        folder: i.folder || '',
+      };
     });
     if (ids) {
-      dispatch(actions.removeFiles(ids));
+      dispatch(fileActions.deleteFiles(ids));
       setSelectedFileIds([]);
     }
   }, [dispatch, selectedFileIds]);
 
   const handleClearSearch = () => {
-    dispatch(actions.fileSystemActions.setPageParam({ filterText: undefined }));
+    dispatch(fileActions.setPageParam({ filterText: '' }));
     setPageParamLocal({ filterText: undefined });
     fetchFiles(pageParamLocal?.filesFilters || undefined);
-    dispatch(actions.fileSystemActions.setPageParam({ page: 0 }));
+    dispatch(fileActions.setPageParam({ page: 0 }));
   };
 
   const [openFolder, setOpenFolder] = useState(false);
 
   const handleGetFolders = () => {
     if (!selectedFileIds.length) {
-      dispatch(actions.fileSystemActions.setError('Файлы не выбраны'));
+      dispatch(fileActions.setError('Файлы не выбраны'));
 
       return;
     }
@@ -189,7 +284,7 @@ const FileList = () => {
       const inaccessibleFile = selectedFileIds.find((i) => !i.appSystem?.id || !i.company?.id);
 
       if (inaccessibleFile) {
-        dispatch(actions.fileSystemActions.setError('Выбранные файлы недоступны для перемещения'));
+        dispatch(fileActions.setError('Выбранные файлы недоступны для перемещения'));
 
         return;
       }
@@ -198,7 +293,7 @@ const FileList = () => {
       );
 
       if (differentId) {
-        dispatch(actions.fileSystemActions.setError('Выбранные файлы относятся к разным подсистемам или компаниям'));
+        dispatch(fileActions.setError('Выбранные файлы относятся к разным подсистемам или компаниям'));
 
         return;
       }
@@ -222,10 +317,15 @@ const FileList = () => {
     setOpenFolder(false);
     if (selectedFolder && selectedFileIds.length) {
       const ids = selectedFileIds.map((i) => {
-        return i.id;
+        return {
+          id: i.id,
+          appSystemId: i.appSystem?.id || '',
+          companyId: i.company?.id || '',
+          folder: i.folder || '',
+        };
       });
-      dispatch(actions.moveFiles(ids, selectedFolder));
-      dispatch(actions.fetchFiles());
+      dispatch(fileActions.moveFiles(ids, selectedFolder));
+      dispatch(fileActions.fetchFiles());
       handleClearSearch();
     }
   };
@@ -245,7 +345,6 @@ const FileList = () => {
       onClick: handleFilter,
       icon: <FilterIcon />,
     },
-
     {
       name: 'Переместить',
       sx: { mx: 1 },
@@ -260,11 +359,22 @@ const FileList = () => {
     },
   ];
 
+  const headCells: IHeadCells<ISystemFile>[] = [
+    { id: 'folder', label: 'Папка', sortEnable: true, value: 'db' },
+    { id: 'id', label: 'Наименование', sortEnable: true },
+    { id: 'company', label: 'Компания', sortEnable: true, fieldName: 'name' },
+    { id: 'appSystem', label: 'Подсистема', sortEnable: false, fieldName: 'name' },
+    { id: 'producer', label: 'Пользователь', sortEnable: true, fieldName: 'name' },
+    { id: 'consumer', label: 'Получатель', sortEnable: true, fieldName: 'name' },
+    { id: 'device', label: 'Устройство', sortEnable: true, fieldName: 'name' },
+    { id: 'uid', label: 'Номер устройства', sortEnable: true },
+    { id: 'date', label: 'Дата', sortEnable: true, type: 'date' },
+    { id: 'size', label: 'Размер', sortEnable: true },
+    { id: 'path', label: 'Путь', sortEnable: true },
+  ];
+
   return (
     <>
-      <Helmet>
-        <title>Файловая система</title>
-      </Helmet>
       <Box>
         <Dialog open={open} onClose={handleClose}>
           <DialogContent>
@@ -289,12 +399,13 @@ const FileList = () => {
         onChange={(folder) => setSelectedFolder(folder)}
         onClose={handleCloseMovingDialog}
         onOk={handleMoveFiles}
-        values={folders}
+        values={foldersForMoving}
       />
       <Box
         sx={{
           backgroundColor: 'background.default',
           minHeight: '100%',
+          maxWidth: filterVisible ? maxWidth : '100%',
           py: 3,
         }}
       >
@@ -302,18 +413,20 @@ const FileList = () => {
           <ToolbarActionsWithSearch
             buttons={buttons}
             searchTitle={'Найти файл'}
-            //valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
             value={(pageParamLocal?.filterText as undefined) || ''}
             clearOnClick={handleClearSearch}
+            disabled={loading}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
               <FileListTable
+                type="Files"
+                headCells={headCells}
                 files={sortedList}
                 isFilterVisible={filterVisible}
                 onSubmit={fetchFiles}
@@ -323,6 +436,11 @@ const FileList = () => {
                 selectedFileIds={selectedFileIds}
                 onSetPageParams={handleSetPageParams}
                 pageParams={pageParams}
+                onCloseFilters={() => setFilterVisible(false)}
+                setCompany={(value: INamedEntity) => setFormikCompany(value)}
+                setAppSystem={(value: INamedEntity) => setFormikAppSystem(value)}
+                setProducer={(value: INamedEntity) => setFormikProducer(value)}
+                listOptions={listOptions}
               />
             </Box>
             // <Box sx={{ pt: 2 }}>
@@ -336,7 +454,6 @@ const FileList = () => {
           )}
         </Container>
       </Box>
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

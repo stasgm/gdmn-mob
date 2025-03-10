@@ -14,7 +14,7 @@ export const MovementNavigator = (props: any) => {
   const titleDoc = params?.titleDoc as string;
 
   return (
-    <Stack.Navigator initialRouteName="MovementList" screenOptions={{ headerShown: true, title: titleDoc }}>
+    <Stack.Navigator initialRouteName="MovementList" screenOptions={{ headerShown: true, title: titleDoc || '' }}>
       {Object.entries({ ...movementListScreens, ...movementScreens }).map(([nameScreen, component]) => (
         <Stack.Screen
           name={nameScreen as keyof MovementStackParamList}

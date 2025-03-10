@@ -1,7 +1,8 @@
 import { IListItem } from '@lib/mobile-types';
 import { mainSettingGroup } from '@lib/store';
 import { Settings, StatusType } from '@lib/types';
-import { BarCodeScanner } from 'expo-barcode-scanner';
+
+import { BarcodeType } from 'expo-camera';
 
 import { IGood } from '../store/app/types';
 
@@ -378,16 +379,18 @@ export const lineTypes: IListItem[] = [
   },
 ];
 
-export const barCodeTypes = [
-  BarCodeScanner.Constants.BarCodeType.qr,
-  BarCodeScanner.Constants.BarCodeType.code128,
-  BarCodeScanner.Constants.BarCodeType.ean13,
-  BarCodeScanner.Constants.BarCodeType.ean8,
-];
+// export const barCodeTypes = [
+//   BarCodeScanner.Constants.BarCodeType.qr,
+//   BarCodeScanner.Constants.BarCodeType.code128,
+//   BarCodeScanner.Constants.BarCodeType.ean13,
+//   BarCodeScanner.Constants.BarCodeType.ean8,
+// ];
 
 export const cellColors = {
   default: '#5aa176',
   barcode: '#226182',
   free: '#d5dce3',
   textWhite: 'white',
+  tertiary: '#eb8826',
 };
+export const barcodeTypes: BarcodeType[] = ['code128'];

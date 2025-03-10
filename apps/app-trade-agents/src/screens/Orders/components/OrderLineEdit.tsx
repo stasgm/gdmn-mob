@@ -88,7 +88,7 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
             </View>
           </View>
           <View style={[{ backgroundColor: colors.background }, localStyles.orderLineItem]}>
-            <OrderLine item={line} packages={packages} onSetLine={setLine} />
+            <OrderLine item={line} packages={packages} onSetLine={setLine} onSave={handleSaveLine} />
           </View>
         </View>
       </SafeAreaView>

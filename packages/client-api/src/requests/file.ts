@@ -1,9 +1,7 @@
-import { IFileIds, IFileSystem } from '@lib/types';
+import { IFileActionResult, IFileParams, IFolderList, ISystemFile } from '@lib/types';
 
-import { error, file as types } from '../types';
+import { error, file as types, BaseApi, BaseRequest } from '../types';
 import { response2Log, sleep } from '../utils';
-import { BaseApi } from '../types/BaseApi';
-import { BaseRequest } from '../types/BaseRequest';
 import { CustomRequest } from '../robustRequest';
 
 class File extends BaseRequest {
@@ -11,46 +9,16 @@ class File extends BaseRequest {
     super(api);
   }
 
-  getFile = async (customRequest: CustomRequest, fileId: string) => {
-    if (this.api.config.debug?.isMock) {
-      await sleep(this.api.config.debug?.mockDelay || 0);
-
-      return {
-        type: 'ERROR',
-        message: 'Файл не найден',
-      } as error.IServerError;
-    }
-
-    const res = await customRequest<any>({
-      api: this.api.axios,
-      method: 'GET',
-      url: `/files/${fileId}`,
-    });
-
-    if (res.type === 'SUCCESS') {
-      return {
-        type: 'GET_FILE',
-        file: res?.data,
-      } as types.IGetFileResponse;
-    }
-
-    return {
-      type: res.type,
-      message: response2Log(res) || 'Данные файла не получены',
-    } as error.IServerError;
-  };
-
   getFiles = async (customRequest: CustomRequest, params?: Record<string, string | number>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'GET_FILES',
-        // files: mockFiles,
       } as types.IGetFilesResponse;
     }
 
-    const res = await customRequest<IFileSystem[]>({
+    const res = await customRequest<ISystemFile[]>({
       api: this.api.axios,
       method: 'GET',
       url: '/files',
@@ -70,12 +38,43 @@ class File extends BaseRequest {
     } as error.IServerError;
   };
 
-  updateFile = async (customRequest: CustomRequest, id: string, file: Partial<any>) => {
+  getFile = async (customRequest: CustomRequest, id: string, params: Record<string, string | number>) => {
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
+
+      return {
+        type: 'ERROR',
+        message: 'Файл не найден',
+      } as error.IServerError;
+    }
+
     const res = await customRequest<any>({
       api: this.api.axios,
-      method: 'PATCH',
+      method: 'GET',
       url: `/files/${id}`,
-      data: file,
+      params,
+    });
+
+    if (res.type === 'SUCCESS') {
+      return {
+        type: 'GET_FILE',
+        file: res?.data,
+      } as types.IGetFileResponse;
+    }
+
+    return {
+      type: res.type,
+      message: response2Log(res) || 'Данные файла не получены',
+    } as error.IServerError;
+  };
+
+  updateFile = async (customRequest: CustomRequest, id: string, params: Record<string, string | number>, data: any) => {
+    const res = await customRequest<any>({
+      api: this.api.axios,
+      method: 'PUT',
+      url: `/files/${id}`,
+      data,
+      params,
     });
 
     if (res.type === 'SUCCESS') {
@@ -91,7 +90,7 @@ class File extends BaseRequest {
     } as error.IServerError;
   };
 
-  removeFile = async (customRequest: CustomRequest, fileId: string) => {
+  deleteFile = async (customRequest: CustomRequest, id: string, params: Record<string, string | number>) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -103,7 +102,8 @@ class File extends BaseRequest {
     const res = await customRequest<void>({
       api: this.api.axios,
       method: 'DELETE',
-      url: `/files/${fileId}`,
+      url: `/files/${id}`,
+      params,
     });
 
     if (res.type === 'SUCCESS') {
@@ -118,7 +118,7 @@ class File extends BaseRequest {
     } as error.IServerError;
   };
 
-  removeFiles = async (customRequest: CustomRequest, fileIds: string[]) => {
+  deleteFiles = async (customRequest: CustomRequest, files: IFileParams[]) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -127,18 +127,17 @@ class File extends BaseRequest {
       } as types.IRemoveFilesResponse;
     }
 
-    const body: Partial<IFileIds> = { ids: fileIds };
-
-    const res = await customRequest<void>({
+    const res = await customRequest<IFileActionResult[]>({
       api: this.api.axios,
       method: 'POST',
-      url: '/files/?action=delete',
-      data: body,
+      url: '/files/actions/deleteList',
+      data: { files },
     });
 
     if (res.type === 'SUCCESS') {
       return {
         type: 'REMOVE_FILES',
+        deletedFiles: res?.data || [],
       } as types.IRemoveFilesResponse;
     }
 
@@ -148,7 +147,7 @@ class File extends BaseRequest {
     } as error.IServerError;
   };
 
-  moveFiles = async (customRequest: CustomRequest, fileIds: string[], folderName: string) => {
+  moveFiles = async (customRequest: CustomRequest, files: IFileParams[], toFolder: string) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -157,18 +156,17 @@ class File extends BaseRequest {
       } as types.IMoveFilesResponse;
     }
 
-    const body: Partial<IFileIds> = { ids: fileIds, folderName: folderName };
-
-    const res = await customRequest<void>({
+    const res = await customRequest<IFileActionResult[]>({
       api: this.api.axios,
       method: 'POST',
-      url: '/files/?action=move',
-      data: body,
+      url: '/files/actions/moveList',
+      data: { files, toFolder },
     });
 
     if (res.type === 'SUCCESS') {
       return {
         type: 'MOVE_FILES',
+        movedFiles: res?.data || [],
       } as types.IMoveFilesResponse;
     }
 
@@ -187,7 +185,7 @@ class File extends BaseRequest {
       } as types.IGetFoldersResponse;
     }
 
-    const res = await customRequest<string[]>({
+    const res = await customRequest<IFolderList[]>({
       api: this.api.axios,
       method: 'GET',
       url: '/files/folders',

@@ -4,7 +4,7 @@ import { NewMessage } from '@lib/types';
 
 import { messageService } from '../services';
 
-import { created, ok } from '../utils/apiHelpers';
+import { created, ok } from '../utils';
 
 import { ForbiddenException, InvalidParameterException } from '../exceptions';
 

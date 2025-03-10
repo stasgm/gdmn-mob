@@ -2,7 +2,7 @@ import { Context, Next, ParameterizedContext } from 'koa';
 
 import { activationCodeService } from '../services';
 
-import { created, ok } from '../utils/apiHelpers';
+import { created, ok } from '../utils';
 
 const getActivationCodes = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
   const { deviceId } = ctx.query;

@@ -288,6 +288,10 @@ const SelectGoodScreen = () => {
     if (selectedDateBegin && _event.type !== 'dismissed') {
       setFilterDateBegin(selectedDateBegin.toISOString().slice(0, 10));
     }
+
+    if (_event.type === 'neutralButtonPressed') {
+      dispatch(appActions.setFormParams({ filterDateBegin: undefined }));
+    }
   };
   const handlePresentDateBegin = () => {
     Keyboard.dismiss();
@@ -301,6 +305,10 @@ const SelectGoodScreen = () => {
 
     if (selectedDateEnd && _event.type !== 'dismissed') {
       setFilterDateEnd(selectedDateEnd.toISOString().slice(0, 10));
+    }
+
+    if (_event.type === 'neutralButtonPressed') {
+      dispatch(appActions.setFormParams({ filterDateBegin: undefined }));
     }
   };
 
@@ -482,18 +490,16 @@ const SelectGoodScreen = () => {
       {!!orderLine && <OrderLineEdit orderLine={orderLine} onDismiss={hadndleDismiss} />}
       {filterVisible && (
         <View>
-          <View style={styles.flexDirectionRow}>
-            <Searchbar
-              placeholder="Поиск"
-              onChangeText={(text) => {
-                setSearchQuery(text);
-              }}
-              value={searchQuery}
-              style={[styles.flexGrow, styles.searchBar]}
-              autoFocus
-              selectionColor={colors.primary}
-            />
-          </View>
+          <Searchbar
+            placeholder="Поиск"
+            onChangeText={(text) => {
+              setSearchQuery(text);
+            }}
+            value={searchQuery}
+            style={styles.searchBar}
+            autoFocus
+            selectionColor={colors.primary}
+          />
           <ItemSeparator />
         </View>
       )}
@@ -571,6 +577,8 @@ const SelectGoodScreen = () => {
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateBegin}
+          maximumDate={filterDateEnd ? new Date(filterDateEnd) : undefined}
+          neutralButtonLabel="Очистить"
         />
       )}
       {showDateEnd && (
@@ -580,6 +588,8 @@ const SelectGoodScreen = () => {
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateEnd}
+          minimumDate={filterDateBegin ? new Date(filterDateBegin) : undefined}
+          neutralButtonLabel="Очистить"
         />
       )}
     </AppScreen>

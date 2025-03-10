@@ -1,9 +1,7 @@
 import { IDBDeviceBinding, IDeviceBinding, NewDeviceBinding } from '@lib/types';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
-import { extraPredicate, getListPart } from '../utils/helpers';
-
-import { deviceStates } from '../utils/constants';
+import { extraPredicate, formatDateToLocale, getListPart, deviceStates, getCountDevicesCompany } from '../utils';
 
 import { getDb } from './dao/db';
 
@@ -14,14 +12,13 @@ import { getDb } from './dao/db';
  * */
 
 const addOne = (deviceBinding: NewDeviceBinding): IDeviceBinding => {
-  const { deviceBindings, users, devices } = getDb();
+  const { deviceBindings, users, devices, companies } = getDb();
 
   const user = users.findById(deviceBinding.user.id);
 
   if (!user) {
     throw new DataNotFoundException('Пользователь не найден');
   }
-
   const device = devices.findById(deviceBinding.device.id);
 
   if (!device) {
@@ -30,6 +27,39 @@ const addOne = (deviceBinding: NewDeviceBinding): IDeviceBinding => {
 
   if (deviceBindings.data.find((i) => i.deviceId === deviceBinding.device.id && i.userId === deviceBinding.user.id)) {
     throw new ConflictException('Данное устройство уже добавлено пользователю');
+  }
+
+  if (!user?.company || !device?.companyId || user?.company !== device?.companyId) {
+    throw new ConflictException('Устройство и пользователь привязаны к разным компаниям');
+  }
+
+  if (user.company && user.erpUserId) {
+    const systems = getCountDevicesCompany(user.company);
+    const userERP = users.findById(user.erpUserId);
+    const company = companies.findById(user.company);
+    const appSystem = company?.appSystems?.find((system) => system.id === userERP?.appSystemId);
+
+    if (!appSystem) {
+      throw new DataNotFoundException('Подсистема не найдена');
+    }
+
+    const otherUsers = deviceBindings.data
+      .filter((binding) => binding.deviceId === deviceBinding.device.id)
+      .map((binding) => users.findById(users.findById(binding.userId)?.erpUserId || ''))
+      .filter((i) => !!i);
+    if (
+      otherUsers.length > 0 &&
+      otherUsers.find((otherUser) => otherUser?.company !== company?.id || appSystem.id !== otherUser?.appSystemId)
+    ) {
+      throw new ConflictException('Пользователи связанные с устройством относятся к разным подсистемам');
+    }
+
+    if (
+      !otherUsers.find((u) => u?.appSystemId === appSystem.id) &&
+      (systems.get(appSystem.id) || 0) >= appSystem.deviceCount
+    ) {
+      throw new ConflictException('В подсистеме используется максимальное количество устройств');
+    }
   }
 
   const binding = deviceBindings.insert({
@@ -76,6 +106,23 @@ const updateOne = (id: string, bindingData: Partial<IDeviceBinding>): IDeviceBin
       throw new DataNotFoundException('Устройство не найдено');
     }
     deviceId = device.id;
+  }
+
+  // Проверяем уникальность записи
+  if (bindingData.user && bindingData.device) {
+    const deviceBinding = deviceBindings.data.find((i) => i.userId === userId && i.deviceId === deviceId);
+    if (deviceBinding) {
+      throw new ConflictException('К пользователю уже привязано это устройство');
+    }
+  }
+
+  // Проверяем относятся ли пользователь и устройство к одной компании
+  if (bindingData.user && bindingData.device) {
+    const user = users.findById(bindingData.user.id);
+    const device = getDb().devices.findById(bindingData.device.id);
+    if (!user?.company || !device?.companyId || user?.company !== device?.companyId) {
+      throw new ConflictException('Устройство и пользователь привязаны к разным компаниям');
+    }
   }
 
   deviceBindings.update({
@@ -130,11 +177,14 @@ const findOne = (id: string): IDeviceBinding => {
  * @param params - параметры
  * @returns
  */
-const findMany = (params: Record<string, string>): IDeviceBinding[] => {
+const findMany = (params: Record<string, string | number>): IDeviceBinding[] => {
   const { devices, deviceBindings } = getDb();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { fromRecord, toRecord, ...newParams } = params;
+
   let deviceBindingList = deviceBindings.data.filter((item) => {
-    const newParams = { ...params };
+    const newParams = { ...params } as Record<string, string>;
 
     let userFound = true;
 
@@ -159,11 +209,10 @@ const findMany = (params: Record<string, string>): IDeviceBinding[] => {
     return userFound && deviceFound && extraPredicate(item, newParams);
   });
 
-  const newParams = { ...params };
-
   if ('companyId' in newParams || 'filterText' in newParams) {
     deviceBindingList = deviceBindingList.filter((i: IDBDeviceBinding) => {
-      const newParams = { ...params };
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { fromRecord, toRecord, ...newParams } = params;
 
       const device = devices.findById(i.deviceId);
       if (!device) {
@@ -187,9 +236,8 @@ const findMany = (params: Record<string, string>): IDeviceBinding[] => {
         if (filterText) {
           const state = deviceStates[i.state].toUpperCase();
           const deviceName = device?.name.toUpperCase();
-          const creationDate = new Date(i.creationDate || '').toLocaleString('ru', { hour12: false });
-          const editionDate = new Date(i.editionDate || '').toLocaleString('ru', { hour12: false });
-
+          const creationDate = formatDateToLocale(i.creationDate);
+          const editionDate = formatDateToLocale(i.editionDate);
           filteredCompanies =
             deviceName.includes(filterText) ||
             state.includes(filterText) ||
@@ -204,7 +252,7 @@ const findMany = (params: Record<string, string>): IDeviceBinding[] => {
     });
   }
 
-  return getListPart(deviceBindingList, params)?.map((i) => makeDeviceBinding(i));
+  return getListPart<IDBDeviceBinding>(deviceBindingList, params)?.map((i) => makeDeviceBinding(i));
 };
 
 export const makeDeviceBinding = (binding: IDBDeviceBinding): IDeviceBinding => {

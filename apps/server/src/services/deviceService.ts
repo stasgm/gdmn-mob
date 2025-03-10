@@ -2,9 +2,7 @@ import { IDBDevice, IDevice, NewDevice } from '@lib/types';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
 
-import { extraPredicate, getListPart } from '../utils/helpers';
-
-import { deviceStates } from '../utils/constants';
+import { extraPredicate, formatDateToLocale, getListPart, deviceStates, getCountDevicesCompany } from '../utils';
 
 import { getDb } from './dao/db';
 
@@ -17,10 +15,19 @@ import { devices as mockDevices } from './data/devices';
  * */
 
 const addOne = (deviceData: NewDevice): IDevice => {
-  const { devices } = getDb();
+  const { devices, companies } = getDb();
 
   if (devices.data.find((i) => i.name === deviceData.name && i.companyId === deviceData.company?.id)) {
-    throw new ConflictException(`Устройство с наименование ${deviceData.name} уже сущеcтвует`);
+    throw new ConflictException(`Устройство с наименованием ${deviceData.name} уже сущеcтвует`);
+  }
+
+  const appSystems = companies.data.find((system) => system.id === deviceData.company?.id)?.appSystems;
+
+  const systems = getCountDevicesCompany(deviceData.company?.id);
+  const devicesCount = appSystems?.filter((a) => a.deviceCount > (systems.get(a.id) || 0)).map((i) => i.id);
+
+  if (!devicesCount || devicesCount.length === 0) {
+    throw new ConflictException('Во всех подсистемах компании нет свободных мест для нового устройства');
   }
 
   const device = devices.insert({
@@ -42,7 +49,19 @@ const addOne = (deviceData: NewDevice): IDevice => {
  * @return обновленное устройство
  * */
 const updateOne = (id: string, deviceData: Partial<IDevice>, params?: Record<string, string>): IDevice => {
-  const { companies, devices, users } = getDb();
+  const { companies, devices, users, deviceBindings } = getDb();
+
+  if (params) {
+    if ('adminId' in params) {
+      const admin = users.findById(params.adminId);
+      if (admin?.role !== 'SuperAdmin') {
+        const company = companies.data.find((c) => c.id === companyId && c.adminId === params.adminId);
+        if (!company) {
+          throw new DataNotFoundException('Устройство не может быть отредактировано');
+        }
+      }
+    }
+  }
 
   const oldDevice = devices.findById(id);
 
@@ -60,16 +79,11 @@ const updateOne = (id: string, deviceData: Partial<IDevice>, params?: Record<str
     companyId = company.id;
   }
 
-  if (params) {
-    if ('adminId' in params) {
-      const admin = users.findById(params.adminId);
-      if (admin?.role !== 'SuperAdmin') {
-        const company = companies.data.find((c) => c.id === companyId && c.adminId === params.adminId);
-        if (!company) {
-          throw new DataNotFoundException('Устройство не может быть отредактировано');
-        }
-      }
-    }
+  if (
+    oldDevice.companyId !== deviceData.company?.id &&
+    deviceBindings.data.find((binding) => binding.deviceId === id)
+  ) {
+    throw new ConflictException('Нельзя изменить комапнию, т.к. устройство уже привязано к пользовтелю');
   }
 
   devices.update({
@@ -98,7 +112,7 @@ const updateOne = (id: string, deviceData: Partial<IDevice>, params?: Record<str
 const deleteOne = (id: string) => {
   const { devices, codes, deviceBindings } = getDb();
 
-  if (!devices.data.find((device) => device.id === id)) {
+  if (!devices.findById(id)) {
     throw new DataNotFoundException('Устройство не найдено');
   }
 
@@ -128,7 +142,7 @@ const findOne = (id: string): IDevice => {
  * @returns объект устройства
  */
 const findOneByUid = (uid: string) => {
-  const device = getDb().devices.data.find((i) => i.uid === uid);
+  const device = getDb().devices.findByField('uid', uid);
 
   if (!device) return;
 
@@ -151,7 +165,7 @@ const findMany = (params: Record<string, string | number>): IDevice[] => {
   }
 
   deviceList = deviceList.filter((item: IDBDevice) => {
-    const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
+    const newParams = { ...params };
 
     let companyFound = true;
 
@@ -170,8 +184,8 @@ const findMany = (params: Record<string, string | number>): IDevice[] => {
         const uid = typeof item.uid === 'string' ? item.uid.toUpperCase() : '';
         const newState = deviceStates[item.state];
         const state = typeof newState === 'string' ? newState.toUpperCase() : '';
-        const creationDate = new Date(item.creationDate || '').toLocaleString('ru', { hour12: false });
-        const editionDate = new Date(item.editionDate || '').toLocaleString('ru', { hour12: false });
+        const creationDate = formatDateToLocale(item.creationDate);
+        const editionDate = formatDateToLocale(item.editionDate);
 
         filteredDevices =
           name.includes(filterText) ||
@@ -186,7 +200,7 @@ const findMany = (params: Record<string, string | number>): IDevice[] => {
     return companyFound && filteredDevices && extraPredicate(item, newParams as Record<string, string>);
   });
 
-  return getListPart(deviceList, params)?.map((i) => makeDevice(i));
+  return getListPart<IDBDevice>(deviceList, params)?.map((i) => makeDevice(i));
 };
 
 /* TODO В звависимости от прав возвращать разный набор полей */

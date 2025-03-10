@@ -1,11 +1,16 @@
 import { INamedEntity } from '@lib/types';
 
+import { IFileFilter, IFileFilterObject, IFilterObject, ILogFileFilter, ILogFilterObject } from '../types';
+
+import { fileFilterInitialValues, fileFilterValues } from './constants';
+
 export const isNamedEntity = (obj: any): obj is INamedEntity => {
   return typeof obj === 'object' && 'name' in obj;
 };
 
-export const isDate = (date: any) => {
-  return !isNaN(new Date(date).getDate());
+export const isDate = (value: any) => {
+  const date = new Date(value);
+  return !isNaN(new Date(date).getTime());
 };
 
 export const getNumber = (value: any, defaultValue: number) =>
@@ -13,4 +18,27 @@ export const getNumber = (value: any, defaultValue: number) =>
 
 export const getCode = () => {
   return `${Math.floor(1000 + Math.random() * 9000)}`;
+};
+
+export const getFilterObject = (filesFilters: IFileFilter | ILogFileFilter) => {
+  const newFilters: IFileFilterObject | ILogFilterObject = Object.entries(filesFilters).reduce(
+    (prev, [name, value]) => {
+      prev[name] = { ...prev[name], value };
+      // prev[name] = name.indexOf('Id') === -1 ? { ...prev[name], value } : value;
+      return prev;
+    },
+    { ...fileFilterValues },
+  );
+  return newFilters;
+};
+
+export const getFilesFilters = (filesFilters: IFilterObject) => {
+  const newFilters: IFileFilter = Object.entries(filesFilters).reduce(
+    (prev, [name, value]) => {
+      prev[name] = value.value;
+      return prev;
+    },
+    { ...fileFilterInitialValues },
+  );
+  return newFilters;
 };

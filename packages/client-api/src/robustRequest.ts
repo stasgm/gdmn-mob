@@ -7,8 +7,6 @@ export type AuthLogOut = () => Promise<any>;
 
 export type CustomRequest = <T>(params: IRequestParams) => Promise<TResponse<T>>;
 
-export type CustomRequestProps = <T>(dispatch: any, actions: any) => CustomRequest;
-
 /** Валидатор проверяет полученные данные на корректность. В случае ошибки генерирует исключение. */
 type Validator = (data: Record<string, unknown>) => void;
 
@@ -62,7 +60,7 @@ export const robustRequest: RobustRequest = async ({
 
   const controller = new AbortController();
 
-  const rTimeout = setTimeout(() => {
+  const rTimeout: NodeJS.Timeout = setTimeout(() => {
     controller.abort();
   }, timeout);
 
@@ -83,6 +81,10 @@ export const robustRequest: RobustRequest = async ({
         res = await api.patch(url, data, config);
         break;
       }
+      case 'PUT': {
+        res = await api.put(url, data, config);
+        break;
+      }
       case 'DELETE': {
         res = await api.delete(url, config);
         break;
@@ -92,6 +94,7 @@ export const robustRequest: RobustRequest = async ({
           type: 'ERROR',
         };
     }
+
     clearTimeout(rTimeout);
 
     let objData = res.data;
@@ -123,11 +126,17 @@ export const robustRequest: RobustRequest = async ({
 
     if (err instanceof AxiosError) {
       if (err.response?.status) {
+        let errorMessage = '';
+        if (typeof err.response.data === 'string') {
+          errorMessage = err.response.data;
+        } else if (err.response.data && typeof err.response.data.error === 'string') {
+          errorMessage = err.response.data.error;
+        }
         return {
           result: false,
           type: 'FAILURE',
           status: err.response.status || 500,
-          error: err.response.data || '',
+          error: errorMessage || 'Ошибка axious',
         };
       } else {
         return {

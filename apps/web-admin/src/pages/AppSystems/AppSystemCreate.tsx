@@ -5,7 +5,7 @@ import { IAppSystem, NewAppSystem } from '@lib/types';
 import AppSystemDetails from '../../components/appSystem/AppSystemDetails';
 
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import actions from '../../store/appSystem';
+import { appSystemActions } from '../../store/appSystem';
 
 const AppSystemCreate = () => {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ const AppSystemCreate = () => {
   };
 
   const handleSubmit = async (values: IAppSystem | NewAppSystem) => {
-    const res = await dispatch(actions.addAppSystem(values as NewAppSystem));
+    const res = await dispatch(appSystemActions.addAppSystem(values as NewAppSystem));
     if (res.type === 'APP_SYSTEM/ADD_SUCCESS') {
       handleGoBack();
     }

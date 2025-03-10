@@ -18,6 +18,7 @@ import Process from './requests/process';
 import DeviceLog from './requests/deviceLog';
 import File from './requests/file';
 import ServerLog from './requests/serverLog';
+import ErpLog from './requests/erpLog';
 
 class Api extends BaseApi {
   protected _config: IApiConfig = {} as IApiConfig;
@@ -35,6 +36,7 @@ class Api extends BaseApi {
   public deviceLog: DeviceLog;
   public file: File;
   public serverLog: ServerLog;
+  public erpLog: ErpLog;
 
   constructor(config: IApiConfig) {
     super();
@@ -51,6 +53,7 @@ class Api extends BaseApi {
     this.deviceLog = new DeviceLog(this);
     this.file = new File(this);
     this.serverLog = new ServerLog(this);
+    this.erpLog = new ErpLog(this);
     this.setAxios(config);
   }
 

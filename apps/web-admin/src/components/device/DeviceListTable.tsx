@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { NavLink } from 'react-router-dom';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
@@ -7,21 +7,9 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 
 import Tooltip from '@mui/material/Tooltip';
 
-import {
-  Box,
-  Button,
-  Card,
-  Checkbox,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TablePagination,
-  TableRow,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Card, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@mui/material';
 
-import { IDevice, IActivationCode } from '@lib/types';
+import { IDevice, IActivationCode, IDeviceBinding } from '@lib/types';
 
 import { deviceStates, adminPath } from '../../utils/constants';
 import { IPageParam } from '../../types';
@@ -29,71 +17,35 @@ import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
 interface IProps {
   devices: IDevice[];
+  devicesWithVersion?: { deviceId: string; version: string }[];
   selectedDevices?: IDevice[];
   activationCodes: IActivationCode[];
   limitRows?: number;
-  onCreateCode?: (deviceId: string) => void;
-  onChangeSelectedDevices?: (newSelectedDeviceIds: any[]) => void;
-  onCreateUid?: (code: string, deviceId: string) => void;
+  onCreateCode: (deviceId: string) => void;
+  onCreateUid: (code: string, deviceId: string) => void;
   onSetPageParams: (pageParams: IPageParam) => void;
   pageParams?: IPageParam | undefined;
+  bindings?: IDeviceBinding[];
 }
+const rowStyle = { height: 53, cursor: 'pointer' };
 
 const DeviceListTable = ({
   devices = [],
   activationCodes = [],
-  onChangeSelectedDevices,
-  selectedDevices = [],
   limitRows = 0,
   onCreateCode,
   onCreateUid,
   onSetPageParams,
   pageParams,
+  bindings,
 }: IProps) => {
-  const [selectedDeviceIds, setSelectedDeviceIds] = useState<IDevice[]>(selectedDevices);
-
+  const navigate = useNavigate();
   const maxHeight = useWindowResizeMaxHeight();
 
   const [limit, setLimit] = useState(
     pageParams?.limit && !isNaN(Number(pageParams?.limit)) ? Number(pageParams?.limit) : 10,
   );
   const [page, setPage] = useState(pageParams?.page && !isNaN(Number(pageParams?.page)) ? Number(pageParams.page) : 0);
-
-  const handleSelectAll = (event: any) => {
-    let newSelectedDeviceIds;
-
-    if (event.target.checked) {
-      newSelectedDeviceIds = devices.map((device: any) => device);
-    } else {
-      newSelectedDeviceIds = [];
-    }
-
-    setSelectedDeviceIds(newSelectedDeviceIds);
-    onChangeSelectedDevices && onChangeSelectedDevices(newSelectedDeviceIds);
-  };
-
-  const handleSelectOne = (_event: any, device: IDevice) => {
-    const selectedIndex = selectedDeviceIds.map((item: IDevice) => item.id).indexOf(device.id);
-
-    let newSelectedDeviceIds: IDevice[] = [];
-
-    if (selectedIndex === -1) {
-      newSelectedDeviceIds = newSelectedDeviceIds.concat(selectedDeviceIds, device);
-    } else if (selectedIndex === 0) {
-      newSelectedDeviceIds = newSelectedDeviceIds.concat(selectedDeviceIds.slice(1));
-    } else if (selectedIndex === selectedDeviceIds.length - 1) {
-      newSelectedDeviceIds = newSelectedDeviceIds.concat(selectedDeviceIds.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelectedDeviceIds = newSelectedDeviceIds.concat(
-        selectedDeviceIds.slice(0, selectedIndex),
-        selectedDeviceIds.slice(selectedIndex + 1),
-      );
-    }
-
-    setSelectedDeviceIds(newSelectedDeviceIds);
-
-    onChangeSelectedDevices && onChangeSelectedDevices(newSelectedDeviceIds);
-  };
 
   const handleLimitChange = useCallback(
     (event: any) => {
@@ -115,62 +67,57 @@ const DeviceListTable = ({
     if (limitRows > 0) {
       setLimit(limitRows);
     }
+  }, [limitRows]);
 
-    if (selectedDeviceIds.length === 0) {
-      if (selectedDevices.length > 0) {
-        const newSelectedDeviceIds = selectedDevices.map((device: IDevice) => device);
-
-        setSelectedDeviceIds(newSelectedDeviceIds);
+  const handleRowClick = useCallback(
+    (e: React.MouseEvent<HTMLTableRowElement>, id: string) => {
+      if (!window.getSelection()?.toString()) {
+        if (bindings) {
+          const binding = bindings.find((b) => b.device.id === id);
+          if (binding) {
+            navigate(`${adminPath}/app/users/${binding?.user?.id}/binding/${binding.id}`);
+            return;
+          }
+        }
+        navigate(`${adminPath}/app/devices/${id}`);
       }
-    }
-  }, [limitRows, selectedDeviceIds.length, selectedDevices]);
+    },
+    [bindings, navigate],
+  );
 
-  const TableRows = () => {
+  const TableRows = useMemo(() => {
     const deviceList = devices.slice(page * limit, page * limit + limit).map((device: IDevice) => {
       const code = activationCodes.find((a) => a.device.id === device.id)?.code;
+      const version = device.appVersion;
 
       return (
-        <TableRow hover key={device.id} selected={selectedDeviceIds.findIndex((d) => d.id === device?.id) !== -1}>
-          <TableCell padding="checkbox">
-            <Checkbox
-              checked={
-                selectedDeviceIds
-                  .map((item: IDevice) => {
-                    return item.id;
-                  })
-                  .indexOf(device.id) !== -1
-              }
-              onChange={(event) => handleSelectOne(event, device)}
-              value="true"
-            />
-          </TableCell>
-          <TableCell style={{ padding: '0 16px' }}>
-            <Box
-              sx={{
-                alignItems: 'center',
-                display: 'flex',
-              }}
-            >
-              <NavLink to={`${adminPath}/app/devices/${device.id}`}>
-                <Typography color="textPrimary" variant="body1" key={device.id}>
-                  {device.name}
-                </Typography>
-              </NavLink>
-            </Box>
-          </TableCell>
-          <TableCell style={{ padding: '0 16px' }}>{device.id} </TableCell>
+        <TableRow
+          sx={rowStyle}
+          hover
+          key={device.id}
+          onClick={(e) => handleRowClick(e, device.id)}
+          style={{ cursor: 'pointer', backgroundColor: version !== device.appSystem?.appVersion ? '#ffcfd1' : 'white' }}
+        >
+          <TableCell>{device.id} </TableCell>
+          <TableCell sx={{ width: 'auto', whiteSpace: 'nowrap', userSelect: 'text' }}>{device.name}</TableCell>
           <TableCell>
             <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-              <Box>
-                {onCreateUid && (
+              <Box style={{ width: '90px' }}>{device.uid}</Box>
+              {code && (
+                <Box>
                   <Tooltip title="Создать номер">
-                    <Button onClick={() => onCreateUid && code && onCreateUid(code, device.id)}>
+                    <Button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onCreateUid(code, device.id);
+                      }}
+                    >
                       <RefreshIcon />
                     </Button>
                   </Tooltip>
-                )}
-              </Box>
-              <Box>{device.uid}</Box>
+                </Box>
+              )}
             </Box>
           </TableCell>
           <TableCell>{deviceStates[device.state]}</TableCell>
@@ -180,7 +127,13 @@ const DeviceListTable = ({
               <Box>
                 {onCreateCode && (
                   <Tooltip title="Создать код">
-                    <Button onClick={() => onCreateCode(device.id)}>
+                    <Button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onCreateCode(device.id);
+                      }}
+                    >
                       <RefreshIcon />
                     </Button>
                   </Tooltip>
@@ -188,8 +141,11 @@ const DeviceListTable = ({
               </Box>
             </Box>
           </TableCell>
+          <TableCell>
+            {`${device.appSystem?.name || ''}${device.appSystem?.appVersion ? ' ' + device.appSystem.appVersion : ''}`}
+          </TableCell>
+          <TableCell>{version}</TableCell>
           <TableCell>{device.company?.name || ''}</TableCell>
-
           <TableCell>{new Date(device.creationDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
           <TableCell>{new Date(device.editionDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
         </TableRow>
@@ -208,36 +164,28 @@ const DeviceListTable = ({
         )}
       </>
     );
-  };
+  }, [devices, page, limit, activationCodes, onCreateCode, handleRowClick, onCreateUid]);
 
   return (
-    <Card>
+    <Card sx={{ mt: 2 }}>
       <PerfectScrollbar>
         <Box sx={{ p: 1, overflowX: 'auto', overflowY: 'auto', maxHeight }}>
-          <Table>
+          <Table sx={{ '& .MuiTableCell-root': { width: 'auto', whiteSpace: 'nowrap', userSelect: 'text' } }}>
             <TableHead>
               <TableRow>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selectedDeviceIds.length === devices.length}
-                    color="primary"
-                    indeterminate={selectedDeviceIds.length > 0 && selectedDeviceIds.length < devices.length}
-                    onChange={handleSelectAll}
-                  />
-                </TableCell>
-                <TableCell>Наименование</TableCell>
-                <TableCell>ID</TableCell>
+                <TableCell>Идентификатор</TableCell>
+                <TableCell sx={{ width: 'auto', whiteSpace: 'nowrap', userSelect: 'text' }}>Наименование</TableCell>
                 <TableCell>Номер</TableCell>
                 <TableCell>Состояние</TableCell>
                 <TableCell>Код активации</TableCell>
+                <TableCell>Подсистема</TableCell>
+                <TableCell>Версия приложения</TableCell>
                 <TableCell>Компания</TableCell>
                 <TableCell>Дата создания</TableCell>
                 <TableCell>Дата редактирования</TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
-              <TableRows />
-            </TableBody>
+            <TableBody>{TableRows}</TableBody>
           </Table>
         </Box>
       </PerfectScrollbar>

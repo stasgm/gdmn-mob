@@ -107,13 +107,13 @@ export const RevisionViewScreen = () => {
     setVisibleDialog(true);
   };
 
-  const handleDismissBarcode = () => {
+  const handleDismissBarcode = useCallback(() => {
     setVisibleDialog(false);
     setBarcode('');
     setErrorMessage('');
     Keyboard.dismiss();
     handleFocus();
-  };
+  }, []);
 
   const handleEditDocHead = useCallback(() => {
     navigation.navigate('RevisionEdit', { id });
@@ -236,7 +236,10 @@ export const RevisionViewScreen = () => {
               )}
               <SendButton onPress={() => setVisibleSendDialog(true)} disabled={screenState !== 'idle' || loading} />
               <ScanButton
-                onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('RevisionGood', { docId: id }))}
+                onPress={() => {
+                  isScanerReader && navigation.navigate('RevisionGood', { docId: id });
+                  handleFocus();
+                }}
                 disabled={screenState !== 'idle'}
               />
               <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
@@ -404,7 +407,7 @@ export const RevisionViewScreen = () => {
               text: 'Добавить',
               onPress: () => {
                 dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
-                handleFocus();
+                handleDismissBarcode();
               },
             },
             { text: 'Отмена', onPress: handleFocus },
@@ -428,12 +431,11 @@ export const RevisionViewScreen = () => {
                 text: line.withGood ? 'Заменить' : 'Добавить',
                 onPress: () => {
                   setCurrentLineId(line.id);
+                  handleDismissBarcode();
                   navigation.navigate('SelectRefItem', {
                     refName: 'good',
                     fieldName: 'good',
                   });
-
-                  handleFocus();
                 },
               },
 
@@ -454,7 +456,7 @@ export const RevisionViewScreen = () => {
             text: 'Добавить',
             onPress: () => {
               dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
-              handleFocus();
+              handleDismissBarcode();
             },
           },
           {
@@ -462,13 +464,11 @@ export const RevisionViewScreen = () => {
             onPress: () => {
               dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
               setCurrentLineId(newLine.id);
-
+              handleDismissBarcode();
               navigation.navigate('SelectRefItem', {
                 refName: 'good',
                 fieldName: 'good',
               });
-
-              handleFocus();
             },
           },
           { text: 'Пересканировать', onPress: handleFocus },
@@ -487,7 +487,19 @@ export const RevisionViewScreen = () => {
       }
       handleFocus();
     },
-    [dispatch, doc, goodRemains, goods, id, isBlocked, lines, navigation, prefixGtin, visibleDialog],
+    [
+      dispatch,
+      doc,
+      goodRemains,
+      goods,
+      handleDismissBarcode,
+      id,
+      isBlocked,
+      lines,
+      navigation,
+      prefixGtin,
+      visibleDialog,
+    ],
   );
 
   const handleSearchBarcode = () => {

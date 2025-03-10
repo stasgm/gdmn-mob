@@ -1,5 +1,4 @@
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
 import {
@@ -15,7 +14,7 @@ import {
 } from '@mui/material';
 import { IUserCredentials } from '@lib/types';
 
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { authActions, useAuthThunkDispatch, useSelector } from '@lib/store';
 
@@ -81,9 +80,6 @@ const Register = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Регистрация</title>
-      </Helmet>
       <Box
         sx={{
           backgroundColor: 'background.default',

@@ -1,12 +1,11 @@
-import { Helmet } from 'react-helmet';
 import { Box, Container } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import CachedIcon from '@mui/icons-material/Cached';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
-import actions from '../../store/process';
-import companyActions from '../../store/company';
+import { processActions } from '../../store/process';
+import { companyActions } from '../../store/company';
 import { IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import ProcessListTable from '../../components/process/ProcessListTable';
@@ -18,7 +17,7 @@ const ProcessList = () => {
 
   const fetchProcesses = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(actions.fetchProcesses(filterText, fromRecord, toRecord));
+      dispatch(processActions.fetchProcesses(filterText, fromRecord, toRecord));
     },
     [dispatch],
   );
@@ -49,7 +48,7 @@ const ProcessList = () => {
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
+    dispatch(processActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
     fetchProcesses(pageParamLocal?.filterText);
   };
 
@@ -59,7 +58,7 @@ const ProcessList = () => {
   };
 
   const handleClearSearch = () => {
-    dispatch(actions.setPageParam({ filterText: undefined, page: 0 }));
+    dispatch(processActions.setPageParam({ filterText: '', page: 0 }));
     setPageParamLocal({ filterText: undefined });
     fetchProcesses();
   };
@@ -75,9 +74,6 @@ const ProcessList = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Процессы</title>
-      </Helmet>
       <Box
         sx={{
           backgroundColor: 'background.default',
@@ -94,6 +90,7 @@ const ProcessList = () => {
             keyPress={handleKeyPress}
             value={(pageParamLocal?.filterText as undefined) || ''}
             clearOnClick={handleClearSearch}
+            disabled={loading}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />

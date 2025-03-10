@@ -1,19 +1,17 @@
 import router from 'koa-joi-router';
 
 import {
-  signup,
+  checkAccessCode,
+  getCurrentUser,
+  getDeviceStatus,
   logIn,
   logout,
-  getCurrentUser,
+  signup,
   verifyCode,
-  getDeviceStatus,
-  checkAccessCode,
 } from '../controllers/auth';
 
-import { authMiddleware } from '../middleware/authRequired';
-import { deviceMiddleware } from '../middleware/deviceRequired';
+import { authMiddleware, deviceMiddleware, userCreatorMiddleware } from '../middleware';
 import { authValidation } from '../validations';
-import { adminMiddleware } from '../middleware/adminRequired';
 
 const auth = router();
 
@@ -30,7 +28,7 @@ auth.post(
   authValidation.checkAccessCode,
   authMiddleware,
   deviceMiddleware,
-  adminMiddleware,
+  userCreatorMiddleware,
   checkAccessCode,
 );
 

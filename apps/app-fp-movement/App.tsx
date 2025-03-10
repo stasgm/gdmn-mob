@@ -3,6 +3,7 @@ import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { GDMN_EMAIL, GDMN_PHONE, GDMN_SITE_ADDRESS, INavItem } from '@lib/mobile-navigation';
 import ErrorBoundary from 'react-native-error-boundary';
+import * as SplashScreen from 'expo-splash-screen';
 
 import { StatusBar } from 'expo-status-bar';
 
@@ -70,6 +71,10 @@ import {
   returnScreens,
   shipmentScreens,
 } from './src/navigation/Root/screens';
+
+SplashScreen.preventAutoHideAsync()
+  .then((result) => console.log(`SplashScreen.preventAutoHideAsync() succeeded: ${result}`))
+  .catch(console.warn);
 
 const Root = () => {
   const { isInit, data: settings } = useSelector((state) => state.settings);
@@ -361,8 +366,8 @@ const Root = () => {
 
   useEffect(() => {
     //Для отрисовки при первом подключении
-    const timer = setTimeout(() => {
-      setLoading(false);
+    const timer = setTimeout(async () => {
+      await setLoading(false);
     }, 1000);
     return () => clearTimeout(timer);
   }, []);
@@ -389,6 +394,12 @@ const Root = () => {
   }, [isDemo, getMessages, connectionStatus, handleSetInfoWindow_1, fpDispatch]);
 
   const onClearLoadingErrors = () => dispatch(fpMovementActions.setLoadingError(''));
+
+  const onLayoutRoot = useCallback(() => {
+    if (!authLoading || !loading || !fpLoading || !appDataLoading) {
+      SplashScreen.hide();
+    }
+  }, [appDataLoading, authLoading, fpLoading, loading]);
 
   return (
     <ErrorBoundary FallbackComponent={AppFallback}>
@@ -465,7 +476,7 @@ const Root = () => {
           </PrimeButton>
         </AppScreen>
       ) : authLoading || loading || fpLoading || appDataLoading ? (
-        <AppScreen>
+        <AppScreen onLayout={onLayoutRoot}>
           <ActivityIndicator size="large" color={defaultTheme.colors.primary} />
           <Caption style={styles.title}>
             {appDataLoading || fpLoading ? 'Загрузка данных...' : 'Пожалуйста, подождите..'}

@@ -3,6 +3,8 @@ import api from '@lib/client-api';
 
 import { authActions } from '@lib/store';
 
+import { IFileParams } from '@lib/types';
+
 import { AppState } from '..';
 
 import { webRequest } from '../webRequest';
@@ -30,32 +32,43 @@ const fetchDeviceLogFiles = (
     const response = await api.deviceLog.getDeviceLogFiles(webRequest(dispatch, authActions), params);
 
     if (response.type === 'GET_DEVICELOGS') {
-      return dispatch(deviceLogActions.fetchDeviceLogFilesAsync.success(response.deviceLogs));
+      return dispatch(deviceLogActions.fetchDeviceLogFilesAsync.success(response.deviceLogFiles));
     }
 
     return dispatch(deviceLogActions.fetchDeviceLogFilesAsync.failure(response.message));
   };
 };
 
-const fetchDeviceLog = (id: string): AppThunk => {
+const fetchDeviceLog = (id: string, appSystemId?: string, companyId?: string): AppThunk => {
   return async (dispatch) => {
     dispatch(deviceLogActions.fetchDeviceLogAsync.request(''));
 
-    const response = await api.deviceLog.getDeviceLog(webRequest(dispatch, authActions), id);
+    const params: Record<string, string | number> = {};
+
+    if (appSystemId) params.appSystemId = appSystemId;
+    if (companyId) params.companyId = companyId;
+
+    const response = await api.deviceLog.getDeviceLog(webRequest(dispatch, authActions), id, params);
 
     if (response.type === 'GET_DEVICELOG') {
-      return dispatch(deviceLogActions.fetchDeviceLogAsync.success(response.deviceLog));
+      return dispatch(deviceLogActions.fetchDeviceLogAsync.success(response.deviceLogData));
     }
 
     return dispatch(deviceLogActions.fetchDeviceLogAsync.failure(response.message));
   };
 };
 
-const removeDeviceLog = (id: string): AppThunk => {
+const deleteDeviceLog = (id: string, folder?: string, appSystemId?: string, companyId?: string): AppThunk => {
   return async (dispatch) => {
     dispatch(deviceLogActions.removeDeviceLogAsync.request(''));
 
-    const response = await api.deviceLog.removeDeviceLog(webRequest(dispatch, authActions), id);
+    const params: Record<string, string | number> = { id };
+
+    if (folder) params.folder = folder;
+    if (appSystemId) params.appSystemId = appSystemId;
+    if (companyId) params.companyId = companyId;
+
+    const response = await api.deviceLog.deleteDeviceLog(webRequest(dispatch, authActions), id, params);
 
     if (response.type === 'REMOVE_DEVICELOG') {
       return dispatch(deviceLogActions.removeDeviceLogAsync.success(id));
@@ -65,11 +78,11 @@ const removeDeviceLog = (id: string): AppThunk => {
   };
 };
 
-const removeDeviceLogs = (deviceLogIds: string[]): AppThunk => {
+const deleteDeviceLogs = (deviceLogIds: IFileParams[]): AppThunk => {
   return async (dispatch) => {
     dispatch(deviceLogActions.removeDeviceLogsAsync.request(''));
 
-    const response = await api.deviceLog.removeDeviceLogs(webRequest(dispatch, authActions), deviceLogIds);
+    const response = await api.deviceLog.deleteDeviceLogs(webRequest(dispatch, authActions), deviceLogIds);
 
     if (response.type === 'REMOVE_DEVICELOGS') {
       return dispatch(deviceLogActions.removeDeviceLogsAsync.success(deviceLogIds));
@@ -79,4 +92,4 @@ const removeDeviceLogs = (deviceLogIds: string[]): AppThunk => {
   };
 };
 
-export default { fetchDeviceLogFiles, fetchDeviceLog, removeDeviceLog, removeDeviceLogs };
+export default { fetchDeviceLogFiles, fetchDeviceLog, deleteDeviceLog, deleteDeviceLogs };

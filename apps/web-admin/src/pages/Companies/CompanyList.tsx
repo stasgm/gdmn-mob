@@ -1,7 +1,6 @@
-import { Helmet } from 'react-helmet';
 import { Box, Container } from '@mui/material';
 import { useNavigate } from 'react-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
@@ -10,47 +9,54 @@ import { ICompany } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import actions from '../../store/company';
+import { companyActions } from '../../store/company';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
 import SortableTable from '../../components/SortableTable';
-import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
+
+const headCells: IHeadCells<ICompany>[] = [
+  { id: 'id', label: 'Идентификатор', sortEnable: true },
+  { id: 'name', label: 'Наименование', sortEnable: true },
+  { id: 'admin', label: 'Администратор', sortEnable: true },
+  { id: 'creationDate', label: 'Дата создания', sortEnable: true, type: 'date' },
+  { id: 'editionDate', label: 'Дата редактирования', sortEnable: true, type: 'date' },
+];
 
 const CompanyList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch: AppDispatch = useDispatch();
-  const { list, loading, errorMessage, pageParams } = useSelector((state) => state.companies);
-  const { user: authUser } = useSelector((state) => state.auth);
-  const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
-  const maxHeight = useWindowResizeMaxHeight();
 
-  const fetchCompanies = useCallback(
-    (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(actions.fetchCompanies(filterText, fromRecord, toRecord));
-    },
-    [dispatch],
-  );
+  const { list, loading, pageParams } = useSelector((state) => state.companies);
+  const { user: authUser } = useSelector((state) => state.auth);
+  const [filterText, setFilterText] = useState(pageParams?.filterText || '');
+  const prevFilterTextRef = useRef<string | undefined | null>(null);
+
+  const fetchCompanies = useCallback(() => {
+    dispatch(companyActions.fetchCompanies(pageParams?.filterText));
+  }, [dispatch, pageParams?.filterText]);
 
   useEffect(() => {
-    // Загружаем данные при загрузке компонента.
-    fetchCompanies(pageParams?.filterText);
+    // Загружаем данные при первой загрузке компонента или при изменении фильтра
+    if (prevFilterTextRef.current !== pageParams?.filterText) {
+      prevFilterTextRef.current = pageParams?.filterText;
+      fetchCompanies();
+    }
   }, [fetchCompanies, pageParams?.filterText]);
 
+  useEffect(() => {
+    dispatch(companyActions.setPageParam({ tab: 0 }));
+  }, [dispatch]);
+
   const handleUpdateInput = (value: string) => {
-    const inputValue: string = value;
+    setFilterText(value);
+    if (value) return;
 
-    setPageParamLocal({ filterText: value });
-
-    if (inputValue) return;
-
-    fetchCompanies('');
+    dispatch(companyActions.setPageParam({ filterText: '', page: 0 }));
   };
 
   const handleSearchClick = () => {
-    dispatch(actions.companyActions.setPageParam({ filterText: pageParamLocal?.filterText, page: 0 }));
-
-    fetchCompanies(pageParamLocal?.filterText);
+    dispatch(companyActions.setPageParam({ filterText, page: 0 }));
   };
 
   const handleKeyPress = (key: string) => {
@@ -60,18 +66,13 @@ const CompanyList = () => {
   };
 
   const handleClearSearch = () => {
-    dispatch(actions.companyActions.setPageParam({ filterText: undefined, page: 0 }));
-    setPageParamLocal({ filterText: undefined });
-    fetchCompanies();
-  };
-
-  const handleClearError = () => {
-    dispatch(actions.companyActions.clearError());
+    dispatch(companyActions.setPageParam({ filterText: '', page: 0 }));
+    setFilterText('');
   };
 
   const handleAddCompany = () => {
     if (list.length && !(authUser?.role === 'SuperAdmin')) {
-      dispatch(actions.companyActions.setError('Компания уже существует'));
+      dispatch(companyActions.setError('Компания уже существует'));
     } else {
       return navigate(`${location.pathname}/new`);
     }
@@ -80,7 +81,7 @@ const CompanyList = () => {
   const handleSetPageParams = useCallback(
     (pageParams: IPageParam) => {
       dispatch(
-        actions.companyActions.setPageParam({
+        companyActions.setPageParam({
           page: pageParams.page,
           limit: pageParams.limit,
         }),
@@ -105,19 +106,8 @@ const CompanyList = () => {
     },
   ];
 
-  const headCells: IHeadCells<ICompany>[] = [
-    { id: 'name', label: 'Наименование', sortEnable: true },
-    { id: 'id', label: 'ID', sortEnable: true },
-    { id: 'admin', label: 'Администратор', sortEnable: true },
-    { id: 'creationDate', label: 'Дата создания', sortEnable: true },
-    { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },
-  ];
-
   return (
     <>
-      <Helmet>
-        <title>Компании</title>
-      </Helmet>
       <Box
         sx={{
           backgroundColor: 'background.default',
@@ -129,12 +119,12 @@ const CompanyList = () => {
           <ToolbarActionsWithSearch
             buttons={buttons}
             searchTitle={'Найти компанию'}
-            // valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
-            value={(pageParamLocal?.filterText as undefined) || ''}
+            value={filterText}
             clearOnClick={handleClearSearch}
+            disabled={loading}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
@@ -146,7 +136,7 @@ const CompanyList = () => {
                 path={'/app/companies/'}
                 onSetPageParams={handleSetPageParams}
                 pageParams={pageParams}
-                style={{ overflowY: 'auto', maxHeight }}
+                byMaxHeight={true}
               />
             </Box>
           )}

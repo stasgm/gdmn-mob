@@ -7,6 +7,7 @@ import { ServerLogActionType, serverLogActions } from './actions';
 const initialState: Readonly<IServerLogState> = {
   list: [],
   serverLog: undefined,
+  serverInfo: undefined,
   loading: false,
   errorMessage: '',
   pageParams: undefined,
@@ -47,11 +48,27 @@ const reducer: Reducer<IServerLogState, ServerLogActionType> = (state = initialS
       return {
         ...state,
         serverLog: action.payload,
-        // list: action.payload,
         loading: false,
       };
 
     case getType(serverLogActions.fetchServerLogAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
+      };
+
+    case getType(serverLogActions.fetchServerInfoAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
+
+    case getType(serverLogActions.fetchServerInfoAsync.success):
+      return {
+        ...state,
+        serverInfo: action.payload,
+        loading: false,
+      };
+
+    case getType(serverLogActions.fetchServerInfoAsync.failure):
       return {
         ...state,
         loading: false,

@@ -24,7 +24,7 @@ const ContactItem = ({ item }: IContactItem) => {
         navigation.navigate('GoodList', { id: item?.id });
       }}
     >
-      <View style={(styles.item, localStyles.line)}>
+      <View style={[styles.item, localStyles.line]}>
         <View style={styles.icon}>
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>

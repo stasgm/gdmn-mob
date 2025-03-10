@@ -5,9 +5,8 @@ import { useEffect } from 'react';
 
 import DeviceDetails from '../../components/device/DeviceDetails';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import selectors from '../../store/device/selectors';
-import actions from '../../store/device';
-import activationCodeSelectors from '../../store/activationCode/selectors';
+import { deviceActions, deviceSelectors } from '../../store/device';
+import { codeSelectors } from '../../store/activationCode';
 
 export type Params = {
   id: string;
@@ -18,11 +17,11 @@ const DeviceEdit = () => {
   const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch();
   const { loading } = useSelector((state) => state.devices);
-  const device = selectors.deviceById(deviceId);
-  const code = activationCodeSelectors.activationCodeByDeviceId(deviceId);
+  const device = deviceSelectors.deviceById(deviceId);
+  const code = codeSelectors.activationCodeByDeviceId(deviceId);
 
   useEffect(() => {
-    dispatch(actions.fetchDeviceById(deviceId));
+    dispatch(deviceActions.fetchDeviceById(deviceId));
   }, [dispatch, deviceId]);
 
   const goBack = () => {
@@ -30,7 +29,7 @@ const DeviceEdit = () => {
   };
 
   const handleSubmit = async (values: IDevice | NewDevice) => {
-    const res = await dispatch(actions.updateDevice(values as IDevice));
+    const res = await dispatch(deviceActions.updateDevice(values as IDevice));
     if (res.type === 'DEVICE/UPDATE_SUCCESS') {
       goBack();
     }

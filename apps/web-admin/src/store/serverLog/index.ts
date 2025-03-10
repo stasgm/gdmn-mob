@@ -1,5 +1,5 @@
 import asyncActions from './actions.async';
-import * as actions from './actions';
-import * as userSelectors from './selectors';
+import { serverLogActions as actions } from './actions';
 
-export default { ...asyncActions, ...actions, userSelectors };
+export { default as serverLogSelectors } from './selectors';
+export const serverLogActions = { ...asyncActions, ...actions };
