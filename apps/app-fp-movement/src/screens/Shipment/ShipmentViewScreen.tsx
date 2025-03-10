@@ -3,6 +3,10 @@ import { View, TouchableHighlight, TextInput, Keyboard, StyleProp, ViewStyle } f
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+import { FlashList } from '@shopify/flash-list';
+
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   MenuButton,
@@ -34,10 +38,6 @@ import {
 } from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
-
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-
-import { FlashList } from '@shopify/flash-list';
 
 import { DashboardStackParamList } from '@lib/mobile-navigation';
 

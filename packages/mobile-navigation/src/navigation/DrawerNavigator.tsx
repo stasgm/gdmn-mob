@@ -18,6 +18,8 @@ import { globalStyles as styles, AppActivityIndicator, LargeText, MediumText } f
 
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 const Drawer = createDrawerNavigator<RootDrawerParamList>();
 
 const baseNavList: INavItem[] = [
@@ -127,75 +129,77 @@ const DrawerNavigator = ({ onSyncClick, items, dashboardScreens }: IProps) => {
 
   return (
     <>
-      <Modal animationType="fade" visible={showSyncInfo} statusBarTranslucent={true}>
-        <Dialog visible={showSyncInfo} onDismiss={onDismissDialog} style={localStyles.dialog}>
-          <Dialog.Title>
-            <View style={styles.containerCenter}>
-              <LargeText
-                style={[
-                  localStyles.dialogTitle,
-                  { color: errorNotice.length && !loading ? colors.error : colors.text },
-                ]}
-              >
-                {loading
-                  ? 'Выполняются операции:'
-                  : errorNotice.length
-                    ? 'Закончено с ошибками!'
-                    : 'Выполнено успешно!'}
-              </LargeText>
-            </View>
-          </Dialog.Title>
-          <Dialog.Content style={localStyles.content}>
-            <ScrollView>
-              {errorListVisible && errorNotice.length ? (
-                errorNotice
-                  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-                  .map((note, key) => (
-                    <MediumText key={key}>
-                      {errorNotice.length - key}. {note.message}
-                      {key === 0 && loading ? '...' : ''}
-                    </MediumText>
-                  ))
-              ) : requestNotice.length ? (
-                requestNotice
-                  .sort((a, b) => new Date(b.started).getTime() - new Date(a.started).getTime())
-                  .map((note, key) => (
-                    <View key={key} style={localStyles.view}>
-                      <MediumText>
-                        {requestNotice.length - key}. {note.message}
+      <SafeAreaView>
+        <Modal animationType="fade" visible={showSyncInfo} statusBarTranslucent={true}>
+          <Dialog visible={showSyncInfo} onDismiss={onDismissDialog} style={localStyles.dialog}>
+            <Dialog.Title>
+              <View style={styles.containerCenter}>
+                <LargeText
+                  style={[
+                    localStyles.dialogTitle,
+                    { color: errorNotice.length && !loading ? colors.error : colors.text },
+                  ]}
+                >
+                  {loading
+                    ? 'Выполняются операции:'
+                    : errorNotice.length
+                      ? 'Закончено с ошибками!'
+                      : 'Выполнено успешно!'}
+                </LargeText>
+              </View>
+            </Dialog.Title>
+            <Dialog.Content style={localStyles.content}>
+              <ScrollView>
+                {errorListVisible && errorNotice.length ? (
+                  errorNotice
+                    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                    .map((note, key) => (
+                      <MediumText key={key}>
+                        {errorNotice.length - key}. {note.message}
                         {key === 0 && loading ? '...' : ''}
                       </MediumText>
-                      {key === 0 && loading && <AppActivityIndicator style={{}} />}
-                    </View>
-                  ))
-              ) : (
-                <MediumText>{`Синхронизация данных${loading ? '...' : ''}`}</MediumText>
-              )}
-            </ScrollView>
-          </Dialog.Content>
-          <Dialog.Actions style={localStyles.action}>
-            {!!errorNotice.length && !loading ? (
-              <Button onPress={() => setErrorListVisible(!errorListVisible)}>
-                {errorListVisible ? 'Просмотреть операции' : 'Проcмотреть ошибки'}
-              </Button>
-            ) : null}
-            <Button onPress={onDismissDialog}>Продолжить работу в приложении</Button>
-          </Dialog.Actions>
-        </Dialog>
-        <Snackbar
-          visible={!!errorMessage}
-          onDismiss={closeErrBar}
-          style={{ backgroundColor: colors.error }}
-          action={{
-            icon: 'close',
-            label: '',
-            onPress: closeErrBar,
-            color: 'white',
-          }}
-        >
-          <Text style={localStyles.snackText}>{errorMessage}</Text>
-        </Snackbar>
-      </Modal>
+                    ))
+                ) : requestNotice.length ? (
+                  requestNotice
+                    .sort((a, b) => new Date(b.started).getTime() - new Date(a.started).getTime())
+                    .map((note, key) => (
+                      <View key={key} style={localStyles.view}>
+                        <MediumText>
+                          {requestNotice.length - key}. {note.message}
+                          {key === 0 && loading ? '...' : ''}
+                        </MediumText>
+                        {key === 0 && loading && <AppActivityIndicator style={{}} />}
+                      </View>
+                    ))
+                ) : (
+                  <MediumText>{`Синхронизация данных${loading ? '...' : ''}`}</MediumText>
+                )}
+              </ScrollView>
+            </Dialog.Content>
+            <Dialog.Actions style={localStyles.action}>
+              {!!errorNotice.length && !loading ? (
+                <Button onPress={() => setErrorListVisible(!errorListVisible)}>
+                  {errorListVisible ? 'Просмотреть операции' : 'Проcмотреть ошибки'}
+                </Button>
+              ) : null}
+              <Button onPress={onDismissDialog}>Продолжить работу в приложении</Button>
+            </Dialog.Actions>
+          </Dialog>
+          <Snackbar
+            visible={!!errorMessage}
+            onDismiss={closeErrBar}
+            style={{ backgroundColor: colors.error }}
+            action={{
+              icon: 'close',
+              label: '',
+              onPress: closeErrBar,
+              color: 'white',
+            }}
+          >
+            <Text style={localStyles.snackText}>{errorMessage}</Text>
+          </Snackbar>
+        </Modal>
+      </SafeAreaView>
       <Drawer.Navigator
         screenOptions={{
           drawerActiveBackgroundColor: colors.primary,
