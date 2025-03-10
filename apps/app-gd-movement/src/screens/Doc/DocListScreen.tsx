@@ -170,9 +170,8 @@ export const DocListScreen = () => {
         const lower = searchQuery.toLowerCase();
 
         const fn = ({ head, documentDate, number, documentType }: IMovementDocument) =>
-          (documentType.remainsField === 'fromContact'
-            ? head.fromContact?.name?.toLowerCase().includes(lower)
-            : head.toContact?.name?.toLowerCase().includes(lower)) ||
+          head.fromContact?.name?.toLowerCase().includes(lower) ||
+          head.toContact?.name?.toLowerCase().includes(lower) ||
           documentType?.description?.toLowerCase().includes(lower) ||
           number.toLowerCase().includes(lower) ||
           getDateString(documentDate).toLowerCase().includes(lower);
@@ -410,16 +409,14 @@ export const DocListScreen = () => {
       </View>
       {filterVisible && (
         <>
-          <View style={styles.flexDirectionRow}>
-            <Searchbar
-              placeholder="Поиск"
-              onChangeText={setSearchQuery}
-              value={searchQuery}
-              style={[styles.flexGrow, styles.searchBar]}
-              autoFocus
-              selectionColor={colors.primary}
-            />
-          </View>
+          <Searchbar
+            placeholder="Поиск"
+            onChangeText={setSearchQuery}
+            value={searchQuery}
+            style={styles.searchBar}
+            autoFocus
+            selectionColor={colors.primary}
+          />
           <ItemSeparator />
         </>
       )}

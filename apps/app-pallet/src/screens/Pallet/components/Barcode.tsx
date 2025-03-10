@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { MD2Theme, useTheme } from 'react-native-paper';
 
-import Barcode from '@kichiyaki/react-native-barcode-generator';
+import Barcode, { barcodeToSvg } from '@adrianso/react-native-barcode-builder';
 import * as Print from 'expo-print';
 
 import ViewShot from 'react-native-view-shot';
@@ -18,6 +18,12 @@ interface IProps {
 export const BarcodeImage = ({ barcode, isPrint = false, printText }: IProps) => {
   const { colors } = useTheme<MD2Theme>();
 
+  const SVGBarcode = barcodeToSvg({
+    value: barcode,
+    width: 500,
+    height: 200,
+  });
+
   const html = `
   <html>
     <head>
@@ -27,7 +33,10 @@ export const BarcodeImage = ({ barcode, isPrint = false, printText }: IProps) =>
     />
     </head>
     <body style="text-align: center; margin-top: 20px">
-     ${printText}</body>
+      <h1 style="font-size: 30px; font-family: Helvetica Neue; font-weight: normal;">${printText}</h1>
+      <div>${SVGBarcode}</div>
+      <h1 style="font-size: 30px; font-family: Helvetica Neue; font-weight: normal;">${barcode}</h1>
+    </body>
   </html>
 `;
 
@@ -39,18 +48,16 @@ export const BarcodeImage = ({ barcode, isPrint = false, printText }: IProps) =>
   }, [html]);
 
   return (
-    <ViewShot style={localStyles.barcodeView}>
+    <ViewShot style={localStyles.containerBarcode}>
       {barcode ? (
-        <Barcode
-          format="EAN13"
-          value={barcode}
-          text={barcode}
-          style={localStyles.marginTop5}
-          background={colors.background}
-          lineColor="black"
-          height={40}
-          width={2}
-        />
+        <View style={localStyles.barcodeView}>
+          <Barcode
+            value={barcode}
+            style={{ ...localStyles.barcode, backgroundColor: colors.background }}
+            lineColor="black"
+          />
+          <MediumText>{barcode}</MediumText>
+        </View>
       ) : null}
       {isPrint && (
         <PrimeButton icon="printer-outline" onPress={print} outlined style={localStyles.button}>
@@ -62,13 +69,18 @@ export const BarcodeImage = ({ barcode, isPrint = false, printText }: IProps) =>
 };
 
 const localStyles = StyleSheet.create({
-  marginTop5: {
+  barcode: {
     marginTop: 5,
+    width: 140,
+    height: 70,
   },
   barcodeView: {
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
   button: {
     marginHorizontal: -1,
+  },
+  containerBarcode: {
+    alignItems: 'flex-start',
   },
 });

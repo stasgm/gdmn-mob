@@ -6,7 +6,6 @@ import * as yup from 'yup';
 
 import { useEffect } from 'react';
 
-import MultipleAutocomplete from '../MultipleAutocomplete';
 import { useDispatch, useSelector } from '../../store';
 import { appSystemActions } from '../../store/appSystem';
 import ComboBox from '../ComboBox';
@@ -19,7 +18,6 @@ interface IProps {
 }
 
 const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
-  const { list, loading: loadingAppSystems } = useSelector((state) => state.appSystems);
   const { list: users, loading: loadingUsers } = useSelector((state) => state.users);
 
   const { user: authUser } = useSelector((state) => state.auth);
@@ -86,20 +84,6 @@ const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
                     value={formik.values.city}
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
-                  <Field
-                    component={MultipleAutocomplete}
-                    name="appSystems"
-                    label="Подсистемы"
-                    type="appSystems"
-                    options={list || []}
-                    setFieldValue={formik.setFieldValue}
-                    setTouched={formik.setTouched}
-                    error={Boolean(formik.touched.appSystems && formik.errors.appSystems)}
-                    disabled={loading || loadingAppSystems}
-                  />
-                </Grid>
-
                 {isAdminRequired ? (
                   <Grid item md={6} xs={12}>
                     <Field

@@ -7,7 +7,6 @@ import {
   globalStyles as styles,
   AddButton,
   ItemSeparator,
-  Status,
   AppScreen,
   SubTitle,
   ScreenListItem,
@@ -55,7 +54,9 @@ export const MoveListScreen = () => {
 
   const [date, setDate] = useState(dateTypes[0]);
 
-  const [status, setStatus] = useState<Status>('all');
+  const [filterStatus, setFilterStatus] = useState<IListItem>(
+    statusTypes.find((i) => i.id === 'all') || statusTypes[0],
+  );
 
   const documentSubtypeList = refSelectors.selectByName<INamedEntity>('documentSubtype')?.data;
 
@@ -69,14 +70,7 @@ export const MoveListScreen = () => {
   const [type, setType] = useState(docTypes[0]);
 
   const filteredList: IListItemProps[] = useMemo(() => {
-    const res =
-      status === 'all'
-        ? list
-        : status === 'active'
-          ? list.filter((e) => e.status !== 'PROCESSED')
-          : status !== 'archive' && status !== 'all'
-            ? list.filter((e) => e.status === status)
-            : [];
+    const res = list.filter((e) => ((filterStatus.statuses as []) || []).find((i) => i === e.status));
 
     const newRes = type?.id === 'all' ? res : res?.filter((i) => i?.head.subtype.id === type?.id);
 
@@ -109,7 +103,7 @@ export const MoveListScreen = () => {
           erpCreationDate: i.erpCreationDate,
         }) as IListItemProps,
     );
-  }, [status, list, type?.id, date.id]);
+  }, [list, type?.id, filterStatus.statuses, date.id]);
 
   const sections = useMemo(
     () =>
@@ -144,7 +138,7 @@ export const MoveListScreen = () => {
 
   const handleApplyStatus = (option: any) => {
     setVisibleStatus(false);
-    setStatus(option.id);
+    setFilterStatus(option);
   };
 
   const handleApplyDate = (option: IListItem) => {
@@ -268,10 +262,10 @@ export const MoveListScreen = () => {
           onDismiss={() => setVisibleStatus(false)}
           onPress={() => setVisibleStatus(true)}
           options={statusTypes}
-          activeOptionId={status}
+          activeOptionId={filterStatus.id}
           style={[styles.btnTab]}
           menuStyle={localStyles.menu}
-          isActive={status !== 'all'}
+          isActive={filterStatus.id !== 'all'}
           iconName={'chevron-down'}
         />
         <Menu

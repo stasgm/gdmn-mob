@@ -13,14 +13,23 @@ interface IProps {
   onDismiss?: () => void;
   onApply: (newValue: string) => void;
   changeOldValue?: boolean;
+  applyValue?: () => void;
   onSave?: () => void;
 }
 
 const isDiv0 = (expression: string, number?: string) => Number(number) === 0 && expression.indexOf('/') >= 0;
 
-const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal, changeOldValue = false, onSave }: IProps) => {
+const NumberKeypad = ({
+  oldValue,
+  onDismiss,
+  onApply,
+  decDigitsForTotal,
+  changeOldValue = false,
+  applyValue,
+  onSave,
+}: IProps) => {
   const [expression, setExpression] = useState('');
-  const [number, setNumber] = useState(oldValue);
+  const [number, setNumber] = useState(oldValue || '');
   const [firstOperation, setFirstOperation] = useState(true);
 
   const calc = useCallback(
@@ -140,7 +149,7 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal, changeO
       {
         title: '=',
         onPress: () => {
-          setNumber(oldValue);
+          setNumber(oldValue || '');
           setExpression('');
           onDismiss && onDismiss();
         },
@@ -153,9 +162,12 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal, changeO
 
   useEffect(() => {
     if (changeOldValue) {
-      setNumber(oldValue);
+      setNumber(oldValue || '0');
+      setExpression('');
+      onApply(oldValue || '0');
+      applyValue && applyValue();
     }
-  }, [changeOldValue, oldValue]);
+  }, [applyValue, changeOldValue, oldValue, onApply]);
 
   const windowHeight = useWindowDimensions().height;
   const viewStyle: StyleProp<ViewStyle> = useMemo(

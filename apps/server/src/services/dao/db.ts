@@ -59,9 +59,9 @@ export const createDb = async (dir: string, name: string): Promise<DBType> => {
   const createFoldersForCompany = (company: IDBCompany) => {
     const companyFolder = path.join(dbPath, `db_${company.id}`);
     mkDir(companyFolder);
-    if (company.appSystemIds) {
-      for (const appSystemId of company.appSystemIds) {
-        const appSystemName = collections.appSystems.findById(appSystemId)?.name;
+    if (company.appSystems) {
+      for (const appSystem of company.appSystems) {
+        const appSystemName = collections.appSystems.findById(appSystem.id)?.name;
         if (appSystemName) {
           mkDir(path.join(companyFolder, appSystemName));
           messageFolders.forEach((folder) => mkDir(path.join(companyFolder, appSystemName, folder)));

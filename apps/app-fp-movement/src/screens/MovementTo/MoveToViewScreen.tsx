@@ -3,6 +3,8 @@ import { View, TextInput, Keyboard, TouchableHighlight, ViewStyle, StyleProp } f
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
+import { FlashList } from '@shopify/flash-list';
+
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   MenuButton,
@@ -34,8 +36,6 @@ import {
 
 import { IDocumentType, INamedEntity, ScreenState } from '@lib/types';
 
-import { FlashList } from '@shopify/flash-list';
-
 import { barcodeSettings, IMoveDocument, IMoveLine, IShipmentDocument } from '../../store/types';
 import { MoveToStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, lineTypes, ONE_SECOND_IN_MS } from '../../utils/constants';
@@ -49,6 +49,7 @@ import {
   getNextDocNumber,
   getRemGoodListByContact,
   getUpdatedLine,
+  TypeSound,
 } from '../../utils/helpers';
 import { IAddressStoreEntity, IBarcode, IGood, IRemains, IRemGood } from '../../store/app/types';
 
@@ -235,11 +236,11 @@ export const MoveToViewScreen = () => {
 
       if (remainsUse && goodRemains.length) {
         if (!good) {
-          alertWithSound('Ошибка!', 'Товар не найден.', handleFocus);
+          alertWithSound('Ошибка!', 'Товар не найден.', handleFocus, 'NOT_FIND_GOOD');
 
           return;
         } else if (good.remains < weight - line.weight) {
-          alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.', handleFocus);
+          alertWithSound('Внимание!', 'Вес товара превышает вес в остатках.', handleFocus, 'NOT_REMAINS_GOOD');
 
           return;
         }
@@ -256,7 +257,7 @@ export const MoveToViewScreen = () => {
 
   const handleEditQuantPack = useCallback(() => {
     if (!isNumeric(quantPack)) {
-      alertWithSound('Ошибка!', 'Неправильное количество.', handleFocus);
+      alertWithSound('Ошибка!', 'Неправильное количество.', handleFocus, 'INCORRECT_QUANTITY');
       return;
     }
     setScanned(false);
@@ -305,6 +306,8 @@ export const MoveToViewScreen = () => {
       documentDate: newDocDate,
       creationDate: newDocDate,
       editionDate: newDocDate,
+      sentDate: undefined,
+      erpCreationDate: undefined,
     };
 
     docDispatch(documentActions.addDocument(newDoc));
@@ -541,11 +544,11 @@ export const MoveToViewScreen = () => {
     [doc?.head.fromDepart?.isAddressStore, doc?.head.toDepart?.isAddressStore, doc?.status, lines?.length],
   );
 
-  const handleErrorMessage = useCallback((visible: boolean, text: string) => {
+  const handleErrorMessage = useCallback((visible: boolean, text: string, typeSound?: TypeSound) => {
     if (visible) {
       setErrorMessage(text);
     } else {
-      alertWithSound('Внимание!', `${text}.`, handleFocus);
+      alertWithSound('Внимание!', `${text}.`, handleFocus, typeSound || 'ERROR');
       setScanned(false);
     }
   }, []);
@@ -561,7 +564,7 @@ export const MoveToViewScreen = () => {
       }
 
       if (!brc.match(/^-{0,1}\d+$/)) {
-        handleErrorMessage(visibleDialog, 'Штрих-код не определён. Повторите сканирование!');
+        handleErrorMessage(visibleDialog, 'Штрих-код не определён. Повторите сканирование!', 'NOT_DEFINED_BARCODE');
         return;
       }
 
@@ -569,6 +572,7 @@ export const MoveToViewScreen = () => {
         handleErrorMessage(
           visibleDialog,
           'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
+          'LENGTH_LESS_MIN',
         );
         return;
       }
@@ -577,6 +581,7 @@ export const MoveToViewScreen = () => {
         handleErrorMessage(
           visibleDialog,
           'Длина штрих-кода больше максимальной длины, указанной в настройках. Повторите сканирование!',
+          'LENGTH_MORE_MAX',
         );
         return;
       }
@@ -586,24 +591,24 @@ export const MoveToViewScreen = () => {
       const lineGood = getLineGood(barc.shcode, barc.weight, goods, goodRemains, remainsUse);
 
       if (!lineGood.good) {
-        handleErrorMessage(visibleDialog, 'Товар не найден!');
+        handleErrorMessage(visibleDialog, 'Товар не найден!', 'NOT_FIND_GOOD');
         return;
       }
 
       // if (barc.weight < goodBarcodeSettings?.boxWeight) {
-      //   handleErrorMessage(visibleDialog, 'Отсканированный товар не является поддоном!');
+      //   handleErrorMessage(visibleDialog, 'Отсканированный товар не является поддоном!', 'GOOD_DOSNT_PALLET');
       //   return;
       // }
 
       if (!lineGood.isRightWeight) {
-        handleErrorMessage(visibleDialog, 'Вес товара превышает вес в остатках!');
+        handleErrorMessage(visibleDialog, 'Вес товара превышает вес в остатках!', 'NOT_REMAINS_GOOD');
         return;
       }
 
       const line = doc.lines?.find((i) => i.barcode === barc.barcode || i.scannedBarcode === barc.barcode);
 
       if (line) {
-        handleErrorMessage(visibleDialog, 'Данный штрих-код уже добавлен!');
+        handleErrorMessage(visibleDialog, 'Данный штрих-код уже добавлен!', 'DUBLICATE_BARCODE');
         return;
       }
 

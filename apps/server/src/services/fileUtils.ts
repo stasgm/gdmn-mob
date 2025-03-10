@@ -1,6 +1,7 @@
 /* eslint-disable no-await-in-loop */
 import path from 'path';
 import { readdir, unlink, stat, rename } from 'fs/promises';
+import os from 'os';
 
 import {
   ISystemFile,
@@ -9,6 +10,8 @@ import {
   INamedEntity,
   IFileActionResult,
   ISystemFileParams,
+  IDBCompany,
+  IDBUser,
 } from '@lib/types';
 
 import {
@@ -582,4 +585,90 @@ export const fileObj2FullFileName = (file: ISystemFileParams | IFileParams): str
   }
 
   return getSystemFilePath(file);
+};
+
+/**
+ * Преобразует объект файла в полное имя файла.
+   Если папка равно serverLogFolder, то возвращает путь к файлу в папке логов сервера
+   Если указаны companyId, appSystemId, folder
+   то возвращает в формате db_companyId/appSystemName/folder/fileName
+   иначе возвращает fileName
+ * @returns
+ */
+export const formatingFileCompanies = async (dir: string): Promise<void> => {
+  const filePath = path.join(dir, '/companies.json');
+  console.log('filePath: ', filePath);
+  //открыть файл и получить массив компаний
+  let companies: IDBCompany[] = [];
+  try {
+    const data = await readFileByChunks(filePath, false);
+
+    // Попытка преобразования данных из JSON
+    try {
+      companies = JSON.parse(data) as IDBCompany[];
+    } catch (err) {
+      // Если не удалось преобразовать в JSON, возвращаем как текст
+      //companies = data as IDBCompany[];
+      console.log('error. dont read');
+    }
+  } catch (error) {
+    throw new InnerErrorException(`Ошибка чтения файла ${filePath} - ${error}`);
+  }
+  //проверить есть ли во всех компниях поле appSystemIds
+  //если нет, то выходим
+  if (companies.some((c) => !!c.appSystemIds)) {
+    console.log('change file');
+    //если есть, то меняем компании
+    //получить количество устройств, котрое на данный момент задействовано
+    //поиск не устройств а пользователей, которые имеют доступ к данной компании и закреплены за данной подсистемой
+    let users: IDBUser[] = [];
+    try {
+      const data = await readFileByChunks(path.join(dir, '/users.json'), false);
+
+      // Попытка преобразования данных из JSON
+      try {
+        users = JSON.parse(data) as IDBUser[];
+      } catch (err) {
+        // Если не удалось преобразовать в JSON, возвращаем как текст
+        //companies = data as IDBCompany[];
+        console.log('error. dont read');
+      }
+    } catch (error) {
+      throw new InnerErrorException(`Ошибка чтения файла ${filePath} - ${error}`);
+    }
+
+    const newData = companies.map((company) => {
+      const appSystemIds = company.appSystemIds;
+      const appSystems = appSystemIds?.map((appSystem) => ({
+        id: appSystem,
+        deviceCount: users.filter(
+          (user) => !user.erpUserId && user.company === company.id && user.appSystemId === appSystem,
+        ).length,
+      }));
+      const newCompany = {
+        id: company.id,
+        name: company.name,
+        adminId: company.adminId,
+        externalId: company.externalId,
+        city: company.city,
+        appSystems: appSystems,
+        creationDate: company.creationDate,
+        editionDate: company.editionDate,
+      };
+      return newCompany;
+    });
+    console.log('new companies: ', JSON.stringify(newData, undefined, 2));
+
+    //записать в файл новые данные
+    try {
+      console.log('write file');
+      return await writeFileByChunks(
+        filePath,
+        typeof newData === 'string' ? newData : JSON.stringify(newData, undefined, 2),
+      );
+    } catch (err) {
+      throw new InnerErrorException(`Ошибка записи файла ${filePath} - ${err}`);
+    }
+    //выход
+  }
 };

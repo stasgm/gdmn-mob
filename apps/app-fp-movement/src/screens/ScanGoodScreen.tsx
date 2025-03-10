@@ -256,8 +256,11 @@ const ScanGoodScreen = () => {
         isToAddressed
       ) {
         if (scannedObject.weight < goodBarcodeSettings?.boxWeight) {
-          alertWithSound('Внимание!', `Вес поддона не может быть меньше ${goodBarcodeSettings?.boxWeight}.`, () =>
-            setScaner({ state: 'init' }),
+          alertWithSound(
+            'Внимание!',
+            `Вес поддона не может быть меньше ${goodBarcodeSettings?.boxWeight}.`,
+            () => setScaner({ state: 'init' }),
+            'WEIGHT_PALLET_LESS_MIN',
           );
 
           return;

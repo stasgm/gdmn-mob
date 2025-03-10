@@ -351,11 +351,12 @@ export const lineTypes: IListItem[] = [
   },
 ];
 
-export const barcodeTypes: BarcodeType[] = ['code128', 'ean13', 'ean8'];
+export const barcodeTypes: BarcodeType[] = ['code128', 'qr'];
 
 export const cellColors = {
   default: '#5aa176',
   barcode: '#226182',
   free: '#d5dce3',
   textWhite: 'white',
+  tertiary: '#eb8826',
 };

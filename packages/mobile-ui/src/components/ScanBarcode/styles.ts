@@ -34,7 +34,6 @@ const styles = StyleSheet.create({
   },
   camera: {
     flex: 1,
-    flexGrow: 1,
   },
   content: {
     flex: 1,

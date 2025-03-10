@@ -8,7 +8,7 @@ const Stack = createStackNavigator<ReturnStackParamList>();
 
 export const ReturnNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="ReturnList" screenOptions={{ headerShown: true, headerBackTitleVisible: false }}>
+    <Stack.Navigator initialRouteName="ReturnList" screenOptions={{ headerShown: true, headerBackTitle: '' }}>
       {Object.entries({ ...returnListScreens, ...returnScreens }).map(([name, { title, component }]) => (
         <Stack.Screen name={name as keyof ReturnStackParamList} component={component} key={name} options={{ title }} />
       ))}

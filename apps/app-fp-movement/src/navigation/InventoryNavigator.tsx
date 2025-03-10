@@ -8,10 +8,7 @@ const Stack = createStackNavigator<InventoryStackParamList>();
 
 export const InventoryNavigator = () => {
   return (
-    <Stack.Navigator
-      initialRouteName="InventoryList"
-      screenOptions={{ headerShown: true, headerBackTitleVisible: false }}
-    >
+    <Stack.Navigator initialRouteName="InventoryList" screenOptions={{ headerShown: true, headerBackTitle: '' }}>
       {Object.entries({ ...inventoryListScreens, ...inventoryScreens }).map(([name, { title, component }]) => (
         <Stack.Screen
           name={name as keyof InventoryStackParamList}

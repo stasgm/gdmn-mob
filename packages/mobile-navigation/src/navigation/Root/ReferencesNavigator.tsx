@@ -9,7 +9,7 @@ const ReferencesNavigator = () => {
   return (
     <Stack.Navigator
       initialRouteName="ReferenceList"
-      screenOptions={{ headerShown: true, title: 'Справочники', headerBackTitleVisible: false }}
+      screenOptions={{ headerShown: true, title: 'Справочники', headerBackTitle: '' }}
     >
       <Stack.Screen name="ReferenceList" component={ReferenceListScreen} />
       <Stack.Screen name="ReferenceView" component={ReferenceViewScreen} />

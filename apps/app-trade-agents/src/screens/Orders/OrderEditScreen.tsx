@@ -356,7 +356,13 @@ const OrderEditScreen = () => {
             directionRow={true}
           />
         </View>
-        <Input label="Номер" value={docNumber} onChangeText={handleChangeNumber} disabled={isBlocked} />
+        <Input
+          label="Номер"
+          value={docNumber}
+          onChangeText={handleChangeNumber}
+          disabled={isBlocked}
+          clearInput={true}
+        />
         <SelectableInput
           label="Дата отгрузки"
           value={getDateString(docOnDate || '')}

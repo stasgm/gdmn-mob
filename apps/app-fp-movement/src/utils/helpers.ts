@@ -411,23 +411,70 @@ const getRemainsByGoodId = (remains: IRemainsData[] /*, linesQuantity: IGoodQuan
   }, {});
 };
 
-export const alertWithSound = (label: string, text: string, onClose?: () => void) => {
-  const playSound = async () => {
-    const { sound } = await Audio.Sound.createAsync(require('../../assets/error.wav'));
-    await sound.playAsync();
-  };
+const soundOk = Audio.Sound.createAsync(require('../../assets/ok.wav'));
+const soundError = Audio.Sound.createAsync(require('../../assets/error.wav'));
+const soundNotFindGood = Audio.Sound.createAsync(require('../../assets/not_find_good.wav'));
+const soundNotFindBarcode = Audio.Sound.createAsync(require('../../assets/not_find_barcode.wav'));
+const soundNotRemainsByGood = Audio.Sound.createAsync(require('../../assets/not_remains_by_good.wav'));
+const soundNotDefinedBarcode = Audio.Sound.createAsync(require('../../assets/not_defined_barcode.wav'));
+const soundDublicateBarcode = Audio.Sound.createAsync(require('../../assets/dublicate_barcode.wav'));
+const soundDublicateGood = Audio.Sound.createAsync(require('../../assets/dublicate_good.wav'));
+const soundGoodNotIncludedInGroup = Audio.Sound.createAsync(require('../../assets/good_not_included_in_group.wav'));
+const soundGoodDosntPallet = Audio.Sound.createAsync(require('../../assets/good_dosnt_pallet.wav'));
+const soundIncorrectQuantity = Audio.Sound.createAsync(require('../../assets/incorrect_quantity.wav'));
+const soundIncorrectWeight = Audio.Sound.createAsync(require('../../assets/incorrect_weight.wav'));
+const soundLengthLessMin = Audio.Sound.createAsync(require('../../assets/length_less_min.wav'));
+const soundLengthMoreMax = Audio.Sound.createAsync(require('../../assets/length_more_max.wav'));
+const soundWeightPalletLessMin = Audio.Sound.createAsync(require('../../assets/weight_pallet_less_min.wav'));
 
-  playSound();
+export type TypeSound =
+  | 'OK'
+  | 'ERROR'
+  | 'NOT_FIND_GOOD'
+  | 'NOT_FIND_BARCODE'
+  | 'NOT_REMAINS_GOOD'
+  | 'NOT_DEFINED_BARCODE'
+  | 'DUBLICATE_BARCODE'
+  | 'DUBLICATE_GOOD'
+  | 'GOOD_NOT_INCLUDED_IN_GROUP'
+  | 'GOOD_DOSNT_PALLET'
+  | 'INCORRECT_QUANTITY'
+  | 'INCORRECT_WEIGHT'
+  | 'LENGTH_LESS_MIN'
+  | 'LENGTH_MORE_MAX'
+  | 'WEIGHT_PALLET_LESS_MIN';
+
+export const playSound = async (sound: TypeSound) => {
+  sound === 'OK' && (await soundOk).sound.playAsync();
+  sound === 'ERROR' && (await soundError).sound.playAsync();
+  sound === 'NOT_FIND_GOOD' && (await soundNotFindGood).sound.playAsync();
+  sound === 'NOT_FIND_BARCODE' && (await soundNotFindBarcode).sound.playAsync();
+  sound === 'NOT_REMAINS_GOOD' && (await soundNotRemainsByGood).sound.playAsync();
+  sound === 'NOT_DEFINED_BARCODE' && (await soundNotDefinedBarcode).sound.playAsync();
+  sound === 'DUBLICATE_BARCODE' && (await soundDublicateBarcode).sound.playAsync();
+  sound === 'DUBLICATE_GOOD' && (await soundDublicateGood).sound.playAsync();
+  sound === 'GOOD_NOT_INCLUDED_IN_GROUP' && (await soundGoodNotIncludedInGroup).sound.playAsync();
+  sound === 'GOOD_DOSNT_PALLET' && (await soundGoodDosntPallet).sound.playAsync();
+  sound === 'INCORRECT_QUANTITY' && (await soundIncorrectQuantity).sound.playAsync();
+  sound === 'INCORRECT_WEIGHT' && (await soundIncorrectWeight).sound.playAsync();
+  sound === 'LENGTH_LESS_MIN' && (await soundLengthLessMin).sound.playAsync();
+  sound === 'LENGTH_MORE_MAX' && (await soundLengthMoreMax).sound.playAsync();
+  sound === 'WEIGHT_PALLET_LESS_MIN' && (await soundWeightPalletLessMin).sound.playAsync();
+};
+
+export const alertWithSound = (label: string, text: string, onClose?: () => void, soundType?: TypeSound) => {
+  soundType && playSound(soundType);
   Alert.alert(label, text, [{ text: 'OK', onPress: onClose }]);
 };
 
-export const alertWithSoundMulti = (label: string, text: string, onOk: () => void, onClose?: () => void) => {
-  const playSound = async () => {
-    const { sound } = await Audio.Sound.createAsync(require('../../assets/error.wav'));
-    await sound.playAsync();
-  };
-
-  playSound();
+export const alertWithSoundMulti = (
+  label: string,
+  text: string,
+  onOk: () => void,
+  onClose?: () => void,
+  soundType?: TypeSound,
+) => {
+  soundType && playSound(soundType);
 
   Alert.alert(`${label}`, `${text}`, [
     {

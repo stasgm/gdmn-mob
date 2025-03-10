@@ -10,10 +10,7 @@ const Stack = createStackNavigator();
 const RoutesNavigator = () => {
   return (
     <BottomSheetModalProvider>
-      <Stack.Navigator
-        initialRouteName="RouteList"
-        screenOptions={{ headerShown: true, headerBackTitleVisible: false }}
-      >
+      <Stack.Navigator initialRouteName="RouteList" screenOptions={{ headerShown: true, headerBackTitle: '' }}>
         {Object.entries({
           ...routerScreen,
           ...orderScreens,

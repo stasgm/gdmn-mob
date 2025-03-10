@@ -163,13 +163,13 @@ export const MoveEditScreen = () => {
   useEffect(() => {
     if (screenState === 'saving') {
       if (!movementType) {
-        alertWithSound('Внимание!', 'Тип документа для перемещений не найден.');
+        alertWithSound('Внимание!', 'Тип документа для перемещений не найден.', undefined, 'ERROR');
         setScreenState('idle');
         return;
       }
 
       if (!docDocumentSubtype) {
-        alertWithSound('Ошибка!', 'Не указан тип документа.');
+        alertWithSound('Ошибка!', 'Не указан тип документа.', undefined, 'ERROR');
         setScreenState('idle');
         return;
       }
@@ -178,18 +178,18 @@ export const MoveEditScreen = () => {
         (docDocumentSubtype?.id === 'internalMovement' && !docFromDepart) ||
         (docDocumentSubtype?.id === 'movement' && !docToDepart)
       ) {
-        alertWithSound('Ошибка!', 'Нет подразделения пользователя. Обратитесь к администратору.');
+        alertWithSound('Ошибка!', 'Нет подразделения пользователя. Обратитесь к администратору.', undefined, 'ERROR');
         setScreenState('idle');
         return;
       }
 
       if (docDocumentSubtype?.id === 'cellMovement' && !docFromDepart?.isAddressStore) {
-        alertWithSound('Ошибка!', 'Подразделение должно быть адресного типа.');
+        alertWithSound('Ошибка!', 'Подразделение должно быть адресного типа.', undefined, 'ERROR');
         setScreenState('idle');
         return;
       }
       if (!(docNumber && docDate && docFromDepart && docToDepart)) {
-        alertWithSound('Ошибка!', 'Не все поля заполнены.');
+        alertWithSound('Ошибка!', 'Не все поля заполнены.', undefined, 'ERROR');
         setScreenState('idle');
         return;
       }

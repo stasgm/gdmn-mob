@@ -1,18 +1,23 @@
 import { Box } from '@mui/material';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { IAppSystem } from '@lib/types';
+import { IAppSystemCompany, ICompanyWithAppSystems } from '@lib/types';
 import CachedIcon from '@mui/icons-material/Cached';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+
+import { useNavigate } from 'react-router';
 
 import SortableTable from '../SortableTable';
 import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
 import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
 import { useDispatch, useSelector } from '../../store';
 import CircularProgressWithContent from '../CircularProgressWidthContent';
-import { appSystemActions, appSystemSelectors } from '../../store/appSystem';
+import { appSystemActions } from '../../store/appSystem';
+import { companySelectors } from '../../store/company';
 
-const headCells: IHeadCells<IAppSystem>[] = [
+const headCells: IHeadCells<IAppSystemCompany>[] = [
   { id: 'id', label: 'Идентификатор', sortEnable: true },
   { id: 'name', label: 'Подсистема', sortEnable: true },
+  { id: 'deviceCount', label: 'Количество устройств', sortEnable: true },
   { id: 'description', label: 'Описание', sortEnable: true },
 ];
 
@@ -21,8 +26,9 @@ interface IProps {
 }
 
 const CompanyAppSystems = ({ companyId }: IProps) => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const appSystems = appSystemSelectors.appSystemsByCompanyId(companyId);
+  const company = companySelectors.companyById(companyId);
   const { loading, pageParams } = useSelector((state) => state.appSystems);
   const [filterText, setFilterText] = useState(pageParams?.filterText || '');
   const prevFilterTextRef = useRef<string | undefined | null>(null);
@@ -66,6 +72,14 @@ const CompanyAppSystems = ({ companyId }: IProps) => {
     setFilterText('');
   };
 
+  const handleAddAppSystem = useCallback(() => {
+    // if (list.length && !(authUser?.role === 'SuperAdmin')) {
+    //   dispatch(companyActions.setError('Компания уже существует'));
+    // } else {
+    return navigate(`${location.pathname}/appSystems/new`);
+    // }
+  }, [navigate]);
+
   const handleSetPageParams = useCallback(
     (newParams: IPageParam) => {
       dispatch(
@@ -87,9 +101,29 @@ const CompanyAppSystems = ({ companyId }: IProps) => {
         icon: <CachedIcon />,
         disablde: loading,
       },
+      {
+        name: 'Добавить',
+        color: 'primary',
+        variant: 'contained',
+        onClick: handleAddAppSystem,
+        icon: <AddCircleOutlineIcon />,
+      },
     ],
-    [fetchAppSystems, loading],
+    [fetchAppSystems, handleAddAppSystem, loading],
   );
+  if (!company) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          p: 3,
+        }}
+      >
+        Компания не найдена
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -112,11 +146,10 @@ const CompanyAppSystems = ({ companyId }: IProps) => {
         <CircularProgressWithContent content={'Идет загрузка данных...'} />
       ) : (
         <Box sx={{ pt: 2 }}>
-          <SortableTable<IAppSystem>
+          <SortableTable<ICompanyWithAppSystems>
             headCells={headCells}
-            data={appSystems}
+            data={company.appSystems || []}
             path={`/app/companies/${companyId}/appSystems/`}
-            endPath={'erpLog'}
             onSetPageParams={handleSetPageParams}
             pageParams={pageParams}
             byMaxHeight={true}

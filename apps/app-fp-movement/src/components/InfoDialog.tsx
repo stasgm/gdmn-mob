@@ -31,6 +31,10 @@ export const InfoDialog = ({ visible, onOk, title }: IProps) => {
           <MediumText style={localStyles.text}>рекомендуемая</MediumText>
         </View>
         <View style={localStyles.cell}>
+          <View style={[localStyles.buttons, { backgroundColor: cellColors.tertiary }]} />
+          <MediumText style={localStyles.text}>выбранная</MediumText>
+        </View>
+        <View style={localStyles.cell}>
           <View style={[localStyles.buttons, { backgroundColor: colors.backdrop }]} />
           <MediumText style={localStyles.text}>недоступна</MediumText>
         </View>

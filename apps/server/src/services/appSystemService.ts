@@ -123,7 +123,7 @@ const findMany = (params: Record<string, string | number>): IAppSystem[] => {
 
     if ('companyId' in newParams) {
       companyFound = !!getDb().companies.data.find(
-        (company) => company.id === newParams.companyId && company.appSystemIds?.includes(item.id),
+        (company) => company.id === newParams.companyId && company.appSystems?.find((i) => i.id === item.id),
       );
       delete newParams['companyId'];
     }
