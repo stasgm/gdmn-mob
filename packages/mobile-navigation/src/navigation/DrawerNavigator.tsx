@@ -6,7 +6,7 @@ import InformationNavigator from './Root/InformationNavigator';
 import { DrawerContent } from './drawerContent';
 import DashboardNavigator from './Root/DashboardNavigator';
 import React, { useCallback, useMemo, useState } from 'react';
-import { Modal, View, StyleSheet, ScrollView } from 'react-native';
+import { Modal, View, StyleSheet, ScrollView, StyleProp, ViewStyle } from 'react-native';
 
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
@@ -127,10 +127,39 @@ const DrawerNavigator = ({ onSyncClick, items, dashboardScreens }: IProps) => {
 
   const drawerContent = (props: any) => <DrawerContent {...props} onSync={onSync} />;
 
+  const modalStyle: StyleProp<ViewStyle> = useMemo(() => ({ maxHeight: showSyncInfo ? 'auto' : 0 }), [showSyncInfo]);
+
   return (
     <>
-      <SafeAreaView>
-        <Modal animationType="fade" visible={showSyncInfo} statusBarTranslucent={true}>
+      <Drawer.Navigator
+        screenOptions={{
+          drawerActiveBackgroundColor: colors.primary,
+          drawerActiveTintColor: '#ffffff',
+          drawerStyle: { width: 270 },
+        }}
+        drawerContent={drawerContent}
+      >
+        {navList.map((item) => {
+          const drawerIcon = (pr: any) => <Icon name={item.icon} {...pr} />;
+
+          return (
+            <Drawer.Screen
+              name={item.name}
+              key={item.name}
+              component={item.component}
+              options={{
+                headerShown: false,
+                title: item.title,
+                drawerLabelStyle: { fontSize: 16 },
+                drawerIcon,
+              }}
+            />
+          );
+        })}
+      </Drawer.Navigator>
+
+      <SafeAreaView style={modalStyle}>
+        <Modal animationType="none" visible={showSyncInfo} statusBarTranslucent={true}>
           <Dialog visible={showSyncInfo} onDismiss={onDismissDialog} style={localStyles.dialog}>
             <Dialog.Title>
               <View style={styles.containerCenter}>
@@ -200,32 +229,6 @@ const DrawerNavigator = ({ onSyncClick, items, dashboardScreens }: IProps) => {
           </Snackbar>
         </Modal>
       </SafeAreaView>
-      <Drawer.Navigator
-        screenOptions={{
-          drawerActiveBackgroundColor: colors.primary,
-          drawerActiveTintColor: '#ffffff',
-          drawerStyle: { width: 270 },
-        }}
-        drawerContent={drawerContent}
-      >
-        {navList.map((item) => {
-          const drawerIcon = (pr: any) => <Icon name={item.icon} {...pr} />;
-
-          return (
-            <Drawer.Screen
-              name={item.name}
-              key={item.name}
-              component={item.component}
-              options={{
-                headerShown: false,
-                title: item.title,
-                drawerLabelStyle: { fontSize: 16 },
-                drawerIcon,
-              }}
-            />
-          );
-        })}
-      </Drawer.Navigator>
       {loading && (
         <View style={localStyles.viewSync}>
           <Button
