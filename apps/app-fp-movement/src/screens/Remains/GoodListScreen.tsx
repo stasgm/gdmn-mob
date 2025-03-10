@@ -3,6 +3,8 @@ import { View, StyleSheet } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
 import { Searchbar } from 'react-native-paper';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import { FlashList } from '@shopify/flash-list';
+
 import {
   AppScreen,
   ItemSeparator,
@@ -19,8 +21,6 @@ import { refSelectors, useSelector } from '@lib/store';
 import { IDepartment, IReferences } from '@lib/types';
 
 import { IListItem } from '@lib/mobile-types';
-
-import { FlashList } from '@shopify/flash-list';
 
 import { RemainsStackParamList } from '../../navigation/Root/types';
 

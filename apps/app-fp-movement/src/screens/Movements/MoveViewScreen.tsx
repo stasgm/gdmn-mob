@@ -3,6 +3,7 @@ import { View, TextInput, Keyboard, TouchableHighlight, StyleProp, ViewStyle } f
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Audio } from 'expo-av';
+import { FlashList } from '@shopify/flash-list';
 
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
@@ -34,8 +35,6 @@ import {
 } from '@lib/mobile-hooks';
 
 import { IDocumentType, INamedEntity, ScreenState } from '@lib/types';
-
-import { FlashList } from '@shopify/flash-list';
 
 import { barcodeSettings, IMoveDocument, IMoveLine, IShipmentDocument } from '../../store/types';
 import { MoveStackParamList } from '../../navigation/Root/types';

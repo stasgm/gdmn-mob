@@ -4,6 +4,8 @@ import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@rea
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Audio } from 'expo-av';
 
+import { FlashList } from '@shopify/flash-list';
+
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   MenuButton,
@@ -26,8 +28,6 @@ import {
 import { generateId, getDateString, keyExtractor, useSendDocs, sleep, round, isNumeric } from '@lib/mobile-hooks';
 
 import { ScreenState } from '@lib/types';
-
-import { FlashList } from '@shopify/flash-list';
 
 import { barcodeSettings, IReturnDocument, IReturnLine } from '../../store/types';
 import { ReturnStackParamList } from '../../navigation/Root/types';

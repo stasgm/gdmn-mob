@@ -43,15 +43,7 @@ const SelectableInput = ({ value, onPress, label, placeholder, editable = false,
           style={style ? [styles.input, style] : styles.input}
           placeholderTextColor={colors.text}
           placeholder={placeholder}
-          right={
-            <TextInput.Icon
-              icon="chevron-right"
-              size={24}
-              style={styles.marginTop}
-              onPress={onPress}
-              disabled={disabled}
-            />
-          }
+          right={<TextInput.Icon icon="chevron-right" size={24} onPress={onPress} disabled={disabled} />}
           editable={editable}
           disabled={disabled}
           children={undefined}

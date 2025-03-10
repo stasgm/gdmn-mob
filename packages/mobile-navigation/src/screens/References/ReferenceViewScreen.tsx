@@ -1,6 +1,7 @@
 import { styles } from './styles';
 import ReferenceItem from './components/ReferenceItem';
 import { ReferenceStackParamList } from '../../navigation/Root/types';
+import { FlashList } from '@shopify/flash-list';
 import React, { useState, useMemo, useLayoutEffect, useEffect, useCallback } from 'react';
 import { Divider, Searchbar } from 'react-native-paper';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
@@ -10,8 +11,6 @@ import { refSelectors } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 
 import { keyExtractorByIndex } from '@lib/mobile-hooks';
-
-import { FlashList } from '@shopify/flash-list';
 
 const ReferenceViewScreen = () => {
   const navigation = useNavigation();

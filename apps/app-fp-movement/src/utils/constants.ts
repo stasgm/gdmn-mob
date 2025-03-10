@@ -351,7 +351,7 @@ export const lineTypes: IListItem[] = [
   },
 ];
 
-export const barcodeTypes: BarcodeType[] = ['code128'];
+export const barcodeTypes: BarcodeType[] = ['code128', 'qr'];
 
 export const cellColors = {
   default: '#5aa176',

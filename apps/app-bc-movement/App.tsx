@@ -3,6 +3,7 @@ import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 import ErrorBoundary from 'react-native-error-boundary';
+import * as SplashScreen from 'expo-splash-screen';
 
 import {
   appActions,
@@ -35,6 +36,10 @@ import { MovementNavigator } from './src/navigation/MovementNavigator';
 import { store, useSelector as useInvSelector, appMovementActions } from './src/store';
 import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
 import { messageBcMovement } from './src/store/mock';
+
+SplashScreen.preventAutoHideAsync()
+  .then((result) => console.log(`SplashScreen.preventAutoHideAsync() succeeded: ${result}`))
+  .catch(console.warn);
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -95,8 +100,8 @@ const Root = () => {
 
   useEffect(() => {
     //Для отрисовки при первом подключении
-    const timer = setTimeout(() => {
-      setLoading(false);
+    const timer = setTimeout(async () => {
+      await setLoading(false);
     }, 1000);
     return () => clearTimeout(timer);
   }, []);
@@ -112,10 +117,16 @@ const Root = () => {
 
   const onClearLoadingErrors = () => dispatch(appMovementActions.setLoadingError(''));
 
+  const onLayoutRoot = useCallback(() => {
+    if (!authLoading || !loading || !appDataLoading) {
+      SplashScreen.hide();
+    }
+  }, [appDataLoading, authLoading, loading]);
+
   return (
     <ErrorBoundary FallbackComponent={AppFallback}>
       {authLoading || loading || appDataLoading ? (
-        <AppScreen>
+        <AppScreen onLayout={onLayoutRoot}>
           <ActivityIndicator size="large" color={colors.primary} />
           <Caption style={styles.title}>{appDataLoading ? 'Загрузка данных...' : 'Пожалуйста, подождите..'}</Caption>
         </AppScreen>

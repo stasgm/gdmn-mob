@@ -91,14 +91,13 @@ const Input = ({
           placeholderTextColor={colors.text}
           right={
             isIcon && iconName ? (
-              <TextInput.Icon icon={iconName} size={20} style={styles.marginTop} onPress={onIconPress} />
+              <TextInput.Icon icon={iconName} size={20} onPress={onIconPress} />
             ) : (
               !!value &&
               !!clearInput && (
                 <TextInput.Icon
                   icon="close"
                   size={20}
-                  style={styles.marginTop}
                   onPress={() => onChangeText && onChangeText('')}
                   disabled={disabled}
                 />

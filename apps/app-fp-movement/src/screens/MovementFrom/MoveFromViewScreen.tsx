@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { View, TextInput, Keyboard, TouchableHighlight, StyleProp, ViewStyle } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { FlashList } from '@shopify/flash-list';
 
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
@@ -24,8 +25,6 @@ import {
 import { generateId, getDateString, keyExtractor, useSendDocs, sleep, useSendOneRefRequest } from '@lib/mobile-hooks';
 
 import { IDocumentType, INamedEntity, ScreenState } from '@lib/types';
-
-import { FlashList } from '@shopify/flash-list';
 
 import { barcodeSettings, IMoveDocument, IMoveLine, IShipmentDocument } from '../../store/types';
 import { MoveFromStackParamList } from '../../navigation/Root/types';

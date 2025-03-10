@@ -8,10 +8,7 @@ const Stack = createStackNavigator<ReceiptStackParamList>();
 
 export const ReceiptNavigator = () => {
   return (
-    <Stack.Navigator
-      initialRouteName="ReceiptList"
-      screenOptions={{ headerShown: true, headerBackTitleVisible: false }}
-    >
+    <Stack.Navigator initialRouteName="ReceiptList" screenOptions={{ headerShown: true, headerBackTitle: '' }}>
       {Object.entries({ ...receiptListScreens, ...receiptScreens }).map(([name, { title, component }]) => (
         <Stack.Screen name={name as keyof ReceiptStackParamList} component={component} key={name} options={{ title }} />
       ))}

@@ -8,10 +8,7 @@ const Stack = createStackNavigator<LaboratoryStackParamList>();
 
 export const LaboratoryNavigator = () => {
   return (
-    <Stack.Navigator
-      initialRouteName="LaboratoryList"
-      screenOptions={{ headerShown: true, headerBackTitleVisible: false }}
-    >
+    <Stack.Navigator initialRouteName="LaboratoryList" screenOptions={{ headerShown: true, headerBackTitle: '' }}>
       {Object.entries({ ...laboratoryListScreens, ...laboratoryScreens }).map(([name, { title, component }]) => (
         <Stack.Screen
           name={name as keyof LaboratoryStackParamList}
