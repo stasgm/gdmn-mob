@@ -231,7 +231,7 @@ export const DocListScreen = () => {
         ? filteredList.list
         : status === 'active'
           ? filteredList.list.filter((e) => e.status !== 'PROCESSED')
-          : status !== 'archive' && status !== 'all'
+          : status !== 'archive' && status !== 'refuse' && status !== 'all'
             ? filteredList.list.filter((e) => e.status === status)
             : [];
 

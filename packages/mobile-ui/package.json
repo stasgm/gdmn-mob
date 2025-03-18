@@ -24,7 +24,7 @@
     "@expo/webpack-config": "^19.0.1",
     "@gorhom/bottom-sheet": "^5.0.6",
     "@types/node": "^22.13.9",
-    "expo-camera": "~16.0.17",
+    "expo-camera": "~16.0.18",
     "mathjs": "^11.11.1",
     "react": "18.3.1",
     "react-native": "0.76.7",

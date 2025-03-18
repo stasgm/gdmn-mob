@@ -800,6 +800,7 @@ export const messageGdMovement: IMessage<MessageType>[] = [
             toDescription: 'Куда',
             toRequired: true,
             toType: 'department',
+            subtype: 'inventory',
           },
           editionDate: new Date().toISOString(),
           head: {
@@ -865,6 +866,7 @@ export const messageGdMovement: IMessage<MessageType>[] = [
             toDescription: 'Место',
             toRequired: true,
             toType: 'department',
+            subtype: 'inventory',
           },
           editionDate: new Date().toISOString(),
           head: {
