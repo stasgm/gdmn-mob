@@ -10,7 +10,6 @@ import {
   Checkbox,
   Divider,
   Drawer,
-  Grid2 as Grid,
   IconButton,
   InputAdornment,
   Table,
@@ -32,7 +31,11 @@ import { X as CloseIcon } from 'react-feather';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 import { DesktopDateTimePicker } from '@mui/x-date-pickers/DesktopDateTimePicker';
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+
+import Grid from '@mui/system/Grid';
+
+import dayjs from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 import { adminPath, fileFilterValues, logFilterValues } from '../../utils/constants';
 import {
@@ -475,12 +478,14 @@ function FileListTable<T extends IEntity>({
                             disabled={item === 'companyId' ? false : !formik.values['companyId'].value}
                           />
                         ) : filterValues[item].type === 'date' ? (
-                          <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale="ru">
-                            <DesktopDateTimePicker
+                          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
+                            {/* <DesktopDateTimePicker
                               label={filterValues[item].name || ''}
-                              inputFormat="DD/MM/YY hh:mm"
-                              value={formik.values[item]?.value || null}
-                              onChange={(date, kbDate) => {
+                              // inputFormat="DD/MM/YY hh:mm"
+                              // defaultValue={dayjs((formik.values[item]?.value as string) || '')}
+                              // defaultValue={formik.values[item]?.value as string || null}
+                              defaultValue={dayjs((formik.values[item]?.value as string) || '')}
+                              onChange={(date: any, kbDate: any) => {
                                 if (date === null) handleUpdateFormik(item, { id: item, name: '' });
                                 const newDate = (kbDate || '').replace(
                                   new RegExp('^(\\d{2})\\/(\\d{2})\\/(\\d{2}).$'),
@@ -498,9 +503,9 @@ function FileListTable<T extends IEntity>({
                                   actions: ['clear'],
                                 },
                               }}
-                              renderInput={(params) => <TextField {...params} fullWidth />}
+                              renderInput={(params: any) => <TextField {...params} fullWidth />}
                               disabled={!formik.values['companyId'].value}
-                            />
+                            /> */}
                           </LocalizationProvider>
                         ) : (
                           <TextField

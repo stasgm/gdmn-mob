@@ -1,5 +1,7 @@
-import { Grid2 as Grid, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import { IDevice, ISystemFile, IUser } from '@lib/types';
+
+import Grid from '@mui/system/Grid';
 
 import { IHeadCells } from '../../types';
 import SortableTable from '../SortableTable';

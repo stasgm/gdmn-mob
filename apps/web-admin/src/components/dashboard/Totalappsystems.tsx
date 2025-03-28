@@ -1,6 +1,7 @@
-import { Avatar, Card, CardContent, Grid2 as Grid, Typography } from '@mui/material';
+import { Avatar, Card, CardContent, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import WidgetsIcon from '@mui/icons-material/Widgets';
+import Grid from '@mui/system/Grid';
 
 interface IProps {
   value: number;

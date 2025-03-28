@@ -1,8 +1,10 @@
-import { CardHeader, CardContent, Typography, Card, Grid2 as Grid, Divider } from '@mui/material';
+import { CardHeader, CardContent, Typography, Card, Divider } from '@mui/material';
 
 import { IUser } from '@lib/types';
 
 import { NavLink } from 'react-router-dom';
+
+import Grid from '@mui/system/Grid';
 
 import { adminPath } from '../../utils/constants';
 

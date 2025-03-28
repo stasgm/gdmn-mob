@@ -1,6 +1,8 @@
-import { CardContent, Typography, Card, Grid2 as Grid } from '@mui/material';
+import { CardContent, Typography, Card } from '@mui/material';
 
 import { NavLink } from 'react-router-dom';
+
+import Grid from '@mui/system/Grid';
 
 import { ILinkedEntity } from '../types';
 

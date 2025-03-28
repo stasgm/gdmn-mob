@@ -1,6 +1,8 @@
-import { CardHeader, Grid2 as Grid, IconButton } from '@mui/material';
+import { CardHeader, IconButton } from '@mui/material';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
+import Grid from '@mui/system/Grid';
 
 import { IToolBarButton } from '../types';
 

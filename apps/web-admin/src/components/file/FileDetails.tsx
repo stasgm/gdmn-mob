@@ -1,4 +1,5 @@
-import { Box, Card, CardContent, Grid2 as Grid, TextField, Divider, Button } from '@mui/material';
+import { Box, Card, CardContent, TextField, Divider, Button } from '@mui/material';
+import Grid from '@mui/system/Grid';
 
 import { useCallback, useState } from 'react';
 

@@ -1,9 +1,10 @@
-import { Card, CardContent, Typography, Grid2 as Grid, useTheme } from '@mui/material';
+import { Card, CardContent, Typography, useTheme } from '@mui/material';
 import { ServerInfo } from '@lib/types';
 
 import MemoryIcon from '@mui/icons-material/Memory';
 import CpuIcon from '@mui/icons-material/Speed';
 import TimerIcon from '@mui/icons-material/AccessTime';
+import Grid from '@mui/system/Grid';
 
 const ServerInfoCard = ({ serverInfo }: { serverInfo: ServerInfo }) => {
   const { palette } = useTheme();

@@ -1,8 +1,9 @@
-import { Box, Card, CardContent, Grid2 as Grid, TextField, Divider, Button } from '@mui/material';
+import { Box, Card, CardContent, TextField, Divider, Button } from '@mui/material';
 
 import { IAppSystem, NewAppSystem } from '@lib/types';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+import Grid from '@mui/system/Grid';
 
 interface IProps {
   loading: boolean;

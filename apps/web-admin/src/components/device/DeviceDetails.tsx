@@ -1,8 +1,10 @@
-import { Box, Card, CardContent, Grid2 as Grid, TextField, Divider, Button } from '@mui/material';
+import { Box, Card, CardContent, TextField, Divider, Button } from '@mui/material';
 
 import { IDevice, INamedEntity } from '@lib/types';
 import { useFormik, FormikProvider, Field } from 'formik';
 import * as yup from 'yup';
+
+import Grid from '@mui/system/Grid';
 
 import ComboBox from '../ComboBox';
 

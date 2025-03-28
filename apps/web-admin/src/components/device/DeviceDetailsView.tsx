@@ -1,6 +1,8 @@
-import { CardHeader, CardContent, Typography, Card, Grid2 as Grid, Divider } from '@mui/material';
+import { CardHeader, CardContent, Typography, Card, Divider } from '@mui/material';
 
 import { IDevice } from '@lib/types';
+
+import Grid from '@mui/system/Grid';
 
 import { deviceStates } from '../../utils/constants';
 

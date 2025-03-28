@@ -1,4 +1,5 @@
-import { CardContent, Typography, Card, Grid2 as Grid } from '@mui/material';
+import { CardContent, Typography, Card } from '@mui/material';
+import Grid from '@mui/system/Grid';
 
 interface IProps {
   file: any;

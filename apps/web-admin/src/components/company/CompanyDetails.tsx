@@ -1,10 +1,12 @@
-import { Box, Card, CardContent, Grid2 as Grid, TextField, Divider, Button } from '@mui/material';
+import { Box, Card, CardContent, TextField, Divider, Button } from '@mui/material';
 
 import { ICompany, NewCompany } from '@lib/types';
 import { useFormik, Field, FormikProvider } from 'formik';
 import * as yup from 'yup';
 
 import { useEffect } from 'react';
+
+import Grid from '@mui/system/Grid';
 
 import { useDispatch, useSelector } from '../../store';
 import { appSystemActions } from '../../store/appSystem';

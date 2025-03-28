@@ -1,6 +1,7 @@
-import { Card, CardContent, Grid2 as Grid, Typography } from '@mui/material';
+import { Card, CardContent, Typography } from '@mui/material';
 
 import { IAppSystemCompany } from '@lib/types';
+import Grid from '@mui/system/Grid';
 
 interface IProps {
   appSystem: IAppSystemCompany;

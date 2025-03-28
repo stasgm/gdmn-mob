@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, Grid2 as Grid, TextField, Divider, Button } from '@mui/material';
+import { Box, Card, CardContent, TextField, Divider, Button } from '@mui/material';
 
 import { IDeviceBinding, INamedEntity } from '@lib/types';
 import { Field, FormikProvider, useFormik } from 'formik';
@@ -7,6 +7,8 @@ import * as yup from 'yup';
 import { useCallback, useEffect } from 'react';
 
 import { useNavigate } from 'react-router';
+
+import Grid from '@mui/system/Grid';
 
 import ComboBox from '../ComboBox';
 import { adminPath, deviceStates } from '../../utils/constants';

@@ -1,10 +1,12 @@
-import { Box, Container, Typography, Grid2 as Grid, CardContent, Card, useTheme } from '@mui/material';
+import { Box, Container, Typography, CardContent, Card, useTheme } from '@mui/material';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import WidgetsIcon from '@mui/icons-material/Widgets';
 
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
+
+import Grid from '@mui/system/Grid';
 
 import { useDispatch, useSelector } from '../store';
 

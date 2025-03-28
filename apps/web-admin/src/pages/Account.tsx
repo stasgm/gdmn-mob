@@ -1,10 +1,12 @@
-import { Box, Container, Grid2 as Grid } from '@mui/material';
+import { Box, Container } from '@mui/material';
 
 import { IUser } from '@lib/types';
 
 import { useSelector } from '@lib/store';
 
 import { useCallback, useEffect, useState } from 'react';
+
+import Grid from '@mui/system/Grid';
 
 import { userActions } from '../store/user';
 

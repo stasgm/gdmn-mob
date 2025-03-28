@@ -1,9 +1,11 @@
-import { Box, Button, Card, CardContent, CardHeader, Divider, Grid2 as Grid, TextField, Tooltip } from '@mui/material';
+import { Box, Button, Card, CardContent, CardHeader, Divider, TextField, Tooltip } from '@mui/material';
 import { IUser } from '@lib/types';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
 import RefreshIcon from '@mui/icons-material/Refresh';
+
+import Grid from '@mui/system/Grid';
 
 import { getCode } from '../../utils/helpers';
 
