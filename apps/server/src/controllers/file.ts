@@ -1,6 +1,6 @@
 import { Context, ParameterizedContext } from 'koa';
 
-import { IDeleteFilesRequest, IMoveFilesRequest, IPathParams } from '@lib/types';
+import { IDeleteFilesRequest, IMoveFilesRequest } from '@lib/types';
 
 import { fileService, fileUtils } from '../services';
 

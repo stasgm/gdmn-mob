@@ -1,4 +1,5 @@
-import { CardContent, Typography, Card, Grid } from '@mui/material';
+import { CardContent, Typography, Card, Grid2 as Grid } from '@mui/material';
+
 import { NavLink } from 'react-router-dom';
 
 import { ILinkedEntity } from '../types';
@@ -35,12 +36,12 @@ const DetailsView = ({ details }: IProps) => {
           <Grid>
             {details.map((item, index) => (
               <Grid container key={index}>
-                <Grid item md={2} xs={6}>
+                <Grid size={{ md: 2, xs: 6 }}>
                   <Typography variant="overline" gutterBottom>
                     {item.id}
                   </Typography>
                 </Grid>
-                <Grid item md={10} xs={6}>
+                <Grid size={{ md: 10, xs: 6 }}>
                   {Array.isArray(item.value) ? (
                     item.value.map((i) => (
                       <Typography variant="body2" gutterBottom key={item.id}>

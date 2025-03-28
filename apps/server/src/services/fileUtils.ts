@@ -1,7 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import path from 'path';
 import { readdir, unlink, stat, rename } from 'fs/promises';
-import os from 'os';
 
 import {
   ISystemFile,
@@ -657,11 +656,9 @@ export const formatingFileCompanies = async (dir: string): Promise<void> => {
       };
       return newCompany;
     });
-    console.log('new companies: ', JSON.stringify(newData, undefined, 2));
 
     //записать в файл новые данные
     try {
-      console.log('write file');
       return await writeFileByChunks(
         filePath,
         typeof newData === 'string' ? newData : JSON.stringify(newData, undefined, 2),

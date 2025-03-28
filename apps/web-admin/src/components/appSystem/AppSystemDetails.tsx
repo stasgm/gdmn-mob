@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@mui/material';
+import { Box, Card, CardContent, Grid2 as Grid, TextField, Divider, Button } from '@mui/material';
 
 import { IAppSystem, NewAppSystem } from '@lib/types';
 import { useFormik } from 'formik';
@@ -39,8 +39,8 @@ const AppSystemDetails = ({ appSystem, loading, onSubmit, onCancel }: IProps) =>
         <form onSubmit={formik.handleSubmit}>
           <Card sx={{ p: 1 }}>
             <CardContent>
-              <Grid container direction="column" item md={6} xs={12} spacing={3}>
-                <Grid item md={6} xs={12}>
+              <Grid container direction="column" size={{ md: 6, xs: 12 }} spacing={3}>
+                <Grid size={{ md: 6, xs: 12 }}>
                   <TextField
                     error={formik.touched.name && Boolean(formik.errors.name)}
                     fullWidth
@@ -56,7 +56,7 @@ const AppSystemDetails = ({ appSystem, loading, onSubmit, onCancel }: IProps) =>
                     value={formik.values.name}
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
+                <Grid size={{ md: 6, xs: 12 }}>
                   <TextField
                     error={formik.touched.appVersion && Boolean(formik.errors.appVersion)}
                     fullWidth
@@ -71,7 +71,7 @@ const AppSystemDetails = ({ appSystem, loading, onSubmit, onCancel }: IProps) =>
                     value={formik.values.appVersion}
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
+                <Grid size={{ md: 6, xs: 12 }}>
                   <TextField
                     error={formik.touched.description && Boolean(formik.errors.description)}
                     fullWidth

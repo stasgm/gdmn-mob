@@ -1,5 +1,5 @@
 import { IProcess } from '@lib/types';
-import { CardContent, Typography, Card, Grid } from '@mui/material';
+import { CardContent, Typography, Card, Grid2 as Grid } from '@mui/material';
 
 import { NavLink } from 'react-router-dom';
 
@@ -16,12 +16,12 @@ const ProcessDetailsView = ({ process }: IProps) => {
         <Grid>
           <Grid>
             <Grid container>
-              <Grid item md={2} xs={6}>
+              <Grid size={{ md: 2, xs: 6 }}>
                 <Typography variant="overline" gutterBottom>
                   Компания
                 </Typography>
               </Grid>
-              <Grid item md={10} xs={6}>
+              <Grid size={{ md: 10, xs: 6 }}>
                 <NavLink to={`${adminPath}/app/companies/${process.company?.id}`} key={process.company?.id}>
                   <Typography
                     variant="body2"
@@ -34,42 +34,42 @@ const ProcessDetailsView = ({ process }: IProps) => {
                   </Typography>
                 </NavLink>
               </Grid>
-              <Grid item md={2} xs={6}>
+              <Grid size={{ md: 2, xs: 6 }}>
                 <Typography variant="overline" gutterBottom>
                   Подсистема
                 </Typography>
               </Grid>
-              <Grid item md={10} xs={6}>
+              <Grid size={{ md: 10, xs: 6 }}>
                 <Typography variant="body2" gutterBottom>
                   {process.appSystem.name}
                 </Typography>
               </Grid>
-              <Grid item md={2} xs={6}>
+              <Grid size={{ md: 2, xs: 6 }}>
                 <Typography variant="overline" gutterBottom>
                   Статус
                 </Typography>
               </Grid>
-              <Grid item md={10} xs={6}>
+              <Grid size={{ md: 10, xs: 6 }}>
                 <Typography variant="body2" gutterBottom>
                   {process.status}
                 </Typography>
               </Grid>
-              <Grid item md={2} xs={6}>
+              <Grid size={{ md: 2, xs: 6 }}>
                 <Typography variant="overline" gutterBottom>
                   Дата создания
                 </Typography>
               </Grid>
-              <Grid item md={10} xs={6}>
+              <Grid size={{ md: 10, xs: 6 }}>
                 <Typography variant="body2" gutterBottom>
                   {new Date(process.dateBegin || '').toLocaleString('ru', { hour12: false })}
                 </Typography>
               </Grid>
-              <Grid item md={2} xs={6}>
+              <Grid size={{ md: 2, xs: 6 }}>
                 <Typography variant="overline" gutterBottom>
                   Дата окончания
                 </Typography>
               </Grid>
-              <Grid item md={10} xs={6}>
+              <Grid size={{ md: 10, xs: 6 }}>
                 <Typography variant="body2" gutterBottom>
                   {new Date(process.dateEnd || '').toLocaleString('ru', { hour12: false })}
                 </Typography>

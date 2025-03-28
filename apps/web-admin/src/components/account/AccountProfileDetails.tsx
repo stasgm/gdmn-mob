@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, CardHeader, Divider, Grid, TextField, Tooltip } from '@mui/material';
+import { Box, Button, Card, CardContent, CardHeader, Divider, Grid2 as Grid, TextField, Tooltip } from '@mui/material';
 import { IUser } from '@lib/types';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -39,7 +39,7 @@ const AccountProfileDetails = ({ user, loading, onSubmit }: IProps) => {
           <Card sx={{ p: 1 }}>
             <CardContent>
               <Grid container spacing={3}>
-                <Grid item md={6} xs={12}>
+                <Grid size={{ md: 6, xs: 12 }}>
                   <TextField
                     error={formik.touched.name && Boolean(formik.errors.name)}
                     fullWidth
@@ -53,7 +53,7 @@ const AccountProfileDetails = ({ user, loading, onSubmit }: IProps) => {
                     disabled={loading}
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
+                <Grid size={{ md: 6, xs: 12 }}>
                   <Grid container>
                     <Box style={{ flexGrow: 1 }}>
                       <TextField
@@ -75,7 +75,7 @@ const AccountProfileDetails = ({ user, loading, onSubmit }: IProps) => {
                     </Tooltip>
                   </Grid>
                 </Grid>
-                <Grid item md={6} xs={12}>
+                <Grid size={{ md: 6, xs: 12 }}>
                   <TextField
                     error={formik.touched.firstName && Boolean(formik.errors.firstName)}
                     fullWidth
@@ -88,7 +88,7 @@ const AccountProfileDetails = ({ user, loading, onSubmit }: IProps) => {
                     disabled={loading}
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
+                <Grid size={{ md: 6, xs: 12 }}>
                   <TextField
                     error={formik.touched.lastName && Boolean(formik.errors.lastName)}
                     fullWidth
@@ -101,7 +101,7 @@ const AccountProfileDetails = ({ user, loading, onSubmit }: IProps) => {
                     disabled={loading}
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
+                <Grid size={{ md: 6, xs: 12 }}>
                   <TextField
                     error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
                     fullWidth
@@ -114,7 +114,7 @@ const AccountProfileDetails = ({ user, loading, onSubmit }: IProps) => {
                     disabled={loading}
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
+                <Grid size={{ md: 6, xs: 12 }}>
                   <TextField
                     error={formik.touched.email && Boolean(formik.errors.email)}
                     fullWidth
@@ -127,37 +127,6 @@ const AccountProfileDetails = ({ user, loading, onSubmit }: IProps) => {
                     disabled={loading}
                   />
                 </Grid>
-
-                {/* <Grid item md={6} xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Country"
-                    name="country"
-                    onChange={handleChange}
-                    required
-                    value={values.country}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Select State"
-                    name="state"
-                    onChange={handleChange}
-                    required
-                    select
-                    SelectProps={{ native: true }}
-                    value={values.state}
-                    variant="outlined"
-                  >
-                    {states.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </TextField>
-                </Grid> */}
               </Grid>
             </CardContent>
             <Divider />

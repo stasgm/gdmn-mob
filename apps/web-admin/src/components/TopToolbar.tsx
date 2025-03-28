@@ -34,14 +34,16 @@ const TopToolbar = ({ buttons, ...rest }: props) => {
             <Box sx={{ maxWidth: 500 }}>
               <TextField
                 fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SvgIcon fontSize="small" color="action">
-                        <SearchIcon />
-                      </SvgIcon>
-                    </InputAdornment>
-                  ),
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SvgIcon fontSize="small" color="action">
+                          <SearchIcon />
+                        </SvgIcon>
+                      </InputAdornment>
+                    ),
+                  },
                 }}
                 placeholder="Search"
                 variant="outlined"

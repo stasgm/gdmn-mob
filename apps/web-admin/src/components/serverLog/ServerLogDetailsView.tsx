@@ -1,4 +1,4 @@
-import { CardContent, Typography, Card, Grid } from '@mui/material';
+import { CardContent, Typography, Card, Grid2 as Grid } from '@mui/material';
 
 import { useWindowResizeMaxHeight } from '../../utils/useWindowResizeMaxHeight';
 
@@ -14,7 +14,7 @@ const ServerLogDetailsView = ({ serverLog }: IProps) => {
       <CardContent>
         <Grid sx={{ overflowX: 'auto', overflowY: 'auto', maxHeight }}>
           <Grid container>
-            <Grid item>
+            <Grid>
               <pre>
                 <Typography variant="subtitle1" gutterBottom>
                   {serverLog}

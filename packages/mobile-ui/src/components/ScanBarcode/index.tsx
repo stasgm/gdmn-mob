@@ -150,6 +150,7 @@ const ScanBarcode = ({
             barcodeTypes,
           }}
           // autofocus={isActiveCamera ? 'on' : 'off'}
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           onBarcodeScanned={({ data, type }: { data: string; type: string }) => {
             !scanned &&
               // Временно. Тип штрих-кода на андроиде передается числом

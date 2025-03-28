@@ -2,7 +2,7 @@ import {
   Box,
   Card,
   CardContent,
-  Grid,
+  Grid2 as Grid,
   TextField,
   Divider,
   Button,
@@ -168,7 +168,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
               <Grid container spacing={3}>
                 {authUser?.role === 'SuperAdmin' && user.role !== 'User' && (
                   <>
-                    <Grid item md={isAdmin ? 12 : 6} xs={12}>
+                    <Grid size={{ md: isAdmin ? 12 : 6, xs: 12 }}>
                       <Checkbox
                         checked={isAdmin}
                         color="primary"
@@ -178,7 +178,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                       Администратор
                     </Grid>
                     {!isAdmin && (
-                      <Grid item md={6} xs={12}>
+                      <Grid size={{ md: 6, xs: 12 }}>
                         <Field
                           component={ComboBox}
                           name="company"
@@ -199,7 +199,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                   </>
                 )}
 
-                <Grid item md={isAdmin ? 12 : 6} xs={12}>
+                <Grid size={{ md: isAdmin ? 12 : 6, xs: 12 }}>
                   <TextField
                     error={formik.touched.name && Boolean(formik.errors.name)}
                     fullWidth
@@ -216,7 +216,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                 </Grid>
                 {!isAdmin && (
                   <>
-                    <Grid item md={6} xs={12}>
+                    <Grid size={{ md: 6, xs: 12 }}>
                       <TextField
                         error={
                           (formik.touched as FormikTouched<NewUser | IUser>).lastName &&
@@ -233,7 +233,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                         value={(formik.values as IUser | NewUser).lastName}
                       />
                     </Grid>
-                    <Grid item md={6} xs={12}>
+                    <Grid size={{ md: 6, xs: 12 }}>
                       <TextField
                         error={
                           (formik.touched as FormikTouched<NewUser | IUser>).firstName &&
@@ -250,7 +250,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                         value={(formik.values as IUser | NewUser).firstName}
                       />
                     </Grid>
-                    <Grid item md={6} xs={12}>
+                    <Grid size={{ md: 6, xs: 12 }}>
                       <TextField
                         error={
                           (formik.touched as FormikTouched<NewUser | IUser>).middleName &&
@@ -267,7 +267,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                         value={(formik.values as IUser | NewUser).middleName}
                       />
                     </Grid>
-                    <Grid item md={6} xs={12}>
+                    <Grid size={{ md: 6, xs: 12 }}>
                       <TextField
                         error={
                           (formik.touched as FormikTouched<NewUser | IUser>).phoneNumber &&
@@ -286,7 +286,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                     </Grid>
                   </>
                 )}
-                <Grid item md={6} xs={12}>
+                <Grid size={{ md: 6, xs: 12 }}>
                   <TextField
                     error={formik.touched.email && Boolean(formik.errors.email)}
                     fullWidth
@@ -304,7 +304,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                 {!isAdmin && (
                   <>
                     {userERP ? (
-                      <Grid item md={6} xs={12}>
+                      <Grid size={{ md: 6, xs: 12 }}>
                         <Field
                           component={ComboBox}
                           name="appSystem"
@@ -326,7 +326,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                         />
                       </Grid>
                     ) : (
-                      <Grid item md={6} xs={12}>
+                      <Grid size={{ md: 6, xs: 12 }}>
                         <Field
                           component={ComboBox}
                           name="erpUser"
@@ -350,7 +350,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                         />
                       </Grid>
                     )}
-                    <Grid item md={6} xs={12}>
+                    <Grid size={{ md: 6, xs: 12 }}>
                       <TextField
                         error={
                           (formik.touched as FormikTouched<NewUser | IUser>).externalId &&
@@ -368,11 +368,11 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                         value={(formik.values as IUser | NewUser).externalId}
                       />
                     </Grid>
-                    <Grid item md={6} xs={12}>
+                    <Grid size={{ md: 6, xs: 12 }}>
                       <Checkbox checked={userERP} color="primary" onChange={handleUserERP} />
                       Пользователь ERP
                     </Grid>
-                    <Grid item md={6} xs={12}>
+                    <Grid size={{ md: 6, xs: 12 }}>
                       <Field
                         id="disabled"
                         type="checkbox"
@@ -390,7 +390,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                     </Grid>
                   </>
                 )}
-                <Grid item md={6} xs={12} display={isAdmin ? 'block' : 'none'}>
+                <Grid size={{ md: 6, xs: 12 }} display={isAdmin ? 'block' : 'none'}>
                   <Grid container>
                     <Box style={{ flexGrow: 1 }}>
                       <TextField
@@ -415,14 +415,14 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                     </Tooltip>
                   </Grid>
                 </Grid>
-                <Grid item md={6} xs={12} display={open ? 'block' : 'none'}>
+                <Grid size={{ md: 6, xs: 12 }} display={open ? 'block' : 'none'}>
                   <TextField
                     error={
                       (formik.touched as FormikTouched<NewUser>).password &&
                       Boolean((formik.errors as NewUser).password)
                     }
                     fullWidth
-                    required={'true' && Boolean(open)}
+                    required={Boolean(open)}
                     label="Пароль"
                     name="password"
                     variant="outlined"
@@ -432,25 +432,27 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                     value={(formik.values as NewUser | IUserCredentials).password.trim()}
                     autoComplete="new-password"
                     type={showPassword ? 'text' : 'password'}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton onClick={handleClickShowPassword}>
-                            {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
+                    slotProps={{
+                      input: {
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton onClick={handleClickShowPassword}>
+                              {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      },
                     }}
                   />
                 </Grid>
-                <Grid item md={6} xs={12} display={open ? 'block' : 'none'}>
+                <Grid size={{ md: 6, xs: 12 }} display={open ? 'block' : 'none'}>
                   <TextField
                     error={
                       (formik.touched as FormikTouched<NewUser>).verifyPassword &&
                       Boolean((formik.errors as NewUser).verifyPassword)
                     }
                     fullWidth
-                    required={'true' && Boolean(open)}
+                    required={Boolean(open)}
                     label="Повторите пароль"
                     name="verifyPassword"
                     variant="outlined"
@@ -460,19 +462,21 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                     value={(formik.values as NewUser | IUserCredentials).verifyPassword?.trim()}
                     autoComplete="new-password"
                     type={showVerifyPassword ? 'text' : 'password'}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton onClick={handleClickShowVerifyPassword}>
-                            {showVerifyPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
+                    slotProps={{
+                      input: {
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton onClick={handleClickShowVerifyPassword}>
+                              {showVerifyPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      },
                     }}
                   />
                 </Grid>
                 {passwordCondition && (
-                  <Grid item md={6} xs={12} display={open ? 'block' : 'none'} style={{ color: 'GrayText' }}>
+                  <Grid size={{ md: 6, xs: 12 }} display={open ? 'block' : 'none'} style={{ color: 'GrayText' }}>
                     Пароль должен содержать не менее восьми знаков, включать буквы (заглавные и строчные), цифры и
                     специальные символы
                   </Grid>
@@ -480,7 +484,7 @@ const UserDetails = ({ user, loading, onSubmit, onSubmitAdmin, onCancel }: IProp
                 {(formik.values as NewUser | IUserCredentials).password !==
                   (formik.values as NewUser | IUserCredentials).verifyPassword &&
                   (formik.values as NewUser).verifyPassword && (
-                    <Grid item md={6} xs={12} display={open ? 'block' : 'none'} style={{ color: 'red' }}>
+                    <Grid size={{ md: 6, xs: 12 }} display={open ? 'block' : 'none'} style={{ color: 'red' }}>
                       Пароли не совпадают
                     </Grid>
                   )}

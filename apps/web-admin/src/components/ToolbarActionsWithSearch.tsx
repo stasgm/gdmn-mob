@@ -41,21 +41,23 @@ const ToolbarActionsWithSearch = ({
           <TextField
             fullWidth
             sx={{ p: 2 }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start" onClick={searchOnClick}>
-                  <IconButton>
-                    <SearchIcon fontSize="small" />
-                  </IconButton>
-                </InputAdornment>
-              ),
-              endAdornment: value ? (
-                <InputAdornment position="end" onClick={clearOnClick}>
-                  <IconButton>
-                    <ClearIcon fontSize="small" />
-                  </IconButton>
-                </InputAdornment>
-              ) : null,
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start" onClick={searchOnClick}>
+                    <IconButton>
+                      <SearchIcon fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+                endAdornment: value ? (
+                  <InputAdornment position="end" onClick={clearOnClick}>
+                    <IconButton>
+                      <ClearIcon fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                ) : null,
+              },
             }}
             placeholder={searchTitle}
             variant="outlined"

@@ -242,55 +242,29 @@ function SortableTable<T extends { id: string }>({
                     <TableCell key={i.id as string}>
                       {i.filterEnable ? (
                         <TextField
-                          InputProps={{
-                            sx: {
-                              height: 30,
-                              // maxWidth: 100,
-                              fontSize: 13,
-                              '& .MuiOutlinedInput-input': {
-                                borderWidth: 0,
-                                padding: 0.5,
+                          slotProps={
+                            {
+                              input: {
+                                sx: {
+                                  height: 30,
+                                  fontSize: 13,
+                                  '& .MuiOutlinedInput-input': {
+                                    borderWidth: 0,
+                                    padding: 0.5,
+                                  },
+                                },
                               },
-                            },
-                          }}
-                          // sx={{ maxWidth: 100 }}
+                            } as any
+                          }
                           fullWidth
                           name="path"
                           required
                           variant="outlined"
                           type="search"
-                          // value={formik.values.path}
-                          // onChange={formik.handleChange}
                         />
                       ) : null}
                     </TableCell>
                   ))}
-                  {/* <TableCell></TableCell>
-                  <TableCell>
-                    {isFilterVisible ? (
-                      <TextField
-                        InputProps={{
-                          sx: {
-                            height: 30,
-                            // maxWidth: 100,
-                            fontSize: 13,
-                            '& .MuiOutlinedInput-input': {
-                              borderWidth: 0,
-                              padding: 0.5,
-                            },
-                          },
-                        }}
-                        // sx={{ maxWidth: 100 }}
-                        fullWidth
-                        name="path"
-                        required
-                        variant="outlined"
-                        type="search"
-                        // value={formik.values.path}
-                        // onChange={formik.handleChange}
-                      />
-                    ) : null}
-                  </TableCell> */}
                 </TableRow>
               ) : null}
             </TableHead>

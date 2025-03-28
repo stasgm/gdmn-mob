@@ -1,4 +1,4 @@
-import { Grid, Box } from '@mui/material';
+import { Grid2 as Grid, Box } from '@mui/material';
 import { IDevice, ISystemFile, IUser } from '@lib/types';
 
 import { IHeadCells } from '../../types';
@@ -46,7 +46,7 @@ const UserDeviceTable = ({ users, devices, files }: { users: IUser[]; devices: I
   return (
     <Grid container spacing={2} mt={1}>
       {/* Грид с пользователями */}
-      <Grid item lg={12} sm={12} xl={12} xs={12} pt={2}>
+      <Grid size={{ lg: 12, sm: 12, xl: 12, xs: 12 }} pt={2}>
         <Box>
           <SortableTable<IUserDevice>
             headCells={userDevicesCells}

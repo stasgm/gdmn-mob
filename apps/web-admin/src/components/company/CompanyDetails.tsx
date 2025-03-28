@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@mui/material';
+import { Box, Card, CardContent, Grid2 as Grid, TextField, Divider, Button } from '@mui/material';
 
 import { ICompany, NewCompany } from '@lib/types';
 import { useFormik, Field, FormikProvider } from 'formik';
@@ -54,8 +54,8 @@ const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
         <form onSubmit={formik.handleSubmit}>
           <Card sx={{ p: 1 }}>
             <CardContent>
-              <Grid container direction="column" item md={6} xs={12} spacing={3}>
-                <Grid item md={6} xs={12}>
+              <Grid container direction="column" size={{ md: 6, xs: 12 }} spacing={3}>
+                <Grid size={{ md: 6, xs: 12 }}>
                   <TextField
                     error={formik.touched.name && Boolean(formik.errors.name)}
                     fullWidth
@@ -70,7 +70,7 @@ const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
                     value={formik.values.name}
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
+                <Grid size={{ md: 6, xs: 12 }}>
                   <TextField
                     error={formik.touched.city && Boolean(formik.errors.city)}
                     fullWidth
@@ -85,7 +85,7 @@ const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
                   />
                 </Grid>
                 {isAdminRequired ? (
-                  <Grid item md={6} xs={12}>
+                  <Grid size={{ md: 6, xs: 12 }}>
                     <Field
                       component={ComboBox}
                       name="admin"

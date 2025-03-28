@@ -1,4 +1,4 @@
-import { Box, Container, Typography, Grid, CardContent, Card, useTheme } from '@mui/material';
+import { Box, Container, Typography, Grid2 as Grid, CardContent, Card, useTheme } from '@mui/material';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -17,18 +17,10 @@ import { userActions } from '../store/user';
 import { deviceActions } from '../store/device';
 import CircularProgressWithContent from '../components/CircularProgressWidthContent';
 import { appSystemActions } from '../store/appSystem';
-import { IFileFilter, IHeadCells } from '../types';
+import { IFileFilter } from '../types';
 import TotalAppSystems from '../components/dashboard/Totalappsystems';
 import { fileActions } from '../store/file';
 import UserDeviceTable from '../components/dashboard/UserDeviceTable';
-
-interface ICompanyInfo {
-  id: string;
-  name: string;
-  deviceQuantity: string;
-  userQuantity: string;
-  lastActivity: string;
-}
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -54,6 +46,9 @@ const Dashboard = () => {
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | undefined>();
 
   useEffect(() => {
+    if (!selectedCompanyId) {
+      return;
+    }
     (async () => {
       const params = {} as IFileFilter;
       if (selectedCompanyId) {
@@ -62,6 +57,8 @@ const Dashboard = () => {
       if (selectedAppSystemId) {
         params.appSystemId = selectedAppSystemId;
       }
+
+      console.log('params', params);
 
       await dispatch(fileActions.fetchFiles(params));
     })();
@@ -179,23 +176,23 @@ const Dashboard = () => {
           ) : (
             <Box>
               <Grid container spacing={2}>
-                <Grid item lg={4} sm={6} xl={3} xs={12}>
+                <Grid size={{ lg: 4, sm: 6, xl: 3, xs: 12 }}>
                   <TotalAppSystems value={appSystems.length} />
                 </Grid>
-                <Grid item lg={4} sm={6} xl={3} xs={12}>
+                <Grid size={{ lg: 4, sm: 6, xl: 3, xs: 12 }}>
                   <TotalCompanies value={companies.length} />
                 </Grid>
-                <Grid item lg={4} sm={6} xl={3} xs={12}>
+                <Grid size={{ lg: 4, sm: 6, xl: 3, xs: 12 }}>
                   <TotalUsers value={users.length} />
                 </Grid>
-                <Grid item lg={4} sm={6} xl={3} xs={12}>
+                <Grid size={{ lg: 4, sm: 6, xl: 3, xs: 12 }}>
                   <TotalDevices value={devices.length} />
                 </Grid>
               </Grid>
               <Grid container>
-                <Grid container mt={1} spacing={2}>
+                <Grid container mt={1} spacing={2} size={{ xl: 12 }}>
                   {appSystems.map((appSystem) => (
-                    <Grid item lg={4} sm={6} xl={2} xs={12} key={appSystem.id}>
+                    <Grid size={{ lg: 4, sm: 6, xl: 2, xs: 12 }} key={appSystem.id}>
                       <Card
                         sx={{
                           cursor: 'pointer',
@@ -226,9 +223,9 @@ const Dashboard = () => {
                   ))}
                 </Grid>
 
-                <Grid container mt={1} spacing={2}>
+                <Grid container mt={1} spacing={2} size={{ xl: 12 }}>
                   {companyInfo.map((company) => (
-                    <Grid item lg={4} sm={6} xl={2} xs={12} key={company.id}>
+                    <Grid size={{ lg: 4, sm: 6, xl: 2, xs: 12 }} key={company.id}>
                       <Card
                         sx={{
                           cursor: 'pointer',

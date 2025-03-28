@@ -208,13 +208,15 @@ const DeviceLogFilesListTable = ({
                   {Object.keys(initialValues).map((item) => (
                     <TableCell key={item}>
                       <TextField
-                        InputProps={{
-                          sx: {
-                            height: 30,
-                            fontSize: 13,
-                            '& .MuiOutlinedInput-input': {
-                              borderWidth: 0,
-                              padding: 0.5,
+                        slotProps={{
+                          input: {
+                            sx: {
+                              height: 30,
+                              fontSize: 13,
+                              '& .MuiOutlinedInput-input': {
+                                borderWidth: 0,
+                                padding: 0.5,
+                              },
                             },
                           },
                         }}

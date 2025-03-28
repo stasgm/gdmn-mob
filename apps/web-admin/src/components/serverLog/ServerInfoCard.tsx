@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, useTheme } from '@mui/material';
+import { Card, CardContent, Typography, Grid2 as Grid, useTheme } from '@mui/material';
 import { ServerInfo } from '@lib/types';
 
 import MemoryIcon from '@mui/icons-material/Memory';
@@ -11,7 +11,7 @@ const ServerInfoCard = ({ serverInfo }: { serverInfo: ServerInfo }) => {
   return (
     <Grid container spacing={2} mb={2}>
       {/* Карточка с использованием памяти */}
-      <Grid item xs={12} sm={6} md={4}>
+      <Grid size={{ md: 4, xs: 12, sm: 6 }}>
         <Card sx={{ height: '100%' }}>
           <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <Typography variant="h5" display="flex" alignItems="center">
@@ -39,7 +39,7 @@ const ServerInfoCard = ({ serverInfo }: { serverInfo: ServerInfo }) => {
         </Card>
       </Grid>
       {/* Карточка с использованием CPU */}
-      <Grid item xs={12} sm={6} md={4}>
+      <Grid size={{ md: 4, xs: 12, sm: 6 }}>
         <Card sx={{ height: '100%' }}>
           <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <Typography variant="h5" display="flex" alignItems="center">
@@ -56,7 +56,7 @@ const ServerInfoCard = ({ serverInfo }: { serverInfo: ServerInfo }) => {
         </Card>
       </Grid>
       {/* Карточка с информацией о времени работы */}
-      <Grid item xs={12} sm={6} md={4}>
+      <Grid size={{ md: 4, xs: 12, sm: 6 }}>
         <Card sx={{ height: '100%' }}>
           <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <Typography variant="h5" display="flex" alignItems="center">

@@ -1,4 +1,4 @@
-import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@mui/material';
+import { CardHeader, CardContent, Typography, Card, Grid2 as Grid, Divider } from '@mui/material';
 
 import { IDevice } from '@lib/types';
 
@@ -18,42 +18,42 @@ const DeviceDetailsView = ({ device, activationCode }: IProps) => {
         <Grid>
           <Grid>
             <Grid container>
-              <Grid item md={2} xs={6}>
+              <Grid size={{ md: 2, xs: 6 }}>
                 <Typography variant="subtitle1" gutterBottom>
                   Наименование
                 </Typography>
               </Grid>
-              <Grid item md={10} xs={6}>
+              <Grid size={{ md: 10, xs: 6 }}>
                 <Typography variant="h4" gutterBottom>
                   {device.name}
                 </Typography>
               </Grid>
-              <Grid item md={2} xs={6}>
+              <Grid size={{ md: 2, xs: 6 }}>
                 <Typography variant="subtitle1" gutterBottom>
                   Номер
                 </Typography>
               </Grid>
-              <Grid item md={10} xs={6}>
+              <Grid size={{ md: 10, xs: 6 }}>
                 <Typography variant="h4" gutterBottom>
                   {device.uid}
                 </Typography>
               </Grid>
-              <Grid item md={2} xs={6}>
+              <Grid size={{ md: 2, xs: 6 }}>
                 <Typography variant="subtitle1" gutterBottom>
                   Состояние
                 </Typography>
               </Grid>
-              <Grid item md={10} xs={6}>
+              <Grid size={{ md: 10, xs: 6 }}>
                 <Typography variant="h4" gutterBottom>
                   {deviceStates[device.state]}
                 </Typography>
               </Grid>
-              <Grid item md={2} xs={6}>
+              <Grid size={{ md: 2, xs: 6 }}>
                 <Typography variant="subtitle1" gutterBottom>
                   Код активации
                 </Typography>
               </Grid>
-              <Grid item md={10} xs={6}>
+              <Grid size={{ md: 10, xs: 6 }}>
                 <Typography variant="h4" gutterBottom>
                   {activationCode}
                 </Typography>

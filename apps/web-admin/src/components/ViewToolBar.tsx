@@ -1,4 +1,4 @@
-import { CardHeader, Grid, IconButton } from '@mui/material';
+import { CardHeader, Grid2 as Grid, IconButton } from '@mui/material';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
@@ -21,7 +21,7 @@ const ViewToolBar = ({ handleCancel, buttons, disabled }: IProps) => {
       style={{ pointerEvents: disabled ? 'none' : 'auto' }}
     >
       {/* Кнопка "Назад" */}
-      <Grid item display="flex" alignItems="center">
+      <Grid display="flex" alignItems="center">
         <IconButton color="primary" onClick={handleCancel}>
           <ArrowBackIcon />
         </IconButton>
@@ -29,7 +29,7 @@ const ViewToolBar = ({ handleCancel, buttons, disabled }: IProps) => {
       </Grid>
 
       {/* Кнопки в ToolBarAction */}
-      <Grid item>
+      <Grid>
         <ToolBarAction buttons={buttons} />
       </Grid>
     </Grid>

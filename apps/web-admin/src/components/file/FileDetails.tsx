@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@mui/material';
+import { Box, Card, CardContent, Grid2 as Grid, TextField, Divider, Button } from '@mui/material';
 
 import { useCallback, useState } from 'react';
 
@@ -26,8 +26,8 @@ const FileDetails = ({ file, loading, onSubmit, onCancel }: IProps) => {
       >
         <Card sx={{ p: 1 }}>
           <CardContent>
-            <Grid container direction="column" item md={6} xs={12} spacing={3}>
-              <Grid item md={6} xs={12}>
+            <Grid container direction="column" size={{ md: 6, xs: 12 }} spacing={3}>
+              <Grid size={{ md: 6, xs: 12 }}>
                 <TextField
                   fullWidth
                   name="file"

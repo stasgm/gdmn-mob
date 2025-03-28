@@ -1,4 +1,4 @@
-import { CardContent, Typography, Card, Grid } from '@mui/material';
+import { CardContent, Typography, Card, Grid2 as Grid } from '@mui/material';
 
 interface IProps {
   file: any;
@@ -10,7 +10,7 @@ const FileContentView = ({ file }: IProps) => {
       <CardContent>
         <Grid sx={{ overflowX: 'auto', overflowY: 'auto' }}>
           <Grid container>
-            <Grid item>
+            <Grid>
               <pre>
                 <Typography variant="subtitle1" gutterBottom>
                   {JSON.stringify(file, null, '\t')}

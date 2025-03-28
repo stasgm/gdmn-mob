@@ -1,4 +1,4 @@
-import { Box, Container, Grid } from '@mui/material';
+import { Box, Container, Grid2 as Grid } from '@mui/material';
 
 import { IUser } from '@lib/types';
 
@@ -70,10 +70,10 @@ const Account = () => {
             <Box>Пользователь не найден</Box>
           ) : (
             <Grid container spacing={3}>
-              <Grid item lg={4} md={6} xs={12}>
+              <Grid size={{ md: 6, xs: 12, lg: 4 }}>
                 <AccountProfile user={user} />
               </Grid>
-              <Grid item lg={8} md={6} xs={12}>
+              <Grid size={{ md: 6, xs: 12, lg: 8 }}>
                 <AccountProfileDetails user={user} loading={loading} onSubmit={handleSaveUser} />
               </Grid>
             </Grid>

@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@mui/material';
+import { Box, Card, CardContent, Grid2 as Grid, TextField, Divider, Button } from '@mui/material';
 
 import { IDeviceBinding, INamedEntity } from '@lib/types';
 import { Field, FormikProvider, useFormik } from 'formik';
@@ -95,8 +95,8 @@ const DeviceBindingDetails = ({ deviceBinding, loading, onSubmit, onCancel }: IP
         <form onSubmit={formik.handleSubmit}>
           <Card sx={{ p: 1 }}>
             <CardContent>
-              <Grid container direction="column" item md={6} xs={12} spacing={3}>
-                <Grid item md={6} xs={12}>
+              <Grid container direction="column" size={{ md: 6, xs: 12 }} spacing={3}>
+                <Grid size={{ md: 6, xs: 12 }}>
                   <TextField
                     error={Boolean(formik.touched.user && formik.errors.user)}
                     fullWidth
@@ -111,7 +111,7 @@ const DeviceBindingDetails = ({ deviceBinding, loading, onSubmit, onCancel }: IP
                     value={formik.values.user?.name}
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
+                <Grid size={{ md: 6, xs: 12 }}>
                   <FieldWithIcon
                     label="Устройство"
                     name="device"
@@ -132,7 +132,7 @@ const DeviceBindingDetails = ({ deviceBinding, loading, onSubmit, onCancel }: IP
                     toolipTitle="Создать устройство"
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
+                <Grid size={{ md: 6, xs: 12 }}>
                   <Field
                     component={ComboBox}
                     name="state"

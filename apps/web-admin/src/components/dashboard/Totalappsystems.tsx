@@ -1,4 +1,4 @@
-import { Avatar, Card, CardContent, Grid, Typography } from '@mui/material';
+import { Avatar, Card, CardContent, Grid2 as Grid, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import WidgetsIcon from '@mui/icons-material/Widgets';
 
@@ -15,7 +15,7 @@ const TotalAppSystems = (props: IProps) => {
     <Card {...props}>
       <CardContent>
         <Grid container spacing={3} sx={{ justifyContent: 'space-between' }}>
-          <Grid item>
+          <Grid>
             <Typography color="textSecondary" gutterBottom variant="h6">
               Всего подсистем
             </Typography>
@@ -23,7 +23,7 @@ const TotalAppSystems = (props: IProps) => {
               {value}
             </Typography>
           </Grid>
-          <Grid item>
+          <Grid>
             <Avatar
               sx={{
                 backgroundColor: palette.primary.main,

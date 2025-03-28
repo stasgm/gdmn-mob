@@ -10,7 +10,7 @@ import {
   Checkbox,
   Divider,
   Drawer,
-  Grid,
+  Grid2 as Grid,
   IconButton,
   InputAdornment,
   Table,
@@ -400,7 +400,6 @@ function FileListTable<T extends IEntity>({
             <>
               <Divider orientation="vertical" flexItem />
               <Drawer
-                // ModalProps={{ disableScrollLock: true }}
                 anchor="right"
                 open={isFilterVisible}
                 variant="persistent"
@@ -408,10 +407,6 @@ function FileListTable<T extends IEntity>({
                   sx: {
                     top: 64,
                     width,
-                    // paddingBottom: 5,
-                    // overflow: 'visible',
-                    // height: drawerHeight,
-                    // maxHeight: drawerHeight,
                     height: 'calc(100% - 64px - 48px)',
                     transitionProperty: 'width, transform !important',
                     transitionDuration: '0.3s !important',
@@ -434,28 +429,27 @@ function FileListTable<T extends IEntity>({
                   </Box>
 
                   <Box
-                    // maxHeight={'85%'}
                     sx={{
                       p: 3,
-                      /*overflowY: 'scroll',*/ flexDirection: 'column',
-                      // maxHeight: '85%',
+                      flexDirection: 'column',
                       overflowY: 'auto',
                     }}
                   >
                     {Object.keys(filterValues).map((item) => (
-                      <Grid item key={item} marginBottom={3}>
+                      <Grid key={item} marginBottom={3}>
                         {filterValues[item].type === 'select' ? (
                           <Field
-                            InputProps={{
-                              sx: {
-                                height: 50,
-                                fontSize: 13,
-                                '& .MuiOutlinedInput-input': {
-                                  borderWidth: 0,
-                                  // padding: 0.5,
+                            slotProps={{
+                              input: {
+                                sx: {
+                                  height: 50,
+                                  fontSize: 13,
+                                  '& .MuiOutlinedInput-input': {
+                                    borderWidth: 0,
+                                  },
+                                  alignItems: 'center',
+                                  justifyContent: 'flex-start',
                                 },
-                                alignItems: 'center',
-                                justifyContent: 'flex-start',
                               },
                             }}
                             component={ComboBox}
@@ -470,12 +464,10 @@ function FileListTable<T extends IEntity>({
                             setTouched={formik.setTouched}
                             error={Boolean(formik.touched[item] && formik.errors[item])}
                             fullWidth
-                            getOptionLabel={
-                              (option: IFilterOption) =>
-                                (formik.values[item]?.name === option.name
-                                  ? getValue(option.value, listOptions[item])
-                                  : option.name) || ''
-                              // (formik.values[item]?.name === option.name ? option.value : option.name) || ''
+                            getOptionLabel={(option: IFilterOption) =>
+                              (formik.values[item]?.name === option.name
+                                ? getValue(option.value, listOptions[item])
+                                : option.name) || ''
                             }
                             isOptionEqualToValue={(option: INamedEntity, value: IFilterOption) =>
                               option.name === getValue(value.value, listOptions[item])
@@ -512,23 +504,25 @@ function FileListTable<T extends IEntity>({
                           </LocalizationProvider>
                         ) : (
                           <TextField
-                            InputProps={{
-                              sx: {
-                                height: 50,
-                                '& .MuiOutlinedInput-input': { borderWidth: 0 },
-                                alignItems: 'center',
-                                justifyContent: 'flex-start',
+                            slotProps={{
+                              input: {
+                                sx: {
+                                  height: 50,
+                                  '& .MuiOutlinedInput-input': { borderWidth: 0 },
+                                  alignItems: 'center',
+                                  justifyContent: 'flex-start',
+                                },
+                                endAdornment: formik.values[item]?.value ? (
+                                  <InputAdornment
+                                    position="end"
+                                    onClick={() => handleUpdateFormik(item, { id: item, name: '' })}
+                                  >
+                                    <IconButton>
+                                      <CloseIcon size="20" />
+                                    </IconButton>
+                                  </InputAdornment>
+                                ) : null,
                               },
-                              endAdornment: formik.values[item]?.value ? (
-                                <InputAdornment
-                                  position="end"
-                                  onClick={() => handleUpdateFormik(item, { id: item, name: '' })}
-                                >
-                                  <IconButton>
-                                    <CloseIcon size="20" />
-                                  </IconButton>
-                                </InputAdornment>
-                              ) : null,
                             }}
                             fullWidth
                             name={item}
@@ -562,33 +556,16 @@ function FileListTable<T extends IEntity>({
                   borderLeftColor: '#DDDDDD',
                 }}
               >
-                {/* <Grid item> */}
-                {/* sx={{maxWidth: '50%'}} */}
                 <Box>
-                  <Button
-                    color="primary"
-                    type="submit"
-                    variant="contained"
-                    // sx={{ m: 1 }}
-                    // fullWidth
-                    onClick={handleSearchClick}
-                  >
+                  <Button color="primary" type="submit" variant="contained" onClick={handleSearchClick}>
                     Применить
                   </Button>
                 </Box>
-                {/* </Grid> */}
-                {/* <Grid item> */}
                 <Box sx={{ paddingRight: 2 }}>
-                  <Button
-                    color="secondary"
-                    variant="contained"
-                    onClick={handleClearFilters}
-                    // fullWidth
-                  >
+                  <Button color="secondary" variant="contained" onClick={handleClearFilters}>
                     Очистить
                   </Button>
                 </Box>
-                {/* </Grid> */}
               </Box>
             </>
           )}

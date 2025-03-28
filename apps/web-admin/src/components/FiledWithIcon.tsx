@@ -1,4 +1,4 @@
-import { Grid, Button, Tooltip, Box } from '@mui/material';
+import { Grid2 as Grid, Button, Tooltip, Box } from '@mui/material';
 import { PlusSquare as AddIcon } from 'react-feather';
 
 import { Field } from 'formik';
