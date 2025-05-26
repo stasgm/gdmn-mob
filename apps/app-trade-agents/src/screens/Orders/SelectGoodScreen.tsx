@@ -63,8 +63,10 @@ const SelectGoodScreen = () => {
 
   const settings = useSelector((state) => state.settings.data);
   const isUseNetPrice = settings?.isUseNetPrice?.data as boolean;
+  const isUseRemains = settings?.isUseRemains?.data as boolean;
 
   const [isUseMatrix, setIsUseMatrix] = useState(isUseNetPrice);
+  const [useRemains, setUseRemains] = useState(isUseRemains);
   const [isShowPrev, setParamsVisible] = useState(false);
 
   const syncDate = useSelector((state) => state.app.syncDate);
@@ -83,12 +85,21 @@ const SelectGoodScreen = () => {
   const [filterDateEnd, setFilterDateEnd] = useState<string | undefined>(
     new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000).toISOString(),
   );
+  const doc = docSelectors.selectByDocId<IOrderDocument>(docId);
 
+  console.log('doc?.head.depart?.id', doc?.head.depart?.id);
   const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
   const goods = refSelectors.selectByName<IGood>('good').data;
   const refGroup = refSelectors.selectByName<IGoodGroup>('goodGroup');
-  const groups = useMemo(() => refGroup.data.concat(UNKNOWN_GROUP), [refGroup.data]);
-  const doc = docSelectors.selectByDocId<IOrderDocument>(docId);
+  const groupsConcat = useMemo(() => refGroup.data.concat(UNKNOWN_GROUP), [refGroup.data]);
+  const groups = useMemo(
+    () =>
+      isUseRemains && useRemains
+        ? groupsConcat.filter((i) => (!i.parent?.id ? i.id === doc?.head.depart?.id : true))
+        : groupsConcat,
+    [doc?.head.depart?.id, groupsConcat, isUseRemains, useRemains],
+  );
+
   const contactId = doc?.head.contact.id;
   const outletId = doc?.head.outlet.id;
   const docs = useSelector((state) => state.documents.list) as IOrderDocument[];
@@ -502,6 +513,12 @@ const SelectGoodScreen = () => {
           <View style={localStyles.switch}>
             <MediumText>Использовать матрицы</MediumText>
             <Switch value={isUseMatrix} onValueChange={() => setIsUseMatrix(!isUseMatrix)} />
+          </View>
+        )}
+        {isUseRemains && (
+          <View style={localStyles.switch}>
+            <MediumText>Использовать остатки</MediumText>
+            <Switch value={useRemains} onValueChange={() => setUseRemains(!useRemains)} />
           </View>
         )}
         {contactId && goodMatrix[contactId] && !isShowPrev && filterVisible && (

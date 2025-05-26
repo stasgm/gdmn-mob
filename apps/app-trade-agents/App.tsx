@@ -43,59 +43,118 @@ import {
   MapNavigator,
   GoodMatrixNavigator,
   ShipmentNavigator,
+  RemainsNavigator,
+  ReportsNavigator,
 } from './src/navigation';
 
 import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
 import { messageAgent } from './src/store/mock';
-import ReportsNavigator from './src/navigation/Root/ReportsNavigator';
 
 const Root = () => {
+  const { isInit, data: settings } = useSelector((state) => state.settings);
+
+  const isUseRemains = useMemo(() => settings.isUseRemains?.data || false, [settings.isUseRemains?.data]);
+
+  const isDemo = useSelector((state) => state.auth.isDemo);
   const navItems: INavItem[] = useMemo(
-    () => [
-      {
-        name: 'RoutesNav',
-        title: 'Маршруты',
-        icon: 'routes',
-        component: RoutesNavigator,
-      },
-      {
-        name: 'OrdersNav',
-        title: 'Заявки',
-        icon: 'clipboard-list-outline',
-        component: OrdersNavigator,
-      },
-      {
-        name: 'ReportsNav',
-        title: 'Отчёты',
-        icon: 'text-box-search-outline',
-        component: ReportsNavigator,
-      },
-      {
-        name: 'ShipmentNav',
-        title: 'Отгрузка',
-        icon: 'truck-outline',
-        component: ShipmentNavigator,
-      },
-      {
-        name: 'DebetsNav',
-        title: 'Задолженности',
-        icon: 'currency-usd',
-        component: DebetsNavigator,
-      },
-      {
-        name: 'GoodMatrixNav',
-        title: 'Матрицы',
-        icon: 'tag-text-outline',
-        component: GoodMatrixNavigator,
-      },
-      {
-        name: 'MapNav',
-        title: 'Карта',
-        icon: 'map-outline',
-        component: MapNavigator,
-      },
-    ],
-    [],
+    () =>
+      isUseRemains
+        ? [
+            {
+              name: 'RoutesNav',
+              title: 'Маршруты',
+              icon: 'routes',
+              component: RoutesNavigator,
+            },
+            {
+              name: 'OrdersNav',
+              title: 'Заявки',
+              icon: 'clipboard-list-outline',
+              component: OrdersNavigator,
+            },
+            {
+              name: 'ReportsNav',
+              title: 'Отчёты',
+              icon: 'text-box-search-outline',
+              component: ReportsNavigator,
+            },
+            {
+              name: 'ShipmentNav',
+              title: 'Отгрузка',
+              icon: 'truck-outline',
+              component: ShipmentNavigator,
+            },
+            {
+              name: 'DebetsNav',
+              title: 'Задолженности',
+              icon: 'currency-usd',
+              component: DebetsNavigator,
+            },
+            {
+              name: 'GoodMatrixNav',
+              title: 'Матрицы',
+              icon: 'tag-text-outline',
+              component: GoodMatrixNavigator,
+            },
+            {
+              name: 'Remains',
+              title: 'Остатки',
+              icon: 'dolly',
+              component: RemainsNavigator,
+            },
+            {
+              name: 'MapNav',
+              title: 'Карта',
+              icon: 'map-outline',
+              component: MapNavigator,
+            },
+          ]
+        : [
+            {
+              name: 'RoutesNav',
+              title: 'Маршруты',
+              icon: 'routes',
+              component: RoutesNavigator,
+            },
+            {
+              name: 'OrdersNav',
+              title: 'Заявки',
+              icon: 'clipboard-list-outline',
+              component: OrdersNavigator,
+            },
+            {
+              name: 'ReportsNav',
+              title: 'Отчёты',
+              icon: 'text-box-search-outline',
+              component: ReportsNavigator,
+            },
+            {
+              name: 'ShipmentNav',
+              title: 'Отгрузка',
+              icon: 'truck-outline',
+              component: ShipmentNavigator,
+            },
+            {
+              name: 'DebetsNav',
+              title: 'Задолженности',
+              icon: 'currency-usd',
+              component: DebetsNavigator,
+            },
+            {
+              name: 'GoodMatrixNav',
+              title: 'Матрицы',
+              icon: 'tag-text-outline',
+              component: GoodMatrixNavigator,
+            },
+
+            {
+              name: 'MapNav',
+              title: 'Карта',
+              icon: 'map-outline',
+              component: MapNavigator,
+            },
+          ],
+    [isUseRemains],
   );
 
   const dispatch = useDispatch();
@@ -106,8 +165,6 @@ const Root = () => {
   }, []);
 
   //Загружаем в стор дополнительные настройки приложения
-  const isInit = useSelector((state) => state.settings.isInit);
-  const isDemo = useSelector((state) => state.auth.isDemo);
 
   const refDispatch = useRefThunkDispatch();
   const docDispatch = useDocThunkDispatch();

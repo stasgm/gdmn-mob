@@ -107,6 +107,10 @@ const OrderViewScreen = () => {
   const packages = refSelectors.selectByName<IPackageGood>('packageGood')?.data;
   const goods = refSelectors.selectByName<IGood>('good')?.data;
 
+  const settings = useSelector((state) => state.settings.data);
+  const isUseRemains = settings?.isUseRemains?.data as boolean;
+  const depart = refSelectors.selectByRefId<INamedEntity>('department', order?.head?.depart?.id)?.name;
+
   const handleAddOrderLine = useCallback(() => {
     navigation.navigate('SelectGood', {
       docId: id,
@@ -586,6 +590,8 @@ const OrderViewScreen = () => {
                 <MediumText>Лимит: {formatValue({ type: 'currency', decimals: 2 }, limitSum)}</MediumText>
               </View>
             ) : null}
+            {isUseRemains && depart ? <LargeText style={localStyles.contract}>{`Склад: ${depart}`}</LargeText> : null}
+
             {order.head.comment ? (
               <View style={styles.rowCenter}>
                 <MediumText>Комментарий: {order.head.comment || ''}</MediumText>
