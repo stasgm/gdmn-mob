@@ -74,6 +74,8 @@ export const DocLineScreen = () => {
             ...line.good,
             barcode: line.barcode,
             id,
+            price: line.price || 0,
+            buyingPrice: line.buyingPrice || 0,
           }),
         );
         newLine = { ...newLine, good: { ...newLine.good, id } };

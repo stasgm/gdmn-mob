@@ -24,6 +24,8 @@ import { IScannedObject } from '@lib/client-types';
 
 import { ISettingsOption } from '@lib/types';
 
+import { isNumeric } from '@lib/mobile-hooks';
+
 import { IMovementLine } from '../../../store/types';
 
 import { ONE_SECOND_IN_MS } from '../../../utils/constants';
@@ -48,6 +50,11 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
 
   const [goodName, setGoodName] = useState<string>(item?.good.name || '');
   const [visibleDialog, setVisibleDialog] = useState(false);
+  const [goodPrice, setGoodPrice] = useState<string>((item?.price || 0)?.toString() || '');
+  const [visiblePriceDialog, setVisiblePriceDialog] = useState(false);
+  const [goodBuyingPrice, setGoodBuyingPrice] = useState<string>((item?.buyingPrice || 0)?.toString() || '');
+  const [visibleBuyingPriceDialog, setVisibleBuyingPriceDialog] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const [scaner, setScaner] = useState<IScannedObject>({ state: 'init' });
 
@@ -64,14 +71,16 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
 
   useEffect(() => {
     !visibleDialog &&
+      !visiblePriceDialog &&
+      !visibleBuyingPriceDialog &&
       (isKeyboardOpen || currRef?.current) &&
       setTimeout(() => {
         currRef.current?.focus();
       }, ONE_SECOND_IN_MS);
-  }, [isKeyboardOpen, visibleDialog]);
+  }, [isKeyboardOpen, visibleBuyingPriceDialog, visibleDialog, visiblePriceDialog]);
 
   useEffect(() => {
-    if (!visibleDialog) {
+    if (!visibleDialog && !visiblePriceDialog && !visibleBuyingPriceDialog) {
       Keyboard.addListener('keyboardDidShow', () => {
         Keyboard.dismiss();
         currRef.current?.focus();
@@ -80,7 +89,7 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
     return () => {
       Keyboard.removeAllListeners('keyboardDidShow');
     };
-  }, [visibleDialog]);
+  }, [visibleBuyingPriceDialog, visibleDialog, visiblePriceDialog]);
 
   const handleGetScannedObject = useCallback(
     (brc: string) => {
@@ -121,15 +130,45 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
     setVisibleDialog(false);
   };
 
+  const getNumber = (value: string) => {
+    let newValue = value.replace(',', '.');
+    newValue = newValue.length > 1 && newValue[0] === '0' && newValue[1] !== '.' ? newValue.substring(1) : newValue;
+
+    newValue = !newValue.includes('.') ? parseFloat(newValue).toString() : newValue;
+    return newValue;
+  };
+
+  const handleAddPrice = useCallback(() => {
+    const price = getNumber(goodPrice);
+    if (!isNumeric(price)) {
+      setErrorMessage('Цена не является числовым значением.');
+      return;
+    }
+    onSetLine({ ...item, price: Number(price) });
+    setVisiblePriceDialog(false);
+    setErrorMessage('');
+  }, [goodPrice, item, onSetLine]);
+
+  const handleAddBuyingPrice = useCallback(() => {
+    const price = getNumber(goodBuyingPrice);
+    if (!isNumeric(price)) {
+      setErrorMessage('Цена не является числовым значением.');
+      return;
+    }
+    onSetLine({ ...item, buyingPrice: Number(price) });
+    setVisibleBuyingPriceDialog(false);
+    setErrorMessage('');
+  }, [goodBuyingPrice, item, onSetLine]);
+
   useEffect(() => {
     onSetLine({ ...item, EID: goodEID });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goodEID]);
 
   useEffect(() => {
-    onSetDisabledSave(visibleDialog);
+    onSetDisabledSave(visibleDialog || visiblePriceDialog);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visibleDialog]);
+  }, [visibleDialog, visiblePriceDialog]);
 
   const price = item?.price || 0;
   const remains = item?.remains || 0;
@@ -241,8 +280,17 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
           ) : (
             <View style={localStyles.item}>
               <View style={localStyles.halfItem}>
-                <MediumText>Цена:</MediumText>
-                <LargeText style={localStyles.value}>{price.toString()}</LargeText>
+                <View style={localStyles.eIdView}>
+                  <MediumText>Цена:</MediumText>
+                  <LargeText style={localStyles.value}>{price.toString()}</LargeText>
+                </View>
+                {/* {item.good.id === 'unknown' && ( */}
+                <View style={localStyles.button}>
+                  <TouchableOpacity>
+                    <IconButton icon="pencil-outline" size={24} onPress={() => setVisiblePriceDialog(true)} />
+                  </TouchableOpacity>
+                </View>
+                {/* )} */}
               </View>
               <View style={[{ backgroundColor: colors.primary }, localStyles.verticalLine]} />
               <View style={[localStyles.halfItem, localStyles.halfItemRemView]}>
@@ -268,8 +316,15 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
             </View>
           ) : (
             <View style={localStyles.item}>
-              <MediumText>Покупная цена:</MediumText>
-              <LargeText style={localStyles.value}>{buyingPrice.toString()}</LargeText>
+              <View style={localStyles.eIdView}>
+                <MediumText>Покупная цена:</MediumText>
+                <LargeText style={localStyles.value}>{buyingPrice.toString()}</LargeText>
+              </View>
+              <View style={localStyles.button}>
+                <TouchableOpacity>
+                  <IconButton icon="pencil-outline" size={24} onPress={() => setVisibleBuyingPriceDialog(true)} />
+                </TouchableOpacity>
+              </View>
             </View>
           )}
 
@@ -341,6 +396,34 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
         onOk={handleAddName}
         okLabel={'Сохранить'}
         okDisabled={goodName ? false : true}
+      />
+      <AppDialog
+        title="Цена"
+        visible={visiblePriceDialog}
+        text={(goodPrice ? getNumber(goodPrice) : '') || ''}
+        onChangeText={setGoodPrice}
+        onCancel={() => {
+          setVisiblePriceDialog(false);
+          setErrorMessage('');
+        }}
+        onOk={handleAddPrice}
+        okLabel={'Сохранить'}
+        okDisabled={goodPrice ? false : true}
+        errorMessage={errorMessage}
+      />
+      <AppDialog
+        title="Покупная цена"
+        visible={visibleBuyingPriceDialog}
+        text={(goodBuyingPrice ? getNumber(goodBuyingPrice) : '') || ''}
+        onChangeText={setGoodBuyingPrice}
+        onCancel={() => {
+          setVisibleBuyingPriceDialog(false);
+          setErrorMessage('');
+        }}
+        onOk={handleAddBuyingPrice}
+        okLabel={'Сохранить'}
+        okDisabled={goodBuyingPrice ? false : true}
+        errorMessage={errorMessage}
       />
     </View>
   );
