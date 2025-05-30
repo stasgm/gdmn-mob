@@ -37,6 +37,7 @@ const fileFilterValues: IFileFilterObject = {
   // date: { id: 'date', name: 'Дата', type: 'date', value: '', visible: true },
   dateFrom: { id: 'dateFrom', name: 'Дата начала', type: 'date', value: '', visible: true },
   dateTo: { id: 'dateTo', name: 'Дата окончания', type: 'date', value: '', visible: true },
+  searchQuery: { id: 'searchQuery', name: 'Текст', type: 'text', value: '', visible: true },
 };
 
 const logFilterValues: ILogFilterObject = {
@@ -68,6 +69,7 @@ const fileFilterInitialValues: IFileFilter = {
   dateFrom: '',
   dateTo: '',
   path: '',
+  searchQuery: '',
 };
 
 const logFilterInitialValues: ILogFileFilter = {
