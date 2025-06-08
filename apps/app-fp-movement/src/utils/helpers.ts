@@ -91,7 +91,7 @@ export const getBarcodeString = (barcodeObj: IBarcode, settings: barcodeSettings
   const weight =
     barcodeObj.weight < ONE_T_IN_KG
       ? getCodeForCheck(round(barcodeObj.weight * ONE_KG_IN_G, 3).toString(), settings?.countWeight || 6)
-      : getCodeForCheck(round(barcodeObj.weight * ONE_KG_IN_G, 3).toString(), -(settings?.countWeight || 6));
+      : round(barcodeObj.weight * ONE_KG_IN_G, 3).toString();
 
   const barcode =
     weight + day + month + year + (barcodeObj.time || '0000') + shcode + quantPack + barcodeObj.numReceived;
