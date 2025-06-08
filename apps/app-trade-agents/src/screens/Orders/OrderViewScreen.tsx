@@ -141,6 +141,14 @@ const OrderViewScreen = () => {
     await sendRequest();
   }, [sendRequest]);
 
+  const sendRemainsRequest = useSendOneRefRequest('Остатки', { name: 'remains' });
+
+  const handleSendRemainsRequest = useCallback(async () => {
+    if (isUseRemains) {
+      await sendRemainsRequest();
+    }
+  }, [isUseRemains, sendRemainsRequest]);
+
   const handleOpenDebtDialog = () => {
     setVisibleDebtDialog(true);
   };
@@ -347,8 +355,9 @@ const OrderViewScreen = () => {
     setVisibleSendDialog(false);
     setScreenState('sending');
     await sendDoc();
+    await handleSendRemainsRequest();
     setScreenState('sent');
-  }, [sendDoc]);
+  }, [handleSendRemainsRequest, sendDoc]);
 
   const handleSaveDocument = useCallback(() => {
     if (!order) {

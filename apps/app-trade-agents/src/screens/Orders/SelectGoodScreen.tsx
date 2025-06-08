@@ -47,9 +47,11 @@ import {
   IMGroupModel,
   IOrderDocument,
   IOrderLine,
+  IRemains,
+  IRemGood,
 } from '../../store/types';
 import { UNKNOWN_GROUP } from '../../utils/constants';
-import { getGoodMatrixByContact, getGroupModelByContact } from '../../utils/helpers';
+import { getGoodMatrixByContact, getGroupModelByContact, getRemGoodListByContact } from '../../utils/helpers';
 
 import { OrderLineDialog } from './components/OrderLineDialog';
 import OrderLineEdit, { IOrderItemLine } from './components/OrderLineEdit';
@@ -98,6 +100,12 @@ const SelectGoodScreen = () => {
         ? groupsConcat.filter((i) => (!i.parent?.id ? i.id === doc?.head.depart?.id : true))
         : groupsConcat,
     [doc?.head.depart?.id, groupsConcat, isUseRemains, useRemains],
+  );
+
+  const remains = refSelectors.selectByName<IRemains>('remains')?.data?.[0];
+
+  const [goodRemains] = useState<IRemGood[]>(() =>
+    doc?.head.depart?.id ? getRemGoodListByContact(goods, remains[doc?.head.depart?.id], true) : [],
   );
 
   const contactId = doc?.head.contact.id;
@@ -393,6 +401,7 @@ const SelectGoodScreen = () => {
         backgroundColor: isAdded ? globalColors.backgroundLight : 'transparent',
       };
 
+      const goodQuantity = isUseRemains && useRemains ? goodRemains.find((i) => i.good.id === item.id)?.remains : 0;
       return (
         <View key={item.id}>
           <TouchableOpacity onPress={() => handlePressGood(isAdded, item)}>
@@ -402,6 +411,12 @@ const SelectGoodScreen = () => {
               </View>
               <View style={styles.details}>
                 <MediumText style={styles.textBold}>{item.name || item.id}</MediumText>
+                {isUseRemains && useRemains && (
+                  <View style={localStyles.remains}>
+                    <IconButton icon={'store-check-outline'} size={18} iconColor={colors.text} />
+                    <MediumText>Остаток: {goodQuantity || 0}</MediumText>
+                  </View>
+                )}
                 {isAdded && (
                   <View style={localStyles.lineView}>
                     {lines.map((line) => (
@@ -431,7 +446,17 @@ const SelectGoodScreen = () => {
         </View>
       );
     },
-    [colors.placeholder, colors.primary, doc?.lines, handlePressGood, prevLines],
+    [
+      colors.placeholder,
+      colors.primary,
+      colors.text,
+      doc?.lines,
+      goodRemains,
+      handlePressGood,
+      isUseRemains,
+      prevLines,
+      useRemains,
+    ],
   );
 
   const handlePressGroup = useCallback(
@@ -688,4 +713,5 @@ const localStyles = StyleSheet.create({
     marginTop: -10,
   },
   primeButton: { height: 40 },
+  remains: { flexDirection: 'row', alignItems: 'center' },
 });
