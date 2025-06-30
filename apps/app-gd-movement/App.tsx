@@ -47,6 +47,8 @@ import { messageGdMovement } from './src/store/mock';
 import RemainsNavigator from './src/navigation/RemainsNavigator';
 import { ScanNavigator } from './src/navigation/ScanNavigator';
 import { RevisionNavigator } from './src/navigation/RevisionNavigator';
+import { InvoiceNavigator } from './src/navigation/InvoiceNavigator';
+import { WaybillNavigator } from './src/navigation/WaybillNavigator';
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -62,6 +64,18 @@ const Root = () => {
         title: 'Сканирование',
         icon: 'barcode-scan',
         component: ScanNavigator,
+      },
+      {
+        name: 'Waybill',
+        title: 'ЭТТН',
+        icon: 'card-bulleted-outline',
+        component: WaybillNavigator,
+      },
+      {
+        name: 'Invoice',
+        title: 'Счёт-заказ',
+        icon: 'order-bool-descending-variant',
+        component: InvoiceNavigator,
       },
       {
         name: 'revision',
