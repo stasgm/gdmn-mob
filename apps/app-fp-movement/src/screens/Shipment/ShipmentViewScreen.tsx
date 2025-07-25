@@ -1207,6 +1207,7 @@ const ShipmentViewScreen = () => {
         onOk={handleSearchBarcode}
         okLabel={'Найти'}
         errorMessage={errorMessage}
+        keyboardType="number-pad"
       />
       <QuantDialog
         visible={visibleQuantPackDialog}
@@ -1218,7 +1219,7 @@ const ShipmentViewScreen = () => {
         onOk={handleEditQuantPack}
         okLabel={'Ок'}
         isPack={isPack}
-        keyboardType="numbers-and-punctuation"
+        keyboardType="number-pad"
         okDisabled={!quantPack || !quantPallet}
       />
       {usePackage && (
@@ -1227,7 +1228,7 @@ const ShipmentViewScreen = () => {
           onCancel={handleCancelBoxDialog}
           onOk={handleSetNewBox}
           okLabel={'Ок'}
-          keyboardType="numbers-and-punctuation"
+          keyboardType="number-pad"
           okDisabled={!quantPack || !quantPallet}
           screenName="ShipmentView"
           lastBox={shipmentLines?.[0]?.box || undefined}
@@ -1239,7 +1240,7 @@ const ShipmentViewScreen = () => {
           onCancel={handleCancelUnitDialog}
           onOk={handleAddUnitLine}
           okLabel={'Ок'}
-          keyboardType="numbers-and-punctuation"
+          keyboardType="number-pad"
           okDisabled={!quantPack || !quantPallet}
           screenName="ShipmentView"
           line={brcLine}

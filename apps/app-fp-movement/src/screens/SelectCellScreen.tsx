@@ -148,6 +148,7 @@ export const SelectCellScreen = () => {
     (cellData: ICellData) => {
       const newCell = `${selectedChamber}-${selectedRow}-${cellData.cell}`;
 
+      const storeDate = new Date().toISOString();
       if (mode === 0) {
         if (doc?.head.fromDepart?.isAddressStore) {
           if (!fromCell) {
@@ -162,15 +163,15 @@ export const SelectCellScreen = () => {
               alertWithSound('Ошибка выбора ячейки!', 'Данная ячейка занята другим товаром, выберите другую ячейку.');
             }
           } else {
-            const newLine: IMoveLine = { ...fromCell, toCell: newCell };
+            const newLine: IMoveLine = { ...fromCell, toCell: newCell, storeDate };
             handleAddLine(newLine);
           }
         } else {
-          const newLine: IMoveLine = { ...item, toCell: newCell };
+          const newLine: IMoveLine = { ...item, toCell: newCell, storeDate };
           handleAddLine(newLine);
         }
       } else {
-        const newLine: IMoveLine = { ...item, toCell: newCell };
+        const newLine: IMoveLine = { ...item, toCell: newCell, storeDate };
         dispatch(
           documentActions.updateDocumentLine({
             docId,

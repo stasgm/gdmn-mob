@@ -129,11 +129,13 @@ export interface ISendingLine extends IEntity {
   usedRemains?: boolean; // используются остатки в приложении
   fromCell?: string; // номер ячейки
   toCell?: string; // номер ячейки
+  storeDate?: string; // дата постановки в ячейку
 }
 
 export interface IMoveLine extends IBasedLine {
   fromCell?: string; // номер ячейки
   toCell?: string; // номер ячейки
+  storeDate?: string;
 }
 
 export type IMoveDocument = MandateProps<IDocument<IMoveHead, IMoveLine>, 'head' | 'lines'>;
@@ -228,6 +230,20 @@ export interface IReturnHead extends IHead {
 }
 export type IReturnLine = IBasedLine;
 export type IReturnDocument = MandateProps<IDocument<IReturnHead, IReturnLine>, 'head' | 'lines'>;
+
+export interface IPalletHead extends IHead {
+  quantPack: number;
+  barcode: string;
+  scannedBarcode: string;
+  good: IGood; // товар
+  weight: number; //вес
+  workDate: string; // Дата производства
+  time?: string; // Время производства
+  numReceived: string; // Номер партии
+  storeMan?: string;
+}
+
+export type IPalletDocument = MandateProps<IDocument<IPalletHead>, 'head'>;
 
 export type barcodeSettings = {
   [name: string]: number;

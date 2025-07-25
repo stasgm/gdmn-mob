@@ -29,6 +29,8 @@ import {
 import { SelectRefItemScreen } from '../../components';
 import { ReceiptEditScreen, ReceiptListScreen, ReceiptViewScreen } from '../../screens/Receipt';
 
+import { PalletListScreen } from '../../screens/Pallet';
+
 export const moveScreens = {
   MoveEdit: { title: 'Перемещение', component: MoveEditScreen },
   MoveView: { title: '', component: MoveViewScreen },
@@ -172,4 +174,8 @@ export const remainsListScreens = {
 export const remainsScreens = {
   GoodList: { title: 'Остатки', component: GoodListScreen },
   GoodLine: { title: 'Позиция остатков', component: GoodRemLineScreen },
+};
+
+export const palletScreens = {
+  PalletList: { title: 'Паллеты', component: PalletListScreen },
 };

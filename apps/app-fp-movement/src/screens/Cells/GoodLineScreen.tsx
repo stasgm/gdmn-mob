@@ -58,6 +58,18 @@ const LineItem = React.memo(({ item }: { item: IMoveLine }) => {
               <Text style={textStyle}>{item?.toCell} </Text>
             </View>
           </View>
+
+          {item?.storeDate ? (
+            <>
+              <ItemSeparator />
+              <View style={styles.item}>
+                <View style={styles.details}>
+                  <Text style={styles.name}>Дата постановки</Text>
+                  <Text style={textStyle}>{getDateString(item?.storeDate)} </Text>
+                </View>
+              </View>
+            </>
+          ) : null}
         </View>
       </ScrollView>
     </AppScreen>
