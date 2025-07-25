@@ -29,6 +29,7 @@ import { isNumeric } from '@lib/mobile-hooks';
 import { IMovementLine } from '../../../store/types';
 
 import { ONE_SECOND_IN_MS } from '../../../utils/constants';
+import { getDataMarkType } from '../../../utils/helpers';
 
 interface IQuantity {
   quantity?: string;
@@ -96,16 +97,23 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
       setScaner({ state: 'found' });
       const prefixGtin = (settings.prefixGtin as ISettingsOption<string>)?.data || '';
       const prefixISN = (settings.prefixISN as ISettingsOption<string>)?.data || '';
-      const isTypeDM = RegExp(`^.{0,1}${prefixGtin}\\d{13,14}${prefixISN}.{13}91.{1,4}92.{1,44}`, 'i').test(brc);
-      if (!brc || !isTypeDM) {
-        return;
-      }
-      const gtin = brc.match(RegExp(`${prefixGtin}0?\\d{13}${prefixISN}`));
+      const dataMarkType = getDataMarkType(brc, prefixGtin, prefixISN);
 
-      if (!gtin || (gtin[0].slice(2, -2) !== item?.barcode && gtin[0].slice(3, -2) !== item?.barcode)) {
-        setScaner({ state: 'error', message: 'Коды товаров не совпадают.' });
+      if (!brc) {
+        setScaner({ state: 'error', message: 'Штрихкод не отсканирован' });
+
         return;
       }
+
+      if (dataMarkType === '1') {
+        const gtin = brc.match(RegExp(`${prefixGtin}0?\\d{13}${prefixISN}`));
+
+        if (!gtin || (gtin[0].slice(2, -2) !== item?.barcode && gtin[0].slice(3, -2) !== item?.barcode)) {
+          setScaner({ state: 'error', message: 'Коды товаров не совпадают.' });
+          return;
+        }
+      }
+
       setGoodEID(brc);
 
       setScaner({ state: 'init' });
@@ -329,6 +337,38 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProp
           )}
 
           <ItemSeparator />
+          {/* <View style={localStyles.item}>
+            <View style={localStyles.eIdView}>
+              <MediumText>EID:</MediumText>
+              <View style={{ flexDirection: 'column' }}>
+                {item?.EIDlist?.map((i, index) => (
+                  <LargeText key={index} style={localStyles.value}>
+                    {i}
+                  </LargeText>
+                ))}
+              </View>
+            </View>
+            <View style={localStyles.button}>
+              {item?.EID ? (
+                <TouchableOpacity>
+                  <IconButton icon="close" size={20} onPress={() => setGoodEID([])} />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity>
+                  <IconButton icon="barcode-scan" size={24} onPress={handleDoScan} />
+                </TouchableOpacity>
+              )}
+              {/* {item?.EIDlist?.length ? (
+                <TouchableOpacity>
+                  <IconButton icon="close" size={20} onPress={() => setGoodEID([])} />
+                </TouchableOpacity>
+              ) : (
+              <TouchableOpacity>
+                <IconButton icon="barcode-scan" size={24} onPress={handleDoScan} />
+              </TouchableOpacity>
+              {/* )}
+            </View>*
+          </View> */}
           <View style={localStyles.item}>
             <View style={localStyles.eIdView}>
               <MediumText>EID:</MediumText>

@@ -21,7 +21,6 @@ import {
   navBackButton,
   SaveDocument,
   SimpleDialog,
-  DateInfo,
   SearchButton,
 } from '@lib/mobile-ui';
 
@@ -39,14 +38,10 @@ import { ISettingsOption, ScreenState } from '@lib/types';
 
 import { FlashList } from '@shopify/flash-list';
 
-import { MD2Theme, Searchbar, useTheme } from 'react-native-paper';
-
 import { IWaybillDocument, IWaybillLine } from '../../store/types';
 import { WaybillStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 import { IGood } from '../../store/app/types';
-
-import { jsonFormat } from '../../utils/helpers';
 
 import DocTotal from './components/WaybillTotal';
 import { WaybillDialog } from './components/WaybillDialog';
@@ -296,22 +291,10 @@ export const WaybillViewScreen = () => {
     );
   };
 
-  //const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
-
-  // const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
-  // const documentType = useMemo(
-  //   () => documentTypes?.find((d) => d.id === doc?.documentType.id),
-  //   [doc?.documentType.id, documentTypes],
-  // );
-
   const settings = useSelector((state) => state.settings?.data);
 
   const prefixGtin = (settings.prefixGtin as ISettingsOption<string>)?.data || '';
   const prefixISN = (settings.prefixISN as ISettingsOption<string>)?.data || '';
-  // const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
-  // const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>)?.data || 0;
-  // const weightSettingsCountWeight = (settings.countWeight as ISettingsOption<number>)?.data || 0;
-  // const isInputQuantity = settings.quantityInput?.data;
 
   const [key, setKey] = useState(1);
 
@@ -329,26 +312,7 @@ export const WaybillViewScreen = () => {
         return;
       }
 
-      console.log('brc', brc);
-      //const charFrom = 0;
-      //const charTo = weightSettingsWeightCode.data.length;
-
-      // let scannedObject: IWaybillLine;
-      // const regIsTypeDM = RegExp(`^.{0,1}${prefixGtin}\\d{13,14}${prefixISN}.{10,13}`, 'i');
-      // // const regIsTypeDM0 = RegExp(`^.{0,1}${prefixGtin}\\d{13,14}${prefixISN}.{13}91.{1,4}92.{1,44}`, 'i');
-
-      // if (regIsTypeDM) {
-      //   Alert.alert('Внимание!', 'Отсканирован код маркировки! Отсканируйте штрихкод товара.', [
-      //     {
-      //       text: 'ОК',
-      //     },
-      //   ]);
-      //   handleFocus();
-
-      //   return;
-      // }
-
-      const line = doc.lines.find((item) => item.EID === brc);
+      const line = doc.lines.find((item) => JSON.parse(JSON.stringify(item.EID)) === JSON.parse(JSON.stringify(brc)));
       console.log('line', line);
       if (line) {
         const newLine: IWaybillLine = { ...line, checked: true };
@@ -359,15 +323,12 @@ export const WaybillViewScreen = () => {
       }
 
       if (!line) {
-        const regIsTypeDM = RegExp(`^.{0,1}${prefixGtin}\\d{13,14}${prefixISN}.{10,13}`, 'i');
         const gtin = brc.match(RegExp(`${prefixGtin}0?\\d{13}${prefixISN}`));
 
-        console.log('brc', brc);
-        console.log('gtin[0].slice(2, -2)', gtin?.[0].slice(2, -2));
-        console.log('gtin[0].slice(3, -2)', gtin?.[0].slice(3, -2));
         const good = goods?.find(
           (e) => gtin && (e.barcode === gtin[0].slice(2, -2) || gtin[0].slice(3, -2) === e?.barcode),
         );
+
         Alert.alert(
           `${good ? `${good.name}` : 'Внимание!'} `,
           'Позиция с данным кодом маркировки не найдена.  \n\nДобавить в документ?',
@@ -482,14 +443,7 @@ export const WaybillViewScreen = () => {
         keyExtractor={keyExtractor}
         extraData={[goods, delList, isDelList, isBlocked, navigation, id]}
       />
-      {doc.lines?.length ? (
-        <DocTotal
-          lineCount={doc.lines?.length || 0}
-          // sum={docLineSum}
-          // quantity={docLineQuantity}
-          // sumWNds={doc?.documentType?.isSumWNds}
-        />
-      ) : null}
+      {doc.lines?.length ? <DocTotal lineCount={doc.lines?.length || 0} /> : null}
       <SimpleDialog
         visible={visibleSendDialog}
         title={'Внимание!'}

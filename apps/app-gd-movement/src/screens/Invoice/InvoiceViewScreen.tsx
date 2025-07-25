@@ -107,11 +107,6 @@ export const InvoiceViewScreen = () => {
       }
     }, [ref]),
   );
-  const handleAddDocLine = useCallback(() => {
-    navigation.navigate('SelectRemainsItem', {
-      docId: id,
-    });
-  }, [navigation, id]);
 
   const handleEditDocHead = useCallback(() => {
     navigation.navigate('InvoiceEdit', { id });
@@ -179,10 +174,6 @@ export const InvoiceViewScreen = () => {
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
-        title: 'Добавить товар',
-        onPress: handleAddDocLine,
-      },
-      {
         title: 'Редактировать данные',
         onPress: handleEditDocHead,
       },
@@ -197,7 +188,7 @@ export const InvoiceViewScreen = () => {
         onPress: handleFocus,
       },
     ]);
-  }, [showActionSheet, handleAddDocLine, handleDelete, handleEditDocHead]);
+  }, [showActionSheet, handleDelete, handleEditDocHead]);
 
   const handleSaveDocument = useCallback(() => {
     if (!doc) {
@@ -284,7 +275,7 @@ export const InvoiceViewScreen = () => {
         onPress={() =>
           isDelList
             ? setDelList(getDelLineList(delList, item.id))
-            : !isBlocked && navigation.navigate('InvoiceLine', { mode: 1, docId: id, item })
+            : !isBlocked && item.eidType !== '0' && navigation.navigate('InvoiceLine', { mode: 1, docId: id, item })
         }
         onLongPress={() => !isBlocked && setDelList(getDelLineList(delList, item.id))}
         checked={delList.includes(item.id)}
@@ -302,23 +293,6 @@ export const InvoiceViewScreen = () => {
     );
   };
 
-  //const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
-
-  // const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
-  // const documentType = useMemo(
-  //   () => documentTypes?.find((d) => d.id === doc?.documentType.id),
-  //   [doc?.documentType.id, documentTypes],
-  // );
-
-  // const settings = useSelector((state) => state.settings?.data);
-
-  // const prefixGtin = (settings.prefixGtin as ISettingsOption<string>)?.data || '';
-  // const prefixISN = (settings.prefixISN as ISettingsOption<string>)?.data || '';
-  // const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
-  // const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>)?.data || 0;
-  // const weightSettingsCountWeight = (settings.countWeight as ISettingsOption<number>)?.data || 0;
-  // const isInputQuantity = settings.quantityInput?.data;
-
   const [key, setKey] = useState(1);
 
   const getScannedObject = useCallback(
@@ -334,24 +308,6 @@ export const InvoiceViewScreen = () => {
       if (!brc) {
         return;
       }
-
-      //const charFrom = 0;
-      //const charTo = weightSettingsWeightCode.data.length;
-
-      // let scannedObject: IInvoiceLine;
-      // const regIsTypeDM = RegExp(`^.{0,1}${prefixGtin}\\d{13,14}${prefixISN}.{10,13}`, 'i');
-      // // const regIsTypeDM0 = RegExp(`^.{0,1}${prefixGtin}\\d{13,14}${prefixISN}.{13}91.{1,4}92.{1,44}`, 'i');
-
-      // if (regIsTypeDM) {
-      //   Alert.alert('Внимание!', 'Отсканирован код маркировки! Отсканируйте штрихкод товара.', [
-      //     {
-      //       text: 'ОК',
-      //     },
-      //   ]);
-      //   handleFocus();
-
-      //   return;
-      // }
 
       const line = doc.lines.find((item) => item.barcode === brc);
 

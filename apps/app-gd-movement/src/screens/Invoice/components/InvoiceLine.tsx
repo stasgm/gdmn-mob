@@ -24,6 +24,7 @@ import { ISettingsOption } from '@lib/types';
 import { IInvoiceLine } from '../../../store/types';
 
 import { ONE_SECOND_IN_MS } from '../../../utils/constants';
+import { getDataMarkType } from '../../../utils/helpers';
 
 interface IQuantity {
   quantity?: string;
@@ -75,12 +76,7 @@ export const InvoiceLine = ({ item, onSetLine }: IProps) => {
       console.log('brc', brc);
       const prefixGtin = (settings.prefixGtin as ISettingsOption<string>)?.data || '';
       const prefixISN = (settings.prefixISN as ISettingsOption<string>)?.data || '';
-      const isTypeDM =
-        item?.eidType.toString() === '1' || item?.eidType.toString() === '3'
-          ? RegExp(`^.{0,1}${prefixGtin}\\d{13,14}${prefixISN}.{8,13}[91,93].{1,4}92?.{1,44}?`, 'i').test(brc)
-          : item?.eidType.toString() === '2' || item?.eidType.toString() === '3'
-            ? RegExp(`^.{0,1}${prefixGtin}\\d{13,14}${prefixISN}.{8,13}`, 'i').test(brc)
-            : false;
+      const dataMarkType = getDataMarkType(brc, prefixGtin, prefixISN);
 
       if (!brc) {
         setScaner({ state: 'error', message: 'Штрихкод не отсканирован' });
@@ -88,47 +84,37 @@ export const InvoiceLine = ({ item, onSetLine }: IProps) => {
         return;
       }
 
-      if (!isTypeDM) {
+      if (dataMarkType === '0') {
         setScaner({ state: 'error', message: 'Ошибка!' });
 
         return;
       }
 
-      // ПРОВЕРКА НА ТИП EID (0,1,2,3)
+      const lineBrc = goodEID.find((i) => i === brc);
+      if (lineBrc) {
+        setScaner({ state: 'error', message: 'Код маркировки уже добавлен' });
 
-      // if (!isTypeDM) {
-      //   // const isTypeDM_1 = RegExp(`^.{0,1}${prefixGtin}\\d{13,14}${prefixISN}.{8,13}`, 'i').test(brc);
-      //   console.log('isTypeDM_1', isTypeDM_1);
-      //   if (isTypeDM_1) {
-      //     setGoodEID([...goodEID, brc]);
+        return;
+      }
 
-      //     setScaner({ state: 'init' });
-      //     setDoScanned(false);
-      //   } else {
-      //     setScaner({ state: 'error', message: '!' });
-
-      //     return;
-      //   }
-      // }
-
-      if (item?.eidType.toString() === '1' || item?.eidType.toString() === '3') {
+      if (dataMarkType === '1') {
+        if (item?.eidType !== '1' && item?.eidType !== '3') {
+          setScaner({ state: 'error', message: 'Отсканирован неправильный код маркировки.' });
+          return;
+        }
         const gtin = brc.match(RegExp(`${prefixGtin}0?\\d{13}${prefixISN}`));
 
         if (!gtin || (gtin[0].slice(2, -2) !== item?.barcode && gtin[0].slice(3, -2) !== item?.barcode)) {
           setScaner({ state: 'error', message: 'Коды товаров не совпадают.' });
           return;
         }
-        setGoodEID([...goodEID, brc]);
-
-        setScaner({ state: 'init' });
-        setDoScanned(false);
-        handleClearScaner();
-      } else {
-        setGoodEID([...goodEID, brc]);
-        setScaner({ state: 'init' });
-        setDoScanned(false);
-        handleClearScaner();
       }
+
+      setGoodEID([...goodEID, brc]);
+
+      setScaner({ state: 'init' });
+      setDoScanned(false);
+      handleClearScaner();
     },
     [goodEID, item?.barcode, item?.eidType, settings.prefixGtin, settings.prefixISN],
   );
@@ -141,6 +127,9 @@ export const InvoiceLine = ({ item, onSetLine }: IProps) => {
   };
 
   const handleDoScan = () => {
+    if (keypadValue.quantity && Number(keypadValue.quantity) === goodEID.length) {
+      return;
+    }
     setDoScanned(true);
   };
 
@@ -239,7 +228,7 @@ export const InvoiceLine = ({ item, onSetLine }: IProps) => {
           <View style={localStyles.item}>
             <View style={localStyles.eIdView}>
               <MediumText>EID:</MediumText>
-              <View style={{ flexDirection: 'column' }}>
+              <View style={localStyles.eidList}>
                 {item?.eidList?.map((i, index) => (
                   <LargeText key={index} style={localStyles.value}>
                     {i}
@@ -324,25 +313,25 @@ const localStyles = StyleSheet.create({
     padding: 5,
     alignItems: 'center',
   },
-  halfItem: {
-    flexDirection: 'row',
-    width: '50%',
-    paddingRight: 3,
-    alignSelf: 'flex-start',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-  },
+  // halfItem: {
+  //   flexDirection: 'row',
+  //   width: '50%',
+  //   paddingRight: 3,
+  //   alignSelf: 'flex-start',
+  //   flexWrap: 'wrap',
+  //   alignItems: 'center',
+  // },
   value: {
     fontWeight: 'bold',
     paddingLeft: 5,
   },
-  verticalLine: {
-    width: 1,
-    height: '100%',
-  },
-  halfItemRemView: {
-    marginLeft: 3,
-  },
+  // verticalLine: {
+  //   width: 1,
+  //   height: '100%',
+  // },
+  // halfItemRemView: {
+  //   marginLeft: 3,
+  // },
   eIdView: {
     flexDirection: 'row',
     width: '80%',
@@ -359,4 +348,5 @@ const localStyles = StyleSheet.create({
     marginHorizontal: 5,
   },
   zIndex: { zIndex: 0 },
+  eidList: { flexDirection: 'column' },
 });

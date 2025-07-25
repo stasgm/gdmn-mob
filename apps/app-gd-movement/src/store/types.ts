@@ -89,7 +89,7 @@ export interface IMovementLine extends IEntity {
   remains?: number;
   barcode?: string;
   EID?: string;
-  EIDlist?: string[];
+  // EIDlist?: string[];
   docType?: string;
   weightCode?: string;
   alias?: string;

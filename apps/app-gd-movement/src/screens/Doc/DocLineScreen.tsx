@@ -108,6 +108,10 @@ export const DocLineScreen = () => {
               Alert.alert('Ошибка!', 'Количество товара не может быть меньше нуля!', [{ text: 'Ок' }]);
               return;
             }
+            if (line.EID && line.quantity !== 1) {
+              Alert.alert('Ошибка!', 'Количество товара с кодом маркировки должно быть равно 1.', [{ text: 'Ок' }]);
+              return;
+            }
             //Предупреждение, если количество по товару больше остатков
             if (
               (!!documentType?.isControlRemains &&
