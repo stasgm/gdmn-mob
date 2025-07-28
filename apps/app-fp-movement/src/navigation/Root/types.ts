@@ -131,3 +131,5 @@ export type RemainsParamList = RefParamList & {
 };
 
 export type RemainsStackParamList = { ContactList: undefined } & RemainsParamList;
+
+export type PalletStackParamList = { PalletList: undefined } & RefParamList;

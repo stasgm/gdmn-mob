@@ -51,6 +51,15 @@ export const appSettings: Settings = {
     visible: true,
     group: mainSettingGroup,
   },
+  isUseRemains: {
+    id: 'isUseRemains',
+    description: 'Использовать остатки',
+    data: false,
+    type: 'boolean',
+    sortOrder: 4,
+    visible: true,
+    group: mainSettingGroup,
+  },
 };
 
 export const viewTypeList: IListItem[] = [

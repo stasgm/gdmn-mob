@@ -43,7 +43,7 @@ import { DocStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS, unknownGood } from '../../utils/constants';
 import { IGood, IMGoodData, IMGoodRemain, IRemains } from '../../store/app/types';
 
-import { getBrc, getRemGoodByContact } from '../../utils/helpers';
+import { getBrc, getDataMarkType, getRemGoodByContact } from '../../utils/helpers';
 
 import { appInventoryActions } from '../../store';
 
@@ -327,12 +327,25 @@ export const DocViewScreen = () => {
       if (!brc) {
         return;
       }
+      const dataMarkType = getDataMarkType(brc, prefixGtin, prefixISN);
+
+      //проверка кода маркировки на уникальность добавить
+
+      if (dataMarkType === '2') {
+        Alert.alert('Внимание!', 'Отсканирован код УКЗ. Отсканируйте штрихкод товара', [
+          {
+            text: 'ОК',
+          },
+        ]);
+        handleFocus();
+
+        return;
+      }
 
       let charFrom = 0;
       let charTo = weightSettingsWeightCode.data.length;
 
       let scannedObject: IMovementLine;
-      const regIsTypeDM = RegExp(`^.{0,1}${prefixGtin}\\d{13,14}${prefixISN}.{13}91.{1,4}92.{1,44}`, 'i');
 
       if (brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
         const remItem =
@@ -356,7 +369,7 @@ export const DocViewScreen = () => {
         scannedObject = {
           good: { id: remItem.good.id, name: remItem.good.name },
           id: generateId(),
-          quantity: isInputQuantity ? 1 : 0,
+          quantity: dataMarkType === '1' ? 1 : isInputQuantity ? 1 : 0,
           price: remItem.remains?.length ? remItem.remains[0].price : 0,
           buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
@@ -364,7 +377,7 @@ export const DocViewScreen = () => {
           sortOrder: (lines?.[0]?.sortOrder || 0) + 1,
           alias: remItem.good.alias || '',
           weightCode: remItem.good.weightCode?.trim() || '',
-          EID: regIsTypeDM.test(brc) ? brc : undefined,
+          EID: dataMarkType === '1' ? brc : undefined,
         };
       } else {
         charFrom = charTo;
@@ -402,7 +415,7 @@ export const DocViewScreen = () => {
           sortOrder: (lines?.[0]?.sortOrder || 0) + 1,
           alias: remItem.good.alias || '',
           weightCode: remItem.good.weightCode?.trim() || '',
-          EID: regIsTypeDM.test(brc) ? brc : undefined,
+          EID: dataMarkType === '1' ? brc : undefined,
         };
       }
 

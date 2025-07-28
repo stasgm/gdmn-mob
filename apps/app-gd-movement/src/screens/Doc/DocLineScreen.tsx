@@ -74,6 +74,8 @@ export const DocLineScreen = () => {
             ...line.good,
             barcode: line.barcode,
             id,
+            price: line.price || 0,
+            buyingPrice: line.buyingPrice || 0,
           }),
         );
         newLine = { ...newLine, good: { ...newLine.good, id } };
@@ -104,6 +106,10 @@ export const DocLineScreen = () => {
           onPress={async () => {
             if (line.quantity < 0) {
               Alert.alert('Ошибка!', 'Количество товара не может быть меньше нуля!', [{ text: 'Ок' }]);
+              return;
+            }
+            if (line.EID && line.quantity !== 1) {
+              Alert.alert('Ошибка!', 'Количество товара с кодом маркировки должно быть равно 1.', [{ text: 'Ок' }]);
               return;
             }
             //Предупреждение, если количество по товару больше остатков

@@ -143,6 +143,19 @@ export const getBrc = (brc: string, prefixGtin: string, goodRemains: IMGoodData<
   const startPosition = brc.match(RegExp(`${prefixGtin}\\d{13,14}${isTypeDM ? prefixISN : ''}`));
 
   return startPosition
-    ? goodRemains[startPosition[0].slice(2, -2)] || goodRemains[startPosition[0].slice(3, -2)]
+    ? goodRemains[startPosition[0].slice(2 /*, -2*/)] || goodRemains[startPosition[0].slice(3 /*, -2*/)]
     : goodRemains[brc.slice(1, 14)] || goodRemains[brc];
+};
+
+type Code = '0' | '1' | '2' | '3';
+export const getDataMarkType = (brc: string, prefixGtin: string, prefixISN?: string) => {
+  const type: Code = RegExp(`^.{0,1}${prefixGtin}\\d{13,14}${prefixISN}.{13}91.{1,4}92.{1,44}`, 'i').test(brc)
+    ? '1'
+    : RegExp(`^.{0,1}${prefixGtin}\\d{13,14}${prefixISN}.{8,13}93.{1,44}`, 'i').test(brc)
+      ? '1'
+      : RegExp(`^.{0,1}${prefixGtin}\\d{13,14}${prefixISN}.{8,13}`).test(brc)
+        ? '2'
+        : '0';
+
+  return type;
 };

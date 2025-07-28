@@ -107,6 +107,10 @@ const OrderViewScreen = () => {
   const packages = refSelectors.selectByName<IPackageGood>('packageGood')?.data;
   const goods = refSelectors.selectByName<IGood>('good')?.data;
 
+  const settings = useSelector((state) => state.settings.data);
+  const isUseRemains = settings?.isUseRemains?.data as boolean;
+  const depart = refSelectors.selectByRefId<INamedEntity>('department', order?.head?.depart?.id)?.name;
+
   const handleAddOrderLine = useCallback(() => {
     navigation.navigate('SelectGood', {
       docId: id,
@@ -136,6 +140,14 @@ const OrderViewScreen = () => {
     setVisibleDebtDialog(false);
     await sendRequest();
   }, [sendRequest]);
+
+  const sendRemainsRequest = useSendOneRefRequest('Остатки', { name: 'remains' });
+
+  const handleSendRemainsRequest = useCallback(async () => {
+    if (isUseRemains) {
+      await sendRemainsRequest();
+    }
+  }, [isUseRemains, sendRemainsRequest]);
 
   const handleOpenDebtDialog = () => {
     setVisibleDebtDialog(true);
@@ -343,8 +355,9 @@ const OrderViewScreen = () => {
     setVisibleSendDialog(false);
     setScreenState('sending');
     await sendDoc();
+    await handleSendRemainsRequest();
     setScreenState('sent');
-  }, [sendDoc]);
+  }, [handleSendRemainsRequest, sendDoc]);
 
   const handleSaveDocument = useCallback(() => {
     if (!order) {
@@ -586,6 +599,8 @@ const OrderViewScreen = () => {
                 <MediumText>Лимит: {formatValue({ type: 'currency', decimals: 2 }, limitSum)}</MediumText>
               </View>
             ) : null}
+            {isUseRemains && depart ? <LargeText style={localStyles.contract}>{`Склад: ${depart}`}</LargeText> : null}
+
             {order.head.comment ? (
               <View style={styles.rowCenter}>
                 <MediumText>Комментарий: {order.head.comment || ''}</MediumText>

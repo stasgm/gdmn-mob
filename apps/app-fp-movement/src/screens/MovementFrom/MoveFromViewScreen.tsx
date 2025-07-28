@@ -712,6 +712,7 @@ export const MoveFromViewScreen = () => {
         onOk={handleSearchBarcode}
         okLabel={'Найти'}
         errorMessage={errorMessage}
+        keyboardType="number-pad"
       />
       {/* <AppDialog
         title="Количество"
@@ -721,7 +722,7 @@ export const MoveFromViewScreen = () => {
         onCancel={handleDismissQuantPack}
         onOk={handleEditQuantPack}
         okLabel={'Ок'}
-        keyboardType="numbers-and-punctuation"
+        keyboardType="number-pad"
       /> */}
       <SimpleDialog
         visible={visibleSendDialog}

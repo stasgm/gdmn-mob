@@ -47,3 +47,4 @@ export { SimpleDialog } from './SimpleDialog';
 export { NumberKeypad } from './NumberKeypad';
 export { default as Checkbox } from './Checkbox';
 export { default as DateInfo } from './DateInfo';
+export { default as DropdownInput } from './DropdownInput';

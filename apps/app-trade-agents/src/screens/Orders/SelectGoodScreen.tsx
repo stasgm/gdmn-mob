@@ -47,9 +47,11 @@ import {
   IMGroupModel,
   IOrderDocument,
   IOrderLine,
+  IRemains,
+  IRemGood,
 } from '../../store/types';
 import { UNKNOWN_GROUP } from '../../utils/constants';
-import { getGoodMatrixByContact, getGroupModelByContact } from '../../utils/helpers';
+import { getGoodMatrixByContact, getGroupModelByContact, getRemGoodListByContact } from '../../utils/helpers';
 
 import { OrderLineDialog } from './components/OrderLineDialog';
 import OrderLineEdit, { IOrderItemLine } from './components/OrderLineEdit';
@@ -63,8 +65,10 @@ const SelectGoodScreen = () => {
 
   const settings = useSelector((state) => state.settings.data);
   const isUseNetPrice = settings?.isUseNetPrice?.data as boolean;
+  const isUseRemains = settings?.isUseRemains?.data as boolean;
 
   const [isUseMatrix, setIsUseMatrix] = useState(isUseNetPrice);
+  const [useRemains, setUseRemains] = useState(isUseRemains);
   const [isShowPrev, setParamsVisible] = useState(false);
 
   const syncDate = useSelector((state) => state.app.syncDate);
@@ -83,12 +87,27 @@ const SelectGoodScreen = () => {
   const [filterDateEnd, setFilterDateEnd] = useState<string | undefined>(
     new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000).toISOString(),
   );
+  const doc = docSelectors.selectByDocId<IOrderDocument>(docId);
 
+  console.log('doc?.head.depart?.id', doc?.head.depart?.id);
   const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
   const goods = refSelectors.selectByName<IGood>('good').data;
   const refGroup = refSelectors.selectByName<IGoodGroup>('goodGroup');
-  const groups = useMemo(() => refGroup.data.concat(UNKNOWN_GROUP), [refGroup.data]);
-  const doc = docSelectors.selectByDocId<IOrderDocument>(docId);
+  const groupsConcat = useMemo(() => refGroup.data.concat(UNKNOWN_GROUP), [refGroup.data]);
+  const groups = useMemo(
+    () =>
+      isUseRemains && useRemains
+        ? groupsConcat.filter((i) => (!i.parent?.id ? i.id === doc?.head.depart?.id : true))
+        : groupsConcat,
+    [doc?.head.depart?.id, groupsConcat, isUseRemains, useRemains],
+  );
+
+  const remains = refSelectors.selectByName<IRemains>('remains')?.data?.[0];
+
+  const [goodRemains] = useState<IRemGood[]>(() =>
+    doc?.head.depart?.id ? getRemGoodListByContact(goods, remains[doc?.head.depart?.id], true) : [],
+  );
+
   const contactId = doc?.head.contact.id;
   const outletId = doc?.head.outlet.id;
   const docs = useSelector((state) => state.documents.list) as IOrderDocument[];
@@ -382,6 +401,7 @@ const SelectGoodScreen = () => {
         backgroundColor: isAdded ? globalColors.backgroundLight : 'transparent',
       };
 
+      const goodQuantity = isUseRemains && useRemains ? goodRemains.find((i) => i.good.id === item.id)?.remains : 0;
       return (
         <View key={item.id}>
           <TouchableOpacity onPress={() => handlePressGood(isAdded, item)}>
@@ -391,6 +411,12 @@ const SelectGoodScreen = () => {
               </View>
               <View style={styles.details}>
                 <MediumText style={styles.textBold}>{item.name || item.id}</MediumText>
+                {isUseRemains && useRemains && (
+                  <View style={localStyles.remains}>
+                    <IconButton icon={'store-check-outline'} size={18} iconColor={colors.text} />
+                    <MediumText>Остаток: {goodQuantity || 0}</MediumText>
+                  </View>
+                )}
                 {isAdded && (
                   <View style={localStyles.lineView}>
                     {lines.map((line) => (
@@ -420,7 +446,17 @@ const SelectGoodScreen = () => {
         </View>
       );
     },
-    [colors.placeholder, colors.primary, doc?.lines, handlePressGood, prevLines],
+    [
+      colors.placeholder,
+      colors.primary,
+      colors.text,
+      doc?.lines,
+      goodRemains,
+      handlePressGood,
+      isUseRemains,
+      prevLines,
+      useRemains,
+    ],
   );
 
   const handlePressGroup = useCallback(
@@ -502,6 +538,12 @@ const SelectGoodScreen = () => {
           <View style={localStyles.switch}>
             <MediumText>Использовать матрицы</MediumText>
             <Switch value={isUseMatrix} onValueChange={() => setIsUseMatrix(!isUseMatrix)} />
+          </View>
+        )}
+        {isUseRemains && (
+          <View style={localStyles.switch}>
+            <MediumText>Использовать остатки</MediumText>
+            <Switch value={useRemains} onValueChange={() => setUseRemains(!useRemains)} />
           </View>
         )}
         {contactId && goodMatrix[contactId] && !isShowPrev && filterVisible && (
@@ -671,4 +713,5 @@ const localStyles = StyleSheet.create({
     marginTop: -10,
   },
   primeButton: { height: 40 },
+  remains: { flexDirection: 'row', alignItems: 'center' },
 });
