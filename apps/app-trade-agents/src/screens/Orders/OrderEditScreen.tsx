@@ -51,6 +51,7 @@ const OrderEditScreen = () => {
 
   // Подразделение по умолчанию
   const departSetting = useSelector((state) => state.settings?.userData?.depart?.data);
+  const isUseRemains = useSelector((state) => state.settings?.data?.isUseRemains?.data) as boolean;
 
   const defaultDepart = useMemo(() => (isNamedEntity(departSetting) ? departSetting : undefined), [departSetting]);
   const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === docOutlet?.id);
@@ -133,6 +134,11 @@ const OrderEditScreen = () => {
         return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
       }
 
+      if (isUseRemains && !docDepart) {
+        setScreenState('idle');
+        return Alert.alert('Ошибка!', 'Не заполнено поле Склад-магазин.', [{ text: 'OK' }]);
+      }
+
       const docId = !id ? generateId() : id;
       const newOrderDate = new Date().toISOString();
 
@@ -209,6 +215,7 @@ const OrderEditScreen = () => {
     routeId,
     road,
     docRoad,
+    isUseRemains,
   ]);
 
   const renderRight = useCallback(
@@ -298,7 +305,7 @@ const OrderEditScreen = () => {
   }, [docContact?.id, docOutlet, isBlocked, navigation, order?.head.route?.id]);
 
   const handlePresentDepart = useCallback(() => {
-    if (isBlocked) {
+    if (isUseRemains ? docStatus !== 'DRAFT' : isBlocked) {
       return;
     }
 
@@ -307,7 +314,8 @@ const OrderEditScreen = () => {
       fieldName: 'depart',
       value: docDepart && [docDepart],
     });
-  }, [docDepart, isBlocked, navigation]);
+  }, [docDepart, docStatus, isBlocked, isUseRemains, navigation]);
+
   const handlePresentRoad = useCallback(() => {
     if (isBlocked) {
       return;
@@ -343,6 +351,7 @@ const OrderEditScreen = () => {
     return <AppActivityIndicator />;
   }
 
+  console.log('isUseRemains', isUseRemains);
   return (
     <AppInputScreen>
       <SubTitle>{statusName}</SubTitle>
@@ -384,7 +393,7 @@ const OrderEditScreen = () => {
           label="Склад-магазин"
           value={docDepart?.name}
           onPress={handlePresentDepart}
-          disabled={isBlocked}
+          disabled={isUseRemains ? docStatus !== 'DRAFT' : isBlocked}
         />
         <Input
           label="Комментарий"

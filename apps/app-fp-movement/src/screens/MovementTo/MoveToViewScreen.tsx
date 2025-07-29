@@ -812,6 +812,7 @@ export const MoveToViewScreen = () => {
         onOk={handleSearchBarcode}
         okLabel={'Найти'}
         errorMessage={errorMessage}
+        keyboardType="number-pad"
       />
       <QuantDialog
         visible={visibleQuantPackDialog}
@@ -823,7 +824,7 @@ export const MoveToViewScreen = () => {
         onOk={handleEditQuantPack}
         okLabel={'Ок'}
         isPack={true}
-        keyboardType="numbers-and-punctuation"
+        keyboardType="number-pad"
         okDisabled={!quantPack || (newwLine?.weight || 0) * Number(quantPack) < goodBarcodeSettings.boxWeight}
       />
       <SimpleDialog

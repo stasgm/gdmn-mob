@@ -76,7 +76,13 @@
     "react-test-renderer": "^18.3.1",
     "redux": "^4.2.1",
     "redux-thunk": "^2.4.2",
-    "typesafe-actions": "^5.1.0"
+    "typesafe-actions": "^5.1.0",
+    "reselect": "~4.1.7",
+    "react-native-svg": "13.9.0",
+    "@adrianso/react-native-barcode-builder": "1.0.12",
+    "react-native-view-shot": "3.7.0",
+    "expo-print": "~12.4.2",
+    "expo-sharing": "~11.5.0"
   },
   "devDependencies": {
     "@babel/core": "^7.26.9",

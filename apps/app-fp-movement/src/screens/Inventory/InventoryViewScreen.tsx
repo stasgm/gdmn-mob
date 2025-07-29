@@ -685,6 +685,7 @@ export const InventoryViewScreen = () => {
         onOk={handleSearchBarcode}
         okLabel={'Найти'}
         errorMessage={errorMessage}
+        keyboardType="number-pad"
       />
       <QuantDialog
         visible={visibleQuantPackDialog}
@@ -696,7 +697,7 @@ export const InventoryViewScreen = () => {
         onOk={handleEditQuantPack}
         okLabel={'Ок'}
         isPack={isPack}
-        keyboardType="numbers-and-punctuation"
+        keyboardType="number-pad"
         okDisabled={!quantPack || !quantPallet}
       />
       <SimpleDialog

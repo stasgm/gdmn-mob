@@ -78,3 +78,33 @@ export interface IMGroupParent {
 export interface IMGroupModel {
   [parentId: string]: IMGroupParent;
 }
+
+export interface IRemains {
+  [id: string]: IRemainsData[];
+}
+
+export interface IRemainsData {
+  goodId: string;
+  q?: number;
+  priceFso?: number;
+  priceFsn?: number; // цена ФСН
+  priceFsoSklad?: number; // цена ФСО склад
+  priceFsnSklad?: number; // цена ФСН склад
+}
+
+export interface IRemGood {
+  good: IGood;
+  priceFso: number;
+  priceFsn: number; // цена ФСН
+  priceFsoSklad: number; // цена ФСО склад
+  priceFsnSklad: number; // цена ФСН склад
+  remains: number;
+}
+
+export interface IModelRem {
+  priceFso: number;
+  priceFsn: number; // цена ФСН
+  priceFsoSklad: number; // цена ФСО склад
+  priceFsnSklad: number; // цена ФСН склад
+  q: number;
+}

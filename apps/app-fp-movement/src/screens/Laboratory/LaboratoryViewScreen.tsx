@@ -709,6 +709,7 @@ export const LaboratoryViewScreen = () => {
         onOk={handleSearchBarcode}
         okLabel={'Найти'}
         errorMessage={errorMessage}
+        keyboardType="number-pad"
       />
       <AppDialog
         title="Количество"
@@ -718,7 +719,7 @@ export const LaboratoryViewScreen = () => {
         onCancel={handleDismissQuantPack}
         onOk={handleEditWeight}
         okLabel={'Ок'}
-        // keyboardType="numbers-and-punctuation"
+        keyboardType="number-pad"
         // errorMessage={errorMessage}
       />
       <SimpleDialog

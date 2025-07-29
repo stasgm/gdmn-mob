@@ -67,10 +67,12 @@ import {
   moveFromScreens,
   moveScreens,
   moveToScreens,
+  palletScreens,
   receiptScreens,
   returnScreens,
   shipmentScreens,
 } from './src/navigation/Root/screens';
+import { PalletNavigator } from './src/navigation/PalletNavigator';
 
 SplashScreen.preventAutoHideAsync()
   .then((result) => console.log(`SplashScreen.preventAutoHideAsync() succeeded: ${result}`))
@@ -161,6 +163,14 @@ const Root = () => {
               component: RemainsNavigator,
             },
             {
+              name: 'Pallet',
+              title: 'Паллеты',
+              icon: 'barcode-scan',
+              component: PalletNavigator,
+              showInDashboard: true,
+              dashboardScreenName: 'PalletList',
+            },
+            {
               name: 'Return',
               title: 'Возврат',
               icon: 'file-restore-outline',
@@ -237,6 +247,14 @@ const Root = () => {
               component: RemainsNavigator,
             },
             {
+              name: 'Pallet',
+              title: 'Паллеты',
+              icon: 'barcode-scan',
+              component: PalletNavigator,
+              showInDashboard: true,
+              dashboardScreenName: 'PalletList',
+            },
+            {
               name: 'Receipt',
               title: 'Приход',
               icon: 'file-document-outline',
@@ -279,6 +297,7 @@ const Root = () => {
             ...returnScreens,
             ...inventoryScreens,
             ...laboratoryScreens,
+            ...palletScreens,
           }
         : {
             ...moveScreens,
@@ -289,6 +308,7 @@ const Root = () => {
             ...returnScreens,
             ...inventoryScreens,
             ...laboratoryScreens,
+            ...palletScreens,
           },
     [isAddressStore],
   );

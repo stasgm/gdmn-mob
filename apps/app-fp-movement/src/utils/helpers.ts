@@ -20,6 +20,7 @@ import {
   IReturnDocument,
   ISendingLine,
   IFreeShipmentLine,
+  IPalletDocument,
 } from '../store/types';
 import {
   IBarcode,
@@ -36,7 +37,7 @@ import {
 import { ONE_KG_IN_G, ONE_T_IN_KG } from './constants';
 
 export const getNextDocNumber = (
-  documents: IMoveDocument[] | IShipmentDocument[] | IFreeShipmentDocument[] | IInventoryDocument[],
+  documents: IMoveDocument[] | IShipmentDocument[] | IFreeShipmentDocument[] | IInventoryDocument[] | IPalletDocument[],
 ) => {
   return (
     documents
@@ -91,7 +92,7 @@ export const getBarcodeString = (barcodeObj: IBarcode, settings: barcodeSettings
   const weight =
     barcodeObj.weight < ONE_T_IN_KG
       ? getCodeForCheck(round(barcodeObj.weight * ONE_KG_IN_G, 3).toString(), settings?.countWeight || 6)
-      : getCodeForCheck(round(barcodeObj.weight * ONE_KG_IN_G, 3).toString(), -(settings?.countWeight || 6));
+      : round(barcodeObj.weight * ONE_KG_IN_G, 3).toString();
 
   const barcode =
     weight + day + month + year + (barcodeObj.time || '0000') + shcode + quantPack + barcodeObj.numReceived;
@@ -344,6 +345,7 @@ export const getDocToSend = (
           fromCell: (i as IMoveLine).fromCell,
           toCell: (i as IMoveLine).toCell,
           box: (i as IFreeShipmentLine).box,
+          storeDate: (i as IMoveLine).storeDate,
         }) as ISendingLine,
     ),
   };

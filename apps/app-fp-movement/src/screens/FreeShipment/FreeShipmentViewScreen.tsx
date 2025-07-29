@@ -909,6 +909,7 @@ export const FreeShipmentViewScreen = () => {
         onCancel={handleDismissBarcode}
         onOk={handleSearchBarcode}
         okLabel={'Найти'}
+        keyboardType="number-pad"
         errorMessage={errorMessage}
       />
       <QuantDialog
@@ -921,7 +922,7 @@ export const FreeShipmentViewScreen = () => {
         onOk={handleEditQuantPack}
         okLabel={'Ок'}
         isPack={isPack}
-        keyboardType="numbers-and-punctuation"
+        keyboardType="number-pad"
         okDisabled={!quantPack || !quantPallet}
       />
       {usePackage && (
@@ -930,7 +931,7 @@ export const FreeShipmentViewScreen = () => {
           onCancel={handleCancelBoxDialog}
           onOk={handleSetNewBox}
           okLabel={'Ок'}
-          keyboardType="numbers-and-punctuation"
+          keyboardType="number-pad"
           okDisabled={!quantPack || !quantPallet}
           screenName="FreeShipmentView"
           lastBox={lines?.[0]?.box || undefined}
@@ -942,7 +943,7 @@ export const FreeShipmentViewScreen = () => {
           onCancel={handleCancelUnitDialog}
           onOk={handleAddUnitLine}
           okLabel={'Ок'}
-          keyboardType="numbers-and-punctuation"
+          keyboardType="number-pad"
           okDisabled={!quantPack || !quantPallet}
           screenName="FreeShipmentView"
           line={brcLine}

@@ -50,7 +50,7 @@ import { ScreenState } from '@lib/types';
 
 import { DashboardStackParamList } from '@lib/mobile-navigation';
 
-import { barcodeSettings, IBox, IShipmentDocument, IShipmentLine, ITempLine } from '../../store/types';
+import { barcodeSettings, IBox, IOrderDocument, IShipmentDocument, IShipmentLine, ITempLine } from '../../store/types';
 
 import { ShipmentStackParamList } from '../../navigation/Root/types';
 
@@ -106,6 +106,8 @@ const ShipmentViewScreen = () => {
   );
 
   const tempOrder = useFpSelector((state) => state.fpMovement.list).find((i) => i.orderId === shipment?.head?.orderId);
+  const order = docSelectors.selectByDocId<IOrderDocument>(shipment?.head?.orderId);
+
   const tempOrderLines = tempOrder?.lines?.filter((i) => i.weight > 0) as ITempLine[];
 
   const isBlocked = shipment?.status !== 'DRAFT';
@@ -448,7 +450,9 @@ const ShipmentViewScreen = () => {
           playSound('OK');
         } else {
           const currTempLine = tempOrderLines.find((i) => i.id === newTempLine.id);
-          if (currTempLine?.weight && Math.abs(newTempLine.weight) <= currTempLine?.weight * limitDelta) {
+          const orderLineWeight = order?.lines?.find((i) => i.good.id === newLine.good?.id)?.weight; // текущее количество в заявке
+          const delta = orderLineWeight ? round(orderLineWeight * limitDelta) : 0;
+          if (limitDelta && delta && currTempLine?.weight && Math.abs(newTempLine.weight) <= delta) {
             dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
             fpDispatch(
               fpMovementActions.updateTempOrderLine({
@@ -496,7 +500,7 @@ const ShipmentViewScreen = () => {
 
       handleFocus();
     },
-    [box, dispatch, fpDispatch, id, limitDelta, tempOrder, tempOrderLines],
+    [box, dispatch, fpDispatch, id, limitDelta, order?.lines, playSound, tempOrder, tempOrderLines],
   );
 
   const handleCancelUnitDialog = () => {
@@ -861,7 +865,7 @@ const ShipmentViewScreen = () => {
       const newLine = box ? { ...shipmentLine, box } : shipmentLine;
 
       if (tempLine && tempOrder) {
-        const newTempLine = { ...tempLine, weight: round(tempLine.weight - newLine.weight, 3) };
+        const newTempLine = { ...tempLine, weight: round(tempLine.weight - newLine.weight, 3) }; // новое количество в заявке
         if (newTempLine.weight > 0) {
           fpDispatch(
             fpMovementActions.updateTempOrderLine({
@@ -881,8 +885,10 @@ const ShipmentViewScreen = () => {
           dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
           playSound('OK');
         } else {
-          const currTempLine = tempOrderLines.find((i) => i.id === newTempLine.id);
-          if (currTempLine?.weight && Math.abs(newTempLine.weight) <= currTempLine?.weight * limitDelta) {
+          const currTempLine = tempOrder?.lines?.find((i) => i.id === newTempLine.id); // текущее количество в заявке
+          const orderLineWeight = order?.lines?.find((i) => i.good.id === lineGood.good?.id)?.weight; // текущее количество в заявке
+          const delta = orderLineWeight ? round(orderLineWeight * limitDelta) : 0;
+          if (limitDelta && delta && currTempLine?.weight && Math.abs(newTempLine.weight) <= delta) {
             dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
             fpDispatch(
               fpMovementActions.updateTempOrderLine({
@@ -954,7 +960,8 @@ const ShipmentViewScreen = () => {
       fpDispatch,
       dispatch,
       id,
-      tempOrderLines,
+      playSound,
+      order?.lines,
       limitDelta,
     ],
   );
@@ -1200,6 +1207,7 @@ const ShipmentViewScreen = () => {
         onOk={handleSearchBarcode}
         okLabel={'Найти'}
         errorMessage={errorMessage}
+        keyboardType="number-pad"
       />
       <QuantDialog
         visible={visibleQuantPackDialog}
@@ -1211,7 +1219,7 @@ const ShipmentViewScreen = () => {
         onOk={handleEditQuantPack}
         okLabel={'Ок'}
         isPack={isPack}
-        keyboardType="numbers-and-punctuation"
+        keyboardType="number-pad"
         okDisabled={!quantPack || !quantPallet}
       />
       {usePackage && (
@@ -1220,7 +1228,7 @@ const ShipmentViewScreen = () => {
           onCancel={handleCancelBoxDialog}
           onOk={handleSetNewBox}
           okLabel={'Ок'}
-          keyboardType="numbers-and-punctuation"
+          keyboardType="number-pad"
           okDisabled={!quantPack || !quantPallet}
           screenName="ShipmentView"
           lastBox={shipmentLines?.[0]?.box || undefined}
@@ -1232,7 +1240,7 @@ const ShipmentViewScreen = () => {
           onCancel={handleCancelUnitDialog}
           onOk={handleAddUnitLine}
           okLabel={'Ок'}
-          keyboardType="numbers-and-punctuation"
+          keyboardType="number-pad"
           okDisabled={!quantPack || !quantPallet}
           screenName="ShipmentView"
           line={brcLine}

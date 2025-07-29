@@ -1,5 +1,5 @@
 import { Linking, ScrollView, TouchableOpacity, View } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Provider } from 'react-redux';
 import * as SplashScreen from 'expo-splash-screen';
 import { MobileApp } from '@lib/mobile-app';
@@ -44,28 +44,142 @@ import {
   MapNavigator,
   GoodMatrixNavigator,
   ShipmentNavigator,
+  RemainsNavigator,
+  ReportsNavigator,
 } from './src/navigation';
 
 import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
 import { messageAgent } from './src/store/mock';
-import ReportsNavigator from './src/navigation/Root/ReportsNavigator';
 
 SplashScreen.preventAutoHideAsync()
   .then((result) => console.log(`SplashScreen.preventAutoHideAsync() succeeded: ${result}`))
   .catch(console.warn);
 
-const navItems: INavItem[] = [
-  { name: 'RoutesNav', title: 'Маршруты', icon: 'routes', component: RoutesNavigator },
-  { name: 'OrdersNav', title: 'Заявки', icon: 'clipboard-list-outline', component: OrdersNavigator },
-  { name: 'ReportsNav', title: 'Отчёты', icon: 'text-box-search-outline', component: ReportsNavigator },
-  { name: 'ShipmentNav', title: 'Отгрузка', icon: 'truck-outline', component: ShipmentNavigator },
-  { name: 'DebetsNav', title: 'Задолженности', icon: 'currency-usd', component: DebetsNavigator },
-  { name: 'GoodMatrixNav', title: 'Матрицы', icon: 'tag-text-outline', component: GoodMatrixNavigator },
-  { name: 'MapNav', title: 'Карта', icon: 'map-outline', component: MapNavigator },
-];
+// const navItems: INavItem[] = [
+//   { name: 'RoutesNav', title: 'Маршруты', icon: 'routes', component: RoutesNavigator },
+//   { name: 'OrdersNav', title: 'Заявки', icon: 'clipboard-list-outline', component: OrdersNavigator },
+//   { name: 'ReportsNav', title: 'Отчёты', icon: 'text-box-search-outline', component: ReportsNavigator },
+//   { name: 'ShipmentNav', title: 'Отгрузка', icon: 'truck-outline', component: ShipmentNavigator },
+//   { name: 'DebetsNav', title: 'Задолженности', icon: 'currency-usd', component: DebetsNavigator },
+//   { name: 'GoodMatrixNav', title: 'Матрицы', icon: 'tag-text-outline', component: GoodMatrixNavigator },
+//   { name: 'MapNav', title: 'Карта', icon: 'map-outline', component: MapNavigator },
+// ];
 
 const Root = () => {
   const dispatch = useDispatch();
+  const { isInit, data: settings } = useSelector((state) => state.settings);
+
+  const isUseRemains = useMemo(() => settings.isUseRemains?.data || false, [settings.isUseRemains?.data]);
+
+  const isDemo = useSelector((state) => state.auth.isDemo);
+  const navItems: INavItem[] = useMemo(
+    () =>
+      isUseRemains
+        ? [
+            {
+              name: 'RoutesNav',
+              title: 'Маршруты',
+              icon: 'routes',
+              component: RoutesNavigator,
+            },
+            {
+              name: 'OrdersNav',
+              title: 'Заявки',
+              icon: 'clipboard-list-outline',
+              component: OrdersNavigator,
+            },
+            {
+              name: 'ReportsNav',
+              title: 'Отчёты',
+              icon: 'text-box-search-outline',
+              component: ReportsNavigator,
+            },
+            {
+              name: 'ShipmentNav',
+              title: 'Отгрузка',
+              icon: 'truck-outline',
+              component: ShipmentNavigator,
+            },
+            {
+              name: 'DebetsNav',
+              title: 'Задолженности',
+              icon: 'currency-usd',
+              component: DebetsNavigator,
+            },
+            {
+              name: 'GoodMatrixNav',
+              title: 'Матрицы',
+              icon: 'tag-text-outline',
+              component: GoodMatrixNavigator,
+            },
+            {
+              name: 'Remains',
+              title: 'Остатки',
+              icon: 'dolly',
+              component: RemainsNavigator,
+            },
+            {
+              name: 'MapNav',
+              title: 'Карта',
+              icon: 'map-outline',
+              component: MapNavigator,
+            },
+          ]
+        : [
+            {
+              name: 'RoutesNav',
+              title: 'Маршруты',
+              icon: 'routes',
+              component: RoutesNavigator,
+            },
+            {
+              name: 'OrdersNav',
+              title: 'Заявки',
+              icon: 'clipboard-list-outline',
+              component: OrdersNavigator,
+            },
+            {
+              name: 'ReportsNav',
+              title: 'Отчёты',
+              icon: 'text-box-search-outline',
+              component: ReportsNavigator,
+            },
+            {
+              name: 'ShipmentNav',
+              title: 'Отгрузка',
+              icon: 'truck-outline',
+              component: ShipmentNavigator,
+            },
+            {
+              name: 'DebetsNav',
+              title: 'Задолженности',
+              icon: 'currency-usd',
+              component: DebetsNavigator,
+            },
+            {
+              name: 'GoodMatrixNav',
+              title: 'Матрицы',
+              icon: 'tag-text-outline',
+              component: GoodMatrixNavigator,
+            },
+
+            {
+              name: 'MapNav',
+              title: 'Карта',
+              icon: 'map-outline',
+              component: MapNavigator,
+            },
+          ],
+    [isUseRemains],
+  );
+
+  useEffect(() => {
+    dispatch(appActions.loadGlobalDataFromDisc());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  //Загружаем в стор дополнительные настройки приложения
+
   const refDispatch = useRefThunkDispatch();
   const docDispatch = useDocThunkDispatch();
 
@@ -87,8 +201,6 @@ const Root = () => {
   }, []);
 
   //Загружаем в стор дополнительные настройки приложения
-  const isInit = useSelector((state) => state.settings.isInit);
-  const isDemo = useSelector((state) => state.auth.isDemo);
 
   useEffect(() => {
     //isInit - true при открытии приложения или при ручном сбросе настроек
