@@ -266,6 +266,15 @@ export const appSettings: Settings = {
     visible: true,
     group: goodGroup,
   },
+  addPalletQuantPack: {
+    id: 'addPalletQuantPack',
+    sortOrder: 17,
+    description: 'Указывать кол-во коробок',
+    data: false,
+    type: 'boolean',
+    visible: true,
+    group: goodGroup,
+  },
   countOrderBarcodeLentgh: {
     id: 'countOrderBarcodeLentgh',
     sortOrder: 15,

@@ -169,6 +169,8 @@ const ShipmentViewScreen = () => {
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
   const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
+  const addPalletQuantPack = Boolean(settings.addPalletQuantPack?.data);
+
   const usePackage = Boolean(settings.usePackage?.data);
   const limitDelta = (settings.limitDelta?.data as number) || 0;
 
@@ -940,6 +942,11 @@ const ShipmentViewScreen = () => {
       }
 
       handleFocus();
+
+      if (addPalletQuantPack && newLine.weight >= goodBarcodeSettings?.boxWeight) {
+        setIsPack(false);
+        setVisibleQuantPackDialog(true);
+      }
     },
 
     [
@@ -956,6 +963,7 @@ const ShipmentViewScreen = () => {
       tempOrder,
       box,
       visibleDialog,
+      addPalletQuantPack,
       handleErrorMessage,
       fpDispatch,
       dispatch,

@@ -91,6 +91,8 @@ export const InventoryViewScreen = () => {
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
   const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
+  const addPalletQuantPack = Boolean(settings.addPalletQuantPack?.data);
+
   const docList = useSelector((state) => state.documents.list).filter(
     (i) => i.documentType.name === 'inventory',
   ) as IInventoryDocument[];
@@ -535,6 +537,10 @@ export const InventoryViewScreen = () => {
         setScanned(false);
       }
       handleFocus();
+      if (addPalletQuantPack && newLine.weight >= goodBarcodeSettings?.boxWeight) {
+        setIsPack(false);
+        setVisibleQuantPackDialog(true);
+      }
     },
 
     [
@@ -545,6 +551,7 @@ export const InventoryViewScreen = () => {
       goods,
       isAddressedDoc,
       visibleDialog,
+      addPalletQuantPack,
       handleErrorMessage,
       navigation,
       id,

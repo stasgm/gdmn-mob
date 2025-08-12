@@ -123,6 +123,8 @@ export const FreeShipmentViewScreen = () => {
 
   const usePackage = Boolean(settings.usePackage?.data);
 
+  const addPalletQuantPack = Boolean(settings.addPalletQuantPack?.data);
+
   const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
   const remainsUse = Boolean(settings.remainsUse?.data);
@@ -759,6 +761,11 @@ export const FreeShipmentViewScreen = () => {
       }
 
       handleFocus();
+
+      if (addPalletQuantPack && newLine.weight >= goodBarcodeSettings?.boxWeight) {
+        setIsPack(false);
+        setVisibleQuantPackDialog(true);
+      }
     },
 
     [
@@ -776,6 +783,7 @@ export const FreeShipmentViewScreen = () => {
       id,
       playSound,
       visibleDialog,
+      addPalletQuantPack,
       handleErrorMessage,
     ],
   );

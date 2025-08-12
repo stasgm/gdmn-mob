@@ -119,6 +119,8 @@ export const MoveToViewScreen = () => {
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
   const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
+  const addPalletQuantPack = Boolean(settings.addPalletQuantPack?.data);
+
   const isAddressStore = Boolean(settings.addressStore?.data);
 
   const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
@@ -658,6 +660,11 @@ export const MoveToViewScreen = () => {
         setScanned(false);
       }
       handleFocus();
+
+      if (addPalletQuantPack && newLine.weight >= goodBarcodeSettings?.boxWeight) {
+        // setIsPack(false);
+        setVisibleQuantPackDialog(true);
+      }
     },
 
     [
@@ -670,6 +677,7 @@ export const MoveToViewScreen = () => {
       remainsUse,
       departs,
       visibleDialog,
+      addPalletQuantPack,
       handleErrorMessage,
       navigation,
       id,

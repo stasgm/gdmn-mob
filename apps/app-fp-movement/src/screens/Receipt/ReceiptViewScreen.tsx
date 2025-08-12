@@ -108,6 +108,8 @@ export const ReceiptViewScreen = () => {
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
   const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
+  const addPalletQuantPack = Boolean(settings.addPalletQuantPack?.data);
+
   const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
   const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
@@ -580,6 +582,11 @@ export const ReceiptViewScreen = () => {
         setScanned(false);
       }
       handleFocus();
+
+      if (addPalletQuantPack && newLine.weight >= goodBarcodeSettings?.boxWeight) {
+        setIsPack(false);
+        setVisibleQuantPackDialog(true);
+      }
     },
 
     [
@@ -594,6 +601,7 @@ export const ReceiptViewScreen = () => {
       id,
       playSound,
       visibleDialog,
+      addPalletQuantPack,
       handleErrorMessage,
     ],
   );

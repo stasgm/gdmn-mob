@@ -88,6 +88,8 @@ export const ReturnViewScreen = () => {
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
   const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
+  const addPalletQuantPack = Boolean(settings.addPalletQuantPack?.data);
+
   const docList = useSelector((state) => state.documents.list).filter(
     (i) => i.documentType.name === 'return',
   ) as IReturnDocument[];
@@ -524,6 +526,11 @@ export const ReturnViewScreen = () => {
         setScanned(false);
       }
       handleFocus();
+
+      if (addPalletQuantPack && newLine.weight >= goodBarcodeSettings?.boxWeight) {
+        setIsPack(false);
+        setVisibleQuantPackDialog(true);
+      }
     },
 
     [
@@ -536,6 +543,7 @@ export const ReturnViewScreen = () => {
       id,
       playSound,
       visibleDialog,
+      addPalletQuantPack,
       handleErrorMessage,
     ],
   );

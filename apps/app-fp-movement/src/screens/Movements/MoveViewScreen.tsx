@@ -109,6 +109,8 @@ export const MoveViewScreen = () => {
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
   const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
+  const addPalletQuantPack = Boolean(settings.addPalletQuantPack?.data);
+
   const isAddressStore = Boolean(settings.addressStore?.data);
 
   const isFromAddressed = departs.find((i) => i.id === doc?.head.fromDepart?.id && i.isAddressStore);
@@ -652,6 +654,11 @@ export const MoveViewScreen = () => {
         setScanned(false);
       }
       handleFocus();
+
+      if (addPalletQuantPack && newLine.weight >= goodBarcodeSettings?.boxWeight) {
+        setIsPack(false);
+        setVisibleQuantPackDialog(true);
+      }
     },
 
     [
@@ -664,6 +671,7 @@ export const MoveViewScreen = () => {
       remainsUse,
       isAddressedDoc,
       visibleDialog,
+      addPalletQuantPack,
       handleErrorMessage,
       navigation,
       id,
