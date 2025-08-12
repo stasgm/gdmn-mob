@@ -102,8 +102,7 @@ export const InvoiceLineScreen = () => {
               return;
             }
 
-            console.log('line.quantity ', line.quantity, 'line.eidList?.length', line.eidList?.length);
-            if (line.quantity !== line.eidList?.length) {
+            if (line.eidType !== '0' && line.quantity !== line.eidList?.length) {
               Alert.alert('Ошибка!', 'Количество кодов маркировки не совпадает с количеством товара', [{ text: 'Ок' }]);
               return;
             }
@@ -113,7 +112,7 @@ export const InvoiceLineScreen = () => {
         />
       </View>
     ),
-    [disabledSave, goods, item?.good.id, line.EID, line.eidList?.length, line.quantity, screenState],
+    [disabledSave, goods, item?.good.id, line.EID, line.eidList?.length, line.eidType, line.quantity, screenState],
   );
 
   useLayoutEffect(() => {

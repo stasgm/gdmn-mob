@@ -45,8 +45,6 @@ import { InvoiceStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 import { IGood } from '../../store/app/types';
 
-import { jsonFormat } from '../../utils/helpers';
-
 import DocTotal from './components/DocTotal';
 
 export const InvoiceViewScreen = () => {
@@ -61,7 +59,6 @@ export const InvoiceViewScreen = () => {
   const id = useRoute<RouteProp<InvoiceStackParamList, 'InvoiceView'>>().params?.id;
   const doc = docSelectors.selectByDocId<IInvoiceDocument>(id);
 
-  console.log(jsonFormat(doc));
   const loading = useSelector((state) => state.app.loading);
 
   const docLineQuantity = doc?.lines?.reduce((sum, line) => sum + line.quantity, 0) || 0;
@@ -275,7 +272,7 @@ export const InvoiceViewScreen = () => {
         onPress={() =>
           isDelList
             ? setDelList(getDelLineList(delList, item.id))
-            : !isBlocked && item.eidType !== '0' && navigation.navigate('InvoiceLine', { mode: 1, docId: id, item })
+            : !isBlocked && navigation.navigate('InvoiceLine', { mode: 1, docId: id, item })
         }
         onLongPress={() => !isBlocked && setDelList(getDelLineList(delList, item.id))}
         checked={delList.includes(item.id)}

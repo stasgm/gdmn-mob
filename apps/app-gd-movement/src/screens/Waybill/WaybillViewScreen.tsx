@@ -57,7 +57,7 @@ export const WaybillViewScreen = () => {
 
   const id = useRoute<RouteProp<WaybillStackParamList, 'WaybillView'>>().params?.id;
   const doc = docSelectors.selectByDocId<IWaybillDocument>(id);
-  console.log('jsonFormat', doc);
+
   const loading = useSelector((state) => state.app.loading);
 
   const lines = useMemo(() => {
@@ -313,12 +313,10 @@ export const WaybillViewScreen = () => {
       }
 
       const line = doc.lines.find((item) => JSON.parse(JSON.stringify(item.EID)) === JSON.parse(JSON.stringify(brc)));
-      console.log('line', line);
       if (line) {
         const newLine: IWaybillLine = { ...line, checked: true };
         dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
         handleFocus();
-        console.log('123');
         return;
       }
 
