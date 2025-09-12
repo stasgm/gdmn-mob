@@ -105,7 +105,7 @@ const SelectGoodScreen = () => {
   const remains = refSelectors.selectByName<IRemains>('remains')?.data?.[0];
 
   const [goodRemains] = useState<IRemGood[]>(() =>
-    doc?.head.depart?.id ? getRemGoodListByContact(goods, remains[doc?.head.depart?.id], true) : [],
+    doc?.head.depart?.id ? getRemGoodListByContact(goods, remains?.[doc?.head.depart?.id], true) : [],
   );
 
   const contactId = doc?.head.contact.id;
@@ -409,7 +409,7 @@ const SelectGoodScreen = () => {
         backgroundColor: isAdded ? globalColors.backgroundLight : 'transparent',
       };
 
-      const goodQuantity = isUseRemains && useRemains ? goodRemains.find((i) => i.good.id === item.id)?.remains : 0;
+      const goodQuantity = isUseRemains && useRemains ? goodRemains?.find((i) => i.good.id === item.id)?.remains : 0;
       return (
         <View key={item.id}>
           <TouchableOpacity onPress={() => handlePressGood(isAdded, item)}>

@@ -24,10 +24,10 @@
     "@lib/types": "*",
     "@react-native-community/netinfo": "11.4.1",
     "@types/node": "^22.13.9",
-    "@types/react": "18.3.18",
+    "@types/react": "~18.3.12",
     "nanoid": "^3.3.4",
     "react": "18.3.1",
-    "react-native": "0.76.7",
+    "react-native": "0.76.9",
     "react-native-get-random-values": "~1.11.0",
     "typescript": "~5.7.2"
   },

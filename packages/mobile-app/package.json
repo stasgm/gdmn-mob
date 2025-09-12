@@ -20,7 +20,7 @@
   "prettier": "@config/prettier-config",
   "dependencies": {
     "@expo/react-native-action-sheet": "^4.1.0",
-    "@expo/vector-icons": "^14.0.3",
+    "@expo/vector-icons": "~14.0.4",
     "@expo/webpack-config": "^19.0.1",
     "@lib/client-api": "*",
     "@lib/mobile-auth": "*",
@@ -31,14 +31,14 @@
     "@react-native-masked-view/masked-view": "0.3.2",
     "@react-navigation/native": "^6.1.18",
     "@types/node": "^22.13.9",
-    "@types/react": "18.3.18",
-    "expo-application": "^6.0.1",
+    "@types/react": "~18.3.12",
+    "expo-application": "^6.0.2",
     "nanoid": "^3.3.4",
     "react": "18.3.1",
-    "react-native": "0.76.7",
+    "react-native": "0.76.9",
     "react-native-get-random-values": "~1.11.0",
     "react-native-paper": "5.13.1",
-    "react-native-reanimated": "3.16.7",
+    "react-native-reanimated": "~3.16.1",
     "react-native-version-check": "^3.4.7",
     "react-redux": "^9.2.0",
     "typescript": "~5.7.2"
@@ -48,7 +48,7 @@
     "@config/eslint-config-react": "*",
     "@config/eslint-config-react-native": "*",
     "@config/prettier-config": "*",
-    "expo": "~52.0.38",
+    "expo": "52.0.47",
     "lint-staged": "^15.2.10"
   }
 }

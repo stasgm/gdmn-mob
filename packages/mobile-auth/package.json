@@ -19,7 +19,7 @@
   },
   "prettier": "@config/prettier-config",
   "dependencies": {
-    "@expo/vector-icons": "^14.0.3",
+    "@expo/vector-icons": "~14.0.4",
     "@expo/webpack-config": "^19.0.1",
     "@lib/client-api": "*",
     "@lib/client-types": "*",
@@ -30,11 +30,11 @@
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/stack": "^6.4.1",
     "@types/node": "^22.13.9",
-    "@types/react": "18.3.18",
+    "@types/react": "~18.3.12",
     "@types/react-native-version-check": "^3.4.6",
     "expo-constants": "~17.0.8",
     "react": "18.3.1",
-    "react-native": "0.76.7",
+    "react-native": "0.76.9",
     "react-native-paper": "5.13.1",
     "react-native-web": "0.19.13",
     "typescript": "~5.7.2"

@@ -40,13 +40,14 @@
           }
         }
       ],
-      "expo-router",
       [ "expo-splash-screen",
         {
-          "image": "./assets/splash.png",
+          "image": "./assets/splash-new.png",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-asset",
+      "expo-font"
     ]
   }
 }

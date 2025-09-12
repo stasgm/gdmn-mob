@@ -192,7 +192,7 @@ export const InvoiceLine = ({ item, onSetLine }: IProps) => {
             onGetScannedObject={handleGetScannedObject}
             onClearScannedObject={handleClearScaner}
             scaner={scaner}
-            barCodeTypes={[BarCodeScanner.Constants.BarCodeType.datamatrix]}
+            barCodeTypes={['datamatrix']}
             isLeftButton={true}
             onCancel={handleCancel}
           />

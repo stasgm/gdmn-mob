@@ -9,8 +9,8 @@
         "distribution": "internal",
         "buildType": "apk"
       },
-      "node": "20.9.0"
+      "node": "20.19.4"
     },
-    "production": {"node": "20.9.0"}
+    "production": {"node": "20.19.4"}
   }
 }
