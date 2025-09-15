@@ -4,8 +4,8 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "start": "npx expo start",
-    "start:prod": "npx expo start --no-dev --minify",
+    "start": "expo start",
+    "start:prod": "expo start --no-dev --minify",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
