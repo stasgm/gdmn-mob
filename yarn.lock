@@ -20090,7 +20090,7 @@ winston-daily-rotate-file@^5.0.0:
     triple-beam "^1.4.1"
     winston-transport "^4.7.0"
 
-winston-transport@^4.7.0:
+winston-transport@^4.7.0, winston-transport@^4.9.0:
   version "4.9.0"
   resolved "https://registry.yarnpkg.com/winston-transport/-/winston-transport-4.9.0.tgz#3bba345de10297654ea6f33519424560003b3bf9"
   integrity sha512-8drMJ4rkgaPo1Me4zD/3WLfI/zPdA9o2IipKODunnGDcuqbHwjsbB79ylv04LCGGzU0xQ6vTznOMpQGaLhhm6A==
