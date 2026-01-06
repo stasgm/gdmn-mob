@@ -163,14 +163,16 @@ export interface IWaybillHead extends IHead {
 
 export interface IWaybillLine extends IEntity {
   goodId: string;
-  // quantity: number;
+  quantity?: number;
   // price?: number;
-  // barcode?: string;
+  barcode?: string;
   EID?: string;
   aggregationCode?: string;
   sortOrder?: number; // порядок сортировки
   checked?: boolean;
   added?: boolean;
+  description?: string;
+  checkedQuantity?: number;
 }
 
 export type IWaybillDocument = MandateProps<IDocument<IWaybillHead, IWaybillLine>, 'head' | 'lines'>;

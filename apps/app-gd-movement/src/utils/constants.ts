@@ -215,3 +215,14 @@ export const unknownGood: IGood = {
   name: 'Неизвестный товар',
   goodGroup: { id: 'unknown', name: 'Неизвестная группа' },
 };
+
+export const lineTypes: IListItem[] = [
+  {
+    id: 'all',
+    value: 'все',
+  },
+  {
+    id: 'last',
+    value: 'позиция',
+  },
+];
