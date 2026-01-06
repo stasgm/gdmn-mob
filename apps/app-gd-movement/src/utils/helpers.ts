@@ -143,7 +143,8 @@ export const getBrc = (brc: string, prefixGtin: string, goodRemains: IMGoodData<
   const startPosition = brc.match(RegExp(`${prefixGtin}\\d{13,14}${isTypeDM ? prefixISN : ''}`));
 
   return startPosition
-    ? goodRemains[startPosition[0].slice(2 /*, -2*/)] || goodRemains[startPosition[0].slice(3 /*, -2*/)]
+    ? goodRemains[isTypeDM ? startPosition[0].slice(2, -2) : startPosition[0].slice(2 /*, -2*/)] ||
+        goodRemains[isTypeDM ? startPosition[0].slice(3, -2) : startPosition[0].slice(3 /*, -2*/)]
     : goodRemains[brc.slice(1, 14)] || goodRemains[brc];
 };
 
