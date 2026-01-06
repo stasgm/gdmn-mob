@@ -108,7 +108,7 @@ export const DocLineScreen = () => {
               Alert.alert('Ошибка!', 'Количество товара не может быть меньше нуля!', [{ text: 'Ок' }]);
               return;
             }
-            if (line.EID && line.quantity !== 1) {
+            if (line.EID && line.quantity !== 1 && document?.documentType.name !== 'inventory') {
               Alert.alert('Ошибка!', 'Количество товара с кодом маркировки должно быть равно 1.', [{ text: 'Ок' }]);
               return;
             }
@@ -130,7 +130,7 @@ export const DocLineScreen = () => {
             }
             const goodIsMark = goods?.find((e) => e.id === item?.good.id)?.isMark;
 
-            if (!!goodIsMark && !line.EID) {
+            if (!!goodIsMark && !line.EID && document?.documentType.name !== 'inventory') {
               Alert.alert('Ошибка!', 'Поле EID должно быть заполнено! Отсканируйте штрих-код.', [{ text: 'Ок' }]);
               return;
             }
@@ -142,6 +142,7 @@ export const DocLineScreen = () => {
     ),
     [
       disabledSave,
+      document?.documentType.name,
       documentType?.isControlRemains,
       goods,
       item?.good.id,
