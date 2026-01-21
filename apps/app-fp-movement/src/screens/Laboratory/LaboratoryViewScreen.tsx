@@ -547,6 +547,7 @@ export const LaboratoryViewScreen = () => {
         sortOrder: doc?.lines?.length + 1,
         quantPack: barc.quantPack,
         usedRemains: remainsUse,
+        flag: barc.flag,
       };
 
       dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));

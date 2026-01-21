@@ -141,6 +141,7 @@ export const ReturnViewScreen = () => {
         weight: line.weight,
         workDate: line.workDate,
         time: line.time,
+        flag: line.flag,
       };
 
       const weight =
@@ -504,7 +505,7 @@ export const ReturnViewScreen = () => {
       }
 
       const newLine: IReturnLine = {
-        good: { id: good.id, name: good.name, shcode: good.shcode },
+        good: { id: good.id, name: good.name, shcode: good.shcode, unitWeight: good.unitWeight },
         id: generateId(),
         weight: barc.weight,
         barcode: barc.barcode,
@@ -513,6 +514,7 @@ export const ReturnViewScreen = () => {
         numReceived: barc.numReceived,
         sortOrder: doc?.lines?.length + 1,
         quantPack: barc.quantPack,
+        flag: barc.flag,
       };
 
       dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));

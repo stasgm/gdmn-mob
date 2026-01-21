@@ -190,6 +190,7 @@ export const FreeShipmentViewScreen = () => {
         weight: line.weight,
         workDate: line.workDate,
         time: line.time,
+        flag: line.flag,
       };
 
       const weight =
@@ -633,6 +634,7 @@ export const FreeShipmentViewScreen = () => {
             isCattle: good?.isCattle,
             goodGroupId: good?.goodGroupId,
             isUnit: Boolean(good?.isUnit),
+            unitWeight: good.unitWeight,
           },
           id: generateId(),
           quantity: 0,
@@ -728,6 +730,7 @@ export const FreeShipmentViewScreen = () => {
         sortOrder: doc?.lines?.length + 1,
         quantPack: barc.quantPack,
         usedRemains: remainsUse,
+        flag: barc.flag,
       };
 
       const boxLine = box

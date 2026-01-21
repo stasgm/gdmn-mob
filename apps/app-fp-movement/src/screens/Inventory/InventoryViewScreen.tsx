@@ -150,6 +150,7 @@ export const InventoryViewScreen = () => {
         weight: line.weight,
         workDate: line.workDate,
         time: line.time,
+        flag: line.flag,
       };
       if (!isAddressedDoc) {
         const weight =
@@ -506,7 +507,7 @@ export const InventoryViewScreen = () => {
       }
 
       const newLine: IInventoryLine = {
-        good: { id: good.id, name: good.name, shcode: good.shcode },
+        good: { id: good.id, name: good.name, shcode: good.shcode, unitWeight: good.unitWeight },
         id: generateId(),
         weight: barc.weight,
         barcode: barc.barcode,
@@ -515,6 +516,7 @@ export const InventoryViewScreen = () => {
         numReceived: barc.numReceived,
         sortOrder: doc?.lines?.length + 1,
         quantPack: barc.quantPack,
+        flag: barc.flag,
       };
 
       if (isAddressedDoc) {

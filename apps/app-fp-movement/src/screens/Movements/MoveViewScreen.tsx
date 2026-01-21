@@ -184,6 +184,7 @@ export const MoveViewScreen = () => {
         weight: line.weight,
         workDate: line.workDate,
         time: line.time,
+        flag: line.flag,
       };
 
       // if (isAddressedDoc && line?.weight >= goodBarcodeSettings?.boxWeight) {
@@ -628,6 +629,7 @@ export const MoveViewScreen = () => {
         quantPack: barc.quantPack,
         sortOrder: doc.lines?.length + 1,
         usedRemains: remainsUse,
+        flag: barc.flag,
       };
 
       if (isAddressedDoc && barc.weight < goodBarcodeSettings?.boxWeight) {

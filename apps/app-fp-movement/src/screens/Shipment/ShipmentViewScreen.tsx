@@ -224,6 +224,7 @@ const ShipmentViewScreen = () => {
         weight: line.weight,
         workDate: line.workDate,
         time: line.time,
+        flag: line.flag,
       };
 
       const weight =
@@ -407,7 +408,16 @@ const ShipmentViewScreen = () => {
             line:
               scanUnit && good && shipmentLine.quantity
                 ? { ...tempLine, weight: round(tempLine.weight + shipmentLine.quantity, 3) }
-                : { ...tempLine, weight: round(tempLine.weight + shipmentLine.weight, 3) },
+                : {
+                    ...tempLine,
+                    weight: round(
+                      tempLine.weight +
+                        (shipmentLine.good.unitWeight && shipmentLine.good.unitWeight !== 1
+                          ? round(shipmentLine.weight / shipmentLine.good.unitWeight, 3)
+                          : shipmentLine.weight),
+                      3,
+                    ),
+                  },
           }),
         );
       }
@@ -752,6 +762,7 @@ const ShipmentViewScreen = () => {
             isCattle: good?.isCattle,
             goodGroupId: good?.goodGroupId,
             isUnit: Boolean(good?.isUnit),
+            unitWeight: good.unitWeight,
           },
           id: generateId(),
           quantity: 0,
@@ -848,6 +859,7 @@ const ShipmentViewScreen = () => {
         quantPack: barc.quantPack,
         sortOrder: (shipmentLines?.length || 0) + 1,
         usedRemains: remainsUse,
+        flag: barc.flag,
       };
 
       const boxLine = box
@@ -867,7 +879,15 @@ const ShipmentViewScreen = () => {
       const newLine = box ? { ...shipmentLine, box } : shipmentLine;
 
       if (tempLine && tempOrder) {
-        const newTempLine = { ...tempLine, weight: round(tempLine.weight - newLine.weight, 3) }; // новое количество в заявке
+        const newTempLine = {
+          ...tempLine,
+          weight: round(
+            lineGood.good.unitWeight && lineGood.good.unitWeight !== 1
+              ? tempLine.weight - round(barc.weight / lineGood.good.unitWeight, 3)
+              : tempLine.weight - newLine.weight,
+            3,
+          ),
+        }; // новое количество в заявке
         if (newTempLine.weight > 0) {
           fpDispatch(
             fpMovementActions.updateTempOrderLine({
@@ -1062,9 +1082,16 @@ const ShipmentViewScreen = () => {
               <MaterialCommunityIcons name="shopping-outline" size={18} />
               <MediumText>
                 {item.good.isUnit ? `${(item.quantity || 0).toString()} шт.` : `${(item.weight || 0).toString()} кг`}
+                {item.good.unitWeight && item.good.unitWeight !== 1
+                  ? `, ${round(item.weight / item.good.unitWeight, 3).toString()} шт.`
+                  : ''}
                 {item.good.isUnit
                   ? `, ${round((item.unitWeight || 0) * (item.quantity || 0), 3)} кг`
-                  : `, ${(item.quantPack || 0).toString()} кор.`}
+                  : item.flag
+                    ? item.flag === '1' || item.flag === '0'
+                      ? `, ${(item.quantPack || 0).toString()} уп.`
+                      : ''
+                    : `, ${(item.quantPack || 0).toString()} кор.`}
                 {/* {(item.weight || 0).toString()} кг, {(item.quantPack || 0).toString()} кор. */}
               </MediumText>
             </View>
@@ -1082,23 +1109,26 @@ const ShipmentViewScreen = () => {
 
   const renderTempItem = useCallback(
     ({ item }: { item: ITempLine }) => {
-      const good = scanUnit ? goods.find((i) => i.id === item.good.id && i.isUnit) : undefined;
+      const good = goods.find((i) => i.id === item.good.id && i.unitWeight && i.unitWeight !== 1);
+      // const good = scanUnit ? goods.find((i) => i.id === item.good.id && i.isUnit) : undefined;
       return (
         <ListItemLine key={item.id} readonly={true}>
           <View style={styles.details}>
             <LargeText style={styles.textBold}>{item.good.name}</LargeText>
             <View style={styles.directionRow}>
-              {scanUnit && good ? (
-                <MediumText>Количество: {(item.weight || 0).toString()} шт.</MediumText>
-              ) : (
-                <MediumText>Вес: {(item.weight || 0).toString()} кг</MediumText>
-              )}
+              {
+                /*scanUnit &&*/ good ? (
+                  <MediumText>Количество: {(item.weight || 0).toString()} шт.</MediumText>
+                ) : (
+                  <MediumText>Вес: {(item.weight || 0).toString()} кг</MediumText>
+                )
+              }
             </View>
           </View>
         </ListItemLine>
       );
     },
-    [goods, scanUnit],
+    [goods],
   );
 
   const LastLine = useMemo(() => renderShipmentItem, [renderShipmentItem]);

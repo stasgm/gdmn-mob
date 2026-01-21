@@ -275,6 +275,15 @@ export const appSettings: Settings = {
     visible: true,
     group: goodGroup,
   },
+  flag: {
+    id: 'flag',
+    sortOrder: 18,
+    description: 'Последний символ',
+    data: 0,
+    type: 'number',
+    visible: true,
+    group: goodGroup,
+  },
   countOrderBarcodeLentgh: {
     id: 'countOrderBarcodeLentgh',
     sortOrder: 15,

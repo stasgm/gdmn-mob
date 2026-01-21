@@ -178,4 +178,5 @@ export const remainsScreens = {
 
 export const palletScreens = {
   PalletList: { title: 'Паллеты', component: PalletListScreen },
+  SelectCell: { title: 'Выбор ячейки', component: SelectCellScreen },
 };

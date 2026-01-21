@@ -174,6 +174,7 @@ export const ReceiptViewScreen = () => {
         weight: line.weight,
         workDate: line.workDate,
         time: line.time,
+        flag: line.flag,
       };
 
       const weight =
@@ -569,6 +570,7 @@ export const ReceiptViewScreen = () => {
         quantPack: barc.quantPack,
         sortOrder: doc.lines?.length + 1,
         usedRemains: remainsUse,
+        flag: barc.flag,
       };
 
       dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));

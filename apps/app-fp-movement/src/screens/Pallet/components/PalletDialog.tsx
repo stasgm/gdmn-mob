@@ -14,10 +14,12 @@ import { IPalletHead } from '../../../store/types';
 interface IProps {
   visible: boolean;
   onOk: (palletHead: IPalletHead) => void;
+  onContinue: (palletHead: IPalletHead) => void;
   onCancel: () => void;
   palletHead: IPalletHead | undefined;
   storeMan: string;
   getBarcode: (palletHead: IPalletHead) => string;
+  // type: 'add' | 'update';
 }
 
 const getHtml = (printedObject: IPalletHead, SVGBarcode: string) => {
@@ -70,10 +72,22 @@ const getHtml = (printedObject: IPalletHead, SVGBarcode: string) => {
                 <td>Партия</td>
                 <td>${printedObject?.numReceived || ''}</td>
               </tr>
-              <tr>
+               ${
+                 printedObject?.toCell
+                   ? `<tr>
                 <td>Дата постановки</td>
-                <td>-</td>
-              </tr>
+                <td>${printedObject?.storeDate ? new Date(printedObject?.storeDate).toLocaleDateString() : '-'}</td>
+              </tr>`
+                   : ''
+               }
+             ${
+               printedObject?.toCell
+                 ? `<tr>
+                <td>Ячейка</td>
+                <td>${printedObject?.toCell || '-'}</td>
+              </tr>`
+                 : ''
+             }
               <tr>
                 <td>Кладовщик</td>
                 <td>${printedObject?.storeMan || ''}</td>
@@ -87,6 +101,7 @@ const getHtml = (printedObject: IPalletHead, SVGBarcode: string) => {
     </html>
   `;
 };
+
 export const print = async (printedObject: IPalletHead, SVGBarcode: string, selectedPrinter?: Print.Printer) => {
   // On iOS/android prints the given html. On web prints the HTML from the current page.
   await Print.printAsync({
@@ -95,43 +110,61 @@ export const print = async (printedObject: IPalletHead, SVGBarcode: string, sele
   });
 };
 
-export const PalletDialog = ({ visible, onOk, onCancel, storeMan, palletHead, getBarcode }: IProps) => {
+export const PalletDialog = ({ visible, onOk, onCancel, storeMan, palletHead, getBarcode, onContinue }: IProps) => {
   const { colors } = useTheme();
 
   const [selectedPrinter, _] = useState<Print.Printer>();
 
   const [quantPack, setQuantPack] = useState<string>('');
 
-  const SVGBarcode =
-    palletHead && palletHead.barcode
-      ? barcodeToSvg({
-          value: palletHead.barcode,
-          width: 500,
-          height: 160,
-        })
-      : '';
+  const handlePressOk = useCallback(
+    async (isForPrint = true) => {
+      if (!palletHead) {
+        return;
+      }
+      const newObj: IPalletHead = {
+        ...palletHead,
+        quantPack: Number(quantPack),
+        weight: round(Number(quantPack) * (palletHead?.weight || 1), 3),
+      };
 
-  const handlePressOk = useCallback(async () => {
+      const brc = getBarcode(newObj);
+
+      const newPalletHead: IPalletHead = {
+        ...newObj,
+        barcode: brc,
+        storeMan,
+      };
+
+      const SVGBarcode =
+        palletHead && palletHead.barcode
+          ? barcodeToSvg({
+              value: brc,
+              width: 500,
+              height: 160,
+            })
+          : '';
+
+      onOk(newPalletHead);
+
+      if (!isForPrint) {
+        setQuantPack('');
+
+        return;
+      }
+
+      await print(newPalletHead, SVGBarcode, selectedPrinter);
+      setQuantPack('');
+    },
+    [getBarcode, palletHead, onOk, quantPack, selectedPrinter, storeMan],
+  );
+
+  const handlePressContinue = () => {
     if (!palletHead) {
       return;
     }
-    const newObj: IPalletHead = {
-      ...palletHead,
-      quantPack: Number(quantPack),
-      weight: round(Number(quantPack) * (palletHead?.weight || 1), 3),
-    };
-
-    const brc = getBarcode(newObj);
-
-    const newPalletHead: IPalletHead = {
-      ...newObj,
-      barcode: brc,
-      storeMan,
-    };
-
-    onOk(newPalletHead);
-    await print(newPalletHead, SVGBarcode, selectedPrinter);
-  }, [SVGBarcode, getBarcode, palletHead, onOk, quantPack, selectedPrinter, storeMan]);
+    onContinue(palletHead);
+  };
 
   return (
     <Dialog visible={visible} onDismiss={onCancel}>
@@ -158,7 +191,21 @@ export const PalletDialog = ({ visible, onOk, onCancel, storeMan, palletHead, ge
           style={localStyles.height}
         />
       </Dialog.Content>
-      <Dialog.Actions style={{ borderColor: colors.primary }}>
+      <Dialog.Actions style={{ borderColor: colors.primary, flexDirection: 'column' }}>
+        <Button
+          labelStyle={{ color: colors.primary }}
+          color={colors.primary}
+          onPress={() => handlePressOk(false)} // disabled={okDisabled}
+        >
+          Подтвердить
+        </Button>
+        <Button
+          labelStyle={{ color: colors.primary }}
+          color={colors.primary}
+          onPress={() => handlePressOk()} // disabled={okDisabled}
+        >
+          Подтвердить и распечатать
+        </Button>
         <Button
           labelStyle={{ color: colors.primary }}
           color={colors.primary}
@@ -167,12 +214,13 @@ export const PalletDialog = ({ visible, onOk, onCancel, storeMan, palletHead, ge
         >
           Отмена
         </Button>
+
         <Button
           labelStyle={{ color: colors.primary }}
           color={colors.primary}
-          onPress={() => handlePressOk()} // disabled={okDisabled}
+          onPress={() => handlePressContinue()} // disabled={okDisabled}
         >
-          ОК
+          Продолжить сканирование
         </Button>
       </Dialog.Actions>
     </Dialog>

@@ -36,7 +36,7 @@ const LineItem = ({
           <MediumText>
             {item.good.isUnit
               ? `${((item as IFreeShipmentLine).quantity || 0).toString()} шт.`
-              : `${(item.weight || 0).toString()} кг`}
+              : `${(item.weight || 0).toString()}${item.good.unitWeight && item.good.unitWeight !== 1 ? 'шт.' : 'кг'}`}
             {item.good.isUnit
               ? `, ${round(
                   ((item as IFreeShipmentLine).unitWeight || 0) * ((item as IFreeShipmentLine).quantity || 0),
@@ -44,7 +44,11 @@ const LineItem = ({
                 )} кг`
               : isLab
                 ? ''
-                : `, ${(item.quantPack || 0).toString()} кор.`}
+                : item.flag
+                  ? item.flag === '1' || item.flag === '0'
+                    ? `, ${(item.quantPack || 0).toString()} уп.`
+                    : ''
+                  : `, ${(item.quantPack || 0).toString()} кор.`}
           </MediumText>
         </View>
         <View style={styles.flexDirectionRow}>

@@ -18,8 +18,8 @@ import { ScrollView } from 'react-native-gesture-handler';
 
 import { DashboardStackParamList } from '@lib/mobile-navigation';
 
-import { ICell, ICellName, ICellRef, IInventoryLine, IMoveDocument, IMoveLine } from '../store/types';
-import { MoveStackParamList } from '../navigation/Root/types';
+import { ICell, ICellName, ICellRef, IInventoryLine, IMoveDocument, IMoveLine, IPalletDocument } from '../store/types';
+import { MoveStackParamList, PalletStackParamList } from '../navigation/Root/types';
 
 import { alertWithSound, getCellItem, getCellList, getCellListRef } from '../utils/helpers';
 import { ICellRefList, ICellData } from '../store/app/types';
@@ -41,7 +41,10 @@ const NamedRow = ({ item }: { item: string }) => (
 
 export const SelectCellScreen = () => {
   const dispatch = useDispatch();
-  const navigation = useNavigation<StackNavigationProp<MoveStackParamList & DashboardStackParamList, 'SelectCell'>>();
+  const navigation =
+    useNavigation<
+      StackNavigationProp<MoveStackParamList & PalletStackParamList & DashboardStackParamList, 'SelectCell'>
+    >();
   const { colors } = useTheme<MD2Theme>();
 
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -73,13 +76,15 @@ export const SelectCellScreen = () => {
       docList
         ?.filter(
           (i) =>
-            i.documentType?.name === (docType ? docType : 'movement') &&
+            i.documentType?.name === (docType && !docType.includes('pallet') ? docType : 'movement') &&
             i.status !== 'PROCESSED' &&
             (i?.head?.fromDepart?.id === departId || i?.head?.toDepart?.id === departId),
         )
         .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()) as IMoveDocument[],
     [departId, docList, docType],
   );
+
+  const palletList = docList.filter((i) => i.documentType?.name === 'pallet') as IPalletDocument[];
 
   const lines = docs.reduce((prev: IMoveLine[], cur) => [...prev, ...cur.lines], []);
 
@@ -169,6 +174,22 @@ export const SelectCellScreen = () => {
         } else {
           const newLine: IMoveLine = { ...item, toCell: newCell, storeDate };
           handleAddLine(newLine);
+          if (docType?.includes('pallet')) {
+            const palletId = docType.replace('pallet', '');
+            const document1 = palletList.find((i) => i.id === palletId);
+            if (document1) {
+              dispatch(
+                documentActions.updateDocument({
+                  docId: palletId,
+                  document: {
+                    ...document1,
+                    status: 'ARCHIVE',
+                    head: { ...document1.head, toCell: newCell, storeDate },
+                  },
+                }),
+              );
+            }
+          }
         }
       } else {
         const newLine: IMoveLine = { ...item, toCell: newCell, storeDate };
@@ -186,11 +207,13 @@ export const SelectCellScreen = () => {
       doc?.head.fromDepart?.isAddressStore,
       doc?.head.toDepart?.isAddressStore,
       docId,
+      docType,
       fromCell,
       handleAddLine,
       item,
       mode,
       navigation,
+      palletList,
       selectedChamber,
       selectedRow,
     ],
