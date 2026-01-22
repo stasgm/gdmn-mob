@@ -87,6 +87,10 @@ const ScanOrderScreen = () => {
         setScannedObject(shipment);
         return;
       } else {
+        if (new Date(order.head.onDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)) {
+          setScaner({ state: 'error', message: 'Нельзя выбрать дату меньше текущей' });
+          return;
+        }
         setScannedObject(order);
         setScaner({ state: 'found' });
       }
