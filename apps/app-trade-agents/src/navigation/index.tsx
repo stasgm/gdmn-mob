@@ -3,3 +3,6 @@ export { default as OrdersNavigator } from './Root/OrdersNavigator';
 export { default as DebetsNavigator } from './Root/DebetsNavigator';
 export { default as GoodMatrixNavigator } from './Root/GoodMatrixNavigator';
 export { default as MapNavigator } from './Root/Maps/MapNavigator';
+export { default as ShipmentNavigator } from './Root/ShipmentNavigator';
+export { default as ReportsNavigator } from './Root/ReportsNavigator';
+export { default as RemainsNavigator } from './Root/RemainsNavigator';

@@ -39,7 +39,7 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
 
   const handleSaveLine = useCallback(() => {
     setScreenState('saving');
-    if (!line.package && packages.length > 0) {
+    if (!line.package && packages?.length > 0) {
       Alert.alert('Ошибка!', 'Не указана упаковка', [{ text: 'Ок' }]);
       setScreenState('idle');
       return;
@@ -74,7 +74,7 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
         { text: 'Отмена', onPress: () => setScreenState('idle') },
       ]);
     }
-  }, [dispatch, docId, line, mode, onDismiss, packages.length]);
+  }, [dispatch, docId, line, mode, onDismiss, packages?.length]);
 
   return (
     <Modal animationType="fade" visible={true}>

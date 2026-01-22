@@ -12,7 +12,7 @@ import {
   InfoButton,
 } from '@lib/mobile-ui';
 
-import { useTheme } from 'react-native-paper';
+import { MD2Theme, useTheme } from 'react-native-paper';
 
 import { ScrollView } from 'react-native-gesture-handler';
 
@@ -43,7 +43,7 @@ export const SelectCellScreen = () => {
   const dispatch = useDispatch();
   const navigation =
     useNavigation<StackNavigationProp<InventoryStackParamList & DashboardStackParamList, 'InventorySelectCell'>>();
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   const [visibleDialog, setVisibleDialog] = useState(false);
   const { docId, item, mode } = useRoute<RouteProp<InventoryStackParamList, 'InventorySelectCell'>>().params;
@@ -135,7 +135,7 @@ export const SelectCellScreen = () => {
 
       return (
         <Pressable
-          key={i.name}
+          key={`${i.name}-${i.sortOrder}`}
           style={({ pressed }) => [localStyles.buttons, backColorStyle, pressed && { backgroundColor: colors.accent }]}
           onPress={() => handleSaveLine(i)}
           disabled={i.barcode !== item.barcode || Boolean(i.disabled)}
@@ -150,9 +150,7 @@ export const SelectCellScreen = () => {
   const CellsColumn = useCallback(
     ({ cellData }: { cellData: ICellData[] }) => (
       <View style={styles.flexDirectionRow}>
-        {cellData?.map((i) => (
-          <Cell key={i.name} i={i} />
-        ))}
+        {cellData?.map((i) => <Cell key={`${i.name}-${i.sortOrder}`} i={i} />)}
       </View>
     ),
     [Cell],

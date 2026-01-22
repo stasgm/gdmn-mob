@@ -1,7 +1,7 @@
 version: "3"
 services:
   web-admin:
-    image: gsbelarus/gdmn-mob.web-admin
+    image: gsbelarus/gdmn-mob.web-admin:1.1.4
     container_name: web-admin
     restart: always
     env_file:
@@ -15,7 +15,7 @@ services:
     volumes:
       - ./ssl:/web-admin/ssl:ro
   server:
-    image: gsbelarus/gdmn-mob.server
+    image: gsbelarus/gdmn-mob.server:0.2.5
     container_name: server
     restart: always
     env_file:

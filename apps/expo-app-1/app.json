@@ -28,7 +28,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "apiLevel": 33
     },
     "web": {
       "favicon": "./assets/favicon.png"

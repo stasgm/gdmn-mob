@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleProp, TouchableOpacity, View, StyleSheet, ViewStyle, Text } from 'react-native';
-import { ActivityIndicator, useTheme } from 'react-native-paper';
+import { ActivityIndicator, MD2Theme, useTheme } from 'react-native-paper';
 
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 
@@ -27,7 +27,7 @@ const PrimeButton = ({
   type = 'normal',
   loadIcon = false,
 }: IProps) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   return (
     <TouchableOpacity
@@ -37,11 +37,13 @@ const PrimeButton = ({
       style={[
         styles.rectangularButton,
         outlined
-          ? {
-              borderWidth: 1,
-              borderColor: colors.primary,
-              backgroundColor: disabled ? colors.disabled : colors.background,
-            }
+          ? [
+              localStyles.border,
+              {
+                borderColor: colors.primary,
+                backgroundColor: disabled ? colors.disabled : colors.background,
+              },
+            ]
           : { backgroundColor: disabled ? colors.disabled : type === 'normal' ? colors.primary : '#a91160' },
         style,
       ]}
@@ -66,10 +68,10 @@ const PrimeButton = ({
                   ? colors.disabled
                   : colors.background
                 : disabled
-                ? colors.disabled
-                : type === 'normal'
-                ? colors.primary
-                : '#a91160'
+                  ? colors.disabled
+                  : type === 'normal'
+                    ? colors.primary
+                    : '#a91160'
             }
             style={localStyles.indicator}
           />
@@ -100,4 +102,5 @@ const localStyles = StyleSheet.create({
   indicator: {
     paddingLeft: 10,
   },
+  border: { borderWidth: 1 },
 });

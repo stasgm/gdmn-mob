@@ -63,8 +63,8 @@ const SelectRefItemScreen = () => {
             newParams.groupParent === 'notNull'
               ? !!item.parent?.id
               : newParams.groupParent && item.parent?.id
-              ? item.parent.id.includes(newParams.groupParent)
-              : true;
+                ? item.parent.id.includes(newParams.groupParent)
+                : true;
           delete newParams.groupParent;
 
           return companyFound && parentFound && extraPredicate(item, newParams);

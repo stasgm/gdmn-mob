@@ -22,17 +22,28 @@ import { BarCodeScanner } from 'expo-barcode-scanner';
 
 import { IScannedObject } from '@lib/client-types';
 
+import { ISettingsOption } from '@lib/types';
+
+import { isNumeric } from '@lib/mobile-hooks';
+
 import { IMovementLine } from '../../../store/types';
 
 import { ONE_SECOND_IN_MS } from '../../../utils/constants';
+import { getDataMarkType } from '../../../utils/helpers';
+
+interface IQuantity {
+  quantity?: string;
+  sumWNds?: string;
+}
 
 interface IProps {
   item: IMovementLine;
   onSetLine: (value: IMovementLine) => void;
   onSetDisabledSave: (value: boolean) => void;
+  isSumWNds?: boolean;
 }
 
-export const DocLine = ({ item, onSetLine, onSetDisabledSave }: IProps) => {
+export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave }: IProps) => {
   const { colors } = useTheme();
 
   const [goodEID, setGoodEID] = useState<string | undefined>(item?.EID?.toString());
@@ -40,6 +51,11 @@ export const DocLine = ({ item, onSetLine, onSetDisabledSave }: IProps) => {
 
   const [goodName, setGoodName] = useState<string>(item?.good.name || '');
   const [visibleDialog, setVisibleDialog] = useState(false);
+  const [goodPrice, setGoodPrice] = useState<string>((item?.price || 0)?.toString() || '');
+  const [visiblePriceDialog, setVisiblePriceDialog] = useState(false);
+  const [goodBuyingPrice, setGoodBuyingPrice] = useState<string>((item?.buyingPrice || 0)?.toString() || '');
+  const [visibleBuyingPriceDialog, setVisibleBuyingPriceDialog] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const [scaner, setScaner] = useState<IScannedObject>({ state: 'init' });
 
@@ -51,16 +67,21 @@ export const DocLine = ({ item, onSetLine, onSetDisabledSave }: IProps) => {
 
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(isScreenKeyboard);
 
+  const [isQuantity, setIsQuantity] = useState(true);
+  const [changeOldValue, setChangeOldValue] = useState(true);
+
   useEffect(() => {
     !visibleDialog &&
+      !visiblePriceDialog &&
+      !visibleBuyingPriceDialog &&
       (isKeyboardOpen || currRef?.current) &&
       setTimeout(() => {
         currRef.current?.focus();
       }, ONE_SECOND_IN_MS);
-  }, [isKeyboardOpen, visibleDialog]);
+  }, [isKeyboardOpen, visibleBuyingPriceDialog, visibleDialog, visiblePriceDialog]);
 
   useEffect(() => {
-    if (!visibleDialog) {
+    if (!visibleDialog && !visiblePriceDialog && !visibleBuyingPriceDialog) {
       Keyboard.addListener('keyboardDidShow', () => {
         Keyboard.dismiss();
         currRef.current?.focus();
@@ -69,18 +90,37 @@ export const DocLine = ({ item, onSetLine, onSetDisabledSave }: IProps) => {
     return () => {
       Keyboard.removeAllListeners('keyboardDidShow');
     };
-  }, [visibleDialog]);
+  }, [visibleBuyingPriceDialog, visibleDialog, visiblePriceDialog]);
 
-  const handleGetScannedObject = useCallback((brc: string) => {
-    setScaner({ state: 'found' });
-    if (!brc) {
-      return;
-    }
-    setGoodEID(brc);
+  const handleGetScannedObject = useCallback(
+    (brc: string) => {
+      setScaner({ state: 'found' });
+      const prefixGtin = (settings.prefixGtin as ISettingsOption<string>)?.data || '';
+      const prefixISN = (settings.prefixISN as ISettingsOption<string>)?.data || '';
+      const dataMarkType = getDataMarkType(brc, prefixGtin, prefixISN);
 
-    setScaner({ state: 'init' });
-    setDoScanned(false);
-  }, []);
+      if (!brc) {
+        setScaner({ state: 'error', message: 'Штрихкод не отсканирован' });
+
+        return;
+      }
+
+      if (dataMarkType === '1') {
+        const gtin = brc.match(RegExp(`${prefixGtin}0?\\d{13}${prefixISN}`));
+
+        if (!gtin || (gtin[0].slice(2, -2) !== item?.barcode && gtin[0].slice(3, -2) !== item?.barcode)) {
+          setScaner({ state: 'error', message: 'Коды товаров не совпадают.' });
+          return;
+        }
+      }
+
+      setGoodEID(brc);
+
+      setScaner({ state: 'init' });
+      setDoScanned(false);
+    },
+    [item?.barcode, settings.prefixGtin, settings.prefixISN],
+  );
 
   const handleClearScaner = () => setScaner({ state: 'init' });
 
@@ -98,46 +138,91 @@ export const DocLine = ({ item, onSetLine, onSetDisabledSave }: IProps) => {
     setVisibleDialog(false);
   };
 
+  const getNumber = (value: string) => {
+    let newValue = value.replace(',', '.');
+    newValue = newValue.length > 1 && newValue[0] === '0' && newValue[1] !== '.' ? newValue.substring(1) : newValue;
+
+    newValue = !newValue.includes('.') ? parseFloat(newValue).toString() : newValue;
+    return newValue;
+  };
+
+  const handleAddPrice = useCallback(() => {
+    const price = getNumber(goodPrice);
+    if (!isNumeric(price)) {
+      setErrorMessage('Цена не является числовым значением.');
+      return;
+    }
+    onSetLine({ ...item, price: Number(price) });
+    setVisiblePriceDialog(false);
+    setErrorMessage('');
+  }, [goodPrice, item, onSetLine]);
+
+  const handleAddBuyingPrice = useCallback(() => {
+    const price = getNumber(goodBuyingPrice);
+    if (!isNumeric(price)) {
+      setErrorMessage('Цена не является числовым значением.');
+      return;
+    }
+    onSetLine({ ...item, buyingPrice: Number(price) });
+    setVisibleBuyingPriceDialog(false);
+    setErrorMessage('');
+  }, [goodBuyingPrice, item, onSetLine]);
+
   useEffect(() => {
     onSetLine({ ...item, EID: goodEID });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goodEID]);
 
   useEffect(() => {
-    onSetDisabledSave(visibleDialog);
+    onSetDisabledSave(visibleDialog || visiblePriceDialog);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visibleDialog]);
+  }, [visibleDialog, visiblePriceDialog]);
 
   const price = item?.price || 0;
   const remains = item?.remains || 0;
   const buyingPrice = item?.buyingPrice || 0;
   const barcode = item?.barcode || '';
 
-  const [quantity, setQuantity] = useState(item.quantity.toString());
+  const [keypadValue, setKeypadValue] = useState<IQuantity>({ quantity: item.quantity.toString() });
+
+  const getValue = useCallback(
+    (obj: any, value?: string | number) => {
+      return isQuantity ? { ...obj, quantity: value } : { ...obj, sumWNds: value };
+    },
+    [isQuantity],
+  );
 
   const handleChangeText = useCallback(
     (text: string) => {
       if (isKeyboardOpen) {
         setIsKeyboardOpen(false);
       }
+      setChangeOldValue(false);
       let newValue = text.replace(',', '.');
       newValue = !newValue.includes('.') ? parseFloat(newValue).toString() : newValue;
       newValue = Number.isNaN(parseFloat(newValue)) ? '0' : newValue;
       const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
-      const q = validNumber.test(newValue) ? newValue : quantity;
-      setQuantity(q);
-      onSetLine({ ...item, quantity: parseFloat(q || '0') });
+      const q = validNumber.test(newValue) ? newValue : isQuantity ? keypadValue.quantity : keypadValue.sumWNds;
+      setKeypadValue(getValue(keypadValue, q));
+      onSetLine(getValue({ ...item, keypadValue }, parseFloat(q || '0')));
     },
-    [isKeyboardOpen, item, onSetLine, quantity],
+    [isKeyboardOpen, isQuantity, keypadValue, getValue, onSetLine, item],
   );
 
+  const handleChangeQuantity = useCallback(() => {
+    setIsQuantity(!isQuantity);
+    setChangeOldValue(true);
+    setKeypadValue(getValue(keypadValue, (isQuantity ? item.quantity : item.sumWNds || 0).toString()));
+  }, [getValue, isQuantity, item.quantity, item.sumWNds, keypadValue]);
+
+  const oldValue = useMemo(() => (isQuantity ? keypadValue.quantity : keypadValue.sumWNds), [isQuantity, keypadValue]);
   const contentStyle = useMemo(
     () =>
       ({
         flexDirection: 'column',
         justifyContent: isKeyboardOpen ? 'space-between' : 'flex-start',
         flex: 1,
-      } as any),
+      }) as any,
     [isKeyboardOpen],
   );
 
@@ -195,23 +280,95 @@ export const DocLine = ({ item, onSetLine, onSetDisabledSave }: IProps) => {
               <ItemSeparator />
             </View>
           ) : null}
-          <View style={localStyles.item}>
-            <View style={localStyles.halfItem}>
-              <MediumText>Цена:</MediumText>
-              <LargeText style={localStyles.value}>{price.toString()}</LargeText>
-            </View>
-            <View style={[{ backgroundColor: colors.primary }, localStyles.verticalLine]} />
-            <View style={[localStyles.halfItem, localStyles.halfItemRemView]}>
+          {isSumWNds ? (
+            <View style={localStyles.item}>
               <MediumText>Остаток:</MediumText>
               <LargeText style={localStyles.value}>{remains.toString()}</LargeText>
             </View>
-          </View>
+          ) : (
+            <View style={localStyles.item}>
+              <View style={localStyles.halfItem}>
+                <View style={localStyles.eIdView}>
+                  <MediumText>Цена:</MediumText>
+                  <LargeText style={localStyles.value}>{price.toString()}</LargeText>
+                </View>
+                {/* {item.good.id === 'unknown' && ( */}
+                <View style={localStyles.button}>
+                  <TouchableOpacity>
+                    <IconButton icon="pencil-outline" size={24} onPress={() => setVisiblePriceDialog(true)} />
+                  </TouchableOpacity>
+                </View>
+                {/* )} */}
+              </View>
+              <View style={[{ backgroundColor: colors.primary }, localStyles.verticalLine]} />
+              <View style={[localStyles.halfItem, localStyles.halfItemRemView]}>
+                <MediumText>Остаток:</MediumText>
+                <LargeText style={localStyles.value}>{remains.toString()}</LargeText>
+              </View>
+            </View>
+          )}
           <ItemSeparator />
-          <View style={localStyles.item}>
-            <MediumText>Покупная цена:</MediumText>
-            <LargeText style={localStyles.value}>{buyingPrice.toString()}</LargeText>
-          </View>
+          {isSumWNds ? (
+            <View style={localStyles.item}>
+              <View style={localStyles.eIdView}>
+                <MediumText>{isQuantity ? 'Сумма с НДС:' : 'Количество:'}</MediumText>
+                <LargeText style={localStyles.value}>
+                  {isQuantity ? item?.sumWNds?.toString() || '0' : item?.quantity?.toString() || '0'}
+                </LargeText>
+              </View>
+              <View style={localStyles.button}>
+                <TouchableOpacity>
+                  <IconButton icon="pencil-outline" size={24} onPress={handleChangeQuantity} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : (
+            <View style={localStyles.item}>
+              <View style={localStyles.eIdView}>
+                <MediumText>Покупная цена:</MediumText>
+                <LargeText style={localStyles.value}>{buyingPrice.toString()}</LargeText>
+              </View>
+              <View style={localStyles.button}>
+                <TouchableOpacity>
+                  <IconButton icon="pencil-outline" size={24} onPress={() => setVisibleBuyingPriceDialog(true)} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
           <ItemSeparator />
+          {/* <View style={localStyles.item}>
+            <View style={localStyles.eIdView}>
+              <MediumText>EID:</MediumText>
+              <View style={{ flexDirection: 'column' }}>
+                {item?.EIDlist?.map((i, index) => (
+                  <LargeText key={index} style={localStyles.value}>
+                    {i}
+                  </LargeText>
+                ))}
+              </View>
+            </View>
+            <View style={localStyles.button}>
+              {item?.EID ? (
+                <TouchableOpacity>
+                  <IconButton icon="close" size={20} onPress={() => setGoodEID([])} />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity>
+                  <IconButton icon="barcode-scan" size={24} onPress={handleDoScan} />
+                </TouchableOpacity>
+              )}
+              {/* {item?.EIDlist?.length ? (
+                <TouchableOpacity>
+                  <IconButton icon="close" size={20} onPress={() => setGoodEID([])} />
+                </TouchableOpacity>
+              ) : (
+              <TouchableOpacity>
+                <IconButton icon="barcode-scan" size={24} onPress={handleDoScan} />
+              </TouchableOpacity>
+              {/* )}
+            </View>*
+          </View> */}
           <View style={localStyles.item}>
             <View style={localStyles.eIdView}>
               <MediumText>EID:</MediumText>
@@ -235,7 +392,7 @@ export const DocLine = ({ item, onSetLine, onSetDisabledSave }: IProps) => {
         <View style={localStyles.quant}>
           <ItemSeparator />
           <View style={localStyles.item}>
-            <MediumText>Количество:</MediumText>
+            <MediumText>{isQuantity ? 'Количество:' : 'Сумма с НДС:'}</MediumText>
             <TextInput
               style={localStyles.quantitySize}
               showSoftInputOnFocus={false}
@@ -245,7 +402,7 @@ export const DocLine = ({ item, onSetLine, onSetDisabledSave }: IProps) => {
               onChangeText={handleChangeText}
               returnKeyType="done"
               ref={currRef}
-              value={quantity}
+              value={isQuantity ? keypadValue.quantity : keypadValue.sumWNds}
             />
           </View>
           {isScreenKeyboard && (
@@ -260,12 +417,13 @@ export const DocLine = ({ item, onSetLine, onSetDisabledSave }: IProps) => {
         </View>
         {isScreenKeyboard && isKeyboardOpen && (
           <NumberKeypad
-            oldValue={quantity}
+            oldValue={oldValue}
             onApply={(value) => {
-              onSetLine({ ...item, quantity: parseFloat(value) });
-              setQuantity(value);
+              onSetLine(getValue(item, parseFloat(value)));
+              setKeypadValue(getValue(keypadValue, value));
             }}
             decDigitsForTotal={3}
+            changeOldValue={changeOldValue}
           />
         )}
       </View>
@@ -278,6 +436,34 @@ export const DocLine = ({ item, onSetLine, onSetDisabledSave }: IProps) => {
         onOk={handleAddName}
         okLabel={'Сохранить'}
         okDisabled={goodName ? false : true}
+      />
+      <AppDialog
+        title="Цена"
+        visible={visiblePriceDialog}
+        text={(goodPrice ? getNumber(goodPrice) : '') || ''}
+        onChangeText={setGoodPrice}
+        onCancel={() => {
+          setVisiblePriceDialog(false);
+          setErrorMessage('');
+        }}
+        onOk={handleAddPrice}
+        okLabel={'Сохранить'}
+        okDisabled={goodPrice ? false : true}
+        errorMessage={errorMessage}
+      />
+      <AppDialog
+        title="Покупная цена"
+        visible={visibleBuyingPriceDialog}
+        text={(goodBuyingPrice ? getNumber(goodBuyingPrice) : '') || ''}
+        onChangeText={setGoodBuyingPrice}
+        onCancel={() => {
+          setVisibleBuyingPriceDialog(false);
+          setErrorMessage('');
+        }}
+        onOk={handleAddBuyingPrice}
+        okLabel={'Сохранить'}
+        okDisabled={goodBuyingPrice ? false : true}
+        errorMessage={errorMessage}
       />
     </View>
   );
@@ -316,7 +502,7 @@ const localStyles = StyleSheet.create({
   eIdView: {
     flexDirection: 'row',
     width: '80%',
-    paddingVertical: 8,
+    alignItems: 'center',
   },
   quantitySize: {
     fontSize: 30,

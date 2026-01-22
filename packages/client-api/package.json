@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "yarn clean-dist && tsc",
-    "clean-dist": "rimraf dist/*",
+    "clean-dist": "rimraf --glob dist/*",
     "prettier:check": "prettier --check \"**/*.ts*\"",
     "prettier:fix": "prettier --write \"**/*.ts*\"",
     "lint": "eslint \"**/*.ts*\"",
@@ -23,12 +23,12 @@
   "dependencies": {
     "@lib/client-config": "*",
     "@lib/types": "*",
-    "axios": "^0.27.2",
+    "axios": "^1.6.2",
     "nanoid": "^3.3.4"
   },
   "devDependencies": {
     "@config/prettier-config": "*",
-    "lint-staged": "^13.0.3",
-    "typescript": "~4.8.4"
+    "lint-staged": "^14.0.1",
+    "typescript": "^5.2.2"
   }
 }

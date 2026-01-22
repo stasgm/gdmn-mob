@@ -12,14 +12,16 @@ import { IApiConfig } from '@lib/client-types';
 import { AppScreen, Input, PrimeButton, ScreenTitle, globalStyles as styles, MediumText } from '@lib/mobile-ui';
 
 import { config as firstConfig } from '@lib/client-config';
+import { IDevice } from '@lib/types';
 
 export type Props = {
   config: IApiConfig | undefined;
   onSetConfig: (config: IApiConfig) => void;
   onSetDemoMode: () => void;
+  device?: IDevice | undefined;
 };
 
-const ConfigScreen = ({ config, onSetConfig, onSetDemoMode }: Props) => {
+const ConfigScreen = ({ config, onSetConfig, onSetDemoMode, device }: Props) => {
   const navigation = useNavigation<StackNavigationProp<AuthStackParamList, 'Config'>>();
   const { colors } = useTheme();
 
@@ -157,7 +159,7 @@ const ConfigScreen = ({ config, onSetConfig, onSetDemoMode }: Props) => {
         </KeyboardAwareScrollView>
       </AppScreen>
       <Dialog visible={visibleDialog} onDismiss={handleVisibleFalse}>
-        <Dialog.Title>Укажите необходимые действия</Dialog.Title>
+        <Dialog.Title>{device ? `Устройство ${device.name}` : 'Устройство не активировано'}</Dialog.Title>
         <Dialog.Content>
           <TouchableOpacity onPress={() => setInitConfig(!initConfig)}>
             <View style={[styles.flexDirectionRow, styles.alignItemsCenter]}>

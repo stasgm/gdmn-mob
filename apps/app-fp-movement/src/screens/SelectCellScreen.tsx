@@ -12,14 +12,14 @@ import {
   InfoButton,
 } from '@lib/mobile-ui';
 
-import { useTheme } from 'react-native-paper';
+import { MD2Theme, useTheme } from 'react-native-paper';
 
 import { ScrollView } from 'react-native-gesture-handler';
 
 import { DashboardStackParamList } from '@lib/mobile-navigation';
 
-import { ICell, ICellName, ICellRef, IInventoryLine, IMoveDocument, IMoveLine } from '../store/types';
-import { MoveStackParamList } from '../navigation/Root/types';
+import { ICell, ICellName, ICellRef, IInventoryLine, IMoveDocument, IMoveLine, IPalletDocument } from '../store/types';
+import { MoveStackParamList, PalletStackParamList } from '../navigation/Root/types';
 
 import { alertWithSound, getCellItem, getCellList, getCellListRef } from '../utils/helpers';
 import { ICellRefList, ICellData } from '../store/app/types';
@@ -41,8 +41,11 @@ const NamedRow = ({ item }: { item: string }) => (
 
 export const SelectCellScreen = () => {
   const dispatch = useDispatch();
-  const navigation = useNavigation<StackNavigationProp<MoveStackParamList & DashboardStackParamList, 'SelectCell'>>();
-  const { colors } = useTheme();
+  const navigation =
+    useNavigation<
+      StackNavigationProp<MoveStackParamList & PalletStackParamList & DashboardStackParamList, 'SelectCell'>
+    >();
+  const { colors } = useTheme<MD2Theme>();
 
   const [visibleDialog, setVisibleDialog] = useState(false);
   const { docId, item, mode, docType } = useRoute<RouteProp<MoveStackParamList, 'SelectCell'>>().params;
@@ -73,13 +76,15 @@ export const SelectCellScreen = () => {
       docList
         ?.filter(
           (i) =>
-            i.documentType?.name === (docType ? docType : 'movement') &&
+            i.documentType?.name === (docType && !docType.includes('pallet') ? docType : 'movement') &&
             i.status !== 'PROCESSED' &&
             (i?.head?.fromDepart?.id === departId || i?.head?.toDepart?.id === departId),
         )
         .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()) as IMoveDocument[],
     [departId, docList, docType],
   );
+
+  const palletList = docList.filter((i) => i.documentType?.name === 'pallet') as IPalletDocument[];
 
   const lines = docs.reduce((prev: IMoveLine[], cur) => [...prev, ...cur.lines], []);
 
@@ -148,6 +153,7 @@ export const SelectCellScreen = () => {
     (cellData: ICellData) => {
       const newCell = `${selectedChamber}-${selectedRow}-${cellData.cell}`;
 
+      const storeDate = new Date().toISOString();
       if (mode === 0) {
         if (doc?.head.fromDepart?.isAddressStore) {
           if (!fromCell) {
@@ -162,15 +168,31 @@ export const SelectCellScreen = () => {
               alertWithSound('Ошибка выбора ячейки!', 'Данная ячейка занята другим товаром, выберите другую ячейку.');
             }
           } else {
-            const newLine: IMoveLine = { ...fromCell, toCell: newCell };
+            const newLine: IMoveLine = { ...fromCell, toCell: newCell, storeDate };
             handleAddLine(newLine);
           }
         } else {
-          const newLine: IMoveLine = { ...item, toCell: newCell };
+          const newLine: IMoveLine = { ...item, toCell: newCell, storeDate };
           handleAddLine(newLine);
+          if (docType?.includes('pallet')) {
+            const palletId = docType.replace('pallet', '');
+            const document1 = palletList.find((i) => i.id === palletId);
+            if (document1) {
+              dispatch(
+                documentActions.updateDocument({
+                  docId: palletId,
+                  document: {
+                    ...document1,
+                    status: 'ARCHIVE',
+                    head: { ...document1.head, toCell: newCell, storeDate },
+                  },
+                }),
+              );
+            }
+          }
         }
       } else {
-        const newLine: IMoveLine = { ...item, toCell: newCell };
+        const newLine: IMoveLine = { ...item, toCell: newCell, storeDate };
         dispatch(
           documentActions.updateDocumentLine({
             docId,
@@ -185,11 +207,13 @@ export const SelectCellScreen = () => {
       doc?.head.fromDepart?.isAddressStore,
       doc?.head.toDepart?.isAddressStore,
       docId,
+      docType,
       fromCell,
       handleAddLine,
       item,
       mode,
       navigation,
+      palletList,
       selectedChamber,
       selectedRow,
     ],
@@ -211,20 +235,20 @@ export const SelectCellScreen = () => {
           defaultCell.length && defaultCell.find((e) => e === i.name)
             ? cellColors.textWhite
             : i.disabled || !i.barcode
-            ? colors.backdrop
-            : cellColors.textWhite,
+              ? colors.backdrop
+              : cellColors.textWhite,
       };
       const backColorStyle = {
         backgroundColor:
           (fromCell && fromCell.barcode === i.barcode) || (toCell && toCell.barcode === i.barcode)
             ? colors.error
             : i.disabled
-            ? colors.backdrop
-            : defaultCell.length && defaultCell.find((e) => e === i.name)
-            ? cellColors.default
-            : i.barcode
-            ? cellColors.barcode
-            : cellColors.free,
+              ? colors.backdrop
+              : defaultCell.length && defaultCell.find((e) => e === i.name)
+                ? cellColors.default
+                : i.barcode
+                  ? cellColors.barcode
+                  : cellColors.free,
       };
 
       return (
@@ -255,9 +279,7 @@ export const SelectCellScreen = () => {
   const CellsColumn = useCallback(
     ({ cellData }: { cellData: ICellData[] }) => (
       <View style={styles.flexDirectionRow}>
-        {cellData?.map((i) => (
-          <Cell key={`${i.name}-${i.sortOrder}`} i={i} />
-        ))}
+        {cellData?.map((i) => <Cell key={`${i.name}-${i.sortOrder}`} i={i} />)}
       </View>
     ),
     [Cell],

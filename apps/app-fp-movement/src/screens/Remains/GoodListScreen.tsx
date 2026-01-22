@@ -27,8 +27,6 @@ import { RemainsStackParamList } from '../../navigation/Root/types';
 import { IEmployee, IGood, IRemains, IRemGood } from '../../store/app/types';
 import { getRemGoodListByContact } from '../../utils/helpers';
 
-import { IShipmentDocument } from '../../store/types';
-
 import GoodItem from './components/GoodItem';
 
 interface IFilteredList {
@@ -48,12 +46,12 @@ const GoodListScreen = () => {
     | IEmployee[];
   const contact = contacts?.find((i) => i.id === id);
 
-  const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
+  // const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
   const goods = refSelectors.selectByName<IGood>('good')?.data;
 
   const [goodRemains] = useState<IRemGood[]>(() =>
-    contact?.id && isFocused ? getRemGoodListByContact(goods, remains[contact.id], docList, id) : [],
+    contact?.id && isFocused ? getRemGoodListByContact(goods, remains[contact.id] /*, docList, id*/) : [],
   );
 
   const [searchQuery, setSearchQuery] = useState('');

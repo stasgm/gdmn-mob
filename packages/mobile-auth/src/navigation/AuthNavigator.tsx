@@ -23,9 +23,17 @@ import { device } from '@lib/mock';
 const AuthStack = createStackNavigator<AuthStackParamList>();
 
 const AuthNavigator = () => {
-  const { config, isDemo, isInit, user, isConfigFirst, connectionStatus, isLogout, appSystem } = useSelector(
-    (state) => state.auth,
-  );
+  const {
+    config,
+    isDemo,
+    isInit,
+    user,
+    isConfigFirst,
+    connectionStatus,
+    isLogout,
+    appSystem,
+    device: userDevice,
+  } = useSelector((state) => state.auth);
 
   const authDispatch = useAuthThunkDispatch();
   /*
@@ -83,7 +91,7 @@ const AuthNavigator = () => {
             mobileRequest(authDispatch, authActions),
             config.deviceId,
             user.erpUser.id,
-            Constants.manifest?.extra?.slug,
+            Constants.expoConfig?.extra?.slug,
           ),
         );
       }
@@ -106,7 +114,7 @@ const AuthNavigator = () => {
   const login = useCallback(
     async (credentials: IUserCredentials) => {
       const res = await authDispatch(
-        authActions.login(mobileRequest(authDispatch, authActions), credentials, Constants.manifest?.extra?.slug),
+        authActions.login(mobileRequest(authDispatch, authActions), credentials, Constants.expoConfig?.extra?.slug),
       );
       if (config?.deviceId && res.type === 'AUTH/LOGIN_SUCCESS') {
         await authDispatch(
@@ -114,7 +122,7 @@ const AuthNavigator = () => {
             mobileRequest(authDispatch, authActions),
             config.deviceId,
             res.payload?.erpUser?.id,
-            Constants.manifest?.extra?.slug,
+            Constants.expoConfig?.extra?.slug,
           ),
         );
       }
@@ -164,8 +172,8 @@ const AuthNavigator = () => {
   }, [authDispatch]);
 
   const CongfigWithParams = useCallback(
-    () => <ConfigScreen onSetConfig={saveConfig} onSetDemoMode={onSetDemoMode} config={config} />,
-    [onSetDemoMode, saveConfig, config],
+    () => <ConfigScreen onSetConfig={saveConfig} onSetDemoMode={onSetDemoMode} config={config} device={userDevice} />,
+    [saveConfig, onSetDemoMode, config, userDevice],
   );
 
   const ModeSelection = useCallback(

@@ -1,4 +1,4 @@
-import { isNumeric, log, round } from '@lib/mobile-hooks';
+import { log, round } from '@lib/mobile-hooks';
 
 import { Alert } from 'react-native';
 
@@ -19,6 +19,8 @@ import {
   IReceiptDocument,
   IReturnDocument,
   ISendingLine,
+  IFreeShipmentLine,
+  IPalletDocument,
 } from '../store/types';
 import {
   IBarcode,
@@ -35,7 +37,7 @@ import {
 import { ONE_KG_IN_G, ONE_T_IN_KG } from './constants';
 
 export const getNextDocNumber = (
-  documents: IMoveDocument[] | IShipmentDocument[] | IFreeShipmentDocument[] | IInventoryDocument[],
+  documents: IMoveDocument[] | IShipmentDocument[] | IFreeShipmentDocument[] | IInventoryDocument[] | IPalletDocument[],
 ) => {
   return (
     documents
@@ -53,6 +55,7 @@ export const getBarcode = (barcode: string, settings: barcodeSettings) => {
   const shcodeLast = timeLast + settings.countCode;
   const quantPackLast = shcodeLast + settings.countQuantPack;
   const numReceivedLast = quantPackLast + settings.countNumReceived;
+  const flagLast = numReceivedLast + settings.flag;
 
   const weight = barcode.slice(0, weightLast);
   const day = barcode.slice(weightLast, dayLast);
@@ -61,6 +64,7 @@ export const getBarcode = (barcode: string, settings: barcodeSettings) => {
   const shcode = barcode.slice(yearLast + 4, shcodeLast);
   const quantPack = barcode.slice(shcodeLast, quantPackLast);
   const numReceived = barcode.slice(quantPackLast, numReceivedLast);
+  const flag = barcode.slice(numReceivedLast, flagLast);
 
   const time = barcode.slice(yearLast, timeLast);
 
@@ -72,26 +76,36 @@ export const getBarcode = (barcode: string, settings: barcodeSettings) => {
     workDate,
     shcode: shcode,
     numReceived: numReceived,
-    quantPack: Number(weight) < settings.boxWeight * ONE_KG_IN_G ? 1 : Number(quantPack),
+    quantPack: flag ? Number(quantPack) : Number(weight) < settings.boxWeight * ONE_KG_IN_G ? 1 : Number(quantPack),
     time,
   };
 
-  return barcodeObj;
+  return flag.trim() ? { ...barcodeObj, flag } : barcodeObj;
 };
 
-export const getBarcodeString = (barcodeObj: IBarcode) => {
+export const getBarcodeString = (barcodeObj: IBarcode, settings: barcodeSettings) => {
   const day = `00${new Date(barcodeObj.workDate).getDate().toLocaleString()}`.slice(-2);
   const month = `00${(new Date(barcodeObj.workDate).getMonth() + 1).toLocaleString()}`.slice(-2);
   const year = `00${new Date(barcodeObj.workDate).getFullYear().toLocaleString().slice(2)}`.slice(-2);
 
-  const shcode = `0000${barcodeObj.shcode}`.slice(-4);
-  const quantPack = `0000${barcodeObj.quantPack.toLocaleString()}`.slice(-4);
+  const shcode = getCodeForCheck(barcodeObj.shcode, settings?.countCode || 4);
+  const quantPack = getCodeForCheck(barcodeObj.quantPack.toLocaleString(), settings?.countQuantPack || 4);
 
-  const weight = `000000${round(barcodeObj.weight * ONE_KG_IN_G, 3).toLocaleString()}`.slice(-6);
+  const weight =
+    barcodeObj.weight < ONE_T_IN_KG
+      ? getCodeForCheck(round(barcodeObj.weight * ONE_KG_IN_G, 3).toString(), settings?.countWeight || 6)
+      : round(barcodeObj.weight * ONE_KG_IN_G, 3).toString();
 
   const barcode =
-    weight + day + month + year + (barcodeObj.time || '0000') + shcode + quantPack + barcodeObj.numReceived;
-
+    weight +
+    day +
+    month +
+    year +
+    (barcodeObj.time || '0000') +
+    shcode +
+    quantPack +
+    barcodeObj.numReceived +
+    (barcodeObj.flag ? barcodeObj.flag : '');
   return barcode;
 };
 
@@ -225,10 +239,13 @@ export const getLineGood = (
   goods: IGood[],
   goodRemains: IRemGood[],
   remainsUse: boolean,
+  countCode: number,
 ) => {
   if (remainsUse) {
     if (goodRemains.length) {
-      const good = goodRemains.find((item) => item.good && `0000${item.good.shcode}`.slice(-4) === shcode);
+      const good = goodRemains.find(
+        (item) => item.good && getCodeForCheck(item.good.shcode, countCode || 4) === shcode,
+      );
 
       if (good) {
         const isRightWeight = good.remains >= weight;
@@ -250,10 +267,17 @@ export const getLineGood = (
       return { good: undefined, isRightWeight: false };
     }
   } else {
-    const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === shcode);
+    const good = goods.find((item) => getCodeForCheck(item.shcode, countCode || 4) === shcode);
     return {
       good: good
-        ? { id: good.id, name: good.name, shcode: good.shcode, isCattle: good.isCattle, goodGroupId: good.goodGroupId }
+        ? {
+            id: good.id,
+            name: good.name,
+            shcode: good.shcode,
+            isCattle: good.isCattle,
+            goodGroupId: good.goodGroupId,
+            unitWeight: good.unitWeight,
+          }
         : undefined,
       isRightWeight: true,
     };
@@ -288,6 +312,7 @@ export const getTotalLines = (docList: IShipmentDocument[], departId: string) =>
   }, {});
 
 export const getUpdatedLine = (
+  settings: barcodeSettings,
   usedRemains: boolean,
   lineBarcode: IBarcode,
   line: IBasedLine,
@@ -295,10 +320,9 @@ export const getUpdatedLine = (
   weight?: number,
 ) => {
   const newBarcode = weight
-    ? weight < ONE_T_IN_KG
-      ? getBarcodeString({ ...lineBarcode, quantPack: quantity, weight })
-      : (weight * ONE_KG_IN_G).toString() + getBarcodeString({ ...lineBarcode, quantPack: quantity, weight }).slice(6)
-    : getBarcodeString({ ...lineBarcode, quantPack: quantity });
+    ? getBarcodeString({ ...lineBarcode, quantPack: quantity, weight }, settings)
+    : getBarcodeString({ ...lineBarcode, quantPack: quantity }, settings);
+
   return {
     ...line,
     quantPack: quantity,
@@ -328,6 +352,7 @@ export const getDocToSend = (
           id: i.id,
           goodId: i.good.id,
           weight: i.weight,
+          quantity: (i as IFreeShipmentLine).quantity,
           workDate: i.workDate,
           numReceived: i.numReceived,
           barcode: i.barcode,
@@ -336,7 +361,10 @@ export const getDocToSend = (
           usedRemains: i.usedRemains,
           fromCell: (i as IMoveLine).fromCell,
           toCell: (i as IMoveLine).toCell,
-        } as ISendingLine),
+          box: (i as IFreeShipmentLine).box,
+          storeDate: (i as IMoveLine).storeDate,
+          flag: i.flag,
+        }) as ISendingLine,
     ),
   };
 };
@@ -344,8 +372,8 @@ export const getDocToSend = (
 export const getRemGoodListByContact = (
   goods: IGood[],
   remains: IRemainsData[] = [],
-  docList: IShipmentDocument[] = [],
-  departId: string,
+  // docList: IShipmentDocument[] = [],
+  // departId: string,
 ) => {
   log('getRemGoodListByContact', 'Начало построения массива товаров по подразделению');
 
@@ -354,9 +382,9 @@ export const getRemGoodListByContact = (
     //Если есть остатки, то формируем модель остатков по ид товара
     if (remains.length) {
       //Формируем объект остатков тмц
-      const linesQuantity = getTotalLines(docList, departId) || undefined;
+      // const linesQuantity = getTotalLines(docList, departId) || undefined;
 
-      const remainsByGoodId = getRemainsByGoodId(remains, linesQuantity);
+      const remainsByGoodId = getRemainsByGoodId(remains /*, linesQuantity*/);
 
       //Формируем массив товаров, добавив свойствоостатка
       //Если по товару нет остатков и если модель не для выбора из справочника тмц, (не из остатков)
@@ -372,17 +400,18 @@ export const getRemGoodListByContact = (
               });
             }
           }
-        } else if (
-          remainsByGoodId &&
-          linesQuantity &&
-          isNumeric(linesQuantity[good.id]) &&
-          linesQuantity[good.id] !== 0
-        ) {
-          remGoods.push({
-            good,
-            remains: linesQuantity[good.id],
-          });
         }
+        // else if (
+        //   remainsByGoodId &&
+        //   linesQuantity &&
+        //   isNumeric(linesQuantity[good.id]) &&
+        //   linesQuantity[good.id] !== 0
+        // ) {
+        //   remGoods.push({
+        //     good,
+        //     remains: linesQuantity[good.id],
+        //   });
+        // }
       }
     }
   }
@@ -392,17 +421,17 @@ export const getRemGoodListByContact = (
 };
 
 //Возвращает объект остатков тмц, пример: {"1": [{ q: 1 }, { q: 2 }]}
-const getRemainsByGoodId = (remains: IRemainsData[], linesQuantity: IGoodQuantity) => {
+const getRemainsByGoodId = (remains: IRemainsData[] /*, linesQuantity: IGoodQuantity*/) => {
   return remains.reduce((p: IMGoodData<IModelRem[]>, { goodId, q = 0 }: IRemainsData) => {
     const x = p[goodId];
-    const goodQ = linesQuantity[goodId] || 0;
+    // const goodQ = linesQuantity[goodId] || 0;
 
-    const newQ = q + goodQ;
-    if (newQ !== 0) {
+    // const newQ = q + goodQ;
+    if (q !== 0) {
       if (!x) {
-        p[goodId] = [{ q: newQ }];
+        p[goodId] = [{ q }];
       } else {
-        x.push({ q: newQ });
+        x.push({ q });
       }
     }
     return p;
@@ -438,3 +467,6 @@ export const alertWithSoundMulti = (label: string, text: string, onOk: () => voi
     },
   ]);
 };
+
+export const getCodeForCheck = (value: string, count: number) =>
+  `${'0'.repeat(count || 4)}${value}`.slice(-(count || 4));

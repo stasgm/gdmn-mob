@@ -1,0 +1,3 @@
+{
+  "extends": ["@config/eslint-config", "@config/eslint-config-react-native"]
+}

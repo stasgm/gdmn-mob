@@ -1,6 +1,6 @@
 import { IReferenceData } from '@lib/types';
 
-import { IMovementLine } from '../../store/types';
+import { IInvoiceLine, IMovementLine } from '../../store/types';
 
 export type IRefSelectParams = {
   refName: string;
@@ -72,3 +72,59 @@ export type ScanParamList = RefParamList & {
 };
 
 export type ScanStackParamList = { ScanList: undefined } & ScanParamList;
+
+export type RevisionParamList = RefParamList & {
+  RevisionView: { id: string; docType?: string };
+  RevisionEdit: { id: string; docType?: string } | undefined; //itemId: string;
+  RevisionGood: { docId: string };
+};
+
+export type RevisionStackParamList = { RevisionList: undefined } & RevisionParamList;
+
+export type DataMarkParamList = RefParamList & {
+  DataMarkView: { id: string; docType?: string };
+  DataMarkEdit: { id: string; docType?: string } | undefined;
+  DataMarkLine: { mode: number; docId: string; item: IMovementLine; docType?: string };
+  SelectRemainsItem: { docId: string; docType?: string };
+  ScanBarcode: { docId: string; docType?: string };
+  DataMarkLineEdit: {
+    docId: string;
+    prodId: string;
+    quantity?: number;
+    lineId?: number;
+    price?: number;
+    remains?: number;
+    modeCor?: boolean;
+    docType?: string;
+  };
+};
+
+export type DataMarkStackParamList = { DataMarkList: undefined } & DataMarkParamList;
+
+export type InvoiceParamList = RefParamList & {
+  InvoiceView: { id: string; docType?: string };
+  InvoiceEdit: { id: string; docType?: string } | undefined;
+  InvoiceLine: { mode: number; docId: string; item: IInvoiceLine; docType?: string };
+  SelectRemainsItem: { docId: string; docType?: string };
+  ScanBarcode: { docId: string; docType?: string };
+  InvoiceLineEdit: {
+    docId: string;
+    prodId: string;
+    quantity?: number;
+    lineId?: number;
+    price?: number;
+    remains?: number;
+    //modeCor?: boolean;
+    //docType?: string;
+  };
+};
+
+export type InvoiceStackParamList = { InvoiceList: undefined } & InvoiceParamList;
+
+export type WaybillParamList = RefParamList & {
+  WaybillView: { id: string; docType?: string };
+  WaybillEdit: { id: string; docType?: string } | undefined;
+  ScanBarcode: { docId: string; docType?: string };
+};
+
+export type WaybillStackParamList = { WaybillList: undefined } & WaybillParamList;

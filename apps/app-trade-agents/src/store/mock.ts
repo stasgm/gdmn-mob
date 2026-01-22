@@ -1538,6 +1538,48 @@ export const messageAgent: IMessage<MessageType>[] = [
                 name: '2 кг',
               },
             },
+            {
+              id: 'ab0d8341-1d641234567',
+              good: {
+                id: '1111111122',
+                name: 'Колбаски Краковские',
+                goodgroup: { id: '690457778', name: '05. Продукты, колбаски' },
+                priceFsn: 19.87,
+              },
+              quantity: 3,
+              package: {
+                id: '1811739170',
+                name: '22 кг',
+              },
+            },
+            {
+              id: 'ab0d8341-1d641235557',
+              good: {
+                id: '111145678922',
+                name: 'Колбаски Чесночные',
+                goodgroup: { id: '690457778', name: '05. Продукты, колбаски' },
+                priceFsn: 15.2,
+              },
+              quantity: 8,
+              package: {
+                id: '1811739170',
+                name: '5 кг',
+              },
+            },
+            {
+              id: 'ab012szz1-1d641234567',
+              good: {
+                id: '1999111122',
+                name: 'Колбаски Охотничьи',
+                goodgroup: { id: '690457778', name: '05. Продукты, колбаски' },
+                priceFsn: 22.08,
+              },
+              quantity: 10,
+              package: {
+                id: '1811739170',
+                name: '2 кг',
+              },
+            },
           ],
           creationDate: new Date().toISOString(),
           editionDate: new Date().toISOString(),

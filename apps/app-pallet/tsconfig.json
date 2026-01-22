@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "declaration": true,
+    "declarationMap": false,
+    "downlevelIteration": true,
+    "allowSyntheticDefaultImports": true,
+    "allowJs": false,
+    "checkJs": false,
+    "jsx": "react-native",
+    "lib": ["dom", "esnext"],
+    "typeRoots": ["./src/types"],
+    "noEmit": true,
+    "rootDir": "."
+  },
+  "include": ["src/**/*", "__tests__/**/*", "./App.tsx"],
+  "exclude": ["dist", "node_modules", "*.sample"]
+}

@@ -157,6 +157,16 @@ export const appSettings: Settings = {
     group: mainSettingGroup,
     checkSettingsCode: true,
   },
+  scanUnit: {
+    id: 'scanUnit',
+    sortOrder: 36,
+    description: 'Сканирование в шт.',
+    data: false,
+    type: 'boolean',
+    visible: true,
+    group: mainSettingGroup,
+    checkSettingsCode: true,
+  },
   minBarcodeLength: {
     id: 'minBarcodeLength',
     sortOrder: 6,
@@ -256,6 +266,24 @@ export const appSettings: Settings = {
     visible: true,
     group: goodGroup,
   },
+  addPalletQuantPack: {
+    id: 'addPalletQuantPack',
+    sortOrder: 17,
+    description: 'Указывать кол-во коробок',
+    data: false,
+    type: 'boolean',
+    visible: true,
+    group: goodGroup,
+  },
+  flag: {
+    id: 'flag',
+    sortOrder: 18,
+    description: 'Последний символ',
+    data: 0,
+    type: 'number',
+    visible: true,
+    group: goodGroup,
+  },
   countOrderBarcodeLentgh: {
     id: 'countOrderBarcodeLentgh',
     sortOrder: 15,
@@ -310,6 +338,24 @@ export const appSettings: Settings = {
     visible: true,
     group: orderGroup,
   },
+  limitDelta: {
+    id: 'limitDelta',
+    sortOrder: 21,
+    description: 'Превышение количества, %',
+    data: 0,
+    type: 'number',
+    visible: true,
+    group: orderGroup,
+  },
+  usePackage: {
+    id: 'usePackage',
+    sortOrder: 22,
+    description: 'Использовать тару',
+    data: false,
+    type: 'boolean',
+    visible: true,
+    group: goodGroup,
+  },
 };
 
 export const unknownGood: IGood = {
@@ -324,7 +370,7 @@ export const tempType = {
   description: 'Отвес',
 };
 
-export const lineTypes: IListItem[] = [
+export const shipmentLineTypes: IListItem[] = [
   {
     id: 'order',
     value: 'заявлено',
@@ -333,9 +379,25 @@ export const lineTypes: IListItem[] = [
     id: 'shipment',
     value: 'отвешено',
   },
+  {
+    id: 'last',
+    value: 'позиция',
+  },
+];
+
+export const lineTypes: IListItem[] = [
+  {
+    id: 'all',
+    value: 'все',
+  },
+  {
+    id: 'last',
+    value: 'позиция',
+  },
 ];
 
 export const barCodeTypes = [
+  BarCodeScanner.Constants.BarCodeType.qr,
   BarCodeScanner.Constants.BarCodeType.code128,
   BarCodeScanner.Constants.BarCodeType.ean13,
   BarCodeScanner.Constants.BarCodeType.ean8,

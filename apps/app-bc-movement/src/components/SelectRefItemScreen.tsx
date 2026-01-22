@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useLayoutEffect, useMemo } from 'react';
 import { View, FlatList, Alert, TouchableOpacity, Text } from 'react-native';
-import { Searchbar, Divider, useTheme, Checkbox } from 'react-native-paper';
+import { Searchbar, Divider, useTheme, Checkbox, MD2Theme } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
 import { INamedEntity } from '@lib/types';
 import { appActions, IFormParam, refSelectors, useSelector } from '@lib/store';
@@ -157,7 +157,7 @@ export const SelectRefItemScreen = () => {
 
 const LineItem = React.memo(
   ({ item, isChecked, onCheck }: { item: INamedEntity; isChecked: boolean; onCheck: (id: INamedEntity) => void }) => {
-    const { colors } = useTheme();
+    const { colors } = useTheme<MD2Theme>();
 
     return (
       <TouchableOpacity onPress={() => onCheck(item)}>

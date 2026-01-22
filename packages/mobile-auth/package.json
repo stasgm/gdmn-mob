@@ -20,31 +20,30 @@
   "prettier": "@config/prettier-config",
   "dependencies": {
     "@expo/vector-icons": "^13.0.0",
-    "@expo/webpack-config": "^0.17.3",
+    "@expo/webpack-config": "^19.0.0",
     "@lib/client-api": "*",
     "@lib/client-types": "*",
     "@lib/mobile-hooks": "*",
     "@lib/mobile-ui": "*",
     "@lib/store": "*",
     "@lib/types": "*",
-    "@react-navigation/native": "^6.1.3",
-    "@react-navigation/stack": "^6.3.12",
-    "@types/node": "^18.11.19",
-    "@types/react": "~18.0.25",
-    "@types/react-native": "0.70.8",
-    "@types/react-native-version-check": "^3.4.5",
-    "expo-constants": "~14.0.2",
-    "react": "18.1.0",
-    "react-native": "0.70.8",
-    "react-native-paper": "^4.12.5",
-    "react-native-web": "0.18.12",
-    "typescript": "~4.8.4"
+    "@react-navigation/native": "^6.1.9",
+    "@react-navigation/stack": "^6.3.20",
+    "@types/node": "^20.8.4",
+    "@types/react": "~18.2.43",
+    "@types/react-native-version-check": "^3.4.6",
+    "expo-constants": "~14.4.2",
+    "react": "18.2.0",
+    "react-native": "0.72.10",
+    "react-native-paper": "^5.10.6",
+    "react-native-web": "0.19.9",
+    "typescript": "^5.2.2"
   },
   "devDependencies": {
     "@config/eslint-config": "*",
     "@config/eslint-config-react": "*",
     "@config/eslint-config-react-native": "*",
     "@config/prettier-config": "*",
-    "lint-staged": "^13.0.3"
+    "lint-staged": "^14.0.1"
   }
 }

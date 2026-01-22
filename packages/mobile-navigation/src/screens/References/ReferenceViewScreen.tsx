@@ -1,20 +1,18 @@
-import React, { useState, useMemo, useLayoutEffect, useEffect } from 'react';
+import { styles } from './styles';
+import ReferenceItem from './components/ReferenceItem';
+import { ReferenceStackParamList } from '../../navigation/Root/types';
+import React, { useState, useMemo, useLayoutEffect, useEffect, useCallback } from 'react';
 import { View } from 'react-native';
 import { Divider, Searchbar } from 'react-native-paper';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
 import { SubTitle, ItemSeparator, SearchButton, AppScreen, navBackButton } from '@lib/mobile-ui';
 
-import { refSelectors, useSelector } from '@lib/store';
+import { refSelectors } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 
 import { keyExtractorByIndex } from '@lib/mobile-hooks';
 
 import { FlashList } from '@shopify/flash-list';
-
-import { ReferenceStackParamList } from '../../navigation/Root/types';
-
-import { styles } from './styles';
-import ReferenceItem from './components/ReferenceItem';
 
 const ReferenceViewScreen = () => {
   const navigation = useNavigation();
@@ -40,12 +38,17 @@ const ReferenceViewScreen = () => {
     }
   }, [filterVisible, searchQuery]);
 
+  const headerRight = useCallback(
+    () => <SearchButton visible={filterVisible} onPress={() => setFilterVisible((prev) => !prev)} />,
+    [filterVisible],
+  );
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackButton,
-      headerRight: () => <SearchButton visible={filterVisible} onPress={() => setFilterVisible((prev) => !prev)} />,
+      headerRight,
     });
-  }, [navigation, filterVisible]);
+  }, [navigation, filterVisible, headerRight]);
 
   if (!list) {
     return (

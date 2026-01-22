@@ -1,6 +1,6 @@
 import { ColorValue, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { globalStyles as styles } from '@lib/mobile-ui';
-import { useTheme } from 'react-native-paper';
+import { MD2Theme, useTheme } from 'react-native-paper';
 
 interface IGroup {
   title: string;
@@ -30,7 +30,7 @@ const GroupItem = ({
   onPress: (item: string) => void;
   selected?: string;
 }) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
   const colorStyle = { color: selected === item ? 'white' : colors.text };
   const backColorStyle = { backgroundColor: selected === item ? colorSelected : colorBack };
   return (

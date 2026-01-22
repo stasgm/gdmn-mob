@@ -116,6 +116,7 @@ export interface IBasedLine extends IEntity {
   sortOrder?: number; // порядок сортировки
   scannedBarcode?: string;
   usedRemains?: boolean; // используются остатки в приложении
+  flag?: string; // флаг (последний символ), означает тип тары
 }
 
 export interface ISendingLine extends IEntity {
@@ -129,11 +130,15 @@ export interface ISendingLine extends IEntity {
   usedRemains?: boolean; // используются остатки в приложении
   fromCell?: string; // номер ячейки
   toCell?: string; // номер ячейки
+  storeDate?: string; // дата постановки в ячейку
 }
 
 export interface IMoveLine extends IBasedLine {
   fromCell?: string; // номер ячейки
   toCell?: string; // номер ячейки
+  storeDate?: string;
+  storeMan?: string;
+  isPack?: boolean;
 }
 
 export type IMoveDocument = MandateProps<IDocument<IMoveHead, IMoveLine>, 'head' | 'lines'>;
@@ -174,15 +179,31 @@ export interface IShipmentHead extends IHead {
   orderId: string;
 }
 
-export type IShipmentLine = IBasedLine;
-
+export interface IShipmentLine extends IBasedLine {
+  box?: IBox;
+  quantity?: number;
+  unitWeight?: number;
+}
 export type IShipmentDocument = MandateProps<IDocument<IShipmentHead, IShipmentLine>, 'head' | 'lines'>;
 
 export interface IFreeShipmentHead extends IHead {
   fromDepart: ICodeEntity;
   comment?: string; // Коментарий
 }
-export type IFreeShipmentLine = IBasedLine;
+
+export interface IBox extends IEntity {
+  packageWeight: number; //вес тары
+  packageId: string; // из справочника тары
+  additionalWeight?: number; //дополнительный вес тары
+  workDate?: string;
+  numReceived?: string;
+}
+
+export interface IFreeShipmentLine extends IBasedLine {
+  box?: IBox;
+  quantity?: number;
+  unitWeight?: number;
+}
 
 export type IFreeShipmentDocument = MandateProps<IDocument<IFreeShipmentHead, IFreeShipmentLine>, 'head' | 'lines'>;
 
@@ -212,6 +233,35 @@ export interface IReturnHead extends IHead {
 }
 export type IReturnLine = IBasedLine;
 export type IReturnDocument = MandateProps<IDocument<IReturnHead, IReturnLine>, 'head' | 'lines'>;
+
+export interface IPalletHead extends IHead {
+  quantPack: number;
+  barcode: string;
+  scannedBarcode: string;
+  good: IGood; // товар
+  weight: number; //вес
+  workDate: string; // Дата производства
+  time?: string; // Время производства
+  numReceived: string; // Номер партии
+  storeMan?: string;
+  boxQuantity?: number; // количество коробок как правильно
+  toCell?: string; // номер ячейки
+  storeDate?: string;
+}
+
+export interface IPalletLine extends IEntity {
+  quantPack: number;
+  barcode: string;
+  scannedBarcode: string;
+  good: IGood; // товар
+  weight: number; //вес
+  workDate: string; // Дата производства
+  time?: string; // Время производства
+  numReceived: string; // Номер партии
+  // storeMan?: string;
+}
+
+export type IPalletDocument = MandateProps<IDocument<IPalletHead, IPalletLine>, 'head' | 'lines'>;
 
 export type barcodeSettings = {
   [name: string]: number;

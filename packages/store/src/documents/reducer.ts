@@ -70,21 +70,22 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
           return !oldDoc || newDoc.status === 'ARCHIVE'
             ? newDoc
             : newDoc.status === 'PROCESSED'
-            ? {
-                ...(newDoc.head ? newDoc : oldDoc),
-                status: 'PROCESSED' as StatusType,
-                errorMessage: undefined,
-              }
-            : newDoc.status === 'PROCESSED_DEADLOCK' || newDoc.status === 'PROCESSED_INCORRECT'
-            ? {
-                ...oldDoc,
-                status: 'DRAFT' as StatusType,
-                errorMessage: newDoc.errorMessage,
-              }
-            : oldDoc.status === 'DRAFT' ||
-              ((oldDoc.status === 'PROCESSED' || oldDoc.status === 'ARCHIVE') && newDoc.status === 'DRAFT')
-            ? newDoc
-            : oldDoc;
+              ? {
+                  ...(newDoc.head ? newDoc : oldDoc),
+                  status: 'PROCESSED' as StatusType,
+                  errorMessage: undefined,
+                  erpCreationDate: newDoc.erpCreationDate,
+                }
+              : newDoc.status === 'PROCESSED_DEADLOCK' || newDoc.status === 'PROCESSED_INCORRECT'
+                ? {
+                    ...oldDoc,
+                    status: 'DRAFT' as StatusType,
+                    errorMessage: newDoc.errorMessage,
+                  }
+                : oldDoc.status === 'DRAFT' ||
+                    ((oldDoc.status === 'PROCESSED' || oldDoc.status === 'ARCHIVE') && newDoc.status === 'DRAFT')
+                  ? newDoc
+                  : oldDoc;
         })
         .concat(oldDocs);
 

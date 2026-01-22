@@ -22,7 +22,7 @@ import Constants from 'expo-constants';
 
 import api from '@lib/client-api';
 
-import { Snackbar } from 'react-native-paper';
+import { MD2Theme, Snackbar, useTheme } from 'react-native-paper';
 
 import { NavigationContainer } from '@react-navigation/native';
 
@@ -82,9 +82,12 @@ const AppRoot = ({ items, dashboardScreens, onSync }: Omit<IApp, 'store'>) => {
     if (!autoSync || loading || isDemo) {
       return;
     }
-    const timeOutId = setTimeout(() => {
-      syncData();
-    }, autoSynchPeriod * 60 * 1000);
+    const timeOutId = setTimeout(
+      () => {
+        syncData();
+      },
+      autoSynchPeriod * 60 * 1000,
+    );
 
     return () => {
       clearTimeout(timeOutId);
@@ -97,6 +100,7 @@ const AppRoot = ({ items, dashboardScreens, onSync }: Omit<IApp, 'store'>) => {
 
 const MobileApp = ({ loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
   const dispatch = useDispatch();
+  const { colors } = useTheme<MD2Theme>();
   const { loadingError: authLoadingError, errorMessage } = useSelector((state) => state.auth);
   const isLoggedWithCompany = authSelectors.isLoggedWithCompany();
   const docsLoadingError = useSelector<string>((state) => state.documents.loadingError);
@@ -117,8 +121,8 @@ const MobileApp = ({ loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
   useEffect(() => {
     if (!isLoggedWithCompany) {
       const checkForUpdates = async () => {
-        const packageName = Constants.manifest?.android?.package || '';
-        const currentVersion = Constants.manifest?.version;
+        const packageName = Constants.expoConfig?.android?.package || '';
+        const currentVersion = Constants.expoConfig?.version;
         try {
           const storeVersion = await VersionCheck.getLatestVersion({
             packageName,
@@ -126,7 +130,7 @@ const MobileApp = ({ loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
 
           if (currentVersion && storeVersion && storeVersion > currentVersion) {
             const installerPackageName = await getInstallReferrerAsync();
-            const appName = Constants.manifest?.name || '';
+            const appName = Constants.expoConfig?.name || '';
 
             if (installerPackageName.includes('utm_source=google-play')) {
               const googlePlayUrl = await VersionCheck.getPlayStoreUrl({
@@ -236,13 +240,13 @@ const MobileApp = ({ loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
           color: 'white',
         }}
       >
-        <Text>{errorMessage}</Text>
+        <Text style={localStyles.snackText}>{errorMessage}</Text>
       </Snackbar>
       {isLoggedWithCompany ? <AppRoot {...props} /> : <AuthNavigator />}
       <Snackbar
         visible={barVisible}
         onDismiss={closeSnackbar}
-        style={{ backgroundColor: defaultTheme.colors.error }}
+        style={{ backgroundColor: colors.error }}
         action={{
           icon: 'close',
           label: '',
@@ -251,7 +255,12 @@ const MobileApp = ({ loadingErrors, onClearLoadingErrors, ...props }: IApp) => {
         }}
       >
         <View style={globalStyles.container}>
-          {!!errList?.length && errList.map((err, id) => <Text key={id}>{truncate(err)}</Text>)}
+          {!!errList?.length &&
+            errList.map((err, id) => (
+              <Text style={localStyles.snackText} key={id}>
+                {truncate(err)}
+              </Text>
+            ))}
         </View>
       </Snackbar>
     </NavigationContainer>
@@ -264,5 +273,8 @@ const localStyles = StyleSheet.create({
   snack: {
     backgroundColor: defaultTheme.colors.error,
     zIndex: 1000,
+  },
+  snackText: {
+    color: 'white',
   },
 });

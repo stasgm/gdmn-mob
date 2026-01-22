@@ -10,6 +10,10 @@ import {
   IMGroupModel,
   IOrderLine,
   IOrderTotalLine,
+  IRemGood,
+  IRemainsData,
+  IMGoodData,
+  IModelRem,
 } from '../store/types';
 
 import { UNKNOWN_GROUP } from './constants';
@@ -214,6 +218,94 @@ const viewabilityConfig = {
   itemVisiblePercentThreshold: 50,
 };
 
+const jsonFormat = (str: any) => {
+  return JSON.stringify(str, null, '\t');
+};
+
+/**Возвращает модель товаров с информацией по остаткам в виде:
+  [
+    { good: { id: '1', name: 'Товар 1', value: 'шт.', ...}, price: 1.2, remains: 1},
+    { good: { id: '1', name: 'Товар 1', value: 'шт.', ...}, price: 1.3, remains: 3},
+    { good: { id: '2', name: 'Товар 2', value: 'шт.', ...}, price: 0, remains: 0}
+  ]
+*/
+const getRemGoodListByContact = (
+  goods: IGood[],
+  remains: IRemainsData[] = [],
+  isRemains: boolean | undefined = false,
+  noZeroRemains = false,
+) => {
+  log('getRemGoodListByContact', 'Начало построения массива товаров по подразделению');
+
+  const remGoods: IRemGood[] = [];
+  if (goods.length) {
+    //Если есть остатки, то формируем модель остатков по ид товара
+    if (remains.length) {
+      //Формируем объект остатков тмц
+      const remainsByGoodId = getRemainsByGoodId(remains, noZeroRemains);
+
+      //Формируем массив товаров, добавив свойство цены и остатка
+      //Если по товару нет остатков и если модель не для выбора из справочника тмц, (не из остатков)
+      //то добавляем запись с нулевыми значениями цены и остатка
+      for (const good of goods) {
+        if (remainsByGoodId && remainsByGoodId[good.id]) {
+          for (const r of remainsByGoodId[good.id]) {
+            //Если isRemains true, showZeroRemains false и "isControlRemains" true, то в модель такие товары не добавляем
+            if (!noZeroRemains || r.q !== 0) {
+              remGoods.push({
+                good,
+                priceFsn: good.priceFsn,
+                priceFsnSklad: good.priceFsn,
+                priceFso: good.priceFso,
+                priceFsoSklad: good.priceFsoSklad,
+                remains: r.q,
+              });
+            }
+          }
+        } else if (!isRemains) {
+          remGoods.push({
+            good,
+            priceFsn: good.priceFsn,
+            priceFsnSklad: good.priceFsn,
+            priceFso: good.priceFso,
+            priceFsoSklad: good.priceFsoSklad,
+            remains: 0,
+          });
+        }
+      }
+    } else if (!isRemains) {
+      //Если по контакту нет остатков и выбор не из остатков, добавляем объект товара c 0
+      for (const good of goods) {
+        remGoods.push({ good, priceFsn: 0, priceFsnSklad: 0, priceFso: 0, priceFsoSklad: 0, remains: 0 });
+      }
+    }
+  }
+
+  log('getRemGoodListByContact', 'Окончание построения массива товаров по подразделению');
+  return remGoods;
+};
+
+//Возвращает объект остатков тмц, пример: {"1": [{ price: 1.2, q: 1 }, { price: 1.3, q: 2 }]}
+const getRemainsByGoodId = (remains: IRemainsData[], noZeroRemains = false) => {
+  return remains.reduce(
+    (
+      p: IMGoodData<IModelRem[]>,
+      { goodId, priceFsn = 0, priceFsnSklad = 0, priceFso = 0, priceFsoSklad = 0, q = 0 }: IRemainsData,
+    ) => {
+      const x = p[goodId];
+      if (!noZeroRemains || q !== 0) {
+        if (!x) {
+          p[goodId] = [{ priceFsn, priceFsnSklad, priceFso, priceFsoSklad, q }];
+        } else {
+          x.push({ priceFsn, priceFsnSklad, priceFso, priceFsoSklad, q });
+        }
+      }
+      return p;
+    },
+    {},
+  );
+};
+
 export {
   getTimeProcess,
   twoDigits,
@@ -223,4 +315,6 @@ export {
   totalList,
   getItemLayout,
   viewabilityConfig,
+  jsonFormat,
+  getRemGoodListByContact,
 };

@@ -1,3 +1,6 @@
+import { DashboardStackParamList } from '../navigation/Root/types';
+import { INavItem, ScreenParams } from '../navigation/types';
+import { dashboardColors } from '../constants';
 import React, { useLayoutEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
@@ -8,10 +11,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { DashboardStackParamList } from '../navigation/Root/types';
-import { INavItem, ScreenParams } from '../navigation/types';
-import { dashboardColors } from '../constants';
-
 const DashboardScreen = ({ items }: { items: INavItem[] }) => {
   const { colors } = useTheme();
 
@@ -21,7 +20,7 @@ const DashboardScreen = ({ items }: { items: INavItem[] }) => {
     navigation.setOptions({
       headerLeft: navBackDrawer,
     });
-  }, []);
+  }, [navigation]);
 
   const handleDocumentPress = (routeName: string, params?: ScreenParams) => {
     navigation.navigate(routeName, params);

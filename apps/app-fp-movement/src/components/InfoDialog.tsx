@@ -1,7 +1,7 @@
 import { MediumText, globalStyles } from '@lib/mobile-ui';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button, Dialog, useTheme } from 'react-native-paper';
+import { Button, Dialog, MD2Theme, useTheme } from 'react-native-paper';
 
 import { cellColors } from '../utils/constants';
 
@@ -12,7 +12,7 @@ interface IProps {
 }
 
 export const InfoDialog = ({ visible, onOk, title }: IProps) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   return (
     <Dialog visible={visible} onDismiss={onOk}>

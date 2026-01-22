@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useRoutes } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
-import { hot } from 'react-hot-loader/root';
 import { Provider } from 'react-redux';
 import { createBrowserHistory } from 'history';
 
@@ -85,4 +84,4 @@ const App = () => {
   );
 };
 
-export default hot(App);
+export default App;

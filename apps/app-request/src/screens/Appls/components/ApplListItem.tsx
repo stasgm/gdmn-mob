@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
-import { useTheme } from 'react-native-paper';
+import { MD2Theme, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -43,7 +43,7 @@ const ApplListItem = ({
   applStatus,
   errorMessage,
 }: ApplListRenderItemProps) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
   const navigation = useNavigation<StackNavigationProp<ApplsStackParamList, 'ApplList'>>();
 
   return (

@@ -1,3 +1,5 @@
+import { styles } from './styles';
+import { ReferenceStackParamList } from '../../navigation/Root/types';
 import React, { useLayoutEffect, useMemo } from 'react';
 import { Text, View, FlatList } from 'react-native';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
@@ -9,10 +11,6 @@ import { refSelectors } from '@lib/store';
 import { IReferenceData } from '@lib/types';
 
 import { keyExtractorByIndex } from '@lib/mobile-hooks';
-
-import { ReferenceStackParamList } from '../../navigation/Root/types';
-
-import { styles } from './styles';
 
 interface IProperty {
   sortOrder: number;
@@ -44,6 +42,33 @@ const ReferenceDetailScreen = () => {
 
   const list = ref?.data.find((e) => e.id === id);
 
+  const meta = ref?.metadata;
+
+  const refData: IProperty[] = useMemo(() => {
+    if (!list) {
+      return [];
+    }
+    return Object.entries(list)
+      .map(
+        ([key, value]) =>
+          ({
+            sortOrder: meta?.[key]?.sortOrder || 999,
+            name: key,
+            title: meta?.[key]?.name || key,
+            visible: meta?.[key]?.visible !== false,
+            value: value instanceof Object ? value.name || '-' : value,
+          }) as IProperty,
+      )
+      .filter((i) => i.visible)
+      .sort((a, b) => (a.sortOrder < b.sortOrder ? -1 : 1));
+  }, [list, meta]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: navBackButton,
+    });
+  }, [navigation]);
+
   if (!list) {
     return (
       <AppScreen>
@@ -52,33 +77,7 @@ const ReferenceDetailScreen = () => {
     );
   }
 
-  const meta = ref.metadata;
-
-  const refData: IProperty[] = useMemo(
-    () =>
-      Object.entries(list)
-        .map(
-          ([key, value]) =>
-            ({
-              sortOrder: meta?.[key]?.sortOrder || 999,
-              name: key,
-              title: meta?.[key]?.name || key,
-              visible: meta?.[key]?.visible !== false,
-              value: value instanceof Object ? value.name || '-' : value,
-            } as IProperty),
-        )
-        .filter((i) => i.visible)
-        .sort((a, b) => (a.sortOrder < b.sortOrder ? -1 : 1)),
-    [list],
-  );
-
   const renderItem = ({ item }: { item: IProperty }) => <LineItem item={item} />;
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerLeft: navBackButton,
-    });
-  }, [navigation]);
 
   return (
     <AppScreen>

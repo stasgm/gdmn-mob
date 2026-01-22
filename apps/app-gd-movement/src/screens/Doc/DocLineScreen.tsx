@@ -25,6 +25,8 @@ import { appInventoryActions } from '../../store';
 
 import { unknownGood } from '../../utils/constants';
 
+import { IGood } from '../../store/app/types';
+
 import { DocLine } from './components/DocLine';
 
 export const DocLineScreen = () => {
@@ -47,8 +49,9 @@ export const DocLineScreen = () => {
     [document?.documentType.id, documentTypes],
   );
 
+  const goods = refSelectors.selectByName<IGood>('good')?.data;
+
   useEffect(() => {
-    // eslint-disable-next-line import/no-named-as-default-member
     KeyEvent.onKeyDownListener((keyEvent: any) => {
       if (keyEvent.keyCode === 66 && !disabledSave) {
         setScreenState('saving');
@@ -56,7 +59,6 @@ export const DocLineScreen = () => {
     });
 
     return () => {
-      // eslint-disable-next-line import/no-named-as-default-member
       KeyEvent.removeKeyDownListener();
     };
   }, [disabledSave]);
@@ -72,6 +74,8 @@ export const DocLineScreen = () => {
             ...line.good,
             barcode: line.barcode,
             id,
+            price: line.price || 0,
+            buyingPrice: line.buyingPrice || 0,
           }),
         );
         newLine = { ...newLine, good: { ...newLine.good, id } };
@@ -104,6 +108,10 @@ export const DocLineScreen = () => {
               Alert.alert('Ошибка!', 'Количество товара не может быть меньше нуля!', [{ text: 'Ок' }]);
               return;
             }
+            if (line.EID && line.quantity !== 1 && document?.documentType.name !== 'inventory') {
+              Alert.alert('Ошибка!', 'Количество товара с кодом маркировки должно быть равно 1.', [{ text: 'Ок' }]);
+              return;
+            }
             //Предупреждение, если количество по товару больше остатков
             if (
               (!!documentType?.isControlRemains &&
@@ -120,13 +128,29 @@ export const DocLineScreen = () => {
                 return;
               }
             }
+            const goodIsMark = goods?.find((e) => e.id === item?.good.id)?.isMark;
+
+            if (!!goodIsMark && !line.EID && document?.documentType.name !== 'inventory') {
+              Alert.alert('Ошибка!', 'Поле EID должно быть заполнено! Отсканируйте штрих-код.', [{ text: 'Ок' }]);
+              return;
+            }
             setScreenState('saving');
           }}
           disabled={screenState === 'saving' || disabledSave}
         />
       </View>
     ),
-    [disabledSave, documentType?.isControlRemains, line.quantity, line.remains, screenState],
+    [
+      disabledSave,
+      document?.documentType.name,
+      documentType?.isControlRemains,
+      goods,
+      item?.good.id,
+      line.EID,
+      line.quantity,
+      line.remains,
+      screenState,
+    ],
   );
 
   useLayoutEffect(() => {
@@ -143,7 +167,12 @@ export const DocLineScreen = () => {
 
   return (
     <AppInputScreen>
-      <DocLine item={line} onSetLine={setLine} onSetDisabledSave={setDisabledSave} />
+      <DocLine
+        item={line}
+        onSetLine={setLine}
+        onSetDisabledSave={setDisabledSave}
+        isSumWNds={Boolean(document?.documentType.isSumWNds)}
+      />
     </AppInputScreen>
   );
 };

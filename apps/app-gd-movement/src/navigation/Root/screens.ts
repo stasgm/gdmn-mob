@@ -8,6 +8,11 @@ import { ContactListScreen, GoodListScreen, GoodLineScreen } from '../../screens
 
 import { ScanListScreen, ScanViewScreen, ScanEditScreen, ScanGoodScreen } from '../../screens/Scan';
 
+import { RevisionGoodScreen, RevisionEditScreen, RevisionListScreen, RevisionViewScreen } from '../../screens/Revision';
+
+import { InvoiceListScreen, InvoiceViewScreen, InvoiceEditScreen, InvoiceLineScreen } from '../../screens/Invoice';
+import { WaybillListScreen, WaybillViewScreen, WaybillEditScreen } from '../../screens/Waybill';
+
 export const docScreens = {
   DocEdit: { title: 'Документ', component: DocEditScreen },
   DocView: { title: '', component: DocViewScreen },
@@ -39,4 +44,38 @@ export const scanScreens = {
   ScanEdit: { title: 'Документ', component: ScanEditScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
   ScanGood: { title: 'Сканер', component: ScanGoodScreen },
+};
+
+export const revisionListScreens = {
+  RevisionList: { title: 'Сверка', component: RevisionListScreen },
+};
+
+export const revisionScreens = {
+  RevisionView: { title: 'Документ', component: RevisionViewScreen },
+  RevisionEdit: { title: 'Документ', component: RevisionEditScreen },
+  SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
+  RevisionGood: { title: 'Сканер', component: RevisionGoodScreen },
+};
+
+export const invoiceScreens = {
+  InvoiceEdit: { title: 'Счёт-заказ', component: InvoiceEditScreen },
+  InvoiceView: { title: '', component: InvoiceViewScreen },
+  InvoiceLine: { title: 'Позиция счёт-заказа', component: InvoiceLineScreen },
+  SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
+  // SelectRemainsItem: { title: 'Выбор из остатков', component: SelectRemainsScreen },
+  ScanBarcode: { title: 'Сканер', component: ScanBarcodeScreen },
+};
+
+export const invoiceListScreens = {
+  InvoiceList: { title: 'Счёт-заказы', component: InvoiceListScreen },
+};
+
+export const waybillScreens = {
+  WaybillEdit: { title: 'ЭТТН', component: WaybillEditScreen },
+  WaybillView: { title: '', component: WaybillViewScreen },
+  ScanBarcode: { title: 'Сканер', component: ScanBarcodeScreen },
+};
+
+export const waybillListScreens = {
+  WaybillList: { title: 'ЭТТН', component: WaybillListScreen },
 };

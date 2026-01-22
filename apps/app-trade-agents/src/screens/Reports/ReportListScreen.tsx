@@ -263,22 +263,23 @@ const ReportListScreen = () => {
 
   return (
     <AppScreen style={styles.contentTop}>
+      <View style={styles.marginRight12}>
+        <Menu
+          key={'report'}
+          options={reports}
+          onChange={handleReport}
+          onPress={handlePressReport}
+          onDismiss={() => setVisibleReport(false)}
+          title={report?.value || ''}
+          visible={visibleReport}
+          activeOptionId={report?.id}
+          style={localStyles.btnTab}
+          iconName={'chevron-down'}
+          iconSize={26}
+        />
+      </View>
       {filterVisible && (
         <View style={[localStyles.filter, { borderColor: colors.primary }]}>
-          <View style={localStyles.report}>
-            <Menu
-              key={'report'}
-              options={reports}
-              onChange={handleReport}
-              onPress={handlePressReport}
-              onDismiss={() => setVisibleReport(false)}
-              title={report?.value || ''}
-              visible={visibleReport}
-              activeOptionId={report?.id}
-              style={localStyles.btnTab}
-              iconName={'chevron-down'}
-            />
-          </View>
           <SelectableInput label="Организация" value={filterReportContact?.name || ''} onPress={handleSearchContact} />
           <View style={localStyles.marginTop}>
             <SelectableInput label="Магазин" value={filterReportOutlet?.name || ''} onPress={handleSearchOutlet} />
@@ -434,9 +435,6 @@ const localStyles = StyleSheet.create({
     marginHorizontal: 5,
     flexDirection: 'row',
     flexWrap: 'wrap',
-  },
-  report: {
-    marginRight: 12,
   },
   btnTab: {
     alignItems: 'flex-end',

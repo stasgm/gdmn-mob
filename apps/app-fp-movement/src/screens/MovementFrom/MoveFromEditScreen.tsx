@@ -128,6 +128,12 @@ export const MoveFromEditScreen = () => {
         return;
       }
 
+      if (docFromDepart.id === docToDepart.id) {
+        alertWithSound('Ошибка!', 'Поля откуда и куда не могут быть с одинаковым значением.');
+        setScreenState('idle');
+        return;
+      }
+
       const docId = !id ? generateId() : id;
       const createdDate = new Date().toISOString();
 

@@ -22,6 +22,12 @@ export type FpMovementState = {
 export interface IGood extends ICodeEntity {
   goodGroupId?: string;
   isCattle?: number;
+  isUnit?: boolean;
+  unitWeight?: number;
+}
+
+export interface IPackage extends INamedEntity {
+  unitWeight?: number;
 }
 
 export interface IEmployee extends INamedEntity {
@@ -39,6 +45,7 @@ export interface IBarcode {
   numReceived: string; // Номер партии
   quantPack: number;
   time?: string;
+  flag?: string;
 }
 
 export interface ITempDocument extends IEntity {

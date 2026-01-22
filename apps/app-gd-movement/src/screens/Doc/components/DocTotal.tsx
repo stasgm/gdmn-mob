@@ -14,9 +14,10 @@ export interface IItem {
   quantity: number;
   sum: number;
   scan?: boolean;
+  sumWNds?: boolean;
 }
 
-const DocTotal = ({ lineCount, sum, quantity, scan = false }: IItem) => {
+const DocTotal = ({ lineCount, sum, quantity, scan = false, sumWNds = false }: IItem) => {
   const { colors } = useTheme();
 
   return (
@@ -45,7 +46,7 @@ const DocTotal = ({ lineCount, sum, quantity, scan = false }: IItem) => {
           </View>
           <View style={styles.directionRow}>
             <View style={localStyles.groupWidth}>
-              <MediumText>Сумма</MediumText>
+              <MediumText>{sumWNds ? 'Сумма с НДС' : 'Сумма'}</MediumText>
             </View>
             <View style={localStyles.quantity}>
               <MediumText>{`${round(sum, 3)}` || 0}</MediumText>

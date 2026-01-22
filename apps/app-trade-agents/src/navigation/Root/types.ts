@@ -49,3 +49,14 @@ export type DebetStackParamList = {
 export type ReportStackParamList = RefParamList & {
   ReportList: undefined;
 };
+
+export type ShipmentStackParamList = RefParamList & {
+  ShipmentList: undefined;
+  OrderView: { id: string; routeId?: string; readonly?: boolean };
+};
+
+export type RemainsStackParamList = RefParamList & {
+  ContactList: undefined;
+  GoodList: { id: string };
+  GoodLine: { item: any };
+};

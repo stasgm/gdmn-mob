@@ -23,7 +23,7 @@ import { useDispatch, documentActions, appActions, useSelector, refSelectors } f
 
 import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-hooks';
 
-import { IDocumentType, IReference } from '@lib/types';
+import { IDocumentType, IReference, ScreenState } from '@lib/types';
 
 import { ScanStackParamList } from '../../navigation/Root/types';
 import { IScanFormParam, IScanDocument } from '../../store/types';
@@ -86,67 +86,76 @@ export const ScanEditScreen = () => {
         }),
       );
     }
-  }, [dispatch, doc, documents]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, doc]);
 
-  const handleSave = useCallback(() => {
-    if (!scanType) {
-      return Alert.alert('Ошибка!', 'Тип документа для сканирования не найден', [{ text: 'OK' }]);
-    }
-    if (!docNumber || !docDate || (!docDepartment && !docIsBindGood)) {
-      return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
-    }
+  const [screenState, setScreenState] = useState<ScreenState>('idle');
 
-    const docId = !id ? generateId() : id;
-    const createdDate = new Date().toISOString();
-
-    if (!id) {
-      const newDoc: IScanDocument = {
-        id: docId,
-        documentType: scanType,
-        number: docNumber && docNumber.trim(),
-        documentDate: docDate,
-        status: 'DRAFT',
-        head: {
-          comment: docComment && docComment.trim(),
-          department: docDepartment,
-          isBindGood: docIsBindGood,
-        },
-        lines: [],
-        creationDate: createdDate,
-        editionDate: createdDate,
-      };
-
-      dispatch(documentActions.addDocument(newDoc));
-
-      navigation.dispatch(StackActions.replace('ScanView', { id: newDoc.id }));
-    } else {
-      if (!doc) {
-        return;
+  useEffect(() => {
+    if (screenState === 'saving') {
+      if (!scanType) {
+        setScreenState('idle');
+        return Alert.alert('Ошибка!', 'Тип документа для сканирования не найден', [{ text: 'OK' }]);
+      }
+      if (!docNumber || !docDate || (!docDepartment && !docIsBindGood)) {
+        setScreenState('idle');
+        return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
       }
 
-      const updatedDate = new Date().toISOString();
+      const docId = !id ? generateId() : id;
+      const createdDate = new Date().toISOString();
 
-      const updatedDoc: IScanDocument = {
-        ...doc,
-        id,
-        number: docNumber && docNumber.trim(),
-        status: docStatus || 'DRAFT',
-        documentDate: docDate,
-        documentType: scanType,
-        errorMessage: undefined,
-        head: {
-          ...doc.head,
-          comment: docComment && docComment.trim(),
-          department: docDepartment,
-          isBindGood: docIsBindGood,
-        },
-        lines: doc.lines,
-        creationDate: doc.creationDate || updatedDate,
-        editionDate: updatedDate,
-      };
+      if (!id) {
+        const newDoc: IScanDocument = {
+          id: docId,
+          documentType: scanType,
+          number: docNumber && docNumber.trim(),
+          documentDate: docDate,
+          status: 'DRAFT',
+          head: {
+            comment: docComment && docComment.trim(),
+            department: docDepartment,
+            isBindGood: docIsBindGood,
+          },
+          lines: [],
+          creationDate: createdDate,
+          editionDate: createdDate,
+        };
 
-      dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
-      navigation.navigate('ScanView', { id });
+        dispatch(documentActions.addDocument(newDoc));
+
+        navigation.dispatch(StackActions.replace('ScanView', { id: newDoc.id }));
+      } else {
+        if (!doc) {
+          setScreenState('idle');
+          return;
+        }
+
+        const updatedDate = new Date().toISOString();
+
+        const updatedDoc: IScanDocument = {
+          ...doc,
+          id,
+          number: docNumber && docNumber.trim(),
+          status: docStatus || 'DRAFT',
+          documentDate: docDate,
+          documentType: scanType,
+          errorMessage: undefined,
+          head: {
+            ...doc.head,
+            comment: docComment && docComment.trim(),
+            department: docDepartment,
+            isBindGood: docIsBindGood,
+          },
+          lines: doc.lines,
+          creationDate: doc.creationDate || updatedDate,
+          editionDate: updatedDate,
+        };
+
+        dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
+        setScreenState('idle');
+        navigation.navigate('ScanView', { id });
+      }
     }
   }, [
     scanType,
@@ -160,9 +169,13 @@ export const ScanEditScreen = () => {
     navigation,
     doc,
     docStatus,
+    screenState,
   ]);
 
-  const renderRight = useCallback(() => <SaveButton onPress={handleSave} />, [handleSave]);
+  const renderRight = useCallback(
+    () => <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />,
+    [screenState],
+  );
 
   useLayoutEffect(() => {
     navigation.setOptions({

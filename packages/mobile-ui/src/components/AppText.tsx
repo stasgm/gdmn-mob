@@ -10,7 +10,6 @@ interface IProps {
 }
 
 export const LargeText = ({ children, style, selectable = false }: IProps) => {
-  const { colors } = useTheme();
   return (
     <Text style={[localStyles.largeText, style]} selectable={selectable}>
       {children}

@@ -100,7 +100,7 @@ export const MovementEditScreen = () => {
 
   const handleSave = useCallback(() => {
     if (!docType) {
-      return Alert.alert('Ошибка!', 'Тип документа "Инвентаризация" не найден', [{ text: 'OK' }]);
+      return Alert.alert('Ошибка!', 'Тип документа "Инвентаризация" не найден.', [{ text: 'OK' }]);
     }
     if (!(docNumber && docFromPlace && docToPlace && docDate)) {
       return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);

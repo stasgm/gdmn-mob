@@ -13,7 +13,7 @@
         "buildType": "apk"
       }
     },
-    "production": {"node": "16.14.0"}
+    "production": {"node": "18.14.0"}
   },
   "submit": {
     "production": {}

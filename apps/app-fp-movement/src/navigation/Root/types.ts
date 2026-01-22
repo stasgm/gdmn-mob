@@ -13,6 +13,7 @@ export type IRefSelectParams = {
   docType?: string;
   refFieldName?: string;
   descrFieldName?: string;
+  additionalField?: string;
 };
 
 export type RefParamList = {
@@ -25,6 +26,7 @@ export type MoveParamList = RefParamList & {
   ScanGood: { docId: string };
   SelectCell: { docId: string; item: IMoveLine; mode: number; docType?: string };
   InventoryView: { id: string; docType?: string };
+  PalletList: undefined;
 };
 
 export type MoveStackParamList = { MoveList: undefined } & MoveParamList;
@@ -130,3 +132,8 @@ export type RemainsParamList = RefParamList & {
 };
 
 export type RemainsStackParamList = { ContactList: undefined } & RemainsParamList;
+
+export type PalletStackParamList = RefParamList & {
+  PalletList: undefined;
+  SelectCell: { docId: string; item: IMoveLine; mode: number; docType?: string };
+};

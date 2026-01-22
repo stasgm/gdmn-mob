@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, TextInput, Keyboard } from 'react-native';
-import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
+import { View, TextInput, Keyboard, TouchableHighlight, StyleProp, ViewStyle } from 'react-native';
+import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
@@ -15,35 +15,36 @@ import {
   MediumText,
   LargeText,
   AppDialog,
-  ListItemLine,
   ScanButton,
   navBackButton,
   SimpleDialog,
+  DateInfo,
 } from '@lib/mobile-ui';
 
 import { generateId, getDateString, keyExtractor, useSendDocs, sleep, useSendOneRefRequest } from '@lib/mobile-hooks';
 
 import { IDocumentType, INamedEntity, ScreenState } from '@lib/types';
 
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-
 import { FlashList } from '@shopify/flash-list';
 
 import { barcodeSettings, IMoveDocument, IMoveLine, IShipmentDocument } from '../../store/types';
 import { MoveFromStackParamList } from '../../navigation/Root/types';
-import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
+import { getStatusColor, lineTypes, ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import {
   alertWithSound,
   alertWithSoundMulti,
   getBarcode,
+  getBarcodeString,
   getDocToSend,
   getLineGood,
+  getNextDocNumber,
   getRemGoodListByContact,
 } from '../../utils/helpers';
-import { IAddressStoreEntity, IGood, IRemains, IRemGood } from '../../store/app/types';
+import { IAddressStoreEntity, IBarcode, IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
+import LineItem from '../../components/LineItem';
 
 export interface IScanerObject {
   item?: IMoveLine;
@@ -57,6 +58,8 @@ export const MoveFromViewScreen = () => {
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<MoveFromStackParamList, 'MoveFromView'>>();
   const isFocused = useIsFocused();
+
+  const { colors } = useTheme();
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -94,6 +97,8 @@ export const MoveFromViewScreen = () => {
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
   const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
+  const addPalletQuantPack = Boolean(settings.addPalletQuantPack?.data);
+
   const isAddressStore = Boolean(settings.addressStore?.data);
 
   const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
@@ -114,9 +119,9 @@ export const MoveFromViewScreen = () => {
 
   const goodRemains = useMemo<IRemGood[]>(() => {
     return doc?.head?.fromDepart?.id && isFocused && remains
-      ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id], docList, doc.head.fromDepart.id)
+      ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id] /*, docList, doc.head.fromDepart.id*/)
       : [];
-  }, [doc?.head?.fromDepart?.id, docList, goods, isFocused, remains]);
+  }, [doc?.head?.fromDepart?.id, goods, isFocused, remains]);
 
   const handleFocus = () => {
     ref?.current?.focus();
@@ -134,59 +139,89 @@ export const MoveFromViewScreen = () => {
     handleFocus();
   };
 
-  // const [visibleQuantPackDialog, setVisibleQuantPackDialog] = useState(false);
-  // const [quantPack, setQuantPack] = useState('');
+  const [visibleQuantPackDialog, setVisibleQuantPackDialog] = useState(false);
+  const [quantPack, setQuantPack] = useState('');
 
-  // const handleAddQuantPack = useCallback(
-  //   (quantity: number) => {
-  //     const line = lines?.[0];
-  //     if (!line) {
-  //       return;
-  //     }
+  const handleAddQuantPack = useCallback(
+    (quantity: number) => {
+      const line = lines?.[0];
+      if (!line) {
+        return;
+      }
 
-  //     const lineBarcode: IBarcode = {
-  //       barcode: line.barcode || '',
-  //       numReceived: line.numReceived,
-  //       quantPack: line.quantPack,
-  //       shcode: line.good.shcode,
-  //       weight: line.weight,
-  //       workDate: line.workDate,
-  //       time: line.time,
-  //     };
+      const lineBarcode: IBarcode = {
+        barcode: line.barcode || '',
+        numReceived: line.numReceived,
+        quantPack: line.quantPack,
+        shcode: line.good.shcode,
+        weight: line.weight,
+        workDate: line.workDate,
+        time: line.time,
+      };
 
-  //     if (line?.weight >= goodBarcodeSettings?.boxWeight) {
-  //       const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: quantity });
-  //       const newLine: IMoveLine = {
-  //         ...line,
-  //         quantPack: quantity,
-  //         scannedBarcode: line?.barcode,
-  //         barcode: newBarcode,
-  //         usedRemains: remainsUse,
-  //       };
-  //       dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
-  //     }
-  //   },
-  //   [dispatch, goodBarcodeSettings?.boxWeight, id, lines, remainsUse],
-  // );
+      if (line?.weight >= goodBarcodeSettings?.boxWeight) {
+        const newBarcode = getBarcodeString({ ...lineBarcode, quantPack: quantity }, goodBarcodeSettings);
+        const newLine: IMoveLine = {
+          ...line,
+          quantPack: quantity,
+          scannedBarcode: line?.barcode,
+          barcode: newBarcode,
+          usedRemains: remainsUse,
+        };
+        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+      }
+    },
+    [dispatch, goodBarcodeSettings, id, lines, remainsUse],
+  );
 
-  // const handleEditQuantPack = () => {
-  //   handleAddQuantPack(Number(quantPack));
-  //   setVisibleQuantPackDialog(false);
-  //   setQuantPack('');
-  //   Keyboard.dismiss();
-  //   handleFocus();
-  // };
+  const handleEditQuantPack = () => {
+    handleAddQuantPack(Number(quantPack));
+    setVisibleQuantPackDialog(false);
+    setQuantPack('');
+    Keyboard.dismiss();
+    handleFocus();
+  };
 
-  // const handleDismissQuantPack = () => {
-  //   setVisibleQuantPackDialog(false);
-  //   setQuantPack('');
-  //   Keyboard.dismiss();
-  //   handleFocus();
-  // };
+  const handleDismissQuantPack = () => {
+    setVisibleQuantPackDialog(false);
+    setQuantPack('');
+    Keyboard.dismiss();
+    handleFocus();
+  };
 
   const handleEditDocHead = useCallback(() => {
     navigation.navigate('MoveFromEdit', { id });
   }, [navigation, id]);
+
+  const handleCopyDoc = useCallback(async () => {
+    if (!doc) {
+      return;
+    }
+    setScreenState('copying');
+    await sleep(1);
+    const newId = generateId();
+
+    const newDocDate = new Date().toISOString();
+
+    const docs = docList.filter((i) => i.documentType.name === 'movement');
+
+    const newNumber = getNextDocNumber(docs);
+
+    const newDoc: IMoveDocument = {
+      ...doc,
+      id: newId,
+      number: newNumber,
+      status: 'DRAFT',
+      documentDate: newDocDate,
+      creationDate: newDocDate,
+      editionDate: newDocDate,
+    };
+
+    docDispatch(documentActions.addDocument(newDoc));
+    navigation.navigate('MoveFromView', { id: newId });
+
+    setScreenState('copied');
+  }, [doc, docList, docDispatch, navigation]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
@@ -246,39 +281,93 @@ export const MoveFromViewScreen = () => {
   }, [handleSendCellRequest, handleSendRemainsRequest, isAddressStore, sendDoc]);
 
   const actionsMenu = useCallback(() => {
-    showActionSheet([
-      {
-        title: 'Запросить справочник ячеек',
-        onPress: handleSendCellRequest,
-      },
-      {
-        title: 'Ввести штрих-код',
-        onPress: handleShowDialog,
-      },
-      {
-        title: 'Отменить последнее сканирование',
-        onPress: hanldeCancelLastScan,
-      },
-      {
-        title: 'Редактировать данные',
-        onPress: handleEditDocHead,
-      },
-      {
-        title: 'Удалить документ',
-        type: 'destructive',
-        onPress: handleDelete,
-      },
-      {
-        title: 'Отмена',
-        type: 'cancel',
-        onPress: handleFocus,
-      },
-    ]);
-  }, [showActionSheet, handleSendCellRequest, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
+    showActionSheet(
+      isBlocked
+        ? doc?.status === 'SENT'
+          ? [
+              {
+                title: 'Копировать документ',
+                onPress: handleCopyDoc,
+              },
+              {
+                title: 'Отмена',
+                type: 'cancel',
+              },
+            ]
+          : [
+              {
+                title: 'Копировать документ',
+                onPress: handleCopyDoc,
+              },
+              {
+                title: 'Удалить документ',
+                type: 'destructive',
+                onPress: handleDelete,
+              },
+              {
+                title: 'Отмена',
+                type: 'cancel',
+              },
+            ]
+        : [
+            {
+              title: 'Запросить справочник ячеек',
+              onPress: handleSendCellRequest,
+            },
+            {
+              title: 'Ввести штрих-код',
+              onPress: handleShowDialog,
+            },
+            {
+              title: 'Отменить последнее сканирование',
+              onPress: hanldeCancelLastScan,
+            },
+            {
+              title: 'Редактировать данные',
+              onPress: handleEditDocHead,
+            },
+            {
+              title: 'Копировать документ',
+              onPress: handleCopyDoc,
+            },
+            {
+              title: 'Удалить документ',
+              type: 'destructive',
+              onPress: handleDelete,
+            },
+            {
+              title: 'Отмена',
+              type: 'cancel',
+              onPress: handleFocus,
+            },
+          ],
+    );
+  }, [
+    showActionSheet,
+    isBlocked,
+    doc?.status,
+    handleCopyDoc,
+    handleDelete,
+    handleSendCellRequest,
+    hanldeCancelLastScan,
+    handleEditDocHead,
+  ]);
 
   const renderRight = useCallback(
     () =>
-      !isBlocked && (
+      isBlocked ? (
+        doc?.status === 'READY' ? (
+          <View style={styles.buttons}>
+            <SendButton
+              onPress={() => setVisibleSendDialog(true)}
+              disabled={screenState !== 'idle' || loading || !lines?.length}
+            />
+            <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
+          </View>
+        ) : (
+          <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
+        )
+      ) : (
         <View style={styles.buttons}>
           <SendButton
             onPress={() => setVisibleSendDialog(true)}
@@ -291,7 +380,7 @@ export const MoveFromViewScreen = () => {
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [actionsMenu, id, isBlocked, isScanerReader, lines?.length, loading, navigation, screenState],
+    [actionsMenu, doc?.status, id, isBlocked, isScanerReader, lines?.length, loading, navigation, screenState],
   );
 
   useLayoutEffect(() => {
@@ -319,45 +408,50 @@ export const MoveFromViewScreen = () => {
   //   return sum;
   // }, []);
 
+  const [lineType, setLineType] = useState(lineTypes[1].id);
+
+  const LineTypes = useCallback(
+    () => (
+      <View style={styles.containerCenter}>
+        {lineTypes.map((e, i) => {
+          return (
+            <TouchableHighlight
+              activeOpacity={0.7}
+              underlayColor="#DDDDDD"
+              key={e.id}
+              style={[
+                styles.btnTab,
+                i === 0 && styles.firstBtnTab,
+                i === lineTypes.length - 1 && styles.lastBtnTab,
+                e.id === lineType && { backgroundColor: colors.primary },
+                { borderColor: colors.primary },
+              ]}
+              onPress={() => setLineType(e.id)}
+            >
+              <LargeText style={{ color: e.id === lineType ? colors.background : colors.text }}>{e.value}</LargeText>
+            </TouchableHighlight>
+          );
+        })}
+      </View>
+    ),
+    [colors.background, colors.primary, colors.text, lineType],
+  );
+
   const renderItem = useCallback(
     ({ item }: { item: IMoveLine }) => {
       return (
-        <ListItemLine
-          key={item.id}
-          readonly={doc?.status !== 'DRAFT' || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
-          // onPress={() => setVisibleQuantPackDialog(true)}
-        >
-          <View style={styles.details}>
-            <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-            <View style={styles.flexDirectionRow}>
-              <MaterialCommunityIcons name="shopping-outline" size={18} />
-              <MediumText>
-                {(item.weight || 0).toString()} кг, {(item.quantPack || 0).toString()} кор.
-              </MediumText>
-            </View>
-            <View style={styles.flexDirectionRow}>
-              <MediumText>
-                Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
-              </MediumText>
-            </View>
-            {doc?.head.fromDepart?.isAddressStore ? (
-              <View style={styles.flexDirectionRow}>
-                <MediumText>Откуда: {item.fromCell || ''}</MediumText>
-              </View>
-            ) : null}
-            {doc?.head.toDepart?.isAddressStore ? (
-              <View style={styles.flexDirectionRow}>
-                <MediumText>
-                  {doc?.head.fromDepart?.isAddressStore ? 'Куда:' : 'Ячейка №'} {item.toCell || ''}
-                </MediumText>
-              </View>
-            ) : null}
-          </View>
-        </ListItemLine>
+        <LineItem
+          item={item}
+          disabled={doc?.status !== 'DRAFT' || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
+          isFromAddressed={doc?.head.fromDepart?.isAddressStore}
+          isToAddressed={doc?.head.toDepart?.isAddressStore}
+        />
       );
     },
     [doc?.head.fromDepart?.isAddressStore, doc?.head.toDepart?.isAddressStore, doc?.status, lines?.length],
   );
+
+  const [isDateVisible, setIsDateVisible] = useState(false);
 
   const [scanned, setScanned] = useState(false);
 
@@ -405,7 +499,14 @@ export const MoveFromViewScreen = () => {
 
       const barc = getBarcode(brc, goodBarcodeSettings);
 
-      const lineGood = getLineGood(barc.shcode, barc.weight, goods, goodRemains, remainsUse);
+      const lineGood = getLineGood(
+        barc.shcode,
+        barc.weight,
+        goods,
+        goodRemains,
+        remainsUse,
+        goodBarcodeSettings?.countCode || 4,
+      );
 
       if (!lineGood.good) {
         handleErrorMessage(visibleDialog, 'Товар не найден!');
@@ -466,6 +567,11 @@ export const MoveFromViewScreen = () => {
         setScanned(false);
       }
       handleFocus();
+
+      if (addPalletQuantPack && newLine.weight >= goodBarcodeSettings?.boxWeight) {
+        // setIsPack(false);
+        setVisibleQuantPackDialog(true);
+      }
     },
 
     [
@@ -478,6 +584,7 @@ export const MoveFromViewScreen = () => {
       remainsUse,
       departs,
       visibleDialog,
+      addPalletQuantPack,
       handleErrorMessage,
       navigation,
       id,
@@ -488,6 +595,10 @@ export const MoveFromViewScreen = () => {
     getScannedObject(barcode);
   };
 
+  const viewStyle: StyleProp<ViewStyle> = useMemo(
+    () => ({ ...styles.container, justifyContent: lineType === 'last' ? 'flex-start' : 'center' }),
+    [lineType],
+  );
   const [key, setKey] = useState(1);
 
   const setScan = (brc: string) => {
@@ -507,21 +618,31 @@ export const MoveFromViewScreen = () => {
   }, [scanned, ref, visibleDialog]);
 
   useEffect(() => {
-    if (screenState === 'sent' || screenState === 'deleted') {
+    if (screenState === 'sent' || screenState === 'deleted' || screenState === 'copied') {
       setScreenState('idle');
-      navigation.goBack();
+      if (screenState !== 'copied') {
+        navigation.goBack();
+      }
     }
   }, [navigation, screenState]);
+
+  const isEditable = useMemo(() => (doc ? ['DRAFT', 'READY'].includes(doc?.status) : false), [doc]);
 
   if (!isFocused) {
     return <AppActivityIndicator />;
   }
 
-  if (screenState === 'deleting' || screenState === 'sending') {
+  if (screenState === 'deleting' || screenState === 'copying' || screenState === 'sending') {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
-          <LargeText>{screenState === 'deleting' ? 'Удаление документа...' : 'Отправка документа...'}</LargeText>
+          <LargeText>
+            {screenState === 'deleting'
+              ? 'Удаление документа...'
+              : screenState === 'copying'
+                ? 'Копирование документа...'
+                : 'Отправка документа...'}
+          </LargeText>
           <AppActivityIndicator style={{}} />
         </View>
       </View>
@@ -537,12 +658,12 @@ export const MoveFromViewScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={viewStyle}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
         title={doc.head.subtype.name || ''}
-        onPress={handleEditDocHead}
-        disabled={!['DRAFT', 'READY'].includes(doc.status)}
+        onPress={() => (isEditable ? handleEditDocHead() : setIsDateVisible(!isDateVisible))}
+        editable={isEditable}
         isBlocked={isBlocked}
       >
         <>
@@ -553,8 +674,11 @@ export const MoveFromViewScreen = () => {
           <View style={styles.rowCenter}>
             <MediumText>Куда: {doc.head.toDepart?.name || ''}</MediumText>
           </View>
+
+          {isDateVisible && <DateInfo sentDate={doc.sentDate} erpCreationDate={doc.erpCreationDate} />}
         </>
       </InfoBlock>
+      <LineTypes />
       <TextInput
         style={styles.scanInput}
         key={key}
@@ -564,16 +688,30 @@ export const MoveFromViewScreen = () => {
         showSoftInputOnFocus={false}
         onChangeText={(text) => !scanned && setScan(text)}
       />
-      <FlashList
-        data={lines}
-        renderItem={renderItem}
-        estimatedItemSize={60}
-        ItemSeparatorComponent={ItemSeparator}
-        keyExtractor={keyExtractor}
-        extraData={[lines, isBlocked]}
-        keyboardShouldPersistTaps={'always'}
-      />
-      {doc?.lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
+      {lineType === 'all' ? (
+        <>
+          <FlashList
+            data={lines}
+            renderItem={renderItem}
+            estimatedItemSize={60}
+            ItemSeparatorComponent={ItemSeparator}
+            keyExtractor={keyExtractor}
+            extraData={[lines, isBlocked]}
+            keyboardShouldPersistTaps={'always'}
+          />
+          {doc?.lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
+        </>
+      ) : lineType === 'last' && lines?.[0] ? (
+        <View style={styles.spaceBetween}>
+          <LineItem
+            item={lines?.[0]}
+            disabled={doc?.status !== 'DRAFT' || Boolean(lines?.[0].scannedBarcode)}
+            isFromAddressed={doc?.head.fromDepart?.isAddressStore}
+            isToAddressed={doc?.head.toDepart?.isAddressStore}
+          />
+          {doc?.lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
+        </View>
+      ) : null}
       <AppDialog
         title="Введите штрих-код"
         visible={visibleDialog}
@@ -583,8 +721,9 @@ export const MoveFromViewScreen = () => {
         onOk={handleSearchBarcode}
         okLabel={'Найти'}
         errorMessage={errorMessage}
+        keyboardType="number-pad"
       />
-      {/* <AppDialog
+      <AppDialog
         title="Количество"
         visible={visibleQuantPackDialog}
         text={quantPack}
@@ -592,8 +731,8 @@ export const MoveFromViewScreen = () => {
         onCancel={handleDismissQuantPack}
         onOk={handleEditQuantPack}
         okLabel={'Ок'}
-        keyboardType="numbers-and-punctuation"
-      /> */}
+        keyboardType="number-pad"
+      />
       <SimpleDialog
         visible={visibleSendDialog}
         title={'Внимание!'}

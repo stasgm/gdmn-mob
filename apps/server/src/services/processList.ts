@@ -13,7 +13,17 @@ import {
   existsSync,
 } from 'fs';
 
-import { IFiles, IDBProcess, AddProcess, IMessage, IDBMessage, NewMessage, IMessageParams, IProcess } from '@lib/types';
+import {
+  IFiles,
+  IDBProcess,
+  AddProcess,
+  IMessage,
+  IDBMessage,
+  NewMessage,
+  IMessageParams,
+  IProcess,
+  IFileMessageInfo,
+} from '@lib/types';
 
 import { extraPredicate, generateId, getListPart, isIDBMessage } from '../utils/helpers';
 
@@ -192,8 +202,8 @@ export const cleanupProcess = (process: IDBProcess) => {
         mes.status === 'PROCESSED' || mes.status === 'READY'
           ? getPathLog(process, requestFN)
           : mes.status === 'PROCESSED_INCORRECT'
-          ? getPathError(process, requestFN)
-          : undefined;
+            ? getPathError(process, requestFN)
+            : undefined;
 
       if (toPath && requestFN) {
         try {
@@ -239,8 +249,8 @@ export const unknownProcess = (process: IDBProcess) => {
         mes.status === 'PROCESSED' || mes.status === 'READY'
           ? getPathUnknown(process, requestFN)
           : mes.status === 'PROCESSED_INCORRECT'
-          ? getPathError(process, requestFN)
-          : undefined;
+            ? getPathError(process, requestFN)
+            : undefined;
 
       if (toPath && requestFN) {
         try {
@@ -464,4 +474,65 @@ export const makeProcess = (process: IDBProcess): IProcess => {
     status: process.status,
     dateEnd: dateDelete,
   };
+};
+
+/**
+ * Синхронное чтение каталога рекурсивно
+ * @param root базовая директория
+ * @param excludeFolders папки, которые нужно пропустить (регистр не важен)
+ * @returns список файлов (полные пути)
+ */
+export const _readDirSync = (root: string, excludeFolders?: string[]): string[] => {
+  try {
+    const dirs = readdirSync(root);
+    const exclude: string[] = (excludeFolders ?? []).map((i) => i.toLowerCase());
+    const subDirs = dirs.filter((item) => !exclude.includes(item.toLowerCase()));
+
+    const files = subDirs.flatMap((subDir) => {
+      const res = path.join(root, subDir);
+      try {
+        const stat = statSync(res);
+        if (stat.isDirectory()) {
+          return _readDirSync(res, excludeFolders);
+        }
+        return [res];
+      } catch {
+        return [];
+      }
+    });
+
+    return files;
+  } catch (err) {
+    console.error(`Robust-protocol.errorDirectory: Ошибка чтения директории - ${err}`);
+    return [];
+  }
+};
+
+export const getMessageFilesRefsListSync = (params: AddProcess): string[] => {
+  const root = getDb().dbPath;
+
+  // собираем путь до конкретной папки message
+  const targetDir = getPathMessages({ companyId: params.companyId, appSystemId: params.appSystemId });
+
+  const fileStrings = _readDirSync(targetDir);
+  const files: string[] = [];
+
+  for (const file of fileStrings) {
+    const fileName: string | undefined = file.split(/[\\/]/).pop();
+    if (!fileName) continue;
+    let fileObj: IFileMessageInfo;
+    try {
+      fileObj = messageFileName2params(fileName);
+    } catch {
+      continue; // игнорируем файлы с некорректным именем
+    }
+    if (
+      fileObj.consumerId === params.consumerId &&
+      fileObj.deviceId === params.deviceId &&
+      fileObj.commandType.toLowerCase() === 'refs'
+    ) {
+      files.push(file);
+    }
+  }
+  return files;
 };

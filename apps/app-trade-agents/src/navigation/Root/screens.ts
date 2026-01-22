@@ -5,8 +5,14 @@ import { OrderEditScreen, OrderListScreen, OrderViewScreen, SelectGoodScreen } f
 import SelectRefItemScreen from '../../components/SelectRefItemScreen';
 
 import { ContactListScreen, GoodListScreen, GoodLineScreen } from '../../screens/GoodMatrix';
+import {
+  ContactListScreen as RemainsContactListScreen,
+  GoodListScreen as RemainsGoodListScreen,
+  GoodLineScreen as RemainsGoodLineScreen,
+} from '../../screens/Remains';
 import { DebetListScreen } from '../../screens/Debets';
 import { ReportListScreen } from '../../screens/Reports';
+import { ShipmentListScreen } from '../../screens/Shipment';
 
 const orderListScreens = {
   OrderList: { title: 'Заявки', component: OrderListScreen },
@@ -43,6 +49,18 @@ const reportScreens = {
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
 };
 
+const shipmentScreens = {
+  ShipmentList: { title: 'Отгрузка', component: ShipmentListScreen },
+  SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
+  OrderView: { title: 'Заявка', component: OrderViewScreen },
+};
+
+const remainsScreens = {
+  ContactList: { title: 'Остатки', component: RemainsContactListScreen },
+  GoodList: { title: 'Остатки', component: RemainsGoodListScreen },
+  GoodLine: { title: 'Позиция остатков', component: RemainsGoodLineScreen },
+};
+
 export {
   orderListScreens,
   orderScreens,
@@ -51,4 +69,6 @@ export {
   goodMatrixListScreens,
   goodMatrixScreens,
   reportScreens,
+  shipmentScreens,
+  remainsScreens,
 };

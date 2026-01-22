@@ -1,10 +1,18 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, TextInput, Keyboard } from 'react-native';
-import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
+import { View, TextInput, Keyboard, TouchableHighlight, StyleProp, ViewStyle } from 'react-native';
+import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Audio } from 'expo-av';
 
-import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
+import {
+  // appActions,
+  docSelectors,
+  documentActions,
+  refSelectors,
+  useDispatch,
+  useDocThunkDispatch,
+  useSelector,
+} from '@lib/store';
 import {
   MenuButton,
   useActionSheet,
@@ -16,11 +24,12 @@ import {
   MediumText,
   AppDialog,
   LargeText,
-  ListItemLine,
   ScanButton,
   navBackButton,
   SaveDocument,
   SimpleDialog,
+  DateInfo,
+  PackageButton,
 } from '@lib/mobile-ui';
 
 import {
@@ -36,20 +45,20 @@ import {
 
 import { ScreenState } from '@lib/types';
 
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-
 import { FlashList } from '@shopify/flash-list';
 
-import { barcodeSettings, IFreeShipmentDocument, IFreeShipmentLine, IShipmentDocument } from '../../store/types';
+import { barcodeSettings, IBox, IFreeShipmentDocument, IFreeShipmentLine, IShipmentDocument } from '../../store/types';
 import { FreeShipmentStackParamList } from '../../navigation/Root/types';
-import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
+import { getStatusColor, lineTypes, ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import {
   alertWithSound,
   alertWithSoundMulti,
   getBarcode,
+  getCodeForCheck,
   getDocToSend,
   getLineGood,
+  getNextDocNumber,
   getRemGoodListByContact,
   getUpdatedLine,
 } from '../../utils/helpers';
@@ -57,6 +66,9 @@ import { IBarcode, IGood, IRemains, IRemGood } from '../../store/app/types';
 
 import ViewTotal from '../../components/ViewTotal';
 import QuantDialog from '../../components/QuantDialog';
+import LineItem from '../../components/LineItem';
+import BoxDialog from '../../components/BoxDialog';
+import BarcodeDialog from '../../components/BarcodeDialog';
 
 export interface IScanerObject {
   item?: IFreeShipmentLine;
@@ -75,6 +87,8 @@ export const FreeShipmentViewScreen = () => {
   const doc = docSelectors.selectByDocId<IFreeShipmentDocument>(id);
   const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
 
+  const { colors } = useTheme();
+
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)) || [], [doc?.lines]);
 
   const lineSum = lines?.reduce(
@@ -88,7 +102,7 @@ export const FreeShipmentViewScreen = () => {
     { quantPack: 0, weight: 0 },
   );
 
-  const isCattle = useMemo(() => (lines?.length > 0 ? lines?.[0].good.isCattle : undefined), [lines]);
+  const isCattle = useMemo(() => (lines?.length > 0 ? lines?.[0].good?.isCattle : undefined), [lines]);
 
   const isBlocked = doc?.status !== 'DRAFT';
   const goods = refSelectors.selectByName<IGood>('good').data;
@@ -105,6 +119,12 @@ export const FreeShipmentViewScreen = () => {
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
   const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
+  const scanUnit = Boolean(settings.scanUnit?.data);
+
+  const usePackage = Boolean(settings.usePackage?.data);
+
+  const addPalletQuantPack = Boolean(settings.addPalletQuantPack?.data);
+
   const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
   const remainsUse = Boolean(settings.remainsUse?.data);
@@ -113,9 +133,9 @@ export const FreeShipmentViewScreen = () => {
 
   const goodRemains = useMemo<IRemGood[]>(() => {
     return doc?.head?.fromDepart?.id && isFocused && remains
-      ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id], docList, doc.head.fromDepart.id)
+      ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id] /*, docList, doc.head.fromDepart.id*/)
       : [];
-  }, [doc?.head?.fromDepart?.id, goods, remains, docList, isFocused]);
+  }, [doc?.head?.fromDepart?.id, goods, remains, isFocused]);
 
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -126,6 +146,12 @@ export const FreeShipmentViewScreen = () => {
   const [quantPack, setQuantPack] = useState('');
   const [quantPallet, setQuantPallet] = useState('');
   const [isPack, setIsPack] = useState(true);
+
+  const [visibleBoxDialog, setVisibleBoxDialog] = useState<boolean>(false);
+  const [box, setBox] = useState<IBox | undefined>(undefined);
+
+  const [visibleBarcodeDialog, setVisibleBarcodeDialog] = useState<boolean>(false);
+  const [brcLine, setBrcLine] = useState<IFreeShipmentLine | undefined>(undefined);
 
   const sound = Audio.Sound.createAsync(require('../../../assets/ok.wav'));
 
@@ -164,6 +190,7 @@ export const FreeShipmentViewScreen = () => {
         weight: line.weight,
         workDate: line.workDate,
         time: line.time,
+        flag: line.flag,
       };
 
       const weight =
@@ -173,7 +200,11 @@ export const FreeShipmentViewScreen = () => {
 
       const good =
         remainsUse && goodRemains.length
-          ? goodRemains.find((item) => `0000${item.good.shcode}`.slice(-4) === `0000${line.good.shcode}`.slice(-4))
+          ? goodRemains.find(
+              (item) =>
+                getCodeForCheck(item.good.shcode, goodBarcodeSettings?.countCode || 4) ===
+                getCodeForCheck(line.good.shcode, goodBarcodeSettings?.countCode || 4),
+            )
           : undefined;
 
       if (remainsUse && goodRemains.length) {
@@ -189,6 +220,7 @@ export const FreeShipmentViewScreen = () => {
       }
 
       const newLine: IFreeShipmentLine = getUpdatedLine(
+        goodBarcodeSettings,
         remainsUse,
         lineBarcode,
         line,
@@ -198,7 +230,7 @@ export const FreeShipmentViewScreen = () => {
 
       dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
     },
-    [dispatch, goodBarcodeSettings?.boxWeight, goodRemains, id, lines, remainsUse],
+    [dispatch, goodBarcodeSettings, goodRemains, id, lines, remainsUse],
   );
 
   const handleEditQuantPack = useCallback(() => {
@@ -226,6 +258,37 @@ export const FreeShipmentViewScreen = () => {
   const handleEditDocHead = useCallback(() => {
     navigation.navigate('FreeShipmentEdit', { id, isCurr });
   }, [navigation, id, isCurr]);
+
+  const handleCopyDoc = useCallback(async () => {
+    if (!doc) {
+      return;
+    }
+    setScreenState('copying');
+    await sleep(1);
+    const newId = generateId();
+
+    const newDocDate = new Date().toISOString();
+
+    const freeShipments = docList.filter((i) =>
+      isCurr ? i.documentType.name === 'currFreeShipment' : i.documentType.name === 'freeShipment',
+    );
+    const newNumber = getNextDocNumber(freeShipments);
+
+    const newDoc: IFreeShipmentDocument = {
+      ...doc,
+      id: newId,
+      number: newNumber,
+      status: 'DRAFT',
+      documentDate: newDocDate,
+      creationDate: newDocDate,
+      editionDate: newDocDate,
+    };
+
+    docDispatch(documentActions.addDocument(newDoc));
+    navigation.navigate('FreeShipmentView', { id: newId, isCurr });
+
+    setScreenState('copied');
+  }, [doc, docList, docDispatch, navigation, isCurr]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
@@ -297,32 +360,95 @@ export const FreeShipmentViewScreen = () => {
     handleFocus();
   };
 
+  const handleSetNewBox = (newBox: IBox) => {
+    setBox(newBox);
+    setVisibleBoxDialog(false);
+    handleFocus();
+  };
+
+  const handleCancelBoxDialog = () => {
+    setVisibleBoxDialog(false);
+    handleFocus();
+  };
+
+  const handleAddUnitLine = useCallback(
+    async (line: IFreeShipmentLine) => {
+      dispatch(documentActions.addDocumentLine({ docId: id, line: box ? { ...line, box } : line }));
+      setVisibleBarcodeDialog(false);
+
+      if (box && !(box.numReceived && box.workDate)) {
+        setBox({ ...box, numReceived: line.numReceived, workDate: line.workDate });
+      }
+
+      handleFocus();
+    },
+    [box, dispatch, id],
+  );
+
+  const handleCancelUnitDialog = () => {
+    setVisibleBarcodeDialog(false);
+    handleFocus();
+  };
+
   const actionsMenu = useCallback(() => {
-    showActionSheet([
-      {
-        title: 'Ввести штрих-код',
-        onPress: handleShowDialog,
-      },
-      {
-        title: 'Отменить последнее сканирование',
-        onPress: hanldeCancelLastScan,
-      },
-      {
-        title: 'Редактировать данные',
-        onPress: handleEditDocHead,
-      },
-      {
-        title: 'Удалить документ',
-        type: 'destructive',
-        onPress: handleDelete,
-      },
-      {
-        title: 'Отмена',
-        type: 'cancel',
-        onPress: handleFocus,
-      },
-    ]);
-  }, [showActionSheet, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
+    showActionSheet(
+      isBlocked
+        ? doc?.status === 'SENT'
+          ? [
+              {
+                title: 'Копировать документ',
+                onPress: handleCopyDoc,
+              },
+              {
+                title: 'Отмена',
+                type: 'cancel',
+              },
+            ]
+          : [
+              {
+                title: 'Копировать документ',
+                onPress: handleCopyDoc,
+              },
+              {
+                title: 'Удалить документ',
+                type: 'destructive',
+                onPress: handleDelete,
+              },
+              {
+                title: 'Отмена',
+                type: 'cancel',
+              },
+            ]
+        : [
+            {
+              title: 'Ввести штрих-код',
+              onPress: handleShowDialog,
+            },
+            {
+              title: 'Отменить последнее сканирование',
+              onPress: hanldeCancelLastScan,
+            },
+            {
+              title: 'Редактировать данные',
+              onPress: handleEditDocHead,
+            },
+            {
+              title: 'Копировать документ',
+              onPress: handleCopyDoc,
+            },
+            {
+              title: 'Удалить документ',
+              type: 'destructive',
+              onPress: handleDelete,
+            },
+            {
+              title: 'Отмена',
+              type: 'cancel',
+              onPress: handleFocus,
+            },
+          ],
+    );
+  }, [showActionSheet, isBlocked, doc?.status, handleCopyDoc, handleDelete, hanldeCancelLastScan, handleEditDocHead]);
 
   const handleSaveDocument = useCallback(() => {
     if (!doc) {
@@ -341,12 +467,15 @@ export const FreeShipmentViewScreen = () => {
     () =>
       isBlocked ? (
         doc?.status === 'READY' ? (
-          <SendButton
-            onPress={() => setVisibleSendDialog(true)}
-            disabled={screenState !== 'idle' || loading || !lines?.length}
-          />
+          <View style={styles.buttons}>
+            <SendButton
+              onPress={() => setVisibleSendDialog(true)}
+              disabled={screenState !== 'idle' || loading || !lines?.length}
+            />
+            <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
+          </View>
         ) : (
-          doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
+          <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         )
       ) : (
         <View style={styles.buttons}>
@@ -359,11 +488,19 @@ export const FreeShipmentViewScreen = () => {
             onPress={() => (isScanerReader ? handleFocus() : navigation.navigate('ScanGood', { docId: id }))}
             disabled={screenState !== 'idle'}
           />
+          {usePackage && (
+            <PackageButton
+              onPress={() => (box ? setBox(undefined) : setVisibleBoxDialog(true))}
+              iconColor={box ? 'red' : undefined}
+              disabled={screenState !== 'idle'}
+            />
+          )}
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
     [
       actionsMenu,
+      box,
       doc?.status,
       handleSaveDocument,
       id,
@@ -373,6 +510,7 @@ export const FreeShipmentViewScreen = () => {
       loading,
       navigation,
       screenState,
+      usePackage,
     ],
   );
 
@@ -393,33 +531,53 @@ export const FreeShipmentViewScreen = () => {
     [goodBarcodeSettings?.boxWeight],
   );
 
+  const [lineType, setLineType] = useState(lineTypes[1].id);
+
+  const LineTypes = useCallback(
+    () => (
+      <View style={styles.containerCenter}>
+        {lineTypes.map((e, i) => {
+          return (
+            <TouchableHighlight
+              activeOpacity={0.7}
+              underlayColor="#DDDDDD"
+              key={e.id}
+              style={[
+                styles.btnTab,
+                i === 0 && styles.firstBtnTab,
+                i === lineTypes.length - 1 && styles.lastBtnTab,
+                e.id === lineType && { backgroundColor: colors.primary },
+                { borderColor: colors.primary },
+              ]}
+              onPress={() => setLineType(e.id)}
+            >
+              <LargeText style={{ color: e.id === lineType ? colors.background : colors.text }}>{e.value}</LargeText>
+            </TouchableHighlight>
+          );
+        })}
+      </View>
+    ),
+    [colors.background, colors.primary, colors.text, lineType],
+  );
+
   const renderItem = useCallback(
     ({ item }: { item: IFreeShipmentLine }) => {
       return (
-        <ListItemLine
-          key={item.id}
-          readonly={doc?.status !== 'DRAFT' || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)}
+        <LineItem
+          item={item}
+          disabled={
+            doc?.status !== 'DRAFT' || scanUnit || item.sortOrder !== lines?.length || Boolean(item.scannedBarcode)
+          }
           onPress={() => handlePressLine(item.weight)}
-        >
-          <View style={styles.details}>
-            <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-            <View style={styles.flexDirectionRow}>
-              <MaterialCommunityIcons name="shopping-outline" size={18} />
-              <MediumText>
-                {(item.weight || 0).toString()} кг, {(item.quantPack || 0).toString()} кор.
-              </MediumText>
-            </View>
-            <View style={styles.flexDirectionRow}>
-              <MediumText>
-                Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
-              </MediumText>
-            </View>
-          </View>
-        </ListItemLine>
+        />
       );
     },
-    [doc?.status, handlePressLine, lines?.length],
+    [doc?.status, handlePressLine, lines?.length, scanUnit],
   );
+
+  const [isDateVisible, setIsDateVisible] = useState(false);
+
+  const [scanned, setScanned] = useState(false);
 
   const handleErrorMessage = useCallback((visible: boolean, text: string) => {
     if (visible) {
@@ -431,9 +589,8 @@ export const FreeShipmentViewScreen = () => {
     handleFocus();
   }, []);
 
-  const [scanned, setScanned] = useState(false);
-
   const ref = useRef<TextInput>(null);
+
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!doc) {
@@ -449,7 +606,63 @@ export const FreeShipmentViewScreen = () => {
         return;
       }
 
-      if (brc.length < minBarcodeLength) {
+      if (scanUnit && brc.length === 13) {
+        const goodRem = goodRemains.find((item) => item.good.shcode === brc);
+        if (!goodRem) {
+          setVisibleRequestDialog(true);
+          setScanned(false);
+          return;
+        }
+
+        /////////////////////////////////////////////////////////////
+        // if (good.remains >= weight) {
+        //   handleErrorMessage(visibleDialog, 'Вес товара превышает вес в остатках!');
+        //   return;
+        // }
+
+        const good = goods.find((item) => item.shcode === brc && item.isUnit);
+        if (!good) {
+          handleErrorMessage(visibleDialog, 'Товар не является штучным. Проверьте товар в справочнике!');
+          return;
+        }
+
+        const newLine: IFreeShipmentLine = {
+          good: {
+            id: good.id,
+            name: good.name,
+            shcode: good.shcode,
+            isCattle: good?.isCattle,
+            goodGroupId: good?.goodGroupId,
+            isUnit: Boolean(good?.isUnit),
+            unitWeight: good.unitWeight,
+          },
+          id: generateId(),
+          quantity: 0,
+          barcode: brc,
+          workDate: '',
+          numReceived: '',
+          sortOrder: doc?.lines?.length + 1,
+          usedRemains: remainsUse,
+          quantPack: 0,
+          weight: goodRem.remains,
+          unitWeight: good.unitWeight,
+        };
+
+        setBrcLine(newLine);
+        if (visibleDialog) {
+          setVisibleDialog(false);
+          setErrorMessage('');
+          setBarcode('');
+        } else {
+          setScanned(false);
+        }
+
+        setVisibleBarcodeDialog(true);
+        handleFocus();
+        return;
+      }
+
+      if (!scanUnit && brc.length < minBarcodeLength) {
         handleErrorMessage(
           visibleDialog,
           'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
@@ -467,10 +680,18 @@ export const FreeShipmentViewScreen = () => {
 
       const barc = getBarcode(brc, goodBarcodeSettings);
 
-      const lineGood = getLineGood(barc.shcode, barc.weight, goods, goodRemains, remainsUse);
+      const lineGood = getLineGood(
+        barc.shcode,
+        barc.weight,
+        goods,
+        goodRemains,
+        remainsUse,
+        goodBarcodeSettings?.countCode || 4,
+      );
 
       if (!lineGood.good) {
         setVisibleRequestDialog(true);
+        setScanned(false);
         return;
       }
 
@@ -509,9 +730,29 @@ export const FreeShipmentViewScreen = () => {
         sortOrder: doc?.lines?.length + 1,
         quantPack: barc.quantPack,
         usedRemains: remainsUse,
+        flag: barc.flag,
       };
 
-      dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+      const boxLine = box
+        ? doc?.lines?.find(
+            (i) => i.box?.id === box?.id && (i.good.id !== newLine.good.id || i.numReceived !== newLine.numReceived),
+          )
+        : null;
+
+      if (boxLine) {
+        handleErrorMessage(
+          visibleDialog,
+          'Нельзя поместить разные товары или товары с разными партиями в одну коробку!',
+        );
+        return;
+      }
+
+      dispatch(documentActions.addDocumentLine({ docId: id, line: box ? { ...newLine, box } : newLine }));
+
+      if (box && !(box.numReceived && box.workDate)) {
+        setBox({ ...box, numReceived: newLine.numReceived, workDate: box.workDate });
+      }
+
       playSound();
 
       if (visibleDialog) {
@@ -523,10 +764,16 @@ export const FreeShipmentViewScreen = () => {
       }
 
       handleFocus();
+
+      if (addPalletQuantPack && newLine.weight >= goodBarcodeSettings?.boxWeight) {
+        setIsPack(false);
+        setVisibleQuantPackDialog(true);
+      }
     },
 
     [
       doc,
+      scanUnit,
       minBarcodeLength,
       maxBarcodeLength,
       goodBarcodeSettings,
@@ -534,10 +781,12 @@ export const FreeShipmentViewScreen = () => {
       goodRemains,
       remainsUse,
       isCattle,
+      box,
       dispatch,
       id,
       playSound,
       visibleDialog,
+      addPalletQuantPack,
       handleErrorMessage,
     ],
   );
@@ -565,21 +814,36 @@ export const FreeShipmentViewScreen = () => {
   }, [scanned, ref, visibleDialog]);
 
   useEffect(() => {
-    if (screenState === 'sent' || screenState === 'deleted') {
+    if (screenState === 'sent' || screenState === 'deleted' || screenState === 'copied') {
       setScreenState('idle');
-      navigation.goBack();
+      if (screenState !== 'copied') {
+        navigation.goBack();
+      }
     }
   }, [navigation, screenState]);
+
+  const isEditable = useMemo(() => (doc ? ['DRAFT', 'READY'].includes(doc?.status) : false), [doc]);
+
+  const viewStyle: StyleProp<ViewStyle> = useMemo(
+    () => ({ ...styles.container, justifyContent: lineType === 'last' ? 'flex-start' : 'center' }),
+    [lineType],
+  );
 
   if (!isFocused) {
     return <AppActivityIndicator />;
   }
 
-  if (screenState === 'deleting' || screenState === 'sending') {
+  if (screenState === 'deleting' || screenState === 'sending' || screenState === 'copying') {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
-          <LargeText>{screenState === 'deleting' ? 'Удаление документа...' : 'Отправка документа...'}</LargeText>
+          <LargeText>
+            {screenState === 'deleting'
+              ? 'Удаление документа...'
+              : screenState === 'copying'
+                ? 'Копирование документа...'
+                : 'Отправка документа...'}
+          </LargeText>
           <AppActivityIndicator style={{}} />
         </View>
       </View>
@@ -595,19 +859,21 @@ export const FreeShipmentViewScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={viewStyle}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
         title={doc.documentType.description || ''}
-        onPress={handleEditDocHead}
-        disabled={!['DRAFT', 'READY'].includes(doc.status)}
         isBlocked={isBlocked}
+        onPress={() => (isEditable ? handleEditDocHead() : setIsDateVisible(!isDateVisible))}
+        editable={isEditable}
       >
         <View style={styles.infoBlock}>
           <MediumText>{doc.head.fromDepart?.name || ''}</MediumText>
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
+          {isDateVisible && <DateInfo sentDate={doc.sentDate} erpCreationDate={doc.erpCreationDate} />}
         </View>
       </InfoBlock>
+      <LineTypes />
       <TextInput
         style={styles.scanInput}
         key={key}
@@ -617,16 +883,29 @@ export const FreeShipmentViewScreen = () => {
         showSoftInputOnFocus={false}
         onChangeText={(text) => !scanned && setScan(text)}
       />
-      <FlashList
-        data={lines}
-        renderItem={renderItem}
-        estimatedItemSize={60}
-        ItemSeparatorComponent={ItemSeparator}
-        keyExtractor={keyExtractor}
-        extraData={[lines, isBlocked]}
-        keyboardShouldPersistTaps={'always'}
-      />
-      {lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
+      {lineType === 'all' ? (
+        <>
+          <FlashList
+            data={lines}
+            renderItem={renderItem}
+            estimatedItemSize={60}
+            ItemSeparatorComponent={ItemSeparator}
+            keyExtractor={keyExtractor}
+            extraData={[lines, isBlocked]}
+            keyboardShouldPersistTaps={'always'}
+          />
+          {lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
+        </>
+      ) : lineType === 'last' && lines?.[0] ? (
+        <View style={styles.spaceBetween}>
+          <LineItem
+            item={lines?.[0]}
+            disabled={doc?.status !== 'DRAFT' || scanUnit || Boolean(lines?.[0]?.scannedBarcode)}
+            onPress={() => handlePressLine(lines?.[0]?.weight)}
+          />
+          {lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
+        </View>
+      ) : null}
       <AppDialog
         title="Введите штрих-код"
         visible={visibleDialog}
@@ -635,6 +914,7 @@ export const FreeShipmentViewScreen = () => {
         onCancel={handleDismissBarcode}
         onOk={handleSearchBarcode}
         okLabel={'Найти'}
+        keyboardType="number-pad"
         errorMessage={errorMessage}
       />
       <QuantDialog
@@ -647,9 +927,35 @@ export const FreeShipmentViewScreen = () => {
         onOk={handleEditQuantPack}
         okLabel={'Ок'}
         isPack={isPack}
-        keyboardType="numbers-and-punctuation"
+        keyboardType="number-pad"
         okDisabled={!quantPack || !quantPallet}
       />
+      {usePackage && (
+        <BoxDialog
+          visible={visibleBoxDialog}
+          onCancel={handleCancelBoxDialog}
+          onOk={handleSetNewBox}
+          okLabel={'Ок'}
+          keyboardType="number-pad"
+          okDisabled={!quantPack || !quantPallet}
+          screenName="FreeShipmentView"
+          lastBox={lines?.[0]?.box || undefined}
+        />
+      )}
+      {scanUnit && (
+        <BarcodeDialog
+          visible={visibleBarcodeDialog}
+          onCancel={handleCancelUnitDialog}
+          onOk={handleAddUnitLine}
+          okLabel={'Ок'}
+          keyboardType="number-pad"
+          okDisabled={!quantPack || !quantPallet}
+          screenName="FreeShipmentView"
+          line={brcLine}
+          box={box}
+          remainsUse={remainsUse}
+        />
+      )}
       <SimpleDialog
         visible={visibleSendDialog}
         title={'Внимание!'}

@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, Platform, TextProps } from 'react-native';
+import React, { useMemo } from 'react';
+import { StyleSheet, Platform, TextProps, StyleProp, TextStyle } from 'react-native';
 
 import { Text } from 'react-native-paper';
 
@@ -45,6 +45,8 @@ const BaseStyle = StyleSheet.create({
       },
     }),
   },
+  textCenter: { textAlign: 'center' },
+  textLeft: { textAlign: 'left' },
 });
 
 const calculateFontSize = (size?: AppSize): number => {
@@ -73,23 +75,30 @@ const calculateFontSize = (size?: AppSize): number => {
   }
 };
 
-const AppText = ({ color, size, style, center, weight, backgroundColor, ...props }: AppTextProps) => (
-  <TextBase
-    style={[
-      BaseStyle.defaultStyle,
-      {
-        color,
-        backgroundColor,
-        fontSize: calculateFontSize(size),
-        lineHeight: calculateFontSize(size) * 1.5,
-      },
-      center ? { textAlign: 'center' } : { textAlign: 'left' },
-      { fontWeight: weight === 'normal' ? '600' : '400' },
-      style,
-    ]}
-    {...props}
-  />
-);
+const AppText = ({ color, size, style, center, weight, backgroundColor, ...props }: AppTextProps) => {
+  const textStyle: StyleProp<TextStyle> = useMemo(
+    () => ({ fontWeight: weight === 'normal' ? '600' : '400' }),
+    [weight],
+  );
+
+  return (
+    <TextBase
+      style={[
+        BaseStyle.defaultStyle,
+        {
+          color,
+          backgroundColor,
+          fontSize: calculateFontSize(size),
+          lineHeight: calculateFontSize(size) * 1.5,
+        },
+        center ? BaseStyle.textCenter : BaseStyle.textLeft,
+        textStyle,
+        style,
+      ]}
+      {...props}
+    />
+  );
+};
 
 const Heading1 = (props: AppTextProps) => <AppText accessibilityRole="heading" weight="normal" size="xxl" {...props} />;
 

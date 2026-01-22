@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useTheme, Switch as SwitchComponent } from 'react-native-paper';
+import { useTheme, Switch as SwitchComponent, MD2Theme } from 'react-native-paper';
 
 type Props = {
   value: boolean;
@@ -9,7 +9,7 @@ type Props = {
 };
 
 const Switch = ({ value, onValueChange, disabled }: Props) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
   return (
     <View>
       <SwitchComponent

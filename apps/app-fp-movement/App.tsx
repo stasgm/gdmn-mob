@@ -17,6 +17,7 @@ import {
   useDocThunkDispatch,
   useRefThunkDispatch,
   useSelector,
+  useSettingsThunkDispatch,
 } from '@lib/store';
 import {
   AppScreen,
@@ -36,8 +37,6 @@ import { sleep, dialCall } from '@lib/mobile-hooks';
 import { TouchableOpacity, Linking, ScrollView, View } from 'react-native';
 
 import Constants from 'expo-constants';
-
-import { useSettingsThunkDispatch } from '@lib/store/src/settings/actions.async';
 
 import { MoveNavigator } from './src/navigation/MoveNavigator';
 
@@ -67,10 +66,13 @@ import {
   moveFromScreens,
   moveScreens,
   moveToScreens,
+  palletScreens,
   receiptScreens,
   returnScreens,
   shipmentScreens,
 } from './src/navigation/Root/screens';
+
+import { PalletNavigator } from './src/navigation/PalletNavigator';
 
 const Root = () => {
   const { isInit, data: settings } = useSelector((state) => state.settings);
@@ -157,6 +159,14 @@ const Root = () => {
               component: RemainsNavigator,
             },
             {
+              name: 'Pallet',
+              title: 'Паллеты',
+              icon: 'barcode-scan',
+              component: PalletNavigator,
+              showInDashboard: true,
+              dashboardScreenName: 'PalletList',
+            },
+            {
               name: 'Return',
               title: 'Возврат',
               icon: 'file-restore-outline',
@@ -233,10 +243,18 @@ const Root = () => {
               component: RemainsNavigator,
             },
             {
-              name: 'Return',
-              title: 'Возврат',
-              icon: 'file-restore-outline',
-              component: ReturnNavigator,
+              name: 'Pallet',
+              title: 'Паллеты',
+              icon: 'barcode-scan',
+              component: PalletNavigator,
+              showInDashboard: true,
+              dashboardScreenName: 'PalletList',
+            },
+            {
+              name: 'Receipt',
+              title: 'Приход',
+              icon: 'file-document-outline',
+              component: ReceiptNavigator,
               showInDashboard: true,
               sortNumber: 60,
             },
@@ -275,6 +293,7 @@ const Root = () => {
             ...returnScreens,
             ...inventoryScreens,
             ...laboratoryScreens,
+            ...palletScreens,
           }
         : {
             ...moveScreens,
@@ -285,6 +304,7 @@ const Root = () => {
             ...returnScreens,
             ...inventoryScreens,
             ...laboratoryScreens,
+            ...palletScreens,
           },
     [isAddressStore],
   );
@@ -448,7 +468,7 @@ const Root = () => {
       ) : infoWindow === 3 ? (
         <AppScreen>
           <Text style={styles.textInfo}>{'Подробную информацию об использовании приложения вы найдете в '}</Text>
-          <TouchableOpacity onPress={() => Linking.openURL(Constants.manifest?.extra?.documentationUrl)}>
+          <TouchableOpacity onPress={() => Linking.openURL(Constants.expoConfig?.extra?.documentationUrl)}>
             <Text style={[styles.textInfo, styles.textDecorationLine]}>{'документации.'}</Text>
           </TouchableOpacity>
           <Text style={styles.textInfo}>

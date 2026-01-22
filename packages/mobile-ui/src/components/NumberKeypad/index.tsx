@@ -1,7 +1,7 @@
 import { Feather } from '@expo/vector-icons';
-import { evaluate, exp } from 'mathjs';
-import React, { useCallback, useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, useWindowDimensions } from 'react-native';
+import { evaluate } from 'mathjs';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity, useWindowDimensions, StyleProp, ViewStyle } from 'react-native';
 
 import globalColors from '../../styles/colors';
 
@@ -12,11 +12,12 @@ interface IProps {
   decDigitsForTotal?: number;
   onDismiss?: () => void;
   onApply: (newValue: string) => void;
+  changeOldValue?: boolean;
 }
 
 const isDiv0 = (expression: string, number?: string) => Number(number) === 0 && expression.indexOf('/') >= 0;
 
-const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProps) => {
+const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal, changeOldValue = false }: IProps) => {
   const [expression, setExpression] = useState('');
   const [number, setNumber] = useState(oldValue);
   const [firstOperation, setFirstOperation] = useState(true);
@@ -148,10 +149,20 @@ const NumberKeypad = ({ oldValue, onDismiss, onApply, decDigitsForTotal }: IProp
     ],
   ];
 
+  useEffect(() => {
+    if (changeOldValue) {
+      setNumber(oldValue);
+    }
+  }, [changeOldValue, oldValue]);
+
   const windowHeight = useWindowDimensions().height;
+  const viewStyle: StyleProp<ViewStyle> = useMemo(
+    () => ({ height: windowHeight > 650 ? windowHeight / 2.6 : 250 }),
+    [windowHeight],
+  );
 
   return (
-    <View style={{ height: windowHeight > 650 ? windowHeight / 2.6 : 250 }}>
+    <View style={viewStyle}>
       <View style={[styles.input, { borderColor: globalColors.border, backgroundColor: globalColors.card }]}>
         <View>
           <Text style={styles.currentNumber}>

@@ -44,7 +44,7 @@ import {
 
 import { IDocumentType, INamedEntity, ScreenState } from '@lib/types';
 
-import { Divider, useTheme } from 'react-native-paper';
+import { Divider, MD2Theme, useTheme } from 'react-native-paper';
 
 import { IDelList } from '@lib/mobile-types';
 
@@ -64,6 +64,7 @@ import { ICoords } from '../../store/geo/types';
 import { getCurrentPosition } from '../../utils/expoFunctions';
 import { lineTypes } from '../../utils/constants';
 import { getNextDocNumber } from '../../utils/helpers';
+import { OrderDepartDialog } from '../Orders/components/OrderDepartDialog';
 
 export interface VisitListSectionProps {
   title: string;
@@ -76,15 +77,16 @@ const VisitScreen = () => {
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'Visit'>>();
   const { routeId, id } = useRoute<RouteProp<RoutesStackParamList, 'Visit'>>().params;
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   const visit = docSelectors.selectByDocType<IVisitDocument>('visit')?.find((e) => e.head.routeLineId === id);
+  console.log('visit', visit);
   const dateBegin = visit ? new Date(visit?.head.dateBegin) : undefined;
   const geo = visit?.head.beginGeoPoint;
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [lineType, setLineType] = useState(lineTypes[0].id);
 
-  const route = useMemo(() => ({ id: routeId, name: '' } as INamedEntity), [routeId]);
+  const route = useMemo(() => ({ id: routeId, name: '' }) as INamedEntity, [routeId]);
   const point = docSelectors.selectByDocId<IRouteDocument>(routeId)?.lines.find((i) => i.id === id);
   const outlet = refSelectors.selectByRefId<IOutlet>('outlet', point?.outlet.id);
   const contact = refSelectors.selectByRefId<IContact>('contact', outlet?.company.id);
@@ -96,6 +98,7 @@ const VisitScreen = () => {
 
   const orderType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'order');
   const defaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as INamedEntity | undefined;
+  const isUseRemains = useSelector((state) => state.settings.data?.isUseRemains?.data) as boolean;
 
   const orderList = docSelectors.selectByDocType<IOrderDocument>('order');
   const loading = useSelector((state) => state.app.loading);
@@ -135,6 +138,7 @@ const VisitScreen = () => {
         subtitle: `${getDateString(creationDate)} ${creationDate.toLocaleTimeString()}`,
         isFromRoute: !!i.head.route,
         lineCount: i.lines.length,
+        errorMessage: i.errorMessage,
       } as IListItemProps;
     });
   }, [orderDocs]);
@@ -182,6 +186,9 @@ const VisitScreen = () => {
       setLineType(lineTypes[0].id);
     }, []),
   );
+
+  const [visibleDepartDialog, setVisibleDepartDialog] = useState(false);
+  const [department, setDepartment] = useState<INamedEntity | undefined>(undefined);
 
   useEffect(() => {
     const handleNewVisit = async () => {
@@ -257,7 +264,7 @@ const VisitScreen = () => {
             route,
             onDate: newOnDate,
             takenOrder: visit?.head.takenType,
-            depart: defaultDepart,
+            depart: department ? department : defaultDepart,
           },
           lines: [],
           creationDate: newOrderDate,
@@ -265,6 +272,7 @@ const VisitScreen = () => {
         };
 
         dispatch(documentActions.addDocument(newOrder));
+        // ? navigation.('OrderEdit', { id: newOrder.id, routeId: route.id })
         navigation.navigate('OrderView', { id: newOrder.id, routeId: route.id });
       } catch (e) {
         setScreenState('idle');
@@ -278,8 +286,10 @@ const VisitScreen = () => {
   }, [
     contact,
     defaultDepart,
+    department,
     dispatch,
     id,
+    isUseRemains,
     navigation,
     orderDocs,
     orderType,
@@ -287,7 +297,6 @@ const VisitScreen = () => {
     route,
     screenState,
     visit,
-    visit?.head.takenType,
   ]);
 
   const sendDoc = useSendDocs(orderDocs.filter((i) => i.status === 'DRAFT' || i.status === 'READY'));
@@ -334,13 +343,16 @@ const VisitScreen = () => {
                   !orderDocs.find((doc) => doc.status === 'READY' || doc.status === 'DRAFT')
                 }
               />
-              <AddButton onPress={() => setScreenState('adding')} disabled={screenState !== 'idle'} />
+              <AddButton
+                onPress={() => (isUseRemains ? setVisibleDepartDialog(true) : setScreenState('adding'))}
+                disabled={screenState !== 'idle'}
+              />
             </>
           )
         )}
       </View>
     ),
-    [contact, handleDeleteDocs, isDelList, orderDocs, orderType, outlet, screenState],
+    [contact, handleDeleteDocs, isDelList, isUseRemains, orderDocs, orderType, outlet, screenState],
   );
 
   const renderLeft = useCallback(() => isDelList && <CloseButton onPress={() => setDelList({})} />, [isDelList]);
@@ -482,6 +494,11 @@ const VisitScreen = () => {
                   {`Просрочено: ${formatValue({ type: 'currency', decimals: 2 }, saldoDebt ?? 0)}, ${debt.dayLeft} дн.`}
                 </MediumText>
               )}
+              {contact.limitSum ? (
+                <View style={styles.rowCenter}>
+                  <MediumText>Лимит: {formatValue({ type: 'currency', decimals: 2 }, contact.limitSum)}</MediumText>
+                </View>
+              ) : null}
               <Divider />
               {visit && dateBegin && (
                 <View>
@@ -521,6 +538,16 @@ const VisitScreen = () => {
           ListEmptyComponent={EmptyList}
         />
       )}
+      <OrderDepartDialog
+        visible={visibleDepartDialog}
+        onCancel={() => setVisibleDepartDialog(false)}
+        onOk={(depart: INamedEntity) => {
+          console.log('depart', depart);
+          setDepartment(depart);
+          setVisibleDepartDialog(false);
+          setScreenState('adding');
+        }}
+      />
       <SimpleDialog
         visible={visibleSendDialog}
         title={'Внимание!'}

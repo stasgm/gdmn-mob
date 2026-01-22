@@ -1,6 +1,6 @@
-import React, { useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableHighlight } from 'react-native';
-import { useTheme } from 'react-native-paper';
+import React, { useCallback, useMemo } from 'react';
+import { View, Text, StyleSheet, TouchableHighlight, StyleProp, ViewStyle } from 'react-native';
+import { MD2Theme, useTheme } from 'react-native-paper';
 import { IListItem } from '@lib/mobile-types';
 
 type Props = {
@@ -21,13 +21,18 @@ const RadioGroup = ({ options, onChange, activeButtonId, directionRow }: Props) 
     [onChange, activeButtonId],
   );
 
+  const viewStyle: StyleProp<ViewStyle> = useMemo(
+    () => ({
+      flexDirection: directionRow ? 'row' : 'column',
+      justifyContent: directionRow ? 'space-between' : 'center',
+    }),
+    [directionRow],
+  );
+
+  const textStyle: StyleProp<ViewStyle> = useMemo(() => ({ flex: directionRow ? 0 : 1 }), [directionRow]);
+
   return (
-    <View
-      style={{
-        flexDirection: directionRow ? 'row' : 'column',
-        justifyContent: directionRow ? 'space-between' : 'center',
-      }}
-    >
+    <View style={viewStyle}>
       {options.map((option) => {
         return (
           <TouchableHighlight
@@ -39,7 +44,7 @@ const RadioGroup = ({ options, onChange, activeButtonId, directionRow }: Props) 
           >
             <>
               <Circle active={activeButtonId === option.id} />
-              <Text style={[localStyles.radioText, { flex: directionRow ? 0 : 1 }]}>{option.value}</Text>
+              <Text style={[localStyles.radioText, textStyle]}>{option.value}</Text>
             </>
           </TouchableHighlight>
         );
@@ -53,7 +58,7 @@ interface ICircleProps {
 }
 
 const Circle = ({ active }: ICircleProps) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
 
   return (
     <View style={[localStyles.radioCircle, { borderColor: colors.primary }]}>
@@ -63,9 +68,6 @@ const Circle = ({ active }: ICircleProps) => {
 };
 
 const localStyles = StyleSheet.create({
-  container: {
-    width: '100%',
-  },
   item: {
     alignItems: 'center',
     flexDirection: 'row',

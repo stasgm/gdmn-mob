@@ -2,9 +2,16 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { View, TextInput, Alert, useWindowDimensions } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { appActions, docSelectors, documentActions, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
+import {
+  appActions,
+  docSelectors,
+  documentActions,
+  refSelectors,
+  useDispatch,
+  useDocThunkDispatch,
+  useSelector,
+} from '@lib/store';
 import {
   MenuButton,
   useActionSheet,
@@ -22,6 +29,7 @@ import {
   navBackButton,
   SaveDocument,
   SimpleDialog,
+  DateInfo,
 } from '@lib/mobile-ui';
 
 import {
@@ -35,13 +43,14 @@ import {
   keyExtractor,
 } from '@lib/mobile-hooks';
 
-import { INamedEntity, ScreenState } from '@lib/types';
+import { INamedEntity, ISettingsOption, ScreenState } from '@lib/types';
 
 import { FlashList } from '@shopify/flash-list';
 
 import { IScanDocument, IScanLine } from '../../store/types';
 import { ScanStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
+import { IGood } from '../../store/app/types';
 
 export const ScanViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -67,6 +76,14 @@ export const ScanViewScreen = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const settings = useSelector((state) => state.settings?.data);
+
+  const prefixGtin = (settings.prefixGtin as ISettingsOption<string>)?.data || '';
+  const prefixISN = (settings.prefixISN as ISettingsOption<string>)?.data || '';
+  const goods = refSelectors.selectByName<IGood>('good')?.data;
+
+  const [isDateVisible, setIsDateVisible] = useState(false);
 
   const ref = useRef<TextInput>(null);
 
@@ -232,32 +249,49 @@ export const ScanViewScreen = () => {
           ? `Выделено позиций: ${delList.length}`
           : `Позиций: ${delList.length}`
         : windowWidth > 320
-        ? 'Документ'
-        : '',
+          ? 'Документ'
+          : '',
     });
   }, [delList.length, isDelList, navigation, renderLeft, renderRight, windowWidth]);
 
-  const renderItem = ({ item, index }: { item: IScanLine; index: number }) => (
-    <ListItemLine
-      {...item}
-      onPress={() => {
-        isDelList && setDelList(getDelLineList(delList, item.id));
-      }}
-      onLongPress={() => !isBlocked && setDelList(getDelLineList(delList, item.id))}
-      checked={delList.includes(item.id)}
-    >
-      <View style={styles.details}>
-        {(doc?.head.isBindGood && item.good) || !doc?.head.isBindGood ? (
-          <LargeText style={styles.textBold}>
-            {doc?.head.isBindGood
-              ? item.good?.name
-              : `Сканирование ${lines?.length ? lines.length - index : 1 + index}`}
-          </LargeText>
-        ) : null}
-        <MediumText>{shortenString(item.barcode, 30)}</MediumText>
-      </View>
-    </ListItemLine>
-  );
+  const renderItem = ({ item, index }: { item: IScanLine; index: number }) => {
+    const isTypeDM = RegExp(`^.{0,1}${prefixGtin}\\d{13,14}${prefixISN}.{13}91.{1,4}92.{1,44}`, 'i').test(item.barcode);
+
+    const startPosition = item.barcode.match(RegExp(`${prefixGtin}\\d{13,14}${isTypeDM ? prefixISN : ''}`));
+    const good = goods.find(
+      (i) =>
+        i.barcode === item.barcode ||
+        (startPosition
+          ? (isTypeDM
+              ? i.barcode === startPosition[0].slice(2, -2)
+              : i.barcode === startPosition[0].slice(2 /*, -2*/)) ||
+            (isTypeDM ? i.barcode === startPosition[0].slice(3, -2) : i.barcode === startPosition[0].slice(3 /*, -2*/))
+          : i.barcode === item.barcode.slice(1, 14)),
+    );
+    return (
+      <ListItemLine
+        {...item}
+        onPress={() => {
+          isDelList && setDelList(getDelLineList(delList, item.id));
+        }}
+        onLongPress={() => !isBlocked && setDelList(getDelLineList(delList, item.id))}
+        checked={delList.includes(item.id)}
+      >
+        <View style={styles.details}>
+          {(doc?.head.isBindGood && item.good) || !doc?.head.isBindGood ? (
+            <LargeText style={styles.textBold}>
+              {doc?.head.isBindGood
+                ? item.good?.name
+                : good
+                  ? good.name
+                  : `Сканирование ${lines?.length ? lines.length - index : 1 + index}`}
+            </LargeText>
+          ) : null}
+          <MediumText>{shortenString(item.barcode, 30)}</MediumText>
+        </View>
+      </ListItemLine>
+    );
+  };
 
   const [scanned, setScanned] = useState(false);
 
@@ -267,7 +301,7 @@ export const ScanViewScreen = () => {
   const good = useSelector((state) => state.app.formParams?.good) as INamedEntity | undefined;
 
   useEffect(() => {
-    if (doc?.head.isBindGood && currentLineId) {
+    if (doc?.head.isBindGood && currentLineId && good) {
       const currentLine = doc.lines?.find((l) => l.id === currentLineId);
       if (currentLine && currentLine.good?.id !== good?.id) {
         dispatch(
@@ -285,6 +319,10 @@ export const ScanViewScreen = () => {
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!doc) {
+        return;
+      }
+
+      if (isBlocked) {
         return;
       }
 
@@ -313,7 +351,7 @@ export const ScanViewScreen = () => {
       }
       handleFocus();
     },
-    [dispatch, doc, id, navigation],
+    [dispatch, doc, id, isBlocked, navigation],
   );
 
   const setScan = (brc: string) => {
@@ -338,6 +376,8 @@ export const ScanViewScreen = () => {
       navigation.goBack();
     }
   }, [navigation, screenState]);
+
+  const isEditable = useMemo(() => (doc ? ['DRAFT', 'READY'].includes(doc?.status) : false), [doc]);
 
   const isFocused = useIsFocused();
   if (!isFocused) {
@@ -369,15 +409,17 @@ export const ScanViewScreen = () => {
         <InfoBlock
           colorLabel={getStatusColor(doc?.status || 'DRAFT')}
           title={doc.head.isBindGood ? 'Привязка штрихкодов к ТМЦ' : 'Сканирование'}
-          onPress={handleEditDocHead}
-          disabled={isDelList || !['DRAFT', 'READY'].includes(doc.status)}
+          onPress={() => (isEditable ? handleEditDocHead() : setIsDateVisible(!isDateVisible))}
+          disabled={delList.length > 0}
+          isBlocked={isBlocked}
         >
           <>
             {!!doc.head.department && <MediumText>{doc.head.department.name}</MediumText>}
             <View style={styles.rowCenter}>
               <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
-              {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
             </View>
+
+            {isDateVisible && <DateInfo sentDate={doc.sentDate} erpCreationDate={doc.erpCreationDate} />}
           </>
         </InfoBlock>
         <TextInput

@@ -1,10 +1,8 @@
-import { createStackNavigator } from '@react-navigation/stack';
-import React from 'react';
-
+import { SettingsStackParamList } from './types';
 import SettingsScreen from '../../screens/SettingsScreen';
 import SettingsDetailsScreen from '../../screens/SettingsDetailsScreen';
-
-import { SettingsStackParamList } from './types';
+import { createStackNavigator } from '@react-navigation/stack';
+import React from 'react';
 
 const Stack = createStackNavigator<SettingsStackParamList>();
 

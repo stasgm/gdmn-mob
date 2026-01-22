@@ -51,9 +51,9 @@ export const appSettings: Settings = {
     visible: true,
     group: mainSettingGroup,
   },
-  isShowPrevOrderLines: {
-    id: 'isShowPrevOrderLines',
-    description: 'Показывать предыдущую заявку',
+  isUseRemains: {
+    id: 'isUseRemains',
+    description: 'Использовать остатки',
     data: false,
     type: 'boolean',
     sortOrder: 4,
@@ -113,4 +113,9 @@ export const reports: IListItem[] = [
   { id: 'byGroup', value: 'В разрезе групп' },
   { id: 'byGood', value: 'В разрезе товаров' },
   // { id: 'sellBill', value: 'Накладные' },
+];
+
+export const shipments: IListItem[] = [
+  { id: 'shipment', value: 'Накладные' },
+  { id: 'noShipment', value: 'Недогрузы' },
 ];

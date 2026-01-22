@@ -35,6 +35,8 @@ import { IDelList, IListItem } from '@lib/mobile-types';
 
 import { Searchbar } from 'react-native-paper';
 
+import { StatusTypes } from '@lib/mobile-ui/src/components/FilterButtons';
+
 import { IDebt, IOrderDocument, IOrderListFormParam, IOutlet } from '../../store/types';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
@@ -111,14 +113,14 @@ const OrderListScreen = () => {
               i.number ||
               i.documentDate ||
               i.head.onDate ||
-              outlets.find((a) => a.id === i.head.outlet.id)?.address
+              outlets?.find((a) => a.id === i.head.outlet.id)?.address
               ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
                 i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
                 i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
                 getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase()) ||
                 getDateString(i.head.onDate).toUpperCase().includes(searchQuery.toUpperCase()) ||
                 outlets
-                  .find((a) => a.id === i.head.outlet.id)
+                  ?.find((a) => a.id === i.head.outlet.id)
                   ?.address.toUpperCase()
                   .includes(searchQuery.toUpperCase())
               : true
@@ -165,22 +167,28 @@ const OrderListScreen = () => {
       status === 'all'
         ? filteredOrderList
         : status === 'active'
-        ? filteredOrderList.filter((e) => e.status !== 'PROCESSED')
-        : status === 'archive'
-        ? filteredOrderList.filter((e) => e.status === 'PROCESSED')
-        : [];
+          ? filteredOrderList.filter((e) => e.status !== 'PROCESSED')
+          : status === 'archive'
+            ? filteredOrderList.filter((e) => e.status === 'PROCESSED')
+            : status === 'refuse'
+              ? filteredOrderList.filter((e) => e.status === 'DRAFT' && e.errorMessage)
+              : [];
 
     return res.map((i) => {
-      const address = outlets.find((o) => i?.head?.outlet.id === o.id)?.address;
+      const address = outlets?.find((o) => i?.head?.outlet.id === o.id)?.address;
       return {
         id: i.id,
         title: i.head.outlet?.name,
         documentDate: getDateString(i.documentDate),
         status: i.status,
-        subtitle: `${address}\n№ ${i.number} от ${getDateString(i.documentDate)} на ${getDateString(i.head?.onDate)}`,
+        subtitle: `${address ? `${address}\n` : ''}№ ${i.number} от ${getDateString(i.documentDate)} на ${getDateString(
+          i.head?.onDate,
+        )}`,
         isFromRoute: !!i.head.route,
         lineCount: i.lines.length,
         errorMessage: i.errorMessage,
+        sentDate: i.sentDate,
+        erpCreationDate: i.erpCreationDate,
       } as IListItemProps;
     });
   }, [status, filteredOrderList, outlets]);
@@ -212,10 +220,10 @@ const OrderListScreen = () => {
       status === 'all'
         ? statusTypes
         : status === 'active'
-        ? statusTypes.filter((e) => e.id !== 'PROCESSED')
-        : status === 'archive'
-        ? statusTypes.filter((e) => e.id === 'PROCESSED')
-        : [],
+          ? statusTypes.filter((e) => e.id !== 'PROCESSED')
+          : status === 'archive'
+            ? statusTypes.filter((e) => e.id === 'PROCESSED')
+            : [],
     [status],
   );
 
@@ -331,7 +339,7 @@ const OrderListScreen = () => {
   );
 
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
-    const debt = debets.find((d) => d.id === orderList.find((o) => o.id === item.id)?.head?.contact.id);
+    const debt = debets?.find((d) => d.id === orderList.find((o) => o.id === item.id)?.head?.contact.id);
 
     return (
       <ScreenListItem
@@ -368,9 +376,27 @@ const OrderListScreen = () => {
     return <AppActivityIndicator />;
   }
 
+  const statusList: StatusTypes[] = [
+    {
+      name: 'Все',
+      status: 'all',
+    },
+    {
+      name: 'Текущие',
+      status: 'active',
+    },
+    {
+      name: 'Отказ',
+      status: 'refuse',
+    },
+    {
+      name: 'Архив',
+      status: 'archive',
+    },
+  ];
   return (
     <AppScreen>
-      <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} />
+      <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} statusList={statusList} />
       {filterVisible && (
         <>
           <View style={styles.flexDirectionRow}>

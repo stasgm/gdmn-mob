@@ -114,6 +114,15 @@ export const appSettings: Settings = {
     visible: true,
     group: scanSettings,
   },
+  lineConfirm: {
+    id: 'lineConfirm',
+    sortOrder: 38,
+    description: 'Подтверждать позицию',
+    data: true,
+    type: 'boolean',
+    visible: true,
+    group: mainSettingGroup,
+  },
   barcodeTypes: {
     id: 'barcodeTypes',
     sortOrder: 31,
@@ -153,6 +162,24 @@ export const appSettings: Settings = {
     group: scanSettings,
     groupInGroup: goodGroup,
   },
+  prefixGtin: {
+    id: 'prefixGtin',
+    sortOrder: 36,
+    description: 'Префикс ГТИН',
+    data: '01',
+    type: 'string',
+    visible: true,
+    group: scanSettings,
+  },
+  prefixISN: {
+    id: 'prefixISN',
+    sortOrder: 36,
+    description: 'Префикс ИСН',
+    data: '21',
+    type: 'string',
+    visible: true,
+    group: scanSettings,
+  },
   screenKeyboard: {
     id: 'screenKeyboard',
     sortOrder: 8,
@@ -188,3 +215,14 @@ export const unknownGood: IGood = {
   name: 'Неизвестный товар',
   goodGroup: { id: 'unknown', name: 'Неизвестная группа' },
 };
+
+export const lineTypes: IListItem[] = [
+  {
+    id: 'all',
+    value: 'все',
+  },
+  {
+    id: 'last',
+    value: 'позиция',
+  },
+];

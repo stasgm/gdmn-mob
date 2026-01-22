@@ -13,12 +13,13 @@ interface IProps {
 
 const FilterButton = ({ onPress, visible, withParams = false }: IProps) => {
   const { colors } = useTheme();
+  const iconStyle = visible ? { backgroundColor: colors.background, opacity: 0.8 } : {};
   return (
     <View style={styles.viewRight_30}>
       <IconButton
         icon={withParams ? 'filter-check-outline' : 'filter-outline'}
         size={30}
-        style={[styles.icon_30, visible && { backgroundColor: colors.background, opacity: 0.8 }]}
+        style={[styles.icon_30, iconStyle]}
         onPress={onPress}
       />
     </View>

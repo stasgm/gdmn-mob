@@ -16,7 +16,7 @@ import {
   documentActions,
 } from '@lib/store';
 import { globalStyles as styles, Theme as defaultTheme, Provider as UIProvider, AppScreen } from '@lib/mobile-ui';
-import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
+import { ActivityIndicator, Caption, MD2Theme, useTheme } from 'react-native-paper';
 
 import { StatusBar } from 'expo-status-bar';
 
@@ -43,7 +43,7 @@ const Root = () => {
   );
 
   const dispatch = useDispatch();
-  const { colors } = useTheme();
+  const { colors } = useTheme<MD2Theme>();
   const authLoading = useSelector((state) => state.auth.loadingData);
   const appDataLoading = appSelectors.selectLoading();
   const isLogged = authSelectors.isLoggedWithCompany();
