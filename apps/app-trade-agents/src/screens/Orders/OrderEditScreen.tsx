@@ -47,6 +47,7 @@ const OrderEditScreen = () => {
     status: docStatus,
     comment: docComment,
     road: docRoad,
+    expeditor: docExpeditor,
   } = useSelector((state) => state.app.formParams as IOrderFormParam);
 
   // Подразделение по умолчанию
@@ -56,6 +57,7 @@ const OrderEditScreen = () => {
   const defaultDepart = useMemo(() => (isNamedEntity(departSetting) ? departSetting : undefined), [departSetting]);
   const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === docOutlet?.id);
   const road = refSelectors.selectByName<INamedEntity>('road')?.data;
+  const expeditor = refSelectors.selectByName<INamedEntity>('expeditors')?.data;
 
   useEffect(() => {
     if (!docContact && !!docOutlet) {
@@ -93,6 +95,7 @@ const OrderEditScreen = () => {
           depart: order.head.depart,
           comment: order.head.comment,
           road: order.head.road,
+          expeditor: order.head.expeditor,
         }),
       );
     } else {
@@ -113,6 +116,7 @@ const OrderEditScreen = () => {
         depart: defaultDepart,
         comment: undefined,
         road: undefined,
+        expeditor: undefined,
       };
 
       dispatch(appActions.setFormParams(road ? { ...formParams, road: undefined } : formParams));
@@ -155,6 +159,7 @@ const OrderEditScreen = () => {
             outlet: docOutlet,
             depart: docDepart,
             road: docRoad,
+            expeditor: docExpeditor,
             comment: docComment && docComment.trim(),
           },
           lines: [],
@@ -216,6 +221,7 @@ const OrderEditScreen = () => {
     road,
     docRoad,
     isUseRemains,
+    docExpeditor,
   ]);
 
   const renderRight = useCallback(
@@ -328,6 +334,18 @@ const OrderEditScreen = () => {
     });
   }, [docRoad, isBlocked, navigation]);
 
+  const handlePresentExpeditor = useCallback(() => {
+    if (isUseRemains ? docStatus !== 'DRAFT' : isBlocked) {
+      return;
+    }
+
+    navigation.navigate('SelectRefItem', {
+      refName: 'expeditors',
+      fieldName: 'expeditor',
+      value: docExpeditor && [docExpeditor],
+    });
+  }, [docExpeditor, docStatus, isBlocked, isUseRemains, navigation]);
+
   const handleChangeStatus = useCallback(() => {
     dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
   }, [dispatch, docStatus]);
@@ -351,7 +369,6 @@ const OrderEditScreen = () => {
     return <AppActivityIndicator />;
   }
 
-  console.log('isUseRemains', isUseRemains);
   return (
     <AppInputScreen>
       <SubTitle>{statusName}</SubTitle>
@@ -383,7 +400,14 @@ const OrderEditScreen = () => {
         {road ? (
           <SelectableInput label="Маршрут" value={docRoad?.name} onPress={handlePresentRoad} disabled={isBlocked} />
         ) : null}
-
+        {expeditor ? (
+          <SelectableInput
+            label="Экспедитор"
+            value={docExpeditor?.name}
+            onPress={handlePresentExpeditor}
+            disabled={isUseRemains ? docStatus !== 'DRAFT' : isBlocked}
+          />
+        ) : null}
         <SelectableInput
           label="Склад-магазин"
           value={docDepart?.name}

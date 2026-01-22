@@ -95,9 +95,31 @@ const OrderLine = ({ item, packages, onSetLine }: IProps) => {
           </View>
         </View>
         <ItemSeparator />
+        {item.remains || item.remains === 0 ? (
+          <>
+            <View style={styles.item}>
+              <View style={styles.details}>
+                <Text style={styles.name}>Общий остаток</Text>
+                <Text style={textStyle}>{item.remains || 0}</Text>
+              </View>
+            </View>
+            <ItemSeparator />
+          </>
+        ) : null}
+        {item.agentRemains || item.agentRemains === 0 ? (
+          <>
+            <View style={styles.item}>
+              <View style={styles.details}>
+                <Text style={styles.name}>Остаток по агенту</Text>
+                <Text style={textStyle}>{item.agentRemains || 0}</Text>
+              </View>
+            </View>
+            <ItemSeparator />
+          </>
+        ) : null}
         <View style={styles.item}>
           <View style={styles.details}>
-            <Text style={styles.name}>Количество, кг</Text>
+            <Text style={styles.name}>Количество</Text>
             <TextInput
               style={[textStyle, localStyles.quantityItem]}
               showSoftInputOnFocus={false}

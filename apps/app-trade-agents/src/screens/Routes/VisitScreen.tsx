@@ -80,7 +80,7 @@ const VisitScreen = () => {
   const { colors } = useTheme<MD2Theme>();
 
   const visit = docSelectors.selectByDocType<IVisitDocument>('visit')?.find((e) => e.head.routeLineId === id);
-  console.log('visit', visit);
+
   const dateBegin = visit ? new Date(visit?.head.dateBegin) : undefined;
   const geo = visit?.head.beginGeoPoint;
   const [screenState, setScreenState] = useState<ScreenState>('idle');
@@ -189,6 +189,7 @@ const VisitScreen = () => {
 
   const [visibleDepartDialog, setVisibleDepartDialog] = useState(false);
   const [department, setDepartment] = useState<INamedEntity | undefined>(undefined);
+  const [expeditor, setExpeditor] = useState<INamedEntity | undefined>(undefined);
 
   useEffect(() => {
     const handleNewVisit = async () => {
@@ -258,14 +259,24 @@ const VisitScreen = () => {
           status: 'DRAFT',
           documentDate: newOrderDate,
           documentType: orderType,
-          head: {
-            contact,
-            outlet,
-            route,
-            onDate: newOnDate,
-            takenOrder: visit?.head.takenType,
-            depart: department ? department : defaultDepart,
-          },
+          head: expeditor
+            ? {
+                contact,
+                outlet,
+                route,
+                onDate: newOnDate,
+                takenOrder: visit?.head.takenType,
+                depart: department ? department : defaultDepart,
+                expeditor,
+              }
+            : {
+                contact,
+                outlet,
+                route,
+                onDate: newOnDate,
+                takenOrder: visit?.head.takenType,
+                depart: department ? department : defaultDepart,
+              },
           lines: [],
           creationDate: newOrderDate,
           editionDate: newOrderDate,
@@ -288,6 +299,7 @@ const VisitScreen = () => {
     defaultDepart,
     department,
     dispatch,
+    expeditor,
     id,
     isUseRemains,
     navigation,
@@ -541,9 +553,11 @@ const VisitScreen = () => {
       <OrderDepartDialog
         visible={visibleDepartDialog}
         onCancel={() => setVisibleDepartDialog(false)}
-        onOk={(depart: INamedEntity) => {
-          console.log('depart', depart);
+        onOk={(depart: INamedEntity, selectedExpeditor?: INamedEntity) => {
           setDepartment(depart);
+          if (selectedExpeditor) {
+            setExpeditor(selectedExpeditor);
+          }
           setVisibleDepartDialog(false);
           setScreenState('adding');
         }}

@@ -32,6 +32,7 @@ export interface IOrderFormParam extends IFormParam {
   route?: IReferenceData;
   road?: IReferenceData;
   comment?: string;
+  expeditor?: IReferenceData;
 }
 
 export interface IOrderListFormParam extends IFormParam {
@@ -168,12 +169,15 @@ export interface IOrderHead extends IHead {
   onDate: string; //  Дата отгрузки
   takenOrder?: TakeOrderType; //тип взятия заявки
   comment?: string;
+  expeditor?: IReferenceData; // экспедитор
 }
 
 export interface IOrderLine extends IEntity {
   good: IGood;
   quantity: number;
   package?: INamedEntity; // Вид упаковки
+  remains?: number;
+  agentRemains?: number;
 }
 
 export interface IOrderTotalLine {

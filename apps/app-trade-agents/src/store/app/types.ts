@@ -86,6 +86,7 @@ export interface IRemains {
 export interface IRemainsData {
   goodId: string;
   q?: number;
+  qAgent?: number; // остатки по пользователю
   priceFso?: number;
   priceFsn?: number; // цена ФСН
   priceFsoSklad?: number; // цена ФСО склад
@@ -99,6 +100,7 @@ export interface IRemGood {
   priceFsoSklad: number; // цена ФСО склад
   priceFsnSklad: number; // цена ФСН склад
   remains: number;
+  agentRemains?: number; // остатки по агенту
 }
 
 export interface IModelRem {
@@ -107,4 +109,5 @@ export interface IModelRem {
   priceFsoSklad: number; // цена ФСО склад
   priceFsnSklad: number; // цена ФСН склад
   q: number;
+  qAgent?: number;
 }

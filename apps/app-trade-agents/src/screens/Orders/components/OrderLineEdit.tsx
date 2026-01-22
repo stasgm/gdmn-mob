@@ -23,9 +23,10 @@ export interface IOrderItemLine {
 interface IProps {
   orderLine: IOrderItemLine;
   onDismiss: () => void;
+  isUseRemains?: boolean;
 }
 
-const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
+const OrderLineEdit = ({ orderLine, onDismiss, isUseRemains = false }: IProps) => {
   const dispatch = useDispatch();
   const { mode, item, docId } = orderLine;
 
@@ -46,6 +47,11 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
     }
     if (line.quantity < 0) {
       Alert.alert('Ошибка!', 'Вес товара не может быть меньше нуля!', [{ text: 'Ок' }]);
+      setScreenState('idle');
+      return;
+    }
+    if (isUseRemains && line.remains && (line.remains <= 0 || line.remains - line.quantity < 0)) {
+      Alert.alert('Ошибка!', 'Остаток меньше 0!', [{ text: 'Ок' }]);
       setScreenState('idle');
       return;
     }
@@ -74,7 +80,7 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
         { text: 'Отмена', onPress: () => setScreenState('idle') },
       ]);
     }
-  }, [dispatch, docId, line, mode, onDismiss, packages?.length]);
+  }, [dispatch, docId, isUseRemains, line, mode, onDismiss, packages?.length]);
 
   return (
     <Modal animationType="fade" visible={true}>
