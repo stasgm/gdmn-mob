@@ -7,6 +7,13 @@ import { IGood } from '../store/app/types';
 
 const statusColors = ['#E91E63', '#06567D', '#80B12C', '#FFA700'] as const;
 
+export const cellColors = {
+  default: '#5aa176',
+  barcode: '#226182',
+  free: '#d5dce3',
+  textWhite: 'white',
+};
+
 export const ONE_SECOND_IN_MS = 1000;
 
 export const contactTypes: IListItem[] = [

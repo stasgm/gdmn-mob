@@ -49,6 +49,7 @@ import { ScanNavigator } from './src/navigation/ScanNavigator';
 import { RevisionNavigator } from './src/navigation/RevisionNavigator';
 import { InvoiceNavigator } from './src/navigation/InvoiceNavigator';
 import { WaybillNavigator } from './src/navigation/WaybillNavigator';
+// import { CellMovementNavigator } from './src/navigation/CellMovementNavigator';
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -65,6 +66,12 @@ const Root = () => {
         icon: 'barcode-scan',
         component: ScanNavigator,
       },
+      // {
+      //   name: 'Cell',
+      //   title: 'Ячейки',
+      //   icon: 'table-split-cell',
+      //   component: CellMovementNavigator,
+      // },
       {
         name: 'Waybill',
         title: 'ЭТТН',

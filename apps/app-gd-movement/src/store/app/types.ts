@@ -1,5 +1,7 @@
 import { INamedEntity } from '@lib/types';
 
+import { ICellGood, ICellRef } from '../types';
+
 export type AppInventoryState = {
   readonly model: IModelData<IMDGoodRemains>;
   readonly unknownGoods: IUnknownGoods[];
@@ -21,6 +23,21 @@ export interface IMGoodRemain {
 
 export interface IModelData<T = unknown> {
   [id: string]: T;
+}
+
+export interface ICellRefList {
+  [id: string]: ICellRef[];
+}
+
+export interface ICellData extends Omit<ICellRef, 'barcode'> {
+  cell: string;
+  /** Multiple goods in one cell (merged from ICellRef[] with same name) */
+  goods: ICellGood[];
+}
+
+/** Nested model: chamber -> row -> tier -> ICellData[] */
+export interface ICellListModel {
+  [chamber: string]: { [row: string]: { [tier: string]: ICellData[] } };
 }
 
 export interface IMGoodData<T = unknown> {

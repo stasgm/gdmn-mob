@@ -11,6 +11,14 @@ import { ScanListScreen, ScanViewScreen, ScanEditScreen, ScanGoodScreen } from '
 import { RevisionGoodScreen, RevisionEditScreen, RevisionListScreen, RevisionViewScreen } from '../../screens/Revision';
 
 import { InvoiceListScreen, InvoiceViewScreen, InvoiceEditScreen, InvoiceLineScreen } from '../../screens/Invoice';
+
+import {
+  CellMovementListScreen,
+  CellMovementViewScreen,
+  CellMovementEditScreen,
+  SelectCellScreen,
+} from '../../screens/CellsMovement';
+
 import { WaybillListScreen, WaybillViewScreen, WaybillEditScreen } from '../../screens/Waybill';
 
 export const docScreens = {
@@ -78,4 +86,16 @@ export const waybillScreens = {
 
 export const waybillListScreens = {
   WaybillList: { title: 'ЭТТН', component: WaybillListScreen },
+};
+
+export const cellMovementScreens = {
+  CellMovementEdit: { title: 'Ячейки', component: CellMovementEditScreen },
+  CellMovementView: { title: '', component: CellMovementViewScreen },
+  ScanBarcode: { title: 'Сканер', component: ScanBarcodeScreen },
+  SelectCell: { title: 'Выбор ячейки', component: SelectCellScreen },
+  SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
+};
+
+export const cellMovementListScreens = {
+  WaybillList: { title: 'ЭТТН', component: CellMovementListScreen },
 };
