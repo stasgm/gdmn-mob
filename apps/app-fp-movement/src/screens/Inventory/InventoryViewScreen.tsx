@@ -72,7 +72,11 @@ export const InventoryViewScreen = () => {
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
   const lineSum = lines?.reduce(
     (sum, line) => {
-      return { ...sum, quantPack: sum.quantPack + (line.quantPack || 0), weight: sum.weight + (line.weight || 0) };
+      return {
+        ...sum,
+        quantPack: sum.quantPack + (line.flag === '0' ? 1 : line.quantPack || 0),
+        weight: sum.weight + (line.weight || 0),
+      };
     },
     { quantPack: 0, weight: 0 },
   );

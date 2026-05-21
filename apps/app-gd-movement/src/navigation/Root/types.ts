@@ -1,6 +1,6 @@
 import { IReferenceData } from '@lib/types';
 
-import { IInvoiceLine, IMovementLine } from '../../store/types';
+import { ICellMovementLine, IInvoiceLine, IMovementLine } from '../../store/types';
 
 export type IRefSelectParams = {
   refName: string;
@@ -128,3 +128,12 @@ export type WaybillParamList = RefParamList & {
 };
 
 export type WaybillStackParamList = { WaybillList: undefined } & WaybillParamList;
+
+export type CellMovementParamList = RefParamList & {
+  CellMovementView: { id: string; docType?: string };
+  CellMovementEdit: { id: string; docType?: string } | undefined;
+  ScanBarcode: { docId: string; docType?: string };
+  SelectCell: { mode: number; docId: string; item: ICellMovementLine; docType?: string };
+};
+
+export type CellMovementStackParamList = { CellMovementList: undefined } & CellMovementParamList;

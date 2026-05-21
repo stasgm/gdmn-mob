@@ -38,11 +38,14 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
+import { INamedEntity } from '@lib/types';
+
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import {
   IGood,
   IGoodGroup,
   IGoodMatrix,
+  IGoodSales,
   IGroupFormParam,
   IMGroupModel,
   IOrderDocument,
@@ -89,27 +92,51 @@ const SelectGoodScreen = () => {
   );
   const doc = docSelectors.selectByDocId<IOrderDocument>(docId);
 
-  console.log('doc?.head.depart?.id', doc?.head.depart?.id);
   const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
-  const goods = refSelectors.selectByName<IGood>('good').data;
+  const goodSales = refSelectors.selectByName<IGoodSales>('goodSales')?.data?.[0];
+  const goodsRef = refSelectors.selectByName<IGood>('good').data;
   const refGroup = refSelectors.selectByName<IGoodGroup>('goodGroup');
-  const groupsConcat = useMemo(() => refGroup.data.concat(UNKNOWN_GROUP), [refGroup.data]);
-  const groups = useMemo(
-    () =>
-      isUseRemains && useRemains
-        ? groupsConcat.filter((i) => (!i.parent?.id ? i.id === doc?.head.depart?.id : true))
-        : groupsConcat,
-    [doc?.head.depart?.id, groupsConcat, isUseRemains, useRemains],
-  );
+  const groups = useMemo(() => refGroup.data.concat(UNKNOWN_GROUP), [refGroup.data]);
+  // const groupsConcat = useMemo(() => refGroup.data.concat(UNKNOWN_GROUP), [refGroup.data]);
+  // const groups = useMemo(
+  //   () =>
+  //     isUseRemains && useRemains
+  //       ? groupsConcat.filter((i) => (!i.parent?.id ? i.id === doc?.head.depart?.id : true))
+  //       : groupsConcat,
+  //   [doc?.head.depart?.id, groupsConcat, isUseRemains, useRemains],
+  // );
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data?.[0];
 
+  // const [goodRemains] = useState<IRemGood[]>(() =>
+  //   doc?.head.depart?.id ? getRemGoodListByContact(goodsRef, remains?.[doc?.head.depart?.id], true) : [],
+  // );
+  const employee = refSelectors.selectByName<INamedEntity>('employee')?.data || [];
+
   const [goodRemains] = useState<IRemGood[]>(() =>
-    doc?.head.depart?.id ? getRemGoodListByContact(goods, remains[doc?.head.depart?.id], true) : [],
+    employee?.[0] ? getRemGoodListByContact(goodsRef, remains?.[employee?.[0].id], true) : [],
   );
+  const goods =
+    useRemains && isUseRemains ? goodsRef.filter((item) => goodRemains.find((i) => i.good.id === item.id)) : goodsRef;
 
   const contactId = doc?.head.contact.id;
   const outletId = doc?.head.outlet.id;
+
+  const priceRedByGoodId = useMemo(() => {
+    const salesByOutlet = outletId ? goodSales?.[outletId] || [] : [];
+    return salesByOutlet.reduce<Record<string, number>>((prev, item) => {
+      prev[item.goodId] = item.priceRed;
+      return prev;
+    }, {});
+  }, [goodSales, outletId]);
+
+  const getGoodWithPriceRed = useCallback(
+    (good: IGood) => {
+      const priceRed = priceRedByGoodId[good.id];
+      return typeof priceRed === 'number' ? ({ ...good, priceRed } as IGood) : good;
+    },
+    [priceRedByGoodId],
+  );
   const docs = useSelector((state) => state.documents.list) as IOrderDocument[];
   const prevOrderByOutlet = useMemo(
     () =>
@@ -379,11 +406,21 @@ const SelectGoodScreen = () => {
   );
 
   const handlePressGood = useCallback(
-    (isAdded: boolean, item: IGood) => {
+    (isAdded: boolean, item: IGood, goodQuantity?: IRemGood) => {
       if (isAdded) {
         setSelectedGood(item);
       } else {
-        const newLine = { mode: 0, docId, item: { id: generateId(), good: item, quantity: 0 } };
+        const newLine = {
+          mode: 0,
+          docId,
+          item: {
+            id: generateId(),
+            good: item,
+            quantity: 0,
+            remains: goodQuantity?.remains || 0,
+            agentRemains: goodQuantity?.agentRemains || 0,
+          },
+        };
         setOrderLine(newLine);
       }
     },
@@ -392,6 +429,7 @@ const SelectGoodScreen = () => {
 
   const renderGood = useCallback(
     ({ item }: { item: IGood }) => {
+      const goodItem = getGoodWithPriceRed(item);
       const lines = doc?.lines?.filter((i) => i.good.id === item.id);
       const isAdded = !!lines?.length;
       const prevLine = prevLines.filter((i) => i.good.id === item.id);
@@ -401,20 +439,27 @@ const SelectGoodScreen = () => {
         backgroundColor: isAdded ? globalColors.backgroundLight : 'transparent',
       };
 
-      const goodQuantity = isUseRemains && useRemains ? goodRemains.find((i) => i.good.id === item.id)?.remains : 0;
+      const goodQuantity = isUseRemains && useRemains ? goodRemains?.find((i) => i.good.id === item.id) : undefined;
       return (
         <View key={item.id}>
-          <TouchableOpacity onPress={() => handlePressGood(isAdded, item)}>
+          <TouchableOpacity onPress={() => handlePressGood(isAdded, goodItem, goodQuantity)}>
             <View style={[localStyles.goodItem, goodStyle]}>
               <View style={iconStyle}>
                 <MaterialCommunityIcons name={'file-document'} size={20} color={'#FFF'} />
               </View>
               <View style={styles.details}>
                 <MediumText style={styles.textBold}>{item.name || item.id}</MediumText>
+                {!!item.barcode && isUseRemains && <MediumText style={localStyles.barcode}>{item.barcode}</MediumText>}
                 {isUseRemains && useRemains && (
                   <View style={localStyles.remains}>
                     <IconButton icon={'store-check-outline'} size={18} iconColor={colors.text} />
-                    <MediumText>Остаток: {goodQuantity || 0}</MediumText>
+                    <MediumText>Остаток: {goodQuantity?.remains || 0}</MediumText>
+                  </View>
+                )}
+                {isUseRemains && useRemains && (
+                  <View style={localStyles.remains}>
+                    <IconButton icon={'store-check-outline'} size={18} iconColor={colors.text} />
+                    <MediumText>Остаток по агенту: {goodQuantity?.agentRemains || 0}</MediumText>
                   </View>
                 )}
                 {isAdded && (
@@ -453,6 +498,7 @@ const SelectGoodScreen = () => {
       doc?.lines,
       goodRemains,
       handlePressGood,
+      getGoodWithPriceRed,
       isUseRemains,
       prevLines,
       useRemains,
@@ -515,7 +561,9 @@ const SelectGoodScreen = () => {
 
   return (
     <AppScreen style={localStyles.container}>
-      {!!orderLine && <OrderLineEdit orderLine={orderLine} onDismiss={hadndleDismiss} />}
+      {!!orderLine && (
+        <OrderLineEdit orderLine={orderLine} onDismiss={hadndleDismiss} isUseRemains={useRemains && isUseRemains} />
+      )}
       {filterVisible && (
         <View>
           <View style={styles.flexDirectionRow}>
@@ -714,4 +762,5 @@ const localStyles = StyleSheet.create({
   },
   primeButton: { height: 40 },
   remains: { flexDirection: 'row', alignItems: 'center' },
+  barcode: { fontSize: 12, opacity: 0.8 },
 });

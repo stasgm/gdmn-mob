@@ -47,7 +47,7 @@ const GoodListScreen = () => {
   const contact = contacts?.find((i) => i.id === id);
 
   // const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
-  const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
+  const remains = refSelectors.selectByName<IRemains>('remains')?.data?.[0];
   const goods = refSelectors.selectByName<IGood>('good')?.data;
 
   const [goodRemains] = useState<IRemGood[]>(() =>

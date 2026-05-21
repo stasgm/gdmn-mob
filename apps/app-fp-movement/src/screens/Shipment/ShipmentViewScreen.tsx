@@ -120,7 +120,7 @@ const ShipmentViewScreen = () => {
     (sum, line) => {
       return {
         ...sum,
-        quantPack: sum.quantPack + (line.quantPack || 0),
+        quantPack: sum.quantPack + (line.flag === '0' ? 1 : line.quantPack || 0),
         weight: sum.weight + (line.weight || 0),
         quantity: sum.quantity + (line.quantity || 0),
       };

@@ -18,7 +18,7 @@ export type RefParamList = {
 
 export type OrderParamList = RefParamList & {
   OrderView: { id: string; routeId?: string; readonly?: boolean };
-  OrderEdit: { id: string; routeId?: string } | undefined;
+  OrderEdit: { id: string; routeId?: string } | { routeId: string } | undefined;
   SelectGood: { docId: string };
 };
 
@@ -41,6 +41,13 @@ export type GoodMatrixParamList = {
 };
 
 export type GoodMatrixStackParamList = { ContactList: undefined } & GoodMatrixParamList;
+
+export type GoodSalesParamList = {
+  GoodList: { id: string };
+  GoodLine: { item: IGood };
+};
+
+export type GoodSalesStackParamList = { ContactList: undefined } & GoodSalesParamList;
 
 export type DebetStackParamList = {
   DebetList: undefined;

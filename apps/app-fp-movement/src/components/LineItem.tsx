@@ -45,9 +45,11 @@ const LineItem = ({
               : isLab
                 ? ''
                 : item.flag
-                  ? item.flag === '1' || item.flag === '0'
-                    ? `, ${(item.quantPack || 0).toString()} уп.`
-                    : ''
+                  ? item.flag === '0'
+                    ? ', 1 кор.'
+                    : item.flag === '1'
+                      ? `, ${(item.quantPack || 0).toString()} уп.`
+                      : ''
                   : `, ${(item.quantPack || 0).toString()} кор.`}
           </MediumText>
         </View>

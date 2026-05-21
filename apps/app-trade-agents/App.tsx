@@ -45,6 +45,7 @@ import {
   ShipmentNavigator,
   RemainsNavigator,
   ReportsNavigator,
+  GoodSalesNavigator,
 } from './src/navigation';
 
 import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
@@ -89,6 +90,12 @@ const Root = () => {
               title: 'Задолженности',
               icon: 'currency-usd',
               component: DebetsNavigator,
+            },
+            {
+              name: 'GoodSalesNav',
+              title: 'Скидки',
+              icon: 'tag-text-outline',
+              component: GoodSalesNavigator,
             },
             {
               name: 'GoodMatrixNav',

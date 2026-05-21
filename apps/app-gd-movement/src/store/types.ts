@@ -61,9 +61,25 @@ export interface IWaybillFormParam extends IFormParam {
   comment?: string;
 }
 
+export interface ICellsMovementFormParam extends IFormParam {
+  number?: string;
+  documentDate?: string;
+  documentType?: IDocumentType;
+  status?: StatusType;
+  fromDepartment?: IAddressStoreDepartment;
+  toDepartment?: IAddressStoreDepartment;
+  comment?: string;
+  documentSubtype?: INamedEntity;
+}
+
 //Подразделения-склады
 export type Department = INamedEntity;
 export type DepartmentType = INamedEntity;
+
+// Подразделение с признаком адресного склада
+export interface IAddressStoreDepartment extends INamedEntity {
+  isAddressStore?: boolean;
+}
 
 export interface IContact extends INamedEntity, IReferenceData {
   contractNumber: string; // Номер договора
@@ -71,6 +87,32 @@ export interface IContact extends INamedEntity, IReferenceData {
   paycond: string; // Условие оплаты
   phoneNumber: string; // Номер телефона
   taxId?: string; //УНП
+}
+
+export interface ICellName {
+  chamber: string;
+  row: string;
+  cell: string;
+}
+
+export interface ICell extends ICellName {
+  tier: string;
+}
+
+/** Single good in a cell (derived from ICellRef[]) */
+export interface ICellGood {
+  barcode: string;
+  quantity: number;
+}
+
+export interface ICellRef {
+  name: string;
+  tier: string;
+  barcode?: string;
+  disabled?: boolean;
+  defaultGroup?: INamedEntity;
+  sortOrder?: number;
+  quantity?: number;
 }
 
 export interface IMovementHead extends IHead {
@@ -199,6 +241,45 @@ export interface IDataMarkLine extends IEntity {
 }
 
 export type IDataMarkDocument = MandateProps<IDocument<IDataMarkHead, IDataMarkLine>, 'head' | 'lines'>;
+
+export interface ICellMovementHead extends IHead {
+  fromDepartment?: IAddressStoreDepartment;
+  toDepartment?: IAddressStoreDepartment; //Подразделение
+  comment?: string;
+}
+
+export interface ICellMovementLine extends IEntity {
+  good: INamedEntity;
+  quantity: number;
+  price?: number;
+  dateReceive?: string; // дата получения
+  // buyingPrice?: number; // покупная цена
+  remains?: number;
+  barcode?: string;
+  fromCell?: string; // номер ячейки
+  toCell?: string; // номер ячейки
+  // weightCode?: string;
+  // alias?: string;
+  sortOrder?: number; // порядок сортировки
+  // sumWNds?: number; // сумма с ндс
+}
+
+export type ICellMovementDocument = MandateProps<IDocument<ICellMovementHead, ICellMovementLine>, 'head' | 'lines'>;
+
+export interface IReceiptHead extends IHead {
+  contact?: INamedEntity; // shcode? нужно ли
+  department?: Department; //Подразделение
+  comment?: string;
+}
+
+export interface IReceiptLine extends IEntity {
+  good: INamedEntity;
+  quantity: number;
+  price?: number;
+  dateReceive?: string; // дата получения
+}
+
+export type IReceiptDocument = MandateProps<IDocument<IReceiptHead, IReceiptLine>, 'head' | 'lines'>;
 
 export type AppThunk<ReturnType = void, S = void, A extends AnyAction = AnyAction> = ThunkAction<
   ReturnType,

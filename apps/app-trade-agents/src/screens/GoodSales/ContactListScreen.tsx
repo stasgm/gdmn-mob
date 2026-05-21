@@ -1,5 +1,6 @@
-import { getDateString, keyExtractor, useSendOneRefRequest } from '@lib/mobile-hooks';
+import { getDateString, keyExtractor } from '@lib/mobile-hooks';
 import {
+  AppActivityIndicator,
   AppScreen,
   EmptyList,
   globalStyles as styles,
@@ -7,19 +8,17 @@ import {
   navBackDrawer,
   SearchButton,
   SubTitle,
-  useActionSheet,
-  MenuButton,
 } from '@lib/mobile-ui';
 import { refSelectors, useSelector } from '@lib/store';
-import { IDepartment, IReference } from '@lib/types';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { IReference } from '@lib/types';
+import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { SectionList, SectionListData, View } from 'react-native';
+import { SectionList, SectionListData, View, Alert } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 
-import { RemainsStackParamList } from '../../navigation/Root/types';
-import { IEmployee, IRemains } from '../../store/app/types';
+import { GoodSalesStackParamList } from '../../navigation/Root/types';
+import { IGoodSales, IOutlet } from '../../store/types';
 
 import ContactItem from './components/ContactItem';
 
@@ -29,29 +28,36 @@ export interface ContactListSectionProps {
   title: string;
 }
 
-export type SectionDataProps = SectionListData<IDepartment | IEmployee, ContactListSectionProps>[];
+export type SectionDataProps = SectionListData<IOutlet, ContactListSectionProps>[];
 
 const ContactListScreen = () => {
-  const navigation = useNavigation<StackNavigationProp<RemainsStackParamList, 'ContactList'>>();
+  const navigation = useNavigation<StackNavigationProp<GoodSalesStackParamList, 'ContactList'>>();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
   const { colors } = useTheme();
-  const showActionSheet = useActionSheet();
 
-  const remains = refSelectors.selectByName<IRemains>('remains')?.data?.[0];
-  const department = refSelectors.selectByName<IDepartment>('depart')?.data || [];
-  const employee = refSelectors.selectByName<IEmployee>('employee')?.data || [];
-  const contacts = department?.concat(employee)?.filter((i) => remains?.[i.id]);
+  const goodSales = refSelectors.selectByName<IGoodSales>('goodSales')?.data || [];
+
+  const sales = goodSales[0];
+
+  const outlets = refSelectors.selectByName<IOutlet>('outlet')?.data?.filter((i) => sales?.[i.id]);
 
   const syncDate = useSelector((state) => state.app.syncDate);
+  const isDemo = useSelector((state) => state.auth.isDemo);
+
+  useEffect(() => {
+    if (sales && outlets && syncDate && getDateString(syncDate) !== getDateString(new Date()) && !isDemo) {
+      return Alert.alert('Внимание!', 'В справочнике устаревшие данные, требуется синхронизация', [{ text: 'OK' }]);
+    }
+  }, [outlets, sales, syncDate, isDemo]);
 
   const filteredList = useMemo(() => {
     return (
-      contacts
+      outlets
         ?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true))
         ?.sort((a, b) => (a.name < b.name ? -1 : 1)) || []
     );
-  }, [contacts, searchQuery]);
+  }, [outlets, searchQuery]);
 
   const sections = useMemo(
     () =>
@@ -81,34 +87,9 @@ const ContactListScreen = () => {
     }
   }, [filterVisible, searchQuery]);
 
-  const sendRequest = useSendOneRefRequest('Остатки', { name: 'remains' });
-
-  const handleSendRequest = useCallback(async () => {
-    await sendRequest();
-  }, [sendRequest]);
-
-  const actionsMenu = useCallback(() => {
-    showActionSheet([
-      {
-        title: 'Запросить справочник остатков',
-        onPress: handleSendRequest,
-      },
-
-      {
-        title: 'Отмена',
-        type: 'cancel',
-      },
-    ]);
-  }, [handleSendRequest, showActionSheet]);
   const renderRight = useCallback(
-    () => (
-      <View style={styles.buttons}>
-        <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={filterVisible} />
-
-        <MenuButton actionsMenu={actionsMenu} />
-      </View>
-    ),
-    [actionsMenu, filterVisible],
+    () => <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={filterVisible} />,
+    [filterVisible],
   );
 
   useLayoutEffect(() => {
@@ -118,12 +99,16 @@ const ContactListScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  const renderItem = ({ item }: { item: IDepartment | IEmployee }) => <ContactItem item={item} />;
+  const renderItem = ({ item }: { item: IOutlet }) => <ContactItem outlet={item} />;
 
-  const renderSectionHeader = useCallback(
-    ({ section }: any) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
-    [],
+  const renderSectionHeader = ({ section }: any) => (
+    <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   return (
     <AppScreen>
@@ -148,8 +133,8 @@ const ContactListScreen = () => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
         renderSectionHeader={renderSectionHeader}
-        scrollEventThrottle={400}
-        ListEmptyComponent={!contacts || !remains ? EmptyList : null}
+        ListEmptyComponent={!outlets || !sales ? EmptyList : null}
+        keyboardShouldPersistTaps={'handled'}
       />
     </AppScreen>
   );

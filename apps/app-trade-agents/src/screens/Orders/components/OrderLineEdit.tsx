@@ -23,9 +23,10 @@ export interface IOrderItemLine {
 interface IProps {
   orderLine: IOrderItemLine;
   onDismiss: () => void;
+  isUseRemains?: boolean;
 }
 
-const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
+const OrderLineEdit = ({ orderLine, onDismiss, isUseRemains = false }: IProps) => {
   const dispatch = useDispatch();
   const { mode, item, docId } = orderLine;
 
@@ -39,6 +40,34 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
 
   const handleSaveLine = useCallback(() => {
     setScreenState('saving');
+    const saveLine = () => {
+      if (line.quantity) {
+        dispatch(
+          mode === 0
+            ? documentActions.addDocumentLine({ docId, line })
+            : documentActions.updateDocumentLine({ docId, line }),
+        );
+        setScreenState('idle');
+        onDismiss();
+      } else {
+        Alert.alert('Внимание!', 'В позиции не указан вес товара.\nВсе равно продолжить сохранение?', [
+          {
+            text: 'Да',
+            onPress: () => {
+              dispatch(
+                mode === 0
+                  ? documentActions.addDocumentLine({ docId, line })
+                  : documentActions.updateDocumentLine({ docId, line }),
+              );
+              setScreenState('idle');
+              onDismiss();
+            },
+          },
+          { text: 'Отмена', onPress: () => setScreenState('idle') },
+        ]);
+      }
+    };
+
     if (!line.package && packages?.length > 0) {
       Alert.alert('Ошибка!', 'Не указана упаковка', [{ text: 'Ок' }]);
       setScreenState('idle');
@@ -49,32 +78,15 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
       setScreenState('idle');
       return;
     }
-    if (line.quantity) {
-      dispatch(
-        mode === 0
-          ? documentActions.addDocumentLine({ docId, line })
-          : documentActions.updateDocumentLine({ docId, line }),
-      );
-      setScreenState('idle');
-      onDismiss();
-    } else {
-      Alert.alert('Внимание!', 'В позиции не указан вес товара.\nВсе равно продолжить сохранение?', [
-        {
-          text: 'Да',
-          onPress: () => {
-            dispatch(
-              mode === 0
-                ? documentActions.addDocumentLine({ docId, line })
-                : documentActions.updateDocumentLine({ docId, line }),
-            );
-            setScreenState('idle');
-            onDismiss();
-          },
-        },
+    if (isUseRemains && line.remains && (line.remains <= 0 || line.remains - line.quantity < 0)) {
+      Alert.alert('Ошибка!', 'Остаток меньше 0! \nВсе равно продолжить сохранение?', [
+        { text: 'Ок', onPress: saveLine },
         { text: 'Отмена', onPress: () => setScreenState('idle') },
       ]);
+      return;
     }
-  }, [dispatch, docId, line, mode, onDismiss, packages?.length]);
+    saveLine();
+  }, [dispatch, docId, isUseRemains, line, mode, onDismiss, packages?.length]);
 
   return (
     <Modal animationType="fade" visible={true}>
@@ -88,7 +100,7 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
             </View>
           </View>
           <View style={[{ backgroundColor: colors.background }, localStyles.orderLineItem]}>
-            <OrderLine item={line} packages={packages} onSetLine={setLine} />
+            <OrderLine item={line} packages={packages} onSetLine={setLine} isUseRemains={isUseRemains} />
           </View>
         </View>
       </SafeAreaView>
