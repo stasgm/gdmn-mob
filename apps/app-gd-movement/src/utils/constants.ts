@@ -207,6 +207,16 @@ export const appSettings: Settings = {
     visible: true,
     group: mainSettingGroup,
   },
+  showRemainsQuantity: {
+    id: 'showRemainsQuantity',
+    sortOrder: 11,
+    description: 'Показывать остатки в документах',
+    data: true,
+    type: 'boolean',
+    visible: true,
+    group: mainSettingGroup,
+    checkSettingsCode: true,
+  },
 };
 
 export const unknownGood: IGood = {
