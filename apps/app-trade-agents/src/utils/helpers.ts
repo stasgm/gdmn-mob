@@ -12,6 +12,7 @@ import {
   IOrderTotalLine,
   IRemGood,
   IRemainsData,
+  ISalesData,
   IMGoodData,
   IModelRem,
 } from '../store/types';
@@ -51,7 +52,9 @@ const getGoodMatrixByContact = (
       const good = goods?.find((g) => g.id === matrix.goodId);
       if (
         ((groupId && good?.goodgroup.id === groupId) || !groupId) &&
-        (!filterTextUpper || good?.name.toUpperCase().includes(filterTextUpper))
+        (!filterTextUpper ||
+          good?.name?.toUpperCase().includes(filterTextUpper) ||
+          good?.barcode?.toUpperCase().includes(filterTextUpper))
       ) {
         const newGood: IGood = {
           ...good,
@@ -68,7 +71,9 @@ const getGoodMatrixByContact = (
     for (const good of goods) {
       if (
         ((groupId && good?.goodgroup.id === groupId) || !groupId) &&
-        (!filterTextUpper || good?.name.toUpperCase().includes(filterTextUpper))
+        (!filterTextUpper ||
+          good?.name?.toUpperCase().includes(filterTextUpper) ||
+          good?.barcode?.toUpperCase().includes(filterTextUpper))
       ) {
         matrixGoods?.push(good);
       }
@@ -76,6 +81,50 @@ const getGoodMatrixByContact = (
   }
   log('getGoodMatrixByContact', 'Окончание построения модели матрицы товаров');
   return matrixGoods;
+};
+
+const getGoodSalesByOutlet = (
+  goods: IGood[],
+  goodSales: ISalesData[],
+  isSales: boolean,
+  groupId?: string,
+  filterText?: string,
+): IGood[] => {
+  log('getGoodSalesByOutlet', 'Начало построения модели товаров по продажам');
+  const filterTextUpper = filterText?.toUpperCase();
+  const salesGoods: IGood[] = [];
+
+  if (isSales && goodSales) {
+    for (const sales of goodSales) {
+      const good = goods?.find((g) => g.id === sales.goodId);
+      if (
+        ((groupId && good?.goodgroup.id === groupId) || !groupId) &&
+        (!filterTextUpper ||
+          good?.name?.toUpperCase().includes(filterTextUpper) ||
+          good?.barcode?.toUpperCase().includes(filterTextUpper))
+      ) {
+        salesGoods.push({
+          ...good,
+          // Сохраняем базовую цену товара и добавляем акционную цену отдельным полем.
+          priceRed: sales.priceRed,
+        } as IGood);
+      }
+    }
+  } else {
+    for (const good of goods) {
+      if (
+        ((groupId && good?.goodgroup.id === groupId) || !groupId) &&
+        (!filterTextUpper ||
+          good?.name?.toUpperCase().includes(filterTextUpper) ||
+          good?.barcode?.toUpperCase().includes(filterTextUpper))
+      ) {
+        salesGoods.push(good);
+      }
+    }
+  }
+
+  log('getGoodSalesByOutlet', 'Окончание построения модели товаров по продажам');
+  return salesGoods;
 };
 /**Формирует модель товаров в разрезе родительских групп*/
 const getGroupModelByContact = (
@@ -259,6 +308,7 @@ const getRemGoodListByContact = (
                 priceFso: good.priceFso,
                 priceFsoSklad: good.priceFsoSklad,
                 remains: r.q,
+                agentRemains: r.qAgent,
               });
             }
           }
@@ -270,13 +320,22 @@ const getRemGoodListByContact = (
             priceFso: good.priceFso,
             priceFsoSklad: good.priceFsoSklad,
             remains: 0,
+            agentRemains: 0,
           });
         }
       }
     } else if (!isRemains) {
       //Если по контакту нет остатков и выбор не из остатков, добавляем объект товара c 0
       for (const good of goods) {
-        remGoods.push({ good, priceFsn: 0, priceFsnSklad: 0, priceFso: 0, priceFsoSklad: 0, remains: 0 });
+        remGoods.push({
+          good,
+          priceFsn: 0,
+          priceFsnSklad: 0,
+          priceFso: 0,
+          priceFsoSklad: 0,
+          remains: 0,
+          agentRemains: 0,
+        });
       }
     }
   }
@@ -290,14 +349,14 @@ const getRemainsByGoodId = (remains: IRemainsData[], noZeroRemains = false) => {
   return remains.reduce(
     (
       p: IMGoodData<IModelRem[]>,
-      { goodId, priceFsn = 0, priceFsnSklad = 0, priceFso = 0, priceFsoSklad = 0, q = 0 }: IRemainsData,
+      { goodId, priceFsn = 0, priceFsnSklad = 0, priceFso = 0, priceFsoSklad = 0, q = 0, qAgent = 0 }: IRemainsData,
     ) => {
       const x = p[goodId];
       if (!noZeroRemains || q !== 0) {
         if (!x) {
-          p[goodId] = [{ priceFsn, priceFsnSklad, priceFso, priceFsoSklad, q }];
+          p[goodId] = [{ priceFsn, priceFsnSklad, priceFso, priceFsoSklad, q, qAgent }];
         } else {
-          x.push({ priceFsn, priceFsnSklad, priceFso, priceFsoSklad, q });
+          x.push({ priceFsn, priceFsnSklad, priceFso, priceFsoSklad, q, qAgent });
         }
       }
       return p;
@@ -310,6 +369,7 @@ export {
   getTimeProcess,
   twoDigits,
   getGoodMatrixByContact,
+  getGoodSalesByOutlet,
   getGroupModelByContact,
   totalListByGroup,
   totalList,

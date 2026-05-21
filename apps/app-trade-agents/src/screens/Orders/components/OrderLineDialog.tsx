@@ -24,7 +24,7 @@ export const OrderLineDialog = React.memo(
         {selectedLine ? (
           <>
             <Dialog.Content>
-              <LargeText>Количество: {selectedLine?.quantity} кг</LargeText>
+              <LargeText>Количество: {selectedLine?.quantity}</LargeText>
               <LargeText>Упаковка: {selectedLine?.package ? selectedLine.package.name : 'без упаковки'}</LargeText>
               <ItemSeparator />
             </Dialog.Content>
