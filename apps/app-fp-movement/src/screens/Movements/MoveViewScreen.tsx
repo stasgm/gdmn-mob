@@ -88,7 +88,11 @@ export const MoveViewScreen = () => {
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
   const lineSum = lines?.reduce(
     (sum, line) => {
-      return { ...sum, quantPack: sum.quantPack + (line.quantPack || 0), weight: sum.weight + (line.weight || 0) };
+      return {
+        ...sum,
+        quantPack: sum.quantPack + (line.flag === '0' ? 1 : line.quantPack || 0),
+        weight: sum.weight + (line.weight || 0),
+      };
     },
     { quantPack: 0, weight: 0 },
   );
@@ -135,10 +139,10 @@ export const MoveViewScreen = () => {
     (doc?.head.fromDepart.id === defaultDepart?.id || Boolean(documentType?.isRemains)) &&
     Boolean(settings.remainsUse?.data);
 
-  const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
+  const remains = refSelectors.selectByName<IRemains>('remains')?.data?.[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return doc?.head?.fromDepart?.id && isFocused && remains && remains
+    return doc?.head?.fromDepart?.id && isFocused && remains
       ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id] /*, docList, doc.head?.fromDepart?.id*/)
       : [];
   }, [doc?.head?.fromDepart?.id, goods, isFocused, remains]);

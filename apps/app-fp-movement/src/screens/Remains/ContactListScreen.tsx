@@ -38,7 +38,7 @@ const ContactListScreen = () => {
   const { colors } = useTheme();
   const showActionSheet = useActionSheet();
 
-  const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
+  const remains = refSelectors.selectByName<IRemains>('remains')?.data?.[0];
   const department = refSelectors.selectByName<IDepartment>('depart')?.data || [];
   const employee = refSelectors.selectByName<IEmployee>('employee')?.data || [];
   const contacts = department?.concat(employee)?.filter((i) => remains?.[i.id]);

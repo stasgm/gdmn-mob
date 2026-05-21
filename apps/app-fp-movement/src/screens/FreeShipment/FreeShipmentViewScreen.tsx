@@ -95,7 +95,7 @@ export const FreeShipmentViewScreen = () => {
     (sum, line) => {
       return {
         ...sum,
-        quantPack: sum.quantPack + (line.quantPack || 0),
+        quantPack: sum.quantPack + (line.flag === '0' ? 1 : line.quantPack || 0),
         weight: sum.weight + (line.weight || 0),
       };
     },
@@ -129,7 +129,7 @@ export const FreeShipmentViewScreen = () => {
 
   const remainsUse = Boolean(settings.remainsUse?.data);
 
-  const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
+  const remains = refSelectors.selectByName<IRemains>('remains')?.data?.[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
     return doc?.head?.fromDepart?.id && isFocused && remains
