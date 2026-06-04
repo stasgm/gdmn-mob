@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Alert, View, StyleSheet, ScrollView, Platform, Keyboard } from 'react-native';
-import { RouteProp, useNavigation, useRoute, StackActions, useTheme, useIsFocused } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, StackActions, useTheme } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Divider } from 'react-native-paper';
@@ -13,7 +13,6 @@ import {
   SaveButton,
   SubTitle,
   RadioGroup,
-  AppActivityIndicator,
   navBackButton,
 } from '@lib/mobile-ui';
 import { IDocumentType, INamedEntity, IReference, ScreenState } from '@lib/types';
@@ -24,6 +23,49 @@ import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOutlet, IOrderFormParam } from '../../store/types';
 import { getNextDocNumber } from '../../utils/helpers';
 import { STATUS_LIST } from '../../utils/constants';
+
+const buildNewOrderFormParams = (
+  orders: IOrderDocument[] | undefined,
+  routeId: string | undefined,
+  currentFormParams: IOrderFormParam,
+  defaultDepart: INamedEntity | undefined,
+): IOrderFormParam => {
+  const newNumber = getNextDocNumber(orders);
+  const tomorrow = new Date();
+  const newDocDate = tomorrow.toISOString();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const newOnDate = tomorrow.toISOString();
+
+  if (routeId) {
+    return {
+      contact: currentFormParams.contact,
+      outlet: currentFormParams.outlet,
+      number: currentFormParams.number || newNumber,
+      onDate: newOnDate,
+      documentDate: currentFormParams.documentDate || newDocDate,
+      status: currentFormParams.status || 'DRAFT',
+      depart: currentFormParams.depart ?? defaultDepart,
+      comment: currentFormParams.comment,
+      road: currentFormParams.road,
+      expeditor: currentFormParams.expeditor,
+      route: currentFormParams.route,
+    };
+  }
+
+  return {
+    contact: undefined,
+    outlet: undefined,
+    number: currentFormParams.number || newNumber,
+    onDate: newOnDate,
+    documentDate: currentFormParams.documentDate || newDocDate,
+    status: currentFormParams.status || 'DRAFT',
+    depart: undefined,
+    comment: undefined,
+    road: undefined,
+    expeditor: undefined,
+    route: undefined,
+  };
+};
 
 const OrderEditScreen = () => {
   const routeParams = useRoute<RouteProp<OrdersStackParamList, 'OrderEdit'>>().params;
@@ -38,9 +80,83 @@ const OrderEditScreen = () => {
   const orderType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'order');
+  const outlets = refSelectors.selectByName<IOutlet>('outlet')?.data;
+  const road = refSelectors.selectByName<INamedEntity>('road')?.data;
+  const expeditor = refSelectors.selectByName<INamedEntity>('expeditors')?.data;
 
-  const params = useSelector((state) => state.app.formParams as IOrderFormParam);
-  console.log('params', params);
+  const reduxFormParams = useSelector((state) => state.app.formParams as IOrderFormParam);
+  const formContact = reduxFormParams.contact;
+  const formOutletItem = reduxFormParams.outlet;
+  const formKey = `${id ?? 'new'}-${routeId ?? ''}`;
+  const syncedFormKeyRef = useRef<string | null>(null);
+
+  // Подразделение по умолчанию
+  const departSetting = useSelector((state) => state.settings?.userData?.depart?.data);
+  const isUseRemains = useSelector((state) => state.settings?.data?.isUseRemains?.data) as boolean;
+
+  const defaultDepart = useMemo(() => (isNamedEntity(departSetting) ? departSetting : undefined), [departSetting]);
+
+  const initialFormParams = useMemo((): IOrderFormParam => {
+    if (order) {
+      return {
+        number: order.number,
+        contact: order.head.contact,
+        outlet: order.head.outlet,
+        onDate: order.head.onDate,
+        documentDate: order.documentDate,
+        status: order.status,
+        depart: order.head.depart,
+        comment: order.head.comment,
+        road: order.head.road,
+        expeditor: order.head.expeditor,
+        route: order.head.route,
+      };
+    }
+
+    return buildNewOrderFormParams(orders, routeId, reduxFormParams, defaultDepart);
+  }, [order, orders, routeId, reduxFormParams, defaultDepart]);
+
+  useLayoutEffect(() => {
+    if (id && !order) {
+      return;
+    }
+
+    if (syncedFormKeyRef.current === formKey) {
+      return;
+    }
+
+    let params = initialFormParams;
+    const outletData = outlets?.find((e) => e.id === params.outlet?.id);
+
+    if (!params.contact && params.outlet) {
+      params = { ...params, contact: outletData?.company };
+    } else if (params.contact && params.outlet && params.contact.id !== outletData?.company?.id) {
+      params = { ...params, outlet: undefined };
+    }
+
+    dispatch(appActions.setFormParams(params));
+    syncedFormKeyRef.current = formKey;
+  }, [dispatch, formKey, id, initialFormParams, order, outlets]);
+
+  useEffect(() => {
+    if (syncedFormKeyRef.current !== formKey) {
+      return;
+    }
+
+    const outletData = outlets?.find((e) => e.id === formOutletItem?.id);
+    const outletCompany = outletData?.company ?? (formOutletItem as IOutlet | undefined)?.company;
+
+    if (!formContact && formOutletItem && outletCompany) {
+      dispatch(appActions.setFormParams({ contact: outletCompany }));
+      return;
+    }
+
+    if (formContact && formOutletItem && outletCompany && formContact.id !== outletCompany.id) {
+      dispatch(appActions.setFormParams({ outlet: undefined }));
+    }
+  }, [dispatch, formKey, formContact, formOutletItem, outlets]);
+
+  const isFormSynced = syncedFormKeyRef.current === formKey;
   const {
     contact: docContact,
     outlet: docOutlet,
@@ -53,101 +169,8 @@ const OrderEditScreen = () => {
     road: docRoad,
     expeditor: docExpeditor,
     route: docRoute,
-  } = useSelector((state) => state.app.formParams as IOrderFormParam);
+  } = isFormSynced ? reduxFormParams : initialFormParams;
 
-  // Подразделение по умолчанию
-  const departSetting = useSelector((state) => state.settings?.userData?.depart?.data);
-  const isUseRemains = useSelector((state) => state.settings?.data?.isUseRemains?.data) as boolean;
-
-  const defaultDepart = useMemo(() => (isNamedEntity(departSetting) ? departSetting : undefined), [departSetting]);
-  const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === docOutlet?.id);
-  const road = refSelectors.selectByName<INamedEntity>('road')?.data;
-  const expeditor = refSelectors.selectByName<INamedEntity>('expeditors')?.data;
-
-  useEffect(() => {
-    if (!docContact && !!docOutlet) {
-      dispatch(
-        appActions.setFormParams({
-          contact: outlet?.company,
-        }),
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, docOutlet, outlet?.company]);
-
-  useEffect(() => {
-    if (!!docContact && !!docOutlet && docContact.id !== outlet?.company.id) {
-      dispatch(
-        appActions.setFormParams({
-          outlet: undefined,
-        }),
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, docContact?.id, outlet?.company.id]);
-
-  useEffect(() => {
-    // Инициализируем параметры
-    if (order) {
-      dispatch(
-        appActions.setFormParams({
-          number: order.number,
-          contact: order.head.contact,
-          outlet: order.head.outlet,
-          onDate: order.head.onDate,
-          documentDate: order.documentDate,
-          status: order.status,
-          depart: order.head.depart,
-          comment: order.head.comment,
-          road: order.head.road,
-          expeditor: order.head.expeditor,
-          route: order.head.route,
-        }),
-      );
-    } else {
-      const newNumber = getNextDocNumber(orders);
-
-      const tomorrow = new Date();
-      const newDocDate = tomorrow.toISOString();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      const newOnDate = tomorrow.toISOString();
-
-      // Если открываем из VisitScreen (есть routeId), используем предзаполненные значения
-      // Если открываем из OrderListScreen (нет routeId), очищаем все поля кроме number, dates и status
-      const formParams = routeId
-        ? {
-            contact: docContact,
-            outlet: docOutlet,
-            number: docNumber || newNumber,
-            onDate: newOnDate,
-            documentDate: docDocumentDate || newDocDate,
-            status: docStatus || 'DRAFT',
-            depart: docDepart ?? defaultDepart,
-            comment: docComment,
-            road: docRoad,
-            expeditor: docExpeditor,
-            route: docRoute,
-          }
-        : {
-            contact: undefined,
-            outlet: undefined,
-            number: docNumber || newNumber,
-            onDate: newOnDate,
-            documentDate: docDocumentDate || newDocDate,
-            status: docStatus || 'DRAFT',
-            depart: undefined,
-            comment: undefined,
-            road: undefined,
-            expeditor: undefined,
-            route: undefined,
-          };
-
-      dispatch(appActions.setFormParams(formParams));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, order, defaultDepart, road, routeId]);
-
-  console.log('docOnDate', docOnDate);
   const [screenState, setScreenState] = useState<ScreenState>('idle');
 
   useEffect(() => {
@@ -389,10 +412,11 @@ const OrderEditScreen = () => {
     [colors.card, colors.primary],
   );
 
-  const isFocused = useIsFocused();
-  if (!isFocused) {
-    return <AppActivityIndicator />;
-  }
+  // При unfocus экран размонтировался в спиннер — это вызывало мигание всей формы.
+  // const isFocused = useIsFocused();
+  // if (!isFocused) {
+  //   return <AppActivityIndicator />;
+  // }
 
   return (
     <AppInputScreen>

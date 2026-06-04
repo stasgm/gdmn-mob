@@ -26,6 +26,15 @@ interface IProps {
   isUseRemains?: boolean;
 }
 
+const getLineForSave = (line: IOrderLine): IOrderLine => {
+  const { priceRed, ...good } = line.good;
+
+  return {
+    ...line,
+    good: typeof priceRed === 'number' ? { ...good, priceFsn: priceRed } : good,
+  };
+};
+
 const OrderLineEdit = ({ orderLine, onDismiss, isUseRemains = false }: IProps) => {
   const dispatch = useDispatch();
   const { mode, item, docId } = orderLine;
@@ -40,12 +49,14 @@ const OrderLineEdit = ({ orderLine, onDismiss, isUseRemains = false }: IProps) =
 
   const handleSaveLine = useCallback(() => {
     setScreenState('saving');
+    const lineForSave = getLineForSave(line);
+
     const saveLine = () => {
       if (line.quantity) {
         dispatch(
           mode === 0
-            ? documentActions.addDocumentLine({ docId, line })
-            : documentActions.updateDocumentLine({ docId, line }),
+            ? documentActions.addDocumentLine({ docId, line: lineForSave })
+            : documentActions.updateDocumentLine({ docId, line: lineForSave }),
         );
         setScreenState('idle');
         onDismiss();
@@ -56,8 +67,8 @@ const OrderLineEdit = ({ orderLine, onDismiss, isUseRemains = false }: IProps) =
             onPress: () => {
               dispatch(
                 mode === 0
-                  ? documentActions.addDocumentLine({ docId, line })
-                  : documentActions.updateDocumentLine({ docId, line }),
+                  ? documentActions.addDocumentLine({ docId, line: lineForSave })
+                  : documentActions.updateDocumentLine({ docId, line: lineForSave }),
               );
               setScreenState('idle');
               onDismiss();
@@ -78,13 +89,12 @@ const OrderLineEdit = ({ orderLine, onDismiss, isUseRemains = false }: IProps) =
       setScreenState('idle');
       return;
     }
-    if (isUseRemains && line.remains && (line.remains <= 0 || line.remains - line.quantity < 0)) {
-      Alert.alert('Ошибка!', 'Остаток меньше 0! \nВсе равно продолжить сохранение?', [
-        { text: 'Ок', onPress: saveLine },
-        { text: 'Отмена', onPress: () => setScreenState('idle') },
-      ]);
+    if (isUseRemains && typeof line.remains !== 'number') {
+      Alert.alert('Ошибка!', 'Товар отсутствует в остатках.', [{ text: 'Ок' }]);
+      setScreenState('idle');
       return;
     }
+
     saveLine();
   }, [dispatch, docId, isUseRemains, line, mode, onDismiss, packages?.length]);
 

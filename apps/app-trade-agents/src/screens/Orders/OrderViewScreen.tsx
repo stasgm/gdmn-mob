@@ -109,6 +109,7 @@ const OrderViewScreen = () => {
 
   const settings = useSelector((state) => state.settings.data);
   const isUseRemains = settings?.isUseRemains?.data as boolean;
+  const isUseUnitMeasure = (settings?.isUseUnitMeasure?.data ?? true) as boolean;
   const depart = refSelectors.selectByRefId<INamedEntity>('department', order?.head?.depart?.id)?.name;
 
   const handleAddOrderLine = useCallback(() => {
@@ -624,7 +625,12 @@ const OrderViewScreen = () => {
         />
       </View>
       {!!order.lines.length && (
-        <OrderTotal onPress={() => setIsGroupVisible(!isGroupVisible)} isGroupVisible={isGroupVisible} order={order} />
+        <OrderTotal
+          onPress={() => setIsGroupVisible(!isGroupVisible)}
+          isGroupVisible={isGroupVisible}
+          isUseUnitMeasure={isUseUnitMeasure}
+          order={order}
+        />
       )}
       <SimpleDialog
         visible={visibleSendDialog}

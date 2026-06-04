@@ -60,6 +60,15 @@ export const appSettings: Settings = {
     visible: true,
     group: mainSettingGroup,
   },
+  isUseUnitMeasure: {
+    id: 'isUseUnitMeasure',
+    description: 'Учитывать ед. изм.',
+    data: true,
+    type: 'boolean',
+    sortOrder: 5,
+    visible: true,
+    group: mainSettingGroup,
+  },
 };
 
 export const viewTypeList: IListItem[] = [
