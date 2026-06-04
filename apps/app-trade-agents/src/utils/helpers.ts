@@ -209,6 +209,7 @@ const totalListByGroup = (
   firstLevelGroups: IGoodGroup[],
   groups: IGoodGroup[],
   orderLines: IOrderLine[],
+  isUseUnitMeasure = true,
 ): IOrderTotalLine[] =>
   firstLevelGroups
     ?.map((firstGr) => {
@@ -221,9 +222,12 @@ const totalListByGroup = (
 
       const { quantity, sum, sumVat } = linesByParentGroup.reduce(
         (prev: any, line) => {
-          const s1 = round((round(line.quantity, 3) / (line.good.invWeight || 1)) * line.good.priceFsn);
+          const lineQuantity = round(line.quantity, 3);
+          const unitQuantity = isUseUnitMeasure ? lineQuantity / (line.good.invWeight || 1) : lineQuantity;
+          const s1 = round(unitQuantity * line.good.priceFsn);
+
           return {
-            quantity: prev.quantity + round(line.quantity, 3),
+            quantity: prev.quantity + lineQuantity,
             sum: prev.sum + s1,
             sumVat: prev.sumVat + s1 + round((s1 * Number(line.good.vat || 0)) / 100, 3),
           };

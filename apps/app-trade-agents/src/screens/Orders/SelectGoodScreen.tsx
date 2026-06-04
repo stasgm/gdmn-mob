@@ -133,10 +133,11 @@ const SelectGoodScreen = () => {
   const getGoodWithPriceRed = useCallback(
     (good: IGood) => {
       const priceRed = priceRedByGoodId[good.id];
-      return typeof priceRed === 'number' ? ({ ...good, priceRed } as IGood) : good;
+      return typeof priceRed === 'number' ? { ...good, priceRed } : good;
     },
     [priceRedByGoodId],
   );
+
   const docs = useSelector((state) => state.documents.list) as IOrderDocument[];
   const prevOrderByOutlet = useMemo(
     () =>
@@ -275,13 +276,35 @@ const SelectGoodScreen = () => {
 
   const handleAddLine = useCallback(() => {
     if (selectedLine) {
-      setOrderLine({ mode: 0, docId, item: { id: generateId(), good: selectedLine.good, quantity: 0 } });
+      setOrderLine({
+        mode: 0,
+        docId,
+        item: {
+          id: generateId(),
+          good: selectedLine.good,
+          quantity: 0,
+          remains: selectedLine.remains,
+          agentRemains: selectedLine.agentRemains,
+        },
+      });
       setSelectedLine(undefined);
     } else if (selectedGood) {
-      setOrderLine({ mode: 0, docId, item: { id: generateId(), good: selectedGood, quantity: 0 } });
+      const goodQuantity = isUseRemains ? goodRemains?.find((i) => i.good.id === selectedGood.id) : undefined;
+
+      setOrderLine({
+        mode: 0,
+        docId,
+        item: {
+          id: generateId(),
+          good: selectedGood,
+          quantity: 0,
+          remains: goodQuantity?.remains,
+          agentRemains: goodQuantity?.agentRemains,
+        },
+      });
       setSelectedGood(undefined);
     }
-  }, [selectedLine, selectedGood, docId]);
+  }, [selectedLine, selectedGood, docId, goodRemains, isUseRemains]);
 
   const handleEditLine = useCallback(() => {
     if (selectedLine) {
@@ -417,8 +440,8 @@ const SelectGoodScreen = () => {
             id: generateId(),
             good: item,
             quantity: 0,
-            remains: goodQuantity?.remains || 0,
-            agentRemains: goodQuantity?.agentRemains || 0,
+            remains: goodQuantity?.remains,
+            agentRemains: goodQuantity?.agentRemains,
           },
         };
         setOrderLine(newLine);
@@ -439,7 +462,7 @@ const SelectGoodScreen = () => {
         backgroundColor: isAdded ? globalColors.backgroundLight : 'transparent',
       };
 
-      const goodQuantity = isUseRemains && useRemains ? goodRemains?.find((i) => i.good.id === item.id) : undefined;
+      const goodQuantity = isUseRemains ? goodRemains?.find((i) => i.good.id === item.id) : undefined;
       return (
         <View key={item.id}>
           <TouchableOpacity onPress={() => handlePressGood(isAdded, goodItem, goodQuantity)}>
@@ -561,9 +584,7 @@ const SelectGoodScreen = () => {
 
   return (
     <AppScreen style={localStyles.container}>
-      {!!orderLine && (
-        <OrderLineEdit orderLine={orderLine} onDismiss={hadndleDismiss} isUseRemains={useRemains && isUseRemains} />
-      )}
+      {!!orderLine && <OrderLineEdit orderLine={orderLine} onDismiss={hadndleDismiss} isUseRemains={isUseRemains} />}
       {filterVisible && (
         <View>
           <View style={styles.flexDirectionRow}>

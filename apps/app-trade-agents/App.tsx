@@ -94,7 +94,7 @@ const Root = () => {
             {
               name: 'GoodSalesNav',
               title: 'Скидки',
-              icon: 'tag-text-outline',
+              icon: 'sale',
               component: GoodSalesNavigator,
             },
             {
