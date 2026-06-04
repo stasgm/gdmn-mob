@@ -96,7 +96,7 @@ export const FreeShipmentViewScreen = () => {
     (sum, line) => {
       return {
         ...sum,
-        quantPack: sum.quantPack + (line.quantPack || 0),
+        quantPack: sum.quantPack + (line.flag === '0' ? 1 : line.quantPack || 0),
         weight: sum.weight + (line.weight || 0),
       };
     },
@@ -124,11 +124,13 @@ export const FreeShipmentViewScreen = () => {
 
   const usePackage = Boolean(settings.usePackage?.data);
 
+  const addPalletQuantPack = Boolean(settings.addPalletQuantPack?.data);
+
   const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
   const remainsUse = Boolean(settings.remainsUse?.data);
 
-  const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
+  const remains = refSelectors.selectByName<IRemains>('remains')?.data?.[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
     return doc?.head?.fromDepart?.id && isFocused && remains
@@ -189,6 +191,7 @@ export const FreeShipmentViewScreen = () => {
         weight: line.weight,
         workDate: line.workDate,
         time: line.time,
+        flag: line.flag,
       };
 
       const weight =
@@ -635,6 +638,7 @@ export const FreeShipmentViewScreen = () => {
             isCattle: good?.isCattle,
             goodGroupId: good?.goodGroupId,
             isUnit: Boolean(good?.isUnit),
+            unitWeight: good.unitWeight,
           },
           id: generateId(),
           quantity: 0,
@@ -733,6 +737,7 @@ export const FreeShipmentViewScreen = () => {
         sortOrder: doc?.lines?.length + 1,
         quantPack: barc.quantPack,
         usedRemains: remainsUse,
+        flag: barc.flag,
       };
 
       const boxLine = box
@@ -766,6 +771,11 @@ export const FreeShipmentViewScreen = () => {
       }
 
       handleFocus();
+
+      if (addPalletQuantPack && newLine.weight >= goodBarcodeSettings?.boxWeight) {
+        setIsPack(false);
+        setVisibleQuantPackDialog(true);
+      }
     },
 
     [
@@ -782,6 +792,7 @@ export const FreeShipmentViewScreen = () => {
       dispatch,
       id,
       visibleDialog,
+      addPalletQuantPack,
       handleErrorMessage,
     ],
   );

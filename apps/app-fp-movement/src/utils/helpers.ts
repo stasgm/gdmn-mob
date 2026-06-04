@@ -55,6 +55,7 @@ export const getBarcode = (barcode: string, settings: barcodeSettings) => {
   const shcodeLast = timeLast + settings.countCode;
   const quantPackLast = shcodeLast + settings.countQuantPack;
   const numReceivedLast = quantPackLast + settings.countNumReceived;
+  const flagLast = numReceivedLast + settings.flag;
 
   const weight = barcode.slice(0, weightLast);
   const day = barcode.slice(weightLast, dayLast);
@@ -63,6 +64,7 @@ export const getBarcode = (barcode: string, settings: barcodeSettings) => {
   const shcode = barcode.slice(yearLast + 4, shcodeLast);
   const quantPack = barcode.slice(shcodeLast, quantPackLast);
   const numReceived = barcode.slice(quantPackLast, numReceivedLast);
+  const flag = barcode.slice(numReceivedLast, flagLast);
 
   const time = barcode.slice(yearLast, timeLast);
 
@@ -74,11 +76,11 @@ export const getBarcode = (barcode: string, settings: barcodeSettings) => {
     workDate,
     shcode: shcode,
     numReceived: numReceived,
-    quantPack: Number(weight) < settings.boxWeight * ONE_KG_IN_G ? 1 : Number(quantPack),
+    quantPack: flag ? Number(quantPack) : Number(weight) < settings.boxWeight * ONE_KG_IN_G ? 1 : Number(quantPack),
     time,
   };
 
-  return barcodeObj;
+  return flag.trim() ? { ...barcodeObj, flag } : barcodeObj;
 };
 
 export const getBarcodeString = (barcodeObj: IBarcode, settings: barcodeSettings) => {
@@ -95,7 +97,15 @@ export const getBarcodeString = (barcodeObj: IBarcode, settings: barcodeSettings
       : round(barcodeObj.weight * ONE_KG_IN_G, 3).toString();
 
   const barcode =
-    weight + day + month + year + (barcodeObj.time || '0000') + shcode + quantPack + barcodeObj.numReceived;
+    weight +
+    day +
+    month +
+    year +
+    (barcodeObj.time || '0000') +
+    shcode +
+    quantPack +
+    barcodeObj.numReceived +
+    (barcodeObj.flag ? barcodeObj.flag : '');
   return barcode;
 };
 
@@ -260,7 +270,14 @@ export const getLineGood = (
     const good = goods.find((item) => getCodeForCheck(item.shcode, countCode || 4) === shcode);
     return {
       good: good
-        ? { id: good.id, name: good.name, shcode: good.shcode, isCattle: good.isCattle, goodGroupId: good.goodGroupId }
+        ? {
+            id: good.id,
+            name: good.name,
+            shcode: good.shcode,
+            isCattle: good.isCattle,
+            goodGroupId: good.goodGroupId,
+            unitWeight: good.unitWeight,
+          }
         : undefined,
       isRightWeight: true,
     };
@@ -346,6 +363,7 @@ export const getDocToSend = (
           toCell: (i as IMoveLine).toCell,
           box: (i as IFreeShipmentLine).box,
           storeDate: (i as IMoveLine).storeDate,
+          flag: i.flag,
         }) as ISendingLine,
     ),
   };

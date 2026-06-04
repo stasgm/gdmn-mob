@@ -282,10 +282,6 @@ const OrderListScreen = () => {
     if (selectedDateBegin && _event.type !== 'dismissed') {
       dispatch(appActions.setFormParams({ filterDateBegin: selectedDateBegin.toISOString().slice(0, 10) }));
     }
-
-    if (_event.type === 'neutralButtonPressed') {
-      dispatch(appActions.setFormParams({ filterDateBegin: undefined }));
-    }
   };
   const handlePresentDateBegin = () => {
     Keyboard.dismiss();
@@ -299,10 +295,6 @@ const OrderListScreen = () => {
 
     if (selectedDateEnd && _event.type !== 'dismissed') {
       dispatch(appActions.setFormParams({ filterDateEnd: selectedDateEnd.toISOString().slice(0, 10) }));
-    }
-
-    if (_event.type === 'neutralButtonPressed') {
-      dispatch(appActions.setFormParams({ filterDateEnd: undefined }));
     }
   };
 
@@ -348,6 +340,7 @@ const OrderListScreen = () => {
 
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const debt = debets?.find((d) => d.id === orderList.find((o) => o.id === item.id)?.head?.contact.id);
+    const ex = orderList.find((o) => o.id === item.id);
 
     return (
       <ScreenListItem
@@ -366,6 +359,7 @@ const OrderListScreen = () => {
             {`Просрочено: ${formatValue({ type: 'currency', decimals: 2 }, debt?.saldoDebt ?? 0)}, ${debt.dayLeft} дн.`}
           </MediumText>
         )}
+        {ex?.head?.expeditor ? <MediumText>Экспедитор: {ex?.head?.expeditor?.name}</MediumText> : null}
       </ScreenListItem>
     );
   };
@@ -490,8 +484,6 @@ const OrderListScreen = () => {
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateBegin}
-          maximumDate={filterDateEnd ? new Date(filterDateEnd) : undefined}
-          neutralButtonLabel="Очистить"
         />
       )}
       {showDateEnd && (
@@ -501,8 +493,6 @@ const OrderListScreen = () => {
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateEnd}
-          minimumDate={filterDateBegin ? new Date(filterDateBegin) : undefined}
-          neutralButtonLabel="Очистить"
         />
       )}
     </AppScreen>

@@ -16,17 +16,18 @@ export interface IItem {
   order: IOrderDocument;
   onPress: () => void;
   isGroupVisible?: boolean;
+  isUseUnitMeasure?: boolean;
 }
 
-const OrderTotal = ({ order, isGroupVisible = false, onPress }: IItem) => {
+const OrderTotal = ({ order, isGroupVisible = false, isUseUnitMeasure = true, onPress }: IItem) => {
   const { colors } = useTheme();
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;
   const firstLevelGroups = groups?.filter((item) => !item.parent?.id);
 
   const totalListByOrder = useMemo(
-    () => totalListByGroup(firstLevelGroups, groups, order.lines),
-    [firstLevelGroups, groups, order.lines],
+    () => totalListByGroup(firstLevelGroups, groups, order.lines, isUseUnitMeasure),
+    [firstLevelGroups, groups, order.lines, isUseUnitMeasure],
   );
 
   const borderColors = {
@@ -65,7 +66,7 @@ const OrderTotal = ({ order, isGroupVisible = false, onPress }: IItem) => {
           <IconButton icon={isGroupVisible ? 'chevron-down' : 'chevron-up'} size={18} iconColor={colors.text} />
         </View>
         <DataTable.Header style={[localStyles.header, headerStyle]}>
-          {['Вес, кг', 'Сумма', 'Сумма с НДC'].map((i) => {
+          {['Вес', 'Сумма', 'Сумма с НДC'].map((i) => {
             return (
               <DataTable.Title key={i} textStyle={textBoldStyle} style={localStyles.title} numeric>
                 {i}

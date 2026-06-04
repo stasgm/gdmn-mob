@@ -108,6 +108,22 @@ const ShipmentEditScreen = () => {
         return;
       }
 
+      const docDateStr = docDocumentDate.slice(0, 10);
+      const todayStr = new Date().toISOString().slice(0, 10);
+      if (docDateStr < todayStr) {
+        alertWithSound('Ошибка!', 'Дата документа не может быть раньше текущей даты.');
+        setScreenState('idle');
+        return;
+      }
+      if (onDate) {
+        const onDateStr = onDate.slice(0, 10);
+        if (docDateStr < onDateStr) {
+          alertWithSound('Ошибка!', 'Дата документа не может быть раньше даты отгрузки.');
+          setScreenState('idle');
+          return;
+        }
+      }
+
       if (id) {
         if (!shipment) {
           setScreenState('idle');
@@ -142,6 +158,7 @@ const ShipmentEditScreen = () => {
     screenState,
     docFromDepart,
     isCurr,
+    onDate,
   ]);
 
   const renderRight = useCallback(

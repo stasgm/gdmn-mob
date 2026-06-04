@@ -16,9 +16,14 @@ interface IProps {
   packages: IPackageGood[];
   onSetLine: (value: IOrderLine) => void;
   onSave?: () => void;
+  isUseRemains?: boolean;
 }
 
-const OrderLine = ({ item, packages, onSetLine, onSave }: IProps) => {
+// const OrderLine = ({ item, packages, onSetLine, onSave }: IProps) => {
+//   isUseRemains?: boolean;
+// }
+
+const OrderLine = ({ item, packages, onSetLine, isUseRemains = false, onSave }: IProps) => {
   const { colors } = useTheme();
   const currRef = useRef<TextInput>(null);
 
@@ -65,6 +70,17 @@ const OrderLine = ({ item, packages, onSetLine, onSave }: IProps) => {
           </View>
         </View>
         <ItemSeparator />
+        {typeof item.good.priceRed === 'number' ? (
+          <>
+            <View style={styles.item}>
+              <View style={styles.details}>
+                <Text style={styles.name}>Цена со скидкой</Text>
+                <Text style={textStyle}>{item.good.priceRed}</Text>
+              </View>
+            </View>
+            <ItemSeparator />
+          </>
+        ) : null}
         {item.good.scale ? (
           <>
             <View style={styles.item}>
@@ -107,9 +123,42 @@ const OrderLine = ({ item, packages, onSetLine, onSave }: IProps) => {
           </View>
         </View>
         <ItemSeparator />
+        {isUseRemains && (item.remains || item.remains === 0) ? (
+          <>
+            <View style={styles.item}>
+              <View style={styles.details}>
+                <Text style={styles.name}>Общий остаток</Text>
+                <Text style={textStyle}>{item.remains || 0}</Text>
+              </View>
+            </View>
+            <ItemSeparator />
+          </>
+        ) : null}
+        {isUseRemains && (item.agentRemains || item.agentRemains === 0) ? (
+          <>
+            <View style={styles.item}>
+              <View style={styles.details}>
+                <Text style={styles.name}>Остаток по агенту</Text>
+                <Text style={textStyle}>{item.agentRemains || 0}</Text>
+              </View>
+            </View>
+            <ItemSeparator />
+          </>
+        ) : null}
+        {isUseRemains && !!item?.good?.barcode && (
+          <>
+            <View style={styles.item}>
+              <View style={styles.details}>
+                <Text style={styles.name}>Баркод</Text>
+                <Text style={textStyle}>{item.good.barcode}</Text>
+              </View>
+            </View>
+            <ItemSeparator />
+          </>
+        )}
         <View style={styles.item}>
           <View style={styles.details}>
-            <Text style={styles.name}>Количество, кг</Text>
+            <Text style={styles.name}>Количество</Text>
             <TextInput
               style={[textStyle, localStyles.quantityItem]}
               showSoftInputOnFocus={false}

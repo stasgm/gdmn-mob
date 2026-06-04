@@ -56,7 +56,6 @@ export const InvoiceLine = ({ item, onSetLine }: IProps) => {
 
   const [changeOldValue, setChangeOldValue] = useState(true);
 
-  console.log('item?.EID?.toString()', item?.EID?.toString());
   useEffect(() => {
     (isKeyboardOpen || currRef?.current) &&
       setTimeout(() => {
@@ -73,7 +72,6 @@ export const InvoiceLine = ({ item, onSetLine }: IProps) => {
   const handleGetScannedObject = useCallback(
     (brc: string) => {
       setScaner({ state: 'found' });
-      console.log('brc', brc);
       const prefixGtin = (settings.prefixGtin as ISettingsOption<string>)?.data || '';
       const prefixISN = (settings.prefixISN as ISettingsOption<string>)?.data || '';
       const dataMarkType = getDataMarkType(brc, prefixGtin, prefixISN);

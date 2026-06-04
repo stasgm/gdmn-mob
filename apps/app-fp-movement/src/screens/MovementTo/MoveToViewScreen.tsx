@@ -104,6 +104,8 @@ export const MoveToViewScreen = () => {
     { quantPack: 0, weight: 0 },
   );
 
+  // const [wMode, setWmode] = useState(false);
+
   const isBlocked = doc?.status !== 'DRAFT';
 
   const goods = refSelectors.selectByName<IGood>('good').data;
@@ -120,7 +122,11 @@ export const MoveToViewScreen = () => {
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
   const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
+  const addPalletQuantPack = Boolean(settings.addPalletQuantPack?.data);
+
   const isAddressStore = Boolean(settings.addressStore?.data);
+
+  // const storeMan = useSelector((state) => state.auth.user);
 
   const docList = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
@@ -136,7 +142,7 @@ export const MoveToViewScreen = () => {
     (doc?.head.fromDepart.id === defaultDepart?.id || Boolean(documentType?.isRemains)) &&
     Boolean(settings.remainsUse?.data);
 
-  const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
+  const remains = refSelectors.selectByName<IRemains>('remains')?.data?.[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
     return doc?.head?.fromDepart?.id && isFocused && remains
@@ -160,6 +166,8 @@ export const MoveToViewScreen = () => {
     Keyboard.dismiss();
     handleFocus();
   };
+
+  // const [barcodeGeneration, setBarcodeGeneration] = useState(false);
 
   // const [visibleQuantPackDialog, setVisibleQuantPackDialog] = useState(false);
   // const [quantPack, setQuantPack] = useState('');
@@ -558,6 +566,42 @@ export const MoveToViewScreen = () => {
     }
   }, []);
 
+  // const [selectedLine, setSelectedLine] = useState<IMoveLine | undefined>(undefined);
+  // const [visiblePalletDialog, setVisiblePalletDialog] = useState(false);
+
+  // console.log('selectedl', selectedLine);
+  // const handleAddDocument = useCallback(
+  //   (barcodeObj: IMoveLine) => {
+  //     // if (!palletType) {
+  //     //   handleErrorMessage(visibleDialog, 'Не найден тип документа!');
+  //     //   return;
+  //     // }
+  //     // const doc = list?.[0];
+  //     if (!doc) {
+  //       return;
+  //     }
+  //     const isFromAddressed = departs.find((i) => i.id === doc.head.fromDepart?.id && i.isAddressStore);
+  //     const isToAddressed = departs.find((i) => i.id === doc.head.toDepart?.id && i.isAddressStore);
+
+  //     if (
+  //       doc.head.toDepart?.isAddressStore ||
+  //       doc.head.fromDepart?.isAddressStore ||
+  //       isFromAddressed ||
+  //       isToAddressed
+  //     ) {
+  //       if (goodBarcodeSettings.boxWeight > barcodeObj.weight) {
+  //         setVisibleQuantPackDialog(true);
+  //         setNewLine(barcodeObj);
+  //         return;
+  //       }
+
+  //       navigation.navigate('SelectCell', { docId: id, item: barcodeObj, mode: 0 });
+  //     }
+  //     setVisiblePalletDialog(false);
+  //   },
+  //   [departs, doc, goodBarcodeSettings.boxWeight, id, navigation],
+  // );
+
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!doc) {
@@ -567,6 +611,12 @@ export const MoveToViewScreen = () => {
       if (doc?.status !== 'DRAFT') {
         return;
       }
+      // if (barcodeGeneration) {
+      //   console.log('code', brc);
+
+      //   Alert.alert('!', brc);
+      //   return;
+      // }
 
       if (!brc.match(/^-{0,1}\d+$/)) {
         handleErrorMessage(visibleDialog, 'Штрих-код не определён. Повторите сканирование!', 'NOT_DEFINED_BARCODE');
@@ -623,6 +673,37 @@ export const MoveToViewScreen = () => {
         handleErrorMessage(visibleDialog, 'Данный штрих-код уже добавлен!', 'DUBLICATE_BARCODE');
         return;
       }
+      // if (wMode) {
+      //   const weight = round(doc?.lines?.[0].weight + barc.weight, 3);
+      //   const nquantPack = round(doc?.lines?.[0].quantPack + barc.quantPack, 3);
+      //   const newObj: IMoveLine = {
+      //     ...doc?.lines?.[0],
+      //     quantPack: nquantPack,
+      //     weight,
+      //   };
+
+      //   const newBrc = getBarcodeString({ ...newObj, shcode: newObj.good.shcode }, goodBarcodeSettings);
+      //   const newLine: IMoveLine = {
+      //     ...newObj,
+      //     barcode: newBrc,
+      //     // storeMan,
+      //   };
+      //   dispatch(
+      //     documentActions.updateDocumentLine({
+      //       docId: doc.id,
+      //       line: newLine,
+      //     }),
+      //   );
+      //   if (visibleDialog) {
+      //     setVisibleDialog(false);
+      //     setErrorMessage('');
+      //     setBarcode('');
+      //   } else {
+      //     setScanned(false);
+      //   }
+      //   handleFocus();
+      //   return;
+      // }
 
       const newLine: IMoveLine = {
         good: lineGood.good,
@@ -636,6 +717,12 @@ export const MoveToViewScreen = () => {
         sortOrder: doc.lines?.length + 1,
         usedRemains: remainsUse,
       };
+      // if (barcodeGeneration) {
+      //   setSelectedLine(newLine);
+      //   // handleFocus();
+      //   setVisiblePalletDialog(true);
+      //   return;
+      // }
 
       const isFromAddressed = departs.find((i) => i.id === doc.head.fromDepart?.id && i.isAddressStore);
       const isToAddressed = departs.find((i) => i.id === doc.head.toDepart?.id && i.isAddressStore);
@@ -663,6 +750,11 @@ export const MoveToViewScreen = () => {
         setScanned(false);
       }
       handleFocus();
+
+      if (addPalletQuantPack && newLine.weight >= goodBarcodeSettings?.boxWeight) {
+        // setIsPack(false);
+        setVisibleQuantPackDialog(true);
+      }
     },
 
     [
@@ -675,11 +767,46 @@ export const MoveToViewScreen = () => {
       remainsUse,
       departs,
       visibleDialog,
+      addPalletQuantPack,
       handleErrorMessage,
       navigation,
       id,
     ],
   );
+  // const handleGetBarcode = (obj: IMoveLine) => {
+  //   return getBarcodeString({ ...obj, shcode: obj.good.shcode }, goodBarcodeSettings);
+  // };
+
+  // const handleContinue = useCallback(
+  //   (obj: IMoveLine) => {
+  //     if (!doc) {
+  //       return;
+  //     }
+  //     if (!barcodeGeneration) {
+  //       return;
+  //     }
+  //     if (
+  //       doc.lines?.[0] &&
+  //       ((doc?.head.fromDepart?.isAddressStore && !lines?.[0].fromCell) ||
+  //         (doc?.head.toDepart?.isAddressStore && !lines?.[0].toCell))
+  //     ) {
+  //       // dispatch(documentActions.updateDocumentLine({ docId: doc.id, line: obj }));
+  //     } else {
+  //       dispatch(documentActions.addDocumentLine({ docId: doc.id, line: obj }));
+  //     }
+  //     setWmode(true);
+  //     setVisiblePalletDialog(false);
+  //     if (visibleDialog) {
+  //       setVisibleDialog(false);
+  //       setErrorMessage('');
+  //       setBarcode('');
+  //     } else {
+  //       setScanned(false);
+  //     }
+  //     handleFocus();
+  //   },
+  //   [barcodeGeneration, dispatch, doc, lines, visibleDialog],
+  // );
 
   const handleSearchBarcode = () => {
     getScannedObject(barcode);
@@ -768,6 +895,14 @@ export const MoveToViewScreen = () => {
           {isDateVisible && <DateInfo sentDate={doc.sentDate} erpCreationDate={doc.erpCreationDate} />}
         </>
       </InfoBlock>
+      {/* <View style={localStyles.container}>
+        <MediumText>Формирование поддона</MediumText>
+        <Switch
+          value={barcodeGeneration}
+          onValueChange={() => setBarcodeGeneration(!barcodeGeneration)}
+          // disabled={disabled}
+        />
+      </View> */}
       <LineTypes />
       <TextInput
         style={styles.scanInput}
@@ -794,15 +929,33 @@ export const MoveToViewScreen = () => {
       ) : lineType === 'last' && lines?.[0] ? (
         <View style={styles.spaceBetween}>
           <LineItem
+            // onPress={() =>
+            //   ((doc?.head.fromDepart?.isAddressStore && !lines?.[0].fromCell) ||
+            //     (doc?.head.toDepart?.isAddressStore && !lines?.[0].toCell)) &&
+            //   setVisiblePalletDialog(true)
+            // }
             item={lines?.[0]}
             disabled={doc?.status !== 'DRAFT' || Boolean(lines?.[0].scannedBarcode)}
             isFromAddressed={doc?.head.fromDepart?.isAddressStore}
             isToAddressed={doc?.head.toDepart?.isAddressStore}
+            // colored={
+            //   (doc?.head.fromDepart?.isAddressStore && !lines?.[0].fromCell) ||
+            //   (doc?.head.toDepart?.isAddressStore && !lines?.[0].toCell)
+            // }
           />
           {doc?.lines?.length ? <ViewTotal quantPack={lineSum?.quantPack || 0} weight={lineSum?.weight || 0} /> : null}
         </View>
       ) : null}
-
+      {/* <PalletDialog
+        visible={visiblePalletDialog}
+        onCancel={() => setVisiblePalletDialog(false)}
+        onOk={handleAddDocument}
+        // pallet={selectedPallet}
+        storeMan={`${storeMan?.lastName} ${storeMan?.firstName}`}
+        palletHead={selectedLine}
+        getBarcode={handleGetBarcode}
+        onContinue={handleContinue}
+      /> */}
       <AppDialog
         title="Введите штрих-код"
         visible={visibleDialog}
@@ -838,3 +991,29 @@ export const MoveToViewScreen = () => {
     </View>
   );
 };
+
+// const localStyles = StyleSheet.create({
+//   container: {
+//     alignItems: 'center',
+//     flexDirection: 'row',
+//     paddingHorizontal: 12,
+//     fontSize: 20,
+//     justifyContent: 'space-between',
+//     paddingVertical: 3,
+//     marginVertical: 6,
+//   },
+//   settingsContainer: {
+//     flexDirection: 'column',
+//     paddingTop: 6,
+//     width: '100%',
+//   },
+//   status: {
+//     margin: 5,
+//     flexDirection: 'row',
+//     flexWrap: 'wrap',
+//   },
+//   title: {
+//     margin: 3,
+//     textAlign: 'center',
+//   },
+// });

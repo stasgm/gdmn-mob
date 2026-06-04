@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, Alert, TextInput } from 'react-native';
-import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
+import { View, Alert, TextInput, TouchableHighlight } from 'react-native';
+import { RouteProp, useFocusEffect, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
@@ -40,7 +40,7 @@ import { FlashList } from '@shopify/flash-list';
 
 import { IWaybillDocument, IWaybillLine } from '../../store/types';
 import { WaybillStackParamList } from '../../navigation/Root/types';
-import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
+import { getStatusColor, lineTypes, ONE_SECOND_IN_MS } from '../../utils/constants';
 import { IGood } from '../../store/app/types';
 
 import DocTotal from './components/WaybillTotal';
@@ -52,12 +52,14 @@ export const WaybillViewScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation<StackNavigationProp<WaybillStackParamList, 'WaybillView'>>();
 
+  const { colors } = useTheme();
+
   const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [searchVisible, setSearchVisible] = useState(false);
 
   const id = useRoute<RouteProp<WaybillStackParamList, 'WaybillView'>>().params?.id;
   const doc = docSelectors.selectByDocId<IWaybillDocument>(id);
-  console.log('jsonFormat', doc);
+
   const loading = useSelector((state) => state.app.loading);
 
   const lines = useMemo(() => {
@@ -199,10 +201,7 @@ export const WaybillViewScreen = () => {
             <>
               {doc?.status === 'DRAFT' && (
                 <>
-                  {/* <View style={styles.buttons}> */}
                   <SearchButton onPress={() => setSearchVisible((prev) => !prev)} visible={searchVisible} />
-                  {/* {isScanerReader && <ScanButton onPress={handleScanner} />} */}
-                  {/* </View> */}
                   <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
                 </>
               )}
@@ -255,17 +254,72 @@ export const WaybillViewScreen = () => {
     setSelectedLine(undefined);
   };
 
+  const [lineType, setLineType] = useState(lineTypes[0].id);
+  const [currentLine, setCurrentLine] = useState<IWaybillLine | undefined>(undefined);
+
+  const handleOkLineDialog = useCallback(
+    (quantity?: number) => {
+      if (quantity && currentLine) {
+        const newLine: IWaybillLine = {
+          ...currentLine,
+          checkedQuantity: quantity,
+          checked: currentLine.quantity === quantity ? true : false,
+        };
+        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+        setCurrentLine(newLine);
+      }
+      setVisibleLineDialog(false);
+      setSelectedLine(undefined);
+    },
+    [currentLine, dispatch, id],
+  );
+
+  const LineTypes = useCallback(
+    () => (
+      <View style={styles.containerCenter}>
+        {lineTypes.map((e, i) => {
+          return (
+            <TouchableHighlight
+              activeOpacity={0.7}
+              underlayColor="#DDDDDD"
+              key={e.id}
+              style={[
+                styles.btnTab,
+                i === 0 && styles.firstBtnTab,
+                i === lineTypes.length - 1 && styles.lastBtnTab,
+                e.id === lineType && { backgroundColor: colors.primary },
+                { borderColor: colors.primary },
+              ]}
+              onPress={() => setLineType(e.id)}
+              disabled={!currentLine}
+            >
+              <LargeText style={{ color: e.id === lineType ? colors.background : colors.text }}>{e.value}</LargeText>
+            </TouchableHighlight>
+          );
+        })}
+      </View>
+    ),
+    [colors.background, colors.primary, colors.text, currentLine, lineType],
+  );
+
   const renderItem = ({ item }: { item: IWaybillLine }) => {
     const good = goods?.find((e) => e.id === item?.goodId);
 
     const handleOnPress = () => {
       setVisibleLineDialog(true);
       setSelectedLine({ ...item, goodId: good?.name || '' });
+      setCurrentLine(item);
     };
 
     const lineStyle = {
-      backgroundColor: item.checked ? 'rgba(65, 177, 237, 0.25)' : item.added ? 'rgba(255, 0, 0, 0.25)' : 'transparent',
-      // opacity: item.added ? 0.2 : 1,#b5d0ff
+      backgroundColor:
+        item.checkedQuantity && item.checkedQuantity !== item.quantity
+          ? 'rgba(206, 146, 222, 0.25)'
+          : item.checked
+            ? 'rgba(65, 177, 237, 0.25)'
+            : item.added
+              ? 'rgba(255, 0, 0, 0.25)'
+              : 'transparent',
     };
 
     return (
@@ -277,19 +331,53 @@ export const WaybillViewScreen = () => {
           checked={delList.includes(item.id)}
         >
           <View style={styles.details}>
-            <LargeText style={styles.textBold}>{good?.name}</LargeText>
+            <LargeText style={styles.textBold}>{good?.name || item.description || ''}</LargeText>
             <View style={styles.directionRow}>
-              <MediumText>{item.EID}</MediumText>
-              {/* <MediumText>
-              {item.quantity} {good?.valueName} x {(item.price || 0).toString()} р.
-            </MediumText>
-            {!!item.barcode && <MediumText style={[styles.number, styles.flexDirectionRow]}>{item.barcode}</MediumText>} */}
+              {item.EID ? <MediumText>{item.EID}</MediumText> : null}
+              {item.quantity ? (
+                <MediumText>
+                  {item.checkedQuantity || '0'} / {item.quantity}
+                </MediumText>
+              ) : null}
+              {item.barcode ? <MediumText>{item.barcode}</MediumText> : null}
             </View>
           </View>
         </ListItemLine>
       </View>
     );
   };
+  console.log('currentLine,', currentLine);
+  const LineLine = useCallback(() => {
+    const good = goods?.find((e) => e.id === currentLine?.goodId);
+    const lineStyle = {
+      backgroundColor:
+        currentLine?.checkedQuantity && currentLine?.checkedQuantity !== currentLine?.quantity
+          ? 'rgba(206, 146, 222, 0.25)'
+          : currentLine?.checked
+            ? 'rgba(65, 177, 237, 0.25)'
+            : currentLine?.added
+              ? 'rgba(255, 0, 0, 0.25)'
+              : 'transparent',
+    };
+    return (
+      <View style={lineStyle}>
+        <ListItemLine>
+          <View style={styles.details}>
+            <LargeText style={styles.textBold}>{good?.name || currentLine?.description || ''}</LargeText>
+            <View style={styles.directionRow}>
+              {currentLine?.EID ? <MediumText>{currentLine?.EID}</MediumText> : null}
+              {currentLine?.quantity ? (
+                <MediumText>
+                  {currentLine?.checkedQuantity || '0'} / {currentLine?.quantity}
+                </MediumText>
+              ) : null}
+              {currentLine?.barcode ? <MediumText>{currentLine?.barcode}</MediumText> : null}
+            </View>
+          </View>
+        </ListItemLine>
+      </View>
+    );
+  }, [currentLine, goods]);
 
   const settings = useSelector((state) => state.settings?.data);
 
@@ -298,6 +386,7 @@ export const WaybillViewScreen = () => {
 
   const [key, setKey] = useState(1);
 
+  console.log('doc.lines', doc?.lines);
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!doc) {
@@ -311,53 +400,92 @@ export const WaybillViewScreen = () => {
       if (!brc) {
         return;
       }
+      console.log('brc', brc);
 
-      const line = doc.lines.find((item) => JSON.parse(JSON.stringify(item.EID)) === JSON.parse(JSON.stringify(brc)));
-      console.log('line', line);
-      if (line) {
-        const newLine: IWaybillLine = { ...line, checked: true };
-        dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+      if (brc.length === 8 || brc.length === 13) {
+        const line = doc.lines.find((item) => item.barcode === brc && item.checkedQuantity !== item.quantity);
+        console.log('line', line);
+
+        if (line) {
+          const newLine: IWaybillLine = {
+            ...line,
+            checked: line?.checkedQuantity && line?.checkedQuantity + 1 === line?.quantity ? true : false,
+            checkedQuantity: line?.checkedQuantity ? line?.checkedQuantity + 1 : 1,
+          };
+
+          dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+          setCurrentLine(newLine);
+          handleFocus();
+
+          return;
+        }
+        Alert.alert('Внимание!', 'Позиция данным штрихкодом не найдена.', [
+          {
+            text: 'ОК',
+          },
+        ]);
         handleFocus();
-        console.log('123');
-        return;
-      }
+      } else {
+        const line = doc.lines.find((item) => JSON.parse(JSON.stringify(item.EID)) === JSON.parse(JSON.stringify(brc)));
+        if (line) {
+          const newLine: IWaybillLine = { ...line, checked: true };
+          dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+          handleFocus();
+          return;
+        }
 
-      if (!line) {
-        const gtin = brc.match(RegExp(`${prefixGtin}0?\\d{13}${prefixISN}`));
+        if (!line) {
+          const gtin = brc.match(RegExp(`${prefixGtin}0?\\d{13}${prefixISN}`));
 
-        const good = goods?.find(
-          (e) => gtin && (e.barcode === gtin[0].slice(2, -2) || gtin[0].slice(3, -2) === e?.barcode),
-        );
+          const good = goods?.find(
+            (e) => gtin && (e.barcode === gtin[0].slice(2, -2) || gtin[0].slice(3, -2) === e?.barcode),
+          );
+          const cline = doc.lines.find(
+            (item) =>
+              (item.barcode === gtin?.[0].slice(2, -2) || gtin?.[0].slice(3, -2) === item?.barcode) &&
+              item.checkedQuantity !== item.quantity,
+          );
+          if (cline) {
+            const newLine: IWaybillLine = {
+              ...cline,
+              checked: cline?.checkedQuantity && cline?.checkedQuantity + 1 === cline?.quantity ? true : false,
+              checkedQuantity: cline?.checkedQuantity ? cline?.checkedQuantity + 1 : 1,
+            };
 
-        Alert.alert(
-          `${good ? `${good.name}` : 'Внимание!'} `,
-          'Позиция с данным кодом маркировки не найдена.  \n\nДобавить в документ?',
-          [
-            {
-              text: 'ОК',
-              onPress: () => {
-                const newLine: IWaybillLine = {
-                  id: generateId(),
-                  goodId: good?.id || 'unknown',
-                  added: true,
-                  sortOrder: (doc.lines?.length || 0) + 1,
-                  EID: brc,
-                };
-                dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
-                handleFocus();
+            dispatch(documentActions.updateDocumentLine({ docId: id, line: newLine }));
+            setCurrentLine(newLine);
+            handleFocus();
+
+            return;
+          }
+          Alert.alert(
+            `${good ? `${good.name}` : 'Внимание!'} `,
+            'Позиция с данным кодом маркировки не найдена.  \n\nДобавить в документ?',
+            [
+              {
+                text: 'ОК',
+                onPress: () => {
+                  const newLine: IWaybillLine = {
+                    id: generateId(),
+                    goodId: good?.id || 'unknown',
+                    added: true,
+                    sortOrder: (doc.lines?.length || 0) + 1,
+                    EID: brc,
+                  };
+                  dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+                  handleFocus();
+                },
               },
-            },
-            {
-              text: 'Отмена',
-            },
-          ],
-        );
-        handleFocus();
+              {
+                text: 'Отмена',
+              },
+            ],
+          );
+          handleFocus();
 
-        return;
+          return;
+        }
       }
-
-      // navigation.navigate('WaybillLine', { mode: 1, docId: id, item: line });
     },
 
     [dispatch, doc, goods, id, isBlocked, prefixGtin, prefixISN],
@@ -408,21 +536,8 @@ export const WaybillViewScreen = () => {
       >
         <MediumText style={styles.rowCenter}>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
       </InfoBlock>
-      {/* {searchVisible && (
-        <>
-          <View style={styles.flexDirectionRow}>
-            <Searchbar
-              placeholder="Поиск (штрихкод, наименование, артикул)"
-              onChangeText={setSearchQuery}
-              value={searchQuery}
-              style={[styles.flexGrow, styles.searchBar]}
-              autoFocus
-              selectionColor={searchStyle}
-            />
-          </View>
-          <ItemSeparator />
-        </>
-      )} */}
+
+      <LineTypes />
       {isScanerReader ? (
         <TextInput
           style={styles.scanInput}
@@ -434,16 +549,25 @@ export const WaybillViewScreen = () => {
           onChangeText={(text) => setScan(text)}
         />
       ) : null}
-      <FlashList
-        data={lines}
-        renderItem={renderItem}
-        estimatedItemSize={60}
-        ItemSeparatorComponent={ItemSeparator}
-        keyboardShouldPersistTaps="handled"
-        keyExtractor={keyExtractor}
-        extraData={[goods, delList, isDelList, isBlocked, navigation, id]}
-      />
-      {doc.lines?.length ? <DocTotal lineCount={doc.lines?.length || 0} /> : null}
+      {lineType === 'all' ? (
+        <>
+          <FlashList
+            data={lines}
+            renderItem={renderItem}
+            estimatedItemSize={60}
+            ItemSeparatorComponent={ItemSeparator}
+            keyboardShouldPersistTaps="handled"
+            keyExtractor={keyExtractor}
+            extraData={[goods, delList, isDelList, isBlocked, navigation, id]}
+          />
+          {doc.lines?.length ? <DocTotal lineCount={doc.lines?.length || 0} /> : null}
+        </>
+      ) : lineType === 'last' && currentLine ? (
+        <View style={styles.spaceBetween}>
+          <LineLine />
+        </View>
+      ) : null}
+
       <SimpleDialog
         visible={visibleSendDialog}
         title={'Внимание!'}
@@ -452,7 +576,12 @@ export const WaybillViewScreen = () => {
         onOk={handleSendDocument}
         okDisabled={loading}
       />
-      <WaybillDialog visible={visibleLineDialog} onDismissDialog={handleDismissLineDialog} item={selectedLine} />
+      <WaybillDialog
+        visible={visibleLineDialog}
+        onDismissDialog={handleDismissLineDialog}
+        item={selectedLine}
+        onOk={handleOkLineDialog}
+      />
     </View>
   );
 };

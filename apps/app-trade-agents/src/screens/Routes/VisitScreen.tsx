@@ -9,7 +9,15 @@ import {
   SectionListData,
 } from 'react-native';
 import { RouteProp, useFocusEffect, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
-import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
+import {
+  appActions,
+  docSelectors,
+  documentActions,
+  refSelectors,
+  useDispatch,
+  useDocThunkDispatch,
+  useSelector,
+} from '@lib/store';
 import {
   SubTitle,
   globalStyles as styles,
@@ -63,8 +71,6 @@ import {
 import { ICoords } from '../../store/geo/types';
 import { getCurrentPosition } from '../../utils/expoFunctions';
 import { lineTypes } from '../../utils/constants';
-import { getNextDocNumber } from '../../utils/helpers';
-import { OrderDepartDialog } from '../Orders/components/OrderDepartDialog';
 
 export interface VisitListSectionProps {
   title: string;
@@ -80,7 +86,7 @@ const VisitScreen = () => {
   const { colors } = useTheme<MD2Theme>();
 
   const visit = docSelectors.selectByDocType<IVisitDocument>('visit')?.find((e) => e.head.routeLineId === id);
-  console.log('visit', visit);
+
   const dateBegin = visit ? new Date(visit?.head.dateBegin) : undefined;
   const geo = visit?.head.beginGeoPoint;
   const [screenState, setScreenState] = useState<ScreenState>('idle');
@@ -98,7 +104,6 @@ const VisitScreen = () => {
 
   const orderType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'order');
   const defaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as INamedEntity | undefined;
-  const isUseRemains = useSelector((state) => state.settings.data?.isUseRemains?.data) as boolean;
 
   const orderList = docSelectors.selectByDocType<IOrderDocument>('order');
   const loading = useSelector((state) => state.app.loading);
@@ -187,9 +192,6 @@ const VisitScreen = () => {
     }, []),
   );
 
-  const [visibleDepartDialog, setVisibleDepartDialog] = useState(false);
-  const [department, setDepartment] = useState<INamedEntity | undefined>(undefined);
-
   useEffect(() => {
     const handleNewVisit = async () => {
       if (!orderType) {
@@ -246,34 +248,31 @@ const VisitScreen = () => {
           }
         }
 
-        const tomorrow = new Date();
-        const newOrderDate = tomorrow.toISOString();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        const newOnDate = tomorrow.toISOString();
-        const newNumber = getNextDocNumber(orderDocs);
+        // Предзаполняем параметры формы заявки по данным визита
+        // и очищаем поля, которые должны вводиться заново (например, экспедитор)
+        const now = new Date();
+        const documentDate = now.toISOString();
+        const onDateDate = new Date(now);
+        onDateDate.setDate(onDateDate.getDate() + 1);
+        const onDate = onDateDate.toISOString();
 
-        const newOrder: IOrderDocument = {
-          id: generateId(),
-          number: newNumber,
-          status: 'DRAFT',
-          documentDate: newOrderDate,
-          documentType: orderType,
-          head: {
+        dispatch(
+          appActions.setFormParams({
             contact,
             outlet,
+            depart: defaultDepart,
             route,
-            onDate: newOnDate,
-            takenOrder: visit?.head.takenType,
-            depart: department ? department : defaultDepart,
-          },
-          lines: [],
-          creationDate: newOrderDate,
-          editionDate: newOrderDate,
-        };
+            documentDate,
+            onDate,
+            expeditor: undefined,
+            comment: undefined,
+            status: 'DRAFT',
+          }),
+        );
 
-        dispatch(documentActions.addDocument(newOrder));
-        // ? navigation.('OrderEdit', { id: newOrder.id, routeId: route.id })
-        navigation.navigate('OrderView', { id: newOrder.id, routeId: route.id });
+        // Переходим к экрану редактирования заявки, сама заявка создаётся только после сохранения.
+        // Передаём routeId чтобы OrderEditScreen знал, что заявка создаётся из визита
+        navigation.navigate('OrderEdit', { routeId: route.id });
       } catch (e) {
         setScreenState('idle');
       }
@@ -283,21 +282,7 @@ const VisitScreen = () => {
       handleNewVisit();
       setScreenState('added');
     }
-  }, [
-    contact,
-    defaultDepart,
-    department,
-    dispatch,
-    id,
-    isUseRemains,
-    navigation,
-    orderDocs,
-    orderType,
-    outlet,
-    route,
-    screenState,
-    visit,
-  ]);
+  }, [contact, defaultDepart, dispatch, id, navigation, orderDocs, orderType, outlet, route, screenState, visit]);
 
   const sendDoc = useSendDocs(orderDocs.filter((i) => i.status === 'DRAFT' || i.status === 'READY'));
 
@@ -343,16 +328,13 @@ const VisitScreen = () => {
                   !orderDocs.find((doc) => doc.status === 'READY' || doc.status === 'DRAFT')
                 }
               />
-              <AddButton
-                onPress={() => (isUseRemains ? setVisibleDepartDialog(true) : setScreenState('adding'))}
-                disabled={screenState !== 'idle'}
-              />
+              <AddButton onPress={() => setScreenState('adding')} disabled={screenState !== 'idle'} />
             </>
           )
         )}
       </View>
     ),
-    [contact, handleDeleteDocs, isDelList, isUseRemains, orderDocs, orderType, outlet, screenState],
+    [contact, handleDeleteDocs, isDelList, orderDocs, orderType, outlet, screenState],
   );
 
   const renderLeft = useCallback(() => isDelList && <CloseButton onPress={() => setDelList({})} />, [isDelList]);
@@ -538,16 +520,6 @@ const VisitScreen = () => {
           ListEmptyComponent={EmptyList}
         />
       )}
-      <OrderDepartDialog
-        visible={visibleDepartDialog}
-        onCancel={() => setVisibleDepartDialog(false)}
-        onOk={(depart: INamedEntity) => {
-          console.log('depart', depart);
-          setDepartment(depart);
-          setVisibleDepartDialog(false);
-          setScreenState('adding');
-        }}
-      />
       <SimpleDialog
         visible={visibleSendDialog}
         title={'Внимание!'}

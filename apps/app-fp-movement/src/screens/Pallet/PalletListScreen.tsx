@@ -13,6 +13,8 @@ import {
   EmptyList,
   AppDialog,
   MediumText,
+  PackageButton,
+  ScanButton,
 } from '@lib/mobile-ui';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -22,11 +24,19 @@ import { documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSel
 
 import { IDelList } from '@lib/mobile-types';
 
-import { deleteSelectedItems, generateId, getDateString, getDelList, keyExtractor } from '@lib/mobile-hooks';
+import {
+  deleteSelectedItems,
+  generateId,
+  getDateString,
+  getDelList,
+  keyExtractor,
+  round,
+  useFilteredDocList,
+} from '@lib/mobile-hooks';
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
-import { IDocumentType, IReference } from '@lib/types';
+import { IDocumentType, INamedEntity, IReference } from '@lib/types';
 
 import * as Print from 'expo-print';
 
@@ -35,14 +45,23 @@ import { barcodeToSvg } from '@adrianso/react-native-barcode-builder';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { PalletStackParamList } from '../../navigation/Root/types';
-import { barcodeSettings, IPalletDocument, IPalletHead } from '../../store/types';
+import {
+  barcodeSettings,
+  IMoveDocument,
+  IMoveLine,
+  IPalletDocument,
+  IPalletHead,
+  IPalletLine,
+} from '../../store/types';
 
 import { alertWithSound, getBarcode, getBarcodeString, getLineGood, getNextDocNumber } from '../../utils/helpers';
 
 import { ONE_SECOND_IN_MS } from '../../utils/constants';
-import { IGood } from '../../store/app/types';
+import { IAddressStoreEntity, IGood } from '../../store/app/types';
 
 import { PalletDialog, print } from './components/PalletDialog';
+
+import { LineDialog } from './components/LineDialog';
 
 export interface PalletListSectionProps {
   title: string;
@@ -50,12 +69,17 @@ export interface PalletListSectionProps {
 
 export type SectionDataProps = SectionListData<IListItemProps, PalletListSectionProps>[];
 
+interface ILineDialog {
+  visible: boolean;
+  id: string;
+}
 export const PalletListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<PalletStackParamList, 'PalletList'>>();
   const docDispatch = useDocThunkDispatch();
 
   const dispatch = useDispatch();
   const storeMan = useSelector((state) => state.auth.user);
+  const [barcodeGeneration, setBarcodeGeneration] = useState(false);
 
   const list = (
     useSelector((state) => state.documents.list)?.filter((i) => i.documentType?.name === 'pallet') as IPalletDocument[]
@@ -81,6 +105,7 @@ export const PalletListScreen = () => {
             <MediumText>
               Партия № {i.head.numReceived || ''} от {getDateString(i.head.workDate) || ''}
             </MediumText>
+            {i.head.toCell ? <MediumText>Ячейка {i.head.toCell}</MediumText> : null}
           </View>
         ),
         sentDate: i.sentDate,
@@ -91,11 +116,34 @@ export const PalletListScreen = () => {
   const palletType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'pallet');
-  const [visiblePalletDialog, setVisiblePalletDialog] = useState(false);
+
+  const movements = useFilteredDocList<IMoveDocument>('movement');
+
+  // const doc = movements?.find((e) => e.id === id);
+
+  const departs = refSelectors.selectByName<IAddressStoreEntity>('depart')?.data;
+
+  const userDefaultDepart = useSelector((state) => state.settings?.userData?.depart?.data) as INamedEntity;
+  const defaultDepart = departs?.find((i) => i.id === userDefaultDepart?.id);
+  const userDefaultSecondDepart = useSelector((state) => state.settings?.userData?.secondDepart?.data) as INamedEntity;
+  const defaultSecondDepart = departs?.find((i) => i.id === userDefaultSecondDepart?.id);
+
+  const movementType = refSelectors
+    .selectByName<IReference<IDocumentType>>('documentType')
+    ?.data.find((t) => t.name === 'movement');
+
+  const movementSubtype = refSelectors
+    .selectByName<IReference<INamedEntity>>('documentSubtype')
+    ?.data.find((t) => t.id === 'internalMovement');
 
   // const loading = useSelector((state) => state.app.loading);
   const [delList, setDelList] = useState<IDelList>({});
   const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
+
+  const [lineDialog, setLineDialog] = useState<ILineDialog>({ id: '', visible: false });
+  const [visiblePalletDialog, setVisiblePalletDialog] = useState(false);
+
+  const [currentDocumentId, setCurrentDocumentId] = useState<string | undefined>('');
 
   const sections = useMemo(
     () =>
@@ -146,11 +194,15 @@ export const PalletListScreen = () => {
             <DeleteButton onPress={handleDeleteDocs} />
           </View>
         ) : (
-          <AddButton onPress={() => setVisibleDialog(true)} />
+          <View style={styles.buttons}>
+            <ScanButton onPress={() => handleFocus()} />
+            <AddButton onPress={() => setVisibleDialog(true)} />
+            <PackageButton onPress={() => setBarcodeGeneration(false)} disabled={!barcodeGeneration} />
+          </View>
         )}
       </View>
     ),
-    [handleDeleteDocs, isDelList],
+    [barcodeGeneration, handleDeleteDocs, isDelList],
   );
 
   const renderLeft = useCallback(() => isDelList && <CloseButton onPress={() => setDelList({})} />, [isDelList]);
@@ -163,8 +215,36 @@ export const PalletListScreen = () => {
     });
   }, [delList, isDelList, navigation, renderLeft, renderRight]);
 
+  const goods = refSelectors.selectByName<IGood>('good').data;
+
+  const settings = useSelector((state) => state.settings?.data);
+
+  const goodBarcodeSettings = Object.entries(settings).reduce((prev: barcodeSettings, [idx, item]) => {
+    if (item && item.group?.id !== 'base' && typeof item.data === 'number') {
+      prev[idx] = item.data;
+    }
+    return prev;
+  }, {});
+
+  const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
+  const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
+
   const [selectedPalletHead, setSelectedPalletHead] = useState<IPalletHead | undefined>(undefined);
   const [selectedPrinter, _] = useState<Print.Printer>();
+
+  const [visibleDialog, setVisibleDialog] = useState(false);
+  const [barcode, setBarcode] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [scanned, setScanned] = useState(false);
+
+  const handleErrorMessage = useCallback((visible: boolean, text: string) => {
+    if (visible) {
+      setErrorMessage(text);
+    } else {
+      alertWithSound('Внимание!', `${text}.`, handleFocus);
+      setScanned(false);
+    }
+  }, []);
 
   const handleOnPress = useCallback(
     async (id: string) => {
@@ -184,8 +264,87 @@ export const PalletListScreen = () => {
         SVGBarcode,
         selectedPrinter,
       );
+      setLineDialog({ id: '', visible: false });
     },
     [list, selectedPrinter, storeMan?.firstName, storeMan?.lastName],
+  );
+
+  const handleOnSetCell = useCallback(
+    (id: string) => {
+      const doc = list?.find((i) => i.id === id);
+      if (!doc?.head.good) {
+        handleErrorMessage(visibleDialog, 'Товар не найден!');
+        return;
+      }
+
+      if (!doc?.head.good) {
+        handleErrorMessage(visibleDialog, 'Товар не найден!');
+        return;
+      }
+      if (goodBarcodeSettings.boxWeight > doc?.head?.weight) {
+        handleErrorMessage(visibleDialog, 'Вес меньше минимального веса поддона.');
+        return;
+      }
+      const newLine: IMoveLine = { ...doc?.head, id: generateId() };
+
+      const docId = currentDocumentId ? currentDocumentId : generateId();
+      const docc = movements.find((i) => i.id === currentDocumentId);
+      if (!currentDocumentId || (currentDocumentId && docc && docc.status !== 'DRAFT')) {
+        if (!movementType || !movementSubtype) {
+          handleErrorMessage(visibleDialog, 'Не найден тип документа!');
+          return;
+        }
+        if (!defaultDepart || !defaultSecondDepart) {
+          handleErrorMessage(visibleDialog, 'Не найдены подразделения!');
+          return;
+        }
+
+        const createdDate = new Date().toISOString();
+        const newNumber = getNextDocNumber(movements);
+
+        const newDoc: IMoveDocument = {
+          id: docId,
+          documentType: movementType,
+          number: newNumber.trim(),
+          documentDate: createdDate,
+          status: 'DRAFT',
+          head: {
+            fromDepart: defaultDepart,
+            toDepart: defaultSecondDepart,
+            subtype: movementSubtype,
+          },
+          lines: [],
+          creationDate: createdDate,
+          editionDate: createdDate,
+        };
+
+        dispatch(documentActions.addDocument(newDoc));
+        setCurrentDocumentId(docId);
+      }
+
+      // navigation.dispatch(StackActions.replace('MoveToView', { id: newDoc.id }));
+
+      // const newNumber = getNextDocNumber(list); // из На хранение надо номер
+
+      setVisiblePalletDialog(false);
+      setLineDialog({ id: '', visible: false });
+      setBarcodeGeneration(false);
+      navigation.navigate('SelectCell', { docId, item: newLine, mode: 0, docType: `pallet${id}` });
+    },
+    [
+      currentDocumentId,
+      defaultDepart,
+      defaultSecondDepart,
+      dispatch,
+      goodBarcodeSettings.boxWeight,
+      handleErrorMessage,
+      list,
+      movementSubtype,
+      movementType,
+      movements,
+      navigation,
+      visibleDialog,
+    ],
   );
 
   const renderItem: ListRenderItem<IListItemProps> = useCallback(
@@ -193,46 +352,22 @@ export const PalletListScreen = () => {
       <ScreenListItem
         key={item.id}
         {...item}
-        onPress={() => (isDelList ? setDelList(getDelList(delList, item.id, item.status!)) : handleOnPress(item.id))}
+        onPress={() =>
+          isDelList
+            ? setDelList(getDelList(delList, item.id, item.status!))
+            : setLineDialog({ id: item.id, visible: true })
+        }
         onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
         checked={!!delList[item.id]}
       />
     ),
-    [delList, handleOnPress, isDelList],
+    [delList, isDelList],
   );
-
-  const goods = refSelectors.selectByName<IGood>('good').data;
-
-  const settings = useSelector((state) => state.settings?.data);
-
-  const goodBarcodeSettings = Object.entries(settings).reduce((prev: barcodeSettings, [idx, item]) => {
-    if (item && item.group?.id !== 'base' && typeof item.data === 'number') {
-      prev[idx] = item.data;
-    }
-    return prev;
-  }, {});
-
-  const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
-  const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
 
   const ref = useRef<TextInput>(null);
   const handleFocus = () => {
     ref?.current?.focus();
   };
-
-  const [visibleDialog, setVisibleDialog] = useState(false);
-  const [barcode, setBarcode] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [scanned, setScanned] = useState(false);
-
-  const handleErrorMessage = useCallback((visible: boolean, text: string) => {
-    if (visible) {
-      setErrorMessage(text);
-    } else {
-      alertWithSound('Внимание!', `${text}.`, handleFocus);
-      setScanned(false);
-    }
-  }, []);
 
   const handleAddDocument = useCallback(
     (barcodeObj: IPalletHead) => {
@@ -240,6 +375,7 @@ export const PalletListScreen = () => {
         handleErrorMessage(visibleDialog, 'Не найден тип документа!');
         return;
       }
+      // const doc = list?.[0];
 
       const newNumber = getNextDocNumber(list);
 
@@ -252,14 +388,82 @@ export const PalletListScreen = () => {
         documentDate: date,
         status: 'DRAFT',
         head: barcodeObj,
-        lines: [],
+        lines: [
+          {
+            ...barcodeObj,
+            id: generateId(),
+          },
+        ],
         creationDate: date,
         editionDate: date,
       };
       dispatch(documentActions.addDocument(newDoc));
       setVisiblePalletDialog(false);
+      handleFocus();
     },
     [dispatch, handleErrorMessage, list, palletType, visibleDialog],
+  );
+
+  const handleAddLine = useCallback(
+    (barcodeObj: IPalletHead, mode: 'add' | 'update') => {
+      if (!palletType) {
+        handleErrorMessage(visibleDialog, 'Не найден тип документа!');
+        return;
+      }
+      if (mode === 'add') {
+        //((!list.length || !list?.[0] || !list?.[0].head)) {
+        handleAddDocument(barcodeObj);
+        setBarcodeGeneration(true);
+
+        handleFocus();
+      } else {
+        const line = list?.[0].lines?.find(
+          (i) => i.barcode === barcodeObj.barcode || i.scannedBarcode === barcodeObj.barcode,
+        );
+        if (line) {
+          handleErrorMessage(visibleDialog, 'Данный штрих-код уже добавлен!');
+          return;
+        }
+
+        const numReceivedCheck =
+          list?.[0].head?.numReceived !== barcodeObj.numReceived || list?.[0].head?.workDate !== barcodeObj.workDate;
+
+        if (numReceivedCheck) {
+          handleErrorMessage(visibleDialog, 'Номер партии или дата не совпадают!');
+          return;
+        }
+
+        const weight = round(list?.[0].head?.weight + barcodeObj.weight, 3);
+        const quantPack = round(list?.[0].head?.quantPack + barcodeObj.quantPack, 3);
+        const newObj: IPalletHead = {
+          ...list?.[0].head,
+          quantPack,
+          weight,
+        };
+        const newBrc = getBarcodeString({ ...newObj, shcode: newObj.good.shcode }, goodBarcodeSettings);
+
+        const newLine: IPalletLine = { ...barcodeObj, id: generateId() };
+        // dispatch(documentActions.addDocumentLine({ docId: list?.[0]?.id, line: newLine }));
+
+        dispatch(
+          documentActions.updateDocument({
+            docId: list?.[0]?.id,
+            document: {
+              ...list?.[0],
+              head: {
+                ...newObj,
+                barcode: newBrc,
+              },
+              lines: list?.[0].lines?.length ? [...list[0].lines, newLine] : [newLine],
+            },
+          }),
+        );
+        setVisiblePalletDialog(false);
+        setBarcodeGeneration(true);
+        handleFocus();
+      }
+    },
+    [dispatch, goodBarcodeSettings, handleAddDocument, handleErrorMessage, list, palletType, visibleDialog],
   );
 
   const getScannedObject = useCallback(
@@ -302,7 +506,11 @@ export const PalletListScreen = () => {
         return;
       }
 
-      setSelectedPalletHead({ ...barc, good: lineGood.good, scannedBarcode: brc });
+      if (barcodeGeneration) {
+        handleAddLine({ ...barc, good: lineGood.good, scannedBarcode: brc }, 'update');
+      } else {
+        setSelectedPalletHead({ ...barc, good: lineGood.good, scannedBarcode: brc });
+      }
 
       if (visibleDialog) {
         setVisibleDialog(false);
@@ -312,10 +520,19 @@ export const PalletListScreen = () => {
         setScanned(false);
       }
 
-      setVisiblePalletDialog(true);
+      !barcodeGeneration && setVisiblePalletDialog(true);
     },
 
-    [minBarcodeLength, maxBarcodeLength, goodBarcodeSettings, goods, visibleDialog, handleErrorMessage],
+    [
+      minBarcodeLength,
+      maxBarcodeLength,
+      goodBarcodeSettings,
+      goods,
+      barcodeGeneration,
+      visibleDialog,
+      handleErrorMessage,
+      handleAddLine,
+    ],
   );
 
   const handleSearchBarcode = () => {
@@ -385,6 +602,7 @@ export const PalletListScreen = () => {
         storeMan={`${storeMan?.lastName} ${storeMan?.firstName}`}
         palletHead={selectedPalletHead}
         getBarcode={handleGetBarcode}
+        onContinue={(barcodeObj: IPalletHead) => handleAddLine(barcodeObj, 'add')}
       />
       <AppDialog
         title="Введите штрих-код"
@@ -396,6 +614,15 @@ export const PalletListScreen = () => {
         okLabel={'Найти'}
         errorMessage={errorMessage}
         keyboardType="number-pad"
+      />
+      <LineDialog
+        visible={lineDialog.visible}
+        title={'Внимание!'}
+        text={'Выберите действие'}
+        onCancel={() => setLineDialog({ id: '', visible: false })}
+        onPrint={() => handleOnPress(lineDialog.id)}
+        onCellSet={() => handleOnSetCell(lineDialog.id)}
+        // okDisabled={toCellDisabled}
       />
     </AppScreen>
   );

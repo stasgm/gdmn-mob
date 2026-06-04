@@ -324,16 +324,16 @@ export const DocViewScreen = () => {
 
       //проверка кода маркировки на уникальность добавить
 
-      if (dataMarkType === '2') {
-        Alert.alert('Внимание!', 'Отсканирован код УКЗ. Отсканируйте штрихкод товара', [
-          {
-            text: 'ОК',
-          },
-        ]);
-        handleFocus();
+      // if (dataMarkType === '2') {
+      //   Alert.alert('Внимание!', 'Отсканирован код УКЗ. Отсканируйте штрихкод товара', [
+      //     {
+      //       text: 'ОК',
+      //     },
+      //   ]);
+      //   handleFocus();
 
-        return;
-      }
+      //   return;
+      // }
 
       let charFrom = 0;
       let charTo = weightSettingsWeightCode.data.length;
@@ -349,11 +349,15 @@ export const DocViewScreen = () => {
         //   иначе подставляем unknownGood cо сканированным шк и добавляем в позицию документа
 
         if (!remItem) {
-          Alert.alert('Внимание!', 'Товар не найден', [
-            {
-              text: 'ОК',
-            },
-          ]);
+          Alert.alert(
+            'Внимание!',
+            dataMarkType === '2' ? 'Товар не найден. Возможно отсканирован код УКЗ.' : 'Товар не найден',
+            [
+              {
+                text: 'ОК',
+              },
+            ],
+          );
           handleFocus();
 
           return;

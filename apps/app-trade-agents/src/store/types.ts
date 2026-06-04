@@ -31,6 +31,7 @@ export interface IOrderFormParam extends IFormParam {
   status?: StatusType;
   route?: IReferenceData;
   road?: IReferenceData;
+  expeditor?: IReferenceData;
   comment?: string;
 }
 
@@ -151,6 +152,20 @@ export interface IMatrixDataNamed extends IMatrixData {
   goodName: string;
 }
 
+export interface IGoodSales {
+  [id: string]: ISalesData[];
+}
+
+export interface ISalesData {
+  goodId: string;
+  priceRed: number; // цена ФСО
+}
+
+export interface ISalesDataNamed extends IMatrixData {
+  [fieldName: string]: number | string | undefined;
+  goodName: string;
+}
+
 export type IPackage = INamedEntity;
 
 export interface IPackageGood extends IEntity {
@@ -168,12 +183,15 @@ export interface IOrderHead extends IHead {
   onDate: string; //  Дата отгрузки
   takenOrder?: TakeOrderType; //тип взятия заявки
   comment?: string;
+  expeditor?: IReferenceData;
 }
 
 export interface IOrderLine extends IEntity {
   good: IGood;
   quantity: number;
   package?: INamedEntity; // Вид упаковки
+  remains?: number;
+  agentRemains?: number;
 }
 
 export interface IOrderTotalLine {

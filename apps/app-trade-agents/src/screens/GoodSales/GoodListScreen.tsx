@@ -1,0 +1,126 @@
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { styles } from '@lib/mobile-navigation';
+import { Searchbar } from 'react-native-paper';
+import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import {
+  AppActivityIndicator,
+  AppScreen,
+  EmptyList,
+  ItemSeparator,
+  navBackButton,
+  SearchButton,
+  SubTitle,
+} from '@lib/mobile-ui';
+
+import { refSelectors } from '@lib/store';
+
+import { keyExtractor } from '@lib/mobile-hooks';
+
+import { FlashList } from '@shopify/flash-list';
+
+import { GoodSalesStackParamList } from '../../navigation/Root/types';
+import { IGood, IGoodSales, IOutlet } from '../../store/types';
+
+import { getGoodSalesByOutlet } from '../../utils/helpers';
+
+import GoodItem from './components/GoodItem';
+
+const GoodListScreen = () => {
+  const { id } = useRoute<RouteProp<GoodSalesStackParamList, 'GoodList'>>().params;
+  const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data.find((e) => e.id === id);
+
+  const goodSales = refSelectors.selectByName<IGoodSales>('goodSales')?.data?.[0];
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterVisible, setFilterVisible] = useState(false);
+  const { colors } = useTheme();
+  const navigation = useNavigation();
+
+  const goods = refSelectors.selectByName<IGood>('good')?.data;
+
+  const goodSaleList = useMemo(
+    () => (outlet?.id ? getGoodSalesByOutlet(goods, goodSales?.[outlet.id], true) : []),
+    [outlet?.id, goodSales, goods],
+  );
+
+  const filteredList = useMemo(() => {
+    return (
+      goodSaleList
+        ?.filter((i) =>
+          i.name || i.priceFsn
+            ? String(i.name).toUpperCase().includes(searchQuery.toUpperCase()) ||
+              String(i.priceFsn).toUpperCase().includes(searchQuery.toUpperCase())
+            : true,
+        )
+        ?.sort((a, b) => (a.name < b.name ? -1 : 1)) || []
+    );
+  }, [goodSaleList, searchQuery]);
+
+  console.log('filteredList', filteredList);
+
+  useEffect(() => {
+    if (!filterVisible && searchQuery) {
+      setSearchQuery('');
+    }
+  }, [filterVisible, searchQuery]);
+
+  const renderRight = useCallback(
+    () => <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={filterVisible} />,
+    [filterVisible],
+  );
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: navBackButton,
+      headerRight: renderRight,
+    });
+  }, [navigation, renderRight]);
+
+  const renderItem = ({ item }: { item: IGood }) => <GoodItem item={item} />;
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
+
+  return (
+    <AppScreen>
+      <SubTitle style={[localStyles.title]}>{outlet?.name}</SubTitle>
+      {filterVisible && (
+        <>
+          <View style={styles.flexDirectionRow}>
+            <Searchbar
+              placeholder="Поиск"
+              onChangeText={setSearchQuery}
+              value={searchQuery}
+              style={[styles.flexGrow, styles.searchBar]}
+              autoFocus
+              selectionColor={colors.primary}
+            />
+          </View>
+          <ItemSeparator />
+        </>
+      )}
+      <FlashList
+        data={filteredList}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        estimatedItemSize={60}
+        ItemSeparatorComponent={ItemSeparator}
+        ListEmptyComponent={EmptyList}
+        keyboardShouldPersistTaps={'handled'}
+      />
+    </AppScreen>
+  );
+};
+
+export default GoodListScreen;
+
+const localStyles = StyleSheet.create({
+  title: {
+    fontSize: 20,
+    textAlign: 'center',
+    padding: 5,
+  },
+});

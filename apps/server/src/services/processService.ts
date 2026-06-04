@@ -2,7 +2,16 @@
 
 import { unlinkSync, renameSync, existsSync } from 'fs';
 
-import { IAddProcessResponse, IStatusResponse, AddProcess, IProcessedFiles, NewMessage, ICmd } from '@lib/types';
+import {
+  IAddProcessResponse,
+  IStatusResponse,
+  AddProcess,
+  IProcessedFiles,
+  NewMessage,
+  ICmd,
+  IDBMessage,
+  IFiles,
+} from '@lib/types';
 
 import { log } from '../utils';
 
@@ -26,6 +35,7 @@ import {
   saveFile,
   makeDBNewMessageSync,
   getFiles,
+  getMessageFilesRefsListSync,
 } from './processList';
 import { getDb } from './dao/db';
 
@@ -146,6 +156,24 @@ export const prepareById = ({
     const commandType = (
       newMes.body.type === 'CMD' ? (newMes.body.payload as ICmd).name : newMes.body.type
     ).toLowerCase();
+
+    // Чистим все имеющиеся refs для consumerId и deviceId
+
+    const refFiles: string[] = getMessageFilesRefsListSync({
+      consumerId: newMes.head.consumerId,
+      deviceId: newMes.head.deviceId,
+      companyId: newMes.head.companyId,
+      appSystemId: newMes.head.appSystemId,
+    });
+
+    for (const file of refFiles) {
+      try {
+        unlinkSync(file);
+      } catch (err) {
+        log.warn(`Robust-protocol.prepareProcess: Не удалось удалить файл ${file}`);
+      }
+    }
+
     const newFn = params2messageFileName({
       id: newMes.id,
       producerId: producerId,

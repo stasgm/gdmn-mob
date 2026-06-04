@@ -6,3 +6,4 @@ export { default as MapNavigator } from './Root/Maps/MapNavigator';
 export { default as ShipmentNavigator } from './Root/ShipmentNavigator';
 export { default as ReportsNavigator } from './Root/ReportsNavigator';
 export { default as RemainsNavigator } from './Root/RemainsNavigator';
+export { default as GoodSalesNavigator } from './Root/GoodSalesNavigator';

@@ -18,6 +18,8 @@ import { IconButton } from 'react-native-paper';
 
 import { useTheme } from '@react-navigation/native';
 
+// import { BarCodeScanner } from 'expo-barcode-scanner';
+
 import { IScannedObject } from '@lib/client-types';
 
 import { ISettingsOption } from '@lib/types';
@@ -63,6 +65,7 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave, onSave 
   const settings = useSelector((state) => state.settings.data);
   const isScanerReader = settings.scannerUse?.data as boolean;
   const isScreenKeyboard = settings.screenKeyboard?.data as boolean;
+  const showRemainsQuantity = settings.showRemainsQuantity?.data as boolean;
 
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(isScreenKeyboard);
 
@@ -282,10 +285,12 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave, onSave 
             </View>
           ) : null}
           {isSumWNds ? (
-            <View style={localStyles.item}>
-              <MediumText>Остаток:</MediumText>
-              <LargeText style={localStyles.value}>{remains.toString()}</LargeText>
-            </View>
+            showRemainsQuantity ? (
+              <View style={localStyles.item}>
+                <MediumText>Остаток:</MediumText>
+                <LargeText style={localStyles.value}>{remains.toString()}</LargeText>
+              </View>
+            ) : null
           ) : (
             <View style={localStyles.item}>
               <View style={localStyles.halfItem}>
@@ -301,11 +306,15 @@ export const DocLine = ({ item, isSumWNds, onSetLine, onSetDisabledSave, onSave 
                 </View>
                 {/* )} */}
               </View>
-              <View style={[{ backgroundColor: colors.primary }, localStyles.verticalLine]} />
-              <View style={[localStyles.halfItem, localStyles.halfItemRemView]}>
-                <MediumText>Остаток:</MediumText>
-                <LargeText style={localStyles.value}>{remains.toString()}</LargeText>
-              </View>
+              {showRemainsQuantity ? (
+                <>
+                  <View style={[{ backgroundColor: colors.primary }, localStyles.verticalLine]} />
+                  <View style={[localStyles.halfItem, localStyles.halfItemRemView]}>
+                    <MediumText>Остаток:</MediumText>
+                    <LargeText style={localStyles.value}>{remains.toString()}</LargeText>
+                  </View>
+                </>
+              ) : null}
             </View>
           )}
           <ItemSeparator />

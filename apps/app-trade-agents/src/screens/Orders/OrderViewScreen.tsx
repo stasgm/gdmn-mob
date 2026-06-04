@@ -109,6 +109,7 @@ const OrderViewScreen = () => {
 
   const settings = useSelector((state) => state.settings.data);
   const isUseRemains = settings?.isUseRemains?.data as boolean;
+  const isUseUnitMeasure = (settings?.isUseUnitMeasure?.data ?? true) as boolean;
   const depart = refSelectors.selectByRefId<INamedEntity>('department', order?.head?.depart?.id)?.name;
 
   const handleAddOrderLine = useCallback(() => {
@@ -521,11 +522,12 @@ const OrderViewScreen = () => {
             isChecked={checkedId ? true : false}
             onLongPress={() => !isBlocked && handleAddDeletelList(item.id, checkedId)}
             isDelList={isDelList}
+            isRemains={isUseRemains}
           />
         </View>
       );
     },
-    [delList, handleAddDeletelList, handlePressOrderLine, isBlocked, isDelList, packages],
+    [delList, handleAddDeletelList, handlePressOrderLine, isBlocked, isDelList, isUseRemains, packages],
   );
 
   const isEditable = useMemo(() => (order ? ['DRAFT', 'READY'].includes(order?.status) : false), [order]);
@@ -600,6 +602,9 @@ const OrderViewScreen = () => {
               </View>
             ) : null}
             {isUseRemains && depart ? <LargeText style={localStyles.contract}>{`Склад: ${depart}`}</LargeText> : null}
+            {isUseRemains && order.head.expeditor ? (
+              <LargeText style={localStyles.contract}>{`Экспедитор: ${order.head.expeditor.name}`}</LargeText>
+            ) : null}
 
             {order.head.comment ? (
               <View style={styles.rowCenter}>
@@ -620,7 +625,12 @@ const OrderViewScreen = () => {
         />
       </View>
       {!!order.lines.length && (
-        <OrderTotal onPress={() => setIsGroupVisible(!isGroupVisible)} isGroupVisible={isGroupVisible} order={order} />
+        <OrderTotal
+          onPress={() => setIsGroupVisible(!isGroupVisible)}
+          isGroupVisible={isGroupVisible}
+          isUseUnitMeasure={isUseUnitMeasure}
+          order={order}
+        />
       )}
       <SimpleDialog
         visible={visibleSendDialog}

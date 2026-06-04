@@ -116,6 +116,7 @@ export interface IBasedLine extends IEntity {
   sortOrder?: number; // порядок сортировки
   scannedBarcode?: string;
   usedRemains?: boolean; // используются остатки в приложении
+  flag?: string; // флаг (последний символ), означает тип тары
 }
 
 export interface ISendingLine extends IEntity {
@@ -136,6 +137,8 @@ export interface IMoveLine extends IBasedLine {
   fromCell?: string; // номер ячейки
   toCell?: string; // номер ячейки
   storeDate?: string;
+  storeMan?: string;
+  isPack?: boolean;
 }
 
 export type IMoveDocument = MandateProps<IDocument<IMoveHead, IMoveLine>, 'head' | 'lines'>;
@@ -241,9 +244,24 @@ export interface IPalletHead extends IHead {
   time?: string; // Время производства
   numReceived: string; // Номер партии
   storeMan?: string;
+  boxQuantity?: number; // количество коробок как правильно
+  toCell?: string; // номер ячейки
+  storeDate?: string;
 }
 
-export type IPalletDocument = MandateProps<IDocument<IPalletHead>, 'head'>;
+export interface IPalletLine extends IEntity {
+  quantPack: number;
+  barcode: string;
+  scannedBarcode: string;
+  good: IGood; // товар
+  weight: number; //вес
+  workDate: string; // Дата производства
+  time?: string; // Время производства
+  numReceived: string; // Номер партии
+  // storeMan?: string;
+}
+
+export type IPalletDocument = MandateProps<IDocument<IPalletHead, IPalletLine>, 'head' | 'lines'>;
 
 export type barcodeSettings = {
   [name: string]: number;

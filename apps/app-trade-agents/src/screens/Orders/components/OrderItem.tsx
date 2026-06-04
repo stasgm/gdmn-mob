@@ -12,9 +12,10 @@ interface IProps {
   onLongPress?: () => void;
   isChecked?: boolean;
   isDelList?: boolean;
+  isRemains?: boolean;
 }
 
-const OrderItem = ({ item, onPress, onLongPress, isChecked, isDelList }: IProps) => (
+const OrderItem = ({ item, onPress, onLongPress, isChecked, isDelList, isRemains }: IProps) => (
   <TouchableOpacity onPress={isDelList ? onLongPress : onPress} onLongPress={onLongPress}>
     <View style={styles.item}>
       <View style={styles.iconsWithCheck}>
@@ -31,7 +32,7 @@ const OrderItem = ({ item, onPress, onLongPress, isChecked, isDelList }: IProps)
         <LargeText style={styles.textBold}>{item.good.name}</LargeText>
         <View style={styles.directionRow}>
           <MediumText>
-            {item.quantity} {'кг  /  '} {(item.good.priceFsn || 0).toString()} р.
+            {item.quantity} {isRemains ? ' /  ' : 'кг  / '} {(item.good.priceFsn || 0).toString()} р.
           </MediumText>
         </View>
         {item.package ? <MediumText>Упаковка: {item.package?.name}</MediumText> : null}

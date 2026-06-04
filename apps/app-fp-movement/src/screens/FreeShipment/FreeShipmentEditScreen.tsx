@@ -119,6 +119,14 @@ export const FreeShipmentEditScreen = () => {
         return;
       }
 
+      const docDateStr = docDate.slice(0, 10);
+      const todayStr = new Date().toISOString().slice(0, 10);
+      if (docDateStr < todayStr) {
+        alertWithSound('Ошибка!', 'Дата документа не может быть раньше текущей даты.');
+        setScreenState('idle');
+        return;
+      }
+
       const docId = !id ? generateId() : id;
       const createdDate = new Date().toISOString();
 

@@ -88,7 +88,11 @@ export const MoveViewScreen = () => {
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
   const lineSum = lines?.reduce(
     (sum, line) => {
-      return { ...sum, quantPack: sum.quantPack + (line.quantPack || 0), weight: sum.weight + (line.weight || 0) };
+      return {
+        ...sum,
+        quantPack: sum.quantPack + (line.flag === '0' ? 1 : line.quantPack || 0),
+        weight: sum.weight + (line.weight || 0),
+      };
     },
     { quantPack: 0, weight: 0 },
   );
@@ -108,6 +112,8 @@ export const MoveViewScreen = () => {
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
   const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
+
+  const addPalletQuantPack = Boolean(settings.addPalletQuantPack?.data);
 
   const isAddressStore = Boolean(settings.addressStore?.data);
 
@@ -133,10 +139,10 @@ export const MoveViewScreen = () => {
     (doc?.head.fromDepart.id === defaultDepart?.id || Boolean(documentType?.isRemains)) &&
     Boolean(settings.remainsUse?.data);
 
-  const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
+  const remains = refSelectors.selectByName<IRemains>('remains')?.data?.[0];
 
   const goodRemains = useMemo<IRemGood[]>(() => {
-    return doc?.head?.fromDepart?.id && isFocused && remains && remains
+    return doc?.head?.fromDepart?.id && isFocused && remains
       ? getRemGoodListByContact(goods, remains[doc.head.fromDepart.id] /*, docList, doc.head?.fromDepart?.id*/)
       : [];
   }, [doc?.head?.fromDepart?.id, goods, isFocused, remains]);
@@ -182,6 +188,7 @@ export const MoveViewScreen = () => {
         weight: line.weight,
         workDate: line.workDate,
         time: line.time,
+        flag: line.flag,
       };
 
       // if (isAddressedDoc && line?.weight >= goodBarcodeSettings?.boxWeight) {
@@ -630,6 +637,7 @@ export const MoveViewScreen = () => {
         quantPack: barc.quantPack,
         sortOrder: doc.lines?.length + 1,
         usedRemains: remainsUse,
+        flag: barc.flag,
       };
 
       if (isAddressedDoc && barc.weight < goodBarcodeSettings?.boxWeight) {
@@ -660,6 +668,11 @@ export const MoveViewScreen = () => {
         setScanned(false);
       }
       handleFocus();
+
+      if (addPalletQuantPack && newLine.weight >= goodBarcodeSettings?.boxWeight) {
+        setIsPack(false);
+        setVisibleQuantPackDialog(true);
+      }
     },
 
     [
@@ -672,6 +685,7 @@ export const MoveViewScreen = () => {
       remainsUse,
       isAddressedDoc,
       visibleDialog,
+      addPalletQuantPack,
       handleErrorMessage,
       navigation,
       id,

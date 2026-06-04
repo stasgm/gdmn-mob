@@ -8,6 +8,13 @@ import { IGood } from '../store/app/types';
 
 const statusColors = ['#E91E63', '#06567D', '#80B12C', '#FFA700'] as const;
 
+export const cellColors = {
+  default: '#5aa176',
+  barcode: '#226182',
+  free: '#d5dce3',
+  textWhite: 'white',
+};
+
 export const ONE_SECOND_IN_MS = 1000;
 
 export const contactTypes: IListItem[] = [
@@ -208,6 +215,16 @@ export const appSettings: Settings = {
     visible: true,
     group: mainSettingGroup,
   },
+  showRemainsQuantity: {
+    id: 'showRemainsQuantity',
+    sortOrder: 11,
+    description: 'Показывать остатки в документах',
+    data: true,
+    type: 'boolean',
+    visible: true,
+    group: mainSettingGroup,
+    checkSettingsCode: true,
+  },
 };
 
 export const unknownGood: IGood = {
@@ -216,3 +233,14 @@ export const unknownGood: IGood = {
   name: 'Неизвестный товар',
   goodGroup: { id: 'unknown', name: 'Неизвестная группа' },
 };
+
+export const lineTypes: IListItem[] = [
+  {
+    id: 'all',
+    value: 'все',
+  },
+  {
+    id: 'last',
+    value: 'позиция',
+  },
+];

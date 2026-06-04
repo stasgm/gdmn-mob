@@ -70,7 +70,11 @@ export const ReturnViewScreen = () => {
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
   const lineSum = lines?.reduce(
     (sum, line) => {
-      return { ...sum, quantPack: sum.quantPack + (line.quantPack || 0), weight: sum.weight + (line.weight || 0) };
+      return {
+        ...sum,
+        quantPack: sum.quantPack + (line.flag === '0' ? 1 : line.quantPack || 0),
+        weight: sum.weight + (line.weight || 0),
+      };
     },
     { quantPack: 0, weight: 0 },
   );
@@ -88,6 +92,8 @@ export const ReturnViewScreen = () => {
 
   const minBarcodeLength = (settings.minBarcodeLength?.data as number) || 0;
   const maxBarcodeLength = (settings.maxBarcodeLength?.data as number) || 0;
+
+  const addPalletQuantPack = Boolean(settings.addPalletQuantPack?.data);
 
   const docList = useSelector((state) => state.documents.list).filter(
     (i) => i.documentType.name === 'return',
@@ -140,6 +146,7 @@ export const ReturnViewScreen = () => {
         weight: line.weight,
         workDate: line.workDate,
         time: line.time,
+        flag: line.flag,
       };
 
       const weight =
@@ -507,7 +514,7 @@ export const ReturnViewScreen = () => {
       }
 
       const newLine: IReturnLine = {
-        good: { id: good.id, name: good.name, shcode: good.shcode },
+        good: { id: good.id, name: good.name, shcode: good.shcode, unitWeight: good.unitWeight },
         id: generateId(),
         weight: barc.weight,
         barcode: barc.barcode,
@@ -516,6 +523,7 @@ export const ReturnViewScreen = () => {
         numReceived: barc.numReceived,
         sortOrder: doc?.lines?.length + 1,
         quantPack: barc.quantPack,
+        flag: barc.flag,
       };
 
       dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
@@ -529,6 +537,11 @@ export const ReturnViewScreen = () => {
         setScanned(false);
       }
       handleFocus();
+
+      if (addPalletQuantPack && newLine.weight >= goodBarcodeSettings?.boxWeight) {
+        setIsPack(false);
+        setVisibleQuantPackDialog(true);
+      }
     },
 
     [
@@ -541,6 +554,7 @@ export const ReturnViewScreen = () => {
       id,
       playSound,
       visibleDialog,
+      addPalletQuantPack,
       handleErrorMessage,
     ],
   );
