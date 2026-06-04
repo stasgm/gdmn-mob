@@ -372,6 +372,7 @@ function FileListTable<T extends IEntity>({
                       onChange={onSelectMany}
                     />
                   </TableCell>
+
                   {headCells.map((item) => {
                     return (
                       <TableCell
@@ -410,7 +411,7 @@ function FileListTable<T extends IEntity>({
                   sx: {
                     top: 64,
                     width,
-                    height: 'calc(100% - 64px - 48px)',
+                    height: 'calc(100% - 64px - 60px)',
                     transitionProperty: 'width, transform !important',
                     transitionDuration: '0.3s !important',
                     transitionTimingFunction: 'cubic-bezier(0.4, 0, 1, 1) !important',
@@ -478,36 +479,37 @@ function FileListTable<T extends IEntity>({
                             disabled={item === 'companyId' ? false : !formik.values['companyId'].value}
                           />
                         ) : filterValues[item].type === 'date' ? (
-                          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
-                            {/* <DesktopDateTimePicker
-                              label={filterValues[item].name || ''}
-                              // inputFormat="DD/MM/YY hh:mm"
-                              // defaultValue={dayjs((formik.values[item]?.value as string) || '')}
-                              // defaultValue={formik.values[item]?.value as string || null}
-                              defaultValue={dayjs((formik.values[item]?.value as string) || '')}
-                              onChange={(date: any, kbDate: any) => {
-                                if (date === null) handleUpdateFormik(item, { id: item, name: '' });
-                                const newDate = (kbDate || '').replace(
-                                  new RegExp('^(\\d{2})\\/(\\d{2})\\/(\\d{2}).$'),
-                                  '$2/$1/$3 12:00',
-                                );
-                                if (!Date.parse(date as string) && (!Date.parse(newDate) || kbDate?.length !== 9))
-                                  return;
-                                handleUpdateFormik(item, {
-                                  id: item,
-                                  name: new Date(Date.parse(date as string) ? (date as string) : newDate).toISOString(),
-                                });
-                              }}
-                              componentsProps={{
-                                actionBar: {
-                                  actions: ['clear'],
-                                },
-                              }}
-                              renderInput={(params: any) => <TextField {...params} fullWidth />}
-                              disabled={!formik.values['companyId'].value}
-                            /> */}
-                          </LocalizationProvider>
+                          <></>
                         ) : (
+                          // <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
+                          //   <DesktopDateTimePicker
+                          //     label={filterValues[item].name || ''}
+                          //     // inputFormat="DD/MM/YY hh:mm"
+                          //     // defaultValue={dayjs((formik.values[item]?.value as string) || '')}
+                          //     // defaultValue={formik.values[item]?.value as string || null}
+                          //     defaultValue={dayjs((formik.values[item]?.value as string) || '')}
+                          //     onChange={(date: any, kbDate: any) => {
+                          //       if (date === null) handleUpdateFormik(item, { id: item, name: '' });
+                          //       const newDate = (kbDate || '').replace(
+                          //         new RegExp('^(\\d{2})\\/(\\d{2})\\/(\\d{2}).$'),
+                          //         '$2/$1/$3 12:00',
+                          //       );
+                          //       if (!Date.parse(date as string) && (!Date.parse(newDate) || kbDate?.length !== 9))
+                          //         return;
+                          //       handleUpdateFormik(item, {
+                          //         id: item,
+                          //         name: new Date(Date.parse(date as string) ? (date as string) : newDate).toISOString(),
+                          //       });
+                          //     }}
+                          //     // componentsProps={{
+                          //     //   actionBar: {
+                          //     //     actions: ['clear'],
+                          //     //   },
+                          //     // }}
+                          //     // renderInput={(params: any) => <TextField {...params} fullWidth />}
+                          //     disabled={!formik.values['companyId'].value}
+                          //   />
+                          // </LocalizationProvider>
                           <TextField
                             slotProps={{
                               input: {
@@ -549,11 +551,11 @@ function FileListTable<T extends IEntity>({
                 sx={{
                   p: 3,
                   flexDirection: 'row',
-                  maxHeight: '10%',
+                  // maxHeight: '10%',
                   justifyContent: 'space-between',
                   width,
                   display: 'flex',
-                  position: 'fixed',
+                  position: 'absolute',
                   bottom: 0,
                   right: 0,
                   background: '#FFFFFF',

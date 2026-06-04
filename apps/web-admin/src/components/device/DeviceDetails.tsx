@@ -115,25 +115,23 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel }: 
                     value={formik.values.code}
                   />
                 </Grid>
-                <Grid container direction="row" size={{ xs: 12 }}>
-                  <Grid size={{ md: 12, xs: 12 }}>
-                    <TextField
-                      error={formik.touched.uid && Boolean(formik.errors.uid)}
-                      fullWidth
-                      label="Номер"
-                      id="uid"
-                      name="uid"
-                      variant="outlined"
-                      onBlur={formik.handleBlur}
-                      onChange={formik.handleChange}
-                      type="uid"
-                      disabled={true}
-                      value={formik.values.uid}
-                    />
-                  </Grid>
+                <Grid size={{ md: 6, xs: 12 }}>
+                  <TextField
+                    error={formik.touched.uid && Boolean(formik.errors.uid)}
+                    fullWidth
+                    label="Номер"
+                    id="uid"
+                    name="uid"
+                    variant="outlined"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="text"
+                    disabled={true}
+                    value={formik.values.uid}
+                  />
                 </Grid>
                 {isCompanyAddRequired && (
-                  <Grid size={{ md: 12, xs: 12 }}>
+                  <Grid size={{ md: 6, xs: 12 }}>
                     <Field
                       component={ComboBox}
                       idr="company"
