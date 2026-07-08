@@ -87,7 +87,8 @@ export const removeProcessFromList = (processId: string) => {
  * Можем ли мы начать новый процесс. Вернет Истина, если да, Ложь, если уже идет процесс.
  * Если нет -- будеми сообщать Гедымину, что состояние BUSY.
  */
-export const getProcessByCompanyId = (companyId: string) => processList.find((p) => p.companyId === companyId);
+export const getProcessByCompanyId = (companyId: string, appSystemId: string) =>
+  processList.find((p) => p.companyId === companyId && p.appSystemId === appSystemId);
 
 export const startProcess = (companyId: string, appSystemId: string, files: IFiles) => {
   const newProcess: IDBProcess = {
