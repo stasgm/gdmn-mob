@@ -49,7 +49,7 @@ import { getDb } from './dao/db';
  */
 export const addOne = (params: AddProcess): IAddProcessResponse => {
   const { companies, users } = getDb();
-  const { companyId, consumerId } = params;
+  const { companyId, consumerId, appSystemId } = params;
 
   if (!companies.findById(companyId)) {
     throw new DataNotFoundException('Компания не найдена');
@@ -61,7 +61,7 @@ export const addOne = (params: AddProcess): IAddProcessResponse => {
   }
 
   // Находим процесс для конкретной базы
-  const process = getProcessByCompanyId(companyId);
+  const process = getProcessByCompanyId(companyId, appSystemId);
 
   //Если процесс существует, то возвращаем status = BUSY
   if (process) {
