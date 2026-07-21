@@ -17,17 +17,24 @@ export interface IItem {
   onPress: () => void;
   isGroupVisible?: boolean;
   isUseUnitMeasure?: boolean;
+  isUseRemains?: boolean;
 }
 
-const OrderTotal = ({ order, isGroupVisible = false, isUseUnitMeasure = true, onPress }: IItem) => {
+const OrderTotal = ({
+  order,
+  isGroupVisible = false,
+  isUseUnitMeasure = true,
+  isUseRemains = false,
+  onPress,
+}: IItem) => {
   const { colors } = useTheme();
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;
   const firstLevelGroups = groups?.filter((item) => !item.parent?.id);
 
   const totalListByOrder = useMemo(
-    () => totalListByGroup(firstLevelGroups, groups, order.lines, isUseUnitMeasure),
-    [firstLevelGroups, groups, order.lines, isUseUnitMeasure],
+    () => totalListByGroup(firstLevelGroups, groups, order.lines, isUseUnitMeasure, isUseRemains),
+    [firstLevelGroups, groups, order.lines, isUseUnitMeasure, isUseRemains],
   );
 
   const borderColors = {
@@ -52,12 +59,18 @@ const OrderTotal = ({ order, isGroupVisible = false, isUseUnitMeasure = true, on
   ];
   const textStyle = [localStyles.cellText, textColor];
   const textBoldStyle = [textStyle, textColor, globalStyles.textBold];
+  const headerTextStyle = [textBoldStyle, localStyles.headerText];
   const labelStyle = { backgroundColor: colors.border, borderBottomColor: globalColors.backgroundLight };
   const totalStyle = {
     backgroundColor: isGroupVisible && totalListByOrder.length % 2 === 1 ? globalColors.backgroundLight : 'transparent',
   };
 
   const total = useMemo(() => totalList(totalListByOrder), [totalListByOrder]);
+
+  const tableHeaders = useMemo(
+    () => (isUseUnitMeasure ? ['Вес', 'Сумма', 'Сумма с\nНДC'] : ['Вес', 'Шт', 'Сумма', 'Сумма с\nНДC']),
+    [isUseUnitMeasure],
+  );
 
   return (
     <TouchableOpacity onPress={onPress}>
@@ -66,13 +79,17 @@ const OrderTotal = ({ order, isGroupVisible = false, isUseUnitMeasure = true, on
           <IconButton icon={isGroupVisible ? 'chevron-down' : 'chevron-up'} size={18} iconColor={colors.text} />
         </View>
         <DataTable.Header style={[localStyles.header, headerStyle]}>
-          {['Вес', 'Сумма', 'Сумма с НДC'].map((i) => {
-            return (
-              <DataTable.Title key={i} textStyle={textBoldStyle} style={localStyles.title} numeric>
-                {i}
-              </DataTable.Title>
-            );
-          })}
+          {tableHeaders.map((label) => (
+            <DataTable.Title
+              key={label}
+              style={localStyles.title}
+              textStyle={headerTextStyle}
+              numeric
+              numberOfLines={2}
+            >
+              {label}
+            </DataTable.Title>
+          ))}
         </DataTable.Header>
         {isGroupVisible
           ? totalListByOrder.map((item, index) => {
@@ -84,8 +101,13 @@ const OrderTotal = ({ order, isGroupVisible = false, isUseUnitMeasure = true, on
                   </DataTable.Row>
                   <DataTable.Row style={[localStyles.row, localStyles.borderBottomColor]}>
                     <DataTable.Cell textStyle={textStyle} numeric>
-                      {formatValue({ type: 'number' }, round(item.quantity, 3))}
+                      {formatValue({ type: 'number' }, round(item.weight, 3))}
                     </DataTable.Cell>
+                    {!isUseUnitMeasure ? (
+                      <DataTable.Cell textStyle={textStyle} numeric>
+                        {formatValue({ type: 'number' }, round(item.pieces, 3))}
+                      </DataTable.Cell>
+                    ) : null}
                     <DataTable.Cell textStyle={textStyle} numeric>
                       {formatValue({ type: 'number', decimals: 2 }, round(item.sum, 2))}
                     </DataTable.Cell>
@@ -103,8 +125,13 @@ const OrderTotal = ({ order, isGroupVisible = false, isUseUnitMeasure = true, on
           </DataTable.Row>
           <DataTable.Row style={[localStyles.borderColor, localStyles.total, localStyles.paddingBottom]}>
             <DataTable.Cell textStyle={textBoldStyle} numeric>
-              {formatValue({ type: 'number' }, round(total?.quantity || 0, 3))}
+              {formatValue({ type: 'number' }, round(total?.weight || 0, 3))}
             </DataTable.Cell>
+            {!isUseUnitMeasure ? (
+              <DataTable.Cell textStyle={textBoldStyle} numeric>
+                {formatValue({ type: 'number' }, round(total?.pieces || 0, 3))}
+              </DataTable.Cell>
+            ) : null}
             <DataTable.Cell textStyle={textBoldStyle} numeric>
               {formatValue({ type: 'number', decimals: 2 }, round(total?.sum || 0, 2))}
             </DataTable.Cell>
@@ -124,10 +151,16 @@ const localStyles = StyleSheet.create({
   cellText: {
     fontSize: 15,
   },
+  headerText: {
+    fontSize: 12,
+    lineHeight: 14,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
   header: {
     display: 'flex',
     flexDirection: 'row',
-    height: 30,
+    minHeight: 38,
     borderBottomWidth: StyleSheet.hairlineWidth * 2,
     borderTopWidth: StyleSheet.hairlineWidth * 2,
     fontWeight: 'bold',
@@ -138,8 +171,10 @@ const localStyles = StyleSheet.create({
     borderBottomWidth: 0,
   },
   title: {
-    paddingVertical: 0,
-    alignItems: 'center',
+    flex: 1,
+    flexShrink: 1,
+    paddingVertical: 4,
+    paddingHorizontal: 1,
   },
   total: {
     minHeight: 30,

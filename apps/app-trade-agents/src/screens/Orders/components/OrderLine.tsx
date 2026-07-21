@@ -10,15 +10,17 @@ import { INamedEntity } from '@lib/types';
 import { IOrderLine, IPackageGood } from '../../../store/types';
 
 import { ONE_SECOND_IN_MS } from '../../../utils/constants';
+import { getLineUnitName, isLineQuantityInKg } from '../../../utils/helpers';
 
 interface IProps {
   item: IOrderLine;
   packages: IPackageGood[];
   onSetLine: (value: IOrderLine) => void;
   isUseRemains?: boolean;
+  isUseUnitMeasure?: boolean;
 }
 
-const OrderLine = ({ item, packages, onSetLine, isUseRemains = false }: IProps) => {
+const OrderLine = ({ item, packages, onSetLine, isUseRemains = false, isUseUnitMeasure = true }: IProps) => {
   const { colors } = useTheme();
   const currRef = useRef<TextInput>(null);
 
@@ -47,6 +49,11 @@ const OrderLine = ({ item, packages, onSetLine, isUseRemains = false }: IProps) 
   }, [pack]);
 
   const textStyle = [styles.number, styles.field, { color: colors.text, backgroundColor: 'transparent' }];
+  const invWeight = item.good.invWeight || 1;
+  const unitName = getLineUnitName(invWeight, item.good.valueName, isUseUnitMeasure, isUseRemains);
+  const quantityLabel = isLineQuantityInKg(invWeight, isUseUnitMeasure, isUseRemains)
+    ? 'Количество, кг'
+    : `Количество, ${unitName}`;
 
   return (
     <View style={localStyles.container}>
@@ -142,7 +149,7 @@ const OrderLine = ({ item, packages, onSetLine, isUseRemains = false }: IProps) 
         )}
         <View style={styles.item}>
           <View style={styles.details}>
-            <Text style={styles.name}>Количество</Text>
+            <Text style={styles.name}>{quantityLabel}</Text>
             <TextInput
               style={[textStyle, localStyles.quantityItem]}
               showSoftInputOnFocus={false}

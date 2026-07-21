@@ -205,11 +205,44 @@ const getGroupModelByContact = (
   return parents;
 };
 
+const isLineQuantityInKg = (invWeight: number, isUseUnitMeasure: boolean, isUseRemains: boolean) =>
+  isUseUnitMeasure || !isUseRemains || invWeight === 1;
+
+const getLineUnitName = (invWeight: number, valueName: string, isUseUnitMeasure: boolean, isUseRemains: boolean) =>
+  isLineQuantityInKg(invWeight, isUseUnitMeasure, isUseRemains) ? 'кг' : valueName;
+
+const getLineWeightAndPieces = (
+  lineQuantity: number,
+  invWeight: number,
+  isUseUnitMeasure: boolean,
+  _isUseRemains: boolean,
+) => {
+  if (isUseUnitMeasure) {
+    return {
+      weight: lineQuantity,
+      pieces: round(lineQuantity / invWeight, 3),
+    };
+  }
+
+  if (invWeight === 1) {
+    return {
+      weight: lineQuantity,
+      pieces: 0,
+    };
+  }
+
+  return {
+    weight: 0,
+    pieces: lineQuantity,
+  };
+};
+
 const totalListByGroup = (
   firstLevelGroups: IGoodGroup[],
   groups: IGoodGroup[],
   orderLines: IOrderLine[],
   isUseUnitMeasure = true,
+  isUseRemains = false,
 ): IOrderTotalLine[] =>
   firstLevelGroups
     ?.map((firstGr) => {
@@ -220,19 +253,27 @@ const totalListByGroup = (
           ),
         ) || [];
 
-      const { quantity, sum, sumVat } = linesByParentGroup.reduce(
-        (prev: any, line) => {
+      const { weight, pieces, sum, sumVat } = linesByParentGroup.reduce(
+        (prev, line) => {
           const lineQuantity = round(line.quantity, 3);
-          const unitQuantity = isUseUnitMeasure ? lineQuantity / (line.good.invWeight || 1) : lineQuantity;
+          const invWeight = line.good.invWeight || 1;
+          const { weight: lineWeight, pieces: linePieces } = getLineWeightAndPieces(
+            lineQuantity,
+            invWeight,
+            isUseUnitMeasure,
+            isUseRemains,
+          );
+          const unitQuantity = isUseUnitMeasure ? lineQuantity / invWeight : lineQuantity;
           const s1 = round(unitQuantity * line.good.priceFsn);
 
           return {
-            quantity: prev.quantity + lineQuantity,
+            weight: prev.weight + lineWeight,
+            pieces: prev.pieces + linePieces,
             sum: prev.sum + s1,
             sumVat: prev.sumVat + s1 + round((s1 * Number(line.good.vat || 0)) / 100, 3),
           };
         },
-        { quantity: 0, sum: 0, sumVat: 0 },
+        { weight: 0, pieces: 0, sum: 0, sumVat: 0 },
       );
 
       return {
@@ -240,22 +281,25 @@ const totalListByGroup = (
           id: firstGr.id,
           name: firstGr.name,
         },
-        quantity,
+        weight,
+        pieces,
         sum,
         sumVat,
       };
     })
-    .filter((i) => i.quantity > 0);
+    .filter((i) => i.weight > 0 || i.pieces > 0);
 
 const totalList = (list: IOrderTotalLine[]) =>
   list?.reduce(
     (prev, item) => ({
-      quantity: prev.quantity + (item.quantity || 0),
+      weight: prev.weight + (item.weight || 0),
+      pieces: prev.pieces + (item.pieces || 0),
       sum: prev.sum + (item.sum || 0),
       sumVat: prev.sumVat + (item.sumVat || 0),
     }),
     {
-      quantity: 0,
+      weight: 0,
+      pieces: 0,
       sum: 0,
       sumVat: 0,
     },
@@ -375,6 +419,8 @@ export {
   getGoodMatrixByContact,
   getGoodSalesByOutlet,
   getGroupModelByContact,
+  getLineUnitName,
+  isLineQuantityInKg,
   totalListByGroup,
   totalList,
   getItemLayout,
