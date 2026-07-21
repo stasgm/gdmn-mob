@@ -24,18 +24,10 @@ interface IProps {
   orderLine: IOrderItemLine;
   onDismiss: () => void;
   isUseRemains?: boolean;
+  isUseUnitMeasure?: boolean;
 }
 
-const getLineForSave = (line: IOrderLine): IOrderLine => {
-  const { priceRed, ...good } = line.good;
-
-  return {
-    ...line,
-    good: typeof priceRed === 'number' ? { ...good, priceFsn: priceRed } : good,
-  };
-};
-
-const OrderLineEdit = ({ orderLine, onDismiss, isUseRemains = false }: IProps) => {
+const OrderLineEdit = ({ orderLine, onDismiss, isUseRemains = false, isUseUnitMeasure = true }: IProps) => {
   const dispatch = useDispatch();
   const { mode, item, docId } = orderLine;
 
@@ -49,7 +41,11 @@ const OrderLineEdit = ({ orderLine, onDismiss, isUseRemains = false }: IProps) =
 
   const handleSaveLine = useCallback(() => {
     setScreenState('saving');
-    const lineForSave = getLineForSave(line);
+    const { priceRed, ...good } = line.good;
+    const lineForSave: IOrderLine = {
+      ...line,
+      good: typeof priceRed === 'number' ? { ...good, priceFsn: priceRed } : good,
+    };
 
     const saveLine = () => {
       if (line.quantity) {
@@ -110,7 +106,13 @@ const OrderLineEdit = ({ orderLine, onDismiss, isUseRemains = false }: IProps) =
             </View>
           </View>
           <View style={[{ backgroundColor: colors.background }, localStyles.orderLineItem]}>
-            <OrderLine item={line} packages={packages} onSetLine={setLine} isUseRemains={isUseRemains} />
+            <OrderLine
+              item={line}
+              packages={packages}
+              onSetLine={setLine}
+              isUseRemains={isUseRemains}
+              isUseUnitMeasure={isUseUnitMeasure}
+            />
           </View>
         </View>
       </SafeAreaView>

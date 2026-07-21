@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { refSelectors } from '@lib/store';
+import { refSelectors, useSelector } from '@lib/store';
 import { DataTable, IconButton } from 'react-native-paper';
 
 import { useIsFocused, useTheme } from '@react-navigation/native';
@@ -21,6 +21,10 @@ export interface IItem {
 const RouteTotal = ({ routeId, onPress, isGroupVisible = false }: IItem) => {
   const { colors } = useTheme();
 
+  const settings = useSelector((state) => state.settings.data);
+  const isUseRemains = settings?.isUseRemains?.data as boolean;
+  const isUseUnitMeasure = (settings?.isUseUnitMeasure?.data ?? true) as boolean;
+
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;
   const firstLevelGroups = groups?.filter((item) => !item.parent?.id);
 
@@ -38,11 +42,16 @@ const RouteTotal = ({ routeId, onPress, isGroupVisible = false }: IItem) => {
   );
 
   const totalListByRoute = useMemo(
-    () => totalListByGroup(firstLevelGroups, groups, orderLines),
-    [firstLevelGroups, groups, orderLines],
+    () => totalListByGroup(firstLevelGroups, groups, orderLines, isUseUnitMeasure, isUseRemains),
+    [firstLevelGroups, groups, orderLines, isUseUnitMeasure, isUseRemains],
   );
 
   const total = useMemo(() => totalList(totalListByRoute), [totalListByRoute]);
+
+  const tableHeaders = useMemo(
+    () => (isUseUnitMeasure ? ['Вес', 'Сумма', 'Сумма с\nНДC'] : ['Вес', 'Шт', 'Сумма', 'Сумма с\nНДC']),
+    [isUseUnitMeasure],
+  );
 
   const borderColors = {
     borderLeftColor: colors.border,
@@ -57,6 +66,7 @@ const RouteTotal = ({ routeId, onPress, isGroupVisible = false }: IItem) => {
   ];
   const textStyle = [localStyles.cellText, textColor];
   const textBoldStyle = [textStyle, textColor, globalStyles.textBold];
+  const headerTextStyle = [textBoldStyle, localStyles.headerText];
   const labelStyle = { backgroundColor: colors.border, borderBottomColor: globalColors.backgroundLight };
   const totalStyle = {
     backgroundColor:
@@ -77,13 +87,17 @@ const RouteTotal = ({ routeId, onPress, isGroupVisible = false }: IItem) => {
           )}
         </View>
         <DataTable.Header style={[localStyles.header, headerStyle]}>
-          {['Вес, кг', 'Сумма', 'Сумма с НДC'].map((i) => {
-            return (
-              <DataTable.Title key={i} textStyle={textBoldStyle} style={localStyles.title} numeric>
-                {i}
-              </DataTable.Title>
-            );
-          })}
+          {tableHeaders.map((label) => (
+            <DataTable.Title
+              key={label}
+              style={localStyles.title}
+              textStyle={headerTextStyle}
+              numeric
+              numberOfLines={2}
+            >
+              {label}
+            </DataTable.Title>
+          ))}
         </DataTable.Header>
         {isGroupVisible
           ? totalListByRoute?.map((item, index) => {
@@ -95,8 +109,13 @@ const RouteTotal = ({ routeId, onPress, isGroupVisible = false }: IItem) => {
                   </DataTable.Row>
                   <DataTable.Row style={[localStyles.row, localStyles.borderBottomColor]}>
                     <DataTable.Cell textStyle={textStyle} numeric>
-                      {formatValue({ type: 'number' }, round(item.quantity, 3))}
+                      {formatValue({ type: 'number' }, round(item.weight, 3))}
                     </DataTable.Cell>
+                    {!isUseUnitMeasure ? (
+                      <DataTable.Cell textStyle={textStyle} numeric>
+                        {formatValue({ type: 'number' }, round(item.pieces, 3))}
+                      </DataTable.Cell>
+                    ) : null}
                     <DataTable.Cell textStyle={textStyle} numeric>
                       {formatValue({ type: 'number', decimals: 2 }, round(item.sum, 2))}
                     </DataTable.Cell>
@@ -114,8 +133,13 @@ const RouteTotal = ({ routeId, onPress, isGroupVisible = false }: IItem) => {
           </DataTable.Row>
           <DataTable.Row style={[localStyles.borderColor, localStyles.total, localStyles.paddingBottom]}>
             <DataTable.Cell textStyle={textBoldStyle} numeric>
-              {formatValue({ type: 'number' }, round(total?.quantity || 0, 3))}
+              {formatValue({ type: 'number' }, round(total?.weight || 0, 3))}
             </DataTable.Cell>
+            {!isUseUnitMeasure ? (
+              <DataTable.Cell textStyle={textBoldStyle} numeric>
+                {formatValue({ type: 'number' }, round(total?.pieces || 0, 3))}
+              </DataTable.Cell>
+            ) : null}
             <DataTable.Cell textStyle={textBoldStyle} numeric>
               {formatValue({ type: 'number', decimals: 2 }, round(total?.sum || 0, 2))}
             </DataTable.Cell>
@@ -135,10 +159,16 @@ const localStyles = StyleSheet.create({
   cellText: {
     fontSize: 15,
   },
+  headerText: {
+    fontSize: 12,
+    lineHeight: 14,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
   header: {
     display: 'flex',
     flexDirection: 'row',
-    height: 30,
+    minHeight: 38,
     borderBottomWidth: StyleSheet.hairlineWidth * 2,
     borderTopWidth: StyleSheet.hairlineWidth * 2,
     fontWeight: 'bold',
@@ -149,8 +179,10 @@ const localStyles = StyleSheet.create({
     borderBottomWidth: 0,
   },
   title: {
-    paddingVertical: 0,
-    alignItems: 'center',
+    flex: 1,
+    flexShrink: 1,
+    paddingVertical: 4,
+    paddingHorizontal: 1,
   },
   total: {
     minHeight: 30,

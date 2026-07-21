@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { View, FlatList, SectionListData, StyleSheet } from 'react-native';
 import { globalStyles as styles, IListItemProps, LargeText, MediumText } from '@lib/mobile-ui';
-import { refSelectors } from '@lib/store';
+import { refSelectors, useSelector } from '@lib/store';
 import { Divider } from 'react-native-paper';
 
 import { useTheme } from '@react-navigation/native';
@@ -24,6 +24,10 @@ export interface IItem {
 const OrderListTotal = ({ sectionOrders }: IItem) => {
   const { colors } = useTheme();
 
+  const settings = useSelector((state) => state.settings.data);
+  const isUseRemains = settings?.isUseRemains?.data as boolean;
+  const isUseUnitMeasure = (settings?.isUseUnitMeasure?.data ?? true) as boolean;
+
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;
   const firstLevelGroups = groups?.filter((item) => !item.parent?.id);
   const orders = useFilteredDocList<IOrderDocument>('order');
@@ -38,8 +42,8 @@ const OrderListTotal = ({ sectionOrders }: IItem) => {
   }, [sectionOrders.data, orders]);
 
   const totalListByOrders = useMemo(
-    () => totalListByGroup(firstLevelGroups, groups, orderLines),
-    [firstLevelGroups, groups, orderLines],
+    () => totalListByGroup(firstLevelGroups, groups, orderLines, isUseUnitMeasure, isUseRemains),
+    [firstLevelGroups, groups, orderLines, isUseUnitMeasure, isUseRemains],
   );
 
   const total = useMemo(() => totalList(totalListByOrders), [totalListByOrders]);
@@ -52,14 +56,17 @@ const OrderListTotal = ({ sectionOrders }: IItem) => {
             <View style={localStyles.name}>
               <MediumText>{item.group.name}</MediumText>
             </View>
-            <View style={localStyles.quantity}>
-              <MediumText>{formatValue({ type: 'number' }, round(item.quantity, 3))}</MediumText>
+            <View style={localStyles.values}>
+              <MediumText>{formatValue({ type: 'number' }, round(item.weight, 3))} кг</MediumText>
+              {!isUseUnitMeasure ? (
+                <MediumText>{formatValue({ type: 'number' }, round(item.pieces, 3))} шт</MediumText>
+              ) : null}
             </View>
           </View>
         </View>
       </View>
     ),
-    [],
+    [isUseUnitMeasure],
   );
 
   return (
@@ -67,8 +74,12 @@ const OrderListTotal = ({ sectionOrders }: IItem) => {
       <Divider style={{ backgroundColor: colors.primary }} />
       {totalListByOrders?.length ? (
         <>
-          <View style={[localStyles.margins, styles.rowCenter]}>
-            <LargeText style={styles.textTotal}>Итого вес, кг:</LargeText>
+          <View style={[localStyles.margins, styles.directionRow, localStyles.headerRow]}>
+            <LargeText style={[styles.textTotal, localStyles.name]}>Итого по группам</LargeText>
+            <View style={localStyles.values}>
+              <LargeText style={styles.textTotal}>Вес, кг</LargeText>
+              {!isUseUnitMeasure ? <LargeText style={styles.textTotal}>Шт</LargeText> : null}
+            </View>
           </View>
           <Divider style={{ backgroundColor: colors.primary }} />
           <FlatList
@@ -83,9 +94,17 @@ const OrderListTotal = ({ sectionOrders }: IItem) => {
       <View style={[styles.directionRow, localStyles.margins]}>
         <LargeText style={styles.textTotal}>Общий вес, кг: </LargeText>
         <MediumText style={styles.textTotal}>
-          {formatValue({ type: 'number' }, round(total?.quantity || 0, 3))}
+          {formatValue({ type: 'number' }, round(total?.weight || 0, 3))}
         </MediumText>
       </View>
+      {!isUseUnitMeasure ? (
+        <View style={[styles.directionRow, localStyles.margins]}>
+          <LargeText style={styles.textTotal}>Общее количество, шт: </LargeText>
+          <MediumText style={styles.textTotal}>
+            {formatValue({ type: 'number' }, round(total?.pieces || 0, 3))}
+          </MediumText>
+        </View>
+      ) : null}
       <Divider style={{ backgroundColor: colors.primary }} />
       <View style={[styles.directionColumn, localStyles.margins]}>
         <View style={styles.itemNoMargin}>
@@ -111,11 +130,17 @@ const localStyles = StyleSheet.create({
   groupMargin: {
     marginHorizontal: 5,
   },
+  headerRow: {
+    alignItems: 'center',
+  },
   name: {
     flex: 1,
     maxWidth: '80%',
   },
-  quantity: {
-    flex: undefined,
+  values: {
+    flexDirection: 'row',
+    gap: 12,
+    minWidth: 80,
+    justifyContent: 'flex-end',
   },
 });

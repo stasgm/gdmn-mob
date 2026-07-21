@@ -183,7 +183,7 @@ export interface IOrderHead extends IHead {
   onDate: string; //  Дата отгрузки
   takenOrder?: TakeOrderType; //тип взятия заявки
   comment?: string;
-  expeditor?: IReferenceData;
+  expeditor?: IReferenceData; // экспедитор
 }
 
 export interface IOrderLine extends IEntity {
@@ -196,7 +196,8 @@ export interface IOrderLine extends IEntity {
 
 export interface IOrderTotalLine {
   group: INamedEntity;
-  quantity: number;
+  weight: number;
+  pieces: number;
   sum: number;
   sumVat: number;
 }
